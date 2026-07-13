@@ -1,0 +1,77 @@
+/* _kit/reset.css — shared baseline. Read-only for idea agents: never edit this file.
+   Deliberately contains NO colors, NO typography choices and NO component styles.
+   Each idea owns its own visual identity; this only removes browser defaults
+   and guarantees the accessibility floor. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul[role="list"], ol[role="list"] { list-style: none; }
+
+body {
+  min-height: 100svh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Mobile-first non-negotiable: the page never scrolls sideways at any width.
+     Wide things (tables, charts) scroll inside their own container instead. */
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, button, input, label { line-height: 1.2; }
+
+img, picture, svg, video, canvas {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select { font: inherit; color: inherit; }
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  /* Touch target floor — enforced, not aspirational. */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+a { color: inherit; }
+
+table { border-collapse: collapse; }
+
+/* Focus must always be visible. Ideas may restyle the ring, never remove it. */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.visually-hidden:not(:focus):not(:active) {
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Anything that must scroll horizontally does so in its own box. */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

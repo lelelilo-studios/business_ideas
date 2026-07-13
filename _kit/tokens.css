@@ -1,0 +1,51 @@
+/* _kit/tokens.css — spacing & type SCALE only. Read-only for idea agents.
+   There are no colors here on purpose. Every idea picks its own palette,
+   its own fonts and its own art direction; if the ten sites share a palette
+   they will look like ten pages of the same template, which is the exact
+   failure we are designing against.
+
+   Use these for RHYTHM (consistent spacing/size relationships), then make
+   every other visual decision yourself. */
+
+:root {
+  /* Fluid type scale. Clamps mean the same tokens work at 390px and 1440px
+     without a stack of media queries. */
+  --step--1: clamp(0.83rem, 0.80rem + 0.15vw, 0.92rem);
+  --step-0:  clamp(1.00rem, 0.95rem + 0.25vw, 1.13rem);
+  --step-1:  clamp(1.20rem, 1.10rem + 0.50vw, 1.50rem);
+  --step-2:  clamp(1.44rem, 1.26rem + 0.90vw, 2.00rem);
+  --step-3:  clamp(1.73rem, 1.42rem + 1.55vw, 2.66rem);
+  --step-4:  clamp(2.07rem, 1.57rem + 2.50vw, 3.55rem);
+  --step-5:  clamp(2.49rem, 1.68rem + 4.05vw, 4.73rem);
+
+  /* Spacing scale. */
+  --sp-3xs: 0.25rem;
+  --sp-2xs: 0.5rem;
+  --sp-xs:  0.75rem;
+  --sp-s:   1rem;
+  --sp-m:   1.5rem;
+  --sp-l:   2rem;
+  --sp-xl:  3rem;
+  --sp-2xl: 4rem;
+  --sp-3xl: 6rem;
+
+  /* Layout. */
+  --measure: 68ch;      /* max line length for readable prose */
+  --gutter: var(--sp-s);
+  --container: 1200px;
+}
+
+@media (min-width: 48em) {
+  :root { --gutter: var(--sp-m); }
+}
+
+/* Mobile-first container. Base styles are the PHONE layout; you layer
+   desktop on top with min-width queries, never the other way around. */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.prose { max-width: var(--measure); }
