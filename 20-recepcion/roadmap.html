@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap — Fonalta</title>
+<meta name="description" content="Del día 1 al mes 24: seis hitos, cada uno con su criterio de muerte declarado. Trayectoria de MRR en tres escenarios, caja con el valle marcado, y la probabilidad de éxito como rango con su derivación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  .doc { padding: var(--sp-l) 0 var(--sp-2xl); }
+  .doc h2 { margin-bottom: var(--sp-s); }
+  .doc h3 { margin: var(--sp-l) 0 var(--sp-2xs); }
+  .doc p { color: var(--tiza-2); max-width: 68ch; margin-bottom: var(--sp-s); }
+  .doc h2 + p, .doc h3 + p { margin-top: 0; }
+  .cuenta {
+    font-family: 'Chivo Mono', monospace; font-size: 0.84rem;
+    background: var(--panel); border: 1px solid var(--linea);
+    border-left: 2px solid var(--ambar); border-radius: var(--radio);
+    padding: var(--sp-s); color: var(--tiza-2);
+    margin-bottom: var(--sp-s); overflow-x: auto;
+  }
+  .cuenta b { color: var(--tiza); font-weight: 600; }
+  .cuenta .r { color: var(--ambar); }
+
+  /* ---- los hitos ---- */
+  .hito {
+    display: grid; gap: var(--sp-s);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio);
+    background: var(--panel);
+    padding: var(--sp-m);
+    margin-bottom: var(--sp-s);
+  }
+  @media (min-width: 56em) { .hito { grid-template-columns: 160px 1fr; } }
+  .hito__id { display: grid; gap: 4px; align-content: start; }
+  .hito__id b {
+    font-family: 'Chivo Mono', monospace; font-size: 1.5rem; font-weight: 600;
+    color: var(--ambar); letter-spacing: -0.02em; line-height: 1;
+  }
+  .hito__id span { font-family: 'Chivo Mono', monospace; font-size: 0.72rem; color: var(--tiza-3); }
+  .hito h3 { margin: 0 0 var(--sp-2xs); font-size: var(--step-1); }
+  .hito p { margin-bottom: var(--sp-xs); }
+  .hito dl { display: grid; gap: var(--sp-2xs); margin: var(--sp-s) 0; }
+  @media (min-width: 40em) { .hito dl { grid-template-columns: repeat(3, 1fr); } }
+  .hito dt {
+    font-family: 'Chivo Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--tiza-3);
+  }
+  .hito dd { margin: 2px 0 0; font-family: 'Chivo Mono', monospace; font-size: 0.9rem; color: var(--tiza); }
+  .muerte {
+    border-left: 2px solid var(--c3);
+    background: color-mix(in srgb, var(--c3) 7%, transparent);
+    border-radius: 0 var(--radio) var(--radio) 0;
+    padding: var(--sp-s);
+    margin-top: var(--sp-s);
+  }
+  .muerte b {
+    display: flex; align-items: center; gap: 7px;
+    font-family: 'Chivo Mono', monospace; font-size: 0.64rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--c3);
+    margin-bottom: 5px;
+  }
+  .muerte b svg { width: 13px; height: 13px; flex: none; }
+  .muerte p { margin: 0; color: var(--tiza); font-size: 0.94rem; }
+  .muerte em { color: var(--tiza-3); font-style: normal; font-size: 0.82rem; display: block; margin-top: 5px; font-family: 'Chivo Mono', monospace; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 12h2.5M7 12V6M11 12V3M15 12v-7M19 12V8M22 12h-1" stroke="#F0A93F"/>
+        <path d="M2 16h20" opacity=".3"/>
+      </svg>
+      Fonalta
+    </a>
+    <button class="nav__btn" aria-expanded="false" aria-controls="nav-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+    <nav class="nav__menu" id="nav-menu" data-abierto="no" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="container">
+    <p class="kicker">Roadmap · día 1 → mes 24</p>
+    <h1 style="font-size:var(--step-3)">Seis hitos, y la observación que debería hacernos parar en cada uno.</h1>
+    <p class="lede" style="max-width:58ch">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Éstos están escritos para que un juez automático los pueda aplicar sin discutir.</p>
+
+    <figure class="fig mt-l">
+      <figcaption class="fig__t">Los seis hitos</figcaption>
+      <p class="fig__s">El triángulo rojo marca que ese hito tiene un criterio de muerte declarado. Todos lo tienen.</p>
+      <div class="scroll-x">
+<svg viewBox="0 0 720 150" role="img" aria-labelledby="t-tl d-tl">
+  <title id="t-tl">Línea de tiempo de los seis hitos, del día 1 al mes 24</title>
+  <desc id="d-tl">Seis hitos entre el día 1 y el mes 24. Cada uno lleva marcado su criterio de muerte: la observación que debería hacer parar el proyecto.</desc>
+  <line x1="34" y1="74" x2="660" y2="74" stroke="var(--linea-2)" stroke-width="2"/>
+  <line x1="73.12" y1="74" x2="73.12" y2="56" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="73.12" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="73.12" y="46" text-anchor="start" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M1</text>
+  <text x="73.12" y="32" text-anchor="start" class="ejeT">día 45</text>
+  <path d="M68.62,79 l4.5,7 l4.5,-7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <line x1="112.25" y1="74" x2="112.25" y2="92" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="112.25" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="112.25" y="114" text-anchor="middle" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M2</text>
+  <text x="112.25" y="127" text-anchor="middle" class="ejeT">mes 3</text>
+  <path d="M107.75,69 l4.5,-7 l4.5,7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <line x1="190.5" y1="74" x2="190.5" y2="56" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="190.5" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="190.5" y="46" text-anchor="middle" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M3</text>
+  <text x="190.5" y="32" text-anchor="middle" class="ejeT">mes 6</text>
+  <path d="M186.0,79 l4.5,7 l4.5,-7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <line x1="347.0" y1="74" x2="347.0" y2="92" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="347.0" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="347.0" y="114" text-anchor="middle" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M4</text>
+  <text x="347.0" y="127" text-anchor="middle" class="ejeT">mes 12</text>
+  <path d="M342.5,69 l4.5,-7 l4.5,7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <line x1="503.5" y1="74" x2="503.5" y2="56" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="503.5" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="503.5" y="46" text-anchor="middle" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M5</text>
+  <text x="503.5" y="32" text-anchor="middle" class="ejeT">mes 18</text>
+  <path d="M499.0,79 l4.5,7 l4.5,-7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <line x1="660.0" y1="74" x2="660.0" y2="92" stroke="var(--ambar-deep)" stroke-width="1.5"/>
+  <circle cx="660.0" cy="74" r="6" fill="var(--ambar)" stroke="var(--panel)" stroke-width="2"/>
+  <text x="660.0" y="114" text-anchor="end" style="font-family:'Chivo Mono',monospace;font-size:12.5px;font-weight:600;fill:var(--ambar)">M6</text>
+  <text x="660.0" y="127" text-anchor="end" class="ejeT">mes 24</text>
+  <path d="M655.5,69 l4.5,-7 l4.5,7 z" fill="var(--c3)" transform="translate(0,0)"/>
+  <path d="M34,142 l4.5,-7 l4.5,7 z" fill="var(--c3)"/>
+  <text x="50" y="144" class="ejeT">cada hito tiene declarado su criterio de muerte</text>
+</svg>
+      </div>
+    </figure>
+  </div>
+
+  <div class="container">
+
+    <!-- ═══════════════════════════════════════════ HITOS ═════════════ -->
+    <section style="border:0">
+      <h2>Los hitos</h2>
+
+      <div class="hito">
+        <div class="hito__id"><b>M1</b><span>día 45</span><span class="pin pin--ambar" style="justify-self:start">El go/no-go</span></div>
+        <div>
+          <h3>5 pilotos, 300 llamadas reales, una sola pregunta</h3>
+          <p>Cinco veterinarias de Ñuñoa, Providencia y Maipú. Gratis. Desvío sólo después de las 19:00 y fines de semana. La pregunta no es si el producto funciona: es <strong>si el chileno acepta hablar con una máquina que se declara máquina</strong>.</p>
+          <p><strong>Qué es cierto si lo logras:</strong> la apuesta cultural sobre la que descansa todo el negocio está confirmada, con datos, y costó menos de dos meses.</p>
+          <dl>
+            <div><dt>Caja requerida</dt><dd>$4,2M</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR</dt><dd>$0</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte</b>
+            <p>Si en 300 llamadas reales <strong>más del 25% de quienes llaman cuelga en los primeros 15 segundos</strong> —o sea, justo después de oír que es una IA— el formato no es aceptable culturalmente en Chile y no hay nada que arreglar. <strong>Se mata.</strong></p>
+            <em>acción: matar · muestra mínima: 300 llamadas · no hay pivote, hay cierre</em>
+          </div>
+          <div class="muerte" style="border-left-color:var(--alerta);background:color-mix(in srgb, var(--alerta) 7%, transparent)">
+            <b style="color:var(--alerta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte del producto</b>
+            <p>Si el <strong>p95 de latencia por turno pasa de 1.500 ms</strong> durante una semana y no baja con optimización, la voz no va a sonar viva y el argumento técnico central se cae. <strong>Se pausa</strong> hasta arreglar el pipeline; si no se arregla en 30 días, se mata.</p>
+            <em>acción: pausar → matar a los 30 días</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito__id"><b>M2</b><span>mes 3</span></div>
+        <div>
+          <h3>Alguien que nunca habló con nosotros paga con su tarjeta</h3>
+          <p>Self-serve completo: registro, número, desvío guiado por operadora, ficha, Flow. El hito no es «tener clientes»: es <strong>que la venta ocurra sin que ningún humano intervenga</strong>. Es la prueba de que el mandato de autonomía es real y no una intención.</p>
+          <p><strong>Qué es cierto si lo logras:</strong> existe un negocio que una máquina puede operar.</p>
+          <dl>
+            <div><dt>Caja requerida</dt><dd>$8,9M acum.</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR base</dt><dd>$312.000</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte</b>
+            <p>Con <strong>200 pruebas iniciadas</strong>, si <strong>cero</strong> personas pagaron sin que un humano interviniera en la venta, el producto no es self-serve. <strong>Se mata</strong> —o se convierte en otra empresa, una con vendedores, que no es la que estamos construyendo.</p>
+            <em>acción: matar · muestra mínima: 200 pruebas</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito__id"><b>M3</b><span>mes 6</span></div>
+        <div>
+          <h3>16 clientes pagando, y se quedan</h3>
+          <p>El canal de intención ya saturó en su techo (~6 clientes/mes) y el SEO recién empieza a mover la aguja. Lo que importa acá <strong>no es el crecimiento, es la retención</strong>: un producto de voz se juzga cada llamada, y basta un mal minuto para que el dueño desactive el desvío.</p>
+          <p><strong>Qué es cierto si lo logras:</strong> el producto entrega valor sostenido, no una primera impresión.</p>
+          <dl>
+            <div><dt>Caja requerida</dt><dd>$11,0M acum.</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR base</dt><dd>$1,22M</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte</b>
+            <p><strong>Churn sobre 12% mensual, sostenido dos meses seguidos</strong>, con al menos 15 clientes. A ese churn el LTV cae a $427.600 y el LTV/CAC a 3,9: el negocio existe pero deja de ser interesante para escalar con publicidad, que es lo único que sabemos hacer sin humanos. <strong>Se mata.</strong></p>
+            <em>acción: matar · muestra mínima: 15 clientes · 2 meses consecutivos</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito__id"><b>M4</b><span>mes 12</span><span class="pin" style="justify-self:start">Venta repetible</span></div>
+        <div>
+          <h3>72 clientes, CAC bajo control, y el SEO empieza a componer</h3>
+          <p>El canal de intención da 6 clientes/mes y no va a dar más nunca. Si en el mes 12 el SEO no está trayendo al menos la mitad de los clientes nuevos, <strong>este negocio tiene un techo y hay que saberlo ahora</strong>, no en el mes 20.</p>
+          <p><strong>Qué es cierto si lo logras:</strong> hay un motor de crecimiento que no depende de gastar más plata cada mes.</p>
+          <dl>
+            <div><dt>Caja en el valle</dt><dd>$15,6M (m13)</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR base</dt><dd>$5,37M</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte · el canal</b>
+            <p><strong>CAC sobre 3× el ARPU mensual (más de $223.500) durante 8 semanas</strong>, con al menos 60 conversiones acumuladas de muestra. <strong>Se pausa el canal pagado</strong> —no se mata la empresa: se apaga el gasto y se vive del SEO y de los referidos hasta entender qué pasó.</p>
+            <em>acción: pausar · muestra mínima: 60 conversiones · ventana: 8 semanas</em>
+          </div>
+          <div class="muerte" style="border-left-color:var(--alerta);background:color-mix(in srgb, var(--alerta) 7%, transparent)">
+            <b style="color:var(--alerta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte · el motor</b>
+            <p>Chequeo adelantado, en el <strong>mes 9</strong>: si el tráfico orgánico no llegó a <strong>250 visitas/mes</strong>, el SEO programático no está rankeando y el motor de crecimiento no existe. El negocio queda con techo de ~6 clientes/mes. <strong>Se reduce</strong> el gasto a mínimos y se replantea el canal antes de quemar el resto de la caja.</p>
+            <em>acción: reducir · corte: mes 9 · umbral: 250 visitas orgánicas/mes</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito__id"><b>M5</b><span>mes 18</span></div>
+        <div>
+          <h3>162 clientes y el margen aguanta</h3>
+          <p>Con volumen, el costo por minuto deja de ser una planilla y se vuelve real. Acá se sabe si el 69% de margen bruto era verdad o era optimismo. También entran los rubros 2 y 3 (talleres, hoteles) y con ellos guiones más difíciles.</p>
+          <p><strong>Qué es cierto si lo logras:</strong> el negocio es rentable a escala, no sólo en la planilla.</p>
+          <dl>
+            <div><dt>Caja</dt><dd>$23,4M</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR base</dt><dd>$12,0M</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte</b>
+            <p><strong>Margen bruto bajo 50%, dos meses seguidos.</strong> Significa que el costo por minuto se comió el precio: o la gente habla mucho más de lo supuesto, o el TTS subió, o los planes están mal calibrados. <strong>Se pausa</strong> la adquisición y se re-precia. Si a los 3 meses el margen no vuelve sobre 60%, <strong>se mata</strong>: un SaaS de 50% de margen bruto no soporta el CAC de un canal pagado.</p>
+            <em>acción: pausar → matar a los 3 meses · 2 meses consecutivos</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito__id"><b>M6</b><span>mes 24</span><span class="pin pin--ambar" style="justify-self:start">Decisión</span></div>
+        <div>
+          <h3>264 clientes · US$246k de ARR · y la pregunta de verdad</h3>
+          <p>En el escenario base el negocio está vivo, es rentable, lo operan dos personas y crece solo. <strong>Y está topado.</strong> El canal de intención de Chile está agotado desde el mes 6 y el SEO ya cubrió las comunas que valen la pena. La decisión del mes 24 <strong>no es sobre si el negocio funciona: es sobre si vale la pena hacerlo más grande.</strong></p>
+          <ul style="margin-left:var(--sp-m);color:var(--tiza-2);margin-bottom:var(--sp-s)">
+            <li><strong>Levantar</strong> — sólo tiene sentido si la respuesta es LatAm (México, Colombia, Perú). Mismo producto, otro acento, otra telefonía. Un TAM 15–20× más grande y competidores americanos ya adentro. Es una carrera, y las carreras se financian.</li>
+            <li><strong>Bootstrapear</strong> — el resultado modal. US$250–400k de ARR, dos socios, márgenes de 70%, sin jefe. Para muchos, ésta es la respuesta correcta y nadie lo dice en voz alta.</li>
+            <li><strong>Matar</strong> — si el churn se estabilizó sobre 8% y el CAC sobre $200.000, esto es un trabajo mal pagado con forma de empresa. Se vende la base de clientes o se cierra.</li>
+          </ul>
+          <dl>
+            <div><dt>Caja</dt><dd>$60,5M</dd></div>
+            <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+            <div><dt>MRR base</dt><dd>$19,7M</dd></div>
+          </dl>
+          <div class="muerte">
+            <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> Criterio de muerte</b>
+            <p><strong>MRR bajo $6M en el mes 24</strong> —el escenario pesimista— con la caja bajo $10M. A ese ritmo no se llega a nada relevante y los dos fundadores están subsidiando el proyecto con su tiempo. <strong>Se mata</strong> o se vende la base.</p>
+            <em>acción: matar · corte: mes 24</em>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ MRR ═══════════════ -->
+    <section id="mrr">
+      <h2>Trayectoria de MRR</h2>
+      <p>Tres escenarios, movidos por supuestos declarados. Lo que cambia entre ellos no es el optimismo: son cuatro números.</p>
+
+      <div class="scroll-x mb-m">
+        <table class="tabla">
+          <caption class="visually-hidden">Supuestos de cada escenario</caption>
+          <thead><tr><th>Escenario</th><th class="n">Churn</th><th class="n">ARPU</th><th class="n">Landing → prueba</th><th class="n">Prueba → pago</th><th class="n">MRR mes 24</th><th class="n">ARR mes 24</th></tr></thead>
+          <tbody>
+            <tr><td>Pesimista</td><td class="n mono">9,0%</td><td class="n mono">$62.000</td><td class="n mono">3,0%</td><td class="n mono">16%</td><td class="n mono">$6,07M</td><td class="n mono">US$76k</td></tr>
+            <tr><td><strong>Base</strong></td><td class="n mono">5,0%</td><td class="n mono">$74.500</td><td class="n mono">4,0%</td><td class="n mono">22%</td><td class="n mono">$19,7M</td><td class="n mono">US$246k</td></tr>
+            <tr><td>Optimista</td><td class="n mono">3,5%</td><td class="n mono">$86.000</td><td class="n mono">5,5%</td><td class="n mono">28%</td><td class="n mono">$44,2M</td><td class="n mono">US$553k</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="fig">
+        <figcaption class="fig__t">MRR mes a mes, en millones de pesos</figcaption>
+        <p class="fig__s">Los tres escenarios están topados por lo mismo: el canal de intención satura en ~700 clics/mes y de ahí en adelante todo el crecimiento lo pone el SEO. Por eso ninguna curva despega — <strong>no hay viralidad en esto</strong>, hay acumulación.</p>
+        <div class="leyenda">
+          <span><i class="linea" style="background:#F0B85A"></i> Optimista</span>
+          <span><i class="linea" style="background:#C4841E"></i> Base</span>
+          <span><i class="linea" style="background:#8A5E15"></i> Pesimista</span>
+        </div>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="t-mrr d-mrr">
+  <title id="t-mrr">Trayectoria de MRR a 24 meses en tres escenarios</title>
+  <desc id="d-mrr">En el escenario base el MRR llega a 19,7 millones de pesos en el mes 24. El pesimista llega a 6,1 y el optimista a 44,2.</desc>
+  <line class="malla" x1="44" y1="248" x2="640" y2="248"/>
+  <text class="ejeT" x="36" y="251.5" text-anchor="end">0</text>
+  <line class="malla" x1="44" y1="170.67" x2="640" y2="170.67"/>
+  <text class="ejeT" x="36" y="174.17" text-anchor="end">15</text>
+  <line class="malla" x1="44" y1="93.33" x2="640" y2="93.33"/>
+  <text class="ejeT" x="36" y="96.83" text-anchor="end">30</text>
+  <line class="malla" x1="44" y1="16" x2="640" y2="16"/>
+  <text class="ejeT" x="36" y="19.5" text-anchor="end">45</text>
+  <text class="ejeT" x="36" y="6" text-anchor="end">M$</text>
+  <text class="ejeT" x="44" y="266" text-anchor="middle">m1</text>
+  <text class="ejeT" x="173.57" y="266" text-anchor="middle">m6</text>
+  <text class="ejeT" x="329.04" y="266" text-anchor="middle">m12</text>
+  <text class="ejeT" x="484.52" y="266" text-anchor="middle">m18</text>
+  <text class="ejeT" x="640" y="266" text-anchor="middle">m24</text>
+  <polyline points="44,248 69.91,247.02 95.83,246.87 121.74,246.5 147.65,245.89 173.57,245.06 199.48,244.08 225.39,243 251.3,241.76 277.22,240.47 303.13,239.03 329.04,237.53 354.96,235.88 380.87,234.13 406.78,232.38 432.7,230.63 458.61,228.87 484.52,227.12 510.43,225.37 536.35,223.61 562.26,221.86 588.17,220.11 614.09,218.41 640,216.71" fill="none" stroke="#8A5E15" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="640" cy="216.71" r="4" fill="#8A5E15" stroke="var(--panel)" stroke-width="2"/>
+  <text class="marcaT" x="650" y="220.71">6,1M</text>
+  <text class="ejeT" x="650" y="233.71">pesimista</text>
+  <polyline points="44,248 69.91,246.87 95.83,246.4 121.74,245.37 147.65,243.82 173.57,241.71 199.48,239.24 225.39,236.3 251.3,232.95 277.22,229.18 303.13,224.95 329.04,220.31 354.96,215.21 380.87,209.64 406.78,203.92 432.7,198.04 458.61,192.11 484.52,185.98 510.43,179.69 536.35,173.24 562.26,166.7 588.17,160.05 614.09,153.4 640,146.69" fill="none" stroke="#C4841E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="640" cy="146.69" r="4" fill="#C4841E" stroke="var(--panel)" stroke-width="2"/>
+  <text class="marcaT" x="650" y="150.69">19,7M</text>
+  <text class="ejeT" x="650" y="163.69">base</text>
+  <polyline points="44,248 69.91,246.66 95.83,245.68 121.74,243.57 147.65,240.32 173.57,235.88 199.48,230.63 225.39,224.39 251.3,217.27 277.22,209.13 303.13,200 329.04,189.79 354.96,178.61 380.87,166.28 406.78,153.5 432.7,140.3 458.61,126.74 484.52,112.67 510.43,98.18 536.35,83.18 562.26,67.76 588.17,52.14 614.09,36.26 640,20.12" fill="none" stroke="#F0B85A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="640" cy="20.12" r="4" fill="#F0B85A" stroke="var(--panel)" stroke-width="2"/>
+  <text class="marcaT" x="650" y="24.12">44,2M</text>
+  <text class="ejeT" x="650" y="37.12">optimista</text>
+  <line class="malla" x1="95.83" y1="16" x2="95.83" y2="248" stroke="var(--linea)"/>
+  <text class="ejeT" x="95.83" y="14" text-anchor="middle" fill="var(--tiza-3)">M2</text>
+  <line class="malla" x1="173.57" y1="16" x2="173.57" y2="248" stroke="var(--linea)"/>
+  <text class="ejeT" x="173.57" y="14" text-anchor="middle" fill="var(--tiza-3)">M3</text>
+  <line class="malla" x1="329.04" y1="16" x2="329.04" y2="248" stroke="var(--linea)"/>
+  <text class="ejeT" x="329.04" y="14" text-anchor="middle" fill="var(--tiza-3)">M4</text>
+  <line class="malla" x1="484.52" y1="16" x2="484.52" y2="248" stroke="var(--linea)"/>
+  <text class="ejeT" x="484.52" y="14" text-anchor="middle" fill="var(--tiza-3)">M5</text>
+  <line class="malla" x1="640" y1="16" x2="640" y2="248" stroke="var(--linea)"/>
+  <text class="ejeT" x="640" y="14" text-anchor="middle" fill="var(--tiza-3)">M6</text>
+</svg>
+        </div>
+        <p class="fig__n">Modelo por canal, no por presupuesto: los nuevos clientes de cada mes salen de (clics de intención × conversión) + (visitas SEO × conversión) + (clics amplios × conversión) + referidos, menos el churn. La rampa de SEO supuesta va de 0 a 3.500 visitas/mes en 24 meses.</p>
+      </figure>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ CAJA ══════════════ -->
+    <section id="caja">
+      <h2>Caja</h2>
+      <p>Se parte con <strong>$30 millones</strong>: $15M de ahorros de los dos fundadores y $15M de un Semilla Inicia de Corfo (subsidio que existe y al que este proyecto califica; si no sale, el valle se vuelve negativo y hay que recortar la publicidad del primer año).</p>
+      <p>Los fundadores <strong>no se pagan sueldo los primeros 8 meses</strong>. Desde el mes 9 se pagan $1.000.000 cada uno. Ése es el escalón que se ve en el gráfico de gastos.</p>
+
+      <figure class="fig">
+        <figcaption class="fig__t">Saldo de caja, escenario base</figcaption>
+        <p class="fig__s">El valle es de <strong>$15,6 millones en el mes 13</strong>. Nunca se toca fondo. Si el escenario real es el pesimista, el valle cae a ~$2M en el mes 16 y hay que cortar publicidad antes.</p>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 250" role="img" aria-labelledby="t-caja d-caja">
+  <title id="t-caja">Saldo de caja mes a mes, escenario base</title>
+  <desc id="d-caja">La caja parte en 30 millones, toca su valle en 15,6 millones el mes 13 y se recupera después del punto de equilibrio.</desc>
+  <line class="malla" x1="44" y1="196" x2="690" y2="196"/>
+  <text class="ejeT" x="36" y="199.5" text-anchor="end">0</text>
+  <line class="malla" x1="44" y1="140.62" x2="690" y2="140.62"/>
+  <text class="ejeT" x="36" y="144.12" text-anchor="end">20</text>
+  <line class="malla" x1="44" y1="85.23" x2="690" y2="85.23"/>
+  <text class="ejeT" x="36" y="88.73" text-anchor="end">40</text>
+  <line class="malla" x1="44" y1="29.85" x2="690" y2="29.85"/>
+  <text class="ejeT" x="36" y="33.35" text-anchor="end">60</text>
+  <text class="ejeT" x="36" y="8" text-anchor="end">M$</text>
+  <polygon points="44,196 44,115.42 72.09,117.49 100.17,120.73 128.26,123.97 156.35,126.99 184.43,129.62 212.52,131.59 240.61,132.94 268.7,139.09 296.78,144.33 324.87,148.48 352.96,151.42 381.04,152.94 409.13,152.88 437.22,150.78 465.3,146.49 493.39,140.01 521.48,131.26 549.57,120.18 577.65,106.72 605.74,90.82 633.83,72.49 661.91,51.7 690,28.38 690,196" fill="var(--c1)" fill-opacity="0.10"/>
+  <polyline points="44,115.42 72.09,117.49 100.17,120.73 128.26,123.97 156.35,126.99 184.43,129.62 212.52,131.59 240.61,132.94 268.7,139.09 296.78,144.33 324.87,148.48 352.96,151.42 381.04,152.94 409.13,152.88 437.22,150.78 465.3,146.49 493.39,140.01 521.48,131.26 549.57,120.18 577.65,106.72 605.74,90.82 633.83,72.49 661.91,51.7 690,28.38" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="381.04" y1="152.94" x2="381.04" y2="196" stroke="var(--c3)" stroke-width="1.5"/>
+  <circle cx="381.04" cy="152.94" r="4.5" fill="var(--c3)" stroke="var(--panel)" stroke-width="2"/>
+  <text class="marcaT" x="381.04" y="140.94" text-anchor="middle" fill="var(--c3)">valle · $15,6M · mes 13</text>
+  <line class="malla" x1="409.13" y1="16" x2="409.13" y2="196" stroke="var(--linea-2)"/>
+  <text class="ejeT" x="415.13" y="26" fill="var(--tiza-2)">equilibrio · m14</text>
+  <circle cx="690" cy="28.38" r="4" fill="var(--c1)" stroke="var(--panel)" stroke-width="2"/>
+  <text class="marcaT" x="690" y="17.38" text-anchor="end">$60,5M</text>
+  <text class="ejeT" x="44" y="214" text-anchor="middle">m1</text>
+  <text class="ejeT" x="184.43" y="214" text-anchor="middle">m6</text>
+  <text class="ejeT" x="352.96" y="214" text-anchor="middle">m12</text>
+  <text class="ejeT" x="521.48" y="214" text-anchor="middle">m18</text>
+  <text class="ejeT" x="690" y="214" text-anchor="middle">m24</text>
+</svg>
+        </div>
+      </figure>
+
+      <figure class="fig mt-m">
+        <figcaption class="fig__t">Ingreso contra gasto, mes a mes</figcaption>
+        <p class="fig__s">El punto de equilibrio es el <strong>mes 14</strong>. El salto del mes 9 en el gasto es el sueldo de los fundadores, no un error del gráfico.</p>
+        <div class="leyenda">
+          <span><i style="background:var(--c4)"></i> Ingreso</span>
+          <span><i style="background:var(--c3)"></i> Gasto (COGS + publicidad + sueldos + fijos)</span>
+        </div>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 250" role="img" aria-labelledby="t-ig d-ig">
+  <title id="t-ig">Ingreso contra gasto, mes a mes, escenario base</title>
+  <desc id="d-ig">El ingreso cruza al gasto en el mes 14. El salto del mes 9 es cuando los fundadores empiezan a pagarse sueldo.</desc>
+  <line class="malla" x1="44" y1="196" x2="700" y2="196"/>
+  <text class="ejeT" x="36" y="199.5" text-anchor="end">0</text>
+  <line class="malla" x1="44" y1="151" x2="700" y2="151"/>
+  <text class="ejeT" x="36" y="154.5" text-anchor="end">5</text>
+  <line class="malla" x1="44" y1="106" x2="700" y2="106"/>
+  <text class="ejeT" x="36" y="109.5" text-anchor="end">10</text>
+  <line class="malla" x1="44" y1="61" x2="700" y2="61"/>
+  <text class="ejeT" x="36" y="64.5" text-anchor="end">15</text>
+  <line class="malla" x1="44" y1="16" x2="700" y2="16"/>
+  <text class="ejeT" x="36" y="19.5" text-anchor="end">20</text>
+  <text class="ejeT" x="36" y="8" text-anchor="end">M$</text>
+  
+  <path d="M58.67,196 L58.67,190.9 Q58.67,187.9 61.67,187.9 L65.51,187.9 Q68.51,187.9 68.51,190.9 L68.51,196 Z" fill="var(--c3)"/>
+  <path d="M74.16,196 L74.16,196 Q74.16,194.02 76.14,194.02 L82.02,194.02 Q84,194.02 84,196 L84,196 Z" fill="var(--c4)"/>
+  <path d="M86,196 L86,190.27 Q86,187.27 89,187.27 L92.84,187.27 Q95.84,187.27 95.84,190.27 L95.84,196 Z" fill="var(--c3)"/>
+  <path d="M101.49,196 L101.49,196 Q101.49,193.21 104.28,193.21 L108.53999999999999,193.21 Q111.33,193.21 111.33,196 L111.33,196 Z" fill="var(--c4)"/>
+  <path d="M113.33,196 L113.33,185.68 Q113.33,182.68 116.33,182.68 L120.17,182.68 Q123.17,182.68 123.17,185.68 L123.17,196 Z" fill="var(--c3)"/>
+  <path d="M128.83,196 L128.83,194.41 Q128.83,191.41 131.83,191.41 L135.67000000000002,191.41 Q138.67000000000002,191.41 138.67000000000002,194.41 L138.67000000000002,196 Z" fill="var(--c4)"/>
+  <path d="M140.67,196 L140.67,183.88 Q140.67,180.88 143.67,180.88 L147.51,180.88 Q150.51,180.88 150.51,183.88 L150.51,196 Z" fill="var(--c3)"/>
+  <path d="M156.16,196 L156.16,191.71 Q156.16,188.71 159.16,188.71 L163,188.71 Q166,188.71 166,191.71 L166,196 Z" fill="var(--c4)"/>
+  <path d="M168,196 L168,181.81 Q168,178.81 171,178.81 L174.84,178.81 Q177.84,178.81 177.84,181.81 L177.84,196 Z" fill="var(--c3)"/>
+  <path d="M183.49,196 L183.49,188.02 Q183.49,185.02 186.49,185.02 L190.33,185.02 Q193.33,185.02 193.33,188.02 L193.33,196 Z" fill="var(--c4)"/>
+  <path d="M195.33,196 L195.33,179.47 Q195.33,176.47 198.33,176.47 L202.17000000000002,176.47 Q205.17000000000002,176.47 205.17000000000002,179.47 L205.17000000000002,196 Z" fill="var(--c3)"/>
+  <path d="M210.83,196 L210.83,183.7 Q210.83,180.7 213.83,180.7 L217.67000000000002,180.7 Q220.67000000000002,180.7 220.67000000000002,183.7 L220.67000000000002,196 Z" fill="var(--c4)"/>
+  <path d="M222.67,196 L222.67,177.31 Q222.67,174.31 225.67,174.31 L229.51,174.31 Q232.51,174.31 232.51,177.31 L232.51,196 Z" fill="var(--c3)"/>
+  <path d="M238.16,196 L238.16,178.57 Q238.16,175.57 241.16,175.57 L245,175.57 Q248,175.57 248,178.57 L248,196 Z" fill="var(--c4)"/>
+  <path d="M250,196 L250,174.16 Q250,171.16 253,171.16 L256.84,171.16 Q259.84,171.16 259.84,174.16 L259.84,196 Z" fill="var(--c3)"/>
+  <path d="M265.49,196 L265.49,172.72 Q265.49,169.72 268.49,169.72 L272.33,169.72 Q275.33,169.72 275.33,172.72 L275.33,196 Z" fill="var(--c4)"/>
+  <path d="M277.33,196 L277.33,152.74 Q277.33,149.74 280.33,149.74 L284.16999999999996,149.74 Q287.16999999999996,149.74 287.16999999999996,152.74 L287.16999999999996,196 Z" fill="var(--c3)"/>
+  <path d="M292.83,196 L292.83,166.15 Q292.83,163.15 295.83,163.15 L299.66999999999996,163.15 Q302.66999999999996,163.15 302.66999999999996,166.15 L302.66999999999996,196 Z" fill="var(--c4)"/>
+  <path d="M304.67,196 L304.67,149.14 Q304.67,146.14 307.67,146.14 L311.51,146.14 Q314.51,146.14 314.51,149.14 L314.51,196 Z" fill="var(--c3)"/>
+  <path d="M320.16,196 L320.16,158.77 Q320.16,155.77 323.16,155.77 L327,155.77 Q330,155.77 330,158.77 L330,196 Z" fill="var(--c4)"/>
+  <path d="M332,196 L332,145.27 Q332,142.27 335,142.27 L338.84,142.27 Q341.84,142.27 341.84,145.27 L341.84,196 Z" fill="var(--c3)"/>
+  <path d="M347.49,196 L347.49,150.67 Q347.49,147.67 350.49,147.67 L354.33,147.67 Q357.33,147.67 357.33,150.67 L357.33,196 Z" fill="var(--c4)"/>
+  <path d="M359.33,196 L359.33,141.22 Q359.33,138.22 362.33,138.22 L366.16999999999996,138.22 Q369.16999999999996,138.22 369.16999999999996,141.22 L369.16999999999996,196 Z" fill="var(--c3)"/>
+  <path d="M374.83,196 L374.83,141.76 Q374.83,138.76 377.83,138.76 L381.66999999999996,138.76 Q384.66999999999996,138.76 384.66999999999996,141.76 L384.66999999999996,196 Z" fill="var(--c4)"/>
+  <path d="M386.67,196 L386.67,136.81 Q386.67,133.81 389.67,133.81 L393.51,133.81 Q396.51,133.81 396.51,136.81 L396.51,196 Z" fill="var(--c3)"/>
+  <path d="M402.16,196 L402.16,132.04 Q402.16,129.04 405.16,129.04 L409,129.04 Q412,129.04 412,132.04 L412,196 Z" fill="var(--c4)"/>
+  <path d="M414,196 L414,132.22 Q414,129.22 417,129.22 L420.84,129.22 Q423.84,129.22 423.84,132.22 L423.84,196 Z" fill="var(--c3)"/>
+  <path d="M429.49,196 L429.49,122.05 Q429.49,119.05 432.49,119.05 L436.33,119.05 Q439.33,119.05 439.33,122.05 L439.33,196 Z" fill="var(--c4)"/>
+  <path d="M441.33,196 L441.33,128.89 Q441.33,125.89 444.33,125.89 L448.16999999999996,125.89 Q451.16999999999996,125.89 451.16999999999996,128.89 L451.16999999999996,196 Z" fill="var(--c3)"/>
+  <path d="M456.83,196 L456.83,111.79 Q456.83,108.79 459.83,108.79 L463.66999999999996,108.79 Q466.66999999999996,108.79 466.66999999999996,111.79 L466.66999999999996,196 Z" fill="var(--c4)"/>
+  <path d="M468.67,196 L468.67,125.74 Q468.67,122.74 471.67,122.74 L475.51,122.74 Q478.51,122.74 478.51,125.74 L478.51,196 Z" fill="var(--c3)"/>
+  <path d="M484.16,196 L484.16,101.44 Q484.16,98.44 487.16,98.44 L491,98.44 Q494,98.44 494,101.44 L494,196 Z" fill="var(--c4)"/>
+  <path d="M496,196 L496,122.5 Q496,119.5 499,119.5 L502.84,119.5 Q505.84,119.5 505.84,122.5 L505.84,196 Z" fill="var(--c3)"/>
+  <path d="M511.49,196 L511.49,90.73 Q511.49,87.73 514.49,87.73 L518.33,87.73 Q521.33,87.73 521.33,90.73 L521.33,196 Z" fill="var(--c4)"/>
+  <path d="M523.33,196 L523.33,119.17 Q523.33,116.17 526.33,116.17 L530.1700000000001,116.17 Q533.1700000000001,116.17 533.1700000000001,119.17 L533.1700000000001,196 Z" fill="var(--c3)"/>
+  <path d="M538.83,196 L538.83,79.75 Q538.83,76.75 541.83,76.75 L545.6700000000001,76.75 Q548.6700000000001,76.75 548.6700000000001,79.75 L548.6700000000001,196 Z" fill="var(--c4)"/>
+  <path d="M550.67,196 L550.67,115.75 Q550.67,112.75 553.67,112.75 L557.51,112.75 Q560.51,112.75 560.51,115.75 L560.51,196 Z" fill="var(--c3)"/>
+  <path d="M566.16,196 L566.16,68.5 Q566.16,65.5 569.16,65.5 L573,65.5 Q576,65.5 576,68.5 L576,196 Z" fill="var(--c4)"/>
+  <path d="M578,196 L578,112.24 Q578,109.24 581,109.24 L584.84,109.24 Q587.84,109.24 587.84,112.24 L587.84,196 Z" fill="var(--c3)"/>
+  <path d="M593.49,196 L593.49,57.07 Q593.49,54.07 596.49,54.07 L600.33,54.07 Q603.33,54.07 603.33,57.07 L603.33,196 Z" fill="var(--c4)"/>
+  <path d="M605.33,196 L605.33,108.64 Q605.33,105.64 608.33,105.64 L612.1700000000001,105.64 Q615.1700000000001,105.64 615.1700000000001,108.64 L615.1700000000001,196 Z" fill="var(--c3)"/>
+  <path d="M620.83,196 L620.83,45.46 Q620.83,42.46 623.83,42.46 L627.6700000000001,42.46 Q630.6700000000001,42.46 630.6700000000001,45.46 L630.6700000000001,196 Z" fill="var(--c4)"/>
+  <path d="M632.67,196 L632.67,105.04 Q632.67,102.04 635.67,102.04 L639.51,102.04 Q642.51,102.04 642.51,105.04 L642.51,196 Z" fill="var(--c3)"/>
+  <path d="M648.16,196 L648.16,33.85 Q648.16,30.85 651.16,30.85 L655,30.85 Q658,30.85 658,33.85 L658,196 Z" fill="var(--c4)"/>
+  <path d="M660,196 L660,101.44 Q660,98.44 663,98.44 L666.84,98.44 Q669.84,98.44 669.84,101.44 L669.84,196 Z" fill="var(--c3)"/>
+  <path d="M675.49,196 L675.49,22.15 Q675.49,19.15 678.49,19.15 L682.33,19.15 Q685.33,19.15 685.33,22.15 L685.33,196 Z" fill="var(--c4)"/>
+  <path d="M687.33,196 L687.33,97.84 Q687.33,94.84 690.33,94.84 L694.1700000000001,94.84 Q697.1700000000001,94.84 697.1700000000001,97.84 L697.1700000000001,196 Z" fill="var(--c3)"/>
+  <text class="ejeT" x="57.67" y="214" text-anchor="middle">m1</text>
+  <text class="ejeT" x="194.33" y="214" text-anchor="middle">m6</text>
+  <text class="ejeT" x="358.33" y="214" text-anchor="middle">m12</text>
+  <text class="ejeT" x="522.33" y="214" text-anchor="middle">m18</text>
+  <text class="ejeT" x="686.33" y="214" text-anchor="middle">m24</text>
+  <line x1="413" y1="16" x2="413" y2="196" stroke="var(--tiza-3)" stroke-width="1"/>
+  <text class="marcaT" x="413" y="24" text-anchor="middle">equilibrio m14</text>
+</svg>
+        </div>
+      </figure>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ EMBUDO ════════════ -->
+    <section id="embudo">
+      <h2>El embudo — y dónde de verdad se pierde la gente</h2>
+      <p>La restricción de este producto <strong>no es la conversión a pago</strong>. Es un paso que casi ningún SaaS tiene: <strong>el cliente tiene que ir a su teléfono y desviar su número.</strong> Ahí se cae el 43% de los que ya se registraron, y no lo puedo automatizar (ver <a href="negocio.html#autonomia">Autonomía</a>).</p>
+
+      <figure class="fig">
+        <figcaption class="fig__t">Embudo mensual en régimen (mes 18, escenario base)</figcaption>
+        <p class="fig__s">La activación no es «creó la cuenta». Es <strong>la IA atendió 5 llamadas reales</strong> de su negocio. Antes de eso el cliente no vio nada de valor y todavía no compró nada.</p>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 250" role="img" aria-labelledby="t-emb d-emb">
+  <title id="t-emb">Embudo mensual en régimen, mes 18, escenario base</title>
+  <desc id="d-emb">De 5.350 visitas al mes, 214 empiezan la prueba, 122 desvían el número, 78 llegan a la activación y 47 pagan.</desc>
+  <path d="M8,18 L474,18 Q478,18 478,22 L478,44 Q478,48 474,48 L8,48 Z" fill="#F4CE8E"/>
+  <text x="20" y="38" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#14100D">5.350</text>
+  <text x="490" y="33" style="font-family:'Chivo',sans-serif;font-size:12px;fill:var(--tiza-2)">Visita a la landing</text>
+  <path d="M8,62 L125.61000000000001,62 Q129.61,62 129.61,66 L129.61,88 Q129.61,92 125.61000000000001,92 L8,92 Z" fill="#EDB65E"/>
+  <text x="20" y="82" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#14100D">214</text>
+  <text x="141.61" y="77" style="font-family:'Chivo',sans-serif;font-size:12px;fill:var(--tiza-2)">Empieza la prueba (crea cuenta)</text>
+  <text x="141.61" y="90" class="ejeT">4% del paso anterior</text>
+  <path d="M8,106 L100.04,106 Q104.04,106 104.04,110 L104.04,132 Q104.04,136 100.04,136 L8,136 Z" fill="#D69B31"/>
+  <text x="20" y="126" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#14100D">122</text>
+  <text x="116.04" y="121" style="font-family:'Chivo',sans-serif;font-size:12px;fill:var(--tiza-2)">Desvía el número de verdad</text>
+  <text x="116.04" y="134" class="ejeT">57% del paso anterior</text>
+  <path d="M8,150 L83.59,150 Q87.59,150 87.59,154 L87.59,176 Q87.59,180 83.59,180 L8,180 Z" fill="#B07615"/>
+  <text x="20" y="170" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#F4EDE3">78</text>
+  <text x="99.59" y="165" style="font-family:'Chivo',sans-serif;font-size:12px;fill:var(--tiza-2)">ACTIVACIÓN · la IA atiende 5 llamadas</text>
+  <text x="99.59" y="178" class="ejeT">64% del paso anterior</text>
+  <path d="M8,194 L68.34,194 Q72.34,194 72.34,198 L72.34,220 Q72.34,224 68.34,224 L8,224 Z" fill="#7F540E"/>
+  <text x="20" y="214" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#F4EDE3">47</text>
+  <text x="84.34" y="209" style="font-family:'Chivo',sans-serif;font-size:12px;fill:var(--tiza-2)">Paga con tarjeta</text>
+  <text x="84.34" y="222" class="ejeT">60% del paso anterior</text>
+</svg>
+        </div>
+        <p class="fig__n">El paso «desvía el número de verdad» es el único punto del producto donde hay un humano obligatorio: el cliente. Si esa conversión sube de 57% a 75% —con mejores instrucciones, video por operadora, o un botón que marque el código GSM por él— el negocio crece 30% sin gastar un peso más en publicidad. <strong>Es la palanca más barata que tengo.</strong></p>
+      </figure>
+    </section>
+
+    <!-- ═══════════════════════════════════════ PROBABILIDAD ══════════ -->
+    <section id="probabilidad">
+      <h2>Probabilidad de éxito</h2>
+      <p>Un número único y confiado sería autoridad inventada. Acá está el método completo, con la derivación a la vista, para que puedas discutir cada paso.</p>
+
+      <h3>1 · La clase de referencia</h3>
+      <p><strong>No conozco una tasa base publicada para «SaaS de voz con IA en Chile».</strong> No existe: la categoría tiene tres años. Así que uso dos clases adyacentes y digo cuál es cuál.</p>
+      <div class="cuenta">
+<b>Clase A — supervivencia de empresas nuevas en Chile</b>
+  Los estudios de dinámica empresarial del Ministerio de Economía reportan
+  del orden de <b>55–60% de supervivencia al tercer año</b>.
+  <span class="r">→ Es contexto, NO es una tasa de éxito.</span> Sobrevivir no es llegar a nada.
+
+<b>Clase B — fracción de SaaS B2B que llega a US$1M de ARR</b>
+  El rango que se cita en la literatura de la industria (encuestas de SaaS
+  Capital, datos de ChartMogul) va de <b>~4%</b> —si el denominador es "empresas
+  fundadas"— a <b>~15%</b> si el denominador es "SaaS que ya levantó capital".
+  Para un SaaS <b>bootstrapeado, sin venta humana</b>, la tasa base honesta
+  está en la parte baja: <b class="r">5% a 12%</b>.
+  <span class="r">→ Declaro el rango. No tengo el paper con el número exacto y no lo voy a inventar.</span>
+      </div>
+
+      <h3>2 · Los ajustes para <em>esta</em> idea</h3>
+      <div class="rejilla rejilla--2">
+        <div class="card" style="border-left:2px solid var(--c4)">
+          <h4 style="color:var(--c4)">Hacia arriba</h4>
+          <ul style="margin-left:var(--sp-m);color:var(--tiza-2)">
+            <li><strong>El presupuesto ya existe.</strong> No hay que crear una categoría de gasto: una recepcionista cuesta $625.000 al mes y la casilla de voz cuesta clientes. Nosotros cobramos $69.000.</li>
+            <li><strong>La demanda es explícita.</strong> La gente escribe «recepcionista virtual» en Google. No hay que educar el mercado, hay que aparecer.</li>
+            <li><strong>La entrega es por la red telefónica.</strong> Cero integración, cero TI, cero implementación. Es de las pocas cosas que se pueden vender a una PYME sin visitarla.</li>
+            <li><strong>Self-serve real.</strong> Si funciona, el CAC es publicidad, y la publicidad escala sin contratar a nadie.</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:2px solid var(--c3)">
+          <h4 style="color:var(--c3)">Hacia abajo</h4>
+          <ul style="margin-left:var(--sp-m);color:var(--tiza-2)">
+            <li><strong>El techo del canal es chico.</strong> ~2.800 búsquedas/mes en Chile. El modelo dice 6 clientes/mes del canal de intención, y satura en el mes 6. <strong>Éste es el ajuste más grande hacia abajo.</strong></li>
+            <li><strong>Competencia americana financiada.</strong> Retell, Bland, Vapi, Synthflow, PolyAI. Pueden lanzar es-CL cuando quieran.</li>
+            <li><strong>El margen no es de software.</strong> 31% de la venta se va en minutos. Comprime todo.</li>
+            <li><strong>El riesgo cultural no está probado.</strong> Que el chileno cuelgue es una posibilidad real y no hay dato previo.</li>
+            <li><strong>La calidad la juzga quien no nos eligió.</strong> El que llama no es nuestro cliente y no nos debe paciencia.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>3 · El resultado, como rango y condicional</h3>
+      <div class="cuenta">
+Base <b>5–12%</b>
+  − techo de canal chico en Chile ......................... <b class="r">fuerte hacia abajo</b>
+  − competencia financiada, ventaja de meses .............. hacia abajo
+  − margen 69%, no 88% ................................... hacia abajo
+  + presupuesto existente, demanda explícita ............. hacia arriba
+  + entrega sin integración, self-serve .................. hacia arriba
+  ────────────────────────────────────────────────────────────────────
+
+LLEGAR A US$1M DE ARR EN 36 MESES ......................... <b class="r">6% – 12%</b>
+  condicional a cumplir M4 en el mes 12
+  (72 clientes, CAC bajo $150.000, SEO sobre 250 visitas/mes)
+  <span class="r">Y casi todo ese 6–12% pasa por salir de Chile.</span> Con el techo del canal
+  chileno, US$1M de ARR sólo con clientes chilenos requiere ~1.100 clientes:
+  el 4,9% del SAM. Posible, pero no en 36 meses con este motor.
+
+RESULTADO MODAL ........................................... <b class="r">35% – 45%</b>
+  terminar entre US$150k y US$400k de ARR, bootstrapeado, dos socios,
+  70% de margen, sin haber levantado un peso. No es un unicornio.
+  Es un buen negocio chico. Y es el resultado más probable.
+
+MORIR ANTES DEL MES 12 .................................... <b class="r">30% – 40%</b>
+  Los dos caminos de muerte más probables, en orden:
+    1. M1 · la gente cuelga cuando oye que es una IA         (~15%)
+    2. M4 · el SEO no rankea y el negocio queda con techo    (~15%)
+      </div>
+      <p class="nota">Los porcentajes de los caminos de muerte son un juicio mío repartiendo el 30–40%, no una medición. Lo digo para que se pueda discutir el juicio, no para que se lea como un dato.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container pie__in">
+    <div>
+      <p><strong style="color:var(--tiza)">Fonalta</strong> · el teléfono que siempre contesta.</p>
+      <p style="margin-top:6px">Los criterios de muerte de esta página están copiados, tal cual, en <code class="mono">autopilot.json</code>. El juez automático los aplica; no los puede cambiar.</p>
+    </div>
+    <nav aria-label="Pie">
+      <div class="fila">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html">Negocio</a>
+        <a href="stack.html">Arquitectura</a>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/sitio.js"></script>
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caprato — El cap rate honesto, antes de que firmes</title>
+<meta name="description" content="Caprato vigila las publicaciones de departamentos en tu comuna, las cruza con lo que ese edificio arrienda de verdad y descuenta vacancia, gastos comunes, contribuciones y administración. Te avisa sólo cuando algo pasa tu filtro.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  /* --- Portada --- */
+  .hero { padding-block: var(--sp-l) var(--sp-xl); }
+  .hero h1 { max-width: 17ch; margin-block: var(--sp-xs) var(--sp-s); }
+  .hero .lead { max-width: 50ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-top: var(--sp-m); }
+  .hero-grid { display: grid; gap: var(--sp-l); }
+  @media (min-width: 62em) {
+    .hero-grid { grid-template-columns: 1.02fr 0.98fr; gap: var(--sp-2xl); align-items: start; }
+  }
+
+  /* Ficha de descarte del hero */
+  .aviso-orig {
+    border: var(--hair-2); background: var(--papel-2);
+    padding: var(--sp-s); margin-bottom: -1px;
+  }
+  .aviso-orig .promesa {
+    display: flex; align-items: baseline; justify-content: space-between; gap: .5rem;
+    margin-top: .4rem;
+  }
+  .tachado { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--tinta-4); }
+  .veredicto { border: var(--borde); background: var(--papel-3); padding: var(--sp-s); }
+  .veredicto-num { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .motivo {
+    border-left: 3px solid var(--ambar); background: var(--ambar-lav);
+    padding: .6rem .7rem; margin-top: .7rem; font-size: .84rem; line-height: 1.5;
+  }
+
+  /* Barra "lo que pasa una semana normal" */
+  .semana { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--borde); margin-top: var(--sp-m); }
+  .semana div { padding: .7rem .6rem; border-right: var(--hair); }
+  .semana div:last-child { border-right: 0; }
+  .semana b { display: block; font-family: var(--mono); font-size: 1.5rem; font-weight: 700; line-height: 1; }
+  .semana .ok b { color: var(--azul); }
+  .semana small { display: block; font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); font-family: var(--mono); margin-top: .35rem; }
+
+  /* --- Cómo se busca hoy --- */
+  .dolor { display: grid; gap: 0; border: var(--borde); background: var(--papel-3); }
+  .dolor > div { padding: var(--sp-s); border-bottom: var(--hair); }
+  .dolor > div:last-child { border-bottom: 0; }
+  .dolor h3 { font-size: var(--step-0); margin-bottom: .25rem; }
+  .dolor p { font-size: .88rem; color: var(--tinta-2); }
+  @media (min-width: 48em) {
+    .dolor { grid-template-columns: 1fr 1fr; }
+    .dolor > div { border-right: var(--hair); }
+    .dolor > div:nth-child(2n) { border-right: 0; }
+    .dolor > div:nth-last-child(-n+2) { border-bottom: 0; }
+  }
+
+  /* --- Mapa --- */
+  .mapa-wrap { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .mapa-wrap { grid-template-columns: 1.35fr 1fr; align-items: start; } }
+  .comuna { cursor: pointer; transition: opacity .1s linear; }
+  .comuna:hover polygon, .comuna:focus polygon { stroke: var(--tinta); stroke-width: 2.5; }
+  .comuna polygon { stroke: var(--tinta); stroke-width: 1; }
+  .comuna text { pointer-events: none; }
+  .comuna[data-sel="1"] polygon { stroke: var(--azul); stroke-width: 3; }
+  .lectura { border: var(--borde); background: var(--papel-3); padding: var(--sp-s); }
+  .lectura-num { display: flex; align-items: baseline; gap: .5rem; margin-block: .4rem .6rem; }
+  .lectura dl { display: grid; grid-template-columns: 1fr auto; gap: .05rem .5rem; font-size: .82rem; }
+  .lectura dt { padding: .4rem 0; border-bottom: var(--hair); color: var(--tinta-2); }
+  .lectura dd { padding: .4rem 0; border-bottom: var(--hair); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .leyenda-mapa { display: flex; flex-wrap: wrap; gap: .3rem .8rem; margin-top: var(--sp-2xs); }
+  .leyenda-mapa span { display: inline-flex; align-items: center; gap: .35rem; font-family: var(--mono); font-size: .66rem; color: var(--tinta-2); }
+  .leyenda-mapa i { width: 16px; height: 10px; border: 1px solid var(--tinta); display: block; }
+
+  /* --- Desglose --- */
+  .desglose-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .desglose-grid { grid-template-columns: 1fr 1fr; } }
+
+  /* --- Pasos --- */
+  .pasos { counter-reset: p; display: grid; gap: var(--sp-s); }
+  @media (min-width: 48em) { .pasos { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 72em) { .pasos { grid-template-columns: repeat(4, 1fr); } }
+  .paso { counter-increment: p; border-top: 2px solid var(--tinta); padding-top: .7rem; }
+  .paso::before {
+    content: counter(p, decimal-leading-zero);
+    font-family: var(--mono); font-size: .7rem; font-weight: 700;
+    color: var(--azul); letter-spacing: .1em;
+  }
+  .paso h3 { font-size: var(--step-0); margin-block: .2rem .3rem; }
+  .paso p { font-size: .86rem; color: var(--tinta-2); }
+
+  /* --- Precios --- */
+  .planes { display: grid; gap: var(--sp-s); }
+  @media (min-width: 52em) { .planes { grid-template-columns: repeat(3, 1fr); } }
+  .plan { border: var(--borde); background: var(--papel-3); padding: var(--sp-s); display: flex; flex-direction: column; }
+  .plan.destacado { border-color: var(--azul); box-shadow: 4px 4px 0 var(--azul-lav); }
+  .plan-precio { font-family: var(--mono); font-size: var(--step-2); font-weight: 700; margin-block: .3rem 0; }
+  .plan ul { list-style: none; margin-block: var(--sp-s); display: grid; gap: .4rem; font-size: .84rem; }
+  .plan li { display: grid; grid-template-columns: 14px 1fr; gap: .5rem; align-items: start; color: var(--tinta-2); }
+  .plan li svg { margin-top: .25rem; }
+  .plan .btn { margin-top: auto; width: 100%; }
+  .suelto { border: 1.5px dashed var(--tinta-3); background: var(--papel-2); padding: var(--sp-s); margin-top: var(--sp-s); }
+
+  /* --- FAQ --- */
+  .faq { border-top: 1.5px solid var(--tinta); }
+  .faq details { border-bottom: var(--hair); }
+  .faq summary {
+    cursor: pointer; list-style: none; padding: .9rem 0;
+    display: flex; gap: .7rem; align-items: baseline;
+    font-weight: 600; min-height: 44px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::before { content: "+"; font-family: var(--mono); color: var(--azul); font-weight: 700; }
+  .faq details[open] summary::before { content: "−"; }
+  .faq details[open] summary { color: var(--azul); }
+  .faq p { padding: 0 0 .9rem 1.4rem; font-size: .9rem; color: var(--tinta-2); max-width: 68ch; }
+
+  .cierre { background: var(--tinta); color: var(--papel); padding-block: var(--sp-xl); margin-top: var(--sp-xl); }
+  .cierre h2 { max-width: 20ch; }
+  .cierre p { color: #B9C2C7; max-width: 54ch; margin-top: var(--sp-s); }
+  .cierre .btn { background: var(--azul); border-color: var(--azul); color: #fff; margin-top: var(--sp-m); }
+  .cierre .btn:hover { background: var(--papel); color: var(--tinta); border-color: var(--papel); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M5 21 L5 12 L11 7 L17 12 L17 21" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M13 21 L13 15 L21 15 L21 21" fill="none" stroke="#1A5FC8" stroke-width="1.5"/>
+        <circle cx="21" cy="15" r="2" fill="#1A5FC8"/>
+      </svg>
+      <span class="marca-txt">Caprato</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" id="navBtn">Menú</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= PORTADA ================= -->
+<section class="hero container">
+  <div class="hero-grid">
+    <div>
+      <p class="rotulo">Radar de inversión inmobiliaria · Chile</p>
+      <h1>Arriendo × 12 ÷ precio no es la rentabilidad.</h1>
+      <p class="lead">
+        Caprato vigila las publicaciones de tu comuna, las cruza con lo que ese edificio
+        arrienda <em>de verdad</em> y descuenta vacancia, gastos comunes, contribuciones y
+        administración. Te avisa sólo cuando algo pasa tu filtro.
+        <strong>La mayoría de las semanas no te avisa nada.</strong>
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-azul" href="demo/index.html">Ver el radar funcionando</a>
+        <a class="btn btn-2" href="#precio">Precios</a>
+      </div>
+
+      <div class="semana">
+        <div>
+          <b class="num">214</b>
+          <small>publicaciones nuevas</small>
+        </div>
+        <div>
+          <b class="num">5</b>
+          <small>en tu rango de precio</small>
+        </div>
+        <div class="ok">
+          <b class="num">2</b>
+          <small>pasan tu filtro</small>
+        </div>
+      </div>
+      <p class="nota mt-s">
+        Una semana cualquiera de un filtro real: 1D–2D, hasta 3.500 UF, cap rate honesto ≥ 4,8%,
+        seis comunas del sector centro-poniente. Datos de demostración.
+      </p>
+    </div>
+
+    <!-- Ficha de descarte: el aviso que parece bueno -->
+    <div>
+      <p class="rotulo mb-s">Lo que el radar hizo con el aviso más lindo de la semana</p>
+
+      <div class="aviso-orig">
+        <p class="rotulo">Publicación · Portal · hace 2 días</p>
+        <p style="margin-top:.35rem;font-weight:600;">
+          Depto 2D + 2B, 62 m², Plaza Egaña, Ñuñoa. Estacionamiento y bodega.
+        </p>
+        <div class="promesa">
+          <span class="nota" style="margin:0">«Renta estimada <b class="num">$780.000</b> · rentabilidad <b class="num">6,8%</b> anual»</span>
+          <span class="num" style="font-weight:700">3.450 UF</span>
+        </div>
+      </div>
+
+      <div class="veredicto">
+        <div class="ficha-h" style="margin-bottom:.7rem">
+          <span class="rotulo">Cap rate honesto</span>
+          <span class="sello sello-no">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+            Descartada
+          </span>
+        </div>
+        <div class="veredicto-num">
+          <span class="cifra cifra-xl">3,8%</span>
+          <span>
+            <span class="cifra cifra-m tachado">6,8%</span>
+            <span class="rotulo" style="display:block">lo que promete el aviso</span>
+          </span>
+        </div>
+        <div class="motivo">
+          <strong>Motivo del descarte:</strong> el arriendo real de ese edificio es
+          <strong>22% menor</strong> al que promete el aviso. Los <span class="num">11</span> departamentos
+          2D del edificio que se arrendaron en los últimos 12 meses lo hicieron a una mediana de
+          <strong class="num">$610.000</strong>, no <span class="num">$780.000</span>.
+          Con eso, y descontando gastos comunes, contribuciones, vacancia y administración,
+          la rentabilidad cae a <strong class="num">3,8%</strong>. Tu filtro pide 4,8%.
+        </div>
+        <p class="nota mt-s">
+          Tu corazonada decía que sí. El número dice que no. Por eso pagas esto.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EL PROBLEMA ================= -->
+<section class="seccion container">
+  <div class="seccion-h">
+    <p class="rotulo">El método actual</p>
+    <h2>Comprar por corazonada y enterarte dos años después.</h2>
+    <p>
+      Así se compra hoy el segundo o el tercer departamento en Chile: a mano, de noche, con 14 pestañas
+      abiertas y ninguna forma de comparar.
+    </p>
+  </div>
+
+  <div class="dolor">
+    <div>
+      <h3>Filtras por comuna y miras fotos</h3>
+      <p>
+        Portal Inmobiliario, Yapo, Mercado Libre. Cada uno con su filtro, su orden y sus avisos repetidos.
+        Media hora para descubrir que las tres publicaciones que te gustaron son el mismo departamento
+        subido por tres corredores.
+      </p>
+    </div>
+    <div>
+      <h3>No sabes cuánto arrienda <em>ese</em> edificio</h3>
+      <p>
+        El aviso dice «renta estimada $780.000». ¿Estimada por quién? En Chile no existe un registro
+        público de contratos de arriendo. El único proxy honesto es mirar qué se publicó en ese mismo
+        edificio, a cuánto, y cuánto tardó en desaparecer del portal.
+      </p>
+    </div>
+    <div>
+      <h3>La cuenta de la servilleta ignora la mitad</h3>
+      <p>
+        Arriendo × 12 ÷ precio. No hay gastos comunes, ni contribuciones, ni los 24 días que el
+        departamento pasó vacío, ni el 8% de la administración, ni la comisión de re-arriendo cada
+        vez que el arrendatario se va.
+      </p>
+    </div>
+    <div>
+      <h3>El corredor cobra por venderte</h3>
+      <p>
+        Su comisión es 2% del precio. La tuya es la rentabilidad. Nadie en la cadena gana plata
+        diciéndote <em>no compres</em>. Ese es exactamente el consejo que te falta, y por eso hay
+        que cobrarlo aparte.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EL MAPA ================= -->
+<section class="seccion container" id="mapa">
+  <div class="seccion-h">
+    <p class="rotulo">Producto en vivo · toca una comuna</p>
+    <h2>La mediana honesta de cada comuna. Ninguna llega al 5%.</h2>
+    <p>
+      Este es el mismo cálculo que hace el radar, aplicado a todas las publicaciones vigentes de
+      departamentos usados de cada comuna. Es la respuesta corta a «¿dónde conviene?»: en ninguna
+      parte con los ojos cerrados.
+    </p>
+  </div>
+
+  <div class="mapa-wrap">
+    <figure class="chart">
+      <div class="chart-h">
+        <h3>Cap rate honesto mediano · departamentos usados 1D–3D</h3>
+        <p class="nota">Esquema de comunas del Gran Santiago. No está a escala: es un diagrama, no un mapa.</p>
+      </div>
+      <svg viewBox="0 0 480 430" role="img" aria-labelledby="mapa-t mapa-d">
+        <title id="mapa-t">Esquema de comunas del Gran Santiago con su cap rate honesto mediano</title>
+        <desc id="mapa-d">Trece comunas. Ninguna supera el 4,8%. Las Condes 2,9%, Providencia 3,2%, Ñuñoa 3,6%, Maipú 4,0%, Macul 4,0%, La Florida 4,1%, La Cisterna 4,2%, Estación Central 4,3%, Santiago Centro 4,4%, San Miguel 4,4%, Recoleta 4,4%, Quinta Normal 4,5%, Independencia 4,6%. La misma información está en la tabla bajo el gráfico.</desc>
+
+        <defs>
+          <!-- Tramas de plano: densidad = cap rate. Segunda codificación además del color. -->
+          <pattern id="t1" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#7FA1DC"/>
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#EFF1EE" stroke-width="4"/>
+          </pattern>
+          <pattern id="t2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="7" height="7" fill="#5C82CB"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#EFF1EE" stroke-width="3"/>
+          </pattern>
+          <pattern id="t3" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="#3B63B9"/>
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#EFF1EE" stroke-width="2"/>
+          </pattern>
+          <pattern id="t4" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="#204892"/>
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#EFF1EE" stroke-width="1"/>
+          </pattern>
+        </defs>
+
+        <!-- marco de plano -->
+        <rect x="6" y="6" width="468" height="418" fill="none" stroke="#9EA8A3" stroke-width="1"/>
+        <path d="M6 26 L6 6 L26 6 M454 6 L474 6 L474 26 M474 404 L474 424 L454 424 M26 424 L6 424 L6 404" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <!-- norte -->
+        <g transform="translate(444,36)">
+          <path d="M0 -14 L5 6 L0 1 L-5 6 Z" fill="#14191C"/>
+          <text x="0" y="20" text-anchor="middle" class="eje" style="font-size:8px">N</text>
+        </g>
+
+        <g id="comunas">
+          <g class="comuna" tabindex="0" role="button" data-c="independencia" aria-label="Independencia, 4,6 por ciento">
+            <polygon points="196,44 262,40 268,78 258,112 200,108 190,76" fill="url(#t4)"/>
+            <text x="228" y="76" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,6</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="recoleta" aria-label="Recoleta, 4,4 por ciento">
+            <polygon points="268,40 340,48 344,88 332,118 262,112 268,78" fill="url(#t4)"/>
+            <text x="304" y="84" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,4</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="quinta-normal" aria-label="Quinta Normal, 4,5 por ciento">
+            <polygon points="112,108 190,104 196,146 186,176 116,172 104,140" fill="url(#t4)"/>
+            <text x="150" y="144" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,5</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="santiago" aria-label="Santiago Centro, 4,4 por ciento">
+            <polygon points="196,112 258,114 266,152 258,190 200,186 190,148" fill="url(#t4)"/>
+            <text x="228" y="152" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,4</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="providencia" aria-label="Providencia, 3,2 por ciento">
+            <polygon points="266,118 344,120 352,146 348,168 268,164 262,140" fill="url(#t1)"/>
+            <text x="306" y="148" text-anchor="middle" class="eje-l" style="font-size:11px;font-weight:700">3,2</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="las-condes" aria-label="Las Condes, 2,9 por ciento">
+            <polygon points="352,62 452,74 458,132 442,166 352,160 344,120 348,88" fill="url(#t1)"/>
+            <text x="400" y="122" text-anchor="middle" class="eje-l" style="font-size:11px;font-weight:700">2,9</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="nunoa" aria-label="Ñuñoa, 3,6 por ciento">
+            <polygon points="268,168 348,172 356,208 348,240 274,236 264,200" fill="url(#t2)"/>
+            <text x="310" y="208" text-anchor="middle" class="eje-l" style="font-size:11px;font-weight:700">3,6</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="estacion-central" aria-label="Estación Central, 4,3 por ciento">
+            <polygon points="116,176 186,180 190,220 182,250 118,244 108,208" fill="url(#t3)"/>
+            <text x="150" y="216" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,3</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="san-miguel" aria-label="San Miguel, 4,4 por ciento">
+            <polygon points="192,192 258,194 264,230 256,262 196,258 186,224" fill="url(#t4)"/>
+            <text x="224" y="230" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,4</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="macul" aria-label="Macul, 4,0 por ciento">
+            <polygon points="276,240 350,244 356,278 344,304 282,298 270,270" fill="url(#t3)"/>
+            <text x="313" y="276" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,0</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="la-florida" aria-label="La Florida, 4,1 por ciento">
+            <polygon points="358,250 442,258 450,320 428,368 360,358 348,308" fill="url(#t3)"/>
+            <text x="400" y="308" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,1</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="la-cisterna" aria-label="La Cisterna, 4,2 por ciento">
+            <polygon points="198,264 258,266 268,300 258,330 202,326 190,296" fill="url(#t3)"/>
+            <text x="228" y="300" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,2</text>
+          </g>
+          <g class="comuna" tabindex="0" role="button" data-c="maipu" aria-label="Maipú, 4,0 por ciento">
+            <polygon points="72,252 180,256 186,310 176,368 82,360 60,304" fill="url(#t3)"/>
+            <text x="124" y="312" text-anchor="middle" class="eje-l" fill="#fff" style="font-size:11px;font-weight:700">4,0</text>
+          </g>
+        </g>
+
+        <!-- La banda vacía: el punto entero del gráfico -->
+        <g transform="translate(24,384)">
+          <rect x="0" y="-14" width="200" height="30" fill="none" stroke="#B07400" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="10" y="-1" class="eje" style="fill:#B07400;font-size:9px;font-weight:700">TRAMO ≥ 4,8% (el que buscas)</text>
+          <text x="10" y="11" class="eje" style="fill:#B07400;font-size:9px">0 de 13 comunas. Está vacío.</text>
+        </g>
+      </svg>
+      <div class="leyenda-mapa" role="list">
+        <span role="listitem"><i style="background:#7FA1DC"></i>2,8–3,3%</span>
+        <span role="listitem"><i style="background:#5C82CB"></i>3,4–3,9%</span>
+        <span role="listitem"><i style="background:#3B63B9"></i>4,0–4,3%</span>
+        <span role="listitem"><i style="background:#204892"></i>4,4–4,7%</span>
+        <span role="listitem"><i style="background:#14306B"></i>≥ 4,8% · sin comunas</span>
+      </div>
+      <figcaption class="nota mt-s">
+        Datos de demostración construidos con la metodología descrita en <a href="stack.html">Arquitectura</a>.
+        La mediana de la comuna no es un veredicto sobre una publicación: el 6% de los avisos sí supera el 4,8%
+        —y encontrar <em>ese</em> 6% es el producto.
+      </figcaption>
+    </figure>
+
+    <aside class="lectura" id="lectura" aria-live="polite">
+      <p class="rotulo">Comuna seleccionada</p>
+      <h3 id="lec-nombre" style="margin-top:.2rem">Ñuñoa</h3>
+      <div class="lectura-num">
+        <span class="cifra cifra-l cifra-azul" id="lec-cap">3,6%</span>
+        <span class="rotulo">cap rate honesto mediano</span>
+      </div>
+      <dl>
+        <dt>Precio mediano</dt><dd id="lec-precio">3.180 UF</dd>
+        <dt>Arriendo real mediano</dt><dd id="lec-arriendo">$620.000</dd>
+        <dt>Gasto común mediano</dt><dd id="lec-gc">$135.000</dd>
+        <dt>Vacancia observada</dt><dd id="lec-vac">6,4%</dd>
+        <dt>Publicaciones vigentes</dt><dd id="lec-n">318</dd>
+        <dt>Sobre 4,8% honesto</dt><dd id="lec-sup">7 (2,2%)</dd>
+      </dl>
+      <p class="nota mt-s" id="lec-nota">
+        En Ñuñoa el arriendo subió menos que el precio: buen barrio, mal negocio de renta.
+        Si vas por rentabilidad, casi nada te sirve acá.
+      </p>
+      <p class="nota mt-s" style="border-top:var(--hair);padding-top:.6rem">
+        Cada comuna tiene su propia página pública con este cálculo. Ese es el producto en su versión
+        gratis, y de paso es el canal: la persona que busca «rentabilidad departamento Ñuñoa» llega
+        justo a la página que le dice que no.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= EL DESGLOSE ================= -->
+<section class="seccion container" id="desglose">
+  <div class="seccion-h">
+    <p class="rotulo">La cuenta completa</p>
+    <h2>De dónde sale cada punto porcentual.</h2>
+    <p>
+      Ésta es la publicación que <strong>sí</strong> pasó el filtro esta semana. Mismo cálculo, sin
+      esconder ninguna línea. El aviso decía 6,8%; el número honesto es 5,1%; igual pasa, y por eso
+      te llega la alerta.
+    </p>
+  </div>
+
+  <div class="desglose-grid">
+    <div class="ficha">
+      <div class="ficha-h">
+        <div>
+          <span class="rotulo">Rol 2.451-18 · Independencia</span>
+          <h3 style="margin-top:.2rem">Av. Independencia 4321, piso 8</h3>
+        </div>
+        <span class="sello sello-pasa">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5 L4 8 L9 1.5" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+          Pasa
+        </span>
+      </div>
+
+      <table class="tabla">
+        <caption class="visually-hidden">Cálculo del cap rate honesto, pesos chilenos al año</caption>
+        <thead>
+          <tr><th scope="col">Concepto</th><th scope="col" class="n">Al año</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Arriendo real del edificio · <span class="num">$430.000</span>/mes
+              <br><span class="nota">Mediana de 14 unidades 1D observadas, no la del aviso ($450.000)</span></td>
+            <td class="n">$5.160.000</td>
+          </tr>
+          <tr class="resta">
+            <td>Vacancia · <span class="num">6,5%</span>
+              <br><span class="nota">24 días vacío al año; es lo que tardó en re-arrendarse la última unidad</span></td>
+            <td class="n">−$335.400</td>
+          </tr>
+          <tr>
+            <td><strong>Ingreso efectivo</strong></td>
+            <td class="n"><strong>$4.824.600</strong></td>
+          </tr>
+          <tr class="resta">
+            <td>Contribuciones
+              <br><span class="nota">Avalúo fiscal $34.800.000: bajo el tramo exento habitacional <span class="pv">por validar</span></span></td>
+            <td class="n">$0</td>
+          </tr>
+          <tr class="resta">
+            <td>Gastos comunes de los meses vacíos
+              <br><span class="nota">GC $62.000/mes × 0,78 meses. Los otros 11,22 los paga el arrendatario</span></td>
+            <td class="n">−$48.360</td>
+          </tr>
+          <tr class="resta">
+            <td>Administración · <span class="num">8%</span> de lo recaudado</td>
+            <td class="n">−$385.968</td>
+          </tr>
+          <tr class="resta">
+            <td>Comisión de re-arriendo
+              <br><span class="nota">Medio arriendo + IVA cada 20 meses de permanencia media</span></td>
+            <td class="n">−$153.510</td>
+          </tr>
+          <tr class="resta">
+            <td>Mantención y reposición · <span class="num">3%</span></td>
+            <td class="n">−$145.000</td>
+          </tr>
+          <tr class="total">
+            <td>Ingreso operacional neto (NOI)</td>
+            <td class="n">$4.091.762</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="border-top:2px solid var(--tinta);margin-top:var(--sp-s);padding-top:var(--sp-s);display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;align-items:end">
+        <div>
+          <p class="rotulo">Capital invertido</p>
+          <p class="num" style="font-weight:700">$80.511.077</p>
+          <p class="nota">1.980 UF a $40.180 + 1,2% de escrituración y CBR</p>
+        </div>
+        <div class="der">
+          <p class="rotulo rotulo-azul">Cap rate honesto</p>
+          <p class="cifra cifra-l cifra-azul">5,1%</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <figure class="chart">
+        <div class="chart-h">
+          <h3>Del 6,8% del aviso al 5,1% real</h3>
+          <p class="nota">Cada barra es lo que se lleva un costo que el aviso no menciona.</p>
+        </div>
+        <svg viewBox="0 0 400 250" role="img" aria-labelledby="wf-t wf-d">
+          <title id="wf-t">Cascada del cap rate: del 6,8% del aviso al 5,1% honesto</title>
+          <desc id="wf-d">Parte en 6,79%, la rentabilidad que promete el aviso. Los gastos de escrituración restan 0,08 puntos. El arriendo real del edificio, menor al del aviso, resta 0,30. La vacancia resta 0,42. La administración resta 0,48. La comisión de re-arriendo resta 0,19. La mantención resta 0,18. Los gastos comunes de los meses vacíos restan 0,06. Las contribuciones no aparecen porque son cero: el avalúo está bajo el tramo exento. Queda 5,08%. La tabla de al lado tiene los mismos números en pesos.</desc>
+          <!-- eje base -->
+          <line x1="34" y1="216" x2="392" y2="216" stroke="#9EA8A3" stroke-width="1"/>
+          <line x1="34" y1="20" x2="34" y2="216" stroke="#9EA8A3" stroke-width="1"/>
+          <!-- gridlines cada 2 puntos: 28px por punto -->
+          <line x1="34" y1="160" x2="392" y2="160" class="grid-l"/>
+          <line x1="34" y1="104" x2="392" y2="104" class="grid-l"/>
+          <line x1="34" y1="48" x2="392" y2="48" class="grid-l"/>
+          <text x="30" y="219" text-anchor="end" class="eje">0</text>
+          <text x="30" y="163" text-anchor="end" class="eje">2%</text>
+          <text x="30" y="107" text-anchor="end" class="eje">4%</text>
+          <text x="30" y="51" text-anchor="end" class="eje">6%</text>
+
+          <!-- Escala: y = 216 − puntos × 28. Nueve columnas de 39,1 px, barra de 30. -->
+          <g>
+            <rect x="44.6" y="25.9" width="30" height="190" rx="4" fill="#B07400"/>
+            <rect x="44.6" y="205" width="30" height="11" fill="#B07400"/>
+            <text x="59.6" y="18" text-anchor="middle" class="eje-l">6,79%</text>
+          </g>
+          <g>
+            <rect x="83.7" y="25.9" width="30" height="3" rx="1.5" fill="#3D464C"><title>Gastos de escrituración y CBR: −0,08 puntos</title></rect>
+            <text x="98.7" y="18" text-anchor="middle" class="eje" style="font-size:7.5px">−0,08</text>
+          </g>
+          <g>
+            <rect x="122.8" y="28.1" width="30" height="8.3" rx="3" fill="#3D464C"><title>Arriendo real del edificio ($430.000) vs. el del aviso ($450.000): −0,30 puntos</title></rect>
+            <text x="137.8" y="22" text-anchor="middle" class="eje" style="font-size:7.5px">−0,30</text>
+          </g>
+          <g>
+            <rect x="161.9" y="36.5" width="30" height="11.7" rx="3" fill="#3D464C"><title>Vacancia: 24 días vacío al año, −0,42 puntos</title></rect>
+            <text x="176.9" y="30" text-anchor="middle" class="eje" style="font-size:7.5px">−0,42</text>
+          </g>
+          <g>
+            <rect x="201.0" y="48.1" width="30" height="13.4" rx="3" fill="#3D464C"><title>Administración, 8% de lo recaudado: −0,48 puntos</title></rect>
+            <text x="216.0" y="42" text-anchor="middle" class="eje" style="font-size:7.5px">−0,48</text>
+          </g>
+          <g>
+            <rect x="240.1" y="61.6" width="30" height="5.3" rx="2.5" fill="#3D464C"><title>Comisión de re-arriendo: −0,19 puntos</title></rect>
+            <text x="255.1" y="55" text-anchor="middle" class="eje" style="font-size:7.5px">−0,19</text>
+          </g>
+          <g>
+            <rect x="279.2" y="66.9" width="30" height="5.0" rx="2.5" fill="#3D464C"><title>Mantención y reposición: −0,18 puntos</title></rect>
+            <text x="294.2" y="60" text-anchor="middle" class="eje" style="font-size:7.5px">−0,18</text>
+          </g>
+          <g>
+            <rect x="318.3" y="71.9" width="30" height="3" rx="1.5" fill="#3D464C"><title>Gastos comunes de los meses vacíos: −0,06 puntos</title></rect>
+            <text x="333.3" y="65" text-anchor="middle" class="eje" style="font-size:7.5px">−0,06</text>
+          </g>
+          <g>
+            <rect x="357.4" y="73.7" width="30" height="142.3" rx="4" fill="#1A5FC8"/>
+            <rect x="357.4" y="205" width="30" height="11" fill="#1A5FC8"/>
+            <text x="372.4" y="66" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">5,08%</text>
+          </g>
+
+          <!-- etiquetas x -->
+          <text x="59.6" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Aviso</text>
+          <text x="98.7" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Compra</text>
+          <text x="137.8" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Arriendo</text>
+          <text x="176.9" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Vacancia</text>
+          <text x="216.0" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Admin.</text>
+          <text x="255.1" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Re-arr.</text>
+          <text x="294.2" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">Mant.</text>
+          <text x="333.3" y="230" text-anchor="middle" class="eje" style="font-size:7.5px">GC</text>
+          <text x="372.4" y="230" text-anchor="middle" class="eje-l" style="fill:#1A5FC8;font-size:8px">Honesto</text>
+          <text x="34" y="244" class="eje" style="font-size:7.5px">Cada resta es un costo que el aviso no menciona. Suman 1,71 puntos.</text>
+        </svg>
+        <div class="leyenda">
+          <span><i style="background:#B07400"></i>Lo que promete el aviso</span>
+          <span><i style="background:#3D464C"></i>Lo que se lleva cada costo</span>
+          <span><i style="background:#1A5FC8"></i>Lo que queda de verdad</span>
+        </div>
+        <figcaption class="nota mt-s">
+          Contribuciones no aparece porque en este departamento son $0: el avalúo fiscal está bajo el
+          tramo exento. En el de Ñuñoa se llevan 0,22 puntos.
+        </figcaption>
+      </figure>
+
+      <div class="ficha mt-m">
+        <p class="rotulo">Y lo que casi nadie te dice</p>
+        <h3 style="margin-block:.3rem .5rem">Con crédito, este departamento te cuesta plata todos los meses.</h3>
+        <p style="font-size:.9rem;color:var(--tinta-2)">
+          Pie del 20% ($15.911.280), crédito a 20 años en UF al 4,9% anual <span class="pv">tasa referencial</span>:
+          el dividendo es <b class="num">$416.472</b> al mes y el NOI da <b class="num">$340.980</b>.
+          Pones <strong class="num">$75.492</strong> de tu bolsillo cada mes durante los primeros años.
+          Eso no lo hace malo —estás amortizando capital— pero <strong>no es «se paga solo»</strong>, y el
+          aviso te dijo que sí.
+        </p>
+        <p class="nota mt-s">El demo trae este cálculo con un interruptor: contado o con crédito.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="seccion container">
+  <div class="seccion-h">
+    <p class="rotulo">Cómo funciona</p>
+    <h2>Cuatro pasos y ninguna reunión.</h2>
+  </div>
+  <div class="pasos">
+    <div class="paso">
+      <h3>Defines el filtro</h3>
+      <p>Comunas, presupuesto en UF, tipología y —lo importante— el cap rate honesto mínimo que aceptas. Tres minutos.</p>
+    </div>
+    <div class="paso">
+      <h3>El radar mira todo</h3>
+      <p>Cada publicación nueva se normaliza, se deduplica (el mismo depto en tres portales es uno) y se le asigna edificio.</p>
+    </div>
+    <div class="paso">
+      <h3>Se calcula el número honesto</h3>
+      <p>Arriendo real de ese edificio, vacancia observada, gastos comunes, contribuciones desde el avalúo fiscal, administración.</p>
+    </div>
+    <div class="paso">
+      <h3>Te llega la alerta — o no</h3>
+      <p>Correo o WhatsApp, con la ficha completa y el porqué. Si nada pasa el filtro, no te escribimos. El silencio también es información.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRECIO ================= -->
+<section class="seccion container" id="precio">
+  <div class="seccion-h">
+    <p class="rotulo">Precio</p>
+    <h2>Vale menos que el 1% de la comisión que te ahorra el error.</h2>
+    <p>
+      Todo con tarjeta, todo en un clic, cancelas en un clic. No hay vendedor, no hay demo agendada,
+      no hay «conversemos».
+    </p>
+  </div>
+
+  <div class="planes">
+    <div class="plan">
+      <p class="rotulo">Radar</p>
+      <p class="plan-precio">$9.900<span style="font-size:.8rem;color:var(--tinta-3)">/mes</span></p>
+      <p class="nota">Para el que está mirando su primera compra de inversión.</p>
+      <ul>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>1 filtro activo</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Alerta semanal</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>5 fichas completas al mes</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Histórico de la comuna</span></li>
+      </ul>
+      <a class="btn btn-2" href="demo/index.html">Probar</a>
+    </div>
+
+    <div class="plan destacado">
+      <p class="rotulo rotulo-azul">Inversionista · el más usado</p>
+      <p class="plan-precio">$19.900<span style="font-size:.8rem;color:var(--tinta-3)">/mes</span></p>
+      <p class="nota">Para el que ya tiene uno o dos y va por el siguiente.</p>
+      <ul>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>3 filtros activos</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Alerta diaria por correo y WhatsApp</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Fichas ilimitadas</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Historial de arriendos y ventas del edificio</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Simulador con crédito</span></li>
+      </ul>
+      <a class="btn btn-azul" href="demo/index.html">Probar</a>
+    </div>
+
+    <div class="plan">
+      <p class="rotulo">Cartera</p>
+      <p class="plan-precio">$49.000<span style="font-size:.8rem;color:var(--tinta-3)">/mes</span></p>
+      <p class="nota">Para el que tiene 5+ y también quiere saber si los suyos siguen rindiendo.</p>
+      <ul>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>10 filtros · Santiago, Valparaíso y Concepción</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Tus departamentos vigilados: aviso si tu arriendo quedó bajo el del edificio</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7 L5.5 10.5 L12 3.5" stroke="#1A5FC8" stroke-width="1.8" fill="none"/></svg><span>Exportación CSV y acceso a la API</span></li>
+      </ul>
+      <a class="btn btn-2" href="demo/index.html">Probar</a>
+    </div>
+  </div>
+
+  <div class="suelto">
+    <div style="display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;align-items:center">
+      <div>
+        <p class="rotulo">Sin suscripción</p>
+        <h3 style="margin-block:.2rem .3rem">Pega el link de una publicación y te devolvemos la ficha honesta.</h3>
+        <p class="nota" style="max-width:56ch">
+          Un pago, una ficha, sin cuenta recurrente. Es la puerta de entrada: la mayoría de la gente
+          llega con un departamento específico en la cabeza y una pregunta específica.
+        </p>
+      </div>
+      <p class="plan-precio" style="margin:0">$4.900</p>
+    </div>
+  </div>
+
+  <p class="nota mt-s">
+    Precios en pesos chilenos, IVA incluido. Cobro con tarjeta a través de Flow (Chile) o Stripe (fuera de Chile).
+    La versión gratis es la página pública de cada comuna: sin registro, sin tarjeta.
+  </p>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="seccion container">
+  <div class="seccion-h">
+    <p class="rotulo">Preguntas</p>
+    <h2>Las incómodas primero.</h2>
+  </div>
+
+  <div class="faq">
+    <details open>
+      <summary>¿De dónde sacan el «arriendo real» si en Chile no hay registro de contratos?</summary>
+      <p>
+        No lo sacamos de ninguna parte: lo <strong>estimamos</strong>, y decimos cómo. Miramos todas las
+        publicaciones de arriendo del <em>mismo edificio</em> en los últimos 12 meses, cuánto pedían y
+        cuántos días tardaron en desaparecer del portal (un aviso que se baja a los 9 días se arrendó;
+        uno que lleva 80 días y bajó dos veces el precio, no). Con eso construimos una mediana con su
+        <strong>n</strong>, su rango y su nivel de confianza, y todo eso te lo mostramos en la ficha.
+        Cuando el n es bajo, la ficha te lo dice y baja la confianza. Nunca vas a ver un número sin
+        saber cuántas observaciones lo sostienen.
+      </p>
+    </details>
+    <details>
+      <summary>Entonces me van a decir que casi nada conviene. ¿Y para qué pago?</summary>
+      <p>
+        Exacto: te vamos a decir que casi nada conviene, y eso es lo que estás pagando. Un error de
+        compra en un departamento de $90 millones que rinde 3,1% en vez de 5% son
+        <strong class="num">$1.700.000</strong> menos de flujo al año, todos los años. La suscripción
+        anual cuesta <span class="num">$238.800</span>. Si te evita un solo error, el retorno no está
+        ni cerca de ser discutible. Y cuando aparece el que <em>sí</em> pasa, eres el primero en verlo.
+      </p>
+    </details>
+    <details>
+      <summary>¿Esto reemplaza al corredor?</summary>
+      <p>
+        No. El corredor te muestra el departamento, negocia y hace el trámite; le pagas por eso y está
+        bien. Lo que el corredor no puede hacer —porque su comisión depende de que compres— es decirte
+        que ese edificio arrienda 22% menos de lo que dice el aviso. Nosotros no ganamos nada si compras.
+        Ganamos si sigues suscrito, y sigues suscrito si el número es cierto.
+      </p>
+    </details>
+    <details>
+      <summary>¿Es lo mismo que Conserjo?</summary>
+      <p>
+        No, son las dos mitades. <a href="../06-arriendos/index.html">Conserjo</a> administra el
+        departamento que <em>ya tienes</em>: filtra al arrendatario, cobra el arriendo, gestiona la
+        filtración del baño. Caprato evalúa el que <em>todavía no compras</em>. Cuando ya lo compraste,
+        Caprato sigue haciendo una sola cosa: avisarte si tu arriendo se quedó abajo del mercado de tu
+        propio edificio. No cobramos arriendos ni administramos nada.
+      </p>
+    </details>
+    <details>
+      <summary>¿Me pueden decir si me conviene comprar?</summary>
+      <p>
+        No, y es a propósito. No somos asesores de inversión registrados ante la CMF y no vamos a
+        fingir que lo somos. Te entregamos el cálculo, los supuestos y la evidencia; la decisión —y la
+        plata— son tuyas. Cualquier producto que te prometa una recomendación personalizada de inversión
+        te está prometiendo algo que no puede dar legalmente.
+      </p>
+    </details>
+    <details>
+      <summary>¿Hay alguien detrás si tengo un problema?</summary>
+      <p>
+        No hay nadie. Caprato lo opera un sistema automático de punta a punta: el registro, el cobro, la
+        alerta y el soporte. El soporte es un agente de IA que responde con la ficha y la metodología a
+        la vista. Si tu caso necesita a un humano —una disputa, un dato que el sistema no entiende— el
+        sistema te lo dice, te devuelve el mes y cierra la cuenta. Mentirte diciendo que «un ejecutivo
+        te contactará» sería lo único que convertiría esto en una estafa.
+      </p>
+    </details>
+    <details>
+      <summary>¿Los datos de los portales los pueden usar?</summary>
+      <p>
+        Es la pregunta que puede matar el negocio y la respondemos de frente. Usamos datos públicos
+        (avalúo fiscal del SII, inscripciones del Conservador de Bienes Raíces, estadísticas del
+        Observatorio del Mercado Inmobiliario) y publicaciones de portales respetando
+        <code>robots.txt</code> y sin sobrecargar a nadie. Los términos de servicio de cada portal
+        <span class="pv">por validar</span> son distintos entre sí, y donde no nos consta que sea
+        lícito, la vía es otra: <strong>tú pegas el link</strong> y el análisis se hace sobre la página
+        que tú abriste. Nunca guardamos ni tocamos datos personales de arrendatarios ni de vendedores.
+        El detalle completo está en <a href="stack.html">Arquitectura</a>.
+      </p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<section class="cierre">
+  <div class="container">
+    <p class="rotulo" style="color:#8FA6C8">La versión corta</p>
+    <h2>Todo el rubro te vende el sueño. Nosotros te vendemos el número.</h2>
+    <p>
+      Mira el radar completo funcionando: los cinco departamentos de la semana, el que pasa, los tres
+      que no, y qué pasa cuando subes el filtro al 5,5%.
+    </p>
+    <a class="btn" href="demo/index.html">Abrir el demo</a>
+  </div>
+</section>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <p class="marca-txt">Caprato</p>
+      <p class="nota mt-s" style="max-width:52ch">
+        Prototipo navegable. Los datos de las fichas son de demostración, construidos con la metodología
+        descrita en Arquitectura. Ninguna cifra de este sitio es una recomendación de inversión.
+      </p>
+    </div>
+    <p class="rotulo">caprato.com · Santiago de Chile · 2026</p>
+  </div>
+</footer>
+
+<script>
+  // Menú móvil
+  var btn = document.getElementById('navBtn');
+  var links = document.getElementById('nav-links');
+  btn.addEventListener('click', function () {
+    var abierto = links.classList.toggle('abierto');
+    btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  });
+
+  // Mapa: seleccionar comuna actualiza la lectura
+  var COMUNAS = {
+    'independencia':   { n:'Independencia',    cap:'4,6%', precio:'2.140 UF', arr:'$430.000', gc:'$62.000',  vac:'6,5%', pub:'146', sup:'21 (14,4%)', nota:'Departamentos chicos, avalúos bajo el tramo exento de contribuciones y arriendo firme por el Metro. Es donde más veces el número honesto pasa el 4,8%.' },
+    'recoleta':        { n:'Recoleta',          cap:'4,4%', precio:'2.290 UF', arr:'$445.000', gc:'$68.000',  vac:'6,9%', pub:'118', sup:'11 (9,3%)',  nota:'Parecida a Independencia pero con más vacancia: hay edificios nuevos compitiendo por el mismo arrendatario.' },
+    'quinta-normal':   { n:'Quinta Normal',     cap:'4,5%', precio:'2.050 UF', arr:'$405.000', gc:'$55.000',  vac:'6,2%', pub:'84',  sup:'9 (10,7%)',  nota:'Gastos comunes bajos (edificios sin piscina ni conserjería 24/7). Eso son 0,3 puntos de cap rate que Ñuñoa no tiene.' },
+    'santiago':        { n:'Santiago Centro',   cap:'4,4%', precio:'2.380 UF', arr:'$460.000', gc:'$78.000',  vac:'8,1%', pub:'612', sup:'44 (7,2%)',  nota:'Mucha oferta y mucha rotación: la vacancia de 8,1% se come casi medio punto. El precio bajó, pero el arriendo también.' },
+    'providencia':     { n:'Providencia',       cap:'3,2%', precio:'3.640 UF', arr:'$680.000', gc:'$142.000', vac:'5,1%', pub:'286', sup:'3 (1,0%)',   nota:'Arrienda rápido y bien, pero pagas por eso. Tres de cada 300 publicaciones superan el 4,8%, y suelen tener algo raro.' },
+    'las-condes':      { n:'Las Condes',        cap:'2,9%', precio:'4.850 UF', arr:'$820.000', gc:'$186.000', vac:'4,8%', pub:'404', sup:'2 (0,5%)',   nota:'Como inversión de renta, no da. Se compra por plusvalía y por vivir ahí, que son otras dos discusiones — y ninguna es ésta.' },
+    'nunoa':           { n:'Ñuñoa',             cap:'3,6%', precio:'3.180 UF', arr:'$620.000', gc:'$135.000', vac:'6,4%', pub:'318', sup:'7 (2,2%)',   nota:'En Ñuñoa el precio subió más que el arriendo: buen barrio, mal negocio de renta. Si vas por rentabilidad, casi nada te sirve acá.' },
+    'estacion-central':{ n:'Estación Central',  cap:'4,3%', precio:'1.760 UF', arr:'$335.000', gc:'$54.000',  vac:'11,8%',pub:'268', sup:'19 (7,1%)',  nota:'El folleto promete 5,7% y la vacancia se lleva un punto y medio: 43 días vacío al año y arrendatarios que duran 14 meses. Léela con lupa.' },
+    'san-miguel':      { n:'San Miguel',        cap:'4,4%', precio:'2.310 UF', arr:'$450.000', gc:'$78.000',  vac:'6,0%', pub:'174', sup:'16 (9,2%)',  nota:'La comuna más equilibrada del listado: arriendo estable, gastos comunes contenidos y vacancia baja. Aparece seguido en las alertas.' },
+    'macul':           { n:'Macul',             cap:'4,0%', precio:'2.640 UF', arr:'$480.000', gc:'$88.000',  vac:'6,6%', pub:'96',  sup:'5 (5,2%)',   nota:'Depende mucho del paño: cerca de Grecia rinde como Ñuñoa, cerca de Departamental rinde como San Miguel.' },
+    'la-florida':      { n:'La Florida',        cap:'4,1%', precio:'2.750 UF', arr:'$500.000', gc:'$95.000',  vac:'5,0%', pub:'232', sup:'14 (6,0%)',  nota:'Vacancia baja —la gente se queda— pero el precio de los edificios nuevos junto al Metro ya descontó toda la fiesta.' },
+    'la-cisterna':     { n:'La Cisterna',       cap:'4,2%', precio:'2.180 UF', arr:'$410.000', gc:'$66.000',  vac:'6,8%', pub:'78',  sup:'6 (7,7%)',   nota:'Poca oferta nueva. Cuando aparece algo bueno, dura poco publicado: acá la alerta diaria es la que sirve.' },
+    'maipu':           { n:'Maipú',             cap:'4,0%', precio:'2.420 UF', arr:'$440.000', gc:'$72.000',  vac:'7,4%', pub:'188', sup:'9 (4,8%)',   nota:'Mucho stock y arrendatario que compara: los edificios sin estacionamiento arriendan $60.000 menos y eso te borra medio punto.' }
+  };
+
+  var els = {
+    nombre: document.getElementById('lec-nombre'),
+    cap: document.getElementById('lec-cap'),
+    precio: document.getElementById('lec-precio'),
+    arriendo: document.getElementById('lec-arriendo'),
+    gc: document.getElementById('lec-gc'),
+    vac: document.getElementById('lec-vac'),
+    n: document.getElementById('lec-n'),
+    sup: document.getElementById('lec-sup'),
+    nota: document.getElementById('lec-nota')
+  };
+
+  function seleccionar(id) {
+    var d = COMUNAS[id];
+    if (!d) return;
+    els.nombre.textContent = d.n;
+    els.cap.textContent = d.cap;
+    els.precio.textContent = d.precio;
+    els.arriendo.textContent = d.arr;
+    els.gc.textContent = d.gc;
+    els.vac.textContent = d.vac;
+    els.n.textContent = d.pub;
+    els.sup.textContent = d.sup;
+    els.nota.textContent = d.nota;
+    document.querySelectorAll('#comunas .comuna').forEach(function (g) {
+      g.setAttribute('data-sel', g.dataset.c === id ? '1' : '0');
+    });
+  }
+
+  document.querySelectorAll('#comunas .comuna').forEach(function (g) {
+    g.addEventListener('click', function () { seleccionar(g.dataset.c); });
+    g.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); seleccionar(g.dataset.c); }
+    });
+  });
+  seleccionar('nunoa');
+</script>
+
+</body>
+</html>

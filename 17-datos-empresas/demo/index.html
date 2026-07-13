@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explorador de API — Fedatia</title>
+<meta name="description" content="Escriba un RUT y vea la petición, la respuesta y de qué fuente vino cada campo. Incluye el caso en que una fuente se cae y la API lo dice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* --- componentes propios del explorador ------------------------------- */
+  .demo { padding-block: var(--sp-m) var(--sp-2xl); }
+  /* minmax(0,1fr) y no "auto": si la columna es auto, el URL con nowrap la estira
+     y el teléfono termina con scroll horizontal. */
+  .tablero { display: grid; gap: var(--sp-m); grid-template-columns: minmax(0, 1fr); }
+  .tablero > * { min-width: 0; }
+  @media (min-width: 64em) {
+    .tablero { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); align-items: start; }
+    .col-izq { position: sticky; top: calc(var(--nav-alto) + 20px); }
+  }
+
+  .caja { border: 1px solid var(--linea); border-radius: var(--radio); background: var(--papel); overflow: hidden; }
+  .caja + .caja { margin-top: var(--sp-m); }
+  .caja__cab {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2xs);
+    padding: .6rem .8rem; border-bottom: 1px solid var(--linea); background: var(--papel-2);
+  }
+  .caja__cab h2, .caja__cab h3 {
+    margin: 0; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+    font-family: "Geist Mono", monospace; font-weight: 500; color: var(--tinta-3);
+  }
+  .caja__cue { padding: var(--sp-s) var(--sp-xs); }
+  @media (min-width: 48em) { .caja__cue { padding: var(--sp-s); } }
+
+  .campo { display: block; margin-bottom: var(--sp-2xs); }
+  .campo__et {
+    display: block; font-size: var(--step--1); font-weight: 500; color: var(--tinta);
+    margin-bottom: .3rem;
+  }
+  input[type="text"] {
+    width: 100%; min-height: 46px; padding: .6rem .75rem;
+    border: 1px solid var(--linea-2); border-radius: var(--radio-s);
+    background: var(--papel); font-family: "Geist Mono", monospace;
+    font-size: 1.05rem; letter-spacing: .01em; color: var(--tinta);
+  }
+  input[type="text"]:focus-visible { border-color: var(--cobalto); outline: 2px solid var(--cobalto); outline-offset: -1px; }
+
+  .dv { font-size: var(--step--1); color: var(--tinta-3); margin-top: .35rem; line-height: 1.35; }
+  .dv--ok { color: #06710a; }
+  .dv--fa { color: #a52a2a; }
+  .dv--cob { color: var(--cobalto-osc); }
+
+  .casos { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: var(--sp-2xs); }
+  .caso {
+    display: flex; flex-direction: column; align-items: flex-start; gap: .1rem;
+    padding: .45rem .6rem; border: 1px solid var(--linea-2); border-radius: var(--radio-s);
+    background: var(--papel); text-align: left; min-height: 44px; flex: 1 1 auto;
+  }
+  .caso:hover { background: var(--papel-2); }
+  .caso[aria-pressed="true"] { border-color: var(--cobalto); background: var(--cobalto-claro); }
+  .caso b { font-family: "Geist Mono", monospace; font-size: .76rem; font-weight: 500; color: var(--tinta); }
+  .caso span { font-size: .68rem; color: var(--tinta-3); }
+  .caso[aria-pressed="true"] span { color: var(--cobalto-osc); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .chip {
+    font-family: "Geist Mono", monospace; font-size: .72rem;
+    padding: .3rem .7rem; border-radius: 999px; min-height: 44px; min-width: 0;
+    border: 1px solid var(--linea-2); color: var(--tinta-3); background: var(--papel);
+    display: inline-flex; align-items: center; gap: .3rem;
+  }
+  .chip:hover { border-color: var(--tinta-3); }
+  .chip[aria-pressed="true"] { border-color: var(--cobalto); background: var(--cobalto); color: #fff; }
+  .chip[aria-pressed="true"]::before { content: "✓"; font-size: .7rem; }
+  .chip--peligro[aria-pressed="true"] { border-color: var(--falla); background: var(--falla); }
+
+  .urlcaja {
+    background: var(--cod-fondo); border-radius: var(--radio-s); padding: .6rem .7rem;
+    font-family: "Geist Mono", monospace; font-size: .74rem; line-height: 1.6;
+    overflow-x: auto; white-space: nowrap; color: var(--cod-base);
+  }
+  .urlcaja .metodo {
+    color: var(--cod-ok); font-weight: 500; margin-right: .4rem;
+  }
+
+  .respcab { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+  .motivo {
+    font-size: var(--step--1); color: var(--tinta-2); margin-top: .5rem;
+    padding: .5rem .6rem; border-radius: var(--radio-s); background: var(--papel-2);
+    border-left: 3px solid var(--linea-2);
+  }
+  .motivo--al { background: var(--alerta-fondo); border-left-color: var(--alerta); color: #7a5000; }
+
+  .json {
+    background: var(--cod-fondo); border-radius: var(--radio); padding: var(--sp-xs);
+    font-family: "Geist Mono", monospace; font-size: .74rem; line-height: 1.65;
+    color: var(--cod-base); overflow-x: auto; -webkit-overflow-scrolling: touch;
+    min-height: 220px; max-height: 62vh; overflow-y: auto;
+    box-shadow: var(--sombra-cod);
+  }
+  @media (min-width: 48em) { .json { font-size: .8rem; padding: var(--sp-s); } }
+  .json .ln { white-space: pre; }
+  .json::-webkit-scrollbar { width: 9px; height: 9px; }
+  .json::-webkit-scrollbar-thumb { background: #2b3644; border-radius: 5px; }
+
+  .pin {
+    display: inline-flex; align-items: center; gap: .2rem; vertical-align: middle;
+    min-height: 26px; min-width: 0; padding: .05rem .4rem; margin-left: .5rem;
+    border: 1px solid #2b3644; border-radius: 999px;
+    font-family: "Geist Mono", monospace; font-size: .62rem; letter-spacing: .04em;
+    color: #7fafea; background: #161d27; white-space: nowrap;
+  }
+  .pin:hover { background: #1f2d40; border-color: #3d5b85; color: #cfe0f8; }
+  .pin svg { width: 11px; height: 11px; }
+
+  /* hoja de procedencia: abajo en teléfono, panel lateral en escritorio */
+  .velo {
+    position: fixed; inset: 0; background: rgba(13,18,25,.42); z-index: 90;
+    opacity: 0; pointer-events: none; transition: opacity .18s ease;
+  }
+  .hoja.abierta ~ .velo, .velo.on { opacity: 1; pointer-events: auto; }
+  .hoja {
+    position: fixed; z-index: 100; left: 0; right: 0; bottom: 0;
+    background: var(--papel); border-top: 1px solid var(--linea);
+    border-radius: 14px 14px 0 0; box-shadow: 0 -12px 40px -12px rgba(13,18,25,.35);
+    transform: translateY(101%); transition: transform .22s ease;
+    max-height: 82vh; overflow-y: auto;
+  }
+  .hoja.abierta { transform: translateY(0); }
+  @media (min-width: 64em) {
+    .hoja {
+      left: auto; top: 0; bottom: 0; width: 460px; max-height: none;
+      border-radius: 0; border-top: 0; border-left: 1px solid var(--linea);
+      transform: translateX(101%);
+    }
+    .hoja.abierta { transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hoja, .velo { transition: none; } }
+  .hoja__cab {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--sp-xs) var(--sp-s); border-bottom: 1px solid var(--linea);
+    position: sticky; top: 0; background: var(--papel);
+  }
+  .hoja__cab h2 { font-size: var(--step-0); margin: 0; }
+  .hoja__cue { padding: var(--sp-s); }
+  .proc > div { padding: .6rem 0; border-bottom: 1px solid var(--linea); }
+  .proc dt {
+    font-family: "Geist Mono", monospace; font-size: .66rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--tinta-3); margin-bottom: .2rem;
+  }
+  .proc dd { font-size: var(--step--1); color: var(--tinta-2); margin: 0; line-height: 1.5; }
+
+  .fuentes { display: grid; gap: 1px; background: var(--linea); border-radius: var(--radio-s); overflow: hidden; }
+  @media (min-width: 40em) { .fuentes { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 64em) { .fuentes { grid-template-columns: 1fr 1fr 1fr; } }
+  .fuente { background: var(--papel); padding: .6rem .7rem; }
+  .fuente__n { font-size: var(--step--1); font-weight: 500; color: var(--tinta); }
+  .fuente__o { font-size: .66rem; color: var(--tinta-3); margin: .1rem 0 .35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fuente__e { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" stroke="#1b5fd0" stroke-width="1.6"/>
+        <path d="M7 8.5h10M7 12h6M7 15.5h8" stroke="#1b5fd0" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="n">Fedatia</span>
+      <span class="v">v1</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="demo">
+  <div class="container">
+
+    <span class="eyebrow">Explorador · entorno sandbox</span>
+    <h1 style="font-size:var(--step-3)">Escriba un RUT. Vea de dónde salió cada dato.</h1>
+    <p class="lede max-60" style="margin-top:.5rem">
+      Esto no es un video. Es la API respondiendo en su navegador, con los mismos
+      cuerpos JSON que devuelve en producción. Cada bloque trae un
+      <strong>pin de procedencia</strong>: tóquelo y le decimos la fuente, la hora
+      de captura y si el dato sigue dentro de su ventana de frescura.
+    </p>
+
+    <div class="aviso" style="max-width:68ch">
+      <span class="aviso__tit">Los RUT de este sandbox son reservados</span>
+      <p class="peq">Todos terminan en <code>-K</code> y <strong>ninguno cumple el módulo 11</strong>.
+      Es deliberado: así un RUT de prueba nunca puede coincidir con una empresa chilena de
+      verdad, ni en su base de datos ni en la nuestra. Es la misma idea de la tarjeta
+      <code>4242…</code> de Stripe, apretada un poco más.</p>
+    </div>
+
+    <div class="tablero">
+
+      <!-- ================= COLUMNA IZQUIERDA: LA PETICIÓN ================= -->
+      <div class="col-izq">
+        <section class="caja" aria-labelledby="t-peticion">
+          <div class="caja__cab"><h2 id="t-peticion">La petición</h2>
+            <span class="eti eti--gris">GET</span></div>
+          <div class="caja__cue">
+
+            <div class="urlcaja" id="urlView"></div>
+
+            <label class="campo" style="margin-top:var(--sp-s)">
+              <span class="campo__et">RUT de la empresa</span>
+              <input type="text" id="rutInput" inputmode="text" autocomplete="off"
+                     spellcheck="false" placeholder="76.543.210-K" aria-describedby="dvAviso">
+            </label>
+            <p class="dv" id="dvAviso">Escriba un RUT o elija un caso.</p>
+
+            <h3 style="font-size:var(--step--1);margin:var(--sp-s) 0 .1rem">Casos del sandbox</h3>
+            <div class="casos">
+              <button class="caso" data-caso="76.543.210-K" aria-pressed="true">
+                <b>76.543.210-K</b><span>Perfil completo</span></button>
+              <button class="caso" data-caso="77.984.120-K" aria-pressed="false">
+                <b>77.984.120-K</b><span>Una fuente caída</span></button>
+              <button class="caso" data-caso="79.612.043-K" aria-pressed="false">
+                <b>79.612.043-K</b><span>Un dato vencido</span></button>
+              <button class="caso" data-caso="78.455.901-K" aria-pressed="false">
+                <b>78.455.901-K</b><span>Sin inicio de actividades</span></button>
+              <button class="caso" data-caso="76.543.210-5" aria-pressed="false">
+                <b>76.543.210-5</b><span>Dígito verificador malo</span></button>
+            </div>
+
+            <h3 style="font-size:var(--step--1);margin:var(--sp-m) 0 .35rem">
+              <code>incluir=</code> qué bloques pide
+            </h3>
+            <div class="chips">
+              <button class="chip" data-inc="identidad" aria-pressed="true">identidad</button>
+              <button class="chip" data-inc="actividad" aria-pressed="true">actividad</button>
+              <button class="chip" data-inc="mercado_publico" aria-pressed="true">mercado_publico</button>
+              <button class="chip" data-inc="marcas" aria-pressed="true">marcas</button>
+              <button class="chip" data-inc="cmf" aria-pressed="false">cmf</button>
+              <button class="chip" data-inc="concursal" aria-pressed="true">concursal</button>
+              <button class="chip" data-inc="sanciones" aria-pressed="true">sanciones</button>
+            </div>
+
+            <h3 style="font-size:var(--step--1);margin:var(--sp-m) 0 .35rem">Parámetros</h3>
+            <div class="chips">
+              <button class="chip chip--peligro" id="optPersonas" aria-pressed="false">personas=true</button>
+              <button class="chip" id="optCache" aria-pressed="false">permitir_cache_vencida=true</button>
+            </div>
+            <p class="peq" style="margin-top:.4rem">
+              <code>personas=true</code> responde <strong>403 siempre</strong>. Está documentado
+              y es a propósito: <a href="../index.html#personas">acá explicamos por qué</a>.
+            </p>
+
+            <button class="btn btn--pri" id="enviar" style="width:100%;margin-top:var(--sp-m)">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Enviar la petición
+            </button>
+          </div>
+        </section>
+
+        <section class="cod" data-tabs id="tabsLangCaja" aria-label="Código de la petición">
+          <div class="cod__barra" id="tabsLang" role="tablist" aria-label="Lenguaje">
+            <span class="cod__tit">petición</span>
+            <button class="cod__tab" role="tab" data-lang="curl" aria-selected="true">curl</button>
+            <button class="cod__tab" role="tab" data-lang="node" aria-selected="false">node</button>
+            <button class="cod__tab" role="tab" data-lang="python" aria-selected="false">python</button>
+            <button class="cod__cop" data-copiar aria-label="Copiar">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4a1.5 1.5 0 0 0-1.5 1.5V10A1.5 1.5 0 0 0 4 11.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+            </button>
+          </div>
+          <pre id="snippet"></pre>
+        </section>
+      </div>
+
+      <!-- ================= COLUMNA DERECHA: LA RESPUESTA ================= -->
+      <div>
+        <section class="caja" aria-labelledby="t-respuesta">
+          <div class="caja__cab">
+            <h2 id="t-respuesta">La respuesta</h2>
+          </div>
+          <div class="caja__cue">
+            <div class="respcab" id="estadoResp"></div>
+            <p class="motivo" id="motivoCobro"></p>
+            <div class="json" id="respuesta" role="region" aria-live="polite" aria-label="Cuerpo de la respuesta"></div>
+            <p class="peq" style="margin-top:.5rem">
+              Toque <span class="eti eti--cob">procedencia</span> en cualquier bloque para ver
+              de qué fuente vino, cuándo se capturó y si sigue vigente.
+            </p>
+          </div>
+        </section>
+
+        <section class="caja" aria-labelledby="t-salud">
+          <div class="caja__cab">
+            <h2 id="t-salud">Salud de las fuentes</h2>
+            <span class="peq">se refleja en la respuesta de arriba</span>
+          </div>
+          <div class="caja__cue">
+            <div class="fuentes" id="salud"></div>
+            <p class="peq" style="margin-top:.6rem">
+              Esta grilla es pública y se publica sola en <code>status.fedatia.com</code>.
+              Cuando una fuente se cae, no lo escondemos: lo dice la respuesta, lo dice el
+              tablero, y esa consulta no se cobra.
+            </p>
+          </div>
+        </section>
+
+        <section class="caja oculto" id="panelVigilancia" aria-labelledby="t-vig">
+          <div class="caja__cab">
+            <h2 id="t-vig">Vigilancia · webhook</h2>
+            <span class="eti eti--gris" id="vigRut">76.543.210-K</span>
+          </div>
+          <div class="caja__cue">
+            <p class="peq" style="margin-top:0">
+              Consultar una vez es barato. Lo que la fintech necesita es enterarse
+              <em>después</em>: cuando el proveedor queda inhábil, cuando aparece en el
+              Boletín Concursal, cuando cambia el giro. Eso es una suscripción por RUT.
+            </p>
+            <button class="btn btn--sec" id="simularCambio" style="margin:.4rem 0 var(--sp-s)">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v11M8 2.5 5 5.5M8 2.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.2" opacity=".35"/></svg>
+              Simular un cambio en la fuente
+            </button>
+            <div class="respcab" id="webhookEstado">
+              <span class="eti eti--gris">esperando un cambio…</span>
+            </div>
+            <div class="json" id="webhook" style="min-height:120px;margin-top:.5rem"><span class="t-com">// Apriete el botón y le mostramos el POST que sale hacia su endpoint.</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-xl);max-width:78ch">
+      <span class="aviso__tit">Qué está falseado acá y qué no</span>
+      <p class="peq">
+        <strong>Real:</strong> el validador de dígito verificador (módulo 11 de verdad), el
+        formato de los cuerpos JSON, los códigos de error, la lógica de facturación
+        (una respuesta incompleta o vencida no se cobra) y la estructura de
+        <code>_meta</code>. <strong>Falseado:</strong> no hay red — las once fuentes están
+        mockeadas en <code>explorador.js</code>, las empresas son inventadas y los hash de
+        documento son de adorno. La lista completa de lo que habría que construir está en
+        <a href="../stack.html">Arquitectura</a>.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<!-- hoja de procedencia -->
+<aside class="hoja" id="hoja" role="dialog" aria-modal="true" aria-labelledby="t-proc" aria-hidden="true">
+  <div class="hoja__cab">
+    <h2 id="t-proc">Procedencia del dato</h2>
+    <button class="nav-btn" id="cerrarHoja" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="hoja__cue" id="procCuerpo"></div>
+</aside>
+<div class="velo" id="velo"></div>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Fedatia</strong> — prototipo. Datos ficticios; empresas, montos y publicaciones son inventados.
+    Los RUT de este sandbox no cumplen el módulo 11 a propósito.</p>
+  </div>
+</footer>
+
+<script src="../sitio.js"></script>
+<script src="explorador.js"></script>
+</body>
+</html>

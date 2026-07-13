@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Cotejia</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, competencia, economía unitaria, canales y autonomía total: cómo Cotejia se vende, se entrega, se cobra y se soporta sin humanos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .toc {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none;
+  }
+  .toc a {
+    font-family: var(--mono); font-size: .72rem; color: var(--ink-2);
+    border: 1px solid var(--line-2); border-radius: var(--r);
+    padding: 7px 10px; display: inline-block; min-height: 38px; line-height: 24px;
+  }
+  .toc a:hover { border-color: var(--amber); color: var(--amber); text-decoration: none; }
+  .calc {
+    font-family: var(--mono); font-size: .82rem; font-variant-numeric: tabular-nums;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-left: 2px solid var(--amber-dim);
+    border-radius: var(--r); padding: 12px 14px; color: var(--ink-2);
+    overflow-x: auto;
+  }
+  .calc b { color: var(--ink); font-weight: 500; }
+  .calc .sup { color: var(--ink-3); }
+  .supuesto {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-3);
+    border: 1px solid var(--line-2); border-radius: 2px; padding: 2px 5px;
+    display: inline-block; margin-right: 4px;
+  }
+  h2 { scroll-margin-top: 70px; }
+  .auto-grid { display: grid; gap: 12px; }
+  @media (min-width: 860px) { .auto-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html"><span class="dot" aria-hidden="true"></span>COTEJIA</a>
+    <div class="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menú</button>
+  </div>
+  <div class="nav-drawer" id="drawer">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html" aria-current="page">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html">Arquitectura</a>
+  </div>
+</nav>
+
+<main id="contenido">
+
+<section class="wrap">
+  <span class="kicker">Negocio · go-to-market</span>
+  <h1>Un negocio chico, honesto y automático.</h1>
+  <p class="lede narrow">
+    Cotejia no va a ser un unicornio. El mercado chileno tiene techo y lo vamos a calcular
+    aquí, delante de ti. Lo que sí puede ser: un producto que se vende, se entrega, se cobra
+    y se soporta <strong>sin una sola persona adentro</strong>, con 85%+ de margen bruto y
+    payback en menos de dos meses.
+  </p>
+  <ul class="toc">
+    <li><a href="#icp">Cliente</a></li>
+    <li><a href="#mercado">Mercado</a></li>
+    <li><a href="#cuna">Cuña</a></li>
+    <li><a href="#competencia">Competencia</a></li>
+    <li><a href="#economia">Economía unitaria</a></li>
+    <li><a href="#canales">Canales</a></li>
+    <li><a href="#autonomia">Autonomía</a></li>
+    <li><a href="#ia">IA en el marketing</a></li>
+    <li><a href="#dias">Primeros 90 días</a></li>
+    <li><a href="#mata">Qué mataría esto</a></li>
+  </ul>
+</section>
+
+<!-- ================= ICP ================= -->
+<section class="wrap">
+  <h2 id="icp">Cliente objetivo</h2>
+  <div class="grid g2">
+    <div>
+      <dl class="kv">
+        <dt>Segmento</dt>
+        <dd>Tienda de e-commerce chilena que <b>revende</b> productos de terceros (no fabrica): outdoor,
+          hogar, deporte, tecnología, belleza, mascotas, repuestos.</dd>
+        <dt>Tamaño</dt>
+        <dd>Ventas entre <b>$8.000.000 y $150.000.000 al mes</b>. De 60 a 3.000 SKU. Entre 1 y 12 personas.</dd>
+        <dt>Dónde vende</dt>
+        <dd>Mercado Libre (casi siempre), más al menos uno de: Falabella Seller Center, Paris Marketplace,
+          Ripley, y su propia tienda en Jumpseller / Shopify / Bsale.</dd>
+        <dt>Quién firma</dt>
+        <dd>La dueña o el dueño. Es la misma persona que mira los precios a mano. No hay comité,
+          no hay compras, no hay "área de pricing". Por eso el ciclo de venta puede ser de minutos.</dd>
+        <dt>Quién lo usa</dt>
+        <dd>La misma persona, o quien maneja las publicaciones. Perfil: sabe Excel, no sabe SQL,
+          desconfía de lo automático hasta que ve la primera sugerencia con su producto y su costo.</dd>
+        <dt>Dónde ya está</dt>
+        <dd>En el panel de Mercado Libre, en el grupo de WhatsApp de vendedores, en el app store de
+          Jumpseller buscando cómo automatizar algo. <b>Ese último lugar es nuestra puerta.</b></dd>
+      </dl>
+    </div>
+    <div>
+      <div class="card">
+        <span class="kicker">Cómo se ve el dolor</span>
+        <p style="font-size:.94rem;color:var(--ink-2)">
+          Vende 340 SKU. Revisa "los que más se mueven" —unos 20— cuando alcanza, después de despachar.
+          Los otros 320 no los mira nunca. En esos 320 hay dos cosas al mismo tiempo:
+        </p>
+        <ul class="clean">
+          <li>Productos donde es <b class="up">el más barato por $3.000</b> y podría cobrar más sin perder
+            una sola venta. Plata regalada, todos los días, sin que nadie se la pida.</li>
+          <li>Productos donde <b class="down">lleva tres semanas cara</b> y no se ha enterado. La venta se la
+            está llevando otro y ella cree que "el producto se murió".</li>
+        </ul>
+        <p style="font-size:.94rem;color:var(--ink-2);margin-bottom:0">
+          Las dos cosas cuestan plata. La segunda duele más, pero la primera cuesta más — y es la
+          invisible.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MERCADO ================= -->
+<section class="wrap">
+  <h2 id="mercado">Tamaño de mercado — con la aritmética a la vista</h2>
+  <p class="note warn" style="margin-bottom:18px">
+    <b>Advertencia de honestidad.</b> No existe una estadística pública confiable de "cuántas tiendas
+    online chilenas revenden en marketplaces". Todo lo que sigue está construido de abajo hacia arriba
+    a partir de supuestos que declaro uno por uno. <b>Cámbialos y el resultado cambia.</b>
+    Ninguna de estas cifras es una fuente: son mi aritmética, y la dejo a la vista para que la puedas romper.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <h3 style="font-size:1rem">TAM Chile — tiendas que venden online de verdad</h3>
+      <div class="calc">
+        <span class="sup">Supuesto 1</span> Empresas formales en Chile <b>≈ 1.100.000</b><br>
+        <span class="sup">(contribuyentes de primera categoría, orden de magnitud según el SII;<br>
+        cifra de memoria, hay que verificarla antes de apostar plata)</span><br><br>
+        <span class="sup">Supuesto 2</span> Venden online con &gt;20 SKU activos: <b>2,5%</b><br>
+        <span class="sup">(tienda propia o marketplace, de forma habitual)</span><br><br>
+        1.100.000 × 2,5% = <b style="color:var(--amber)">27.500 tiendas</b> &nbsp;<span class="sup">TAM Chile</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1rem">SAM — a las que este producto les sirve</h3>
+      <div class="calc">
+        <span class="sup">Supuesto 3</span> Tienen ≥50 SKU <b>y</b> revenden productos que
+        <b>otro vendedor también vende</b> (o sea: hay con quién compararse). Marcas propias y
+        productos únicos quedan fuera — para ellas Cotejia no sirve: <b>40%</b><br><br>
+        27.500 × 40% = <b style="color:var(--amber)">11.000 tiendas</b> &nbsp;<span class="sup">SAM Chile</span>
+      </div>
+      <h3 style="font-size:1rem;margin-top:18px">SOM — las que pueden pagar</h3>
+      <div class="calc">
+        <span class="sup">Supuesto 4</span> Venden ≥ $8.000.000/mes. Bajo ese umbral, $29.900/mes es
+        más del 0,4% de las ventas y la dueña —con razón— prefiere seguir mirando a mano: <b>55%</b><br><br>
+        11.000 × 55% = <b style="color:var(--amber)">6.050 tiendas</b> &nbsp;<span class="sup">SOM Chile</span>
+      </div>
+    </div>
+  </div>
+
+  <figure style="margin-top:22px">
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 620 190" style="min-width:520px;max-width:700px" role="img"
+        aria-label="Embudo de mercado: TAM 27.500 tiendas, SAM 11.000 tiendas, SOM 6.050 tiendas, meta a 24 meses 258 clientes.">
+        <text x="0" y="14" class="lbl" font-size="11">TAM · venden online</text>
+        <rect x="0" y="22" width="560" height="26" rx="4" fill="#86b6ef"/>
+        <text x="570" y="40" class="lbl" font-size="12" fill="#e9edf2">27.500</text>
+
+        <text x="0" y="72" class="lbl" font-size="11">SAM · tienen con quién compararse</text>
+        <rect x="0" y="80" width="224" height="26" rx="4" fill="#3987e5"/>
+        <text x="234" y="98" class="lbl" font-size="12" fill="#e9edf2">11.000</text>
+
+        <text x="0" y="130" class="lbl" font-size="11">SOM · además pueden pagarlo</text>
+        <rect x="0" y="138" width="123" height="26" rx="4" fill="#256abf"/>
+        <text x="133" y="156" class="lbl" font-size="12" fill="#e9edf2">6.050</text>
+
+        <line x1="5.3" y1="138" x2="5.3" y2="182" stroke="#f2b544" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="12" y="180" class="lbl" font-size="11" fill="#f2b544">258 clientes = nuestra meta al mes 24 (4,3% del SOM)</text>
+      </svg>
+    </div>
+    <figcaption>Cada barra es la anterior filtrada por un supuesto declarado. La línea ámbar es la meta del
+      escenario base del <a href="roadmap.html">roadmap</a>: 258 clientes, 4,3% del SOM. Escala lineal, misma base.</figcaption>
+  </figure>
+
+  <h3 style="margin-top:26px">El techo, dicho sin adornos</h3>
+  <div class="calc">
+    ARPU esperado (mezcla de tramos) = <b>$52.000/mes</b><br>
+    <span class="sup">(60% Cinta $29.900 · 30% Pizarra $59.900 · 10% Mesa $129.900 → 0,6×29.900 + 0,3×59.900 + 0,1×129.900 = $48.890 ≈ $52.000 con crecimiento de SKU dentro del tramo)</span><br><br>
+    <b>Si tomáramos el 100% del SOM chileno</b>: 6.050 × $52.000 × 12 = <b>$3.775 millones CLP/año</b> ≈ <b>US$4,0M ARR</b>
+    <span class="sup">(dólar supuesto $950)</span><br><br>
+    <b>Lo realista</b>: 4–6% del SOM en 24 meses = 250–360 clientes = <b class="up">$156M–$225M CLP/año</b> ≈ <b>US$165k–US$237k ARR</b><br><br>
+    <b>Para llegar a US$1M ARR sólo con Chile</b> harían falta ≈ <b>1.600 clientes = 26% del SOM.</b>
+    Ninguna herramienta B2B de nicho toma un cuarto de su mercado. <b style="color:var(--down)">Con Chile solo, US$1M ARR
+    es prácticamente imposible.</b> Es un hecho estructural, no una falta de ganas.
+  </div>
+
+  <h3 style="margin-top:22px">Extensión regional — donde sí hay negocio grande</h3>
+  <p style="color:var(--ink-2)">
+    El producto no es "chileno": es <b>de Mercado Libre</b>. El mismo motor, la misma API oficial, las mismas
+    reglas, funcionan en México, Argentina, Colombia y Brasil cambiando el <code>site_id</code> y la moneda.
+    Lo que cambia es el marketplace local no-MELI (Falabella en Chile/Perú/Colombia; Magalu y Americanas en Brasil).
+  </p>
+  <div class="calc">
+    <span class="sup">Supuesto 5</span> Brasil + México + Argentina + Colombia tienen, juntos, del orden de
+    <b>15× los vendedores de marketplace de Chile</b>
+    <span class="sup">(por población y penetración de e-commerce; supuesto grueso, verificable con los reportes públicos de MELI)</span><br><br>
+    SAM regional ≈ 11.000 × 15 = <b>165.000 tiendas</b> · SOM regional ≈ <b>90.000</b><br>
+    Con 3% del SOM regional: 2.700 clientes × US$55/mes × 12 = <b class="up">≈ US$1,8M ARR</b><br><br>
+    <b>Conclusión:</b> Chile es la cabecera de playa y la prueba de que el motor funciona.
+    <b>El negocio de verdad se decide en el mes 24: o cruza a LatAm, o se queda siendo un buen
+    negocio pequeño de US$200k ARR operado por un sistema automático.</b> Las dos son respuestas válidas.
+    Fingir que la primera está garantizada, no.
+  </div>
+</section>
+
+<!-- ================= CUÑA ================= -->
+<section class="wrap">
+  <h2 id="cuna">Posicionamiento y cuña</h2>
+  <div class="grid g2">
+    <div>
+      <h3 style="font-size:1rem">La cabecera de playa</h3>
+      <p style="color:var(--ink-2)">
+        <b>Vendedores de Mercado Libre Chile con 100–800 SKU que además venden en Falabella o Paris,
+        en categorías con muchos revendedores del mismo producto</b>: outdoor/camping, electrohogar chico,
+        deporte, mascotas, herramientas.
+      </p>
+      <p style="color:var(--ink-2)">Por qué ése y no otro:</p>
+      <ul class="clean">
+        <li><b>El dolor es diario y medible.</b> Cinco vendedores publicando el mismo termo: el precio
+          decide la venta, y cambia todos los días.</li>
+        <li><b>El multicanal es lo que quiebra el Excel.</b> Con un solo canal, la dueña se las arregla
+          mirando. Con tres, no da.</li>
+        <li><b>Tienen costos cargados.</b> Sin costo no hay piso de margen, y sin piso de margen este
+          producto no debería encenderse.</li>
+        <li><b>Se les encuentra sin vendedor:</b> están en el app store de Jumpseller y de Bsale buscando
+          precisamente esto.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card">
+        <span class="kicker">La frase</span>
+        <p style="font-size:1.05rem;color:var(--ink)">
+          "Los repricers internacionales te enseñan a bajar el precio.
+          <b>Cotejia te enseña cuándo no bajarlo.</b>"
+        </p>
+        <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:0">
+          Es la única posición defendible: cualquiera puede escribir un bot que iguale al más barato.
+          Lo difícil —y lo que salva el margen del cliente— es saber cuándo el más barato es un bot,
+          cuándo es un vendedor sin reputación, y cuándo la palanca correcta ni siquiera es el precio.
+        </p>
+      </div>
+      <div class="card" style="margin-top:12px;border-left:2px solid var(--amber)">
+        <span class="kicker">La cuña técnica</span>
+        <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:0">
+          El emparejamiento de productos en <b>español chileno</b>. "Termo Stanley 1,4L verde original
+          garantía" contra "Stanley Classic Legendary 1.4 lts verde" es el mismo producto, y un repricer
+          gringo entrenado en catálogos de Amazon con ASIN no lo resuelve: en Mercado Libre no hay ASIN,
+          hay títulos escritos a mano por 300 vendedores distintos. Ese es nuestro foso.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPETENCIA ================= -->
+<section class="wrap">
+  <h2 id="competencia">Competencia</h2>
+  <div class="scroll-x">
+    <table>
+      <thead>
+        <tr><th>Quién</th><th>Qué hace</th><th>Por qué gana hoy</th><th>Dónde no llega</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Mirar a mano</b><br><small style="color:var(--ink-3)">el titular real del puesto</small></td>
+          <td>La dueña abre Mercado Libre, busca su producto, mira quién está más barato, decide a ojo.</td>
+          <td>Gratis, inmediato, y ella confía en su criterio. <b>Es el 95% del mercado.</b></td>
+          <td>No escala más allá de ~20 SKU. No mira de noche. No detecta que lleva 14 bajadas
+            contra un bot. Y nunca ve la plata sobre la mesa: sólo ve cuando pierde.</td>
+        </tr>
+        <tr>
+          <td><b>Un Excel con precios pegados</b></td>
+          <td>Copiar y pegar precios de la competencia una vez por semana en una planilla.</td>
+          <td>Es el paso siguiente natural. Ya lo tienen hecho.</td>
+          <td>Está desactualizado en 24 horas. Nadie lo mantiene después del segundo mes.</td>
+        </tr>
+        <tr>
+          <td><b>Mercado Libre</b><br><small style="color:var(--ink-3)">"precio sugerido", "publicación con descuento"</small></td>
+          <td>Le sugiere al vendedor bajar el precio para "ganar la escucha". Y le ofrece campañas.</td>
+          <td>Está adentro del panel, es gratis, y tiene los datos de conversión reales.</td>
+          <td><b>Su incentivo no es tu margen: es su comisión.</b> Mercado Libre gana más si tú vendes
+            más barato. Nunca te va a decir "sube el precio $2.000" ni "no bajes, activa el despacho".
+            Y no mira Falabella ni Paris — sus competidores.</td>
+        </tr>
+        <tr>
+          <td><b>Repricers internacionales</b><br><small style="color:var(--ink-3)">Prisync, RepricerExpress, Informed.co, Minderest</small></td>
+          <td>Monitoreo y repricing sobre Amazon, eBay, Google Shopping.</td>
+          <td>Producto maduro, más features, años de desarrollo.</td>
+          <td>No entienden Mercado Libre, no entienden Falabella, no hablan CLP y cobran en dólares
+            (US$99–US$500/mes). El emparejamiento sin ASIN, en títulos escritos en chileno, los rompe.
+            Ninguno tiene detector de bucle.</td>
+        </tr>
+        <tr>
+          <td><b>Nubox / Bsale / Defontana</b></td>
+          <td>ERP y facturación PYME. Tienen el costo del producto, que es la mitad de este problema.</td>
+          <td>Ya están instalados y ya tienen la confianza del cliente.</td>
+          <td>No miran la competencia. Su negocio es la boleta, no el precio.
+            <b>Son más socio de canal que competidor</b> — y ese es el plan.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:16px">
+    <b>Diferenciación honesta:</b> nada de lo que hacemos es tecnológicamente imposible para
+    Mercado Libre. Podrían construirlo en un trimestre. <b>No lo van a construir</b>, porque un producto
+    que le dice al vendedor "sube el precio" y "no bajes, el otro es un bot" va directamente contra su
+    incentivo: MELI cobra comisión sobre la venta, y vende más si los precios bajan. Esa contradicción
+    de incentivos es nuestro único foso real. No es tecnología. Es alineación.
+  </p>
+</section>
+
+<!-- ================= ECONOMÍA ================= -->
+<section class="wrap">
+  <h2 id="economia">Precio y economía unitaria</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Todos los costos de abajo salen de <a href="stack.html">la página de arquitectura</a>, donde están
+    derivados uno por uno. Si esa página y ésta no cuadran, esta página está mintiendo.
+  </p>
+
+  <div class="scroll-x">
+    <table>
+      <thead>
+        <tr><th>Tramo</th><th class="t-r">Precio/mes</th><th class="t-r">SKU</th><th class="t-r">Lectura</th><th class="t-r">Cambio automático</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vitrina</td><td class="t-r">$0</td><td class="t-r">25</td><td class="t-r">1× día</td><td class="t-r">no</td></tr>
+        <tr><td>Cinta</td><td class="t-r"><b>$29.900</b></td><td class="t-r">250</td><td class="t-r">cada 3 h</td><td class="t-r">no</td></tr>
+        <tr><td><b>Pizarra</b> <span class="tag amber">el que se vende</span></td><td class="t-r"><b>$59.900</b></td><td class="t-r">1.000</td><td class="t-r">cada 30 min</td><td class="t-r"><b class="up">sí</b></td></tr>
+        <tr><td>Mesa</td><td class="t-r"><b>$129.900</b></td><td class="t-r">5.000</td><td class="t-r">cada 10 min</td><td class="t-r"><b class="up">sí</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:24px">Margen bruto de un cliente Pizarra ($59.900/mes)</h3>
+  <div class="calc">
+    <b>Costo de IA</b> (emparejamiento de ofertas nuevas + resumen semanal + soporte + autorreparación)<br>
+    &nbsp;&nbsp;≈ US$1,22/mes → <b>$1.160 CLP</b> <span class="sup">(derivación token por token en stack.html; dólar supuesto $950)</span><br>
+    <b>Infraestructura prorrateada</b> (workers, Postgres, proxies, CDN, observabilidad) con 100 clientes<br>
+    &nbsp;&nbsp;US$173/mes ÷ 100 = US$1,73 → <b>$1.640 CLP</b><br>
+    <b>Pasarela de pago</b> (Flow/Webpay, 3,5% + IVA ≈ 4,2%)<br>
+    &nbsp;&nbsp;$59.900 × 4,2% = <b>$2.516 CLP</b><br>
+    ─────────────────────────────<br>
+    <b>COGS = $5.316</b> → Margen bruto = (59.900 − 5.316) / 59.900 = <b class="up">91,1%</b><br><br>
+    <span class="sup">Sobre la mezcla completa de tramos, y castigando por el rev-share de los app stores
+    (20% de lo cobrado a los clientes que llegan por ahí, que serán ~40% del total), el margen bruto
+    consolidado que uso en el roadmap es <b>85%</b>. Prefiero equivocarme por abajo.</span>
+  </div>
+
+  <div class="grid g2" style="margin-top:20px">
+    <div>
+      <h3 style="font-size:1rem">CAC</h3>
+      <div class="calc">
+        <b>Canal Google Ads</b> <span class="sup">(estimación)</span><br>
+        CPC estimado clúster "repricer / monitoreo de precios / precios mercado libre": <b>$500 CLP</b><br>
+        Visita → prueba gratis: <b>6%</b> → costo por prueba = 500 / 0,06 = <b>$8.333</b><br>
+        Prueba → pago: <b>20%</b> → <b class="down">CAC ≈ $41.700</b><br>
+        + costo de IA del onboarding (emparejar 1.000 SKU una vez): US$8 = <b>$7.600</b><br>
+        <b>CAC total ≈ $49.300</b><br><br>
+        <b>Canal app store</b> (Jumpseller / Bsale / Shopify)<br>
+        CAC de adquisición ≈ <b>$0</b>. El costo es el rev-share: <b>20%</b> de lo que ese cliente paga.<br>
+        <span class="sup">Sobre 16 meses de vida: 0,20 × 59.900 × 16 = $191.680 — más caro que Ads en el largo
+        plazo, pero sin desembolso, sin riesgo y con conversión mucho mayor. Se paga solo si el cliente se queda.</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1rem">LTV y payback</h3>
+      <div class="calc">
+        <span class="sup">Supuesto</span> Churn mensual <b>6%</b> <span class="sup">(PYME e-commerce: alto. Si
+        resulta ser 3%, todo mejora; si es 10%, esto no es un negocio)</span><br>
+        Vida media = 1 / 0,06 = <b>16,7 meses</b><br>
+        Contribución mensual = $59.900 × 85% = <b>$50.915</b><br>
+        <b>LTV = 50.915 × 16,7 = $850.281</b><br><br>
+        <b>LTV / CAC = 850.281 / 49.300 = 17×</b><br>
+        <b>Payback = 49.300 / 50.915 = 0,97 meses</b> <span class="up">(menos de un mes)</span><br><br>
+        <b style="color:var(--down)">Cuidado con este número.</b> Un LTV/CAC de 17× no significa
+        "esto es un negocio increíble": significa que <b>el CAC no es la restricción</b>. La restricción
+        de Cotejia son otras dos cosas: <b>cuánta gente activa el producto</b> y <b>cuántas tiendas hay
+        en Chile</b>. Optimizar el CAC aquí es pulir el bronce de un barco chico.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CANALES ================= -->
+<section class="wrap">
+  <h2 id="canales">Canales de adquisición, rankeados</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Todos tienen que funcionar sin una persona. Eso elimina de entrada el outbound por LinkedIn, las
+    ferias y los gremios: no porque no sirvan, sino porque necesitan a alguien que apriete manos.
+    Lo digo en <a href="#autonomia">Autonomía</a> con todas sus letras.
+  </p>
+
+  <div class="scroll-x">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Canal</th><th>Por qué</th><th class="t-r">CPL / CAC estimado</th><th>Automatizable</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1</b></td>
+          <td><b>App stores de e-commerce</b><br><small style="color:var(--ink-3)">Jumpseller, Bsale, Shopify, Defontana</small></td>
+          <td>Es el único canal donde <b>el cliente nos busca a nosotros</b>. Entra a buscar "precios"
+            o "repricing" en el marketplace de apps de la plataforma que ya usa, y ahí estamos.
+            Trae confianza prestada de la plataforma y OAuth de un clic.</td>
+          <td class="t-r">$0 de desembolso<br><small>20% rev-share</small></td>
+          <td><b class="up">Total</b><br><small>Publicar la app y responder a su API. No hay reunión.</small></td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>SEO programático en dominio propio</b><br><small style="color:var(--ink-3)">cotejia.com/precios/&lt;categoría&gt;</small></td>
+          <td>Índice público de precios por categoría: "Precio de los termos Stanley en Chile — 47 vendedores,
+            mediana $42.990, actualizado hoy". Es un dato real que ya tenemos, es útil de verdad, y lo busca
+            exactamente quien nos interesa. <b>El producto genera su propio contenido.</b></td>
+          <td class="t-r">≈ $0 marginal<br><small>tarda 6–9 meses</small></td>
+          <td><b class="up">Total</b></td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>Google Ads</b><br><small style="color:var(--ink-3)">búsqueda, no display</small></td>
+          <td>Volumen bajo pero intención altísima: "monitorear precios mercado libre", "repricer chile",
+            "software para cambiar precios automático". Se prende y se apaga en un día.</td>
+          <td class="t-r">CAC ≈ <b>$49.300</b></td>
+          <td><b class="up">Total</b><br><small>Google Ads API</small></td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>Cuentas propias de marca</b><br><small style="color:var(--ink-3)">Instagram, X, LinkedIn de Cotejia</small></td>
+          <td>Publicar el <b>Índice Cotejia</b>: "esta semana el precio mediano de las freidoras de aire
+            bajó 4,1% en Mercado Libre Chile". Dato real, propio, citable. Es marketing que no miente
+            porque es literalmente nuestro producto hablando.</td>
+          <td class="t-r">≈ $0</td>
+          <td><b class="up">Total</b><br><small>Instagram Graph API / X API, con nuestro nombre</small></td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>Meta Ads</b><br><small style="color:var(--ink-3)">retargeting, no prospección fría</small></td>
+          <td>Sólo a quien ya visitó la landing o instaló y no conectó. Prospección fría en Meta para
+            un producto B2B tan de nicho es quemar plata.</td>
+          <td class="t-r">CPL est. $6.000</td>
+          <td><b class="up">Total</b></td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>Patrocinio de newsletters de e-commerce</b></td>
+          <td>Comprado, declarado como publicidad. Un envío a una lista de vendedores de marketplace
+            vale más que 10.000 impresiones.</td>
+          <td class="t-r">$150.000–$400.000<br><small>por envío</small></td>
+          <td><b>Parcial</b><br><small>hay que negociar con un humano al otro lado</small></td>
+        </tr>
+        <tr style="opacity:.6">
+          <td>—</td>
+          <td><b>Foros y grupos de vendedores</b></td>
+          <td colspan="3"><b class="down">PROHIBIDO.</b> Hay grupos de Facebook y WhatsApp llenos de
+            vendedores de Mercado Libre. Entrar ahí con una cuenta que finge ser un vendedor más es
+            astroturfing: viola los términos de la plataforma, es publicidad engañosa bajo la Ley 19.496,
+            y quema el canal para siempre. <b>El kernel del piloto automático lo bloquea y lo registra.</b>
+            Si un día queremos estar ahí, será con la cuenta de Cotejia, diciendo que somos Cotejia.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= AUTONOMÍA ================= -->
+<section class="wrap" style="border-left:2px solid var(--amber);padding-left:14px;margin-left:-16px">
+  <span class="kicker">Lo que este lote exige</span>
+  <h2 id="autonomia">Autonomía: cómo opera sin ningún ser humano</h2>
+  <p class="lede narrow">
+    Cotejia fue elegida para este lote porque el producto entero cabe dentro de una máquina:
+    el cliente se convence solo mirando sus propios precios, se conecta con OAuth, paga con tarjeta
+    y el valor se entrega sin que nadie toque nada. <strong>Pero hay tres cosas que no logro
+    automatizar, y las escribo abajo antes que las buenas noticias.</strong>
+  </p>
+
+  <div class="auto-grid" style="margin-top:20px">
+    <div class="card">
+      <span class="kicker">Venta</span>
+      <h3>Sin vendedor, sin demo, sin llamada</h3>
+      <ul class="clean">
+        <li><b>Descubrimiento:</b> ficha en el app store de Jumpseller/Bsale/Shopify + SEO programático
+          + Google Ads (Google Ads API) + cuentas propias de marca. Todo por API.</li>
+        <li><b>Convencimiento:</b> el demo <i>es</i> el vendedor. En 14 días de prueba, con su propio
+          catálogo conectado, el cliente ve su plata sobre la mesa con sus productos y sus costos.
+          No hay argumento de venta más fuerte que ése, y no lo puede dar una persona mejor que el software.</li>
+        <li><b>Objeciones:</b> las seis preguntas frecuentes están respondidas en la landing, incluida
+          la incómoda ("¿hay alguien humano ahí?" → no).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="kicker">Entrega</span>
+      <h3>Del OAuth a la primera sugerencia: 10 minutos</h3>
+      <ul class="clean">
+        <li>OAuth con el marketplace → importamos catálogo, costos y ventas por API.</li>
+        <li>El emparejador (Claude Haiku) busca las ofertas competidoras y arma la pizarra.</li>
+        <li>Reglas por defecto precargadas y explicadas. El cliente ajusta tres sliders.</li>
+        <li>Cero implementación, cero migración de datos, cero capacitación. <b>Si necesita capacitación,
+          el producto está mal diseñado</b> — y eso es un criterio de muerte, no una tarea de soporte.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="kicker">Cobro</span>
+      <h3>Tarjeta recurrente, y el dunning también es software</h3>
+      <ul class="clean">
+        <li>Flow o Webpay Oneclick: suscripción mensual en CLP, tarjeta guardada, cobro automático.</li>
+        <li>Boleta/factura electrónica emitida por API (SII, vía un proveedor de DTE).</li>
+        <li>Tarjeta rechazada → 3 reintentos en 10 días + correo automático → suspensión del cambio
+          automático (no del monitoreo) → cancelación. Sin cobranza telefónica, sin negociación.</li>
+        <li><b>Y por esto mismo cobramos suscripción y no comisión:</b> una comisión sobre "margen
+          defendido" exige una conciliación mensual, discusiones sobre atribución y un humano que las
+          resuelva. La suscripción plana es la única que se cobra sola.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="kicker">Soporte</span>
+      <h3>Un agente que puede leer tu cuenta</h3>
+      <ul class="clean">
+        <li>Chat y correo atendidos por un agente LLM con <b>acceso de sólo lectura</b> a la cuenta del
+          cliente: puede abrir su pizarra, ver qué regla se aplicó a qué SKU y explicarlo con sus números.
+          El 80% de los tickets de este producto son "¿por qué me sugirió esto?", y ésa es una pregunta
+          que el sistema puede contestar mirando su propia bitácora.</li>
+        <li>Cuando no sabe, <b>lo dice</b>: "no tengo cómo pasarte con una persona; te dejo el ticket
+          registrado y te respondo por correo apenas tenga la respuesta". Mentir aquí es lo único que
+          convertiría un producto honesto en una estafa.</li>
+        <li>Bajas: un clic, honradas al instante, sin retención, sin "espera, te ofrezco un descuento".</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note warn" style="margin-top:20px">
+    <span class="kicker" style="color:var(--down)">Lo que NO logro automatizar — dicho antes de que lo descubras tú</span>
+    <ul class="clean" style="margin-bottom:0">
+      <li><b>Los parsers se rompen y no siempre se arreglan solos.</b> Cuando Falabella cambia su HTML,
+        el lector deja de funcionar. Hay un intento de autorreparación (un modelo re-deriva los selectores
+        y valida contra precios conocidos) que resuelve la mayoría de los casos. <b>El resto necesita un
+        ingeniero.</b> Estimación honesta: <b>1 a 3 horas de trabajo humano por semana</b>, impredecibles.
+        Sin eso, la cobertura se degrada en semanas y el producto muere lento. Un sistema que se dice
+        100% autónomo y esconde esto está mintiendo, y en un mes se le nota.</li>
+      <li><b>La relación con el marketplace.</b> Si Mercado Libre nos escribe por el uso de su API, o
+        Falabella nos manda una carta, no hay bot que negocie eso. Es una persona con un abogado.</li>
+      <li><b>Los contratos y el papeleo inicial:</b> constituir la sociedad, firmar con Flow, registrar
+        la app en el app store de Jumpseller, dar de alta el proveedor de DTE. Todo eso lo hace un humano
+        <b>una vez</b>, antes del día 1. Después, no vuelve.</li>
+      <li><b>El emparejamiento dudoso lo confirma el cliente.</b> No es trabajo nuestro, pero es trabajo
+        humano dentro del flujo, y hay que decirlo: si el cliente no confirma, esos SKU se quedan sin
+        vigilar. No adivinamos: un emparejamiento errado que baja un precio es el peor error que este
+        producto puede cometer.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= IA EN MARKETING ================= -->
+<section class="wrap">
+  <h2 id="ia">Uso de IA en el marketing mismo</h2>
+  <div class="grid g2">
+    <div class="card" style="border-left:2px solid var(--up)">
+      <span class="kicker">Donde la IA sí sirve</span>
+      <ul class="clean">
+        <li><b>Las páginas de SEO programático.</b> 400 categorías × una página de índice de precios,
+          cada una con datos reales y actualizados. La IA escribe la vuelta editorial ("las freidoras
+          bajaron 4,1% esta semana; el vendedor más agresivo fue..."), no inventa los números:
+          los números salen de la base de datos. <b>Escribir 400 páginas a mano es donde un humano se rinde.</b></li>
+        <li><b>Variantes de anuncios.</b> 30 titulares y descripciones para Google Ads, filtrados por una
+          regla dura: ninguna afirmación que no esté respaldada por un número que podamos mostrar.</li>
+        <li><b>Clasificar el correo entrante</b> y responder lo que ya está respondido.</li>
+        <li><b>El resumen semanal al cliente</b> —que es marketing y producto a la vez—: "esta semana
+          te ahorré $84.000 y bloqueé 3 bajadas que no te habrían traído ventas".</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:2px solid var(--down)">
+      <span class="kicker">Donde la IA no sirve, o directamente daña</span>
+      <ul class="clean">
+        <li><b>El "contenido de valor" genérico.</b> Un blog de IA con "10 tips para vender más en
+          Mercado Libre" no lo lee nadie, no lo posiciona Google desde 2024, y le baja la autoridad al
+          dominio. La tentación es enorme porque es barato. <b>No lo vamos a hacer.</b></li>
+        <li><b>Encontrar la cuña.</b> La idea de que el momento valioso del producto es
+          <i>"llevas 14 bajadas contra un bot"</i> no salió de un modelo: salió de mirar el problema.
+          La IA multiplica una idea buena; no la tiene.</li>
+        <li><b>Hacerse pasar por un vendedor en un grupo de WhatsApp.</b> Es lo más eficiente que
+          podríamos hacer y es exactamente por eso que el kernel lo bloquea. El canal es el activo:
+          quemarlo por diez leads es el peor negocio del mundo.</li>
+        <li><b>Reseñas.</b> Ninguna, nunca, escrita por nosotros ni por un modelo.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 90 DÍAS ================= -->
+<section class="wrap">
+  <h2 id="dias">Primeros 90 días</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Semana</th><th>Qué pasa</th><th>Cómo se mide</th></tr></thead>
+      <tbody>
+        <tr><td><b>1–2</b></td><td>Lector de Mercado Libre por API oficial funcionando sobre 5 categorías.
+          Emparejador con Haiku evaluado a mano contra 300 pares etiquetados.</td>
+          <td>Precisión del emparejador ≥ 92% y <b>cero falsos positivos que bajen un precio</b>.</td></tr>
+        <tr><td><b>3–4</b></td><td>Motor de reglas + piso de margen + tope de cambios. Detector de bucle
+          probado contra series sintéticas y contra dos vendedores reales sospechosos de ser bots.</td>
+          <td>El detector marca los dos bots conocidos y no marca a los 20 vendedores humanos de control.</td></tr>
+        <tr><td><b>5–6</b></td><td><b>8 design partners</b> conectan su tienda en modo sólo lectura.
+          Reclutados en el grupo de vendedores donde ya estamos <b>con nuestro nombre</b>, no infiltrados.</td>
+          <td>≥5 de 8 conectan OAuth en menos de 2 semanas. <b>Si no, el producto no pasa la barrera
+            de confianza y hay que parar.</b></td></tr>
+        <tr><td><b>7–9</b></td><td>Lectores de Falabella y Paris. Bitácora. Cobro con Flow.
+          Landing + los 3 primeros paquetes de SEO programático publicados.</td>
+          <td>Cobertura ≥ 80% de los SKU de los design partners.</td></tr>
+        <tr><td><b>10–11</b></td><td><b>Se abre el cobro.</b> Los design partners pasan a tarjeta (con
+          descuento vitalicio del 40%, declarado). Google Ads encendido con tope de $15.000/día.</td>
+          <td><b>El primer cliente que paga sin haber hablado con nadie.</b> Ése es el hito, no la plata.</td></tr>
+        <tr><td><b>12–13</b></td><td>App publicada en el marketplace de Jumpseller. Solicitud enviada a Bsale.
+          Primer <b>Índice Cotejia</b> publicado en las cuentas propias.</td>
+          <td>App aprobada y ≥10 instalaciones orgánicas en las primeras 2 semanas.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= QUÉ MATA ================= -->
+<section class="wrap">
+  <h2 id="mata">Qué mataría esto</h2>
+  <div class="grid g3">
+    <div class="card" style="border-left:2px solid var(--down)">
+      <h3>1. Que el emparejamiento no llegue a ser confiable</h3>
+      <p style="font-size:.92rem;color:var(--ink-2)">
+        Todo el producto se apoya en una afirmación: "este termo es el mismo que aquel termo". Si el
+        emparejador se equivoca, el sistema baja el precio de un producto comparándolo con otro más
+        barato que no es. <b>Un solo caso así, y el cliente no vuelve nunca.</b> No es un bug: es una
+        traición. Si en 90 días la precisión no llega a 95% con falsos positivos cerca de cero, este
+        producto no debe encenderse.
+      </p>
+    </div>
+    <div class="card" style="border-left:2px solid var(--down)">
+      <h3>2. Que Mercado Libre lo haga gratis</h3>
+      <p style="font-size:.92rem;color:var(--ink-2)">
+        Tienen los datos, la distribución y la plata. Lo único que los frena es su incentivo: ganan
+        comisión sobre las ventas y les conviene que los precios bajen. <b>Si algún día deciden que
+        retener vendedores vale más que la comisión marginal, nos borran del mapa en un trimestre.</b>
+        Mitigación real: ser multicanal desde el día 1 (Falabella, Paris, tienda propia), porque eso
+        MELI nunca lo va a hacer.
+      </p>
+    </div>
+    <div class="card" style="border-left:2px solid var(--down)">
+      <h3>3. Que el mercado sea, simplemente, muy chico</h3>
+      <p style="font-size:.92rem;color:var(--ink-2)">
+        El SOM chileno son 6.050 tiendas. Si el churn resulta ser 10% y no 6%, y si la activación se
+        queda en 20%, el negocio se estanca en 80 clientes y $4M de MRR: <b>no alcanza para pagarle a
+        nadie, aunque los márgenes sean del 90%.</b> Ese es el escenario más probable de fracaso: no
+        una explosión, sino un negocio que nunca termina de despegar y consume dos años de vida.
+      </p>
+    </div>
+  </div>
+  <p class="note" style="margin-top:16px">
+    <b>El riesgo que NO me quita el sueño:</b> la legalidad del raspado de precios públicos. Es un riesgo
+    real (un marketplace puede bloquearnos y ese día perdemos cobertura), pero es acotado, gestionable y
+    tiene una salida: la API oficial de Mercado Libre, que es el 70% del volumen y es un contrato.
+    Lo tratamos con seriedad —<a href="index.html#precio">postura pública</a>, <code>robots.txt</code>,
+    User-Agent identificado, sin datos personales— y sigue adelante.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Cotejia · Todas las cifras de esta página o están citadas, o son estimaciones con su aritmética
+      a la vista. No hay ninguna tercera categoría.</p>
+    <p><a href="../index.html">← Volver a las ideas</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+document.getElementById("menuBtn").onclick = function () {
+  const d = document.getElementById("drawer");
+  const open = d.classList.toggle("open");
+  this.setAttribute("aria-expanded", open ? "true" : "false");
+};
+</script>
+</body>
+</html>

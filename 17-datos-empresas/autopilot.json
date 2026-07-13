@@ -1,0 +1,126 @@
+{
+  "idea": "17-datos-empresas",
+  "brand": "Fedatia",
+  "autonomia": "total",
+  "por_que": "Producto digital puro entregado por HTTP. El cliente es un desarrollador que no quiere hablar con nadie: quiere un curl que funcione. Sin onboarding, sin demo, sin implementación. La documentación es el vendedor, la API es la entrega, el medidor de uso es la cobranza, y el soporte es una política de reembolso automático en vez de un agente que improvisa.",
+
+  "oferta": {
+    "landing": "https://fedatia.com",
+    "checkout": "stripe",
+    "checkout_respaldo": "flow",
+    "modelo": "freemium",
+    "precio_clp": 29000,
+    "tarifa_por_consulta_clp": 8,
+    "prueba_sin_tarjeta": true,
+    "prueba_detalle": "500 consultas al mes, todas las fuentes, sin tarjeta. El plan gratis ES el canal de adquisición: cuesta $45 CLP al mes por usuario y es lo más barato que tenemos.",
+    "tarifa_publicada_completa": true,
+    "nota_tarifa": "Todos los tramos están publicados, incluido el de volumen. No existe el boton 'contáctanos' porque no hay a quién contactar."
+  },
+
+  "publico": {
+    "icp": "Fintech, factoring digital y marketplaces B2B que hacen onboarding de empresas chilenas: 5-80 personas, con equipo de producto propio. Secundarios: ERPs y software PYME, equipos comerciales que califican prospectos, compliance de proveedores.",
+    "icp_excluido": "Bancos y entidades reguladas. Exigen contrato de tratamiento firmado, cuestionario de proveedor crítico y revisión de seguridad. Eso lo firma una persona y no tenemos personas. Renunciamos al segmento que mejor paga, a propósito y por escrito.",
+    "geo": ["CL"],
+    "geo_futuro": ["PE", "CO", "MX"],
+    "canales": ["seo", "google_ads", "x_propio", "linkedin_propio", "email_optin"],
+    "canales_propios_no_publicitarios": ["docs_publicas", "status_page_publica", "marketplace_apis"],
+    "canales_descartados": {
+      "meta_ads": "No está prohibido: simplemente no sirve. Nadie compra una API de verificación de empresas mirando reels. No llenamos la casilla con un canal que sabemos muerto.",
+      "voz_saliente": "No.",
+      "whatsapp_optin": "El ICP es un desarrollador. No quiere WhatsApp; quiere docs."
+    }
+  },
+
+  "presupuesto": {
+    "tope_diario_clp": 25000,
+    "tope_mensual_clp": 600000,
+    "tope_total_antes_de_revisar_clp": 3000000,
+    "capital_comprometido_clp": 9000000,
+    "nota": "El valle de caja del escenario base es el mes 9 con $2.788.000 disponibles, equivalentes a 3,1 meses de gasto. Ese es el punto en que el sistema no debe estar gastando de más."
+  },
+
+  "metricas": {
+    "endpoint": "https://api.fedatia.com/metrics",
+    "eventos": ["visita", "registro", "activacion", "pago", "churn", "consulta_no_facturada", "fuente_caida"],
+    "activacion": "100 consultas exitosas desde al menos dos direcciones IP distintas. Significa que el código salió del computador del desarrollador y llegó a un servidor. Un registro que hizo tres curl y se fue NO está activado, por mucho que engorde la métrica.",
+    "metrica_de_la_verdad": "registros_mensuales_desde_seo — es el cuello de botella real del negocio. El LTV/CAC de 10x no es una virtud: es la señal de que el canal tiene techo y de que el riesgo está en el volumen de demanda, no en la conversión."
+  },
+
+  "criterios_de_muerte": [
+    {
+      "hito": "H1",
+      "mes": 2,
+      "condicion": "Menos de 5 llaves de sandbox con >=100 consultas a las 6 semanas, habiendo gastado $900.000 CLP en anuncios",
+      "accion": "pausar"
+    },
+    {
+      "hito": "H2",
+      "mes": 4,
+      "condicion": "Tres o más cuentas activadas declaran que necesitan hablar con una persona antes de pagar, y ninguna paga sola. La tesis de autonomía es falsa para este ICP y no hay parche técnico",
+      "accion": "matar"
+    },
+    {
+      "hito": "H3",
+      "mes": 7,
+      "condicion": "Churn mensual > 8% durante 3 meses seguidos",
+      "accion": "matar"
+    },
+    {
+      "hito": "H4",
+      "mes": 12,
+      "condicion": "El SEO programático genera menos de 40 registros al mes, con 400 páginas publicadas y 6 meses de indexación. Si con toda la superficie construida el canal no rinde, el volumen de demanda no existe",
+      "accion": "matar"
+    },
+    {
+      "hito": "H5",
+      "mes": 18,
+      "condicion": "El Estado publica un servicio unificado, gratuito y con SLA que cubre >=70% de los campos que vendemos, Y el churn del plan Desarrollador supera 15% mensual durante 2 meses. Se repliega a vigilancia y trazabilidad; si eso no sostiene $2.000.000 de MRR en 6 meses, se mata",
+      "accion": "reducir"
+    },
+    {
+      "hito": "H6",
+      "mes": 24,
+      "condicion": "MRR < $2.000.000 CLP con 18 meses o más de operación",
+      "accion": "matar"
+    },
+    {
+      "hito": "OP",
+      "mes": 0,
+      "condicion": "PERMANENTE — Una fuente crítica (SII o Diario Oficial) queda caída más de 72 horas sin que el adaptador se repare solo, 3 veces en un mismo trimestre. Significa que el foso no se sostiene sin una persona, que es la premisa entera del producto",
+      "accion": "pausar"
+    },
+    {
+      "hito": "LEGAL",
+      "mes": 0,
+      "condicion": "PERMANENTE — Tres o más requerimientos de la Agencia de Protección de Datos Personales o del SERNAC sobre nuestro tratamiento, en 12 meses. Se apaga la superficie pública de perfiles el mismo día y no se reenciende sin una respuesta jurídica escrita por una persona",
+      "accion": "pausar"
+    }
+  ],
+
+  "economia": {
+    "cac_objetivo_clp": 320000,
+    "cac_modelado_clp": 159058,
+    "ltv_estimado_clp": 3194000,
+    "arpa_clp": 110000,
+    "churn_mensual": 0.03,
+    "margen_bruto": 0.88,
+    "payback_meses": 3.3,
+    "nota": "El churn modelado por plan da 2,1% ponderado por ingreso. Usamos 3,0% igual: un producto sin contacto humano no tiene quién rescate una cuenta que se está yendo. Castigo declarado, no optimismo."
+  },
+
+  "cumplimiento": {
+    "voz_saliente": false,
+    "voz_entrante": false,
+    "datos_personales": "De nuestros CLIENTES: sólo el correo de quien se registra. Nada más: ni RUT, ni nombre, ni teléfono. De TERCEROS: cero. Fedatia no entrega datos de personas naturales — ni nombres de socios, ni de representantes legales, ni sus RUT, ni sus domicilios. El parámetro personas=true está documentado y responde 403 SIEMPRE. Que un dato esté publicado en el Diario Oficial no habilita a revenderlo para otro fin; tratarlo exigiría un contrato de tratamiento con cada cliente y este servicio se opera sin humanos que firmen contratos. Preferimos renunciar al dato. Tampoco vendemos morosidad: el Boletín Comercial es de Equifax y está regulado por la Ley 20.575. Sin datos de menores. Marco: Ley 19.628 y Ley 21.719 — por validar la fecha exacta de vigencia de cada artículo y si la excepción de 'fuentes de acceso público' sobrevive a la nueva ley; como no nos consta, asumimos que no.",
+    "supresion": "Endpoint público de supresión. Las páginas públicas indexables de una empresa se bajan en 48 h, sin preguntas. Corre solo.",
+    "publicidad": "Todo anuncio se rotula como tal por la plataforma. La cuenta de marca publica con su nombre. Cero cuentas falsas, cero reseñas falsas, cero participación en foros haciéndose pasar por usuario orgánico: además de estar prohibido por el kernel, nos quemaría el único canal donde los desarrolladores confían.",
+    "riesgo_declarado": "Tres riesgos, en orden. (1) EL VOLUMEN: puede que simplemente no haya suficiente gente en Chile buscando esto. Es el riesgo número uno y está en el criterio de muerte del H4. (2) EL ESTADO: si publica un servicio unificado con SLA que normaliza las once fuentes, el plan básico se muere (criterio H5). Matiz: si publica UNA fuente, nos abarata; sólo el servicio unificado nos mata. (3) UNA FUENTE SE CIERRA: si el SII exige ClaveÚnica o pone captcha en la consulta de terceros, perdemos el bloque 'actividad', que es la mitad del valor, y no hay agente que resuelva eso — hay que aparecer con una persona a negociar, y no tenemos persona.",
+    "no_automatizable": [
+      "Firmar. Contratos de tratamiento de datos, cuestionarios de proveedor crítico, revisiones de seguridad. Consecuencia asumida: se pierde el segmento bancario.",
+      "Decidir cuando una fuente cambia de régimen. El adaptador se repara solo si cambia un selector; si la fuente pone captcha, exige login o lo prohíbe en sus términos, la decisión es un juicio de licitud y automatizarlo mal es exactamente cómo un sistema autónomo se mete en un problema legal.",
+      "Contestarle a la autoridad. El endpoint de supresión corre solo; explicar la base de licitud de un tratamiento es un acto jurídico.",
+      "Añadir una fuente nueva. Rasparla es trivial; decidir si se puede es el trabajo caro."
+    ],
+    "politica_de_soporte": "Reembolso automático ante falla, no un agente que improvisa. Si estado_respuesta != 'completo', entonces facturado = false: sin formulario, sin ticket, sin discusión. Si la disponibilidad mensual baja de 99,5% se abona el 25% del mes; bajo 99%, el mes entero. El asistente de soporte responde SÓLO con recuperación estricta sobre la documentación y el log de estado, NO tiene acceso a la API de empresas, y cuando no puede citar responde 'No tengo cómo responder esto', abona las consultas y registra el caso. Justificación: un LLM alucinando sobre si una empresa está en el Boletín Concursal le cuesta plata al cliente; un reembolso es una acción acotada, auditable y barata. Preferimos devolver la plata antes que inventar una explicación."
+  }
+}

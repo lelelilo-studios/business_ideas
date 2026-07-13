@@ -1,0 +1,301 @@
+/* ============================================================================
+   CAPRATO — hoja de marca
+   ----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: informe de tasación y plano de loteo.
+   La referencia no es una app: es el documento que el tasador entrega y el
+   plano de catastro que lo acompaña. Papel técnico gris-frío (NO crema),
+   hairlines de plano, marcas de esquina, folio y rol arriba a la derecha,
+   la cifra al centro en monoespaciada tabular. Un solo acento —azul catastro
+   #1A5FC8— y lo usa exclusivamente lo que ES una oportunidad. Todo lo demás
+   es tinta, línea y trama.
+
+   Tipografía: Chivo (grotesca de señalética, no editorial) + Roboto Mono
+   (las cifras, siempre tabulares). Ningún serif, ningún papel crema, ningún
+   rojo óxido — ese cuadrante ya está ocupado ocho veces en este repo.
+
+   Paleta de datos (validada con dataviz/scripts/validate_palette.js
+   sobre superficie #EFF1EE — categórica y ordinal, ambas PASS):
+     categórica: #1A5FC8 · #0E8A5F · #B07400
+     ordinal:    #7FA1DC · #5C82CB · #3B63B9 · #204892 · #14306B
+   ============================================================================ */
+
+:root {
+  /* Superficie */
+  --papel:    #EFF1EE;   /* papel técnico, gris frío */
+  --papel-2:  #E4E7E3;   /* banda / cabecera de tabla */
+  --papel-3:  #F8F9F7;   /* ficha, casi blanco */
+  --papel-4:  #DADED9;
+
+  /* Tinta */
+  --tinta:    #14191C;
+  --tinta-2:  #3D464C;
+  --tinta-3:  #6B767D;
+  --tinta-4:  #8F999F;
+
+  /* Líneas de plano */
+  --linea:    #C4CAC6;
+  --linea-2:  #9EA8A3;
+  --hair:     1px solid var(--linea);
+  --hair-2:   1px solid var(--linea-2);
+  --borde:    1.5px solid var(--tinta);
+
+  /* Acento: azul catastro. Marca la oportunidad. Nada más. */
+  --azul:     #1A5FC8;
+  --azul-osc: #14468F;
+  --azul-lav: #E1E9F7;
+  --azul-lin: #A9C0E9;
+
+  /* Señales secundarias */
+  --verde:    #0E8A5F;
+  --ambar:    #B07400;
+  --ambar-lav:#F5EDDC;
+
+  /* Rampa ordinal (mapa de comunas) */
+  --o1: #7FA1DC; --o2: #5C82CB; --o3: #3B63B9; --o4: #204892; --o5: #14306B;
+
+  --sans: "Chivo", system-ui, -apple-system, sans-serif;
+  --mono: "Roboto Mono", ui-monospace, "SF Mono", monospace;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  /* Trama de plano: retícula de 8mm, casi imperceptible. */
+  background-image:
+    linear-gradient(to right, rgba(20,25,28,.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20,25,28,.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+::selection { background: var(--azul); color: #fff; }
+
+/* --- Tipografía ------------------------------------------------------ */
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.015em; }
+h1 { font-size: var(--step-4); line-height: 1.05; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); }
+p { line-height: 1.6; }
+a { color: var(--azul); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-style: dotted; }
+strong { font-weight: 700; }
+
+.num, .mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Etiqueta de plano: el rótulo de una acotación */
+.rotulo {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--tinta-3);
+  font-weight: 500;
+}
+.rotulo-azul { color: var(--azul); }
+
+.lead { font-size: var(--step-1); line-height: 1.45; color: var(--tinta-2); }
+.nota { font-size: 0.78rem; line-height: 1.55; color: var(--tinta-3); }
+.nota a { color: var(--tinta-2); }
+
+/* Marca "por validar" — obligatoria donde el dato no nos consta */
+.pv {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ambar);
+  border: 1px solid var(--ambar);
+  padding: 0.05em 0.35em;
+  white-space: nowrap;
+  vertical-align: 0.12em;
+}
+
+/* --- Navegación ------------------------------------------------------ */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--papel-3);
+  border-bottom: var(--borde);
+}
+.nav-in {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-s); min-height: 56px;
+}
+.marca { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+.marca-txt {
+  font-family: var(--mono); font-weight: 700; font-size: 0.95rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--tinta);
+}
+.nav-toggle {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--tinta-2);
+  border: var(--hair-2); padding-inline: 0.6rem;
+}
+.nav-links { display: none; }
+.nav-links.abierto {
+  display: flex; flex-direction: column;
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--papel-3); border-bottom: var(--borde);
+  padding: var(--sp-2xs) var(--gutter) var(--sp-s);
+}
+.nav-links a {
+  display: flex; align-items: center; min-height: 44px;
+  font-family: var(--mono); font-size: 0.8rem; text-transform: uppercase;
+  letter-spacing: 0.08em; text-decoration: none; color: var(--tinta-2);
+  border-bottom: var(--hair);
+}
+.nav-links a:last-child { border-bottom: 0; }
+.nav-links a[aria-current="page"] { color: var(--azul); font-weight: 700; }
+.nav-links a:hover { color: var(--azul); }
+@media (min-width: 56em) {
+  .nav-toggle { display: none; }
+  .nav-links, .nav-links.abierto {
+    display: flex; flex-direction: row; align-items: center; gap: var(--sp-m);
+    position: static; border: 0; padding: 0; background: none;
+  }
+  .nav-links a { border-bottom: 0; min-height: 56px; }
+}
+
+/* --- Estructura de página -------------------------------------------- */
+.seccion { padding-block: var(--sp-xl); border-top: var(--hair); }
+.seccion:first-of-type { border-top: 0; }
+.seccion-h { margin-bottom: var(--sp-m); }
+.seccion-h h2 { margin-top: 0.25rem; max-width: 24ch; }
+.seccion-h p { margin-top: var(--sp-2xs); max-width: 62ch; color: var(--tinta-2); }
+
+/* --- Carátula de informe (la caja con marcas de esquina) -------------- */
+.ficha {
+  position: relative;
+  background: var(--papel-3);
+  border: var(--borde);
+  padding: var(--sp-m);
+}
+.ficha::before, .ficha::after {
+  content: ""; position: absolute; width: 10px; height: 10px;
+  border: 1.5px solid var(--tinta);
+}
+.ficha::before { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+.ficha::after { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+.ficha-h {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 0.5rem;
+  border-bottom: 2px solid var(--tinta);
+  padding-bottom: 0.5rem; margin-bottom: var(--sp-s);
+}
+
+/* La cifra al centro */
+.cifra { font-family: var(--mono); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.cifra-xl { font-size: clamp(3.2rem, 2.2rem + 5vw, 5.2rem); }
+.cifra-l  { font-size: clamp(2rem, 1.5rem + 2.5vw, 3rem); }
+.cifra-m  { font-size: var(--step-2); }
+.cifra-azul { color: var(--azul); }
+.cifra-tenue { color: var(--tinta-4); }
+
+/* --- Tablas de tasación ---------------------------------------------- */
+.tabla { width: 100%; font-size: 0.86rem; }
+.tabla th {
+  text-align: left; font-family: var(--mono); font-weight: 500;
+  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--tinta-3); padding: 0.45rem 0.6rem 0.45rem 0;
+  border-bottom: 1.5px solid var(--tinta); white-space: nowrap;
+}
+.tabla td {
+  padding: 0.55rem 0.6rem 0.55rem 0; border-bottom: var(--hair);
+  vertical-align: top;
+}
+.tabla td:last-child, .tabla th:last-child { padding-right: 0; }
+.tabla .n {
+  text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tabla tr:last-child td { border-bottom: 0; }
+.tabla .total td {
+  border-top: 1.5px solid var(--tinta); border-bottom: 0;
+  font-weight: 700; padding-top: 0.7rem;
+}
+.tabla .resta td:last-child { color: var(--ambar); }
+
+/* --- Botones --------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 48px; padding: 0.75rem 1.4rem;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none;
+  border: 1.5px solid var(--tinta); background: var(--tinta); color: var(--papel-3);
+  transition: background .12s linear, color .12s linear;
+}
+.btn:hover { background: var(--azul); border-color: var(--azul); color: #fff; }
+.btn-2 { background: transparent; color: var(--tinta); }
+.btn-2:hover { background: var(--tinta); color: var(--papel-3); border-color: var(--tinta); }
+.btn-azul { background: var(--azul); border-color: var(--azul); color: #fff; }
+.btn-azul:hover { background: var(--azul-osc); border-color: var(--azul-osc); }
+
+/* --- Sellos de estado ------------------------------------------------- */
+.sello {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-family: var(--mono); font-size: 0.66rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 0.25rem 0.5rem; border: 1.5px solid currentColor;
+}
+.sello-pasa { color: var(--azul); background: var(--azul-lav); }
+.sello-no   { color: var(--tinta-3); background: var(--papel-2); }
+.sello-ojo  { color: var(--ambar); background: var(--ambar-lav); }
+
+/* --- Grillas --------------------------------------------------------- */
+.g2, .g3 { display: grid; gap: var(--sp-m); }
+@media (min-width: 48em) { .g2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 48em) { .g3 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 64em) { .g3 { grid-template-columns: repeat(3, 1fr); } }
+
+/* Un grid sin `grid-template-columns` declarado crea una columna implícita `auto`,
+   que se dimensiona a MAX-CONTENT y se sale del viewport en el teléfono si adentro
+   hay una fila ancha (una tabla, un folio de cuatro campos). En móvil, todas las
+   grillas de este sitio son de una columna y tienen que poder encogerse: por eso
+   `minmax(0, 1fr)` como base. Los `min-width` de cada página lo sobreescriben
+   después para tablet y escritorio. Lo ancho de verdad scrollea en su `.scroll-x`. */
+.g2, .g3, .pie-in, .hero-grid, .mapa-wrap, .desglose-grid, .pasos, .planes, .dolor,
+.filtro-grid, .radar-grid, .ficha-grid, .lista, .tablas, .cronograma, .prob {
+  grid-template-columns: minmax(0, 1fr);
+}
+.g2 > *, .g3 > *, .hero-grid > *, .mapa-wrap > *, .desglose-grid > *,
+.filtro-grid > *, .radar-grid > *, .ficha-grid > *, .prob > * { min-width: 0; }
+
+/* --- Gráficos -------------------------------------------------------- */
+figure { margin: 0; }
+.chart { background: var(--papel-3); border: var(--hair-2); padding: var(--sp-s); }
+.chart-h { margin-bottom: var(--sp-2xs); }
+.chart-h h3 { font-size: var(--step-0); margin-bottom: 0.1rem; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart figcaption { margin-top: var(--sp-2xs); }
+.leyenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-top: var(--sp-2xs); }
+.leyenda span {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-2);
+}
+.leyenda i { width: 14px; height: 3px; border-radius: 2px; display: block; }
+.eje { fill: var(--tinta-3); font-family: var(--mono); font-size: 9px; }
+.eje-l { fill: var(--tinta); font-family: var(--mono); font-size: 10px; font-weight: 500; }
+.grid-l { stroke: var(--linea); stroke-width: 1; }
+
+/* --- Pie ------------------------------------------------------------- */
+.pie { border-top: var(--borde); padding-block: var(--sp-l); margin-top: var(--sp-xl); }
+.pie-in { display: grid; gap: var(--sp-s); }
+@media (min-width: 48em) { .pie-in { grid-template-columns: 1fr auto; align-items: end; } }
+
+/* Utilidades */
+.mt-0 { margin-top: 0; }
+.mt-s { margin-top: var(--sp-s); }
+.mt-m { margin-top: var(--sp-m); }
+.mt-l { margin-top: var(--sp-l); }
+.mb-s { margin-bottom: var(--sp-s); }
+.mb-m { margin-bottom: var(--sp-m); }
+.centro { text-align: center; }
+.der { text-align: right; }

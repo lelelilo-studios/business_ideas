@@ -1,0 +1,1212 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caprato — El radar funcionando</title>
+<meta name="description" content="Define tu filtro, enciende el radar y mira el cap rate honesto de cada publicación: el arriendo real del edificio, la vacancia observada y el desglose completo de por qué el número no es el del aviso.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/marca.css">
+<style>
+  /* --- Cabecera del demo --- */
+  .demo-h { border-bottom: var(--hair); padding-block: var(--sp-s); }
+  .demo-h-in { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: space-between; align-items: center; }
+  .cuenta { font-family: var(--mono); font-size: .68rem; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* --- Pasos (breadcrumb) --- */
+  .pasos-b { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; margin-top: .6rem; }
+  .pasos-b button {
+    font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em;
+    border: var(--hair-2); padding: .35rem .6rem; min-height: 34px; color: var(--tinta-3); background: var(--papel-3);
+  }
+  .pasos-b button[aria-current="step"] { border-color: var(--azul); color: var(--azul); background: var(--azul-lav); font-weight: 700; }
+  .pasos-b button:disabled { opacity: .45; cursor: not-allowed; }
+  .pasos-b span { color: var(--linea-2); }
+
+  .vista { display: none; padding-block: var(--sp-l) var(--sp-xl); }
+  .vista.activa { display: block; }
+
+  /* --- Filtro --- */
+  .filtro-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .filtro-grid { grid-template-columns: 1fr 1fr; } }
+  fieldset { border: 0; padding: 0; margin: 0; }
+  legend { padding: 0; }
+  .campo { border-top: 1.5px solid var(--tinta); padding-top: .7rem; margin-bottom: var(--sp-m); }
+  .campo > .rotulo { display: block; margin-bottom: .5rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin: 0; }
+  .chip span {
+    display: flex; align-items: center; justify-content: center; min-height: 44px;
+    padding: .4rem .8rem; border: var(--hair-2); background: var(--papel-3);
+    font-size: .82rem; color: var(--tinta-2); white-space: nowrap;
+  }
+  .chip input:checked + span { border-color: var(--azul); background: var(--azul-lav); color: var(--azul-osc); font-weight: 600; }
+  .chip input:focus-visible + span { outline: 2px solid var(--tinta); outline-offset: 2px; }
+
+  .slider-fila { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .3rem; }
+  .slider-val { font-family: var(--mono); font-weight: 700; font-size: var(--step-1); }
+  input[type="range"] {
+    width: 100%; height: 44px; -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: var(--linea-2); }
+  input[type="range"]::-moz-range-track { height: 4px; background: var(--linea-2); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin-top: -9px;
+    background: var(--azul); border: 2px solid var(--papel-3); border-radius: 50%;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; background: var(--azul); border: 2px solid var(--papel-3); border-radius: 50%;
+  }
+  select {
+    width: 100%; min-height: 44px; padding: .5rem .6rem; border: var(--hair-2);
+    background: var(--papel-3); font-size: .9rem;
+  }
+
+  .aviso-honesto {
+    border-left: 3px solid var(--azul); background: var(--azul-lav);
+    padding: .7rem .8rem; font-size: .85rem; line-height: 1.55;
+  }
+
+  /* --- Radar --- */
+  .radar-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 66em) { .radar-grid { grid-template-columns: 300px 1fr; align-items: start; } }
+  .panel { border: var(--borde); background: var(--papel-3); padding: var(--sp-s); }
+  @media (min-width: 66em) { .panel-sticky { position: sticky; top: 72px; } }
+
+  .contadores { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--borde); background: var(--papel-3); margin-bottom: var(--sp-s); }
+  .contadores div { padding: .7rem .6rem; border-right: var(--hair); }
+  .contadores div:last-child { border-right: 0; }
+  .contadores b { display: block; font-family: var(--mono); font-size: 1.6rem; font-weight: 700; line-height: 1; }
+  .contadores .ok b { color: var(--azul); }
+  .contadores small { display: block; font-family: var(--mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-3); margin-top: .35rem; }
+
+  .lista { display: grid; gap: var(--sp-s); }
+  .tarjeta {
+    display: block; width: 100%; text-align: left; border: var(--hair-2); background: var(--papel-3);
+    padding: var(--sp-s); cursor: pointer; transition: border-color .1s linear;
+  }
+  .tarjeta:hover, .tarjeta:focus-visible { border-color: var(--tinta); }
+  .tarjeta[data-estado="pasa"] { border-left: 4px solid var(--azul); }
+  .tarjeta[data-estado="no"] { border-left: 4px solid var(--linea-2); }
+  .t-h { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: space-between; align-items: start; }
+  .t-dir { font-weight: 700; font-size: .98rem; }
+  .t-sub { font-size: .78rem; color: var(--tinta-3); margin-top: .1rem; }
+  .t-nums { display: flex; gap: var(--sp-m); margin-top: .7rem; flex-wrap: wrap; }
+  .t-num .rotulo { display: block; font-size: .6rem; }
+  .t-num b { font-family: var(--mono); font-size: 1.35rem; font-weight: 700; display: block; line-height: 1.15; }
+  .t-num .honesto { color: var(--azul); }
+  .t-num[data-estado="no"] b.honesto { color: var(--tinta-2); }
+  .t-num .folleto { color: var(--tinta-4); text-decoration: line-through; text-decoration-thickness: 2px; }
+  .t-motivo {
+    margin-top: .7rem; padding: .5rem .6rem; font-size: .8rem; line-height: 1.5;
+    border-left: 3px solid var(--ambar); background: var(--ambar-lav);
+  }
+  .t-ok { margin-top: .7rem; padding: .5rem .6rem; font-size: .8rem; line-height: 1.5; border-left: 3px solid var(--azul); background: var(--azul-lav); }
+  .t-ver { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em; color: var(--azul); margin-top: .6rem; display: flex; align-items: center; gap: .3rem; }
+
+  .vacio { border: 1.5px dashed var(--ambar); background: var(--ambar-lav); padding: var(--sp-m); text-align: center; }
+  .vacio .cifra { color: var(--ambar); }
+  .vacio p { max-width: 46ch; margin-inline: auto; margin-top: .5rem; font-size: .9rem; color: var(--tinta-2); }
+
+  /* --- Ficha --- */
+  .volver {
+    display: inline-flex; align-items: center; gap: .4rem; font-family: var(--mono);
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-2);
+    border: var(--hair-2); padding-inline: .7rem; background: var(--papel-3); margin-bottom: var(--sp-s);
+  }
+  .volver:hover { border-color: var(--tinta); color: var(--azul); }
+
+  .ficha-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 66em) { .ficha-grid { grid-template-columns: 1.05fr .95fr; align-items: start; } }
+
+  .cabecera-ficha { border: var(--borde); background: var(--papel-3); padding: var(--sp-m); position: relative; }
+  .cabecera-ficha::before {
+    content: ""; position: absolute; top: 5px; left: 5px; width: 10px; height: 10px;
+    border: 1.5px solid var(--tinta); border-right: 0; border-bottom: 0;
+  }
+  .folio { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; border-bottom: 2px solid var(--tinta); padding-bottom: .5rem; min-width: 0; }
+  .folio div { min-width: 0; }
+  .folio b { overflow-wrap: anywhere; }
+  .folio .rotulo { display: block; font-size: .6rem; }
+  .folio b { font-family: var(--mono); font-size: .8rem; }
+  .numerote { display: flex; align-items: baseline; gap: var(--sp-s); flex-wrap: wrap; margin-block: var(--sp-s); }
+
+  .conf { display: inline-flex; align-items: center; gap: .3rem; font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; }
+  .conf i { display: flex; gap: 2px; }
+  .conf i b { width: 5px; height: 11px; background: var(--linea-2); display: block; }
+  .conf i b.on { background: var(--azul); }
+
+  .interruptor { display: flex; border: var(--hair-2); background: var(--papel-2); margin-bottom: var(--sp-s); }
+  .interruptor button {
+    flex: 1; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em;
+    padding: .5rem; color: var(--tinta-3);
+  }
+  .interruptor button[aria-pressed="true"] { background: var(--tinta); color: var(--papel-3); font-weight: 700; }
+
+  .alerta-prev { border: var(--borde); background: var(--papel-3); }
+  .alerta-top {
+    background: var(--tinta); color: var(--papel); padding: .6rem var(--sp-s);
+    font-family: var(--mono); font-size: .68rem; display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap;
+  }
+  .alerta-cuerpo { padding: var(--sp-s); font-size: .88rem; line-height: 1.6; }
+  .alerta-cuerpo p + p { margin-top: .6rem; }
+  .alerta-cuerpo .cita { border-left: 2px solid var(--azul); padding-left: .7rem; color: var(--tinta-2); }
+
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1.5px solid var(--tinta);
+    margin-bottom: var(--sp-s); overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .tabs button {
+    /* flex:0 0 auto — si no, los botones se encogen dentro del contenedor que
+       scrollea y el texto en nowrap se sale de su propia caja y choca con el
+       siguiente. Lo ancho scrollea; no se aprieta. */
+    flex: 0 0 auto;
+    font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em;
+    padding: .6rem .8rem; color: var(--tinta-3); border-bottom: 3px solid transparent; margin-bottom: -1.5px; white-space: nowrap;
+  }
+  .tabs button[aria-selected="true"] { color: var(--azul); border-bottom-color: var(--azul); font-weight: 700; }
+  .tabpanel { display: none; }
+  .tabpanel.activa { display: block; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="../index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M5 21 L5 12 L11 7 L17 12 L17 21" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M13 21 L13 15 L21 15 L21 21" fill="none" stroke="#1A5FC8" stroke-width="1.5"/>
+        <circle cx="21" cy="15" r="2" fill="#1A5FC8"/>
+      </svg>
+      <span class="marca-txt">Caprato</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" id="navBtn">Menú</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<div class="demo-h">
+  <div class="container">
+    <div class="demo-h-in">
+      <div>
+        <p class="rotulo">Demo · datos de demostración</p>
+        <p class="cuenta">Cuenta: rmunoz@correo.cl · Plan Inversionista · UF de hoy $40.180</p>
+      </div>
+      <p class="cuenta">Semana del 6 al 12 de julio de 2026</p>
+    </div>
+    <div class="pasos-b" role="group" aria-label="Pasos del demo">
+      <button id="p1" aria-current="step">1 · Filtro</button>
+      <span>→</span>
+      <button id="p2" disabled>2 · Radar</button>
+      <span>→</span>
+      <button id="p3" disabled>3 · Ficha</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ VISTA 1: FILTRO ============ -->
+<section class="vista activa container" id="vista-filtro" aria-labelledby="h-filtro">
+  <div class="seccion-h">
+    <p class="rotulo">Paso 1</p>
+    <h2 id="h-filtro">Dime qué buscas. Con qué te conformas, en realidad.</h2>
+    <p>Se guarda una vez. Después el radar corre solo y sólo te habla cuando tiene algo que decir.</p>
+  </div>
+
+  <form class="filtro-grid" id="form-filtro">
+    <div>
+      <fieldset class="campo">
+        <legend class="rotulo">Comunas</legend>
+        <div class="chips">
+          <label class="chip"><input type="checkbox" name="comuna" value="Independencia" checked><span>Independencia</span></label>
+          <label class="chip"><input type="checkbox" name="comuna" value="San Miguel" checked><span>San Miguel</span></label>
+          <label class="chip"><input type="checkbox" name="comuna" value="Ñuñoa" checked><span>Ñuñoa</span></label>
+          <label class="chip"><input type="checkbox" name="comuna" value="Estación Central" checked><span>Estación Central</span></label>
+          <label class="chip"><input type="checkbox" name="comuna" value="La Florida" checked><span>La Florida</span></label>
+          <label class="chip"><input type="checkbox" name="comuna" value="Santiago"><span>Santiago Centro</span></label>
+        </div>
+      </fieldset>
+
+      <div class="campo">
+        <span class="rotulo">Tipología</span>
+        <label class="visually-hidden" for="tipologia">Tipología</label>
+        <select id="tipologia">
+          <option value="todas" selected>Todas · 1D a 3D</option>
+          <option value="1D">Sólo 1D y studio</option>
+          <option value="2D">Sólo 2D</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div class="campo">
+        <div class="slider-fila">
+          <span class="rotulo">Presupuesto máximo</span>
+          <span class="slider-val num" id="v-presupuesto">3.500 UF</span>
+        </div>
+        <input type="range" id="presupuesto" min="1500" max="4500" step="50" value="3500"
+               aria-label="Presupuesto máximo en UF">
+        <p class="nota">≈ <span class="num" id="v-presupuesto-clp">$140.630.000</span> con la UF de hoy.</p>
+      </div>
+
+      <div class="campo">
+        <div class="slider-fila">
+          <span class="rotulo rotulo-azul">Cap rate honesto mínimo</span>
+          <span class="slider-val num cifra-azul" id="v-cap">4,8%</span>
+        </div>
+        <input type="range" id="capmin" min="3" max="6" step="0.1" value="4.8"
+               aria-label="Cap rate honesto mínimo, en porcentaje">
+        <p class="nota">
+          Este número es el filtro entero. Súbelo y vas a ver lo que casi ningún producto inmobiliario
+          se atreve a mostrarte: nada.
+        </p>
+      </div>
+
+      <div class="aviso-honesto">
+        <strong>Antes de que sigas:</strong> el cap rate honesto descuenta vacancia, gastos comunes de los
+        meses vacíos, contribuciones, administración, comisión de re-arriendo y mantención. Es
+        entre 1,2 y 2,1 puntos <em>menor</em> que el que sale en el aviso. Si esperabas 6%, este es el
+        momento de ajustar la expectativa, no el número.
+      </div>
+
+      <button class="btn btn-azul mt-m" type="submit" style="width:100%">Encender el radar</button>
+    </div>
+  </form>
+</section>
+
+<!-- ============ VISTA 2: RADAR ============ -->
+<section class="vista container" id="vista-radar" aria-labelledby="h-radar">
+  <div class="seccion-h">
+    <p class="rotulo">Paso 2 · barrido del 6 al 12 de julio</p>
+    <h2 id="h-radar">Lo que el radar encontró.</h2>
+  </div>
+
+  <div class="radar-grid">
+    <aside class="panel panel-sticky">
+      <p class="rotulo mb-s">Tu filtro · edítalo en vivo</p>
+
+      <div class="slider-fila">
+        <span class="rotulo rotulo-azul">Cap honesto mínimo</span>
+        <span class="slider-val num cifra-azul" id="v-cap2">4,8%</span>
+      </div>
+      <input type="range" id="capmin2" min="3" max="6" step="0.1" value="4.8" aria-label="Cap rate honesto mínimo">
+
+      <div class="slider-fila mt-s">
+        <span class="rotulo">Presupuesto</span>
+        <span class="slider-val num" id="v-presupuesto2" style="font-size:1rem">3.500 UF</span>
+      </div>
+      <input type="range" id="presupuesto2" min="1500" max="4500" step="50" value="3500" aria-label="Presupuesto máximo en UF">
+
+      <p class="rotulo mt-m mb-s">Tipología</p>
+      <label class="visually-hidden" for="tipologia2">Tipología</label>
+      <select id="tipologia2">
+        <option value="todas" selected>Todas · 1D a 3D</option>
+        <option value="1D">Sólo 1D y studio</option>
+        <option value="2D">Sólo 2D</option>
+      </select>
+
+      <p class="rotulo mt-m mb-s">Comunas</p>
+      <div class="chips" id="chips2"></div>
+
+      <p class="nota mt-m" style="border-top:var(--hair);padding-top:.6rem">
+        Cambia el mínimo y mira cómo se apagan las tarjetas. Ese es todo el producto: la disciplina
+        de no bajarte el estándar porque la foto se veía linda.
+      </p>
+      <button class="btn btn-2 mt-s" id="btn-volver-filtro" style="width:100%">Volver al filtro</button>
+    </aside>
+
+    <div>
+      <div class="contadores">
+        <div><b class="num" id="c-total">214</b><small>revisadas</small></div>
+        <div><b class="num" id="c-rango">5</b><small>en tu rango</small></div>
+        <div class="ok"><b class="num" id="c-pasan">2</b><small>pasan el filtro</small></div>
+      </div>
+      <p class="nota mb-m" id="dedupe">
+        De 214 publicaciones nuevas, 37 eran el mismo departamento subido por más de un corredor.
+        El radar las fusionó antes de calcular nada.
+      </p>
+
+      <div class="lista" id="lista"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISTA 3: FICHA ============ -->
+<section class="vista container" id="vista-ficha" aria-labelledby="h-ficha">
+  <button class="volver" id="btn-volver-radar">
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7 2 L3 6 L7 10" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+    Volver a las 5
+  </button>
+
+  <div class="ficha-grid">
+    <!-- Columna izquierda -->
+    <div>
+      <div class="cabecera-ficha">
+        <div class="folio">
+          <div><span class="rotulo">Rol</span><b id="f-rol">2.451-18</b></div>
+          <div><span class="rotulo">Comuna</span><b id="f-comuna">Independencia</b></div>
+          <div><span class="rotulo">Tipología</span><b id="f-tipo">1D+1B · 34 m²</b></div>
+          <div><span class="rotulo">Publicado</span><b id="f-pub">hace 2 días</b></div>
+        </div>
+
+        <h2 id="h-ficha" style="margin-top:.7rem;font-size:var(--step-2)">Av. Independencia 4321, piso 8</h2>
+        <p class="nota" id="f-edificio">Edificio Vista Norte · 96 departamentos · entrega 2019</p>
+
+        <div class="numerote">
+          <div>
+            <span class="rotulo rotulo-azul">Cap rate honesto</span>
+            <span class="cifra cifra-xl cifra-azul" id="f-cap">5,1%</span>
+          </div>
+          <div>
+            <span class="rotulo">Lo que dice el aviso</span>
+            <span class="cifra cifra-m cifra-tenue" id="f-folleto" style="text-decoration:line-through;text-decoration-thickness:2px">6,8%</span>
+          </div>
+          <div id="f-sello-wrap"></div>
+        </div>
+
+        <div id="f-veredicto"></div>
+      </div>
+
+      <div class="panel mt-m">
+        <div class="tabs" role="tablist">
+          <button role="tab" id="tab-1" aria-selected="true" aria-controls="tp-1">La cuenta completa</button>
+          <button role="tab" id="tab-2" aria-selected="false" aria-controls="tp-2">Evidencia del arriendo</button>
+          <button role="tab" id="tab-3" aria-selected="false" aria-controls="tp-3">Con crédito</button>
+        </div>
+
+        <div class="tabpanel activa" id="tp-1" role="tabpanel" aria-labelledby="tab-1">
+          <div class="scroll-x">
+            <table class="tabla" id="f-tabla"></table>
+          </div>
+          <div style="border-top:2px solid var(--tinta);margin-top:var(--sp-s);padding-top:var(--sp-s);display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;align-items:end">
+            <div>
+              <p class="rotulo">Capital invertido</p>
+              <p class="num" style="font-weight:700" id="f-capital">$80.511.077</p>
+              <p class="nota" id="f-capital-nota">1.980 UF a $40.180 + 1,2% de escrituración y CBR</p>
+            </div>
+            <div class="der">
+              <p class="rotulo rotulo-azul">NOI ÷ capital</p>
+              <p class="cifra cifra-m cifra-azul" id="f-cap2">5,1%</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpanel" id="tp-2" role="tabpanel" aria-labelledby="tab-2">
+          <figure class="chart" style="border:0;padding:0;background:none">
+            <div class="chart-h">
+              <h3>Arriendos observados en este edificio · últimos 12 meses</h3>
+              <p class="nota" id="f-evid-sub">14 publicaciones de arriendo de unidades 1D del mismo edificio.</p>
+            </div>
+            <svg viewBox="0 0 400 150" role="img" aria-labelledby="ev-t" id="f-evid">
+              <title id="ev-t">Arriendos observados del edificio</title>
+            </svg>
+            <div class="leyenda">
+              <span><i style="background:#1A5FC8;border-radius:50%;width:9px;height:9px"></i>Arriendo publicado que se arrendó</span>
+              <span><i style="background:#B07400"></i>Lo que promete el aviso de venta</span>
+            </div>
+            <figcaption class="nota mt-s" id="f-evid-nota"></figcaption>
+          </figure>
+        </div>
+
+        <div class="tabpanel" id="tp-3" role="tabpanel" aria-labelledby="tab-3">
+          <p class="nota mb-s">
+            Pie 20%, crédito hipotecario a 20 años en UF, tasa 4,9% anual <span class="pv">referencial</span>.
+            El «se paga solo» del aviso, con la calculadora encendida.
+          </p>
+          <table class="tabla" id="f-credito"></table>
+          <div class="motivo" style="border-left:3px solid var(--ambar);background:var(--ambar-lav);padding:.6rem .7rem;margin-top:.7rem;font-size:.84rem" id="f-credito-nota"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div>
+      <figure class="chart">
+        <div class="chart-h">
+          <h3>De lo que promete el aviso a lo que queda</h3>
+          <p class="nota">Cada barra gris es un costo que el aviso no menciona.</p>
+        </div>
+        <svg viewBox="0 0 400 250" role="img" aria-labelledby="wf-t" id="f-cascada">
+          <title id="wf-t">Cascada del cap rate</title>
+        </svg>
+        <div class="leyenda">
+          <span><i style="background:#B07400"></i>Aviso</span>
+          <span><i style="background:#3D464C"></i>Costos descontados</span>
+          <span><i style="background:#1A5FC8"></i>Honesto</span>
+        </div>
+        <figcaption class="nota mt-s" id="f-cascada-nota"></figcaption>
+      </figure>
+
+      <div class="alerta-prev mt-m">
+        <div class="alerta-top">
+          <span>Alerta Caprato · correo + WhatsApp</span>
+          <span id="a-fecha">12 jul 2026, 07:04</span>
+        </div>
+        <div class="alerta-cuerpo">
+          <p class="rotulo" id="a-asunto">Asunto: 1 publicación pasó tu filtro en Independencia</p>
+          <div id="a-cuerpo"></div>
+          <p class="nota" style="border-top:var(--hair);padding-top:.6rem;margin-top:.8rem">
+            Esto es todo lo que hay: una alerta. No hay vendedor, no hay onboarding, no hay llamada de
+            seguimiento. Si nada pasa el filtro, esta semana no te llega ningún correo — y eso también
+            es el servicio.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <p class="marca-txt">Caprato</p>
+      <p class="nota mt-s" style="max-width:56ch">
+        Datos de demostración: publicaciones, arriendos observados y avalúos son inventados pero
+        construidos con la metodología real, descrita en <a href="../stack.html">Arquitectura</a>.
+        Nada de esto es una recomendación de inversión.
+      </p>
+    </div>
+    <p class="rotulo">caprato.com</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   Estado del demo. Todo en el cliente, sin backend.
+   ============================================================ */
+var UF = 40180;
+
+var DATOS = [
+  {
+    id: 'independencia',
+    comuna: 'Independencia',
+    rol: '2.451-18',
+    dir: 'Av. Independencia 4321, piso 8',
+    edificio: 'Edificio Vista Norte · 96 departamentos · entrega 2019',
+    tipo: '1D+1B · 34 m²',
+    tipologia: '1D',
+    pub: 'hace 2 días',
+    precioUF: 1980,
+    precio: 79556400,
+    gastosCompra: 954677,
+    capital: 80511077,
+    arriendoAviso: 450000,
+    arriendoReal: 430000,
+    n: 14,
+    rango: [395000, 470000],
+    confianza: 3,
+    obs: [395,400,410,415,420,425,430,430,435,440,445,450,460,470],
+    gc: 62000,
+    vacancia: 6.5,
+    vacanciaDias: 24,
+    contribuciones: 0,
+    avaluo: 34800000,
+    contribNota: 'Avalúo fiscal $34.800.000: bajo el tramo exento habitacional',
+    permanencia: 20,
+    bruto: 5160000,
+    vacanciaCLP: 335400,
+    efectivo: 4824600,
+    gcVacio: 48360,
+    admin: 385968,
+    rearriendo: 153510,
+    mantencion: 145000,
+    noi: 4091762,
+    cap: 5.08,
+    folleto: 6.79,
+    dividendo: 416472,
+    pie: 15911280,
+    deuda: 63645120,
+    bandera: null,
+    razon: 'El arriendo real del edificio ($430.000) está sólo 4,4% bajo lo que promete el aviso: la publicación es sincera. Los gastos comunes son bajos ($62.000, edificio sin piscina) y el avalúo fiscal está bajo el tramo exento, así que no paga contribuciones. Ahí están los 5,1%.',
+    cascada: [
+      { l:'Compra',   n:'Gastos de escrituración y CBR', v:0.080 },
+      { l:'Arriendo', n:'Arriendo real del edificio vs. el del aviso', v:0.298 },
+      { l:'Vacancia', n:'Vacancia observada', v:0.417 },
+      { l:'Admin.',   n:'Administración (8%)', v:0.479 },
+      { l:'Re-arr.',  n:'Comisión de re-arriendo', v:0.191 },
+      { l:'Mant.',    n:'Mantención y reposición', v:0.180 },
+      { l:'GC',       n:'Gastos comunes de los meses vacíos', v:0.060 }
+    ]
+  },
+  {
+    id: 'san-miguel',
+    comuna: 'San Miguel',
+    rol: '3.902-7',
+    dir: 'Gran Avenida 5210, piso 5',
+    edificio: 'Edificio Portal Sur · 124 departamentos · entrega 2021',
+    tipo: '2D+1B · 46 m²',
+    tipologia: '2D',
+    pub: 'hace 4 días',
+    precioUF: 2150,
+    precio: 86387000,
+    gastosCompra: 1036644,
+    capital: 87423644,
+    arriendoAviso: 480000,
+    arriendoReal: 450000,
+    n: 9,
+    rango: [420000, 495000],
+    confianza: 2,
+    obs: [420,430,440,445,450,460,470,480,495],
+    gc: 78000,
+    vacancia: 6.0,
+    vacanciaDias: 22,
+    contribuciones: 0,
+    avaluo: 41200000,
+    contribNota: 'Avalúo fiscal $41.200.000: bajo el tramo exento habitacional',
+    permanencia: 20,
+    bruto: 5400000,
+    vacanciaCLP: 324000,
+    efectivo: 5076000,
+    gcVacio: 56160,
+    admin: 406080,
+    rearriendo: 160650,
+    mantencion: 152280,
+    noi: 4300830,
+    cap: 4.92,
+    folleto: 6.67,
+    dividendo: 452279,
+    pie: 17277400,
+    deuda: 69109600,
+    bandera: 'Confianza media: sólo 9 arriendos observados en este edificio. El número puede moverse ±0,3 puntos cuando lleguen más datos.',
+    razon: 'Pasa el filtro por 0,12 puntos. Es el caso donde la evidencia importa: con 9 observaciones, el intervalo de confianza toca el 4,8%. La ficha te lo dice en vez de redondear para arriba.',
+    cascada: [
+      { l:'Compra',   n:'Gastos de escrituración y CBR', v:0.079 },
+      { l:'Arriendo', n:'Arriendo real del edificio vs. el del aviso', v:0.412 },
+      { l:'Vacancia', n:'Vacancia observada', v:0.371 },
+      { l:'Admin.',   n:'Administración (8%)', v:0.464 },
+      { l:'Re-arr.',  n:'Comisión de re-arriendo', v:0.184 },
+      { l:'Mant.',    n:'Mantención y reposición', v:0.174 },
+      { l:'GC',       n:'Gastos comunes de los meses vacíos', v:0.064 }
+    ]
+  },
+  {
+    id: 'nunoa',
+    comuna: 'Ñuñoa',
+    rol: '1.284-9',
+    dir: 'Av. Irarrázaval 5240, piso 12',
+    edificio: 'Edificio Parque Egaña · 212 departamentos · entrega 2022',
+    tipo: '2D+2B · 62 m²',
+    tipologia: '2D',
+    pub: 'hace 2 días',
+    precioUF: 3450,
+    precio: 138621000,
+    gastosCompra: 1663452,
+    capital: 140284452,
+    arriendoAviso: 780000,
+    arriendoReal: 610000,
+    n: 11,
+    rango: [560000, 680000],
+    confianza: 3,
+    obs: [560,570,585,590,600,610,620,630,645,660,680],
+    gc: 145000,
+    vacancia: 7.2,
+    vacanciaDias: 26,
+    contribuciones: 312000,
+    avaluo: 78400000,
+    contribNota: 'Avalúo fiscal $78.400.000 · 4 cuotas de $78.000',
+    permanencia: 18,
+    bruto: 7320000,
+    vacanciaCLP: 527040,
+    efectivo: 6792960,
+    gcVacio: 125280,
+    admin: 543437,
+    rearriendo: 241967,
+    mantencion: 203789,
+    noi: 5366487,
+    cap: 3.83,
+    folleto: 6.75,
+    dividendo: 725683,
+    pie: 27724200,
+    deuda: 110896800,
+    bandera: 'El aviso promete $780.000 de arriendo. El edificio arrienda a $610.000. Son 22% menos.',
+    razon: 'El arriendo real del edificio es 22% menor al que promete el aviso: los 11 departamentos 2D que se arrendaron en los últimos 12 meses lo hicieron a una mediana de $610.000, no $780.000. Además el edificio tiene 9 unidades publicadas al mismo tiempo, lo que empuja la vacancia a 7,2%. Con $145.000 de gastos comunes y $312.000 de contribuciones, quedan 3,8%.',
+    cascada: [
+      { l:'Compra',   n:'Gastos de escrituración y CBR', v:0.080 },
+      { l:'Arriendo', n:'Arriendo real del edificio vs. el del aviso', v:1.454 },
+      { l:'Vacancia', n:'Vacancia observada', v:0.376 },
+      { l:'Contrib.', n:'Contribuciones', v:0.222 },
+      { l:'Admin.',   n:'Administración (8%)', v:0.387 },
+      { l:'Re-arr.',  n:'Comisión de re-arriendo', v:0.172 },
+      { l:'Mant.',    n:'Mantención y reposición', v:0.145 },
+      { l:'GC',       n:'Gastos comunes de los meses vacíos', v:0.089 }
+    ]
+  },
+  {
+    id: 'estacion-central',
+    comuna: 'Estación Central',
+    rol: '5.118-2',
+    dir: 'Alameda 4680, piso 14',
+    edificio: 'Edificio Metro Unión · 348 departamentos · entrega 2023',
+    tipo: 'Studio · 26 m²',
+    tipologia: '1D',
+    pub: 'hace 1 día',
+    precioUF: 1740,
+    precio: 69913200,
+    gastosCompra: 838958,
+    capital: 70752158,
+    arriendoAviso: 350000,
+    arriendoReal: 330000,
+    n: 22,
+    rango: [290000, 365000],
+    confianza: 3,
+    obs: [290,295,300,305,310,315,320,325,325,330,330,330,335,340,345,345,350,350,355,360,360,365],
+    gc: 54000,
+    vacancia: 12.0,
+    vacanciaDias: 44,
+    contribuciones: 0,
+    avaluo: 28900000,
+    contribNota: 'Avalúo fiscal $28.900.000: bajo el tramo exento habitacional',
+    permanencia: 14,
+    bruto: 3960000,
+    vacanciaCLP: 475200,
+    efectivo: 3484800,
+    gcVacio: 77760,
+    admin: 278784,
+    rearriendo: 168300,
+    mantencion: 104544,
+    noi: 2855412,
+    cap: 4.04,
+    folleto: 6.01,
+    dividendo: 365988,
+    pie: 13982640,
+    deuda: 55930560,
+    bandera: 'Vacancia de 12%: 44 días vacío al año. El edificio tiene 31 unidades publicadas simultáneamente.',
+    razon: 'Aquí el arriendo del aviso casi no miente ($350.000 contra $330.000 reales). Lo que mata el número es la vacancia: 44 días vacío al año y arrendatarios que duran 14 meses en un edificio de 348 departamentos donde hay 31 publicados a la vez. Esos 44 días se llevan casi dos puntos de rentabilidad, y ningún folleto los menciona.',
+    cascada: [
+      { l:'Compra',   n:'Gastos de escrituración y CBR', v:0.072 },
+      { l:'Arriendo', n:'Arriendo real del edificio vs. el del aviso', v:0.339 },
+      { l:'Vacancia', n:'Vacancia observada: 44 días vacío al año', v:0.672 },
+      { l:'Admin.',   n:'Administración (8%)', v:0.394 },
+      { l:'Re-arr.',  n:'Comisión de re-arriendo cada 14 meses', v:0.238 },
+      { l:'Mant.',    n:'Mantención y reposición', v:0.148 },
+      { l:'GC',       n:'Gastos comunes de los meses vacíos', v:0.110 }
+    ]
+  },
+  {
+    id: 'la-florida',
+    comuna: 'La Florida',
+    rol: '4.677-3',
+    dir: 'Vicuña Mackenna Oriente 7130, piso 9',
+    edificio: 'Edificio Bellavista Oriente · 168 departamentos · entrega 2020',
+    tipo: '2D+1B · 48 m²',
+    tipologia: '2D',
+    pub: 'hace 5 días',
+    precioUF: 2750,
+    precio: 110495000,
+    gastosCompra: 1325940,
+    capital: 111820940,
+    arriendoAviso: 520000,
+    arriendoReal: 500000,
+    n: 17,
+    rango: [470000, 545000],
+    confianza: 3,
+    obs: [470,475,480,485,490,495,500,500,505,510,515,520,525,530,535,540,545],
+    gc: 95000,
+    vacancia: 5.0,
+    vacanciaDias: 18,
+    contribuciones: 124000,
+    avaluo: 62100000,
+    contribNota: 'Avalúo fiscal $62.100.000 · 4 cuotas de $31.000',
+    permanencia: 24,
+    bruto: 6000000,
+    vacanciaCLP: 300000,
+    efectivo: 5700000,
+    gcVacio: 57000,
+    admin: 456000,
+    rearriendo: 148750,
+    mantencion: 171000,
+    noi: 4743250,
+    cap: 4.24,
+    folleto: 5.65,
+    dividendo: 578446,
+    pie: 22099000,
+    deuda: 88396000,
+    bandera: 'El mismo edificio tiene 3 departamentos idénticos publicados entre 2.480 y 2.590 UF. Éste pide 2.750: 8% sobre la mediana de su propio edificio.',
+    razon: 'El edificio arrienda bien y la vacancia es la más baja de la semana (18 días): la gente se queda. El problema es el precio: piden 2.750 UF cuando tres unidades idénticas del mismo edificio están publicadas entre 2.480 y 2.590. A 2.550 UF este departamento daría 4,6%; a 2.750 da 4,2%. La conversación no es sobre el arriendo, es sobre la oferta que vas a hacer.',
+    cascada: [
+      { l:'Compra',   n:'Gastos de escrituración y CBR', v:0.067 },
+      { l:'Arriendo', n:'Arriendo real del edificio vs. el del aviso', v:0.214 },
+      { l:'Vacancia', n:'Vacancia observada: la más baja de la semana', v:0.268 },
+      { l:'Contrib.', n:'Contribuciones', v:0.111 },
+      { l:'Admin.',   n:'Administración (8%)', v:0.408 },
+      { l:'Re-arr.',  n:'Comisión de re-arriendo', v:0.133 },
+      { l:'Mant.',    n:'Mantención y reposición', v:0.153 },
+      { l:'GC',       n:'Gastos comunes de los meses vacíos', v:0.051 }
+    ]
+  }
+];
+
+/* ---------- utilidades ---------- */
+function clp(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
+function uf(n) { return n.toLocaleString('es-CL') + ' UF'; }
+function pct(n) { return n.toFixed(1).replace('.', ',') + '%'; }
+function pct2(n) { return n.toFixed(2).replace('.', ',') + '%'; }
+
+var estado = {
+  comunas: ['Independencia', 'San Miguel', 'Ñuñoa', 'Estación Central', 'La Florida'],
+  presupuesto: 3500,
+  capmin: 4.8,
+  tipologia: 'todas',
+  fichaId: 'independencia',
+  credito: false
+};
+
+/* ---------- navegación entre vistas ---------- */
+var vistas = {
+  filtro: document.getElementById('vista-filtro'),
+  radar: document.getElementById('vista-radar'),
+  ficha: document.getElementById('vista-ficha')
+};
+var pasos = { filtro: document.getElementById('p1'), radar: document.getElementById('p2'), ficha: document.getElementById('p3') };
+
+function irA(v) {
+  Object.keys(vistas).forEach(function (k) { vistas[k].classList.toggle('activa', k === v); });
+  Object.keys(pasos).forEach(function (k) {
+    if (k === v) { pasos[k].setAttribute('aria-current', 'step'); }
+    else { pasos[k].removeAttribute('aria-current'); }
+  });
+  pasos.radar.disabled = (v === 'filtro');
+  pasos.ficha.disabled = (v !== 'ficha');
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+pasos.filtro.addEventListener('click', function () { irA('filtro'); });
+pasos.radar.addEventListener('click', function () { if (!pasos.radar.disabled) irA('radar'); });
+pasos.ficha.addEventListener('click', function () { if (!pasos.ficha.disabled) irA('ficha'); });
+document.getElementById('btn-volver-filtro').addEventListener('click', function () { irA('filtro'); });
+document.getElementById('btn-volver-radar').addEventListener('click', function () { irA('radar'); });
+
+/* ---------- paso 1: filtro ---------- */
+var sPres = document.getElementById('presupuesto');
+var sCap = document.getElementById('capmin');
+var sPres2 = document.getElementById('presupuesto2');
+var sCap2 = document.getElementById('capmin2');
+
+function pintaFiltro() {
+  document.getElementById('v-presupuesto').textContent = uf(estado.presupuesto);
+  document.getElementById('v-presupuesto-clp').textContent = clp(estado.presupuesto * UF);
+  document.getElementById('v-cap').textContent = pct(estado.capmin);
+  document.getElementById('v-presupuesto2').textContent = uf(estado.presupuesto);
+  document.getElementById('v-cap2').textContent = pct(estado.capmin);
+  sPres.value = estado.presupuesto; sPres2.value = estado.presupuesto;
+  sCap.value = estado.capmin; sCap2.value = estado.capmin;
+}
+
+sPres.addEventListener('input', function () { estado.presupuesto = +sPres.value; pintaFiltro(); pintaRadar(); });
+sCap.addEventListener('input', function () { estado.capmin = +sCap.value; pintaFiltro(); pintaRadar(); });
+sPres2.addEventListener('input', function () { estado.presupuesto = +sPres2.value; pintaFiltro(); pintaRadar(); });
+sCap2.addEventListener('input', function () { estado.capmin = +sCap2.value; pintaFiltro(); pintaRadar(); });
+
+/* Los dos selectores de tipología —el del paso 1 y el del panel del radar— son
+   el mismo estado: cambiar uno mueve el otro. */
+var tip1 = document.getElementById('tipologia');
+var tip2 = document.getElementById('tipologia2');
+function cambiaTipologia(v) {
+  estado.tipologia = v;
+  tip1.value = v; tip2.value = v;
+  pintaRadar();
+}
+tip1.addEventListener('change', function (e) { cambiaTipologia(e.target.value); });
+tip2.addEventListener('change', function (e) { cambiaTipologia(e.target.value); });
+
+function leerComunas() {
+  estado.comunas = Array.prototype.slice
+    .call(document.querySelectorAll('#form-filtro input[name="comuna"]:checked'))
+    .map(function (i) { return i.value; });
+  sincronizaChips2();
+  pintaRadar();
+}
+document.querySelectorAll('#form-filtro input[name="comuna"]').forEach(function (i) {
+  i.addEventListener('change', leerComunas);
+});
+
+document.getElementById('form-filtro').addEventListener('submit', function (e) {
+  e.preventDefault();
+  irA('radar');
+});
+
+/* chips del panel del radar, espejo de los del filtro */
+var chips2 = document.getElementById('chips2');
+['Independencia', 'San Miguel', 'Ñuñoa', 'Estación Central', 'La Florida', 'Santiago'].forEach(function (c) {
+  var l = document.createElement('label');
+  l.className = 'chip';
+  var etiqueta = (c === 'Santiago') ? 'Santiago Centro' : c;
+  l.innerHTML = '<input type="checkbox" value="' + c + '"><span>' + etiqueta + '</span>';
+  var input = l.querySelector('input');
+  input.checked = estado.comunas.indexOf(c) > -1;
+  input.addEventListener('change', function () {
+    var f = document.querySelector('#form-filtro input[value="' + c + '"]');
+    if (f) { f.checked = input.checked; }
+    estado.comunas = Array.prototype.slice
+      .call(chips2.querySelectorAll('input:checked')).map(function (i) { return i.value; });
+    pintaRadar();
+  });
+  chips2.appendChild(l);
+});
+function sincronizaChips2() {
+  chips2.querySelectorAll('input').forEach(function (i) {
+    i.checked = estado.comunas.indexOf(i.value) > -1;
+  });
+}
+
+/* ---------- paso 2: radar ---------- */
+var lista = document.getElementById('lista');
+
+function enRango(d) {
+  if (estado.comunas.indexOf(d.comuna) === -1) return false;
+  if (d.precioUF > estado.presupuesto) return false;
+  if (estado.tipologia !== 'todas' && d.tipologia !== estado.tipologia) return false;
+  return true;
+}
+
+function pintaRadar() {
+  var candidatas = DATOS.filter(enRango);
+  var pasan = candidatas.filter(function (d) { return d.cap >= estado.capmin; });
+
+  document.getElementById('c-rango').textContent = candidatas.length;
+  document.getElementById('c-pasan').textContent = pasan.length;
+
+  lista.innerHTML = '';
+
+  if (candidatas.length === 0) {
+    lista.innerHTML =
+      '<div class="vacio"><p class="cifra cifra-l">0</p>' +
+      '<p><strong>Ninguna publicación entra en tu rango.</strong> Con este presupuesto y estas comunas, ' +
+      'el radar no tiene nada que analizar. Amplía el presupuesto o suma una comuna.</p></div>';
+    return;
+  }
+
+  if (pasan.length === 0) {
+    var v = document.createElement('div');
+    v.className = 'vacio';
+    v.innerHTML =
+      '<p class="cifra cifra-l">0 de ' + candidatas.length + '</p>' +
+      '<p><strong>Esta semana no hay nada que llegue a ' + pct(estado.capmin) + ' honesto en tus comunas.</strong></p>' +
+      '<p>No te vamos a inventar una. Las ' + candidatas.length + ' publicaciones de tu rango están abajo con su ' +
+      'número real y el motivo. El promedio de semanas con al menos un resultado sobre 5% en estas comunas es ' +
+      '<b class="num">1 de cada 3</b>. Baja el mínimo o ten paciencia: las dos son respuestas honestas.</p>';
+    lista.appendChild(v);
+  }
+
+  candidatas
+    .slice()
+    .sort(function (a, b) { return b.cap - a.cap; })
+    .forEach(function (d) {
+      var ok = d.cap >= estado.capmin;
+      var b = document.createElement('button');
+      b.className = 'tarjeta';
+      b.setAttribute('data-estado', ok ? 'pasa' : 'no');
+      b.innerHTML =
+        '<div class="t-h">' +
+          '<div>' +
+            '<div class="t-dir">' + d.dir + '</div>' +
+            '<div class="t-sub">' + d.comuna + ' · ' + d.tipo + ' · ' + uf(d.precioUF) + ' · ' + clp(d.precio) + '</div>' +
+          '</div>' +
+          (ok
+            ? '<span class="sello sello-pasa"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5 L4 8 L9 1.5" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>Pasa</span>'
+            : '<span class="sello sello-no"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Descartada</span>') +
+        '</div>' +
+        '<div class="t-nums">' +
+          '<div class="t-num" data-estado="' + (ok ? 'pasa' : 'no') + '">' +
+            '<span class="rotulo">Cap honesto</span><b class="honesto">' + pct(d.cap) + '</b></div>' +
+          '<div class="t-num"><span class="rotulo">Dice el aviso</span><b class="folleto">' + pct(d.folleto) + '</b></div>' +
+          '<div class="t-num"><span class="rotulo">Arriendo real</span><b>' + clp(d.arriendoReal) + '</b></div>' +
+          '<div class="t-num"><span class="rotulo">Dice el aviso</span><b class="folleto">' + clp(d.arriendoAviso) + '</b></div>' +
+        '</div>' +
+        (ok
+          ? '<div class="t-ok"><strong>Pasa tu filtro de ' + pct(estado.capmin) + '.</strong> ' +
+            (d.bandera ? d.bandera : 'El aviso y el edificio dicen casi lo mismo: la publicación es sincera.') + '</div>'
+          : '<div class="t-motivo"><strong>Descartada:</strong> ' +
+            (d.bandera ? d.bandera + ' ' : '') +
+            'Con el cálculo honesto rinde ' + pct(d.cap) + ' y tu filtro pide ' + pct(estado.capmin) + '.</div>') +
+        '<div class="t-ver">Ver la cuenta completa <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1 L7 5 L3 9" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></div>';
+      b.addEventListener('click', function () { abrirFicha(d.id); });
+      lista.appendChild(b);
+    });
+}
+
+/* ---------- paso 3: ficha ---------- */
+function abrirFicha(id) {
+  estado.fichaId = id;
+  estado.credito = false;
+  pintaFicha();
+  irA('ficha');
+}
+
+function pintaFicha() {
+  var d = DATOS.filter(function (x) { return x.id === estado.fichaId; })[0];
+  var ok = d.cap >= estado.capmin;
+
+  document.getElementById('f-rol').textContent = d.rol;
+  document.getElementById('f-comuna').textContent = d.comuna;
+  document.getElementById('f-tipo').textContent = d.tipo;
+  document.getElementById('f-pub').textContent = d.pub;
+  document.getElementById('h-ficha').textContent = d.dir;
+  document.getElementById('f-edificio').textContent = d.edificio;
+  document.getElementById('f-cap').textContent = pct(d.cap);
+  document.getElementById('f-cap2').textContent = pct2(d.cap);
+  document.getElementById('f-folleto').textContent = pct(d.folleto);
+  document.getElementById('f-capital').textContent = clp(d.capital);
+  document.getElementById('f-capital-nota').textContent =
+    uf(d.precioUF) + ' a ' + clp(UF) + ' + 1,2% de escrituración y CBR (' + clp(d.gastosCompra) + ')';
+
+  document.getElementById('f-sello-wrap').innerHTML = ok
+    ? '<span class="sello sello-pasa"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5 L4 8 L9 1.5" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>Pasa tu filtro</span>'
+    : '<span class="sello sello-no"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Descartada</span>';
+
+  document.getElementById('f-veredicto').innerHTML =
+    '<div style="border-left:3px solid ' + (ok ? 'var(--azul)' : 'var(--ambar)') + ';background:' +
+    (ok ? 'var(--azul-lav)' : 'var(--ambar-lav)') + ';padding:.7rem .8rem;font-size:.88rem;line-height:1.6">' +
+    '<strong>' + (ok ? 'Por qué pasa:' : 'Por qué se descarta:') + '</strong> ' + d.razon + '</div>';
+
+  /* tabla de la cuenta */
+  var t = document.getElementById('f-tabla');
+  var filas = '';
+  filas += fila('Arriendo real del edificio · ' + clp(d.arriendoReal) + '/mes',
+    'Mediana de ' + d.n + ' unidades observadas. El aviso dice ' + clp(d.arriendoAviso) + '.', clp(d.bruto), '');
+  filas += fila('Vacancia · ' + pct(d.vacancia),
+    d.vacanciaDias + ' días vacío al año, medidos en este edificio', '−' + clp(d.vacanciaCLP), 'resta');
+  filas += '<tr><td><strong>Ingreso efectivo</strong></td><td class="n"><strong>' + clp(d.efectivo) + '</strong></td></tr>';
+  filas += fila('Contribuciones', d.contribNota, d.contribuciones === 0 ? '$0' : '−' + clp(d.contribuciones), 'resta');
+  filas += fila('Gastos comunes de los meses vacíos',
+    'GC ' + clp(d.gc) + '/mes × ' + (d.vacancia / 100 * 12).toFixed(2).replace('.', ',') + ' meses', '−' + clp(d.gcVacio), 'resta');
+  filas += fila('Administración · 8% de lo recaudado', '', '−' + clp(d.admin), 'resta');
+  filas += fila('Comisión de re-arriendo',
+    'Medio arriendo + IVA cada ' + d.permanencia + ' meses de permanencia media', '−' + clp(d.rearriendo), 'resta');
+  filas += fila('Mantención y reposición · 3%', '', '−' + clp(d.mantencion), 'resta');
+  filas += '<tr class="total"><td>Ingreso operacional neto (NOI)</td><td class="n">' + clp(d.noi) + '</td></tr>';
+  t.innerHTML =
+    '<caption class="visually-hidden">Cálculo del cap rate honesto en pesos al año</caption>' +
+    '<thead><tr><th scope="col">Concepto</th><th scope="col" class="n">Al año</th></tr></thead><tbody>' + filas + '</tbody>';
+
+  /* evidencia */
+  document.getElementById('f-evid-sub').textContent =
+    d.n + ' publicaciones de arriendo de unidades ' + d.tipologia + ' del mismo edificio, últimos 12 meses.';
+  dibujaEvidencia(d);
+  var brecha = Math.round((1 - d.arriendoReal / d.arriendoAviso) * 1000) / 10;
+  document.getElementById('f-evid-nota').innerHTML =
+    'Mediana <b class="num">' + clp(d.arriendoReal) + '</b> · rango ' + clp(d.rango[0]) + '–' + clp(d.rango[1]) +
+    ' · n = ' + d.n + '. El aviso de venta promete <b class="num">' + clp(d.arriendoAviso) + '</b>: ' +
+    (brecha >= 0
+      ? '<strong>' + brecha.toFixed(1).replace('.', ',') + '% más</strong> de lo que este edificio arrienda de verdad.'
+      : 'está bajo la mediana del edificio.') +
+    ' Un arriendo publicado se cuenta como arrendado cuando el aviso desaparece del portal sin haber bajado de precio.';
+
+  /* crédito */
+  var noiMes = d.noi / 12;
+  var flujo = noiMes - d.dividendo;
+  var propio = d.pie + d.gastosCompra;
+  var coc = (flujo * 12) / propio * 100;
+  document.getElementById('f-credito').innerHTML =
+    '<tbody>' +
+    '<tr><td>Pie · 20%</td><td class="n">' + clp(d.pie) + '</td></tr>' +
+    '<tr><td>Gastos de compra</td><td class="n">' + clp(d.gastosCompra) + '</td></tr>' +
+    '<tr class="total"><td>Capital propio</td><td class="n">' + clp(propio) + '</td></tr>' +
+    '<tr><td>Crédito a 20 años · 4,9% en UF</td><td class="n">' + clp(d.deuda) + '</td></tr>' +
+    '<tr><td>Dividendo mensual</td><td class="n">−' + clp(d.dividendo) + '</td></tr>' +
+    '<tr><td>NOI mensual (lo que deja el arriendo)</td><td class="n">' + clp(noiMes) + '</td></tr>' +
+    '<tr class="total"><td>Flujo de tu bolsillo, al mes</td><td class="n" style="color:' +
+      (flujo < 0 ? 'var(--ambar)' : 'var(--azul)') + '">' + (flujo < 0 ? '−' : '+') + clp(Math.abs(flujo)) + '</td></tr>' +
+    '</tbody>';
+  document.getElementById('f-credito-nota').innerHTML = flujo < 0
+    ? '<strong>No se paga solo.</strong> Pones <b class="num">' + clp(Math.abs(flujo)) + '</b> al mes ' +
+      '(<b class="num">' + clp(Math.abs(flujo) * 12) + '</b> al año) durante los primeros años. Eso no lo hace ' +
+      'un mal negocio —parte del dividendo amortiza capital que sigue siendo tuyo— pero el retorno sobre tu ' +
+      'capital propio en flujo es <b class="num">' + pct(coc) + '</b>, y ahí está la diferencia entre invertir y creerse el aviso.'
+    : '<strong>Se paga solo</strong>, apenas: te quedan <b class="num">' + clp(flujo) + '</b> al mes libres después del dividendo.';
+
+  dibujaCascada(d);
+  document.getElementById('f-cascada-nota').textContent =
+    'Del ' + pct(d.folleto) + ' que promete el aviso al ' + pct(d.cap) + ' que queda: ' +
+    (d.folleto - d.cap).toFixed(2).replace('.', ',') + ' puntos que nadie te descuenta antes de firmar.';
+
+  /* alerta */
+  document.getElementById('a-asunto').textContent = ok
+    ? 'Asunto: 1 publicación pasó tu filtro en ' + d.comuna
+    : 'Asunto: descartamos la publicación de ' + d.comuna + ' que te iba a gustar';
+  document.getElementById('a-cuerpo').innerHTML = ok
+    ? '<p>Hola Rodrigo,</p>' +
+      '<p>Apareció una publicación que pasa tu filtro de <b class="num">' + pct(estado.capmin) + '</b>:</p>' +
+      '<p class="cita"><strong>' + d.dir + '</strong>, ' + d.comuna + '. ' + d.tipo + '. ' +
+      uf(d.precioUF) + '.<br>Cap rate honesto: <strong class="num">' + pct(d.cap) + '</strong> ' +
+      '(el aviso dice ' + pct(d.folleto) + ').<br>Arriendo real del edificio: <strong class="num">' +
+      clp(d.arriendoReal) + '</strong> sobre ' + d.n + ' observaciones.</p>' +
+      '<p>El desglose completo está en la ficha. Lleva ' + d.pub + ' publicada.</p>' +
+      '<p class="nota">Esto no es una recomendación de inversión. Es un cálculo con sus supuestos a la vista.</p>'
+    : '<p>Hola Rodrigo,</p>' +
+      '<p>No te vamos a mandar esta publicación como oportunidad, pero como está en tu comuna y se ve bien en las ' +
+      'fotos, te contamos por qué la descartamos antes de que la veas en el portal y te ilusiones:</p>' +
+      '<p class="cita"><strong>' + d.dir + '</strong>, ' + d.comuna + '. ' + uf(d.precioUF) + '.<br>' +
+      'El aviso promete <strong class="num">' + pct(d.folleto) + '</strong>. El cálculo honesto da ' +
+      '<strong class="num">' + pct(d.cap) + '</strong>.<br>' + (d.bandera || '') + '</p>' +
+      '<p>Si igual quieres verla, la ficha completa está acá con toda la cuenta.</p>';
+}
+
+function fila(concepto, nota, valor, clase) {
+  return '<tr class="' + (clase || '') + '"><td>' + concepto +
+    (nota ? '<br><span class="nota">' + nota + '</span>' : '') +
+    '</td><td class="n">' + valor + '</td></tr>';
+}
+
+/* ---------- gráfico: evidencia de arriendo (strip plot) ---------- */
+function dibujaEvidencia(d) {
+  var svg = document.getElementById('f-evid');
+  var W = 400, H = 150, x0 = 20, x1 = 380;
+  var vals = d.obs;
+  var min = Math.min.apply(null, vals.concat([d.arriendoAviso / 1000])) * 0.94;
+  var max = Math.max.apply(null, vals.concat([d.arriendoAviso / 1000])) * 1.04;
+  var X = function (v) { return x0 + (v - min) / (max - min) * (x1 - x0); };
+
+  var s = '<title>Arriendos observados en el edificio</title>' +
+    '<desc>Cada punto es un arriendo publicado que se concretó. La mediana del edificio es ' +
+    clp(d.arriendoReal) + ' y el aviso de venta promete ' + clp(d.arriendoAviso) + '.</desc>';
+
+  // eje
+  s += '<line x1="' + x0 + '" y1="96" x2="' + x1 + '" y2="96" stroke="#9EA8A3" stroke-width="1"/>';
+  var ticks = [min, (min + max) / 2, max];
+  ticks.forEach(function (t) {
+    var xx = X(t);
+    s += '<line x1="' + xx + '" y1="96" x2="' + xx + '" y2="100" stroke="#9EA8A3" stroke-width="1"/>';
+    s += '<text x="' + xx + '" y="112" text-anchor="middle" class="eje">$' +
+      (Math.round(t / 5) * 5).toLocaleString('es-CL') + 'k</text>';
+  });
+
+  // banda del rango intercuartil visual (rango observado)
+  s += '<rect x="' + X(d.rango[0] / 1000) + '" y="60" width="' +
+    (X(d.rango[1] / 1000) - X(d.rango[0] / 1000)) + '" height="36" fill="#1A5FC8" fill-opacity="0.10"/>';
+
+  // puntos (con anillo de superficie para que no se peguen)
+  vals.forEach(function (v, i) {
+    var xx = X(v);
+    var yy = 88 - (i % 4) * 8;
+    s += '<circle cx="' + xx + '" cy="' + yy + '" r="4.5" fill="#1A5FC8" stroke="#F8F9F7" stroke-width="2">' +
+      '<title>' + clp(v * 1000) + '</title></circle>';
+  });
+
+  // mediana
+  var xm = X(d.arriendoReal / 1000);
+  s += '<line x1="' + xm + '" y1="34" x2="' + xm + '" y2="96" stroke="#1A5FC8" stroke-width="2"/>';
+  s += '<text x="' + xm + '" y="28" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">' +
+    clp(d.arriendoReal) + '</text>';
+  s += '<text x="' + xm + '" y="18" text-anchor="middle" class="eje">mediana real</text>';
+
+  // promesa del aviso
+  var xa = X(d.arriendoAviso / 1000);
+  s += '<line x1="' + xa + '" y1="46" x2="' + xa + '" y2="96" stroke="#B07400" stroke-width="2" stroke-dasharray="4 3"/>';
+  s += '<text x="' + Math.min(xa, 356) + '" y="40" text-anchor="middle" class="eje-l" style="fill:#B07400">' +
+    clp(d.arriendoAviso) + '</text>';
+  s += '<text x="' + Math.min(xa, 356) + '" y="130" text-anchor="middle" class="eje" style="fill:#B07400">promete el aviso</text>';
+
+  svg.innerHTML = s;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+}
+
+/* ---------- gráfico: cascada ---------- */
+function dibujaCascada(d) {
+  var svg = document.getElementById('f-cascada');
+  var base = 210, esc = 24; // px por punto porcentual
+  var pasos = d.cascada;
+  var nb = pasos.length + 2;
+  var ancho = 360 / nb;
+  var bw = Math.min(30, ancho - 8);
+
+  var s = '<title>Cascada del cap rate</title><desc>Parte en ' + pct(d.folleto) +
+    ' y termina en ' + pct(d.cap) + ' tras descontar ' + pasos.length + ' costos.</desc>';
+
+  // grilla
+  [2, 4, 6].forEach(function (g) {
+    var y = base - g * esc;
+    s += '<line x1="30" y1="' + y + '" x2="392" y2="' + y + '" class="grid-l"/>';
+    s += '<text x="26" y="' + (y + 3) + '" text-anchor="end" class="eje">' + g + '%</text>';
+  });
+  s += '<line x1="30" y1="' + base + '" x2="392" y2="' + base + '" stroke="#9EA8A3" stroke-width="1"/>';
+  s += '<text x="26" y="' + (base + 3) + '" text-anchor="end" class="eje">0</text>';
+
+  var xi = function (i) { return 34 + i * ancho + (ancho - bw) / 2; };
+
+  // barra del aviso
+  var hFol = d.folleto * esc;
+  s += '<rect x="' + xi(0) + '" y="' + (base - hFol) + '" width="' + bw + '" height="' + hFol + '" rx="4" fill="#B07400"/>';
+  s += '<rect x="' + xi(0) + '" y="' + (base - 10) + '" width="' + bw + '" height="10" fill="#B07400"/>';
+  s += '<text x="' + (xi(0) + bw / 2) + '" y="' + (base - hFol - 6) + '" text-anchor="middle" class="eje-l">' + pct(d.folleto) + '</text>';
+  s += '<text x="' + (xi(0) + bw / 2) + '" y="' + (base + 16) + '" text-anchor="middle" class="eje">Aviso</text>';
+
+  // restas
+  var acum = d.folleto;
+  pasos.forEach(function (p, i) {
+    var yTop = base - acum * esc;
+    var h = Math.max(3, p.v * esc);
+    s += '<rect x="' + xi(i + 1) + '" y="' + yTop + '" width="' + bw + '" height="' + h + '" rx="3" fill="#3D464C">' +
+      '<title>' + p.n + ': −' + p.v.toFixed(2).replace('.', ',') + ' puntos de cap rate</title></rect>';
+    s += '<text x="' + (xi(i + 1) + bw / 2) + '" y="' + (yTop - 5) + '" text-anchor="middle" class="eje" style="font-size:7.5px">−' +
+      p.v.toFixed(2).replace('.', ',') + '</text>';
+    s += '<text x="' + (xi(i + 1) + bw / 2) + '" y="' + (base + 16) + '" text-anchor="middle" class="eje" style="font-size:7.5px">' + p.l + '</text>';
+    acum -= p.v;
+  });
+
+  // resultado
+  var hCap = d.cap * esc;
+  var xr = xi(nb - 1);
+  s += '<rect x="' + xr + '" y="' + (base - hCap) + '" width="' + bw + '" height="' + hCap + '" rx="4" fill="#1A5FC8"/>';
+  s += '<rect x="' + xr + '" y="' + (base - 10) + '" width="' + bw + '" height="10" fill="#1A5FC8"/>';
+  s += '<text x="' + (xr + bw / 2) + '" y="' + (base - hCap - 6) + '" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">' + pct(d.cap) + '</text>';
+  s += '<text x="' + (xr + bw / 2) + '" y="' + (base + 16) + '" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">Real</text>';
+
+  // línea del filtro del usuario
+  var yf = base - estado.capmin * esc;
+  s += '<line x1="30" y1="' + yf + '" x2="392" y2="' + yf + '" stroke="#14191C" stroke-width="1.5" stroke-dasharray="5 3"/>';
+  s += '<text x="392" y="' + (yf - 5) + '" text-anchor="end" class="eje" style="font-weight:700">tu filtro ' + pct(estado.capmin) + '</text>';
+
+  svg.innerHTML = s;
+  svg.setAttribute('viewBox', '0 0 400 240');
+}
+
+/* ---------- tabs ---------- */
+var tabs = [
+  { t: document.getElementById('tab-1'), p: document.getElementById('tp-1') },
+  { t: document.getElementById('tab-2'), p: document.getElementById('tp-2') },
+  { t: document.getElementById('tab-3'), p: document.getElementById('tp-3') }
+];
+tabs.forEach(function (x) {
+  x.t.addEventListener('click', function () {
+    tabs.forEach(function (y) {
+      var sel = (y === x);
+      y.t.setAttribute('aria-selected', sel ? 'true' : 'false');
+      y.p.classList.toggle('activa', sel);
+    });
+  });
+});
+
+/* ---------- arranque ---------- */
+pintaFiltro();
+pintaRadar();
+pintaFicha();
+
+/* Menú móvil */
+var btn = document.getElementById('navBtn');
+var links = document.getElementById('nav-links');
+btn.addEventListener('click', function () {
+  var abierto = links.classList.toggle('abierto');
+  btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+});
+</script>
+
+</body>
+</html>

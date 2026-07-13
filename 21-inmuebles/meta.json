@@ -1,0 +1,20 @@
+{
+  "folder": "21-inmuebles",
+  "brand": "Caprato",
+  "domain": "caprato.com",
+  "domain_evidence": "_kit/check-domain.sh 2026-07-13 — rdap.verisign.com/com/v1/domain/caprato.com -> HTTP 404 (AVAILABLE). caprato.cl -> NIC Chile 'no existe' (AVAILABLE).",
+  "alternates": ["cabidal.com", "catastria.com", "deslindo.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE.",
+  "tagline": "El cap rate honesto, antes de que firmes.",
+  "category": "PropTech · datos de inversión inmobiliaria",
+  "market": "Chile (Gran Santiago, Valparaíso, Concepción, La Serena) → LatAm y España, condicional a que exista fuente observable de arriendos por edificio",
+  "icp": "Inversionista hormiga de departamentos: persona natural de 34 a 55 años, ingreso familiar sobre $3.000.000, con uno o dos departamentos arrendados que va por el tercero —o por el primero—, presupuesto de 1.500 a 3.500 UF, compra con crédito y busca renta, no plusvalía.",
+  "price_clp": "Desde $9.900/mes (Radar) · $19.900 (Inversionista) · $49.000 (Cartera) · informe suelto $4.900 pago único",
+  "accent": "#1A5FC8",
+  "problem": "El inversionista chileno compra departamentos por corazonada: filtra a mano en Portal Inmobiliario, mira fotos y cree la 'rentabilidad' del aviso —arriendo × 12 ÷ precio—, que ignora vacancia, gastos comunes, contribuciones, administración y la comisión de re-arriendo. Descubre la rentabilidad real dos años después, cuando ya es tarde.",
+  "solution": "Defines tu filtro (comuna, presupuesto en UF, cap rate mínimo) y el radar vigila las publicaciones, las cruza con lo que ese mismo edificio arrienda de verdad y con el histórico de la zona, calcula el cap rate honesto con los siete descuentos a la vista, y te avisa sólo cuando algo pasa de verdad. La mayoría de las semanas no avisa nada.",
+  "wedge": "Nadie en la cadena inmobiliaria gana plata diciéndote que no compres. El corredor cobra 2% por venderte; el portal vive de la publicación. El único producto que puede cobrar por el 'no' es uno que no participa de la operación.",
+  "art_direction": "Informe de tasación y plano de loteo: papel técnico gris frío, hairlines de plano, marcas de esquina, folio y rol, cifras en Roboto Mono tabular, mapa de comunas dibujado a mano en SVG con tramas de densidad. Un solo acento —azul catastro #1A5FC8— reservado para lo que sí es una oportunidad. Tipografía Chivo + Roboto Mono. Nada de papel crema, serif editorial ni rojo óxido.",
+  "autonomia": "total",
+  "status": "prototipo"
+}

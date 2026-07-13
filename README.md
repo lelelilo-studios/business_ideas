@@ -50,6 +50,33 @@ el papá paga y el banco termina financiando la cuenta.
 |---|------|---------|----------|
 | 16 | [Finakids](16-finakids/) | finakids.com | Educación financiera para niños: recibe la mesada el día 1 y tiene que llegar a fin de mes |
 
+## Autónomas
+
+Cinco ideas elegidas por una sola razón: se venden, se entregan, se cobran y se soportan
+sin que una persona intervenga. Cada una declara un [`autopilot.json`](_kit/autopilot.md)
+y es operada por el sistema de abajo.
+
+| # | Marca | Dominio | Problema |
+|---|------|---------|----------|
+| 17 | [Fedatia](17-datos-empresas/) | fedatia.com | Un RUT entra, sale la empresa entera — y cada campo declara de qué fuente vino |
+| 18 | [Pregonia](18-alertas/) | pregonia.com | El Estado publicó 613 avisos hoy; tres te tocan |
+| 19 | [Cotejia](19-precios/) | cotejia.com | Te bajaron el precio a las 3 de la mañana. Tú te enteras el viernes |
+| 20 | [Fonalta](20-recepcion/) | fonalta.com | El teléfono que siempre contesta — y que se declara IA en los primeros 5 segundos |
+| 21 | [Caprato](21-inmuebles/) | caprato.com | Arriendo × 12 ÷ precio no es la rentabilidad. La mayoría de las semanas no te avisa nada |
+
+## El sistema: [Cuantario](00-sistema/)
+
+`cuantario.com` — La máquina que comercializa, mide y decide sobre todas las ideas de acá,
+y sobre las que vengan. Veintiuna ideas, un dueño, cero personas en el loop.
+
+- **El juez** aplica los criterios de muerte que cada idea firmó *antes* de recibir el primer
+  peso. No puede editarlos ni levantarse un tope.
+- **El kernel de cumplimiento** bloquea la acción antes de que toque una API: nada de cuentas
+  falsas, reseñas inventadas ni llamadas en frío con voz sintética. El canal es el activo.
+- **El acoplamiento** es un solo archivo: [`autopilot.json`](_kit/autopilot.md). Cualquier idea
+  futura se enchufa escribiéndolo.
+- **Se enchufan** 8 de las 16 viejas del todo, 3 a medias, y las 5 de minería no.
+
 ## Cómo está hecho
 
 HTML/CSS/JS a mano. Sin build, sin framework, sin CDN — se abre el archivo y funciona.

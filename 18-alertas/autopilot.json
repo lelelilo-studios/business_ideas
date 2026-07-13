@@ -1,0 +1,133 @@
+{
+  "idea": "18-alertas",
+  "brand": "Pregonia",
+  "autonomia": "total",
+  "por_que": "Producto digital puro, autoservicio de punta a punta. El cliente se registra, pega los RUT que quiere vigilar y paga con tarjeta: no hay demo, no hay implementación, no hay dato que migrar. La entrega es un correo o un WhatsApp. El soporte es un agente que consulta la cuenta. El único trabajo humano irreducible es rehacer un parser cuando una fuente del Estado cambia de formato (~4 horas al mes en régimen), y ese trabajo lo detecta el sistema solo mediante canarios.",
+
+  "oferta": {
+    "landing": "https://pregonia.com",
+    "checkout": "flow",
+    "modelo": "suscripcion",
+    "precio_clp": 79000,
+    "prueba_sin_tarjeta": true,
+    "tramos_clp": {
+      "vigia": 14900,
+      "estudio": 79000,
+      "cartera": 249000
+    },
+    "nota_precio": "El tramo que el sistema compra y optimiza es Estudio ($79.000). Vigía ($14.900) es autoservicio puro que llega por SEO y por reventa del propio estudio; no se le compra tráfico porque su CAC no lo aguanta."
+  },
+
+  "publico": {
+    "icp": "Estudio de abogados boutique de 3 a 15 abogados (corporativo, propiedad industrial, cobranza y concursal) que lleva entre 10 y 80 empresas como clientes recurrentes y hoy tiene a un procurador revisando el Diario Oficial a mano todas las mañanas. Segundo anillo: oficina contable con cartera de 20 a 200 PYME. Tercero, sin perseguirlo: la PYME sola con marca registrada.",
+    "geo": ["CL"],
+    "canales": [
+      "seo",
+      "google_ads",
+      "linkedin_propio",
+      "x_propio",
+      "email_optin",
+      "whatsapp_optin"
+    ],
+    "canales_excluidos": {
+      "voz_saliente": "No. El producto se entrega por escrito y una alerta legal por teléfono es peor que por correo. Además, en Chile choca con el registro No Molestar (Ley 21.398).",
+      "voz_entrante": "No. No aporta: la pregunta que llega es «¿por qué no me llegó X?» y se contesta mostrando el descarte en pantalla.",
+      "meta_ads": "No en la fase 1. El ICP (socio de estudio) no compra software desde Instagram. Se reevalúa si el tramo Vigía crece.",
+      "foros_y_comunidades": "PROHIBIDO por el kernel y, además, suicida en este mercado: el gremio legal chileno es chico y se conoce. El día que un abogado descubre que la cuenta que recomendaba Pregonia era un bot, el producto está muerto en el gremio."
+    }
+  },
+
+  "presupuesto": {
+    "tope_diario_clp": 20000,
+    "tope_mensual_clp": 500000,
+    "tope_total_antes_de_revisar_clp": 2000000,
+    "derivacion": "Con CAC de $64.000 (sólo Google Ads, antes de que el SEO cargue), $500.000/mes compran ~7,8 cuentas nuevas al mes, es decir +$616.000 de MRR al mes. El tope acumulado de $2.000.000 es el punto en que ya deberían existir ~30 cuentas pagando; si no existen, algo está roto y hay que mirarlo antes de gastar más."
+  },
+
+  "metricas": {
+    "endpoint": "https://pregonia.com/metrics",
+    "eventos": ["visita", "registro", "activacion", "pago", "churn"],
+    "activacion": "La cuenta recibió al menos 1 alerta Y la accionó (abrió la publicación original, la reenvió a un cliente, o le dio pulgar arriba) dentro de los primeros 14 días. NO cuenta como activación haber recibido alertas: si nadie las abrió, no entregamos valor, entregamos ruido.",
+    "metrica_estrella": {
+      "nombre": "senal",
+      "definicion": "alertas_accionadas / alertas_enviadas, en ventana móvil de 4 semanas, por cuenta.",
+      "objetivo": 0.6,
+      "piso": 0.4,
+      "por_que": "No es cuántas alertas mandamos: es qué fracción sirvió. Es la única métrica que separa este producto de Ctrl+F con delivery, y es la que dispara el criterio de muerte M1."
+    }
+  },
+
+  "criterios_de_muerte": [
+    {
+      "hito": "M1",
+      "mes": 2,
+      "condicion": "senal < 0.40 con al menos 5 cuentas activas y al menos 60 alertas enviadas",
+      "accion": "matar",
+      "nota": "El producto ES el filtro. Un filtro que acierta menos de 2 de cada 5 veces es ruido con factura. Tamaño mínimo de muestra declarado a propósito: nadie declara derrota con 12 alertas."
+    },
+    {
+      "hito": "M2",
+      "mes": 4,
+      "condicion": "0 de 5 design partners puso tarjeta tras 6 semanas de uso diario y gratuito",
+      "accion": "pausar",
+      "nota": "Si lo usan gratis todos los días y no pagan, el dolor no vale plata. Se repivota al tramo Vigía; si tampoco, se mata."
+    },
+    {
+      "hito": "M3",
+      "mes": 8,
+      "condicion": "cac > 237000 (3x el precio mensual del tramo Estudio) con al menos 30 conversiones medidas",
+      "accion": "pausar",
+      "nota": "Se pausa el canal pagado, no la idea. El SEO y el referido del estudio siguen corriendo gratis."
+    },
+    {
+      "hito": "M4",
+      "mes": 12,
+      "condicion": "churn mensual > 0.08 sostenido durante 3 meses seguidos, con al menos 25 cuentas activas",
+      "accion": "matar",
+      "nota": "El filtro no aguanta el uso real. No hay adquisición que compense un balde con hoyo."
+    },
+    {
+      "hito": "M5",
+      "mes": 18,
+      "condicion": "registros_por_seo / registros_totales < 0.30 en el mes",
+      "accion": "reducir",
+      "nota": "No es muerte, es techo. Si el único canal es Google Ads, el volumen de búsqueda en Chile lo topa en ~9 cuentas al mes y nunca se llega a 200. Se reduce a bootstrap y se deja de comprar tráfico."
+    },
+    {
+      "hito": "M6",
+      "mes": 24,
+      "condicion": "arr_clp < 120000000",
+      "accion": "matar",
+      "nota": "La mitad del escenario base. Bajo eso no hay negocio que justifique dos años más de atención: se entrega a un operador como bootstrap o se apaga."
+    }
+  ],
+
+  "economia": {
+    "cac_objetivo_clp": 32000,
+    "cac_inicial_solo_ads_clp": 64000,
+    "ltv_estimado_clp": 1422000,
+    "margen_bruto": 0.90,
+    "payback_meses": 0.45,
+    "derivacion": "Margen bruto 90% declarado con holgura sobre los tramos calculados en stack.html (Vigía 88,1%, Estudio 92,6%, Cartera 91,9%). LTV = $79.000 x 0,90 x 20 meses de vida (churn 5%/mes). CAC mezclado al mes 12 = 45% Ads ($64.000) + 40% SEO ($8.000) + 15% referido ($0). ADVERTENCIA HONESTA: un LTV/CAC de 44x no significa que el negocio sea fácil, significa que el cuello de botella no es el CAC sino el VOLUMEN del canal. Ver el criterio M5."
+  },
+
+  "cumplimiento": {
+    "voz_saliente": false,
+    "voz_entrante": false,
+    "datos_personales": "Sólo el correo y el teléfono de quien se registra, con opt-in explícito para WhatsApp y baja honrada al instante. Los RUT que el cliente vigila son de personas jurídicas y de fuentes públicas: no se venden, no alimentan ningún producto de datos, no salen de su cuenta. Sin datos de menores. Leyes 19.628 y 21.719.",
+    "riesgo_declarado": "Tres riesgos reales. (1) OMISIÓN: el producto decide NO enviar publicaciones, y si descarta una que sí importaba, el cliente puede perder un plazo legal. Mitigación estructural: la bandeja de descartadas es visible y buscable, cada descarte lleva su motivo escrito, y los términos dicen explícitamente que Pregonia no es asesoría legal y no reemplaza al abogado. Nunca se promete exhaustividad — esa promesa es demandable. (2) SEO PROGRAMÁTICO: se generan páginas por norma, regulador, rubro y comuna (~8.000, todas con contenido útil). NO se genera una página por empresa, aunque serían 1,3 millones y traerían tráfico: es contenido delgado en masa que hace que Google penalice el dominio entero, y publicar un perfil indexable de la actividad de una persona natural con giro toca la Ley 19.628 y la 21.719. (3) FUENTE: la ingesta depende de sitios del Estado que pueden cambiar de formato. Cuando eso pasa, el sistema pausa el envío de esa fuente y avisa al usuario que está caída, en vez de fingir silencio."
+  },
+
+  "humano_irreducible": {
+    "horas_mes_en_regimen": 4,
+    "que": [
+      "Rehacer un parser cuando una fuente del Estado cambia de formato. El canario lo detecta y pausa el envío; rehacerlo es ingeniería. ~4-8 horas por trimestre y por fuente afectada, ~30 horas al año con 6 fuentes.",
+      "Trámites de una vez que exigen persona jurídica: verificación de negocio de Meta para la WhatsApp Business API, y certificado digital del SII para emitir DTE.",
+      "Un reclamo grave por una alerta omitida. Un bot no comparece.",
+      "La decisión de agregar una fuente nueva (el sistema la propone con datos de demanda; la aprueba el operador del portafolio).",
+      "Revisión por muestreo de 1 de cada 20 páginas de SEO: una explicación legal errónea publicada 8.000 veces es un problema serio.",
+      "El webinar del Colegio de Abogados y la conversación de partner con Nubox/Defontana. Canales 4 y 5, no 1 y 2."
+    ],
+    "cero_horas_de": ["venta", "demos", "onboarding", "soporte de primera línea", "cobranza"]
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "idea": "20-recepcion",
+  "brand": "Fonalta",
+  "autonomia": "total",
+  "por_que": "Producto digital que se entrega por la red telefónica: no hay integración, no hay instalación, no hay visita. El cliente se registra, desvía su número con un código de su operadora, pega los datos de su negocio y paga con tarjeta. La venta es publicidad de intención y SEO en dominio propio; el soporte lo contesta la propia IA por WhatsApp; el producto se mejora solo con el bucle de la tabla no_supo. El único humano obligatorio del proceso es el cliente marcando el código de desvío en su teléfono.",
+
+  "oferta": {
+    "landing": "https://fonalta.com",
+    "checkout": "flow",
+    "modelo": "suscripcion",
+    "precio_clp": 69000,
+    "planes_clp": { "recado": 29000, "recepcion": 69000, "central": 159000 },
+    "excedente_clp_por_minuto": 89,
+    "prueba_sin_tarjeta": true,
+    "prueba": "30 minutos de llamadas, sin tarjeta"
+  },
+
+  "publico": {
+    "icp": "PYME de servicios de 3 a 30 personas donde el teléfono es canal de venta o atención —veterinaria, consulta médica o dental, taller mecánico, hotel chico, constructora, corredora de propiedades, servicio técnico— con 6 a 25 llamadas al día, en comuna urbana, y un momento del día en que nadie las puede contestar. Firma el dueño, con su tarjeta.",
+    "cuna": "Veterinarias y clínicas dentales de Santiago: la intención de la llamada es limpia y repetitiva, el valor de una hora es alto y medible, y ya viven en Google Calendar.",
+    "geo": ["CL"],
+    "canales": [
+      "google_ads",
+      "seo",
+      "meta_ads",
+      "instagram_propio",
+      "linkedin_propio",
+      "whatsapp_optin",
+      "voz_entrante"
+    ],
+    "canales_prohibidos_explicitamente": [
+      "voz_saliente_en_frio",
+      "foros_y_comunidades",
+      "resenas",
+      "cuentas_no_propias"
+    ],
+    "nota_canal": "El canal de intención tiene techo: estimo ~2.800 búsquedas/mes en Chile para el clúster ('recepcionista virtual', 'contestar llamadas automático', 'central telefónica virtual', 'secretaria virtual'), lo que da ~700 clics/mes y ~6 clientes/mes. Satura en el mes 6. El motor de crecimiento real es el SEO programático en dominio propio, y es también el que puede fallar."
+  },
+
+  "presupuesto": {
+    "tope_diario_clp": 25000,
+    "tope_mensual_clp": 700000,
+    "tope_total_antes_de_revisar_clp": 4200000
+  },
+
+  "metricas": {
+    "endpoint": "https://fonalta.com/api/metrics",
+    "eventos": ["visita", "registro", "desvio_verificado", "activacion", "pago", "churn"],
+    "activacion": "La IA atendió 5 llamadas reales del negocio del cliente. No es 'creó la cuenta' y no es 'desvió el número': es que el producto contestó el teléfono de verdad, cinco veces. Antes de eso el cliente no vio ningún valor.",
+    "metricas_de_voz": {
+      "latencia_p50_ms": "objetivo 730, presupuesto 800",
+      "latencia_p95_ms": "objetivo 1180, alerta sobre 1500",
+      "tasa_cuelgue_15s": "la métrica que decide si el producto existe · umbral de muerte 25%",
+      "tasa_no_supo": "fracción de turnos donde la IA admitió no saber · alerta sobre 15%",
+      "divulgacion_cumplida": "fracción de llamadas donde la palabra 'virtual' salió antes de los 5 s · debe ser 100%"
+    }
+  },
+
+  "criterios_de_muerte": [
+    {
+      "hito": "M1",
+      "mes": 2,
+      "condicion": "En 300 llamadas reales, más del 25% de quienes llaman cuelga en los primeros 15 segundos (es decir, justo después de oír que es una IA)",
+      "muestra_minima": 300,
+      "accion": "matar",
+      "nota": "El go/no-go del producto. Si el chileno no acepta hablar con una máquina que se declara máquina, no hay precio, ni canal, ni latencia, ni acento que lo salve. No hay pivote: hay cierre."
+    },
+    {
+      "hito": "M1",
+      "mes": 2,
+      "condicion": "El p95 de latencia por turno pasa de 1.500 ms durante una semana y no baja con optimización",
+      "accion": "pausar",
+      "escalamiento": "matar a los 30 días si no se arregla",
+      "nota": "Criterio de muerte del producto, no del negocio: sin latencia la voz no suena viva y el argumento técnico central se cae."
+    },
+    {
+      "hito": "M2",
+      "mes": 3,
+      "condicion": "Con 200 pruebas iniciadas, cero personas pagaron con tarjeta sin que un humano interviniera en la venta",
+      "muestra_minima": 200,
+      "accion": "matar",
+      "nota": "El producto no es self-serve, y por lo tanto no es esta empresa."
+    },
+    {
+      "hito": "M3",
+      "mes": 6,
+      "condicion": "Churn sobre 12% mensual, sostenido dos meses seguidos, con al menos 15 clientes",
+      "muestra_minima": 15,
+      "ventana": "2 meses consecutivos",
+      "accion": "matar",
+      "nota": "A 12% de churn el LTV cae a $427.600 y el LTV/CAC a 3,9: el negocio deja de soportar el CAC de un canal pagado, que es lo único que sabemos hacer sin humanos."
+    },
+    {
+      "hito": "M4",
+      "mes": 9,
+      "condicion": "El tráfico orgánico no llegó a 250 visitas/mes",
+      "accion": "reducir",
+      "nota": "Chequeo adelantado del motor de crecimiento. Si el SEO programático no rankea, el negocio queda con techo de ~6 clientes/mes del canal de intención. Se recorta el gasto a mínimos y se replantea el canal antes de quemar la caja."
+    },
+    {
+      "hito": "M4",
+      "mes": 12,
+      "condicion": "CAC sobre 3× el ARPU mensual (más de $223.500) durante 8 semanas, con al menos 60 conversiones acumuladas",
+      "muestra_minima": 60,
+      "ventana": "8 semanas",
+      "accion": "pausar",
+      "nota": "Se pausa el canal pagado, no la empresa. Se vive del SEO y de los referidos hasta entender qué pasó."
+    },
+    {
+      "hito": "M5",
+      "mes": 18,
+      "condicion": "Margen bruto bajo 50%, dos meses seguidos",
+      "ventana": "2 meses consecutivos",
+      "accion": "pausar",
+      "escalamiento": "matar a los 3 meses si el margen no vuelve sobre 60%",
+      "nota": "El costo por minuto se comió el precio. Un SaaS de 50% de margen bruto no soporta el CAC de un canal pagado."
+    },
+    {
+      "hito": "M6",
+      "mes": 24,
+      "condicion": "MRR bajo $6.000.000 y caja bajo $10.000.000",
+      "accion": "matar",
+      "nota": "El escenario pesimista. A ese ritmo no se llega a nada relevante y los dos fundadores están subsidiando el proyecto con su tiempo. Se mata o se vende la base de clientes."
+    }
+  ],
+
+  "economia": {
+    "cac_objetivo_clp": 109133,
+    "ltv_estimado_clp": 1026200,
+    "margen_bruto": 0.689,
+    "payback_meses": 2.1,
+    "costo_variable_clp_por_minuto": 50.3,
+    "nota": "El 31% de cada peso que cobramos se va en minutos de voz (telefonía + ASR + LLM + TTS). Por eso el margen es 69% y no 88%. El TTS solo es el 46% del costo variable."
+  },
+
+  "cumplimiento": {
+    "voz_saliente": false,
+    "voz_saliente_condicionada": "Sólo devoluciones de llamada a quien dejó su número EN la llamada entrante y dio consentimiento explícito, con el fragmento de audio del 'sí' guardado en la tabla consentimiento. El worker no marca si esa fila no existe. Tope: 1 devolución por número por día, máximo 2 intentos. Se consulta la lista de supresión y el registro No Molestar antes de cada marcado.",
+    "divulgacion_ia": "Obligatoria en los primeros 5 segundos, en todas las llamadas. El saludo con la palabra 'virtual' va pre-sintetizado en caché y se emite en el ms 40: no lo genera el modelo, así que el modelo no lo puede omitir. Si el archivo de saludo no está disponible, la llamada no se contesta.",
+    "clonacion_de_voz": "Prohibida. La voz base es de una locutora chilena contratada con cesión escrita de derechos para uso sintético. Nunca se clona la voz de una persona real sin ese documento, y la IA nunca dice ser una persona específica.",
+    "transferencia_a_humano": "La herramienta transferir() sólo existe en el conjunto de herramientas si hay un destino configurado y disponible. Si no lo hay, el modelo literalmente no tiene esa opción: dice que no puede pasar con una persona y ofrece recado o devolución. Simular una transferencia es el único acto que convertiría este producto en una estafa.",
+    "afirmaciones": "El modelo no puede emitir un hecho sobre el negocio del cliente que no venga del resultado de una herramienta en ese turno. Si buscar_conocimiento vuelve vacío, la única salida permitida es admitirlo y registrar la pregunta en no_supo.",
+    "grabacion": "Todas las llamadas se graban y transcriben, y se avisa en la misma frase de la divulgación. Retención 12 meses o hasta que el cliente pida borrarlas.",
+    "datos_personales": "Nombre y teléfono de quien llama, más el motivo de la llamada. Sin datos de menores. Sin datos raspados. Ley 19.628 y Ley 21.719.",
+    "riesgo_declarado": "El riesgo más grande no es legal, es cultural y no está probado: que el chileno cuelgue al oír que le contesta una IA. Está declarado como criterio de muerte de M1 y se mide en el día 45. El segundo riesgo es que el SEO programático no rankee, dejando el negocio con un techo de ~6 clientes/mes."
+  }
+}

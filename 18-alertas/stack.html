@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Pregonia</title>
+<meta name="description" content="Qué habría que configurar para que Pregonia funcione de verdad: modelo de datos, los cinco agentes de IA, las fuentes, el costo mensual con su aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc { max-width: 78ch; }
+  .doc p { margin-top: var(--sp-s); line-height: 1.62; }
+  .caja { border: 1px solid var(--linea-2); background: var(--panel); padding: var(--sp-s); margin-top: var(--sp-s); }
+  .caja .rotulo { display: block; margin-bottom: 8px; }
+  .caja-f { border-color: var(--flash-bord); background: var(--flash-apag); }
+  .calc { font-family: var(--mono); font-size: 0.76rem; line-height: 1.85; color: var(--texto-2); white-space: pre; overflow-x: auto; }
+  .calc b { color: var(--texto); font-weight: 500; }
+  .calc .f { color: var(--flash); }
+  .calc .d { color: var(--texto-3); }
+
+  /* El diagrama del pipeline */
+  .tubo { display: grid; gap: 2px; margin-top: var(--sp-s); }
+  .etapa {
+    display: grid; grid-template-columns: 2.2rem 1fr; gap: var(--sp-s);
+    border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-s);
+    border-left: 3px solid var(--linea-2);
+  }
+  .etapa.ia { border-left-color: var(--flash); }
+  .etapa .n { font-family: var(--mono); font-size: 0.75rem; color: var(--texto-3); letter-spacing: 0.1em; }
+  .etapa h3 { font-size: 1.02rem; }
+  .etapa .que { font-size: 0.88rem; color: var(--texto-2); line-height: 1.5; margin-top: 6px; }
+  .etapa .costo { font-family: var(--mono); font-size: 0.68rem; color: var(--texto-3); letter-spacing: 0.05em; margin-top: 8px; border-top: 1px solid var(--linea); padding-top: 6px; }
+  .etapa .costo b { color: var(--flash); font-weight: 500; }
+
+  .agente { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-s); display: grid; gap: 8px; align-content: start; }
+  .agente-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .agente h3 { font-size: 1.02rem; }
+  .agente .modelo { font-family: var(--mono); font-size: 0.62rem; border: 1px solid var(--linea-2); padding: 2px 5px; color: var(--texto-2); letter-spacing: 0.04em; }
+  .agente p { font-size: 0.88rem; line-height: 1.5; }
+  .agente .prompt {
+    font-family: var(--mono); font-size: 0.73rem; line-height: 1.6; color: var(--texto-2);
+    background: #0D1113; border: 1px solid var(--linea); border-left: 2px solid var(--flash);
+    padding: 10px 12px; white-space: pre-wrap;
+  }
+  .agente .herr { font-family: var(--mono); font-size: 0.68rem; color: var(--texto-3); letter-spacing: 0.04em; line-height: 1.7; }
+  .agente .herr b { color: var(--texto-2); font-weight: 500; }
+
+  .env { font-family: var(--mono); font-size: 0.74rem; line-height: 1.9; color: var(--texto-2); background: #0D1113; border: 1px solid var(--linea); padding: var(--sp-s); overflow-x: auto; white-space: pre; }
+  .env .k { color: var(--texto); }
+  .env .c { color: var(--texto-3); }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="container cabecera-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 9v6M3 12h4l8-5v10l-8-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 8c1.6 1.1 1.6 6.9 0 8" stroke="#FF3B30" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Pregonia<span class="pt">.</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+  <div class="container" id="menuMovil">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <section style="padding-block: var(--sp-l) var(--sp-m)">
+    <p class="rotulo">Pregonia · Qué habría que configurar de verdad</p>
+    <h1 style="margin-top:8px;max-width:24ch">La IA no busca. Busca Postgres. La IA decide.</h1>
+    <p style="font-size:var(--step-1);color:var(--texto-2);margin-top:var(--sp-s);max-width:60ch;line-height:1.45">Esa distinción es toda la arquitectura, y es también toda la economía: si un modelo leyera el Diario Oficial completo para cada cliente, el margen sería negativo. <b style="color:var(--texto)">El modelo sólo ve lo que el índice ya levantó.</b></p>
+  </section>
+
+  <!-- ===== PIPELINE ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>El tubo, etapa por etapa</h2><span class="rotulo">Con el costo de cada una</span></div>
+    <div class="tubo">
+      <div class="etapa">
+        <span class="n">00</span>
+        <div>
+          <h3>Ingesta</h3>
+          <p class="que">A las 05:40 se descarga la edición electrónica del Diario Oficial. Se parte en avisos por su CVE. En paralelo se raspan el Boletín Concursal, la CMF, el SEIA y los dictámenes de la Dirección del Trabajo. Cada documento se guarda crudo, con su hash, para siempre: <b>el archivo es el activo</b> y no se puede reconstruir hacia atrás si un día la fuente lo borra.</p>
+          <p class="costo">Python + <span class="mono">httpx</span> + <span class="mono">pdfplumber</span> · <b>Sin IA. Costo: CPU.</b> · Canario: si una fuente devuelve 0 avisos y su promedio de 30 días es 142, se pausa el envío y se le avisa al usuario.</p>
+        </div>
+      </div>
+
+      <div class="etapa ia">
+        <span class="n">01</span>
+        <div>
+          <h3>Extracción estructurada <span class="fuente" style="vertical-align:2px">IA</span></h3>
+          <p class="que">Cada aviso pasa <b>una sola vez</b> (no una vez por cliente) por Haiku 4.5, que devuelve JSON: tipo de acto, RUT mencionados, razones sociales, comunas, montos, plazos, regulador. Esto es lo que convierte un PDF en una base de datos.</p>
+          <p class="costo">Haiku 4.5 · 17.400 documentos/mes · <b>US$55/mes para toda la base de clientes</b> · el costo NO escala con el número de cuentas.</p>
+        </div>
+      </div>
+
+      <div class="etapa">
+        <span class="n">02</span>
+        <div>
+          <h3>Recuperación de candidatos</h3>
+          <p class="que">Postgres con <span class="mono">tsvector</span> (texto), <span class="mono">pg_trgm</span> (razón social difusa, para pillar «ANDESPAK» contra «ANDESPACK») y comparación exacta de RUT con dígito verificador. Se recupera <b>a propósito de más</b>: es mejor levantar 120 candidatos y descartar 94 que perder uno.</p>
+          <p class="costo">Postgres · <b>Sin IA. Costo: CPU.</b> · Acá es donde Ctrl+F llega y se queda.</p>
+        </div>
+      </div>
+
+      <div class="etapa ia">
+        <span class="n">03</span>
+        <div>
+          <h3>El juez de relevancia <span class="fuente" style="vertical-align:2px">IA</span> <span class="flash">El producto</span></h3>
+          <p class="que">Cada candidato se evalúa contra el perfil de la cuenta y los pulgares anteriores de <em>ese usuario</em>. Devuelve relevante sí/no, una confianza, y —siempre, incluso cuando descarta— <b>el motivo escrito</b>. Si la confianza es menor a 0,7, escala a Sonnet 5.</p>
+          <p class="costo">Haiku 4.5 (85%) → Sonnet 5 (15% escalado) · <b>US$0,75/mes en una cuenta Estudio</b></p>
+        </div>
+      </div>
+
+      <div class="etapa ia">
+        <span class="n">04</span>
+        <div>
+          <h3>Redacción <span class="fuente" style="vertical-align:2px">IA</span></h3>
+          <p class="que">Sólo para los que pasaron. Sonnet 5 escribe el titular, la frase de «por qué te importa» —nombrando el sujeto vigilado que calzó— y el «qué hacer». <b>El plazo NO lo calcula el modelo</b>: lo calcula una función con el calendario de días hábiles de Chile, porque contar días es exactamente lo que un LLM hace mal y lo que un cliente no perdona.</p>
+          <p class="costo">Sonnet 5 · 26 alertas/mes en una cuenta Estudio · <b>US$0,49/mes</b></p>
+        </div>
+      </div>
+
+      <div class="etapa">
+        <span class="n">05</span>
+        <div>
+          <h3>Entrega y aprendizaje</h3>
+          <p class="que">Correo (SES) y WhatsApp (API oficial, plantilla de utilidad aprobada, sólo a quien dejó su número). Cada apertura, cada clic y cada pulgar vuelve a la tabla <span class="mono">pulgar</span>, que es el único activo que no se puede copiar.</p>
+          <p class="costo">SES + WhatsApp Business API · <b>US$0,78/mes en una cuenta Estudio</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AGENTES ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>Los agentes</h2><span class="rotulo">Modelo · prompt · herramientas</span></div>
+    <div class="rejilla rejilla-2">
+
+      <div class="agente">
+        <div class="agente-top"><h3>1 · Extractor</h3><span class="modelo">claude-haiku-4-5-20251001</span></div>
+        <p>Convierte un aviso en texto plano en un registro. Corre una vez por documento, nunca por cliente. Prompt cacheado (el sistema y los ejemplos no cambian): el input efectivo baja ~70%, y ese ahorro <b>no está contado</b> en los costos de abajo — es holgura.</p>
+        <p class="prompt">Eres un extractor. Devuelve SOLO JSON válido.
+Del aviso, saca: tipo_acto, ruts[], razones_sociales[],
+comunas[], montos_clp[], plazo_dias, regulador,
+resumen (≤ 20 palabras).
+Si un campo no está, es null. NO infieras.
+NO expliques. Si el texto está truncado, dilo en
+"trunco": true.</p>
+        <p class="herr"><b>Herramientas:</b> ninguna. A propósito: un extractor con herramientas es un extractor que alucina.</p>
+      </div>
+
+      <div class="agente" style="border-color:var(--flash-bord)">
+        <div class="agente-top"><h3>2 · Juez de relevancia</h3><span class="modelo">haiku-4-5 → claude-sonnet-5</span></div>
+        <p><b>Es el producto entero.</b> Decide si esta publicación cambia lo que este cliente tiene que hacer esta semana. Escala a Sonnet 5 cuando la confianza baja de 0,7.</p>
+        <p class="prompt">Tu trabajo NO es encontrar menciones. Eso ya lo hizo
+el índice. Tu trabajo es decidir si ESTA publicación
+cambia lo que ESTE cliente tiene que hacer.
+
+Descarta si: es homonimia (nombre parecido, RUT
+distinto), es una norma general que no lo toca, ya se
+lo dijimos este mes, o no hay nada que hacer al
+respecto.
+
+SIEMPRE escribe el motivo, también cuando descartas:
+el cliente lo va a leer y tiene que quedar convencido.
+Una frase. Nombra el sujeto vigilado que calzó.
+
+Ante la duda, escala. No adivines: una alerta de más
+apaga el producto y una de menos nos cuesta un juicio.</p>
+        <p class="herr">
+          <b>Herramientas:</b><br>
+          <span class="mono">verificar_rut(rut)</span> → ¿calza exacto con un sujeto?<br>
+          <span class="mono">historial(sujeto_id, 30d)</span> → ¿ya se lo dijimos?<br>
+          <span class="mono">pulgares(usuario_id, 20)</span> → los 20 más informativos<br>
+          <span class="mono">reglas(cuenta_id)</span> → las reglas que el usuario escribió
+        </p>
+      </div>
+
+      <div class="agente">
+        <div class="agente-top"><h3>3 · Redactor</h3><span class="modelo">claude-sonnet-5</span></div>
+        <p>Escribe la alerta. Sólo corre sobre lo que el juez aprobó, y ése es el truco del margen: se redacta el 22% de los candidatos, no el 100%.</p>
+        <p class="prompt">Escribe para alguien que va a leerte en el teléfono,
+parado, entre dos reuniones.
+
+TITULAR: qué pasó, en la voz de un cable de agencia.
+POR QUÉ TE IMPORTA: una frase, segunda persona,
+  nombrando la empresa o la marca que calzó.
+QUÉ HACER: el acto concreto. Si no hay acto, dilo.
+
+Prohibido: "podría afectarle", "le recomendamos
+evaluar", "es importante estar al tanto". Si no
+sabes qué tiene que hacer, no era una alerta.</p>
+        <p class="herr">
+          <b>Herramientas:</b><br>
+          <span class="mono">calcular_plazo(fecha_pub, tipo_acto)</span> → función determinista con el calendario de días hábiles. <b>El modelo nunca cuenta días.</b>
+        </p>
+      </div>
+
+      <div class="agente">
+        <div class="agente-top"><h3>4 · Soporte</h3><span class="modelo">claude-haiku-4-5-20251001</span></div>
+        <p>Contesta con acceso a la cuenta. La pregunta número uno es «¿por qué no me llegó X?», y la respuesta está en la tabla de descartes: se la muestra.</p>
+        <p class="prompt">Tienes acceso a la cuenta del usuario. Contesta con
+datos, no con simpatía.
+
+Si pide hablar con una persona: NO hay persona.
+Dilo así, textual: "No tengo cómo pasarte con alguien
+ahora, pero te dejo agendada una respuesta por correo
+para hoy." Y agéndala de verdad.
+
+Nunca digas que un humano va a llamar. Nunca prometas
+que no se nos pasa nada.</p>
+        <p class="herr">
+          <b>Herramientas:</b> <span class="mono">ver_cuenta</span> · <span class="mono">buscar_descartes(consulta)</span> · <span class="mono">crear_ticket</span> · <span class="mono">cancelar_suscripcion</span> <span class="dim">(sí: la cancelación es autoservicio, y retenerla a la fuerza es lo que quema la marca)</span>
+        </p>
+      </div>
+
+      <div class="agente">
+        <div class="agente-top"><h3>5 · Escritor de SEO</h3><span class="modelo">claude-haiku-4-5-20251001</span></div>
+        <p>Genera las páginas del canal: una por norma, por regulador, por rubro, por comuna. Entrada: el texto oficial. Salida: la explicación de a quién afecta.</p>
+        <p class="prompt">Escribe la página de esta norma para alguien del rubro,
+no para un abogado. Estructura: qué cambió · a quién
+afecta · desde cuándo · qué hay que hacer.
+
+Cita el texto oficial literal en un bloque aparte.
+Si no sabes a quién afecta, escríbelo: "esta norma no
+tiene destinatario identificable". Es una respuesta
+válida y es mejor que inventar.</p>
+        <p class="herr"><b>Costo:</b> US$0,008 por página. 8.000 páginas = <b>US$64 una vez</b>, y ~500 nuevas al mes = US$4/mes.<br><b>Control:</b> 1 de cada 20 páginas se revisa a mano. Una explicación legal errónea publicada 8.000 veces es un problema serio, y es de los pocos lugares donde el humano no se puede sacar del todo.</p>
+      </div>
+
+      <div class="agente">
+        <div class="agente-top"><h3>6 · Operador de Ads</h3><span class="modelo">claude-sonnet-5</span></div>
+        <p>Escribe y rota el copy de Google Ads, mata los grupos con CAC alto, sube el presupuesto cuando el CAC del mes anterior aguanta. Opera <b>dentro</b> del tope del <span class="mono">autopilot.json</span> y no lo puede levantar.</p>
+        <p class="herr"><b>Herramientas:</b> Google Ads API · <span class="mono">metricas(cac, conversiones)</span><br><b>Corre:</b> semanal. <b>Costo:</b> despreciable (&lt; US$1/mes).<br><b>Regla dura:</b> no declara ganador un anuncio con menos de 30 conversiones. La honestidad estadística está en el código, no en el prompt.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COSTOS ===== -->
+  <section id="costos">
+    <div class="titulo-seccion"><h2>Costo mensual, con la aritmética</h2><span class="rotulo">Este número es el que Negocio descuenta del margen</span></div>
+
+    <div class="caja">
+      <span class="rotulo">Precios de referencia usados en todo el cálculo</span>
+      <p class="calc"><b>Haiku 4.5</b>   US$1 / millón de tokens de entrada   ·  US$5 / millón de salida
+<b>Sonnet 5</b>   US$3 / millón de tokens de entrada   ·  US$15 / millón de salida
+<b>Tipo de cambio</b>  $960 CLP / US$
+<span class="d">Los precios de los modelos son los de lista; el descuento por caché de prompt
+(que en el Extractor sería grande) NO está contado. Es holgura a favor.</span></p>
+    </div>
+
+    <div class="caja">
+      <span class="rotulo">A · Ingesta — costo fijo, compartido por todas las cuentas</span>
+      <p class="calc">Documentos que entran al mes:
+  Diario Oficial   613 avisos/día × 22 días hábiles   = <b>13.486</b>  <span class="d">estimación de volumen; verificar contra el D.O.</span>
+  INAPI (solicitudes publicadas)                       =  <b>3.100</b>  <span class="d">estimación</span>
+  Boletín Concursal                                    =    <b>400</b>
+  CMF (normas, oficios, sanciones)                     =     <b>60</b>
+  SEIA (proyectos ingresados)                          =    <b>120</b>
+  Dirección del Trabajo (dictámenes)                   =     <b>80</b>
+  <b>TOTAL                                            17.246</b> → se usa 17.400
+
+Extracción con Haiku 4.5:
+  entrada   17.400 × 1.400 tok = 24,36 MTok × US$1   = US$ 24,36
+  salida    17.400 ×   350 tok =  6,09 MTok × US$5   = US$ 30,45
+  <b class="f">Costo de ingesta = US$ 54,81/mes ≈ US$55  →  para TODA la base</b>
+
+  A 250 cuentas: <b>US$0,22 por cuenta</b>. A 1.000 cuentas: US$0,055.
+  <span class="d">Esta es la economía del negocio: el corpus se lee una vez, no una vez por cliente.</span></p>
+    </div>
+
+    <div class="caja">
+      <span class="rotulo">B · Costo variable de una cuenta Estudio ($79.000/mes, 60 sujetos)</span>
+      <p class="calc">Candidatos que levanta el índice para 60 sujetos    <b>120/mes</b>  <span class="d">supuesto</span>
+
+  JUEZ · Haiku 4.5
+    120 × (2.500 in + 250 out)
+    entrada  300.000 tok × US$1/M                     = US$ 0,30
+    salida    30.000 tok × US$5/M                     = US$ 0,15
+                                                       <b>US$ 0,45</b>
+  JUEZ · escalada a Sonnet 5 (confianza &lt; 0,7 → 15%)
+    18 × (3.000 in + 500 out)
+    entrada   54.000 tok × US$3/M                     = US$ 0,162
+    salida     9.000 tok × US$15/M                    = US$ 0,135
+                                                       <b>US$ 0,30</b>
+  REDACCIÓN · Sonnet 5 (pasan 22% → 26 alertas)
+    26 × (4.000 in + 450 out)
+    entrada  104.000 tok × US$3/M                     = US$ 0,312
+    salida    11.700 tok × US$15/M                    = US$ 0,176
+                                                       <b>US$ 0,49</b>
+  SOPORTE · Haiku (0,6 conversaciones/cuenta/mes)      <b>US$ 0,02</b>
+  PRORRATEO DE INGESTA (US$55 ÷ 250 cuentas)           <b>US$ 0,22</b>
+  <b class="f">SUBTOTAL IA = US$1,48/mes = $1.421 CLP</b>
+
+  WhatsApp Business API  26 plantillas × US$0,03      = US$0,78 = <b>$749</b>
+    <span class="d">supuesto: US$0,03 por conversación de utilidad en Chile. Verificar en la
+    tabla de precios de Meta: varía por país y por categoría, y cambió en 2025.</span>
+  Infraestructura        US$180 ÷ 250 cuentas         = US$0,72 = <b>$691</b>
+  Pasarela Flow          3,19% + IVA = 3,796% × 79.000         = <b>$2.999</b>
+
+  <b class="f">COGS cuenta Estudio = $5.860/mes</b>
+  <b class="f">MARGEN BRUTO = (79.000 − 5.860) / 79.000 = 92,6%</b></p>
+    </div>
+
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla-num">
+        <thead><tr><th>Tramo</th><th>Precio</th><th>IA</th><th>WhatsApp</th><th>Infra</th><th>Pasarela</th><th>COGS</th><th>Margen</th></tr></thead>
+        <tbody>
+          <tr><td><b>Vigía</b> <span class="dim">5 sujetos</span></td><td>$14.900</td><td>$490</td><td>—</td><td>$691</td><td>$566</td><td><b>$1.770</b></td><td><b>88,1%</b></td></tr>
+          <tr><td><b>Estudio</b> <span class="dim">60 sujetos</span></td><td>$79.000</td><td>$1.421</td><td>$749</td><td>$691</td><td>$2.999</td><td><b>$5.860</b></td><td><b>92,6%</b></td></tr>
+          <tr><td><b>Cartera</b> <span class="dim">300 sujetos</span></td><td>$249.000</td><td>$6.221</td><td>$3.802</td><td>$691</td><td>$9.452</td><td><b>$20.166</b></td><td><b>91,9%</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:10px"><b>Margen bruto mezclado declarado: 90%</b> — más bajo que los tres, a propósito, porque los supuestos de volumen de candidatos y de precio de WhatsApp son estimaciones y prefiero equivocarme para abajo. Ese 90% es el que usan <a href="negocio.html#economia">Negocio</a> y <a href="roadmap.html">Roadmap</a>, y es el que va en <span class="mono">autopilot.json</span>. Las tres páginas cuadran.</p>
+
+    <div class="caja">
+      <span class="rotulo">C · Infraestructura fija</span>
+      <p class="calc">VPS de aplicación (4 vCPU / 8 GB)                     US$ 25
+Postgres administrado (con pg_trgm + tsvector)        US$ 50
+2 workers de ingesta                                  US$ 20
+Object storage — el archivo crudo, ~400 GB            US$  8
+Proxies para la ingesta <span class="d">(por si el D.O. limita por IP)</span>       US$ 40
+Monitoreo, logs, canarios de fuente                   US$ 15
+Amazon SES                                            US$  5
+DNS/CDN                                               US$  0
+<b class="f">TOTAL US$163  →  se presupuesta US$180 con holgura</b>
+<span class="d">No crece con las cuentas: son 6 parsers y una base de datos. Crece con las
+FUENTES, y por eso agregar la séptima fuente es una decisión, no un reflejo.</span></p>
+    </div>
+
+    <div class="caja caja-f">
+      <span class="rotulo">El costo total del sistema al mes 12 (40 cuentas)</span>
+      <p class="calc">Ingesta (fija)                                 US$ 55   = $ 52.800
+Infra (fija)                                   US$180   = $172.800
+IA variable · 40 cuentas × ~US$1,26            US$ 50   = $ 48.000
+WhatsApp · 40 × US$0,78                        US$ 31   = $ 29.760
+SEO (500 páginas nuevas × US$0,008)            US$  4   = $  3.840
+Pasarela (3,796% de $3,6M de MRR)                       = $136.656
+<b class="f">TOTAL ≈ $444.000 CLP/mes  contra un MRR de $3.600.000</b>
+<span class="d">El resto del gasto del roadmap ($1,4M al mes 12) es publicidad, no infraestructura.</span></p>
+    </div>
+  </section>
+
+  <!-- ===== MODELO DE DATOS ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>Modelo de datos</h2><span class="rotulo">Las 11 tablas</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Tabla</th><th>Campos</th><th>Por qué existe</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">fuente</td><td class="mono">id · nombre · url_base · parser · ultima_corrida · avisos_ultima_corrida · promedio_30d · estado</td><td>El canario vive acá: si <span class="mono">avisos_ultima_corrida = 0</span> y <span class="mono">promedio_30d = 142</span>, la fuente está caída y <b>se pausa el envío en vez de fingir silencio</b>.</td></tr>
+          <tr><td class="mono">documento</td><td class="mono">id · fuente_id · fecha_pub · folio · url_original · hash · texto_crudo · pdf_key</td><td>El archivo crudo, para siempre. Si el Estado borra una publicación, nosotros la tenemos.</td></tr>
+          <tr><td class="mono">aviso</td><td class="mono">id · documento_id · tipo_acto · texto · extraido_jsonb · ruts[] · razones[] · comunas[] · montos[] · tsv · embedding</td><td>El aviso individual ya estructurado. Índices GIN sobre <span class="mono">tsv</span> y <span class="mono">ruts</span>.</td></tr>
+          <tr><td class="mono">cuenta</td><td class="mono">id · razon_social · rut · plan · sujetos_max · estado · trial_hasta · flow_id</td><td><span class="mono">estado = silencio</span> cuando se acaba la prueba: sigue vigilando, no envía.</td></tr>
+          <tr><td class="mono">usuario</td><td class="mono">id · cuenta_id · email · telefono · wa_optin · rol</td><td>El filtro se entrena <b>por usuario</b>, no por cuenta: el socio y el procurador no quieren lo mismo.</td></tr>
+          <tr><td class="mono">sujeto</td><td class="mono">id · cuenta_id · tipo · valor · etiqueta · activo · creado</td><td>Lo que se vigila. <span class="mono">tipo ∈ {rut, marca, rubro, comuna, clave}</span>.</td></tr>
+          <tr><td class="mono">candidato</td><td class="mono">id · aviso_id · sujeto_id · score · motor</td><td>Lo que el índice levantó. <span class="mono">motor ∈ {rut_exacto, trigram, fts, semantico}</span>. Es lo único que ve el juez.</td></tr>
+          <tr><td class="mono">veredicto</td><td class="mono">id · candidato_id · usuario_id · relevante · confianza · motivo · modelo · tokens_in · tokens_out · costo_usd</td><td><b>El costo se registra por veredicto.</b> Sin esto no se sabe el COGS real y el margen es una opinión.</td></tr>
+          <tr><td class="mono">alerta</td><td class="mono">id · veredicto_id · titular · porque · que_hacer · plazo_vence · urgente · enviada_en · canal · abierta_en · accionada_en</td><td><span class="mono">accionada_en</span> es la métrica estrella. Si es null, la alerta sobró.</td></tr>
+          <tr><td class="mono">pulgar</td><td class="mono">id · alerta_id · usuario_id · valor · motivo_codigo · creado</td><td><b>El único activo que no se puede copiar.</b> Un competidor clona el producto en un fin de semana; no clona 40 semanas de pulgares.</td></tr>
+          <tr><td class="mono">regla</td><td class="mono">id · cuenta_id · usuario_id · texto · familia · origen_pulgar_id · activa</td><td>La regla que nació de un pulgar. Reversible: al desactivarla vuelven las publicaciones que descartó.</td></tr>
+          <tr><td class="mono">evento</td><td class="mono">id · cuenta_id · tipo · payload · creado</td><td><span class="mono">visita · registro · activacion · pago · churn</span>. Es lo que lee el <span class="mono">/metrics</span> del <span class="mono">autopilot.json</span>. Nada más.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== TERCEROS ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>Qué hay que contratar</h2><span class="rotulo">APIs y fuentes</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Qué</th><th>Para qué</th><th>Estado / qué falta</th></tr></thead>
+        <tbody>
+          <tr><td><b>Diario Oficial</b><br><span class="mono dim">diariooficial.interior.gob.cl</span></td><td>La fuente madre. Edición electrónica diaria.</td><td>Acceso público. <b>Hay que revisar los términos de uso y si existe una vía oficial de suscripción por volumen</b> antes de raspar en serio. Es el riesgo técnico número uno del negocio.</td></tr>
+          <tr><td><b>INAPI</b></td><td>Solicitudes de marca, oposiciones, estado del expediente.</td><td>Las publicaciones vienen en el propio D.O.; el estado del expediente hay que consultarlo en INAPI.</td></tr>
+          <tr><td><b>Boletín Concursal</b></td><td>Liquidaciones y reorganizaciones (Ley 20.720).</td><td>Público, electrónico. Parseable.</td></tr>
+          <tr><td><b>CMF · SEIA · Dirección del Trabajo</b></td><td>Normas, proyectos, dictámenes.</td><td>Públicos. Formatos distintos, ~1 semana de parser cada uno.</td></tr>
+          <tr><td><b>WhatsApp Business API</b><br><span class="dim">Meta, vía Twilio o 360dialog</span></td><td>La entrega que sí se lee.</td><td><b>Verificación de negocio de Meta: trámite humano, una vez.</b> Plantilla de utilidad aprobada. Sólo a opt-in.</td></tr>
+          <tr><td><b>Flow</b> o <b>Transbank Webpay Oneclick</b></td><td>Suscripción con tarjeta.</td><td>Contrato con RUT de empresa. 3,19% + IVA.</td></tr>
+          <tr><td><b>Integrador DTE</b><br><span class="dim">LibreDTE, Bsale o Nubox</span></td><td>Boleta y factura electrónica al SII.</td><td><b>Certificado digital de la persona jurídica: trámite humano, una vez.</b></td></tr>
+          <tr><td><b>Google Ads API</b></td><td>El autopilot compra tráfico.</td><td>Cuenta con método de pago. Tope duro configurado en el sistema, no en Google.</td></tr>
+          <tr><td><b>Anthropic API</b></td><td>Los 6 agentes.</td><td>Presupuesto mensual con alerta al 80%.</td></tr>
+          <tr><td><b>Amazon SES</b></td><td>Correo transaccional.</td><td>Salir del sandbox. SPF, DKIM, DMARC.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== ENV ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>Variables de entorno</h2><span class="rotulo">.env</span></div>
+    <div class="env"><span class="c"># Modelos</span>
+<span class="k">ANTHROPIC_API_KEY</span>=sk-ant-...
+<span class="k">MODELO_EXTRACTOR</span>=claude-haiku-4-5-20251001
+<span class="k">MODELO_JUEZ</span>=claude-haiku-4-5-20251001
+<span class="k">MODELO_JUEZ_ESCALADA</span>=claude-sonnet-5
+<span class="k">MODELO_REDACTOR</span>=claude-sonnet-5
+<span class="k">MODELO_SOPORTE</span>=claude-haiku-4-5-20251001
+<span class="k">UMBRAL_CONFIANZA_ESCALADA</span>=0.70          <span class="c"># bajo esto, se llama al modelo grande</span>
+<span class="k">TOPE_USD_DIARIO_INFERENCIA</span>=12            <span class="c"># interruptor duro; sobre esto, se para</span>
+
+<span class="c"># Fuentes</span>
+<span class="k">DO_URL_BASE</span>=https://www.diariooficial.interior.gob.cl
+<span class="k">DO_HORA_INGESTA</span>=05:40
+<span class="k">FUENTES_ACTIVAS</span>=diario_oficial,inapi,concursal,cmf,seia,dt
+<span class="k">CANARIO_MIN_AVISOS</span>=1                      <span class="c"># 0 avisos = fuente caída = se pausa el envío</span>
+<span class="k">PROXY_URL</span>=...
+
+<span class="c"># Base de datos</span>
+<span class="k">DATABASE_URL</span>=postgres://...              <span class="c"># requiere pg_trgm y unaccent</span>
+<span class="k">S3_BUCKET_ARCHIVO</span>=pregonia-archivo-crudo
+
+<span class="c"># Entrega</span>
+<span class="k">SES_REGION</span>=us-east-1
+<span class="k">WA_PHONE_ID</span>=...
+<span class="k">WA_TOKEN</span>=...
+<span class="k">WA_PLANTILLA_ALERTA</span>=alerta_publicacion_v3   <span class="c"># aprobada por Meta</span>
+
+<span class="c"># Cobro</span>
+<span class="k">FLOW_API_KEY</span>=...
+<span class="k">FLOW_SECRET</span>=...
+<span class="k">DTE_INTEGRADOR_TOKEN</span>=...
+
+<span class="c"># Autopilot</span>
+<span class="k">GOOGLE_ADS_TOKEN</span>=...
+<span class="k">TOPE_DIARIO_ADS_CLP</span>=20000
+<span class="k">TOPE_MENSUAL_ADS_CLP</span>=500000
+<span class="k">METRICS_ENDPOINT</span>=https://pregonia.com/metrics</div>
+  </section>
+
+  <!-- ===== FALSEADO ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>Qué está falseado en el demo</h2><span class="rotulo">Sin adornos</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>En el demo</th><th>La verdad</th><th>Qué costaría hacerlo real</th></tr></thead>
+        <tbody>
+          <tr><td>La bandeja de 5 alertas y las 6 descartadas</td><td>Son objetos JavaScript escritos a mano. <b>No hay ninguna ingesta.</b></td><td>~3 semanas: parser del Diario Oficial + INAPI, Postgres, el extractor.</td></tr>
+          <tr><td>El juez que decide y explica</td><td>Es una función con un campo <span class="mono">familia</span> y un <span class="mono">switch</span>. <b>No hay ningún modelo corriendo.</b> Los motivos de descarte los escribí yo.</td><td>~2 semanas, y son las 2 semanas que deciden el negocio: el prompt del juez sólo se puede escribir <em>después</em> de mandar 6 semanas de alertas a mano.</td></tr>
+          <tr><td>«El filtro aplicó tu regla a 2 publicaciones en cola»</td><td>Es real dentro del demo (la cola existe, las reglas la filtran de verdad), pero la cola tiene 4 ítems fijos.</td><td>Sale gratis con lo anterior: es la misma tabla <span class="mono">candidato</span>.</td></tr>
+          <tr><td>La búsqueda retroactiva que «siempre encuentra 1»</td><td>Encuentra exactamente 1, siempre, porque está escrito así. <b>En producción a veces no encontrará nada</b>, y eso hay que decírselo al usuario sin adornar.</td><td>Nada extra: es una consulta al histórico.</td></tr>
+          <tr><td>Las curvas de señal y de retención por cohorte</td><td><b>Son proyecciones, no mediciones.</b> Nadie ha usado esto. La cohorte de marzo que cae a 34% es lo que creo que pasa si el filtro no aprende, no lo que vi.</td><td>8 semanas con 5 design partners. Es exactamente el hito M1.</td></tr>
+          <tr><td>RUT, razones sociales, folios, CVE, roles de avalúo, expedientes</td><td>Todos inventados. Ninguna empresa nombrada existe. El <b>formato</b> imita al real.</td><td>—</td></tr>
+          <tr><td>Los pulgares</td><td>Viven en memoria. Se pierden al recargar la página.</td><td>Una tabla.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)"><b>Total para un producto real con 2 fuentes y 5 design partners: ~6 semanas de una persona.</b> Cada fuente adicional, ~1 semana. Nada de esto es investigación: es trabajo. Y ése es, precisamente, el argumento de que es construible — y también el argumento de que es copiable.</p>
+  </section>
+
+  <!-- ===== DOMINIO ===== -->
+  <section>
+    <div class="titulo-seccion"><h2>El dominio</h2><span class="rotulo">Evidencia</span></div>
+    <div class="caja">
+      <span class="rotulo">Verificado el 2026-07-13 con <span class="mono">_kit/check-domain.sh</span></span>
+      <p class="calc"><b class="f">pregonia.com     .com AVAILABLE   (HTTP 404 en rdap.verisign.com)   .cl AVAILABLE</b>
+<span class="d">(RDAP de Verisign: 404 = el dominio no está registrado. Es la fuente autoritativa.)</span>
+
+Alternativas, también verificadas el mismo día:
+  <b>avizorio.com</b>   .com AVAILABLE  (HTTP 404)   .cl AVAILABLE
+  <b>cribante.com</b>   .com AVAILABLE  (HTTP 404)   .cl AVAILABLE
+  <b>atisbia.com</b>    .com AVAILABLE  (HTTP 404)   .cl AVAILABLE
+
+Descartadas por estar TOMADAS:
+  avizor.com (200) · avizora.com (200) · atisbo.com (200) · cernida.com (200)</p>
+      <p style="margin-top:14px"><b>Por qué Pregonia.</b> El pregonero era quien leía los edictos en la plaza: es el Diario Oficial antes de que existiera el Diario Oficial. Y la tensión del nombre <em>es</em> el pitch: <b>todo se pregona, casi nada te toca.</b></p>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b style="color:var(--texto-2)">Pregonia</b> · Los costos de esta página son los que <a href="negocio.html#economia">Negocio</a> descuenta del margen y los que <a href="roadmap.html">Roadmap</a> usa en la curva de caja. Si encuentras que no cuadran, es un error mío y hay que arreglarlo antes de gastar un peso.</p>
+    <p style="margin-top:8px"><a href="../index.html">← Volver a las ideas</a> · <a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('btnMenu'), m = document.getElementById('menuMovil');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('abierto');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+</script>
+</body>
+</html>

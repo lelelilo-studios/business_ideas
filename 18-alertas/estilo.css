@@ -1,0 +1,396 @@
+/* ============================================================================
+   PREGONIA — hoja de estilo única
+   ----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: BOLETÍN / TELETIPO DE AGENCIA DE CABLE.
+   La referencia es una sala de redacción de servicio noticioso: fondo casi
+   negro de monitor, reglas finas, metadatos en monoespaciada (hora, folio,
+   fuente, RUT), titulares en gótica de prensa (Libre Franklin = linaje Franklin
+   Gothic, la tipografía del titular de diario) y UN SOLO acento de urgencia
+   —el rojo de "FLASH"— usado con avaricia absoluta.
+
+   Esa avaricia no es estética: ES LA TESIS DEL PRODUCTO. Si todo está en rojo,
+   nada está en rojo. En este sitio el rojo aparece en tres lugares y en ningún
+   otro: la insignia URGENTE, la métrica estrella y el foco de teclado.
+
+   PALETA (validada con scripts/validate_palette.js, modo oscuro, surface #101416)
+     fondo      #0A0D0E   panel #12171A   panel-2 #171D21
+     línea      #232B2E   línea-fuerte #38454A
+     texto      #E8EBEC   texto-2 #98A3A8   texto-3 #6B7679
+     FLASH      #FF3B30   (único acento)
+     serie-2    #3987E5   (sólo en gráficos; identidad, no urgencia)
+     rampa ordinal roja: #8C2A22 #B8352B #E04537 #FF6A5E
+   TIPOGRAFÍA
+     Libre Franklin  — titulares (800/900) y cuerpo (400/500)
+     DM Mono         — teletipo: horas, folios, RUT, códigos de fuente
+   Prohibido en este proyecto: emoji como icono, degradados, glassmorphism,
+   papel crema, rojo óxido.
+   ========================================================================== */
+
+:root {
+  --fondo:      #0A0D0E;
+  --panel:      #12171A;
+  --panel-2:    #171D21;
+  --panel-3:    #1D2529;
+  --linea:      #232B2E;
+  --linea-2:    #38454A;
+  --texto:      #E8EBEC;
+  --texto-2:    #98A3A8;
+  --texto-3:    #6B7679;
+  --flash:      #FF3B30;
+  --flash-apag: rgba(255, 59, 48, 0.10);
+  --flash-bord: rgba(255, 59, 48, 0.38);
+  --serie-2:    #3987E5;
+  --ok:         #4FA97C;
+
+  --display: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radio: 2px; /* casi cero: esto es papel de teletipo, no una app de banco */
+}
+
+html { background: var(--fondo); }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--display);
+  font-size: var(--step-0);
+  font-weight: 400;
+  letter-spacing: 0.002em;
+}
+
+/* ---------- Tipografía base ---------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); line-height: 1.02; }
+h2 { font-size: var(--step-3); line-height: 1.06; }
+h3 { font-size: var(--step-1); line-height: 1.15; }
+p  { color: var(--texto-2); }
+p strong, li strong { color: var(--texto); font-weight: 700; }
+a  { color: var(--texto); text-underline-offset: 3px; text-decoration-color: var(--linea-2); }
+a:hover { text-decoration-color: var(--flash); }
+
+:focus-visible { outline: 2px solid var(--flash); outline-offset: 2px; }
+
+/* El rótulo del teletipo: mono, versal, tracking abierto. */
+.rotulo {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--texto-3);
+  font-weight: 500;
+}
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num  { font-variant-numeric: tabular-nums; }
+
+/* Chip de fuente: DIARIO OFICIAL / INAPI / CMF / BOLETÍN CONCURSAL */
+.fuente {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 3px 6px;
+  border: 1px solid var(--linea-2);
+  color: var(--texto-2);
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* La insignia de urgencia. El rojo vive aquí y casi en ninguna otra parte. */
+.flash {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 3px 7px;
+  background: var(--flash);
+  color: #0A0D0E;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.grado {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--texto-3);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* ---------- Estructura ---------------------------------------------------- */
+.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+section { padding-block: var(--sp-xl); }
+.regla { border: 0; border-top: 1px solid var(--linea); }
+.regla-fuerte { border: 0; border-top: 3px solid var(--linea-2); }
+
+.titulo-seccion {
+  display: flex; align-items: baseline; gap: var(--sp-xs);
+  border-bottom: 3px solid var(--linea-2);
+  padding-bottom: var(--sp-2xs);
+  margin-bottom: var(--sp-m);
+  flex-wrap: wrap;
+}
+.titulo-seccion h2 { font-size: var(--step-2); }
+.titulo-seccion .rotulo { margin-left: auto; }
+
+/* ---------- Barra superior + teletipo ------------------------------------ */
+.cabecera {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10, 13, 14, 0.96);
+  border-bottom: 1px solid var(--linea);
+}
+.cabecera-in {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-s);
+  min-height: 54px;
+}
+.marca {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 44px; /* target táctil: es el link al inicio, no un adorno */
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.marca svg { width: 18px; height: 18px; flex: none; }
+.marca .pt { color: var(--flash); }
+
+.nav-links { display: none; }
+.nav-btn {
+  font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--texto-2);
+  border: 1px solid var(--linea-2); padding: 6px 10px; min-height: 44px;
+}
+#menuMovil { display: none; border-top: 1px solid var(--linea); padding-block: var(--sp-2xs) var(--sp-s); }
+#menuMovil.abierto { display: block; }
+#menuMovil ul { list-style: none; }
+#menuMovil a {
+  display: block; padding: 12px 0; min-height: 44px;
+  border-bottom: 1px solid var(--linea);
+  font-family: var(--mono); font-size: 0.82rem; text-transform: uppercase;
+  letter-spacing: 0.1em; text-decoration: none; color: var(--texto-2);
+}
+#menuMovil a[aria-current="page"] { color: var(--texto); }
+#menuMovil a[aria-current="page"]::before { content: "▸ "; color: var(--flash); }
+
+@media (min-width: 62em) {
+  .nav-btn { display: none; }
+  #menuMovil { display: none !important; }
+  .nav-links { display: flex; gap: var(--sp-s); list-style: none; align-items: center; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.11em; color: var(--texto-3); text-decoration: none;
+    padding: 6px 0; display: inline-block;
+  }
+  .nav-links a:hover { color: var(--texto); }
+  .nav-links a[aria-current="page"] { color: var(--texto); border-bottom: 2px solid var(--flash); }
+  .nav-links .volver { color: var(--texto-2); }
+}
+
+/* La cinta del teletipo bajo la barra: metadatos que se mueven. */
+.cinta {
+  background: var(--panel);
+  border-bottom: 1px solid var(--linea);
+  overflow: hidden;
+  height: 26px;
+  display: flex; align-items: center;
+}
+.cinta-in {
+  display: flex; gap: 2.5rem; white-space: nowrap;
+  font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--texto-3);
+  animation: correr 48s linear infinite;
+  padding-left: 100%;
+}
+.cinta-in b { color: var(--texto-2); font-weight: 500; }
+.cinta-in .f { color: var(--flash); }
+@keyframes correr { to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .cinta-in { animation: none; padding-left: var(--gutter); }
+}
+
+/* ---------- Botones ------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.76rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 12px 18px; min-height: 46px;
+  border: 1px solid var(--texto); background: var(--texto); color: var(--fondo);
+  text-decoration: none; border-radius: var(--radio);
+  transition: background 0.12s linear, color 0.12s linear;
+}
+.btn:hover { background: var(--flash); border-color: var(--flash); color: #0A0D0E; }
+.btn-2 {
+  background: transparent; color: var(--texto-2); border-color: var(--linea-2);
+}
+.btn-2:hover { background: transparent; color: var(--texto); border-color: var(--texto); }
+.btn-sm { padding: 8px 12px; min-height: 44px; font-size: 0.7rem; }
+
+/* ---------- Tarjetas / paneles ------------------------------------------- */
+.panel { background: var(--panel); border: 1px solid var(--linea); padding: var(--sp-s); }
+.panel-b { background: var(--panel-2); border: 1px solid var(--linea); padding: var(--sp-s); }
+
+/* ---------- LA ALERTA: la pieza de noticia ------------------------------- */
+.alerta {
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-left: 3px solid var(--linea-2);
+  padding: var(--sp-s);
+  display: grid; gap: 10px;
+}
+.alerta.urgente { border-left-color: var(--flash); }
+.alerta-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.alerta-meta time { font-family: var(--mono); font-size: 0.66rem; color: var(--texto-3); letter-spacing: 0.06em; }
+.alerta-meta .folio { font-family: var(--mono); font-size: 0.66rem; color: var(--texto-3); letter-spacing: 0.04em; }
+.alerta h3 {
+  font-size: 1.16rem; font-weight: 800; line-height: 1.16; letter-spacing: -0.02em;
+  color: var(--texto);
+}
+@media (min-width: 48em) { .alerta h3 { font-size: 1.3rem; } }
+
+/* El extracto textual: papel de télex. */
+.extracto {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--texto-2);
+  background: #0D1113;
+  border: 1px solid var(--linea);
+  border-left: 2px solid var(--linea-2);
+  padding: 10px 12px;
+  overflow-wrap: break-word;
+}
+.extracto mark {
+  background: transparent; color: var(--texto);
+  border-bottom: 2px solid var(--flash);
+  padding-bottom: 1px;
+}
+.extracto .cve { color: var(--texto-3); display: block; margin-top: 6px; font-size: 0.7rem; }
+
+/* La frase que justifica la existencia del producto. */
+.porque {
+  border-top: 1px solid var(--linea);
+  padding-top: 10px;
+}
+.porque .rotulo { display: block; margin-bottom: 4px; }
+.porque p { color: var(--texto); font-size: 0.95rem; line-height: 1.45; }
+.hacer {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--panel-2); border: 1px solid var(--linea);
+  padding: 10px 12px;
+}
+.hacer svg { width: 16px; height: 16px; flex: none; margin-top: 3px; stroke: var(--texto-3); }
+.hacer p { color: var(--texto-2); font-size: 0.88rem; line-height: 1.45; }
+.hacer b { color: var(--texto); font-weight: 700; }
+.plazo { font-family: var(--mono); font-size: 0.72rem; color: var(--flash); letter-spacing: 0.06em; display: block; margin-top: 4px; }
+
+.acciones { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--linea); padding-top: 10px; }
+.pulgar {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; min-width: 44px; padding: 6px 10px;
+  border: 1px solid var(--linea-2); background: transparent; color: var(--texto-3);
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.pulgar svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+.pulgar:hover { color: var(--texto); border-color: var(--texto); }
+.pulgar[aria-pressed="true"] { color: var(--texto); border-color: var(--texto); background: var(--panel-3); }
+.pulgar.abajo[aria-pressed="true"] { color: var(--flash); border-color: var(--flash-bord); background: var(--flash-apag); }
+.acciones .sep { flex: 1; }
+
+/* La descartada: misma pieza, tono apagado, con el motivo a la vista. */
+.descarte {
+  background: transparent; border: 1px dashed var(--linea);
+  padding: var(--sp-xs); display: grid; gap: 8px;
+}
+.descarte h4 { font-size: 0.95rem; font-weight: 700; color: var(--texto-2); line-height: 1.2; letter-spacing: -0.01em; }
+.descarte .motivo {
+  font-size: 0.85rem; color: var(--texto-2); line-height: 1.45;
+  border-left: 2px solid var(--linea-2); padding-left: 10px;
+}
+.descarte .motivo b { color: var(--texto); }
+
+/* ---------- Tablas -------------------------------------------------------- */
+table { width: 100%; font-size: 0.85rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+th {
+  font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--texto-3); font-weight: 500;
+  border-bottom: 1px solid var(--linea-2); white-space: nowrap;
+}
+td { color: var(--texto-2); }
+td b, td strong { color: var(--texto); }
+tbody tr:hover td { background: var(--panel); }
+.tabla-num td:not(:first-child), .tabla-num th:not(:first-child) { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Cifras -------------------------------------------------------- */
+.cifra { display: grid; gap: 2px; }
+.cifra .v { font-family: var(--display); font-weight: 900; font-size: var(--step-3); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.cifra .v.f { color: var(--flash); }
+.cifra .k { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--texto-3); }
+.cifra .n { font-size: 0.78rem; color: var(--texto-3); line-height: 1.35; }
+
+.rejilla { display: grid; gap: var(--sp-s); }
+/* Los hijos de una grilla tienen min-width:auto por defecto: un SVG ancho dentro
+   de un .scroll-x ensancha la columna entera y saca el texto de la pantalla.
+   Esto es lo que rompe el mobile-first, y se arregla acá y no con un media query. */
+.rejilla > *, .hito-grid > *, .app > *, .figura > * { min-width: 0; }
+@media (min-width: 40em) { .rejilla-2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 62em) { .rejilla-3 { grid-template-columns: repeat(3, 1fr); } .rejilla-4 { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 40em) and (max-width: 61.99em) { .rejilla-4 { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- Nota al pie / fuentes ---------------------------------------- */
+.nota {
+  font-size: 0.76rem; color: var(--texto-3); line-height: 1.5;
+  border-left: 2px solid var(--linea-2); padding-left: 10px;
+}
+.nota b { color: var(--texto-2); }
+.supuesto {
+  font-family: var(--mono); font-size: 0.63rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--texto-3);
+  border: 1px solid var(--linea); padding: 2px 5px; display: inline-block;
+}
+
+/* ---------- Gráficos ------------------------------------------------------ */
+.figura { background: var(--panel); border: 1px solid var(--linea); padding: var(--sp-s); }
+.figura figcaption { font-size: 0.78rem; color: var(--texto-3); line-height: 1.5; margin-top: 10px; border-top: 1px solid var(--linea); padding-top: 8px; }
+.figura h3 { font-size: 1rem; margin-bottom: 2px; }
+.figura .sub { font-size: 0.8rem; color: var(--texto-3); margin-bottom: 10px; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-2); }
+.leyenda i { width: 14px; height: 3px; display: inline-block; }
+svg .grid { stroke: var(--linea); stroke-width: 1; }
+svg .eje { stroke: var(--linea-2); stroke-width: 1; }
+svg .et { font-family: "DM Mono", monospace; font-size: 10px; fill: var(--texto-3); }
+svg .et-b { font-family: "DM Mono", monospace; font-size: 10px; fill: var(--texto-2); }
+svg .dl { font-family: "Libre Franklin", sans-serif; font-size: 11px; font-weight: 700; fill: var(--texto); }
+
+/* ---------- Pie ----------------------------------------------------------- */
+.pie { border-top: 1px solid var(--linea); padding-block: var(--sp-l); margin-top: var(--sp-xl); }
+.pie p { font-size: 0.78rem; color: var(--texto-3); }
+.pie a { color: var(--texto-2); }
+
+/* ---------- Utilidades ---------------------------------------------------- */
+.apilado { display: grid; gap: var(--sp-s); }
+.apilado-s { display: grid; gap: var(--sp-2xs); }
+.fila { display: flex; gap: var(--sp-2xs); flex-wrap: wrap; align-items: center; }
+.crece { flex: 1; }
+.dim { color: var(--texto-3); }
+.lista { list-style: none; display: grid; gap: 10px; }
+.lista li { display: grid; grid-template-columns: 14px 1fr; gap: 10px; font-size: 0.9rem; color: var(--texto-2); line-height: 1.5; }
+.lista li::before { content: ""; width: 6px; height: 6px; background: var(--linea-2); margin-top: 8px; }
+.lista li.si::before { background: var(--flash); }
+.scroll-x { overflow-x: auto; }
+.scroll-x table { min-width: 560px; }

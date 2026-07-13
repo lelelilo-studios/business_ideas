@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integración · Cuantario</title>
+<meta name="description" content="Cómo se enchufa una idea a Cuantario: el manifiesto autopilot.json campo por campo, y la clasificación honesta de las 16 ideas existentes — cuáles pueden, cuáles a medias y cuáles no.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&family=Martian+Mono:wght@600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="cuantario.css">
+<style>
+  .clase { font-family: var(--disp); font-weight: 700; font-size: .55rem; letter-spacing: .1em;
+           text-transform: uppercase; padding: 3px 7px; border: 1px solid; white-space: nowrap; display: inline-block; }
+  .clase-total   { color: var(--in);    border-color: var(--in);     background: var(--in-bg); }
+  .clase-parcial { color: var(--ink);   border-color: var(--line-2); background: var(--s2); }
+  .clase-no      { color: var(--out);   border-color: var(--out);    background: var(--out-bg); }
+  .si  { color: var(--in); }
+  .no  { color: var(--out); }
+  .mas { color: var(--ink-3); }
+  table.t td.c { text-align: center; }
+  table.t th.c { text-align: center; }
+  .campo { border-bottom: 1px solid var(--line); padding: var(--sp-s) 0; }
+  .campo:last-child { border-bottom: 0; }
+  .campo h4 { color: var(--c2); font-family: var(--mono); font-weight: 600; font-size: .84rem; }
+  .campo p { font-size: .84rem; color: var(--ink-2); margin: 5px 0 0; line-height: 1.6; }
+  .campo p b { color: var(--ink); }
+  .campo .oblig { font-family: var(--disp); font-weight: 700; font-size: .52rem; letter-spacing: .1em;
+                  text-transform: uppercase; color: var(--out); margin-left: 6px; }
+  .dos { display: grid; gap: var(--sp-l); }
+  @media (min-width: 68em) { .dos { grid-template-columns: 0.95fr 1.05fr; gap: var(--sp-xl); align-items: start; } }
+  .conteo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line);
+            border: 1px solid var(--line); margin-bottom: var(--sp-m); }
+  .conteo > div { background: var(--s1); padding: var(--sp-s); }
+  .conteo .v { display: block; font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="index.html">
+      <svg class="glifo" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 10.5 L6.6 6.2 L9.2 8.6 L12 3.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      Cuantario
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Qué es</a></li>
+        <li><a href="demo/index.html">Tablero</a></li>
+        <li><a href="arquitectura.html">Arquitectura</a></li>
+        <li><a href="integracion.html" aria-current="page">Integración</a></li>
+        <li><a href="economia.html">Economía</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="wrap">
+  <span class="kicker">Integración</span>
+  <h1 style="margin-bottom:var(--sp-s);max-width:20ch">Una idea se enchufa escribiendo un archivo.</h1>
+  <p class="prosa prose-max">
+    Cuantario no sabe nada de una idea salvo lo que su <code>autopilot.json</code> declara. No hay
+    código específico por idea, no hay una rama, no hay un despliegue. <b>El manifiesto es el único
+    punto de acoplamiento</b>, y por eso una idea que todavía no existe se puede enchufar sin tocar
+    una línea del sistema.
+  </p>
+  <p class="prosa prose-max">
+    La parte que no es obvia: <b>los <code>criterios_de_muerte</code> no se inventan en el manifiesto.
+    Se copian.</b> El contrato de este repositorio ya obligó a cada idea a escribirlos en su
+    <code>roadmap.html</code>, en frío, antes de tener un peso gastado. El manifiesto sólo los traduce
+    a algo que una máquina puede evaluar. Esa es toda la gracia del diseño: el que decide no es el que
+    escribió la regla, y el que escribió la regla no sabía todavía cuánto le iba a doler.
+  </p>
+</section>
+
+<!-- ============ EL MANIFIESTO ============ -->
+<section class="wrap" style="padding-top:0">
+  <div class="dos">
+    <div>
+      <span class="kicker">El manifiesto, de verdad</span>
+      <h2 style="margin-bottom:var(--sp-s)">05-contratos / Antefirma</h2>
+      <p class="prosa" style="margin-bottom:var(--sp-s)">
+        No es un ejemplo de juguete: es el manifiesto de una de las ideas que hoy están corriendo en el
+        tablero. Los criterios de muerte están copiados de
+        <code>05-contratos/roadmap.html</code>, palabra por palabra.
+      </p>
+<pre><code><span class="cm">// 05-contratos/autopilot.json</span>
+{
+  <span class="k">"idea"</span>: <span class="s">"05-contratos"</span>,
+  <span class="k">"brand"</span>: <span class="s">"Antefirma"</span>,
+  <span class="k">"autonomia"</span>: <span class="s">"total"</span>,
+  <span class="k">"por_que"</span>: <span class="s">"Subes un PDF, pagas con tarjeta, recibes el informe.
+              Sin onboarding, sin contrato, sin humano."</span>,
+
+  <span class="k">"oferta"</span>: {
+    <span class="k">"landing"</span>:  <span class="s">"https://antefirma.com"</span>,
+    <span class="k">"checkout"</span>: <span class="s">"flow"</span>,
+    <span class="k">"modelo"</span>:   <span class="s">"uso+suscripcion"</span>,
+    <span class="k">"precio_clp"</span>: <span class="nu">29000</span>,
+    <span class="k">"prueba_sin_tarjeta"</span>: <span class="nu">true</span>
+  },
+
+  <span class="k">"publico"</span>: {
+    <span class="k">"icp"</span>: <span class="s">"PYME de retail, gastronomía y servicios, 3-60 empleados,
+            que arrienda local comercial"</span>,
+    <span class="k">"geo"</span>: [<span class="s">"CL"</span>],
+    <span class="k">"canales"</span>: [<span class="s">"google_ads"</span>, <span class="s">"meta_ads"</span>, <span class="s">"seo"</span>,
+                 <span class="s">"x_propio"</span>, <span class="s">"email_optin"</span>, <span class="s">"voz_entrante"</span>]
+  },
+
+  <span class="k">"presupuesto"</span>: {
+    <span class="k">"tope_diario_clp"</span>:  <span class="nu">42000</span>,
+    <span class="k">"tope_mensual_clp"</span>: <span class="nu">1150000</span>,
+    <span class="k">"tope_total_antes_de_revisar_clp"</span>: <span class="nu">8000000</span>,
+    <span class="k">"escalamiento_max_por_ciclo"</span>: <span class="nu">0.40</span>
+  },
+
+  <span class="k">"metricas"</span>: {
+    <span class="k">"endpoint"</span>: <span class="s">"https://antefirma.com/api/metrics"</span>,
+    <span class="k">"eventos"</span>: [<span class="s">"visita"</span>, <span class="s">"registro"</span>, <span class="s">"activacion"</span>, <span class="s">"pago"</span>, <span class="s">"churn"</span>],
+    <span class="k">"activacion"</span>: <span class="s">"El usuario abrió el informe de un contrato propio
+                   y activó la vigilancia de al menos una fecha."</span>
+  },
+
+  <span class="cm">// copiados de 05-contratos/roadmap.html — el juez los lee, no los escribe</span>
+  <span class="k">"criterios_de_muerte"</span>: [
+    { <span class="k">"hito"</span>: <span class="s">"M1"</span>, <span class="k">"mes"</span>: <span class="nu">3</span>,
+      <span class="k">"condicion"</span>: <span class="s">"sorpresa_en_informe &lt; 10 de 15 contratos"</span>,
+      <span class="k">"accion"</span>: <span class="s">"matar"</span>,
+      <span class="k">"cita"</span>: <span class="s">"Si menos de 10 de los 15 se sorprenden con el informe,
+                el contrato no esconde nada que la gente no supiera y toda
+                la tesis se cae. No hay pivote: se para."</span> },
+
+    { <span class="k">"hito"</span>: <span class="s">"M2"</span>, <span class="k">"mes"</span>: <span class="nu">4</span>,
+      <span class="k">"condicion"</span>: <span class="s">"pagos &lt; 3 de 15"</span>,
+      <span class="k">"accion"</span>: <span class="s">"matar"</span>,
+      <span class="k">"cita"</span>: <span class="s">"Menos de 3 de 15 pagan. El dolor es real pero no es un
+                dolor por el que se pague — que es una cosa distinta,
+                y es fatal."</span> },
+
+    { <span class="k">"hito"</span>: <span class="s">"M3"</span>, <span class="k">"mes"</span>: <span class="nu">8</span>,
+      <span class="k">"condicion"</span>: <span class="s">"churn_mensual &gt; 0.12 sostenido 3 meses"</span>,
+      <span class="k">"accion"</span>: <span class="s">"pausar"</span>,
+      <span class="k">"cita"</span>: <span class="s">"Churn sobre 12% mensual sostenido. Significa que la
+                vigilancia no se está usando."</span> }
+  ],
+
+  <span class="k">"economia"</span>: {
+    <span class="k">"cac_objetivo_clp"</span>: <span class="nu">120000</span>,
+    <span class="k">"ltv_estimado_clp"</span>: <span class="nu">490000</span>,
+    <span class="k">"margen_bruto"</span>: <span class="nu">0.88</span>
+  },
+
+  <span class="k">"cumplimiento"</span>: {
+    <span class="k">"voz_saliente"</span>: <span class="nu">false</span>,
+    <span class="k">"datos_personales"</span>: <span class="s">"Sólo el correo de quien se registra. Los contratos
+                         subidos no se usan para entrenar ni se citan en
+                         marketing. Sin datos de menores."</span>,
+    <span class="k">"riesgo_declarado"</span>: <span class="s">"El informe no es asesoría legal y así se rotula en
+                         cada pieza. Ninguna creatividad puede prometer un
+                         resultado judicial."</span>
+  }
+}</code></pre>
+    </div>
+
+    <div>
+      <span class="kicker">Campo por campo</span>
+      <h2 style="margin-bottom:var(--sp-xs)">Qué hace cada uno, y qué pasa si mientes.</h2>
+      <p class="prosa" style="margin-bottom:var(--sp-s)">
+        Los campos en <span class="out" style="font-family:var(--disp);font-weight:700;font-size:.62rem;letter-spacing:.08em">ROJO</span>
+        son obligatorios: sin ellos el sistema <b>rechaza el manifiesto y no gasta un peso</b>. Falla cerrado.
+      </p>
+
+      <div class="campo">
+        <h4>idea <span class="oblig">obligatorio</span></h4>
+        <p>El id de carpeta (<code>05-contratos</code>). No la marca: la marca cambia, la carpeta no.
+        Es la llave primaria de todo el sistema, y por eso el tablero muestra las 5 ideas nuevas por su
+        carpeta aunque todavía no tengan nombre.</p>
+      </div>
+
+      <div class="campo">
+        <h4>autonomia <span class="oblig">obligatorio</span></h4>
+        <p><code>total</code> · <code>parcial</code> · <code>no</code>. Y <b>el sistema no te cree
+        automáticamente</b>: si declaras <code>total</code> pero tu <code>oferta.checkout</code> está
+        vacío, o tu modelo exige una firma, el validador te baja a <code>parcial</code> y lo registra.
+        Una idea que se declara más automatizable de lo que es sólo consigue quemar presupuesto más rápido.</p>
+      </div>
+
+      <div class="campo">
+        <h4>oferta.checkout <span class="oblig">obligatorio si autonomia = total</span></h4>
+        <p>Flow, Stripe o Mercado Pago. Si no hay una pasarela donde un desconocido pueda pagar solo
+        a las 2 de la mañana, <b>no hay autonomía total</b>. Este es el campo que separa el 60% de las ideas.</p>
+      </div>
+
+      <div class="campo">
+        <h4>publico.canales <span class="oblig">obligatorio</span></h4>
+        <p>La lista blanca. El kernel <b>sólo</b> emite acciones hacia canales que están acá. Pedir un
+        canal que no declaraste es una acción bloqueada, no una advertencia. Los valores válidos son los
+        seis de <code>_kit/autopilot.md §1</code>; cualquier otro string rechaza el manifiesto entero.</p>
+      </div>
+
+      <div class="campo">
+        <h4>presupuesto.tope_total_antes_de_revisar_clp <span class="oblig">obligatorio</span></h4>
+        <p>El número que el juez <b>no puede levantar</b>. Ni él, ni una campaña que va bien, ni una
+        racha de tres semanas buenas. Cuando el gasto acumulado lo toca, la idea se congela hasta que un
+        humano suba el tope <em>a mano, en el archivo</em>. Es el único freno de emergencia que el
+        sistema no puede soltar por su cuenta.</p>
+      </div>
+
+      <div class="campo">
+        <h4>metricas.endpoint · metricas.eventos <span class="oblig">obligatorio</span></h4>
+        <p>Un endpoint que devuelve los contadores. <b>Si un criterio de muerte depende de un evento que
+        no publicas, el juez no lo evalúa y no lo sustituye por otro.</b> Emite una <i>falla de
+        manifiesto</i> y sigue. Eso le pasa hoy a 07-terreno: su criterio depende de
+        <code>adopcion_tecnico</code> y su endpoint no lo expone.
+        <a href="demo/index.html" style="color:var(--in)">Está en la bitácora →</a></p>
+      </div>
+
+      <div class="campo">
+        <h4>metricas.activacion <span class="oblig">obligatorio</span></h4>
+        <p>En prosa, honesta: <b>el momento en que el producto entregó valor</b>. No «hizo login».
+        Este texto es el que se le muestra al juez cuando evalúa activación, y es la definición contra
+        la que se te va a medir. Poner una fácil acá es engañarse con más pasos.</p>
+      </div>
+
+      <div class="campo">
+        <h4>criterios_de_muerte[] <span class="oblig">obligatorio</span></h4>
+        <p>Cada uno: <code>hito</code>, <code>mes</code> (a partir de cuándo es evaluable),
+        <code>condicion</code> (una expresión sobre tus propias métricas), <code>accion</code>
+        (<code>pausar</code> o <code>matar</code>) y <code>cita</code> — el texto literal de tu roadmap.
+        <b>La cita es la que aparece en la bitácora cuando el criterio se dispara.</b> El juez no
+        parafrasea: te lee tus propias palabras de vuelta.</p>
+        <p><b>Un criterio no se puede editar después de que la idea recibió gasto.</b> El manifiesto se
+        sella con un hash; cambiarlo requiere una nueva versión firmada a mano, y el cambio queda en la
+        bitácora con la versión anterior al lado.</p>
+      </div>
+
+      <div class="campo">
+        <h4>cumplimiento.voz_saliente · datos_personales · riesgo_declarado <span class="oblig">obligatorio</span></h4>
+        <p>Alimentan al kernel. <code>voz_saliente: true</code> obliga a declarar la base de
+        consentimiento y activa la lista de supresión y el registro No Molestar.
+        <code>datos_personales</code> es lo que hace que el kernel de Finakids <b>bloquee cualquier
+        segmentación a menores de 18</b>, aunque el motor de campañas la pida y aunque convierta mejor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ LA TABLA ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">La pregunta honesta</span>
+  <h2 style="margin-bottom:var(--sp-s);max-width:24ch">¿Cuáles de las 16 ideas existentes se enchufan?</h2>
+  <p class="prosa prose-max" style="margin-bottom:var(--sp-m)">
+    Los criterios son cuatro y son operativos, no filosóficos: <b>¿puede un desconocido comprar solo?</b>
+    · <b>¿la entrega es 100% software?</b> · <b>¿hace falta que un humano venda?</b> ·
+    <b>¿hace falta onboarding, hardware en terreno o un contrato firmado?</b>
+  </p>
+
+  <div class="conteo">
+    <div><span class="rot">Autonomía total</span><span class="v in">8</span><span class="mut" style="font-size:.7rem">de las 16 existentes</span></div>
+    <div><span class="rot">Parcial</span><span class="v">3</span><span class="mut" style="font-size:.7rem">el sistema opera una parte</span></div>
+    <div><span class="rot">No se enchufan</span><span class="v out">5</span><span class="mut" style="font-size:.7rem">las cinco de minería</span></div>
+  </div>
+
+  <div class="scroll-x">
+    <table class="t" style="min-width:940px">
+      <caption>Clasificación de las 16 ideas existentes. Cada motivo sale de leer su <code>negocio.html</code> y su <code>roadmap.html</code>, no de suponer.</caption>
+      <thead>
+        <tr>
+          <th>Carpeta</th><th>Marca</th><th class="n">Precio</th>
+          <th class="c">Compra<br>solo</th><th class="c">Entrega<br>software</th>
+          <th class="c">Venta<br>humana</th><th class="c">Onboarding<br>o hardware</th>
+          <th>Clase</th><th>Motivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>01-licitaciones</code></td><td><b>Adjudate</b></td><td class="n">$59.000/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>Dato público (Mercado Público), alertas por software. Su propio criterio M5 dice que si al mes 20 todo sigue siendo outbound a mano «esto es una consultora, no una empresa de software». <b>El sistema es justamente el canal que le falta.</b></td>
+        </tr>
+        <tr>
+          <td><code>02-cobranza</code></td><td><b>Tinoria</b></td><td class="n">$49.000/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c mas">leve</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>Conectar el SII es un flujo self-service estándar en Chile. El WhatsApp lo manda <em>el cliente a sus deudores</em>: es su canal, no el nuestro, y el kernel no lo toca.</td>
+        </tr>
+        <tr>
+          <td><code>03-agenda</code></td><td><b>Zurcia</b></td><td class="n">$34.000/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c mas">leve</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>El número de WhatsApp se conecta con el <i>embedded signup</i> de Meta, sin humano. Ticket bajo, volumen alto, ICP alcanzable por Meta Ads. El caso de libro.</td>
+        </tr>
+        <tr>
+          <td><code>04-inventario</code></td><td><b>Mermata</b></td><td class="n">$49.000/mes<br><span class="mut">+ $190.000 puesta en marcha</span></td>
+          <td class="c mas">a medias</td><td class="c si">sí</td><td class="c mas">para el POS</td><td class="c no">sí</td>
+          <td><span class="clase clase-parcial">Parcial</span></td>
+          <td>El diagnóstico gratis es un imán de leads perfecto y automatizable — <b>el sistema lo corrió, y por eso pudo matarla</b>. Pero la <b>puesta en marcha de $190.000</b> y la integración con cada POS son trabajo humano. Su hito H4 es literalmente «un POS nos distribuye»: eso es una negociación, no un signup.</td>
+        </tr>
+        <tr>
+          <td><code>05-contratos</code></td><td><b>Antefirma</b></td><td class="n">$29.000/contrato</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td><b>El caso más limpio del repositorio.</b> Subes un PDF, pagas con tarjeta, recibes el informe. Transaccional, sin contrato, sin onboarding, valor entregado en minutos. Por eso es la que mejor rinde en el tablero: payback 2,8 meses.</td>
+        </tr>
+        <tr>
+          <td><code>06-arriendos</code></td><td><b>Conserjo</b></td><td class="n">$7.900/unidad/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>Tiene además una cuña transaccional ideal para adquisición pagada: el informe de arrendatario suelto a $6.900. Se compra sin hablar con nadie.</td>
+        </tr>
+        <tr>
+          <td><code>07-terreno</code></td><td><b>Rutamo</b></td><td class="n">$59.000/mes</td>
+          <td class="c mas">a medias</td><td class="c si">sí</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-parcial">Parcial</span></td>
+          <td>El software se entrega solo, pero <b>la activación depende de que una cuadrilla de técnicos adopte una app en terreno</b>. Su criterio de muerte H3 es «adopción del técnico bajo 50% a la semana 4», y su roadmap modela un vendedor cerrando 3 cuentas al mes con CAC de $900.000. El sistema genera demanda; el cierre y la adopción no los hace. <b>Y hoy ni siquiera puede evaluar su criterio: no publica el evento.</b></td>
+        </tr>
+        <tr>
+          <td><code>08-laboral</code></td><td><b>Contralta</b></td><td class="n">$34.000/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>Software puro, con una cuña transaccional (auditoría de un finiquito, $19.000). Se enchufó bien — <b>y el sistema la pausó igual</b>, porque su CAC llegó a $484.000 contra el techo de $350.000 que ella misma declaró.</td>
+        </tr>
+        <tr>
+          <td><code>09-despacho</code></td><td><b>Kilonauta</b></td><td class="n">Gratis · $34.900/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total<span class="mut">*</span></span></td>
+          <td>La demanda es 100% self-service: conectas tu tienda, compras la etiqueta. <b>*Pero el negocio no existe sin un contrato de tarifas negociado a mano con los couriers</b> — su hito M2 es «que un courier baje del 25% bajo lista». Eso es una compra de suministro, aguas arriba del sistema: Cuantario la <em>opera</em>, no la <em>funda</em>. Dicho de frente para que nadie lea «total» y crea que el sistema puede levantar el negocio solo.</td>
+        </tr>
+        <tr>
+          <td><code>10-contabilidad</code></td><td><b>Talonio</b></td><td class="n">$7.900/RUT/mes</td>
+          <td class="c si">sí</td><td class="c si">sí</td><td class="c si">no</td><td class="c si">no</td>
+          <td><span class="clase clase-total">Total</span></td>
+          <td>Software puro. Su canal preferido son los contadores (una alianza humana), pero el SEO long-tail y Google Ads sobre «recuperar IVA crédito fiscal» funcionan sin nadie. El sistema opera el canal que sí se automatiza.</td>
+        </tr>
+
+        <tr>
+          <td><code>11-correas</code></td><td><b>Cintavia</b></td><td class="n">$890.000 – $8.400.000/mes<br><span class="mut">+ $2.250.000 por estación</span></td>
+          <td class="c no">no</td><td class="c no">no</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-no">No</span></td>
+          <td><b>Hardware instalado en faena.</b> Su hito M0 es «una estación instalada con permiso escrito al día 90»; sin eso no hay producto. Homologación del contratista, ciclo de 8-14 semanas. Ninguna campaña de anuncios produce un permiso de faena.</td>
+        </tr>
+        <tr>
+          <td><code>12-seguridad</code></td><td><b>Cuasio</b></td><td class="n">$190.000/mes</td>
+          <td class="c no">no</td><td class="c si">sí</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-no">No</span></td>
+          <td>Es el ticket más bajo de las cinco de minería y <b>aun así no</b>. Su H1 exige «tres contratistas firmaron carta de piloto» y un asesor prevencionista con equity adentro. El producto se despliega a 80-250 personas en faena: eso es gestión del cambio, no un signup. La entrega es software, pero la venta y la adopción no lo son.</td>
+        </tr>
+        <tr>
+          <td><code>13-contratistas</code></td><td><b>Torniqua</b></td><td class="n">$69.000/mes</td>
+          <td class="c no">no</td><td class="c no">no</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-no">No</span></td>
+          <td><b>Lector físico en la portería de la minera</b>, que además hay que regalarle a un tercero (la mandante) que no es el que paga. Su H1 lo dice sin rodeos: «si a los 60 días ninguna faena nos deja instalar el lector, el canal no existe».</td>
+        </tr>
+        <tr>
+          <td><code>14-permisos</code></td><td><b>Cianota</b></td><td class="n">$890.000/mes</td>
+          <td class="c no">no</td><td class="c si">sí</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-no">No</span></td>
+          <td>ICP: titular de un proyecto de más de US$100 M en tramitación. <b>CAC modelado: $8.200.000 a $15.000.000. Ciclo mediano: 9 meses.</b> El universo son decenas de cuentas con nombre y apellido. No hay embudo: hay una lista y hay que ir a verlos.</td>
+        </tr>
+        <tr>
+          <td><code>15-agua</code></td><td><b>Freatia</b></td><td class="n">$2.900.000 – $9.800.000/mes<br><span class="mut">+ $12.000.000-$28.000.000 de implementación</span></td>
+          <td class="c no">no</td><td class="c no">no</td><td class="c no">sí</td><td class="c no">sí</td>
+          <td><span class="clase clase-no">No</span></td>
+          <td>Ciclo de venta sobre 12 meses (es su propio criterio de muerte), implementación de 12 semanas con un fundador sentado en la faena, universo de 200 cuentas en todo Chile. Su criterio M4 es «si el producto no se puede instalar sin nosotros, no es un producto». <b>Hoy, por su propia definición, no lo es.</b></td>
+        </tr>
+
+        <tr>
+          <td><code>16-finakids</code></td><td><b>Finakids</b></td><td class="n">$4.990/mes (familia)<br><span class="mut">$54.000.000/año (banco)</span></td>
+          <td class="c mas">sólo B2C</td><td class="c si">sí</td><td class="c mas">para el banco</td><td class="c mas">para el banco</td>
+          <td><span class="clase clase-parcial">Parcial</span></td>
+          <td><b>Dos negocios en una carpeta, y sólo uno se enchufa.</b> La línea Familia ($4.990/mes) es self-service pura: se opera entera. La línea Marca ($54.000.000/año) pasa por la gerencia de sostenibilidad de un banco, un comité legal y un RFP — <b>y el propio Finakids dice que sin el banco no hay canal gratis ni CAC viable</b>. Además el kernel le impone una restricción que ninguna otra idea tiene: <b>prohibido segmentar a menores</b>. Se publicita al padre, nunca al niño.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nota aviso" style="margin-top:var(--sp-m)">
+    <b>Lo que este cuadro no dice.</b> «Total» no significa que la idea vaya a funcionar: significa que
+    el sistema puede operarla sin humanos. 08-laboral es autonomía total y el juez la pausó en el mes 9.
+    La automatización es una condición de la operación, no una predicción del resultado — y confundir
+    las dos es exactamente cómo se pierde plata a escala.
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ LAS NUEVAS ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">Las cinco nuevas</span>
+  <h2 style="margin-bottom:var(--sp-s)">Nacen con el manifiesto puesto.</h2>
+  <p class="prosa prose-max">
+    Las ideas <code>17-datos-empresas</code>, <code>18-alertas</code>, <code>19-precios</code>,
+    <code>20-recepcion</code> y <code>21-inmuebles</code> se están construyendo en paralelo con este
+    sistema y bajo el mismo contrato: <b>producto digital, self-service, entrega por software, sin
+    onboarding humano</b>. Declaran <code>"autonomia": "total"</code> por diseño, no por optimismo.
+  </p>
+  <p class="prosa prose-max">
+    En el tablero aparecen por su id de carpeta y no por su marca. No es un descuido: <b>es la prueba
+    de que el acoplamiento funciona.</b> El sistema le asignó presupuesto, corrió campañas, midió el
+    embudo y emitió un veredicto sobre <code>17-datos-empresas</code> — escalarla, con n=34 pagos —
+    sin saber cómo se llama. Lo único que necesitó fue el archivo.
+  </p>
+  <p class="prosa prose-max">
+    Ese es el examen que importa: <b>si una idea que todavía no tiene nombre se puede operar, entonces
+    una idea que todavía no existe también.</b>
+  </p>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    Las citas de los criterios de muerte salen textuales de los <code>roadmap.html</code> de cada idea.
+    Los precios salen de sus <code>meta.json</code>. Nada de esta tabla es una suposición sobre una
+    idea que no leímos.
+  </div>
+</footer>
+
+<script src="comun.js"></script>
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fedatia — la API de datos de empresas chilenas</title>
+<meta name="description" content="Un RUT entra, un perfil de empresa sale: Diario Oficial, SII, Mercado Público, INAPI, CMF, Boletín Concursal. Cada campo dice de qué fuente vino y cuándo se actualizó.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero { padding-block: var(--sp-l) var(--sp-xl); }
+  @media (min-width: 75em) { .hero { padding-block: var(--sp-2xl) var(--sp-3xl); } }
+  .hero h1 { max-width: 15ch; }
+  .hero .lede { max-width: 46ch; margin-top: var(--sp-s); }
+  .chips-rut { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .5rem; }
+  .chip-rut {
+    font-family: "Geist Mono", monospace; font-size: .72rem;
+    padding: .35rem .75rem; border-radius: 999px; min-height: 44px; min-width: 0;
+    border: 1px solid var(--linea-2); color: var(--tinta-2); background: var(--papel);
+    display: inline-flex; align-items: center; gap: .35rem;
+  }
+  .chip-rut:hover { border-color: var(--tinta-3); }
+  .chip-rut[aria-pressed="true"] { border-color: var(--cobalto); background: var(--cobalto); color: #fff; }
+  .chip-rut i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: block; opacity: .7; }
+  .precio-col { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .precio-col { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 78em) { .precio-col { grid-template-columns: repeat(4, 1fr); } }
+  .plan { display: flex; flex-direction: column; }
+  .plan--destacado { border-color: var(--cobalto); box-shadow: 0 0 0 1px var(--cobalto); }
+  .plan__n { font-family: "Geist Mono", monospace; font-size: .72rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--tinta-3); }
+  .plan--destacado .plan__n { color: var(--cobalto); }
+  .plan__p { font-size: var(--step-2); font-weight: 600; letter-spacing: -.03em; margin: .35rem 0 .1rem; }
+  .plan__u { font-size: var(--step--1); color: var(--tinta-3); }
+  .plan ul { list-style: none; padding: 0; margin: var(--sp-s) 0 0; font-size: var(--step--1); color: var(--tinta-2); }
+  .plan ul li { padding: .35rem 0; border-top: 1px solid var(--linea); display: flex; gap: .45rem; align-items: baseline; }
+  .plan ul li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--linea-2); flex: none; transform: translateY(-2px); }
+  .faq { border-top: 1px solid var(--linea); }
+  .faq details { border-bottom: 1px solid var(--linea); }
+  .faq summary {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+    padding: var(--sp-s) 0; cursor: pointer; font-weight: 500; color: var(--tinta);
+    min-height: 56px; list-style: none;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: "Geist Mono", monospace; color: var(--cobalto); font-size: 1.2rem; flex: none; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq details > div { padding-bottom: var(--sp-s); }
+  .faq details > div p { max-width: 68ch; }
+  .fuente-t { border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" stroke="#1b5fd0" stroke-width="1.6"/>
+        <path d="M7 8.5h10M7 12h6M7 15.5h8" stroke="#1b5fd0" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="n">Fedatia</span><span class="v">v1</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ======================= HERO ======================= -->
+<section class="hero">
+  <div class="container doc">
+    <div class="doc__txt">
+      <span class="eyebrow">API · datos de empresas · Chile</span>
+      <h1>Un RUT entra. Sale la empresa entera, con su procedencia.</h1>
+      <p class="lede">
+        Diario Oficial, SII, Mercado Público, INAPI, CMF, Boletín Concursal y seis
+        fuentes más, normalizadas en un solo JSON. Cada campo declara de qué fuente
+        vino y cuándo se capturó. <strong>Si una fuente se cayó, la respuesta lo dice
+        y esa consulta no se cobra.</strong>
+      </p>
+      <div class="btns">
+        <a class="btn btn--pri" href="demo/index.html">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Probar la API en vivo
+        </a>
+        <a class="btn btn--sec" href="#precios">Ver precios</a>
+      </div>
+      <p class="peq" style="margin-top:var(--sp-s)">
+        500 consultas al mes gratis. Sin tarjeta, sin llamada, sin vendedor.
+        La llave llega al correo en menos de un minuto.
+      </p>
+    </div>
+
+    <div class="doc__cod">
+      <div class="chips-rut" role="group" aria-label="Casos de ejemplo">
+        <button class="chip-rut" data-hero="ok" aria-pressed="true"><i></i>perfil completo</button>
+        <button class="chip-rut" data-hero="caida" aria-pressed="false"><i></i>fuente caída</button>
+        <button class="chip-rut" data-hero="vencido" aria-pressed="false"><i></i>dato vencido</button>
+      </div>
+      <div class="cod">
+        <div class="cod__barra">
+          <span class="cod__tit" id="heroTit">200 OK · 148 ms · facturada</span>
+          <button class="cod__cop" data-copiar aria-label="Copiar">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4a1.5 1.5 0 0 0-1.5 1.5V10A1.5 1.5 0 0 0 4 11.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+        <pre id="heroCod"></pre>
+      </div>
+      <p class="peq" style="margin-top:.5rem">
+        Los RUT de ejemplo terminan en <code>-K</code> y no cumplen el módulo 11: son
+        RUT reservados del sandbox y no pueden chocar con una empresa real.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= EL PROBLEMA ======================= -->
+<section class="seccion seccion--gris" id="problema">
+  <div class="container">
+    <span class="eyebrow">El titular del puesto</span>
+    <h2 style="margin-top:0">Hoy esto lo hace un becario con cinco pestañas abiertas.</h2>
+    <div class="rejilla rejilla--3" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <h3 style="margin-top:0;font-size:var(--step-0)">La fintech que hace onboarding</h3>
+        <p class="peq">«Antes de abrir la cuenta necesito saber si la sociedad existe, si tiene
+        inicio de actividades, si está en el Boletín Concursal. Lo revisa una persona,
+        tarda dos días, y el cliente se va a otra parte.»</p>
+      </div>
+      <div class="ficha">
+        <h3 style="margin-top:0;font-size:var(--step-0)">El equipo comercial</h3>
+        <p class="peq">«Tengo 4.000 RUT en una planilla y no sé cuáles venden al Estado.
+        Los que venden al Estado son los que me compran. Nadie tiene tiempo de mirarlos uno a uno.»</p>
+      </div>
+      <div class="ficha">
+        <h3 style="margin-top:0;font-size:var(--step-0)">El marketplace</h3>
+        <p class="peq">«Escribimos un scraper. Funcionó tres meses. El SII cambió el formulario
+        y llevamos dos semanas con el proceso de validación de vendedores apagado.»</p>
+      </div>
+    </div>
+    <p class="lede" style="margin-top:var(--sp-l);max-width:62ch">
+      Raspar un portal es fácil una tarde. Lo caro es mantener once fuentes chilenas que
+      cambian de maqueta sin avisar, deduplicar razones sociales, resolver el dígito
+      verificador y responder por la frescura del dato. <strong>Eso es lo que vendemos.</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ======================= EL OBJETO EMPRESA ======================= -->
+<section class="seccion" id="objeto">
+  <div class="container">
+    <span class="eyebrow">Referencia</span>
+    <h2 style="margin-top:0">El objeto <code style="font-size:.7em">empresa</code></h2>
+    <p class="max-60">Siete bloques. Usted pide los que necesita con <code>incluir=</code> y paga
+    una consulta, no siete. Cada bloque trae su propio <code>_meta</code>.</p>
+
+    <div class="scroll-x fuente-t" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead>
+          <tr>
+            <th>Bloque</th><th>Qué trae</th><th>Fuente</th><th>Frescura prometida</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>identidad</code></td>
+            <td>Razón social, nombre de fantasía, tipo societario, constitución, capital, domicilio comercial</td>
+            <td>Diario Oficial · Registro de Empresas y Sociedades</td>
+            <td class="num">24 h</td>
+          </tr>
+          <tr>
+            <td><code>actividad</code></td>
+            <td>Giro principal y secundarios (código SII), inicio de actividades, situación tributaria, si emite DTE</td>
+            <td>SII (consulta pública de terceros)</td>
+            <td class="num">24 h</td>
+          </tr>
+          <tr>
+            <td><code>mercado_publico</code></td>
+            <td>Estado hábil/inhábil, órdenes de compra y montos adjudicados a 24 meses, última licitación</td>
+            <td>API de ChileCompra · ChileProveedores</td>
+            <td class="num">12 h</td>
+          </tr>
+          <tr>
+            <td><code>marcas</code></td>
+            <td>Marcas registradas y solicitudes en trámite, clase, vencimiento</td>
+            <td>INAPI</td>
+            <td class="num">7 días</td>
+          </tr>
+          <tr>
+            <td><code>cmf</code></td>
+            <td>Si está inscrita en el Registro de Valores, si es entidad fiscalizada</td>
+            <td>CMF</td>
+            <td class="num">7 días</td>
+          </tr>
+          <tr>
+            <td><code>concursal</code></td>
+            <td>Procedimientos de reorganización o liquidación, rol, tribunal, estado</td>
+            <td>Boletín Concursal</td>
+            <td class="num">24 h</td>
+          </tr>
+          <tr>
+            <td><code>sanciones</code></td>
+            <td>Multas administrativas publicadas <span class="eti eti--val">por validar</span></td>
+            <td>Dirección del Trabajo · sanciones publicadas en el Diario Oficial</td>
+            <td class="num">30 días</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="peq" style="margin-top:.6rem">
+      <span class="eti eti--val">por validar</span> significa que no nos consta que la fuente
+      publique el universo completo ni que lo mantenga publicado. Va marcado en la respuesta,
+      no escondido en un pie de página.
+    </p>
+  </div>
+</section>
+
+<!-- ======================= PROCEDENCIA ======================= -->
+<section class="seccion seccion--gris" id="procedencia">
+  <div class="container doc">
+    <div class="doc__txt">
+      <span class="eyebrow">Lo que realmente compra</span>
+      <h2 style="margin-top:0">La procedencia es el producto</h2>
+      <p>
+        Un dato sin procedencia no sirve para decidir. Si su comité de riesgo pregunta
+        «¿de dónde salió que este proveedor está inhábil?», la respuesta no puede ser
+        «lo dice la API».
+      </p>
+      <p>
+        Por eso cada bloque viene con <code>_meta</code>: la fuente, el instante exacto de
+        captura y el estado del dato contra su ventana de frescura. Es auditable, se puede
+        guardar junto a su decisión, y es lo que un scraper casero nunca le va a dar.
+      </p>
+      <ul class="lista">
+        <li><code>vigente</code> — dentro de la ventana prometida.</li>
+        <li><code>vencido</code> — lo tenemos, pero está fuera de ventana. Se lo entregamos marcado.</li>
+        <li><code>no_disponible</code> — la fuente no respondió. No inventamos nada.</li>
+      </ul>
+    </div>
+    <div class="doc__cod">
+      <div class="cod">
+        <div class="cod__barra">
+          <span class="cod__tit">_meta de un bloque</span>
+          <button class="cod__cop" data-copiar aria-label="Copiar">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4a1.5 1.5 0 0 0-1.5 1.5V10A1.5 1.5 0 0 0 4 11.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+<pre><span class="t-cla">"mercado_publico"</span><span class="t-pun">: {</span>
+  <span class="t-cla">"proveedor_estado"</span><span class="t-pun">: </span><span class="t-ok">"habil"</span><span class="t-pun">,</span>
+  <span class="t-cla">"ordenes_24m"</span><span class="t-pun">: </span><span class="t-num">14</span><span class="t-pun">,</span>
+  <span class="t-cla">"monto_adjudicado_24m_clp"</span><span class="t-pun">: </span><span class="t-num">412680000</span><span class="t-pun">,</span>
+  <span class="t-com">"_meta"</span><span class="t-pun">: {</span>
+    <span class="t-com">"fuente"</span><span class="t-pun">: </span><span class="t-txt">"mercado_publico"</span><span class="t-pun">,</span>
+    <span class="t-com">"origen"</span><span class="t-pun">: </span><span class="t-txt">"api.mercadopublico.cl"</span><span class="t-pun">,</span>
+    <span class="t-com">"capturado"</span><span class="t-pun">: </span><span class="t-txt">"2026-07-13T13:41:00Z"</span><span class="t-pun">,</span>
+    <span class="t-com">"ventana"</span><span class="t-pun">: </span><span class="t-txt">"12h"</span><span class="t-pun">,</span>
+    <span class="t-com">"estado"</span><span class="t-pun">: </span><span class="t-ok">"vigente"</span>
+  <span class="t-pun">}</span>
+<span class="t-pun">}</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FUENTE CAÍDA ======================= -->
+<section class="seccion" id="fallas">
+  <div class="container doc">
+    <div class="doc__txt">
+      <span class="eyebrow">La parte incómoda</span>
+      <h2 style="margin-top:0">Cuando una fuente se cae, se lo decimos</h2>
+      <p>
+        Las once fuentes son portales del Estado. Se caen, cambian de formulario, se ponen
+        lentos en marzo. Un proveedor de datos tiene dos salidas: servirle el dato viejo y
+        callarse, o decírselo.
+      </p>
+      <p><strong>Nosotros se lo decimos, y además no le cobramos esa consulta.</strong> No es
+      generosidad: es la única política de soporte que se puede ejecutar sin un humano
+      improvisando. La regla está en el log y el abono es automático.</p>
+
+      <div class="aviso aviso--al">
+        <span class="aviso__tit">La regla, escrita para que la ejecute una máquina</span>
+        <p class="peq">Si <code>estado_respuesta</code> no es <code>completo</code>, entonces
+        <code>facturado: false</code>. Sin formulario, sin ticket, sin discusión. Y si la
+        disponibilidad mensual baja de 99,5%, se abona el 25% del mes; bajo 99%, el mes entero.</p>
+      </div>
+    </div>
+    <div class="doc__cod">
+      <div class="cod">
+        <div class="cod__barra">
+          <span class="cod__tit t-al">200 OK · parcial · NO facturada</span>
+          <button class="cod__cop" data-copiar aria-label="Copiar">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4a1.5 1.5 0 0 0-1.5 1.5V10A1.5 1.5 0 0 0 4 11.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+<pre><span class="t-pun">{</span>
+  <span class="t-cla">"rut"</span><span class="t-pun">: </span><span class="t-txt">"77.984.120-K"</span><span class="t-pun">,</span>
+  <span class="t-cla">"estado_respuesta"</span><span class="t-pun">: </span><span class="t-al">"parcial"</span><span class="t-pun">,</span>
+  <span class="t-cla">"facturado"</span><span class="t-pun">: </span><span class="t-num">false</span><span class="t-pun">,</span>
+  <span class="t-cla">"identidad"</span><span class="t-pun">: { … },</span>
+  <span class="t-cla">"mercado_publico"</span><span class="t-pun">: {</span>
+    <span class="t-cla">"valor"</span><span class="t-pun">: </span><span class="t-pun">null</span><span class="t-pun">,</span>
+    <span class="t-com">"_meta"</span><span class="t-pun">: {</span>
+      <span class="t-com">"estado"</span><span class="t-pun">: </span><span class="t-fa">"no_disponible"</span><span class="t-pun">,</span>
+      <span class="t-com">"error"</span><span class="t-pun">: </span><span class="t-txt">"HTTP 503 · 3 intentos"</span><span class="t-pun">,</span>
+      <span class="t-com">"ultimo_valor_conocido"</span><span class="t-pun">: </span><span class="t-txt">"2026-07-13T10:05:00Z"</span>
+    <span class="t-pun">}</span>
+  <span class="t-pun">}</span>
+<span class="t-pun">}</span></pre>
+      </div>
+      <p class="peq" style="margin-top:.5rem">
+        ¿Prefiere el dato viejo a no tener dato? Pida <code>permitir_cache_vencida=true</code>
+        y se lo damos, marcado como <code>vencido</code>, con la advertencia adentro. Usted
+        decide; nosotros no decidimos por usted.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= DATOS PERSONALES ======================= -->
+<section class="seccion seccion--tinta" id="personas">
+  <div class="container doc">
+    <div class="doc__txt">
+      <span class="eyebrow">Dónde trazamos la línea</span>
+      <h2 style="margin-top:0;color:#fff">Datos de empresas, sí. Datos de personas, no.</h2>
+      <p>
+        Nos van a pedir el nombre del representante legal. Está publicado en el Diario Oficial,
+        cualquiera lo puede leer. Y aun así no se lo vamos a entregar.
+      </p>
+      <p>
+        Que un dato esté publicado no habilita a revenderlo para otro fin. Tratar datos de
+        personas naturales exige declarar una finalidad, una base de licitud y un contrato de
+        tratamiento con cada cliente. Eso lo firma una persona, y este servicio se opera sin
+        personas. Preferimos renunciar al dato antes que fingir que el problema no existe.
+      </p>
+      <p class="peq">
+        Marco: Ley 19.628 y Ley 21.719, que crea la Agencia de Protección de Datos Personales.
+        <span class="eti eti--val" style="background:transparent;color:#a9b6c6;border-color:#3a4757">por validar</span>
+        la fecha exacta de entrada en vigencia de cada artículo y si la excepción de «fuentes
+        de acceso público» sobrevive a la nueva ley. Como no nos consta, asumimos que no.
+      </p>
+      <p><strong>Lo que sí entregamos:</strong> que existan poderes vigentes, cuántos apoderados
+      hay y cuándo se modificaron. Es el hecho societario, sin la persona.</p>
+    </div>
+    <div class="doc__cod">
+      <div class="cod">
+        <div class="cod__barra">
+          <span class="cod__tit t-fa">403 Forbidden · siempre · a propósito</span>
+          <button class="cod__cop" data-copiar aria-label="Copiar">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4a1.5 1.5 0 0 0-1.5 1.5V10A1.5 1.5 0 0 0 4 11.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+<pre><span class="t-cmd">GET</span> <span class="t-txt">/v1/empresas/76.543.210-K?personas=true</span>
+
+<span class="t-pun">{</span>
+  <span class="t-cla">"error"</span><span class="t-pun">: </span><span class="t-fa">"personas_no_disponibles"</span><span class="t-pun">,</span>
+  <span class="t-cla">"mensaje"</span><span class="t-pun">: </span><span class="t-txt">"No entregamos nombres de socios ni</span>
+<span class="t-txt">     de representantes legales, ni sus RUT."</span><span class="t-pun">,</span>
+  <span class="t-cla">"lo_que_si_entregamos"</span><span class="t-pun">: {</span>
+    <span class="t-cla">"representacion"</span><span class="t-pun">: {</span>
+      <span class="t-cla">"poderes_vigentes"</span><span class="t-pun">: </span><span class="t-num">true</span><span class="t-pun">,</span>
+      <span class="t-cla">"cantidad_apoderados"</span><span class="t-pun">: </span><span class="t-num">2</span><span class="t-pun">,</span>
+      <span class="t-cla">"ultima_modificacion"</span><span class="t-pun">: </span><span class="t-txt">"2023-08-04"</span>
+    <span class="t-pun">}</span>
+  <span class="t-pun">}</span>
+<span class="t-pun">}</span></pre>
+      </div>
+      <p class="peq" style="margin-top:.5rem;color:#7d8b9c">
+        Tampoco vendemos morosidad. El Boletín Comercial es de Equifax y está regulado por la
+        Ley 20.575: no es una fuente pública y no la tocamos. Si busca DICOM, no somos nosotros.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PRECIOS ======================= -->
+<section class="seccion" id="precios">
+  <div class="container">
+    <span class="eyebrow">Precios</span>
+    <h2 style="margin-top:0">La tarifa completa está publicada. No hay «contáctanos».</h2>
+    <p class="max-60">Se paga por consulta respondida. Una consulta incompleta, vencida o con
+    error no se cobra nunca. Precios en pesos, IVA incluido.</p>
+
+    <div class="precio-col" style="margin-top:var(--sp-m)">
+      <div class="ficha plan">
+        <span class="plan__n">Sandbox</span>
+        <span class="plan__p">$0</span>
+        <span class="plan__u">500 consultas al mes</span>
+        <ul>
+          <li>Las once fuentes</li>
+          <li>Sin tarjeta</li>
+          <li>Sin webhooks, sin SLA</li>
+          <li>Es el canal de adquisición, no un regalo</li>
+        </ul>
+      </div>
+      <div class="ficha plan plan--destacado">
+        <span class="plan__n">Desarrollador</span>
+        <span class="plan__p">$29.000<span class="plan__u" style="display:inline;font-size:.5em"> /mes</span></span>
+        <span class="plan__u">5.000 consultas · luego $8 c/u</span>
+        <ul>
+          <li>Webhooks de cambio</li>
+          <li>SLA 99,5% con abono automático</li>
+          <li>Vigilancia de hasta 200 RUT</li>
+          <li>Se contrata con tarjeta, en dos minutos</li>
+        </ul>
+      </div>
+      <div class="ficha plan">
+        <span class="plan__n">Escala</span>
+        <span class="plan__p">$149.000<span class="plan__u" style="display:inline;font-size:.5em"> /mes</span></span>
+        <span class="plan__u">50.000 consultas · luego $4 c/u</span>
+        <ul>
+          <li>SLA 99,9%</li>
+          <li>Vigilancia de hasta 2.000 RUT</li>
+          <li>Consultas por lote (CSV in / CSV out)</li>
+          <li>Historial de capturas de 24 meses</li>
+        </ul>
+      </div>
+      <div class="ficha plan">
+        <span class="plan__n">Volumen</span>
+        <span class="plan__p">$2 <span class="plan__u" style="display:inline;font-size:.5em">/consulta</span></span>
+        <span class="plan__u">sobre 250.000 al mes · mínimo $600.000</span>
+        <ul>
+          <li>Misma API, mismo SLA</li>
+          <li>Tarifa publicada: no hay llamada de descubrimiento</li>
+          <li>Se activa solo cuando cruza el umbral</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-m)">
+      <span class="aviso__tit">Vigilancia — el producto que retiene</span>
+      <p class="peq">Consultar una vez es barato. Enterarse <em>después</em> —cuando el proveedor
+      queda inhábil, cuando aparece en el Boletín Concursal, cuando cambia el giro— es lo que
+      la fintech necesita de verdad. <strong>$290 por RUT vigilado al mes</strong>, sobre la
+      cuota del plan. Es lo que convierte una consulta puntual en una suscripción.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ERRORES ======================= -->
+<section class="seccion seccion--gris" id="errores">
+  <div class="container">
+    <span class="eyebrow">Referencia</span>
+    <h2 style="margin-top:0">Códigos de error</h2>
+    <div class="scroll-x fuente-t" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>HTTP</th><th>code</th><th>Qué pasó</th><th class="num">¿Se cobra?</th></tr></thead>
+        <tbody>
+          <tr><td><code>400</code></td><td><code>dv_invalido</code></td><td>El dígito verificador no cumple el módulo 11. Le devolvemos el DV correcto.</td><td class="num">No</td></tr>
+          <tr><td><code>403</code></td><td><code>personas_no_disponibles</code></td><td>Pidió <code>personas=true</code>. Siempre responde esto.</td><td class="num">No</td></tr>
+          <tr><td><code>404</code></td><td><code>empresa_no_encontrada</code></td><td>RUT válido, sin inicio de actividades ni constitución publicada.</td><td class="num">No</td></tr>
+          <tr><td><code>429</code></td><td><code>cuota_agotada</code></td><td>Se acabó la cuota del plan. La cabecera dice cuándo se renueva.</td><td class="num">No</td></tr>
+          <tr><td><code>200</code></td><td><code>estado_respuesta: parcial</code></td><td>Una o más fuentes no respondieron. El resto sí viene.</td><td class="num">No</td></tr>
+          <tr><td><code>200</code></td><td><code>estado_respuesta: completo</code></td><td>Todo dentro de su ventana de frescura.</td><td class="num">Sí</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FAQ ======================= -->
+<section class="seccion" id="faq">
+  <div class="container">
+    <span class="eyebrow">Preguntas</span>
+    <h2 style="margin-top:0">Lo que nos van a preguntar</h2>
+    <div class="faq" style="margin-top:var(--sp-m)">
+
+      <details open>
+        <summary>¿Y si el Estado publica mañana la API que ustedes venden?</summary>
+        <div>
+          <p>Es el riesgo real y no lo vamos a maquillar. Chile ya tiene la Ley 21.180 de
+          Transformación Digital y una API pública en ChileCompra; que aparezca un registro
+          unificado de empresas es plausible.</p>
+          <p>Nuestra respuesta tiene dos partes. La primera: <strong>si el Estado publica la
+          fuente, nuestro costo baja y nuestro precio no</strong>. Cada fuente es un adaptador
+          intercambiable; el día que exista una API oficial, dejamos de raspar y la consumimos.
+          Nos hace más baratos, no nos mata.</p>
+          <p>La segunda es la incómoda: si el Estado publicara un servicio <em>unificado</em>,
+          con SLA, versionado y las once fuentes normalizadas en un solo JSON, el plan básico
+          se muere. Lo dejamos escrito como criterio de muerte en el
+          <a href="roadmap.html">roadmap</a> —hito 5, mes 18— y el negocio tendría que moverse
+          a lo que el Estado no va a hacer: vigilancia, alertas y trazabilidad para auditoría.
+          Lo que no vamos a hacer es descubrirlo tarde.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Esto es DICOM?</summary>
+        <div>
+          <p>No, y es importante. El Boletín Comercial es un registro privado operado por Equifax
+          y regulado por la Ley 20.575; no es una fuente pública y no lo tocamos. Nosotros
+          entregamos hechos societarios y administrativos publicados por el Estado: constitución,
+          giro, licitaciones, marcas, procedimientos concursales. Si necesita morosidad
+          comercial, tiene que contratarla con quien la tiene.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿De verdad no hay nadie con quien hablar?</summary>
+        <div>
+          <p>De verdad. Hay documentación, hay un sandbox sin tarjeta, hay una página de estado
+          pública y hay un asistente que responde <em>sólo</em> con lo que está en la
+          documentación: si no lo sabe, lo dice y le abona la consulta. No hay vendedor, no hay
+          llamada de descubrimiento, no hay demo agendada.</p>
+          <p>Esto tiene un costo y lo asumimos: si usted es un banco regulado y necesita que
+          alguien firme un cuestionario de proveedor crítico, <strong>no somos su proveedor</strong>.
+          Lo decimos en la primera pantalla en vez de hacerle perder tres semanas.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Qué pasa si un dato está equivocado?</summary>
+        <div>
+          <p>Cada campo viene con el documento del que salió y la hora en que se capturó. Si el
+          documento dice otra cosa que la API, es un error nuestro y le abonamos las consultas
+          afectadas del período. Si el documento está equivocado, el error es de la fuente y se
+          lo mostramos igual: nuestro trabajo es reflejar la fuente con fidelidad, no corregir
+          al Estado.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Puedo pedir que borren la ficha de mi empresa?</summary>
+        <div>
+          <p>Sí. Hay un endpoint de supresión y se honra en 48 horas para las páginas públicas
+          indexables. La API sigue respondiendo por RUT: son hechos societarios publicados por
+          el Estado y su tratamiento tiene base legal. Las páginas públicas nunca contienen
+          datos de personas naturales.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Cuánto se demora?</summary>
+        <div>
+          <p>De caché, entre 60 y 200 ms. Cuando hay que ir a la fuente en vivo, hasta 6 segundos
+          — y si la fuente se demora más que eso, cortamos, devolvemos el resto y no cobramos.
+          Preferimos una respuesta honesta y rápida a una completa que nunca llega.</p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CTA ======================= -->
+<section class="seccion seccion--gris">
+  <div class="container centro">
+    <h2 style="margin-top:0">Pruébelo antes de creernos.</h2>
+    <p class="max-60" style="margin-inline:auto">El explorador de abajo corre en su navegador,
+    con los mismos cuerpos JSON que devuelve la API en producción. Incluye el caso feo:
+    una fuente caída.</p>
+    <div class="btns" style="justify-content:center">
+      <a class="btn btn--pri" href="demo/index.html">Abrir el explorador</a>
+      <a class="btn btn--sec" href="negocio.html">Cómo se sostiene el negocio</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Fedatia</strong> — <span class="mono">fedatia.com</span> · prototipo.
+    Datos de demostración inventados. Las cifras de negocio y roadmap llevan su derivación
+    a la vista o van marcadas como estimación.</p>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+<script>
+/* Hero en vivo: tres respuestas reales de la API, conmutadas por los chips. */
+(function () {
+  var C = {
+    ok: {
+      tit: '200 OK · 148 ms · facturada',
+      cls: '',
+      cod: '<span class="t-cmd">curl</span> <span class="t-txt">"https://api.fedatia.com/v1/empresas/76.543.210-K"</span> \\\n' +
+        '  -H <span class="t-txt">"Authorization: Bearer fd_live_9f4c…"</span>\n\n' +
+        '<span class="t-pun">{</span>\n' +
+        '  <span class="t-cla">"rut"</span><span class="t-pun">: </span><span class="t-txt">"76.543.210-K"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"estado_respuesta"</span><span class="t-pun">: </span><span class="t-ok">"completo"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"facturado"</span><span class="t-pun">: </span><span class="t-num">true</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"identidad"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"razon_social"</span><span class="t-pun">: </span><span class="t-txt">"Comercializadora Aysén Austral SpA"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"tipo"</span><span class="t-pun">: </span><span class="t-txt">"SpA"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"constitucion"</span><span class="t-pun">: </span><span class="t-txt">"2019-03-12"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"capital_clp"</span><span class="t-pun">: </span><span class="t-num">180000000</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-com">"_meta"</span><span class="t-pun">: { </span><span class="t-com">"fuente"</span><span class="t-pun">: </span><span class="t-txt">"diario_oficial"</span><span class="t-pun">, </span><span class="t-com">"estado"</span><span class="t-pun">: </span><span class="t-ok">"vigente"</span><span class="t-pun"> }</span>\n' +
+        '  <span class="t-pun">},</span>\n' +
+        '  <span class="t-cla">"actividad"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"giro_principal"</span><span class="t-pun">: </span><span class="t-txt">"463000 — Venta al por mayor de alimentos"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"situacion_tributaria"</span><span class="t-pun">: </span><span class="t-ok">"vigente"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"emite_dte"</span><span class="t-pun">: </span><span class="t-num">true</span>\n' +
+        '  <span class="t-pun">},</span>\n' +
+        '  <span class="t-cla">"mercado_publico"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"proveedor_estado"</span><span class="t-pun">: </span><span class="t-ok">"habil"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"monto_adjudicado_24m_clp"</span><span class="t-pun">: </span><span class="t-num">412680000</span>\n' +
+        '  <span class="t-pun">}</span>\n' +
+        '<span class="t-pun">}</span>'
+    },
+    caida: {
+      tit: '200 OK · parcial · NO facturada',
+      cls: 't-al',
+      cod: '<span class="t-cmd">curl</span> <span class="t-txt">"https://api.fedatia.com/v1/empresas/77.984.120-K"</span>\n\n' +
+        '<span class="t-pun">{</span>\n' +
+        '  <span class="t-cla">"rut"</span><span class="t-pun">: </span><span class="t-txt">"77.984.120-K"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"estado_respuesta"</span><span class="t-pun">: </span><span class="t-al">"parcial"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"facturado"</span><span class="t-pun">: </span><span class="t-num">false</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"avisos"</span><span class="t-pun">: [</span>\n' +
+        '    <span class="t-txt">"mercado_publico no respondió tras 3 intentos."</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-txt">"Esta consulta no se cobra."</span>\n' +
+        '  <span class="t-pun">],</span>\n' +
+        '  <span class="t-cla">"identidad"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"razon_social"</span><span class="t-pun">: </span><span class="t-txt">"Constructora Valle del Elqui Limitada"</span>\n' +
+        '  <span class="t-pun">},</span>\n' +
+        '  <span class="t-cla">"mercado_publico"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"valor"</span><span class="t-pun">: null,</span>\n' +
+        '    <span class="t-com">"_meta"</span><span class="t-pun">: {</span>\n' +
+        '      <span class="t-com">"estado"</span><span class="t-pun">: </span><span class="t-fa">"no_disponible"</span><span class="t-pun">,</span>\n' +
+        '      <span class="t-com">"error"</span><span class="t-pun">: </span><span class="t-txt">"HTTP 503 en api.mercadopublico.cl · 3 intentos"</span>\n' +
+        '    <span class="t-pun">}</span>\n' +
+        '  <span class="t-pun">}</span>\n' +
+        '<span class="t-pun">}</span>\n\n' +
+        '<span class="t-com">// Un scraper casero acá te habría entregado el dato de ayer</span>\n' +
+        '<span class="t-com">// sin decírtelo. Ese es todo el punto.</span>'
+    },
+    vencido: {
+      tit: '200 OK · un campo vencido · NO facturada',
+      cls: 't-al',
+      cod: '<span class="t-cmd">curl</span> <span class="t-txt">"https://api.fedatia.com/v1/empresas/79.612.043-K"</span>\n\n' +
+        '<span class="t-pun">{</span>\n' +
+        '  <span class="t-cla">"rut"</span><span class="t-pun">: </span><span class="t-txt">"79.612.043-K"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"estado_respuesta"</span><span class="t-pun">: </span><span class="t-al">"completo_con_vencidos"</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"facturado"</span><span class="t-pun">: </span><span class="t-num">false</span><span class="t-pun">,</span>\n' +
+        '  <span class="t-cla">"concursal"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"procedimientos_vigentes"</span><span class="t-pun">: </span><span class="t-num">1</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"tipo"</span><span class="t-pun">: </span><span class="t-txt">"Reorganización"</span><span class="t-pun">,</span>\n' +
+        '    <span class="t-cla">"rol"</span><span class="t-pun">: </span><span class="t-txt">"C-4120-2025"</span>\n' +
+        '  <span class="t-pun">},</span>\n' +
+        '  <span class="t-cla">"marcas"</span><span class="t-pun">: {</span>\n' +
+        '    <span class="t-cla">"registradas"</span><span class="t-pun">: [</span><span class="t-txt">"PUNTA LOBOS"</span><span class="t-pun">],</span>\n' +
+        '    <span class="t-com">"_meta"</span><span class="t-pun">: {</span>\n' +
+        '      <span class="t-com">"estado"</span><span class="t-pun">: </span><span class="t-al">"vencido"</span><span class="t-pun">,</span>\n' +
+        '      <span class="t-com">"ventana_prometida"</span><span class="t-pun">: </span><span class="t-txt">"7 días"</span><span class="t-pun">,</span>\n' +
+        '      <span class="t-com">"vencido_hace"</span><span class="t-pun">: </span><span class="t-txt">"34 días"</span><span class="t-pun">,</span>\n' +
+        '      <span class="t-com">"causa"</span><span class="t-pun">: </span><span class="t-txt">"INAPI cambió de formulario el 2026-06-03."</span>\n' +
+        '    <span class="t-pun">}</span>\n' +
+        '  <span class="t-pun">}</span>\n' +
+        '<span class="t-pun">}</span>'
+    }
+  };
+  var cod = document.getElementById('heroCod');
+  var tit = document.getElementById('heroTit');
+  var chips = document.querySelectorAll('[data-hero]');
+  function pintar(k) {
+    cod.innerHTML = C[k].cod;
+    tit.textContent = C[k].tit;
+    tit.className = 'cod__tit ' + C[k].cls;
+  }
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      chips.forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+      c.setAttribute('aria-pressed', 'true');
+      pintar(c.dataset.hero);
+    });
+  });
+  pintar('ok');
+})();
+</script>
+</body>
+</html>

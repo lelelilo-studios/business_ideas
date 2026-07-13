@@ -1,0 +1,124 @@
+{
+  "folder": "20-recepcion",
+  "slug": "20-recepcion",
+  "brand": "Fonalta",
+  "marca": "Fonalta",
+  "domain": "fonalta.com",
+  "domain_evidence": "fonalta .com AVAILABLE (http 404) .cl AVAILABLE — _kit/check-domain.sh: RDAP de Verisign para .com (404 = libre), NIC Chile para .cl, 2026-07-13",
+  "alternates": ["tonalva.com", "aloline.com", "lineafon.com"],
+  "tagline": "El teléfono que siempre contesta.",
+  "pitch": "Una recepcionista de IA que contesta el teléfono de tu PYME 24/7 en chileno: se declara IA en los primeros 5 segundos, responde en menos de 800 ms, agenda, toma el recado y te manda el resumen por WhatsApp.",
+  "category": "SaaS vertical · Voz con IA",
+  "market": "Chile → LatAm",
+  "icp": "PYME de servicios de 3 a 30 personas donde el teléfono es canal de venta —veterinaria, consulta médica o dental, taller mecánico, hotel chico, constructora, corredora— con 6 a 25 llamadas al día y un momento del día en que nadie las puede contestar.",
+  "price_clp": "Desde $29.000/mes · plan Recepción $69.000/mes",
+  "accent": "#F0A93F",
+  "problem": "El teléfono suena y no hay nadie: el mecánico está abajo de un auto, la consulta está en hora punta, el hotel cerró la recepción a las 22:00. El cliente que no fue atendido llama al siguiente de la lista y no vuelve — y el dueño ni siquiera se entera de que existió.",
+  "status": "prototipo navegable, sin backend",
+
+  "direccion_de_arte": "Central telefónica: fondo oscuro cálido (el gabinete de la centralita, no el negro azulado del terminal), la forma de onda como elemento gráfico protagonista, tipografía de señalética, y un solo acento ámbar que pulsa como la lámpara de línea activa.",
+  "tipografia": {
+    "titulos": "Chivo",
+    "texto": "Chivo",
+    "datos": "Chivo Mono",
+    "por_que": "Chivo es una grotesca de señalética (Omnibus-Type), diseñada para letreros y alta legibilidad — no un libro. Chivo Mono es su instrumento de medida: latencia, timestamps, CLP, RUT. Una familia, dos voces."
+  },
+  "paleta": {
+    "noche": "#14100D",
+    "panel": "#1E1813",
+    "linea": "#362D24",
+    "tiza": "#F4EDE3",
+    "ambar": "#F0A93F",
+    "graficos": ["#C4841E", "#3699C9", "#D8574D", "#57A768", "#8E7AE0"],
+    "validacion": "dataviz/validate_palette.js --mode dark --surface #1E1813 --pairs all → banda de luminosidad PASS · piso de croma PASS · separación CVD PASS (peor par ΔE 13,9 deutan) · contraste PASS. Rampas ordinales (escenarios, embudo) validadas con --ordinal: PASS."
+  },
+
+  "precio": {
+    "moneda": "CLP",
+    "planes": [
+      { "nombre": "Recado", "mensual": 29000, "minutos": 100, "para": "Taller o servicio técnico chico. Sólo quiere el recado." },
+      { "nombre": "Recepción", "mensual": 69000, "minutos": 400, "para": "El plan que se lleva casi todo. Agenda de verdad.", "destacado": true },
+      { "nombre": "Central", "mensual": 159000, "minutos": 1200, "para": "Varias sucursales o mucho volumen." }
+    ],
+    "excedente_por_minuto": 89,
+    "prueba": "30 minutos sin tarjeta",
+    "arpu_mezclado": 74500
+  },
+
+  "unit_economics": {
+    "costo_por_minuto_clp": 50.3,
+    "costo_por_minuto_usd": 0.0524,
+    "tipo_cambio_supuesto": 960,
+    "minutos_promedio_mes": 330,
+    "cogs_mes": 23190,
+    "arpu": 74500,
+    "margen_bruto": 0.689,
+    "cac": 109133,
+    "churn_mensual": 0.05,
+    "ltv": 1026200,
+    "ltv_cac": 9.4,
+    "payback_meses": 2.1,
+    "nota": "LTV/CAC de 9,4 no significa que el negocio sea grande: significa que el canal está topado. El techo del canal de intención en Chile es ~6 clientes/mes."
+  },
+
+  "mercado": {
+    "tam_usd": 52400000,
+    "sam_usd": 20900000,
+    "som_ano3_usd": 419000,
+    "empresas_objetivo_cl": 56250,
+    "nota": "Derivado de ~225.000 PYMEs chilenas (SII, orden de magnitud) × 25% cuyo rubro usa el teléfono como canal. El 25% es un supuesto propio y declarado, no un dato."
+  },
+
+  "voz": {
+    "divulgacion_ms": 3400,
+    "divulgacion_limite_ms": 5000,
+    "presupuesto_latencia_ms": 800,
+    "latencia_p50_ms": 730,
+    "latencia_p95_ms": 1180,
+    "barge_in": true,
+    "clonacion_de_voz": false,
+    "voz": "Locutora chilena contratada, con cesión escrita de derechos para uso sintético. Respaldo: voz neuronal es-CL con licencia del proveedor (Azure).",
+    "saliente": "Sólo a quien dejó su número y consintió, con el consentimiento grabado. Nunca en frío.",
+    "nota": "Los milisegundos son presupuesto de arquitectura, no una medición. No existe el pipeline todavía."
+  },
+
+  "ia": {
+    "modelo_llamada": "claude-haiku-4-5",
+    "modelo_analisis": "claude-sonnet-5",
+    "por_que": "El presupuesto de primer token son 320 ms: Haiku 4.5 lo cumple en streaming con prompt cacheado, Sonnet 5 no de forma confiable. Y el 94% de los turnos son intención simple. Sonnet 5 se usa fuera del camino crítico (resumen, curaduría de la ficha, juez de calidad, SEO).",
+    "regla_dura": "El modelo no puede afirmar nada sobre el negocio que no venga del resultado de una herramienta en ese mismo turno. Si buscar_conocimiento vuelve vacío, la única salida permitida es admitirlo."
+  },
+
+  "roadmap": {
+    "hitos": 6,
+    "horizonte_meses": 24,
+    "mrr_mes24_base_clp": 19650000,
+    "arr_mes24_base_usd": 246000,
+    "arr_mes24_pesimista_usd": 76000,
+    "arr_mes24_optimista_usd": 553000,
+    "clientes_mes24_base": 264,
+    "break_even": "mes 14",
+    "valle_de_caja": { "mes": 13, "caja_clp": 15550000 },
+    "caja_inicial_clp": 30000000,
+    "probabilidad_1m_arr_36m": "6–12%, condicional a cumplir M4 en el mes 12",
+    "resultado_modal": "35–45% de terminar entre US$150k y US$400k de ARR, bootstrapeado, dos socios",
+    "probabilidad_muerte_antes_m12": "30–40%"
+  },
+
+  "stack": [
+    "Node 22 + media server con WebSocket bidireccional",
+    "Twilio Programmable Voice + Media Streams (número local +56)",
+    "Deepgram Nova-3 (ASR streaming es)",
+    "ElevenLabs Flash v2.5 (TTS con licencia) · respaldo Azure Neural es-CL",
+    "Anthropic API (Haiku 4.5 + Sonnet 5)",
+    "Postgres 16 + pgvector (Neon)",
+    "Redis (colas, estado de llamada)",
+    "Meta WhatsApp Cloud API",
+    "Flow (pagos en CLP) + SII (boleta electrónica)",
+    "Fly.io (gru, São Paulo — no hay región en Chile), Sentry, Axiom"
+  ],
+
+  "paginas": ["index.html", "demo/index.html", "negocio.html", "roadmap.html", "stack.html"],
+  "autonomia": "total",
+  "diferencia_con_03_agenda": "Zurcia es un agente de texto por WhatsApp para agendar horas en peluquerías. Fonalta es la línea telefónica de cualquier PYME, y el producto es la voz. Se complementan: Fonalta manda su resumen por WhatsApp."
+}

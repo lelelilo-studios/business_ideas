@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Economía · Cuantario</title>
+<meta name="description" content="Cuánto cuesta correr Cuantario ($536.977 al mes con 16 ideas operadas) y a partir de cuántas ideas se paga solo. Dos lecturas, dos respuestas: 2 y 15.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&family=Martian+Mono:wght@600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="cuantario.css">
+<style>
+  .dos { display: grid; gap: var(--sp-l); }
+  @media (min-width: 68em) { .dos { grid-template-columns: 1fr 1fr; gap: var(--sp-xl); align-items: start; } }
+  .resp { border: 1px solid var(--line-2); background: var(--s1); padding: var(--sp-m) var(--sp-s); }
+  .resp.a { border-left: 3px solid var(--in); }
+  .resp.b { border-left: 3px solid var(--out); }
+  .resp .n { display: block; font-family: var(--disp); font-weight: 700; font-size: 2.6rem;
+             letter-spacing: -.03em; line-height: 1; margin: 6px 0 var(--sp-xs); font-variant-numeric: tabular-nums; }
+  .resp.a .n { color: var(--in); }
+  .resp.b .n { color: var(--out); }
+  .resp p { font-size: .86rem; color: var(--ink-2); margin: 0; line-height: 1.6; }
+  .resp p b { color: var(--ink); }
+  .der { font-family: var(--mono); font-size: .8rem; background: var(--s1); border: 1px solid var(--line);
+         padding: var(--sp-s); margin-top: var(--sp-s); color: var(--ink-2); line-height: 1.9;
+         font-variant-numeric: tabular-nums; overflow-x: auto; }
+  .der b { color: var(--ink); }
+  .der .r { color: var(--in); }
+  .tot-fila td { border-top: 1px solid var(--line-2); font-weight: 700; color: var(--ink); background: var(--s2); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="index.html">
+      <svg class="glifo" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 10.5 L6.6 6.2 L9.2 8.6 L12 3.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      Cuantario
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Qué es</a></li>
+        <li><a href="demo/index.html">Tablero</a></li>
+        <li><a href="arquitectura.html">Arquitectura</a></li>
+        <li><a href="integracion.html">Integración</a></li>
+        <li><a href="economia.html" aria-current="page">Economía</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="wrap">
+  <span class="kicker">Economía</span>
+  <h1 style="margin-bottom:var(--sp-s);max-width:22ch">$536.977 al mes. Y la pregunta es desde cuándo vale la pena.</h1>
+  <p class="prosa prose-max">
+    La respuesta cómoda sería un número. Hay dos, porque hay dos preguntas distintas escondidas en
+    «¿se paga solo?», y dan resultados muy separados. Las dos están derivadas abajo.
+  </p>
+</section>
+
+<!-- ============ LA FORMA DEL COSTO ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">01 · La forma del costo</span>
+  <h2 style="margin-bottom:var(--sp-s)">Casi todo es fijo. Esa es toda la tesis.</h2>
+
+  <div class="dos">
+    <div>
+      <div class="scroll-x">
+        <table class="t" style="min-width:520px">
+          <caption>Costo mensual, con 21 manifiestos conectados y 16 ideas recibiendo presupuesto.</caption>
+          <thead><tr><th>Componente</th><th>Detalle</th><th class="n">CLP/mes</th></tr></thead>
+          <tbody>
+            <tr><td>Inferencia</td><td>US$120,02 × $960 — juez, kernel, creatividades, SEO, voz</td><td class="n">$115.219</td></tr>
+            <tr><td>Infraestructura</td><td>US$306 × $960 — Fly, Postgres, Redis, Twilio, dominios…</td><td class="n">$293.760</td></tr>
+            <tr><td>Mantención de plataforma</td><td>4 h/mes × $32.000 — <b>fuera del loop de decisión</b></td><td class="n">$128.000</td></tr>
+            <tr class="tot-fila"><td colspan="2">Total</td><td class="n">$536.977</td></tr>
+            <tr><td colspan="3" style="padding-top:var(--sp-s)">
+              <span class="rot" style="margin-bottom:6px">Descompuesto en fijo + marginal</span>
+            </td></tr>
+            <tr><td><b>Fijo</b></td><td>No cambia si el portafolio tiene 3 ideas o 30</td><td class="n">$446.689</td></tr>
+            <tr><td><b>Marginal por idea operada</b></td><td>Juez (US$1,80) + kernel + creatividades + SEO + dominio = US$5,88</td><td class="n">$5.643</td></tr>
+            <tr class="tot-fila"><td colspan="2">$446.689 + $5.643 × 16</td><td class="n">$536.977</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota ok" style="margin-top:var(--sp-s)">
+        <b>La idea número 17 cuesta $5.643 al mes.</b> No $500.000. Es un archivo <code>autopilot.json</code>
+        más, treinta corridas del juez, doce creatividades y cuarenta páginas de SEO. Ese es el número que
+        hace que este sistema tenga sentido — y también el que explica por qué no lo tiene con pocas ideas.
+      </div>
+      <p class="prosa" style="margin-top:var(--sp-s)">
+        <b>La construcción es aparte y no es gratis:</b> ~5 meses de un ingeniero senior a $4.500.000 de
+        costo empresa = <b>$22.500.000</b>. Amortizada a 24 meses son <b>$937.500/mes</b>, y va incluida
+        en todo lo que sigue. Omitirla sería la trampa más obvia de esta página.
+      </p>
+    </div>
+
+    <div>
+      <figure>
+        <div class="fig-h">
+          <span class="rot">Costo mensual según cuántas ideas se operen</span>
+        </div>
+        <div class="gwrap" id="g-be"></div>
+        <div class="leyenda">
+          <span><i class="sw" style="background:var(--out)"></i> Operar a mano (personas)</span>
+          <span><i class="sw" style="background:var(--in)"></i> Cuantario (con su construcción amortizada)</span>
+        </div>
+        <figcaption>
+          La línea roja crece con cada idea porque las personas no se clonan. La verde es casi horizontal.
+          Se cruzan entre la primera y la segunda idea. En las 16 de hoy, la diferencia es
+          <b>$18.400.000 contra $1.474.477</b> al mes.
+          <button class="ver-datos" aria-controls="t-be" aria-expanded="false">Ver los datos como tabla</button>
+        </figcaption>
+        <div class="datos-tabla" id="t-be" hidden></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ LAS DOS RESPUESTAS ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">02 · A partir de cuántas ideas se paga solo</span>
+  <h2 style="margin-bottom:var(--sp-m)">Dos preguntas distintas. Dos respuestas honestas.</h2>
+
+  <div class="dos">
+    <div class="resp a">
+      <span class="rot">Lectura A · «¿es más barato que contratar a alguien?»</span>
+      <span class="n">2 ideas</span>
+      <p>
+        Un operador de <i>growth</i> con carga cuesta <b>$2.300.000/mes</b> de costo empresa y lleva
+        bien <b>dos</b> ideas a la vez: <b>$1.150.000 por idea</b>. Cuantario cuesta $446.689 fijos +
+        $937.500 de construcción amortizada + $5.643 por idea.
+      </p>
+      <div class="der">
+        $1.150.000 · N &nbsp;=&nbsp; $1.384.189 + $5.643 · N<br>
+        $1.144.357 · N &nbsp;=&nbsp; $1.384.189<br>
+        <b>N = 1,21</b> &nbsp;→&nbsp; <span class="r">desde la segunda idea</span>
+      </div>
+      <p style="margin-top:var(--sp-s)">
+        Con las 16 de hoy: <b>$1.474.477</b> contra <b>$18.400.000</b> (ocho personas).
+        <b class="in">12,5 veces más barato.</b>
+      </p>
+    </div>
+
+    <div class="resp b">
+      <span class="rot">Lectura B · «¿no será el sistema más caro que la plata que administra?»</span>
+      <span class="n">15 ideas</span>
+      <p>
+        Una operación de medios sana no gasta más del <b>20%</b> en la estructura que la administra.
+        Cada idea operada mueve en promedio <b>$511.250/mes</b> de gasto de canal ($8.180.000 ÷ 16).
+      </p>
+      <div class="der">
+        $1.384.189 + $5.643 · N &nbsp;≤&nbsp; 0,20 · $511.250 · N<br>
+        $1.384.189 &nbsp;≤&nbsp; $96.607 · N<br>
+        <b>N = 14,3</b> &nbsp;→&nbsp; <span class="r">recién a las 15 ideas</span>
+      </div>
+      <p style="margin-top:var(--sp-s)">
+        <b>Con 2 ideas, Cuantario cuesta $1.395.475 al mes para administrar $1.022.500 de anuncios.</b>
+        Cuesta más que la plata que reparte. Es más barato que un humano y aun así es una idiotez.
+      </p>
+    </div>
+  </div>
+
+  <div class="dos" style="margin-top:var(--sp-l)">
+    <div>
+      <figure>
+        <div class="fig-h">
+          <span class="rot">El sistema como % del gasto de canal que administra</span>
+        </div>
+        <div class="gwrap" id="g-ov"></div>
+        <figcaption>
+          Con 3 ideas el sistema cuesta el <b>91%</b> de la plata que reparte. Con 16 cuesta el
+          <b>18%</b>. Fuera del gráfico, a la izquierda: con 2 ideas es <b>136%</b> y con 1, <b>272%</b>.
+          El costo fijo no se diluye solo — hay que darle portafolio.
+          <button class="ver-datos" aria-controls="t-ov" aria-expanded="false">Ver los datos como tabla</button>
+        </figcaption>
+        <div class="datos-tabla" id="t-ov" hidden></div>
+      </figure>
+    </div>
+
+    <div>
+      <span class="kicker">La respuesta que hay que dar</span>
+      <h3 style="margin-bottom:var(--sp-s)">15, no 2.</h3>
+      <div class="prosa">
+        <p>
+          «Se paga solo desde 2 ideas» es verdad y es la respuesta que se vería mejor en una lámina.
+          También es la respuesta que hace que alguien construya esto para un portafolio de tres ideas y
+          termine con una infraestructura que cuesta más que los anuncios que compra.
+        </p>
+        <p>
+          <b>La respuesta útil es 15.</b> Bajo eso, Cuantario es una obra de ingeniería buscando un
+          problema. Sobre eso, es la única manera de que una persona sola tenga veintiún negocios
+          corriendo — y ahí el costo fijo, que era el problema, se vuelve la ventaja: la idea 22 cuesta
+          $5.643.
+        </p>
+        <p>
+          <b>Este portafolio tiene 21, con 16 operables.</b> Por eso el sistema existe. Si tuviera tres,
+          no debería.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ EL JUEZ NO SE PAGA SOLO ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">03 · Lo que el juez ahorra, y por qué no alcanza</span>
+  <h2 style="margin-bottom:var(--sp-s)">El juez no justifica el sistema. La escala lo justifica.</h2>
+
+  <div class="dos">
+    <div>
+      <div class="prosa">
+        <p>
+          Hay una tentación clara acá: decir que el sistema se paga solo <em>con lo que el juez evita
+          gastar</em>. Suena bien. Hicimos la cuenta y <b>no alcanza</b>, y decirlo es más útil que
+          inflarlo.
+        </p>
+      </div>
+      <div class="scroll-x">
+        <table class="t" style="min-width:480px">
+          <thead><tr><th>Concepto</th><th class="n">CLP</th></tr></thead>
+          <tbody>
+            <tr><td>04-inventario <b>matada</b> · tope $6.000.000 − gastado $3.410.000</td><td class="n in">$2.590.000</td></tr>
+            <tr><td>08-laboral <b>pausada</b> · tope $5.000.000 − gastado $2.420.000</td><td class="n in">$2.580.000</td></tr>
+            <tr class="tot-fila"><td>Capital preservado por el juez</td><td class="n">$5.170.000</td></tr>
+            <tr><td>Costo del sistema en el ciclo · 6 meses × $1.474.477</td><td class="n out">$8.846.862</td></tr>
+            <tr class="tot-fila"><td>Diferencia</td><td class="n out">−$3.676.862</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota aviso" style="margin-top:var(--sp-s)">
+        <b>El juez, solo, no paga el sistema.</b> Preservó $5.170.000 en seis meses; el sistema completo
+        costó $8.846.862 en el mismo período. Un vendedor diría que el juez «se paga 2,3 veces» comparándolo
+        contra los $3.221.862 de operación pura y escondiendo la construcción. Es la cuenta que este
+        mismo kernel bloquearía por no verificable.
+      </div>
+    </div>
+
+    <div>
+      <div class="prosa">
+        <p>
+          <b>Entonces, ¿de dónde sale el valor?</b> De poder operar 16 ideas con una estructura de una.
+          El juez no es el negocio: es el control de calidad que hace que la escala no sea un suicidio.
+        </p>
+        <p>
+          Sin juez, un sistema que corre 16 ideas en piloto automático es una máquina de gastar
+          $8.180.000 al mes sin que nadie apriete el freno. <b>Con juez, ese mismo gasto se corta a los
+          cuatro meses en la idea que no convierte</b> — y en el ciclo mostrado eso fueron $1.400.000
+          mensuales liberados, de los cuales $590.000 se reasignaron a las dos ideas que sí rinden.
+        </p>
+        <p>
+          Esa es la frase honesta: <b>la escala paga el sistema; el juez hace que la escala no te
+          arruine.</b> Son dos cosas distintas y sólo una de las dos es un ahorro contable.
+        </p>
+      </div>
+
+      <span class="rot" style="margin-top:var(--sp-m);margin-bottom:8px">Qué haría falsa esta página</span>
+      <ul class="lista">
+        <li><b>Que el humano y el sistema no produzcan lo mismo</b> — y no lo producen. Un operador
+          humano negocia con un courier, arma una alianza con Nubox, consigue prensa. Cuantario no hace
+          nada de eso. La comparación de la Lectura A supone un humano dedicado sólo a comprar medios y
+          mirar números, que es la parte del trabajo que sí se automatiza. <b>Es la comparación más
+          favorable al sistema que se puede hacer con honestidad</b>, y hay que leerla sabiéndolo.</li>
+        <li><b>Que el gasto de canal por idea sea mucho menor.</b> Todo el cálculo usa $511.250/idea/mes,
+          que es lo observado. Con la mitad de presupuesto, el umbral de la Lectura B se duplica a
+          ~29 ideas.</li>
+        <li><b>Que las ideas no publiquen su endpoint de métricas.</b> Sin eso el juez no evalúa nada,
+          el sistema es un comprador de anuncios sin freno, y no vale $536.977 al mes. Es la dependencia
+          dura, y hoy no la cumple ninguna.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    Tipo de cambio $960/US$. Costo empresa de un operador de growth: $2.300.000/mes. Construcción:
+    5 meses de un senior a $4.500.000/mes = $22.500.000, amortizados a 24 meses. Toda la aritmética de
+    esta página está a la vista y se puede discutir paso por paso.
+  </div>
+</footer>
+
+<script src="comun.js"></script>
+<script>
+/* ---- modelo, idéntico al de la página (una sola fuente) ---- */
+var FIJO = 446689, MARG = 5643, BUILD_MES = 937500, HUM = 1150000, CANAL = 511250;
+function sis(n) { return FIJO + BUILD_MES + MARG * n; }
+function hum(n) { return HUM * n; }
+function ovh(n) { return sis(n) / (CANAL * n) * 100; }
+
+/* ---- gráfico 1: costo vs N ---- */
+fluido(document.getElementById('g-be'), function (host, W, tip) {
+  tip = tip || tipDe(host);
+  var chico = W < 480;
+  var H = chico ? 250 : 300, m = { t: 16, r: chico ? 10 : 46, b: 30, l: chico ? 42 : 50 };
+  var iw = W - m.l - m.r, ih = H - m.t - m.b;
+  var N = 24, max = 28e6;
+  var X = function (n) { return m.l + (n - 1) * iw / (N - 1); };
+  var Y = function (v) { return m.t + ih - v / max * ih; };
+  var s = el('svg', { class: 'g', viewBox: '0 0 ' + W + ' ' + H, role: 'img',
+    'aria-label': 'Costo mensual de operar N ideas. A mano crece linealmente hasta 27,6 millones con 24 ideas. Cuantario se mantiene casi plano, entre 1,39 y 1,52 millones. Se cruzan entre la primera y la segunda idea.' });
+
+  for (var v = 0; v <= max; v += 7e6) {
+    s.appendChild(el('line', { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), class: 'grid-l' }));
+    s.appendChild(el('text', { x: m.l - 6, y: Y(v) + 3, class: 'gx', 'text-anchor': 'end' }, v ? (v / 1e6) + ' M' : '0'));
+  }
+  [1, 6, 12, 16, 24].forEach(function (n) {
+    s.appendChild(el('text', { x: X(n), y: H - 12, class: 'gx', 'text-anchor': 'middle' }, n));
+  });
+  s.appendChild(el('text', { x: m.l + iw / 2, y: H - 1, class: 'gxl', 'text-anchor': 'middle' }, 'ideas operadas'));
+
+  function ln(f, color, w) {
+    var p = '';
+    for (var n = 1; n <= N; n++) p += (n === 1 ? 'M' : 'L') + X(n) + ' ' + Y(f(n));
+    s.appendChild(el('path', { d: p, fill: 'none', stroke: color, 'stroke-width': w || 2, 'stroke-linejoin': 'round' }));
+  }
+  ln(hum, 'var(--out)');
+  ln(sis, 'var(--in)');
+
+  /* las 16 de hoy */
+  s.appendChild(el('line', { x1: X(16), x2: X(16), y1: m.t, y2: m.t + ih, stroke: 'var(--line-2)',
+    'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+  s.appendChild(el('text', { x: X(16), y: m.t - 4, class: 'gxl', 'text-anchor': 'middle', fill: 'var(--ink-2)' }, 'hoy · 16'));
+  s.appendChild(el('circle', { cx: X(16), cy: Y(hum(16)), r: 3.5, fill: 'var(--out)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+  s.appendChild(el('circle', { cx: X(16), cy: Y(sis(16)), r: 3.5, fill: 'var(--in)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+  if (!chico) {
+    s.appendChild(el('text', { x: X(24) + 5, y: Y(hum(24)) + 3, class: 'gx', fill: 'var(--out)' }, '27,6 M'));
+    s.appendChild(el('text', { x: X(24) + 5, y: Y(sis(24)) + 3, class: 'gx', fill: 'var(--in)' }, '1,5 M'));
+  }
+
+  var vl = el('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--line-2)', 'stroke-width': 1, opacity: 0 });
+  s.appendChild(vl);
+  var hit = el('rect', { x: m.l, y: m.t, width: iw, height: ih, fill: 'transparent' });
+  s.appendChild(hit);
+  function mv(ev) {
+    var r = s.getBoundingClientRect();
+    var px = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) * (W / r.width);
+    var n = Math.max(1, Math.min(N, Math.round((px - m.l) / (iw / (N - 1)) + 1)));
+    vl.setAttribute('x1', X(n)); vl.setAttribute('x2', X(n)); vl.setAttribute('opacity', 1);
+    mostrarTip(tip, host, X(n) * (r.width / W), Y(sis(n)) * (r.height / H),
+      '<b>' + n + (n === 1 ? ' idea' : ' ideas') + '</b>' +
+      '<span class="out">A mano&nbsp;&nbsp; ' + clp(hum(n)) + '</span><br>' +
+      '<span class="in">Cuantario ' + clp(sis(n)) + '</span><br>' +
+      '<span class="mut">' + dec(hum(n) / sis(n)) + '× más barato</span>');
+  }
+  hit.addEventListener('mousemove', mv);
+  hit.addEventListener('touchstart', mv, { passive: true });
+  hit.addEventListener('touchmove', mv, { passive: true });
+  hit.addEventListener('mouseleave', function () { vl.setAttribute('opacity', 0); ocultarTip(tip); });
+  host.insertBefore(s, tip);
+});
+
+/* ---- gráfico 2: overhead % ---- */
+fluido(document.getElementById('g-ov'), function (host, W, tip) {
+  tip = tip || tipDe(host);
+  var chico = W < 480;
+  var H = chico ? 230 : 270, m = { t: 16, r: 12, b: 30, l: chico ? 38 : 46 };
+  var iw = W - m.l - m.r, ih = H - m.t - m.b;
+  var N0 = 3, N1 = 24, max = 100;
+  var X = function (n) { return m.l + (n - N0) * iw / (N1 - N0); };
+  var Y = function (v) { return m.t + ih - v / max * ih; };
+  var s = el('svg', { class: 'g', viewBox: '0 0 ' + W + ' ' + H, role: 'img',
+    'aria-label': 'El costo del sistema como porcentaje del gasto de canal que administra: 91% con 3 ideas, 20,4% con 14, 18% con 16, 12,4% con 24. Cruza el umbral del 20% en la idea 15.' });
+
+  for (var v = 0; v <= max; v += 25) {
+    s.appendChild(el('line', { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), class: 'grid-l' }));
+    s.appendChild(el('text', { x: m.l - 6, y: Y(v) + 3, class: 'gx', 'text-anchor': 'end' }, v + '%'));
+  }
+  [3, 8, 15, 20, 24].forEach(function (n) {
+    s.appendChild(el('text', { x: X(n), y: H - 12, class: 'gx', 'text-anchor': 'middle' }, n));
+  });
+  s.appendChild(el('text', { x: m.l + iw / 2, y: H - 1, class: 'gxl', 'text-anchor': 'middle' }, 'ideas operadas'));
+
+  /* umbral 20% */
+  s.appendChild(el('line', { x1: m.l, x2: m.l + iw, y1: Y(20), y2: Y(20), stroke: 'var(--out)',
+    'stroke-width': 1.5, 'stroke-dasharray': '4 3' }));
+  s.appendChild(el('text', { x: m.l + iw - 2, y: Y(20) - 5, class: 'gxl', fill: 'var(--out)', 'text-anchor': 'end' }, 'umbral 20%'));
+
+  var p = '';
+  for (var n = N0; n <= N1; n++) p += (n === N0 ? 'M' : 'L') + X(n) + ' ' + Y(Math.min(max, ovh(n)));
+  s.appendChild(el('path', { d: p, fill: 'none', stroke: 'var(--c2)', 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+
+  /* el cruce */
+  s.appendChild(el('circle', { cx: X(15), cy: Y(ovh(15)), r: 4, fill: 'var(--in)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+  s.appendChild(el('text', { x: X(15), y: Y(ovh(15)) - 12, class: 'gxl', fill: 'var(--in)', 'text-anchor': 'middle' }, '15 · 19,2%'));
+  s.appendChild(el('circle', { cx: X(16), cy: Y(ovh(16)), r: 3, fill: 'var(--c2)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+
+  var vl = el('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--line-2)', 'stroke-width': 1, opacity: 0 });
+  s.appendChild(vl);
+  var hit = el('rect', { x: m.l, y: m.t, width: iw, height: ih, fill: 'transparent' });
+  s.appendChild(hit);
+  function mv(ev) {
+    var r = s.getBoundingClientRect();
+    var px = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) * (W / r.width);
+    var n = Math.max(N0, Math.min(N1, Math.round((px - m.l) / (iw / (N1 - N0)) + N0)));
+    vl.setAttribute('x1', X(n)); vl.setAttribute('x2', X(n)); vl.setAttribute('opacity', 1);
+    mostrarTip(tip, host, X(n) * (r.width / W), Y(Math.min(max, ovh(n))) * (r.height / H),
+      '<b>' + n + ' ideas</b>' +
+      'Sistema ' + clp(sis(n)) + '<br>' +
+      'Gasto de canal ' + clp(CANAL * n) + '<br>' +
+      '<b class="' + (ovh(n) <= 20 ? 'in' : 'out') + '">' + dec(ovh(n)) + '% de overhead</b>');
+  }
+  hit.addEventListener('mousemove', mv);
+  hit.addEventListener('touchstart', mv, { passive: true });
+  hit.addEventListener('touchmove', mv, { passive: true });
+  hit.addEventListener('mouseleave', function () { vl.setAttribute('opacity', 0); ocultarTip(tip); });
+  host.insertBefore(s, tip);
+});
+
+/* ---- tablas de respaldo ---- */
+(function () {
+  var f = [1, 2, 4, 8, 12, 15, 16, 20, 24];
+  document.getElementById('t-be').innerHTML =
+    '<table><thead><tr><th>Ideas</th><th>A mano</th><th>Cuantario</th><th>Veces más barato</th></tr></thead><tbody>' +
+    f.map(function (n) {
+      return '<tr><td>' + n + '</td><td>' + clp(hum(n)) + '</td><td>' + clp(sis(n)) +
+        '</td><td>' + dec(hum(n) / sis(n)) + '×</td></tr>';
+    }).join('') + '</tbody></table>';
+  document.getElementById('t-ov').innerHTML =
+    '<table><thead><tr><th>Ideas</th><th>Sistema</th><th>Gasto de canal</th><th>Overhead</th></tr></thead><tbody>' +
+    f.map(function (n) {
+      return '<tr><td>' + n + '</td><td>' + clp(sis(n)) + '</td><td>' + clp(CANAL * n) +
+        '</td><td>' + dec(ovh(n)) + '%</td></tr>';
+    }).join('') + '</tbody></table>';
+})();
+</script>
+</body>
+</html>

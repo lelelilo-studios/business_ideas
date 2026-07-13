@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Fonalta</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, competencia, economía unitaria, canales, y cómo el negocio opera sin ningún humano — incluyendo lo que no logramos automatizar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  .doc { padding: var(--sp-l) 0 var(--sp-2xl); }
+  .doc h2 { margin-bottom: var(--sp-s); }
+  .doc h3 { margin: var(--sp-l) 0 var(--sp-2xs); }
+  .doc p { color: var(--tiza-2); max-width: 68ch; margin-bottom: var(--sp-s); }
+  .doc h2 + p, .doc h3 + p { margin-top: 0; }
+  .doc ul:not(.lista):not(.pasos) { margin: 0 0 var(--sp-s) var(--sp-m); color: var(--tiza-2); max-width: 68ch; }
+  .doc li { margin-bottom: 6px; }
+  .cuenta {
+    font-family: 'Chivo Mono', monospace;
+    font-size: 0.84rem;
+    background: var(--panel);
+    border: 1px solid var(--linea);
+    border-left: 2px solid var(--ambar);
+    border-radius: var(--radio);
+    padding: var(--sp-s);
+    color: var(--tiza-2);
+    margin-bottom: var(--sp-s);
+    overflow-x: auto;
+  }
+  .cuenta b { color: var(--tiza); font-weight: 600; }
+  .cuenta .r { color: var(--ambar); }
+  .indice {
+    position: sticky; top: 56px; z-index: 20;
+    background: rgba(20,16,13,.94);
+    border-bottom: 1px solid var(--linea);
+    margin-bottom: var(--sp-l);
+    overflow-x: auto;
+  }
+  .indice ol { list-style: none; display: flex; gap: var(--sp-s); padding: 10px 0; white-space: nowrap; }
+  .indice a {
+    font-family: 'Chivo Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--tiza-3); text-decoration: none;
+  }
+  .indice a:hover { color: var(--ambar); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 12h2.5M7 12V6M11 12V3M15 12v-7M19 12V8M22 12h-1" stroke="#F0A93F"/>
+        <path d="M2 16h20" opacity=".3"/>
+      </svg>
+      Fonalta
+    </a>
+    <button class="nav__btn" aria-expanded="false" aria-controls="nav-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+    <nav class="nav__menu" id="nav-menu" data-abierto="no" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="container">
+    <p class="kicker">Negocio</p>
+    <h1 style="font-size:var(--step-3)">A quién, por cuánto, y por qué no necesita a nadie.</h1>
+    <p class="lede" style="max-width:60ch">Toda cifra de acá abajo está citada, o es una estimación con la aritmética a la vista. Si no sé algo, lo digo.</p>
+  </div>
+
+  <nav class="indice" aria-label="Secciones">
+    <div class="container">
+      <ol>
+        <li><a href="#icp">1 · Cliente</a></li>
+        <li><a href="#mercado">2 · Mercado</a></li>
+        <li><a href="#cuna">3 · Cuña</a></li>
+        <li><a href="#competencia">4 · Competencia</a></li>
+        <li><a href="#economia">5 · Economía</a></li>
+        <li><a href="#canales">6 · Canales</a></li>
+        <li><a href="#autonomia">7 · Autonomía</a></li>
+        <li><a href="#ia">8 · IA en el marketing</a></li>
+        <li><a href="#dias">9 · 90 días</a></li>
+        <li><a href="#muerte">10 · Qué lo mata</a></li>
+      </ol>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- ═══════════════════════════════════════════ 1 · ICP ═══════════ -->
+    <section id="icp" style="border:0;padding-top:0">
+      <h2>1 · El cliente objetivo</h2>
+      <p>No es «la PYME chilena». Es una empresa donde <strong>el teléfono es un canal de venta o de atención, y hay un momento del día en que nadie lo puede contestar</strong>. Ese es el filtro entero.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card">
+          <h3 style="margin-top:0">Quién es</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Rubro:</strong> veterinaria, consulta médica o dental, taller mecánico, hotel chico, constructora, corredora de propiedades, servicio técnico, estudio jurídico.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Tamaño:</strong> 3 a 30 personas. Venta anual entre UF 2.400 y UF 25.000 (pequeña, según el tramo del SII).</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Volumen:</strong> entre 6 y 25 llamadas al día. Bajo 6 no duele lo suficiente; sobre 25 ya contrataron a alguien.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Dónde está:</strong> comuna urbana. Santiago, Viña, Concepción, Temuco, Antofagasta.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Quién firma y quién lo usa</h3>
+          <p><strong>Firma el dueño.</strong> Es la misma persona que atiende, que factura y que contesta el teléfono cuando puede. No hay comité, no hay TI, no hay proceso de compra. Paga con su tarjeta y la boleta la manda al contador.</p>
+          <p><strong>Lo usa el que llama</strong> —que no es el cliente de Fonalta, es el cliente del cliente—. Ahí está la gracia y ahí está el riesgo: la calidad la juzga alguien que nunca nos eligió.</p>
+          <p><strong>Y lo revisa el dueño por WhatsApp</strong>, en la micro, a las 8 de la mañana. Ese es el producto que él ve: un mensaje de WhatsApp que le dice qué pasó anoche.</p>
+        </div>
+      </div>
+
+      <div class="aviso mt-m">
+        <strong>Dónde ya está.</strong> Ya tiene un número. Ya tiene WhatsApp. Y ya tiene el dolor todos los días. Lo que <em>no</em> tiene es una categoría en la cabeza para esto: nadie despierta pensando «necesito una recepcionista de IA». Despierta pensando «se me está cayendo el teléfono». Todo el copy y todos los anuncios tienen que estar escritos en esas palabras, no en las nuestras.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 2 · MERCADO ═══════════ -->
+    <section id="mercado">
+      <h2>2 · Tamaño de mercado</h2>
+      <p>Con la aritmética a la vista y cada supuesto declarado. Los supuestos son míos, no de un estudio: si alguno se cae, se cae el número.</p>
+
+      <h3>Chile</h3>
+      <div class="cuenta">
+Empresas con inicio de actividades vigente (SII, orden de magnitud) ....... <b>~1.200.000</b>
+  menos micro (ventas &lt; UF 2.400/año) — sin presupuesto, sin teléfono
+  de negocio ............................................................. <b>−  ~800.000</b>
+  menos grandes (&gt; UF 100.000) — ya tienen call center ................... <b>−   ~15.000</b>
+  ────────────────────────────────────────────────────────────────────────
+  Pequeñas (UF 2.400–25.000) + medianas (UF 25.000–100.000) .............. <b>≈   225.000</b>
+
+  × <span class="r">25%</span> — supuesto: fracción cuyo rubro usa el teléfono como canal
+      de venta o atención (salud, veterinaria, talleres, hotelería,
+      inmobiliaria, construcción, servicio técnico, legal) ............... <b>≈    56.250 empresas</b>
+
+TAM Chile = 56.250 × $74.500 ARPU × 12 meses ......................... <b>$50.287.500.000 / año</b>
+                                                    a $960/USD ....... <b class="r">≈ US$52,4M / año</b>
+      </div>
+
+      <div class="cuenta">
+SAM = las que además pueden comprar HOY, sin que las visite nadie:
+  · comuna urbana con internet estable
+  · tarjeta de crédito de empresa (no todas la tienen)
+  · ≥ 6 llamadas/día (bajo eso el dolor no paga $29.000)
+  supuesto: <span class="r">40%</span> del TAM ................................................ <b>≈ 22.500 empresas</b>
+
+SAM = 22.500 × $74.500 × 12 ........................................... <b class="r">≈ US$20,9M / año</b>
+      </div>
+
+      <div class="cuenta">
+SOM año 3 (mes 36, escenario base extrapolado del <a href="roadmap.html#mrr">roadmap</a>):
+  clientes en régimen = nuevos por mes ÷ churn = 30 ÷ 0,05 ............... <b>≈ 600</b>
+  ajustado por la rampa real hasta el mes 36 ............................. <b>≈ 450 clientes</b>
+
+SOM = 450 × $74.500 × 12 .............................................. <b class="r">≈ US$419k / año</b>
+                                                   = <b>2,0% del SAM</b>
+      </div>
+
+      <figure class="fig">
+        <figcaption class="fig__t">Los tres círculos, en dólares al año</figcaption>
+        <p class="fig__s">La barrera no es el tamaño del mercado. Es cuánta de esa gente <em>busca</em> esto en Google —y ese techo lo declaro en la sección 6.</p>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 170" role="img" aria-labelledby="t-tam d-tam">
+  <title id="t-tam">Mercado direccionable en Chile, en millones de dólares al año</title>
+  <desc id="d-tam">El mercado total en Chile son 52,4 millones de dólares al año; el alcanzable, 20,9; y la meta al tercer año, 0,42.</desc>
+  <path d="M8,16 L434,16 Q438,16 438,20 L438,44 Q438,48 434,48 L8,48 Z" fill="#C4841E"/>
+  <text x="20" y="37" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#14100D">US$52,4M</text>
+  <text x="450" y="31" style="font-family:'Chivo',sans-serif;font-size:12.5px;font-weight:600;fill:var(--tiza)">TAM · Chile</text>
+  <text x="450" y="45" class="ejeT">56.250 PYMEs donde el teléfono es canal</text>
+  <path d="M8,70 L275.57,70 Q279.57,70 279.57,74 L279.57,98 Q279.57,102 275.57,102 L8,102 Z" fill="#8A5E15"/>
+  <text x="20" y="91" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:#14100D">US$20,9M</text>
+  <text x="291.57" y="85" style="font-family:'Chivo',sans-serif;font-size:12.5px;font-weight:600;fill:var(--tiza)">SAM · Chile</text>
+  <text x="291.57" y="99" class="ejeT">22.500 con tarjeta, urbanas, ≥6 llamadas/día</text>
+  <path d="M8,124 L42.5,124 Q46.5,124 46.5,128 L46.5,152 Q46.5,156 42.5,156 L8,156 Z" fill="#F0B85A"/>
+  <text x="58.5" y="139" style="font-family:'Chivo Mono',monospace;font-size:12px;font-weight:600;fill:var(--tiza)">US$0,42M</text>
+  <text x="132" y="139" style="font-family:'Chivo',sans-serif;font-size:12.5px;font-weight:600;fill:var(--tiza)">SOM · año 3</text>
+  <text x="58.5" y="153" class="ejeT">450 clientes · 2,0% del SAM</text>
+  <text x="8" y="166" class="ejeT">escala de raíz cuadrada · el ancho compara órdenes de magnitud, no razones</text>
+</svg>
+        </div>
+        <p class="fig__n">Los conteos de empresas del SII son de orden de magnitud, no un censo que yo haya descargado. El 25% y el 40% son supuestos míos, declarados. Si el 25% fuera 12%, el TAM cae a US$25M y el negocio sigue existiendo; si fuera 5%, no.</p>
+      </figure>
+
+      <h3>La extensión global</h3>
+      <p>El producto es el mismo; lo que cambia es el acento, la telefonía y el medio de pago. LatAm hispanohablante tiene del orden de <strong>15 a 20 veces</strong> la población de empresas de Chile (México solo tiene ~5 millones de unidades económicas según el DENUE del INEGI, la mayoría micro). Aplicando los mismos filtros: <strong>~1 millón de empresas objetivo → TAM regional del orden de US$900M al año</strong>. Es un escalamiento por población de empresas, <em>no</em> un estudio de mercado, y así hay que leerlo.</p>
+      <p>Pero acá va la parte incómoda: <strong>ese mercado también lo ven los americanos</strong>, y ellos tienen 50 veces más plata. Nuestra ventaja no es la tecnología —es replicable en un trimestre—: es que el guión suena chileno, el pago es en pesos, la boleta es electrónica, y las instrucciones de desvío son las de Entel y Movistar. Eso da meses de ventaja, no años.</p>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 3 · CUÑA ══════════════ -->
+    <section id="cuna">
+      <h2>3 · Posicionamiento y cuña</h2>
+      <p><strong>La cabeza de playa: veterinarias y clínicas dentales de Santiago.</strong> No porque sean el mercado más grande, sino porque son el mercado donde puedo <em>probar el producto y el canal a la vez</em>, rápido y barato.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card">
+          <h3 style="margin-top:0">Por qué ése</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>La llamada tiene una intención limpia y repetitiva:</strong> pedir hora, preguntar precio, preguntar horario. Un guión cubre el 90%.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>El valor de una llamada es alto y medible:</strong> una consulta son $35–45 mil. Recuperar dos llamadas al mes ya paga el plan.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Ya viven en Google Calendar</strong> o en algo que se le parece. La integración de agenda existe.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Se buscan en Google.</strong> «Veterinaria en Ñuñoa» es una búsqueda con intención — y su dueño lo sabe, porque ya paga Google Ads. Entiende de canales.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Y de ahí, hacia dónde</h3>
+          <p>El orden de expansión sigue la <strong>dificultad del guión</strong>, no el tamaño del rubro:</p>
+          <ol style="margin-left:var(--sp-m);color:var(--tiza-2)">
+            <li>Veterinarias y dentales <span class="dato">(guión de agenda simple)</span></li>
+            <li>Talleres y servicio técnico <span class="dato">(recado + estado de un trabajo)</span></li>
+            <li>Hoteles y cabañas <span class="dato">(disponibilidad + tarifa; entra la estacionalidad)</span></li>
+            <li>Corredoras de propiedades <span class="dato">(calificar al que llama: presupuesto, comuna)</span></li>
+            <li>Constructoras y contratistas <span class="dato">(el guión más difícil: cotizaciones)</span></li>
+          </ol>
+          <p class="dato mt-m">Cada rubro nuevo es una plantilla de guión y una landing de SEO. No es producto nuevo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 4 · COMPETENCIA ═══════════ -->
+    <section id="competencia">
+      <h2>4 · Competencia</h2>
+      <p>El titular del puesto no es una empresa. Es <strong>la casilla de voz</strong>, y le está ganando a todo el mundo.</p>
+
+      <div class="scroll-x">
+        <table class="tabla tabla--total">
+          <caption class="visually-hidden">Competidores y diferenciación honesta</caption>
+          <thead>
+            <tr><th>Quién</th><th>Qué cuesta</th><th>Por qué gana hoy</th><th>Nuestra diferencia — honesta</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>La casilla de voz</strong><br><span class="dato">el verdadero titular</span></td>
+              <td class="mono">$0</td>
+              <td>Ya está. No hay que decidir nada.</td>
+              <td>Nadie deja mensaje, y el que lo deja ya llamó a otro mientras tanto. Nuestra ventaja es enorme <em>si</em> el dueño acepta que perder llamadas le cuesta plata. Muchos no lo han medido nunca.</td>
+            </tr>
+            <tr>
+              <td><strong>La recepcionista</strong></td>
+              <td class="mono">$625.000/mes</td>
+              <td>Entiende matices, resuelve el caso raro, calma a un cliente enojado.</td>
+              <td>Nosotros no la reemplazamos y no vamos a decir que sí. Contestamos cuando ella no está: colación, hora punta, después de las 19:00, fin de semana, y la tercera llamada simultánea. <strong>Somos complemento, no despido.</strong></td>
+            </tr>
+            <tr>
+              <td><strong>«Que conteste la señora Rosa cuando pueda»</strong></td>
+              <td class="mono">$0</td>
+              <td>Es lo que pasa hoy en el 90% de los talleres.</td>
+              <td>Rosa está soldando. La llamada de las 15:40 no la contestó nadie y nadie sabe que existió.</td>
+            </tr>
+            <tr>
+              <td><strong>Call centers y servicios de recepción telefónica chilenos</strong></td>
+              <td class="mono">$300–600/min</td>
+              <td>Es un humano de verdad.</td>
+              <td>6 a 12 veces más caro por minuto, y el operador no sabe nada de tu negocio: lee un guión de una pantalla. Nosotros somos más baratos y sabemos tus precios. Pero ellos <em>sí</em> pueden manejar una queja de verdad.</td>
+            </tr>
+            <tr>
+              <td><strong>Plataformas de voz IA internacionales</strong><br><span class="dato">Bland AI, Retell AI, Vapi, Synthflow, PolyAI</span></td>
+              <td class="mono">US$0,07–0,20/min</td>
+              <td>Tecnología excelente, muy financiadas.</td>
+              <td>Son <em>plataformas para desarrolladores</em>: te venden la API y tú armas tu agente. La PYME chilena no va a armar nada. Además hablan español neutro o mexicano, no dan número +56 self-serve, no emiten boleta chilena y no saben qué es un desvío de Entel. <strong>Es la diferenciación más frágil que tengo y lo digo derecho: es de meses, no de años.</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Zurcia</strong> <span class="dato">(idea 03 de este mismo repo)</span></td>
+              <td class="mono">Desde $34.000/mes</td>
+              <td>Agenda por WhatsApp, en texto.</td>
+              <td>Canal distinto: ellos viven en el chat, nosotros en la línea telefónica. Se complementan más de lo que compiten — de hecho, Fonalta manda su resumen <em>por</em> WhatsApp.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 5 · ECONOMÍA ══════════════ -->
+    <section id="economia">
+      <h2>5 · Precio y economía unitaria</h2>
+      <p>Este es el negocio en una hoja. El costo de inferencia sale de <a href="stack.html#costo">Arquitectura</a> y es el mismo número: <strong>$50,3 por minuto de llamada</strong> (US$0,0524 a $960/USD). Si ese número se mueve, todo esto se mueve.</p>
+
+      <h3>Los tramos</h3>
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Plan</th><th class="n">CLP/mes</th><th class="n">Minutos</th><th class="n">Costo del minuto incluido</th><th class="n">Excedente</th><th>Para quién</th></tr></thead>
+          <tbody>
+            <tr><td>Recado</td><td class="n mono">$29.000</td><td class="n mono">100</td><td class="n mono">$290</td><td class="n mono">$89/min</td><td>Taller o servicio técnico chico. Sólo quiere el recado.</td></tr>
+            <tr><td><strong>Recepción</strong></td><td class="n mono">$69.000</td><td class="n mono">400</td><td class="n mono">$173</td><td class="n mono">$89/min</td><td>El plan que se lleva casi todo. Agenda de verdad.</td></tr>
+            <tr><td>Central</td><td class="n mono">$159.000</td><td class="n mono">1.200</td><td class="n mono">$133</td><td class="n mono">$89/min</td><td>Varias sucursales o mucho volumen.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nota">El excedente a $89 deja <strong>44% de margen</strong> sobre un costo de $50,3. Es un margen flaco <em>a propósito</em>: no queremos castigar al cliente que más usa el producto, pero tampoco perder plata. El día que alguien consuma 2.000 minutos, le conviene el plan de arriba y el sistema se lo propone solo.</p>
+
+      <h3>ARPU y COGS</h3>
+      <div class="cuenta">
+MEZCLA SUPUESTA:  30% Recado · 55% Recepción · 15% Central
+
+ARPU suscripción  = 0,30×29.000 + 0,55×69.000 + 0,15×159.000 ......... <b>$70.500</b>
+  + excedentes promedio (los que se pasan del plan) .................... <b>$ 4.000</b>
+                                                              ARPU ..... <b class="r">$74.500 / mes</b>
+
+CONSUMO REAL (supuesto: la gente usa ~70% de lo que compra)
+  0,30×78 + 0,55×285 + 0,15×700 min ................................... <b>≈ 285 min</b>
+  + minutos de excedente ($4.000 ÷ $89) ............................... <b>≈  45 min</b>
+                                                            TOTAL ...... <b>330 min/mes</b>
+
+COGS POR CLIENTE / MES
+  minutos ......... 330 × $50,3 ...................................... <b>$16.605</b>
+  número local .... US$3/mes × 960 ................................... <b>$ 2.880</b>
+  WhatsApp ........ 60 plantillas × US$0,0296 × 960 .................. <b>$ 1.705</b>
+  infra fija ...... prorrateada (ver stack) .......................... <b>$ 2.000</b>
+                                                            COGS ...... <b>$23.190</b>
+
+MARGEN BRUTO = (74.500 − 23.190) ÷ 74.500 ......................... <b class="r">68,9%</b>
+      </div>
+      <p class="nota">Un SaaS de texto puro tiene 85–90% de margen. Nosotros tenemos <strong>69%</strong>, y la razón es honesta: <strong>el 31% de cada peso que cobramos se va en minutos de voz.</strong> Eso cambia el negocio: no podemos regalar uso ilimitado, no podemos ignorar el costo del TTS, y un cliente que dispara su volumen sin subir de plan nos come el margen. Por eso el excedente existe y por eso está en el precio desde el día uno.</p>
+
+      <h3>CAC, LTV, payback</h3>
+      <div class="cuenta">
+CAC (Google Ads sobre intención, sin ningún humano en la venta)
+  CPC estimado en CL ("recepcionista virtual", "contestar llamadas") .. <b>$900</b>
+  landing → empieza la prueba ......................................... <b>4,0%</b>
+  prueba → paga con tarjeta ........................................... <b>22%</b>
+  CAC de ads = 900 ÷ (0,04 × 0,22) .................................... <b>$102.273</b>
+  + minutos de prueba regalados (30 min × $50 ÷ 0,22) ................. <b>$  6.860</b>
+                                                              CAC ...... <b class="r">$109.133</b>
+
+LTV = ARPU × margen ÷ churn = 74.500 × 0,689 ÷ churn
+  churn 3,5% (optimista) ....... LTV <b>$1.466.000</b> · LTV/CAC <b>13,4</b>
+  churn 5,0% (base) ............ LTV <b>$1.026.200</b> · LTV/CAC <b class="r">9,4</b>
+  churn 8,0% (pesimista) ....... LTV <b>$  641.400</b> · LTV/CAC <b>5,9</b>
+  churn 12%  (desastre) ........ LTV <b>$  427.600</b> · LTV/CAC <b>3,9</b>
+
+PAYBACK = CAC ÷ (ARPU × margen) = 109.133 ÷ 51.331 ................ <b class="r">2,1 meses</b>
+      </div>
+
+      <div class="aviso">
+        <strong>Un LTV/CAC de 9,4 debería darte desconfianza, y a mí también.</strong> Un múltiplo así normalmente significa que se está gastando poco en adquisición porque el canal <em>no da para más</em>. Y eso es exactamente lo que pasa acá: el problema de este negocio <strong>no es el CAC, es el volumen</strong>. En Chile no hay tanta gente buscando esto. El techo del canal de intención está calculado en la sección siguiente y es de <strong>~6 clientes al mes</strong>. Si el múltiplo fuera 3, este negocio no existiría; que sea 9 no significa que sea grande — significa que es rentable y chico, y que el trabajo real es <em>ensancharlo</em>.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 6 · CANALES ═══════════════ -->
+    <section id="canales">
+      <h2>6 · Canales de adquisición</h2>
+      <p>Rankeados por lo que de verdad van a traer, no por lo que suena bien. Y todos tienen que ser operables por una máquina: si un canal necesita que alguien salga a tomar café, no está en esta lista.</p>
+
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>#</th><th>Canal</th><th class="n">Techo real</th><th class="n">CAC</th><th>Por qué, y su límite</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="mono">1</td>
+              <td><strong>Google Ads sobre intención</strong><br><span class="dato">«recepcionista virtual», «contestar llamadas automático», «central telefónica virtual», «secretaria virtual precio»</span></td>
+              <td class="n mono">~6 clientes/mes</td>
+              <td class="n mono">$102.000</td>
+              <td>La demanda existe y es explícita. <strong>Pero es chica.</strong> Estimo el clúster de palabras en <strong>~2.800 búsquedas/mes en Chile</strong>; con 25% de share de clics en la posición 1–2, son ~700 clics/mes. A 4% × 22% eso da 6 clientes. <strong>Ese es el techo, y satura en el mes 6.</strong> <span class="dato">Estimación propia por analogía de volumen; hay que verificarla con el Keyword Planner el día 1 — es el primer dato que voy a buscar.</span></td>
+            </tr>
+            <tr>
+              <td class="mono">2</td>
+              <td><strong>SEO programático en dominio propio</strong><br><span class="dato">«Recepcionista virtual para [rubro] en [comuna]» · 12 rubros × 60 comunas</span></td>
+              <td class="n mono">~15 clientes/mes al m24</td>
+              <td class="n mono">~$23.000</td>
+              <td><strong>Es el motor de crecimiento real y es el que puede fallar.</strong> Cada página lleva contenido de verdad: el patrón horario del rubro, el guión que usaría la IA, una calculadora de llamadas perdidas, y —esto es lo único genuinamente único— <em>las preguntas que la IA no supo responder en ese rubro</em>, agregadas y anonimizadas. Riesgo declarado: Google castiga el contenido masivo sin valor, y con razón. Si esas páginas son relleno, no rankean y este canal no existe.</td>
+            </tr>
+            <tr>
+              <td class="mono">3</td>
+              <td><strong>Ads amplios + Meta</strong><br><span class="dato">retargeting, lookalike de quien probó</span></td>
+              <td class="n mono">~7 clientes/mes</td>
+              <td class="n mono">~$185.000</td>
+              <td>Peor intención, CPC más barato ($500). Sólo se enciende cuando el LTV está probado —desde el mes 8—, porque un CAC de $185.000 sólo se justifica si el churn de verdad es 5% y no 12%.</td>
+            </tr>
+            <tr>
+              <td class="mono">4</td>
+              <td><strong>Cuentas propias de marca</strong><br><span class="dato">Instagram, LinkedIn</span></td>
+              <td class="n mono">difuso</td>
+              <td class="n mono">—</td>
+              <td>«La llamada de la semana»: una transcripción real, con permiso escrito del cliente, mostrando algo que la IA hizo bien o algo en que se equivocó. Es la marca hablando con su nombre: legítimo y automatizable. <strong>Nunca</strong> cuentas falsas, nunca comentarios «orgánicos» plantados.</td>
+            </tr>
+            <tr>
+              <td class="mono">5</td>
+              <td><strong>Afiliados con pago automático</strong><br><span class="dato">contadores, agencias, gremios</span></td>
+              <td class="n mono">incierto</td>
+              <td class="n mono">$40.000<br><span class="dato">(comisión)</span></td>
+              <td>Un contador atiende 80 PYMEs. El canal es real. Pero el partnership con Nubox o Defontana <strong>requiere que alguien negocie</strong>, y eso viola el mandato de autonomía. Lo automatizable es lo otro: un programa de afiliados con link propio, panel, y pago automático por conversión. Cualquiera se inscribe solo. Es peor canal, pero es un canal que corre sin nosotros.</td>
+            </tr>
+            <tr>
+              <td class="mono">6</td>
+              <td><strong>Patrocinio comprado</strong><br><span class="dato">newsletters de gremios (ASECH, CCS)</span></td>
+              <td class="n mono">bajo</td>
+              <td class="n mono">alto</td>
+              <td>Se compra el espacio, va rotulado como publicidad, se mide. Automatizable en la medida en que el gremio tenga un formulario. Probablemente no valga la pena, pero está permitido y es barato de probar.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color:var(--c3)">Lo que el kernel bloquea, y por qué no es moralismo</h3>
+      <div class="rejilla rejilla--2">
+        <div class="card" style="border-left:2px solid var(--c3)">
+          <h3 style="margin-top:0">Llamadas en frío con nuestra propia voz de IA</h3>
+          <p>Sería la demo perfecta: la IA se vende sola por teléfono. <strong>Es exactamente lo que no vamos a hacer.</strong> En Chile choca con el registro <em>No Molestar</em> (Ley 21.398) y con la Ley 19.496; en EE.UU. la FCC ya declaró ilegales las robocalls con voz de IA bajo la TCPA.</p>
+          <p>Y aunque no fuera ilegal: <strong>la operadora te quema el número</strong>. Un sistema autónomo que quema sus propios canales no es un negocio autónomo, es una máquina de destruir activos rápido. Vender una recepcionista honesta con una llamada deshonesta es, además, el suicidio de marca más obvio que se me ocurre.</p>
+        </div>
+        <div class="card" style="border-left:2px solid var(--c3)">
+          <h3 style="margin-top:0">Cuentas falsas, foros, reseñas</h3>
+          <p>Nada de responder en un grupo de Facebook de veterinarios haciéndose pasar por un colega que «encontró esta herramienta». Nada de reseñas plantadas. Es astroturfing: viola los ToS de toda plataforma, es práctica comercial engañosa bajo la Ley 19.496, y te cuesta el canal.</p>
+          <p class="dato">Cada acción que el kernel bloquea queda registrada y sale en el tablero. Un sistema autónomo sin bitácora de lo que <em>no</em> hizo es un sistema que no se puede auditar.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 7 · AUTONOMÍA ═════════════ -->
+    <section id="autonomia">
+      <h2>7 · Autonomía: cómo esto opera sin ningún ser humano</h2>
+      <p>El compromiso es fuerte: <strong>nadie vende, nadie implementa, nadie cobra, nadie atiende.</strong> Abajo está cómo, y —más importante— dónde se rompe.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card">
+          <h3 style="margin-top:0">Venta</h3>
+          <p>Google Ads sobre intención + SEO programático + retargeting. El sistema escribe los anuncios, los rota por rendimiento, genera las páginas de rubro/comuna y ajusta el gasto dentro de un tope duro. <strong>No hay llamada de venta, no hay demo agendada, no hay «conversemos».</strong> El que llega, prueba.</p>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Entrega</h3>
+          <p>Tres pantallas: (1) se le asigna un número +56 al instante; (2) se le dan las instrucciones de desvío de <em>su</em> operadora, detectada por el prefijo; (3) pega el texto de su negocio o la URL de su web y el sistema la lee e indexa. <strong>El producto se entrega por la red telefónica.</strong> No hay nada que instalar.</p>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Cobro</h3>
+          <p>Flow (tarjeta, CLP), suscripción recurrente, boleta electrónica automática vía el SII. Los excedentes se calculan al cierre del ciclo y se cobran al siguiente. <strong>Dunning automático</strong>: si la tarjeta falla, tres reintentos, aviso por WhatsApp, y suspensión con el desvío intacto para que no pierda llamadas mientras arregla su tarjeta.</p>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Soporte</h3>
+          <p>Lo contesta la propia IA por WhatsApp, con la documentación como base de conocimiento. Y el sistema <strong>se autodiagnostica</strong>: si detecta que el número no está bien desviado (cero llamadas en 48 h después de activar), avisa; si el ASR falla mucho en una cuenta, sugiere revisar el ruido; si un cliente va a pasarse de plan, le propone subir antes de cobrarle el excedente.</p>
+        </div>
+      </div>
+
+      <h3>El bucle de mejora, también sin humanos</h3>
+      <p>Lo que hace que esto no se degrade con el tiempo es la tabla <code class="mono">no_supo</code>. Cada vez que la IA busca algo en la ficha de un cliente y no lo encuentra, lo admite en la llamada <em>y lo registra</em>. Una vez a la semana, un agente agrupa esas preguntas y le manda al dueño un WhatsApp: <em>«Esta semana 3 personas preguntaron si atienden gatos. ¿Atienden?»</em>. El dueño responde una vez y la ficha queda mejor. <strong>Nadie de nuestro lado tocó nada</strong>, y el producto mejoró. Se puede jugar con eso en el <a href="demo/index.html">demo</a>, pestaña «Lo que ve el dueño».</p>
+
+      <h3 style="color:var(--c3)">Lo que NO logro automatizar</h3>
+      <p>Esta lista es la parte honesta de la sección. Si alguien te dice que su negocio es 100% autónomo sin una lista así, no la ha buscado.</p>
+
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Qué</th><th>Por qué no se puede</th><th>Qué hago en cambio</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>El desvío en una línea fija antigua</strong></td>
+              <td>El desvío en móvil se activa con un código GSM y lo hace el cliente en 20 segundos. Pero algunas centrales fijas viejas exigen que la <em>operadora</em> lo active por mesa de ayuda. Yo no tengo poder para actuar sobre la cuenta de Entel del cliente, y no debería tenerlo.</td>
+              <td>Se lo digo antes de que pague, con el número de la mesa de ayuda y el guión exacto de lo que tiene que pedir. Es un trámite de 10 minutos que hace él. <strong>Es el punto de fuga más grande del embudo y no lo puedo tapar.</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Portar su número a la plataforma</strong></td>
+              <td>Requiere firma del titular y trámite ante la Subtel. Es humano por diseño legal, y está bien que lo sea.</td>
+              <td>No lo ofrezco. El producto funciona con desvío, que no requiere portabilidad. Si alguien quiere portar, lo derivo a su operadora.</td>
+            </tr>
+            <tr>
+              <td><strong>Que la ficha del cliente sea buena</strong></td>
+              <td>Si el dueño carga tres líneas y se va, la IA va a decir «no sé» muy seguido. Puedo detectarlo y avisarlo. <strong>No puedo inventarle los precios de su taller</strong>, y no debo.</td>
+              <td>Detecto la ficha pobre (menos de N campos, o tasa de <code class="mono">no_supo</code> sobre 15%) y lo persigo por WhatsApp con preguntas concretas. Si aun así no responde, ese cliente va a churnear y lo sé de antemano.</td>
+            </tr>
+            <tr>
+              <td><strong>Un contracargo o un reclamo al SERNAC</strong></td>
+              <td>Una disputa de cobro en Transbank/Flow necesita una respuesta con evidencia. El 80% es plantilla. <strong>El 20% que escala necesita una persona firmando</strong>, y una empresa necesita un representante legal de todos modos.</td>
+              <td>El sistema arma el expediente completo (grabación, transcripción, log de facturación) y lo deja listo. La firma es humana. Es un costo fijo del negocio, no una operación.</td>
+            </tr>
+            <tr>
+              <td><strong>La emergencia real</strong></td>
+              <td>Si alguien llama a la veterinaria porque su perro se está muriendo, ninguna IA de voz sirve, y pretender que sí es indefendible.</td>
+              <td>Detección de urgencia → la IA corta el guión, marca al celular del dueño y le manda un SMS. <strong>Eso no es automatización: es reconocer un límite y diseñar la salida.</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Decidir el precio</strong></td>
+              <td>No se le pregunta al modelo cuánto cobrar. Se prueba.</td>
+              <td>Experimentos de precio con muestra mínima y prueba secuencial. El juez del piloto automático no puede mover el precio sin evidencia estadística; los criterios están fijos de antemano.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 8 · IA MARKETING ══════════ -->
+    <section id="ia">
+      <h2>8 · Dónde la IA sirve en el marketing, y dónde no</h2>
+      <p>«IA en todo» no es una respuesta. Ésta es la mía.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card" style="border-left:2px solid var(--c4)">
+          <h3 style="margin-top:0">Sirve de verdad</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Generar las 720 páginas de SEO</strong> con datos reales por rubro y comuna. Sin IA esto no se escribe nunca; con IA se escribe en un fin de semana.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Convertir la tabla <code class="mono">no_supo</code> en contenido.</strong> «Las 12 preguntas que más le hacen por teléfono a una veterinaria en Chile» — con datos que sólo nosotros tenemos. Es el único contenido de la industria que no puede copiar nadie.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>Escribir y rotar variantes de anuncio</strong>, y matar las que no rinden. Es una tarea de volumen con retroalimentación numérica: ideal.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>El soporte por WhatsApp</strong> y los resúmenes de llamada. Es el producto mismo.</span></li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:2px solid var(--c3)">
+          <h3 style="margin-top:0">No sirve, o está prohibido</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>Llamar a vender.</strong> Prohibido por el kernel. No es negociable y no hay una versión «suave» de esto.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>Publicar en comunidades haciéndose pasar por usuario.</strong> Astroturfing. Bloqueado y registrado.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>Decidir el precio, o declarar un ganador con 12 conversiones.</strong> Eso no es IA, es superstición con esteroides. Tamaño mínimo de muestra antes de mover plata.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>Escribir testimonios.</strong> Los testimonios son de clientes reales, con nombre, o no van.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ 9 · 90 DÍAS ═══════════════ -->
+    <section id="dias">
+      <h2>9 · Los primeros 90 días</h2>
+      <ol class="pasos">
+        <li>
+          <div>
+            <h3 style="margin-top:0">Días 1–15 · El pipeline y un solo rubro</h3>
+            <p>Número Twilio +56, media server en São Paulo, cadena ASR→LLM→TTS con barge-in. Un guión: veterinarias. Landing con el demo. <strong>Y lo primero de todo: abrir el Keyword Planner y ver si las 2.800 búsquedas/mes que supuse existen de verdad.</strong> Si son 300, el plan de canal cambia el día 2.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 style="margin-top:0">Días 16–45 · 5 pilotos y 300 llamadas reales</h3>
+            <p>Cinco veterinarias de Ñuñoa, Providencia y Maipú. Gratis. Desvío sólo después de las 19:00 y fines de semana —el horario donde hoy no pierden nada porque ya no contestan—. <strong>La métrica es una sola: qué fracción de la gente cuelga en los primeros 15 segundos, después de oír que es una IA.</strong> Ése es el go/no-go del producto y no hay ninguna otra pregunta importante en esta etapa.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 style="margin-top:0">Días 46–60 · Self-serve completo</h3>
+            <p>Registro, asignación de número, desvío guiado por operadora, carga de la ficha, Flow. <strong>El hito: alguien que nunca habló con nosotros paga con su tarjeta.</strong> Si para que pague hay que llamarlo, el producto no es self-serve y todo el plan de autonomía es una fantasía.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 style="margin-top:0">Días 61–75 · Google Ads</h3>
+            <p>$600.000/mes sobre las palabras de intención. Se mide CAC de verdad, no CAC estimado. Se publican las primeras 60 páginas de SEO (5 rubros × 12 comunas) para empezar a acumular antigüedad de dominio, que es lo único que no se puede comprar.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 style="margin-top:0">Días 76–90 · La primera decisión</h3>
+            <p>Entre 10 y 16 clientes pagando. Con eso ya se sabe: el CAC real, el churn del primer mes, la tasa de <code class="mono">no_supo</code>, y —lo más importante— si el canal de intención tiene el volumen que supuse. Si el CAC real es $250.000 en vez de $102.000, la sección 5 entera está mal y hay que reescribirla, no ignorarla.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ═══════════════════════════════════ 10 · MUERTE ═══════════════ -->
+    <section id="muerte">
+      <h2>10 · Qué mataría esto</h2>
+
+      <div class="card card--vivo">
+        <h3 style="margin-top:0;font-size:var(--step-1)">Que el chileno cuelgue.</h3>
+        <p style="font-size:1.02rem">Todo el negocio descansa sobre una apuesta cultural que <strong>nadie ha probado en Chile</strong>: que una persona que llama a su veterinaria acepte que le conteste una máquina que se declara máquina, y siga la conversación en vez de cortar. Si la tasa de cuelgue tras la divulgación es alta, <strong>no hay precio, no hay canal, no hay latencia y no hay acento que salve esto</strong>. Se mata en el día 45 y se aprende barato.</p>
+        <p>Por eso el M1 del <a href="roadmap.html">roadmap</a> no es «tener el producto listo»: es <em>medir esa fracción</em>, y su criterio de muerte es el más duro de todos.</p>
+      </div>
+
+      <div class="rejilla rejilla--3 mt-m">
+        <div class="card">
+          <h4>Lo segundo que lo mata</h4>
+          <p>Que Retell, Bland o Synthflow lancen es-CL con número +56 y self-serve. La ventaja de acento y distribución local es real, pero es de <strong>meses, no de años</strong>. La respuesta no es esconderse: es tener el SEO y la marca antes de que lleguen.</p>
+        </div>
+        <div class="card">
+          <h4>Lo tercero</h4>
+          <p>Que el SEO programático no rankee. Si esas 720 páginas son relleno, Google las hunde, y el negocio queda con un techo de <strong>6 clientes al mes</strong> del canal de intención. Eso no es una empresa: es un trabajo.</p>
+        </div>
+        <div class="card">
+          <h4>Lo cuarto</h4>
+          <p>Que el costo del TTS no baje. Es el 46% de nuestro costo variable. Si baja a la mitad —lo que la tendencia sugiere—, el margen salta a 77%. Si <em>sube</em>, el plan Recado deja de tener sentido.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container pie__in">
+    <div>
+      <p><strong style="color:var(--tiza)">Fonalta</strong> · el teléfono que siempre contesta.</p>
+      <p style="margin-top:6px">Toda cifra acá o está citada, o es estimación propia con la aritmética a la vista.</p>
+    </div>
+    <nav aria-label="Pie">
+      <div class="fila">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="stack.html">Arquitectura</a>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/sitio.js"></script>
+</body>
+</html>

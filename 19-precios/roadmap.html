@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap — Cotejia</title>
+<meta name="description" content="Día 1 a mes 24: seis hitos, cada uno con su criterio de muerte. Tres escenarios de MRR con sus supuestos declarados, la caja con el valle marcado, y la probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hito {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 2px solid var(--amber);
+    border-radius: var(--r); padding: 16px; margin-bottom: 12px;
+  }
+  .hito-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 10px; }
+  .hito-h .id {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .12em;
+    color: var(--amber); text-transform: uppercase;
+  }
+  .hito-h .fecha { font-family: var(--mono); font-size: .72rem; color: var(--ink-3); margin-left: auto; }
+  .hito h3 { font-size: 1.05rem; margin: 0; flex-basis: 100%; }
+  .hito-grid { display: grid; gap: 10px; font-size: .9rem; }
+  @media (min-width: 760px) { .hito-grid { grid-template-columns: 1.6fr 1fr; } }
+  .hito dt {
+    font-family: var(--mono); font-size: .64rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-3); margin-top: 10px;
+  }
+  .hito dd { margin: 3px 0 0; color: var(--ink-2); }
+  .muerte {
+    border: 1px solid rgba(242,85,90,.4);
+    border-left: 2px solid var(--down);
+    background: rgba(242,85,90,.05);
+    border-radius: var(--r); padding: 10px 12px; margin-top: 12px;
+  }
+  .muerte .t {
+    font-family: var(--mono); font-size: .64rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--down); display: block; margin-bottom: 4px;
+  }
+  .muerte p { margin: 0; font-size: .88rem; color: var(--ink-2); }
+  .muerte p b { color: var(--ink); }
+  .calc {
+    font-family: var(--mono); font-size: .82rem; font-variant-numeric: tabular-nums;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-left: 2px solid var(--amber-dim);
+    border-radius: var(--r); padding: 12px 14px; color: var(--ink-2); overflow-x: auto;
+  }
+  .calc b { color: var(--ink); font-weight: 500; }
+  .calc .sup { color: var(--ink-3); }
+  figure { margin: 0 0 24px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html"><span class="dot" aria-hidden="true"></span>COTEJIA</a>
+    <div class="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menú</button>
+  </div>
+  <div class="nav-drawer" id="drawer">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html">Negocio</a>
+    <a href="roadmap.html" aria-current="page">Roadmap</a>
+    <a href="stack.html">Arquitectura</a>
+  </div>
+</nav>
+
+<main id="contenido">
+
+<section class="wrap">
+  <span class="kicker">Roadmap · día 1 → mes 24</span>
+  <h1>Seis hitos, seis formas de morir.</h1>
+  <p class="lede narrow">
+    Cada hito de abajo declara qué es cierto si lo logramos, cuánta caja necesita, y —lo único
+    que de verdad importa— <strong>la observación que debería hacernos parar</strong>. Esos
+    criterios de muerte no son decorativos: están copiados tal cual en
+    <code>autopilot.json</code>, y el juez del sistema los ejecuta sin poder cambiarlos.
+  </p>
+</section>
+
+<!-- ================= MRR ================= -->
+<section class="wrap">
+  <h2>Trayectoria de MRR — tres escenarios</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Los tres escenarios se mueven por tres supuestos, y sólo por tres: cuántos clientes nuevos
+    entran al mes, cuántos se van (churn) y cuánto paga cada uno (ARPU). Están declarados abajo.
+    Nada aquí es una curva dibujada a mano para que se vea bonita.
+  </p>
+
+  <figure>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 620 240" style="min-width:540px;max-width:720px" role="img"
+        aria-label="MRR a 24 meses en tres escenarios. Optimista llega a 33,7 millones de pesos al mes 24; base a 13,4 millones; pesimista a 4,5 millones. Los valores exactos están en la tabla siguiente.">
+        <line class="grid-l" x1="56" y1="212" x2="550" y2="212"/>
+        <line class="grid-l" x1="56" y1="156" x2="550" y2="156"/>
+        <line class="grid-l" x1="56" y1="100" x2="550" y2="100"/>
+        <line class="grid-l" x1="56" y1="44" x2="550" y2="44"/>
+        <text x="48" y="215" text-anchor="end">$0</text>
+        <text x="48" y="159" text-anchor="end">$10M</text>
+        <text x="48" y="103" text-anchor="end">$20M</text>
+        <text x="48" y="47" text-anchor="end">$30M</text>
+
+        <path d="M56.0,211.4 L77.2,210.1 L98.4,208.2 L119.7,205.8 L140.9,202.1 L162.1,197.3 L183.3,191.4 L204.5,184.4 L225.7,176.4 L247.0,167.5 L268.2,157.6 L289.4,146.7 L310.6,135.1 L331.8,123.8 L353.0,113.1 L374.3,102.7 L395.5,92.8 L416.7,83.3 L437.9,72.2 L459.1,61.6 L480.3,51.3 L501.6,41.5 L522.8,32.1 L544.0,23.1"
+          fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M56.0,211.7 L77.2,211.1 L98.4,210.3 L119.7,209.3 L140.9,207.7 L162.1,205.6 L183.3,203.1 L204.5,200.1 L225.7,196.8 L247.0,193.0 L268.2,188.9 L289.4,184.5 L310.6,179.7 L331.8,175.2 L353.0,171.0 L374.3,167.1 L395.5,163.4 L416.7,159.9 L437.9,155.4 L459.1,151.3 L480.3,147.3 L501.6,143.7 L522.8,140.2 L544.0,136.9"
+          fill="none" stroke="#c08a20" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M56.0,212.0 L77.2,211.8 L98.4,211.6 L119.7,211.1 L140.9,210.5 L162.1,209.7 L183.3,208.7 L204.5,207.6 L225.7,206.4 L247.0,205.0 L268.2,203.5 L289.4,201.9 L310.6,200.2 L331.8,198.7 L353.0,197.3 L374.3,196.0 L395.5,194.9 L416.7,193.8 L437.9,192.4 L459.1,191.1 L480.3,189.9 L501.6,188.9 L522.8,187.9 L544.0,187.0"
+          fill="none" stroke="#d55181" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+
+        <circle cx="544" cy="23.1" r="3.5" fill="#3987e5" stroke="#0e1218" stroke-width="2"/>
+        <circle cx="544" cy="136.9" r="4" fill="#c08a20" stroke="#0e1218" stroke-width="2"/>
+        <circle cx="544" cy="187" r="3.5" fill="#d55181" stroke="#0e1218" stroke-width="2"/>
+        <text x="552" y="20" fill="#3987e5" font-size="11">$33,7M</text>
+        <text x="552" y="33" fill="#7d8894" font-size="9">optimista</text>
+        <text x="552" y="134" fill="#c08a20" font-size="11">$13,4M</text>
+        <text x="552" y="147" fill="#7d8894" font-size="9">base</text>
+        <text x="552" y="184" fill="#d55181" font-size="11">$4,5M</text>
+        <text x="552" y="197" fill="#7d8894" font-size="9">pesimista</text>
+
+        <line class="axis-l" x1="56" y1="212" x2="550" y2="212"/>
+        <text x="56" y="230" text-anchor="middle">m1</text>
+        <text x="162" y="230" text-anchor="middle">m6</text>
+        <text x="289" y="230" text-anchor="middle">m12</text>
+        <text x="417" y="230" text-anchor="middle">m18</text>
+        <text x="544" y="230" text-anchor="middle">m24</text>
+      </svg>
+    </div>
+    <ul class="legend">
+      <li><span class="sw" style="background:#3987e5"></span>Optimista</li>
+      <li><span class="sw" style="background:#c08a20"></span>Base</li>
+      <li><span class="sw" style="background:#d55181"></span>Pesimista</li>
+    </ul>
+    <figcaption>MRR mensual en CLP. Un solo eje. Los tres escenarios comparten la misma escala:
+      el optimista no está exagerado, es que de verdad es 7,5 veces el base — y por eso hay que
+      desconfiar de él.</figcaption>
+  </figure>
+
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Escenario</th><th>Nuevos/mes (m1→m24)</th><th class="t-r">Churn</th><th class="t-r">ARPU</th><th class="t-r">Clientes m24</th><th class="t-r">MRR m24</th><th class="t-r">ARR</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b style="color:#d55181">Pesimista</b></td>
+          <td>0 → 13. El app store no despega; casi todo viene de Ads.</td>
+          <td class="t-r">9%</td><td class="t-r">$42.000</td><td class="t-r">106</td>
+          <td class="t-r">$4,5M</td><td class="t-r">≈US$56k</td>
+        </tr>
+        <tr>
+          <td><b style="color:#c08a20">Base</b></td>
+          <td>1 → 26. El app store de Jumpseller aporta la mitad desde el mes 6.</td>
+          <td class="t-r">6%</td><td class="t-r">$52.000</td><td class="t-r">258</td>
+          <td class="t-r">$13,4M</td><td class="t-r">≈US$169k</td>
+        </tr>
+        <tr>
+          <td><b style="color:#3987e5">Optimista</b></td>
+          <td>2 → 50. Jumpseller + Bsale + Shopify, y el SEO programático prende al mes 9.</td>
+          <td class="t-r">4%</td><td class="t-r">$58.000</td><td class="t-r">582</td>
+          <td class="t-r">$33,7M</td><td class="t-r">≈US$426k</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:14px">
+    <b>Lee el escenario base y no el optimista.</b> El optimista supone que tres app stores nos aprueban
+    la app, que el SEO prende, y que el churn de una PYME de e-commerce es 4% mensual —
+    lo que sería excepcionalmente bueno para este segmento. <b>Incluso el optimista es un negocio de
+    US$426k de ARR.</b> Esta idea no tiene un escenario en que sea grande sin salir de Chile.
+    Eso no es un defecto del plan: es el tamaño del mercado, y está calculado
+    <a href="negocio.html#mercado">con la aritmética a la vista</a>.
+  </p>
+</section>
+
+<!-- ================= CAJA ================= -->
+<section class="wrap">
+  <h2>Caja: quema contra ingresos</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Sin sueldos. El único costo humano de este negocio es la mantención de los lectores cuando un
+    marketplace cambia su HTML: <b>$600.000/mes</b> a un contratista, declarado en
+    <a href="negocio.html#autonomia">Autonomía</a> como lo que no logro automatizar. Todo lo demás
+    es infraestructura, IA, comisiones de pago y publicidad.
+  </p>
+
+  <div class="grid g2">
+    <figure>
+      <div class="scroll-x">
+        <svg class="chart" viewBox="0 0 620 210" style="min-width:520px;max-width:700px" role="img"
+          aria-label="Ingresos contra costos mensuales, escenario base. Los ingresos cruzan a los costos en el mes 5 y al mes 24 los ingresos son 13,4 millones contra 2,9 millones de costos.">
+          <line class="grid-l" x1="58" y1="182" x2="550" y2="182"/>
+          <line class="grid-l" x1="58" y1="134.6" x2="550" y2="134.6"/>
+          <line class="grid-l" x1="58" y1="87.1" x2="550" y2="87.1"/>
+          <line class="grid-l" x1="58" y1="39.7" x2="550" y2="39.7"/>
+          <text x="50" y="185" text-anchor="end">$0</text>
+          <text x="50" y="138" text-anchor="end">$4M</text>
+          <text x="50" y="90" text-anchor="end">$8M</text>
+          <text x="50" y="43" text-anchor="end">$12M</text>
+
+          <path d="M58.0,181.4 L79.4,180.2 L100.8,178.4 L122.2,176.2 L143.6,172.8 L165.0,168.5 L186.3,163.1 L207.7,156.8 L229.1,149.7 L250.5,141.8 L271.9,133.1 L293.3,123.7 L314.7,113.6 L336.1,104.2 L357.5,95.3 L378.9,86.9 L400.3,79.1 L421.7,71.7 L443.0,62.3 L464.4,53.4 L485.8,45.1 L507.2,37.3 L528.6,29.9 L550.0,23.0"
+            fill="none" stroke="#199e70" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M58.0,169.6 L79.4,169.5 L100.8,169.3 L122.2,166.8 L143.6,166.5 L165.0,165.0 L186.3,164.1 L207.7,163.0 L229.1,161.8 L250.5,160.5 L271.9,159.0 L293.3,157.5 L314.7,155.8 L336.1,154.2 L357.5,152.7 L378.9,151.3 L400.3,150.0 L421.7,148.7 L443.0,147.1 L464.4,145.6 L485.8,144.2 L507.2,142.9 L528.6,141.7 L550.0,140.5"
+            fill="none" stroke="#d55181" stroke-width="2" stroke-linejoin="round" stroke-dasharray="5 3"/>
+
+          <line x1="143.6" y1="16" x2="143.6" y2="182" stroke="#f2b544" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+          <text x="149" y="28" fill="#f2b544" font-size="10">mes 5: los ingresos</text>
+          <text x="149" y="40" fill="#f2b544" font-size="10">pasan a los costos</text>
+
+          <text x="556" y="26" fill="#199e70" font-size="11">$13,4M</text>
+          <text x="556" y="144" fill="#d55181" font-size="11">$2,9M</text>
+          <line class="axis-l" x1="58" y1="182" x2="550" y2="182"/>
+          <text x="58" y="200" text-anchor="middle">m1</text>
+          <text x="165" y="200" text-anchor="middle">m6</text>
+          <text x="293" y="200" text-anchor="middle">m12</text>
+          <text x="422" y="200" text-anchor="middle">m18</text>
+          <text x="550" y="200" text-anchor="middle">m24</text>
+        </svg>
+      </div>
+      <ul class="legend">
+        <li><span class="sw" style="background:#199e70"></span>Ingresos (escenario base)</li>
+        <li><span class="sw" style="background:#d55181"></span>Costos totales</li>
+      </ul>
+      <figcaption>Los costos casi no suben porque casi no hay costos que subir: sin gente, la
+        estructura es infraestructura + IA + 4,2% de la pasarela de pago + $400.000 de publicidad
+        (el tope duro que declara <code>autopilot.json</code>).</figcaption>
+    </figure>
+
+    <figure>
+      <div class="scroll-x">
+        <svg class="chart" viewBox="0 0 620 210" style="min-width:520px;max-width:700px" role="img"
+          aria-label="Caja acumulada partiendo de 9 millones. En el escenario base el valle es el mes 6 con 4,7 millones. En el pesimista el valle es el mes 10 con menos de 1 millón: el runway alcanza, pero por poco.">
+          <line class="grid-l" x1="58" y1="182" x2="550" y2="182"/>
+          <line class="grid-l" x1="58" y1="148.8" x2="550" y2="148.8"/>
+          <line class="grid-l" x1="58" y1="115.6" x2="550" y2="115.6"/>
+          <line class="grid-l" x1="58" y1="82.4" x2="550" y2="82.4"/>
+          <line class="grid-l" x1="58" y1="49.2" x2="550" y2="49.2"/>
+          <text x="50" y="185" text-anchor="end">$0</text>
+          <text x="50" y="152" text-anchor="end">$2M</text>
+          <text x="50" y="119" text-anchor="end">$4M</text>
+          <text x="50" y="86" text-anchor="end">$6M</text>
+          <text x="50" y="52" text-anchor="end">$8M</text>
+
+          <path d="M58.0,49.1 L102.7,64.1 L147.5,76.9 L192.2,90.1 L236.9,99.0 L281.6,103.8 L326.4,102.5 L371.1,93.8 L415.8,76.8 L460.5,50.6 L505.3,14.3"
+            fill="none" stroke="#c08a20" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M58.0,49.9 L102.7,66.6 L147.5,82.7 L192.2,100.9 L236.9,117.5 L281.6,132.5 L326.4,145.2 L371.1,155.1 L415.8,162.0 L460.5,165.5 L505.3,165.4 L550.0,161.5"
+            fill="none" stroke="#d55181" stroke-width="2" stroke-linejoin="round"/>
+
+          <circle cx="281.6" cy="103.8" r="4" fill="#c08a20" stroke="#0e1218" stroke-width="2"/>
+          <text x="272" y="120" fill="#c08a20" font-size="10" text-anchor="middle">valle m6</text>
+          <text x="272" y="131" fill="#c08a20" font-size="10" text-anchor="middle">$4,7M</text>
+
+          <circle cx="460.5" cy="165.5" r="4" fill="#d55181" stroke="#0e1218" stroke-width="2"/>
+          <text x="452" y="180" fill="#d55181" font-size="10" text-anchor="middle">valle m10</text>
+          <text x="452" y="191" fill="#d55181" font-size="10" text-anchor="middle">$1,0M</text>
+
+          <line class="axis-l" x1="58" y1="182" x2="550" y2="182"/>
+          <text x="58" y="200" text-anchor="middle">m1</text>
+          <text x="192" y="200" text-anchor="middle">m4</text>
+          <text x="282" y="200" text-anchor="middle">m6</text>
+          <text x="460" y="200" text-anchor="middle">m10</text>
+          <text x="550" y="200" text-anchor="middle">m12</text>
+        </svg>
+      </div>
+      <ul class="legend">
+        <li><span class="sw" style="background:#c08a20"></span>Caja · base</li>
+        <li><span class="sw" style="background:#d55181"></span>Caja · pesimista</li>
+      </ul>
+      <figcaption>Caja inicial: <b>$9.000.000</b> (aporte del fundador; no hay ronda). El escenario base
+        toca fondo en el mes 6 con $4,7M y se recupera. <b>El pesimista roza el suelo en el mes 10 con
+        $1,0M</b>: sobrevive, pero sin margen para un solo error. La línea base se corta en el mes 11
+        porque se sale del gráfico hacia arriba ($13,0M al mes 12).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= EMBUDO ================= -->
+<section class="wrap">
+  <h2>El embudo — y dónde está la restricción de verdad</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    En un producto que se vende solo, el CAC no es el problema: <a href="negocio.html#economia">el payback
+    es de menos de un mes</a>. <b>El problema es la activación.</b> De cada 100 tiendas que instalan la
+    app, 77 nunca llegan a aplicar un cambio de precio — y una tienda que no aplicó nunca un cambio no
+    renueva, porque no vio pasar la plata.
+  </p>
+
+  <figure>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 620 250" style="min-width:520px;max-width:700px" role="img"
+        aria-label="Embudo: de 1000 visitas a la ficha del app store, 120 instalan, 78 conectan el catálogo, 47 definen una regla, 28 aplican el primer cambio (activación) y 11 pagan.">
+        <text x="0" y="14" class="lbl">Visita la ficha en el app store</text>
+        <rect x="0" y="20" width="480" height="24" rx="4" fill="#86b6ef"/>
+        <text x="490" y="37" class="lbl" fill="#e9edf2" font-size="12">1.000</text>
+
+        <text x="0" y="66" class="lbl">Instala la app</text>
+        <rect x="0" y="72" width="58" height="24" rx="4" fill="#6da7ec"/>
+        <text x="68" y="89" class="lbl" fill="#e9edf2" font-size="12">120 · 12%</text>
+
+        <text x="0" y="118" class="lbl">Conecta el catálogo (OAuth)</text>
+        <rect x="0" y="124" width="37" height="24" rx="4" fill="#3987e5"/>
+        <text x="47" y="141" class="lbl" fill="#e9edf2" font-size="12">78 · 65% de los que instalan</text>
+
+        <text x="0" y="170" class="lbl">Define al menos una regla</text>
+        <rect x="0" y="176" width="23" height="24" rx="4" fill="#2a78d6"/>
+        <text x="33" y="193" class="lbl" fill="#e9edf2" font-size="12">47 · 60%</text>
+
+        <text x="0" y="222" class="lbl" fill="#f2b544">Aplica el primer cambio · ACTIVACIÓN</text>
+        <rect x="0" y="228" width="14" height="24" rx="4" fill="#1c5cab"/>
+        <text x="24" y="245" class="lbl" fill="#f2b544" font-size="12">28 · 23% de los que instalan</text>
+      </svg>
+    </div>
+    <figcaption>Metas declaradas, no medidas — todavía no existe el producto. Escala lineal sobre 1.000
+      visitas. De los 28 que se activan, la meta es que <b>11 paguen</b> al terminar los 14 días de prueba
+      (40%). El cuello está en los tres pasos del medio, y esos tres pasos son diseño de producto,
+      no marketing.</figcaption>
+  </figure>
+
+  <div class="note amber">
+    <b>La definición honesta de activación:</b> el cliente conectó su tienda, definió al menos una regla,
+    y <b>aplicó al menos un cambio de precio sugerido dentro de los primeros 14 días</b>. No "inició
+    sesión dos veces". No "vio el dashboard". Si no movió un precio, Cotejia no le entregó nada,
+    y cobrarle sería cobrar por una promesa.
+  </div>
+</section>
+
+<!-- ================= HITOS ================= -->
+<section class="wrap">
+  <h2>Los seis hitos</h2>
+
+  <figure>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 620 150" style="min-width:560px;max-width:720px" role="img"
+        aria-label="Línea de tiempo con seis hitos: M0 día 45, M1 mes 3, M2 mes 6, M3 mes 12, M4 mes 18, M5 mes 24. Cada uno tiene un criterio de muerte.">
+        <line x1="20" y1="60" x2="600" y2="60" stroke="#2b3542" stroke-width="2"/>
+        <g font-size="10">
+          <circle cx="20" cy="60" r="5" fill="#c08a20"/>
+          <text x="20" y="40" text-anchor="start" fill="#e9edf2" font-size="11">M0</text>
+          <text x="20" y="82" text-anchor="start" fill="#7d8894">día 45</text>
+          <text x="20" y="96" text-anchor="start" fill="#f2555a">emparejador &lt;90%</text>
+
+          <circle cx="122" cy="60" r="5" fill="#c08a20"/>
+          <text x="122" y="40" text-anchor="middle" fill="#e9edf2" font-size="11">M1</text>
+          <text x="122" y="82" text-anchor="middle" fill="#7d8894">mes 3</text>
+          <text x="122" y="96" text-anchor="middle" fill="#f2555a">CAC &gt; 3× precio</text>
+
+          <circle cx="238" cy="60" r="5" fill="#c08a20"/>
+          <text x="238" y="40" text-anchor="middle" fill="#e9edf2" font-size="11">M2</text>
+          <text x="238" y="82" text-anchor="middle" fill="#7d8894">mes 6</text>
+          <text x="238" y="96" text-anchor="middle" fill="#f2555a">activación &lt;20%</text>
+
+          <circle cx="382" cy="60" r="5" fill="#c08a20"/>
+          <text x="382" y="40" text-anchor="middle" fill="#e9edf2" font-size="11">M3</text>
+          <text x="382" y="82" text-anchor="middle" fill="#7d8894">mes 12</text>
+          <text x="382" y="96" text-anchor="middle" fill="#f2555a">churn &gt;8% × 3 meses</text>
+
+          <circle cx="496" cy="60" r="5" fill="#c08a20"/>
+          <text x="496" y="40" text-anchor="middle" fill="#e9edf2" font-size="11">M4</text>
+          <text x="496" y="82" text-anchor="middle" fill="#7d8894">mes 18</text>
+          <text x="496" y="96" text-anchor="middle" fill="#f2555a">holdout &lt; suscripción</text>
+
+          <circle cx="600" cy="60" r="6" fill="#f2b544"/>
+          <text x="600" y="40" text-anchor="end" fill="#e9edf2" font-size="11">M5</text>
+          <text x="600" y="82" text-anchor="end" fill="#7d8894">mes 24</text>
+          <text x="600" y="96" text-anchor="end" fill="#f2555a">&lt;150 clientes</text>
+        </g>
+        <text x="20" y="128" fill="#7d8894" font-size="10">En rojo: el criterio de muerte de cada hito. Copiados tal cual en autopilot.json.</text>
+      </svg>
+    </div>
+  </figure>
+
+  <div class="hito">
+    <div class="hito-h">
+      <span class="id">M0 · Validación</span><span class="fecha">Día 1 → día 45</span>
+      <h3>Ocho tiendas conectan su catálogo y el emparejador acierta</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>5 de 8 design partners conectaron OAuth <b>de sólo lectura</b>, y sobre sus catálogos reales
+            (no sintéticos) el emparejador acierta <b>≥92%</b> con <b>cero falsos positivos que habrían
+            bajado un precio</b>. Reclutados en grupos de vendedores <b>diciendo que somos Cotejia</b>,
+            no infiltrados.</dd>
+          <dt>Caja requerida</dt><dd>$1.500.000 (infra + IA de evaluación + dominio)</dd>
+          <dt>Headcount</dt><dd>0 empleados. 1 fundador técnico + contratista por horas.</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte</span>
+        <p>Si <b>menos de 5 de 8</b> conectan OAuth en 2 semanas, <b>o</b> si la precisión del emparejador
+          queda <b>bajo 90%</b> con falsos positivos que bajarían precios: <b>parar</b>. Sin emparejamiento
+          confiable no hay producto, hay una máquina de destruir el margen de tus clientes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hito">
+    <div class="hito-h">
+      <span class="id">M1 · Primer peso</span><span class="fecha">Mes 3</span>
+      <h3>Alguien paga sin haber hablado con nadie</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>Un cliente llegó por Google Ads o por el app store, se conectó solo, definió sus reglas solo,
+            aplicó un cambio, y al día 14 puso su tarjeta. <b>Cero contacto humano en todo el recorrido.</b>
+            Ese es el hito — no la plata, que son $59.900.</dd>
+          <dt>Caja requerida</dt><dd>$2.500.000 acumulados</dd>
+          <dt>Headcount</dt><dd>0</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte</span>
+        <p><b>CAC &gt; 3× el precio mensual</b> (es decir, &gt;$180.000) sostenido durante 4 semanas con
+          al menos 40 pruebas iniciadas: <b>pausar el canal pagado</b>. Si el canal no paga con un producto
+          de 85% de margen y payback de un mes, el problema no es el canal: es que nadie lo quiere.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hito">
+    <div class="hito-h">
+      <span class="id">M2 · Los primeros 10</span><span class="fecha">Mes 6</span>
+      <h3>Diez clientes pagando y una activación que no da vergüenza</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>≥10 clientes pagando y <b>activación ≥40%</b> (conectó + definió regla + aplicó un cambio,
+            en 14 días). App publicada en el marketplace de Jumpseller.</dd>
+          <dt>Caja requerida</dt><dd>Valle: $4.700.000 en el escenario base. En el pesimista el valle
+            llega al mes 10 con $1.000.000 — ahí no hay margen para equivocarse.</dd>
+          <dt>Headcount</dt><dd>0</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte</span>
+        <p><b>Activación &lt; 20% al mes 6</b>: <b>matar</b>. Un producto que sólo funciona si alguien te
+          explica cómo usarlo no puede operarse sin humanos, y ése es el mandato. No se arregla con un
+          onboarding más bonito: se arregla admitiendo que la idea no calza con la restricción.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hito">
+    <div class="hito-h">
+      <span class="id">M3 · Venta repetible</span><span class="fecha">Mes 12</span>
+      <h3>El canal trae clientes solo, y se quedan</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>90–100 clientes, MRR ≥$4,5M, y <b>≥50% de los nuevos llegan por el app store o por SEO</b>
+            (o sea: sin que paguemos por ellos). Cobertura ≥80% de los SKU de cada cliente.</dd>
+          <dt>Caja requerida</dt><dd>Autofinanciado desde el mes 7 en el escenario base.</dd>
+          <dt>Headcount</dt><dd>0 empleados. El contratista de mantención sube a ~12 h/mes.</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte (dos)</span>
+        <p><b>1.</b> <b>Churn &gt; 8% mensual durante 3 meses seguidos</b>: matar. Con ese churn la vida
+          media es de 12 meses y el negocio nunca acumula base instalada.<br>
+          <b>2.</b> Si Mercado Libre nos corta la API, <b>o</b> Falabella y Paris nos bloquean y la
+          cobertura cae bajo el 60% de los SKU: <b>pausar</b> las ventas nuevas y re-evaluar. Un producto
+          que promete vigilar precios y no puede verlos no se vende: se devuelve.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hito">
+    <div class="hito-h">
+      <span class="id">M4 · La prueba del holdout</span><span class="fecha">Mes 18</span>
+      <h3>Demostrar, con un grupo de control, que valemos lo que cobramos</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>175–180 clientes, MRR ≥$9M. Y lo que de verdad importa: en cada cuenta, <b>el 10% de los SKU
+            queda al azar fuera del repricing automático</b> (declarado al cliente), y al comparar los dos
+            grupos, <b>el margen defendido es ≥2× la suscripción</b>. Con tamaño de muestra suficiente
+            y prueba estadística, no con una anécdota.</dd>
+          <dt>Caja requerida</dt><dd>Autofinanciado. Caja acumulada ≈$43M.</dd>
+          <dt>Headcount</dt><dd>0 empleados.</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte · el más importante de todos</span>
+        <p>Si el holdout muestra que <b>el margen defendido es menor que lo que cobramos</b>, con
+          significancia estadística: <b>matar y devolver el último mes cobrado a todos</b>. Estaríamos
+          cobrando por un valor que no existe. Es tentador no hacer nunca este experimento —
+          por eso está escrito acá, con fecha, antes de que haya plata de por medio.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hito" style="border-left-color:var(--ink-2)">
+    <div class="hito-h">
+      <span class="id" style="color:var(--ink)">M5 · Punto de decisión</span><span class="fecha">Mes 24</span>
+      <h3>Levantar, bootstrapear o matar</h3>
+    </div>
+    <div class="hito-grid">
+      <div>
+        <dl style="margin:0">
+          <dt>Qué es cierto si lo lograste</dt>
+          <dd>250–350 clientes, MRR $13M–$18M, ARR ≈US$170k–230k, operando con 0 empleados y ~$95M de caja.</dd>
+          <dt>La decisión</dt>
+          <dd><b>Levantar</b> — sólo si un piloto de 60 días en Mercado Libre México o Colombia muestra la
+            misma activación que Chile. Sin eso, levantar plata contra un mercado de 6.050 tiendas es
+            venderle humo a alguien.<br>
+            <b>Bootstrapear</b> — lo más probable, y perfectamente digno: un negocio de US$200k ARR con
+            90% de margen y cero empleados es un excelente activo.<br>
+            <b>Matar</b> — si no llegamos.</dd>
+        </dl>
+      </div>
+      <div class="muerte">
+        <span class="t">Criterio de muerte</span>
+        <p><b>Menos de 150 clientes al mes 24</b>: cerrar ordenadamente. Avisar con 60 días, exportar los
+          datos de precios históricos de cada cliente (son suyos), devolver el mes en curso y apagar.
+          <b>Un producto que se muere sin avisarle a sus clientes es lo peor que puede hacer un sistema
+          automático</b>, y eso no lo decide un juez de IA: está escrito acá.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROBABILIDAD ================= -->
+<section class="wrap">
+  <h2>Probabilidad de éxito</h2>
+
+  <div class="note warn">
+    <span class="kicker" style="color:var(--down)">Primero, lo que no sé</span>
+    <p style="margin:0">
+      <b>No existe una tasa base pública y confiable</b> para "qué fracción de los micro-SaaS listados en
+      un app store de e-commerce llega a US$100k de ARR". La busqué y no la tengo.
+      <b>No la voy a inventar</b>, y desconfía de cualquier documento que te la dé con un decimal.
+      Lo que sigue no es una tasa base: es una cadena de probabilidades condicionales que yo estimo,
+      con la aritmética a la vista, para que puedas cambiar cada eslabón.
+    </p>
+  </div>
+
+  <h3 style="margin-top:20px">El techo estructural (esto sí es aritmética, no opinión)</h3>
+  <div class="calc">
+    SOM Chile = <b>6.050 tiendas</b> <span class="sup">(derivado en negocio.html, supuestos 1–4)</span><br>
+    Para US$1M ARR con ARPU $52.000: 1.000.000 × 950 / (52.000 × 12) = <b>1.522 clientes</b><br>
+    1.522 / 6.050 = <b class="down">25% del SOM chileno.</b><br><br>
+    Ninguna herramienta B2B de nicho ha tomado un cuarto de su mercado direccionable.
+    <b>Conclusión: P(US$1M ARR sólo con Chile) ≈ 0.</b> No es pesimismo: es división.
+  </div>
+
+  <h3 style="margin-top:22px">La cadena, eslabón por eslabón</h3>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Eslabón</th><th class="t-r">P(éxito)</th><th>Por qué ese número</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>M0</b> · el emparejador funciona<br><small style="color:var(--ink-3)">≥92%, sin falsos positivos peligrosos</small></td>
+          <td class="t-r"><b class="up">75–85%</b></td>
+          <td>Es un problema de <i>entity matching</i> bien estudiado, y los modelos actuales son buenos en
+            eso. El riesgo no es la media, es la cola: los falsos positivos peligrosos.</td>
+        </tr>
+        <tr>
+          <td><b>M2</b> · activación ≥40%<br><small style="color:var(--ink-3)">condicional a M0</small></td>
+          <td class="t-r"><b>40–55%</b></td>
+          <td>Aquí es donde mueren los productos que se venden solos. La dueña tiene que confiarle el precio
+            a un software el mismo día que lo instaló. <b>Es el eslabón más débil de toda la cadena</b>
+            y por eso es el criterio de muerte del mes 6.</td>
+        </tr>
+        <tr>
+          <td><b>M3</b> · venta repetible, churn ≤8%<br><small style="color:var(--ink-3)">condicional a M2</small></td>
+          <td class="t-r"><b>50–65%</b></td>
+          <td>Si se activó, el producto se usa solo y el valor es visible cada semana. El churn del segmento
+            es alto igual: las tiendas chicas cierran.</td>
+        </tr>
+        <tr>
+          <td><b>M4</b> · el holdout demuestra el valor<br><small style="color:var(--ink-3)">condicional a M3</small></td>
+          <td class="t-r"><b>60–75%</b></td>
+          <td>Si un cliente lleva 6 meses usándolo, es porque le sirve. Pero "le sirve" y "le sirve más de
+            $59.900 al mes, medido contra un control" no son lo mismo, y hay una probabilidad real de que
+            el experimento nos deje mal parados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="calc" style="margin-top:16px">
+    <b>P(negocio autosostenible al mes 24, ≥US$150k ARR, 0 empleados)</b><br>
+    = 0,80 × 0,48 × 0,58 × 0,68 <span class="sup">(punto medio de cada rango)</span><br>
+    = <b class="up">15%</b> &nbsp;→ con los extremos de cada rango: <b class="up">9% – 28%</b><br><br>
+    <b>Rango que declaro: 12–25%</b>, condicional a llegar a M2 (activación ≥40%) en el mes 6.<br>
+    <span class="sup">Si M2 se cumple, la probabilidad condicional sube a <b>0,58 × 0,68 = 39% (30–49%)</b>.
+    Todo este negocio se juega en la activación del mes 6.</span><br><br>
+    <b>P(cruzar a LatAm y superar US$1M ARR al mes 36)</b> = 15% × 0,35 <span class="sup">(P de que el
+    piloto regional funcione y se financie)</span> = <b>≈5% (3–8%)</b>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card" style="border-left:2px solid var(--up)">
+      <span class="kicker">Ajustes hacia arriba</span>
+      <ul class="clean">
+        <li><b>Canal de distribución que ya existe.</b> Los app stores de Jumpseller/Bsale/Shopify son un
+          estante donde el cliente entra a buscar exactamente esto. No hay que construir el canal.</li>
+        <li><b>Presupuesto que el cliente ya gasta:</b> su propio tiempo, todas las semanas, mirando precios.</li>
+        <li><b>Cuña afilada:</b> el emparejamiento en español chileno y el detector de bucle no existen en
+          ningún competidor.</li>
+        <li><b>Ciclo de venta de minutos.</b> Firma la misma persona que sufre el problema.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:2px solid var(--down)">
+      <span class="kicker">Ajustes hacia abajo</span>
+      <ul class="clean">
+        <li><b>Techo estructural del mercado chileno.</b> Es el ajuste más pesado de todos.</li>
+        <li><b>Titular con la distribución:</b> Mercado Libre podría hacerlo gratis mañana si cambiara de
+          opinión sobre su propio incentivo.</li>
+        <li><b>Confianza:</b> le estamos pidiendo a una dueña que le entregue el precio —su variable más
+          sensible— a un software que no tiene a nadie detrás.</li>
+        <li><b>Dependencia de raspado</b> en 30% del volumen. Un bloqueo de Falabella nos duele.</li>
+        <li><b>Churn de PYME e-commerce:</b> alto por naturaleza. Las tiendas chicas cierran.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Cotejia · Los criterios de muerte de esta página son los mismos que están en <code>autopilot.json</code>.
+      Si un día el sistema decide seguir gastando con la activación bajo 20%, es que alguien movió el arco.</p>
+    <p><a href="../index.html">← Volver a las ideas</a> · <a href="negocio.html">Negocio</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+document.getElementById("menuBtn").onclick = function () {
+  const d = document.getElementById("drawer");
+  const open = d.classList.toggle("open");
+  this.setAttribute("aria-expanded", open ? "true" : "false");
+};
+</script>
+</body>
+</html>

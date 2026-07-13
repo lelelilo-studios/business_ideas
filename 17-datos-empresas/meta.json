@@ -1,0 +1,17 @@
+{
+  "folder": "17-datos-empresas",
+  "brand": "Fedatia",
+  "domain": "fedatia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/fedatia.com -> HTTP 404 (disponible); NIC Chile: fedatia.cl disponible. Verificado con _kit/check-domain.sh el 2026-07-13.",
+  "alternates": ["catastria.com", "veritanda.com", "fedante.com"],
+  "tagline": "Un RUT entra. Sale la empresa entera, con su procedencia.",
+  "category": "API de datos · KYB Chile",
+  "market": "Chile → LatAm hispanohablante",
+  "icp": "Fintech y marketplaces que hacen onboarding de empresas: 5-80 personas, con equipo de producto propio, que hoy lo resuelven con un scraper frágil o con un analista revisando cinco portales a mano.",
+  "price_clp": "Gratis hasta 500 consultas/mes · desde $29.000/mes",
+  "accent": "#1b5fd0",
+  "problem": "Verificar una empresa chilena exige cruzar once portales públicos que cambian de maqueta sin avisar; hoy lo hace un becario con cinco pestañas o un scraper que se rompe.",
+  "status": "prototipo",
+  "autonomia": "total",
+  "notas": "Idea del lote de piloto automático: se vende, se entrega, se cobra y se disculpa sin humanos. Lo que NO automatiza: firmar contratos (renuncia al segmento bancario) y decidir la licitud de una fuente nueva."
+}

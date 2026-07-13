@@ -1,0 +1,15 @@
+{
+  "folder": "19-precios",
+  "brand": "Cotejia",
+  "domain": "cotejia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/cotejia.com -> HTTP 404 (disponible), 2026-07-13; cotejia.cl libre en NIC Chile (\"no existe\") misma fecha",
+  "alternates": ["repricia.com", "cotizal.com", "pizarria.com"],
+  "tagline": "Te bajaron el precio a las 3 de la mañana. Tú te enteras el viernes.",
+  "category": "SaaS e-commerce · Inteligencia de precios",
+  "market": "Chile → LatAm (donde llega Mercado Libre)",
+  "icp": "Tienda online chilena que revende: 60-3.000 SKU, $8M-$150M de ventas al mes, vende en Mercado Libre más Falabella/Paris/Ripley o su propio Jumpseller",
+  "price_clp": "Desde $29.900/mes",
+  "accent": "#f2b544",
+  "problem": "La dueña compite contra vendedores que le bajan el precio de madrugada; revisa a ojo cuando puede, y o deja plata sobre la mesa o regala margen persiguiendo a un bot.",
+  "status": "prototipo"
+}

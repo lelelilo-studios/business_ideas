@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Fedatia</title>
+<meta name="description" content="Modelo de datos, los cinco agentes de IA, las APIs a contratar, las variables de entorno, el costo mensual con su aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .diag { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .diag svg { min-width: 660px; }
+  .agente { border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; margin-bottom: var(--sp-s); }
+  .agente__cab { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap;
+    padding: var(--sp-xs) var(--sp-s); background: var(--papel-2); border-bottom: 1px solid var(--linea); }
+  .agente__cab h3 { margin: 0; font-size: var(--step-0); flex: 1 1 12rem; }
+  .agente__cue { padding: var(--sp-s); }
+  .agente dl { display: grid; gap: var(--sp-xs); margin: 0; }
+  @media (min-width: 56em) { .agente dl { grid-template-columns: 9rem 1fr; } }
+  .agente dt { font-family: "Geist Mono", monospace; font-size: .64rem; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--tinta-3); padding-top: .15rem; }
+  .agente dd { margin: 0; font-size: var(--step--1); color: var(--tinta-2); }
+  .env { background: var(--cod-fondo); border-radius: var(--radio); padding: var(--sp-s);
+    font-family: "Geist Mono", monospace; font-size: .76rem; line-height: 1.85;
+    color: var(--cod-base); overflow-x: auto; box-shadow: var(--sombra-cod); }
+  .env .v { color: var(--cod-clave); }
+  .env .c { color: var(--cod-tenue); }
+  .env .s { color: var(--cod-texto); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" stroke="#1b5fd0" stroke-width="1.6"/>
+        <path d="M7 8.5h10M7 12h6M7 15.5h8" stroke="#1b5fd0" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="n">Fedatia</span><span class="v">v1</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="seccion">
+  <div class="container">
+    <span class="eyebrow">Arquitectura</span>
+    <h1 style="font-size:var(--step-3);max-width:22ch">Qué habría que configurar para que esto exista de verdad.</h1>
+    <p class="lede max-60" style="margin-top:var(--sp-s)">
+      Nada de esto está aprovisionado. Está documentado, que es distinto y es honesto.
+      Al final de la página está la lista de <strong>lo que el demo finge</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ DIAGRAMA ============ -->
+<section class="seccion seccion--gris">
+  <div class="container">
+    <span class="eyebrow">01 · El sistema</span>
+    <h2 style="margin-top:0">Once fuentes, un objeto, y un lazo que se repara solo</h2>
+
+    <div class="diag" style="margin-top:var(--sp-m)">
+      <svg viewBox="0 0 720 300" role="img" aria-label="Diagrama del sistema: once fuentes públicas alimentan crawlers programados, cuyas capturas se guardan crudas en almacenamiento de objetos; un extractor con IA las convierte en campos normalizados con metadatos de procedencia; la API sirve esos campos y escribe el log de uso, que alimenta la facturación y los abonos. Un lazo aparte detecta caídas de cobertura y dispara un agente reparador de adaptadores.">
+        <defs>
+          <marker id="fl" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L8 4 L0 8 z" fill="#6b7789"/>
+          </marker>
+          <marker id="flr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L8 4 L0 8 z" fill="#d03b3b"/>
+          </marker>
+        </defs>
+        <style>
+          .bx { fill: #fff; stroke: #ced6e0; stroke-width: 1.2; rx: 6; }
+          .bxc { fill: #eaf1fd; stroke: #1b5fd0; stroke-width: 1.2; }
+          .bxd { fill: #0d1219; stroke: #0d1219; }
+          .tt { font-family: "Geist", sans-serif; font-size: 11px; fill: #0d1219; font-weight: 500; }
+          .tw { font-family: "Geist", sans-serif; font-size: 11px; fill: #fff; font-weight: 500; }
+          .ts { font-family: "Geist Mono", monospace; font-size: 9px; fill: #6b7789; }
+          .tsw { font-family: "Geist Mono", monospace; font-size: 9px; fill: #7fafea; }
+          .ln { stroke: #6b7789; stroke-width: 1.2; fill: none; marker-end: url(#fl); }
+          .lnr { stroke: #d03b3b; stroke-width: 1.2; fill: none; marker-end: url(#flr); stroke-dasharray: 4 3; }
+        </style>
+
+        <rect class="bx" x="8" y="30" width="110" height="88" rx="6"/>
+        <text class="tt" x="63" y="52" text-anchor="middle">11 fuentes</text>
+        <text class="ts" x="63" y="68" text-anchor="middle">Diario Oficial · SII</text>
+        <text class="ts" x="63" y="80" text-anchor="middle">Mercado Público</text>
+        <text class="ts" x="63" y="92" text-anchor="middle">INAPI · CMF</text>
+        <text class="ts" x="63" y="104" text-anchor="middle">Concursal · DT · …</text>
+
+        <line class="ln" x1="120" y1="74" x2="152" y2="74"/>
+
+        <rect class="bx" x="155" y="30" width="106" height="88" rx="6"/>
+        <text class="tt" x="208" y="52" text-anchor="middle">Adaptadores</text>
+        <text class="ts" x="208" y="68" text-anchor="middle">crawler + parser</text>
+        <text class="ts" x="208" y="80" text-anchor="middle">uno por fuente</text>
+        <text class="ts" x="208" y="92" text-anchor="middle">versionados</text>
+        <text class="ts" x="208" y="104" text-anchor="middle">Playwright / HTTP</text>
+
+        <line class="ln" x1="263" y1="74" x2="295" y2="74"/>
+
+        <rect class="bx bxd" x="298" y="30" width="112" height="88" rx="6"/>
+        <text class="tw" x="354" y="52" text-anchor="middle">captura cruda</text>
+        <text class="tsw" x="354" y="68" text-anchor="middle">R2 · PDF/HTML</text>
+        <text class="tsw" x="354" y="80" text-anchor="middle">hash sha256</text>
+        <text class="tsw" x="354" y="92" text-anchor="middle">inmutable</text>
+        <text class="tsw" x="354" y="104" text-anchor="middle">= la evidencia</text>
+
+        <line class="ln" x1="412" y1="74" x2="444" y2="74"/>
+
+        <rect class="bx bxc" x="447" y="30" width="112" height="88" rx="6"/>
+        <text class="tt" x="503" y="52" text-anchor="middle">Extractor (IA)</text>
+        <text class="ts" x="503" y="68" text-anchor="middle">Haiku 4.5</text>
+        <text class="ts" x="503" y="80" text-anchor="middle">salida estructurada</text>
+        <text class="ts" x="503" y="92" text-anchor="middle">verificada contra</text>
+        <text class="ts" x="503" y="104" text-anchor="middle">el texto original</text>
+
+        <line class="ln" x1="561" y1="74" x2="593" y2="74"/>
+
+        <rect class="bx" x="596" y="30" width="112" height="88" rx="6"/>
+        <text class="tt" x="652" y="52" text-anchor="middle">Almacén</text>
+        <text class="ts" x="652" y="68" text-anchor="middle">Postgres</text>
+        <text class="ts" x="652" y="80" text-anchor="middle">campo + _meta</text>
+        <text class="ts" x="652" y="92" text-anchor="middle">vigente_hasta</text>
+        <text class="ts" x="652" y="104" text-anchor="middle">histórico 24 m</text>
+
+        <path class="ln" d="M652 122 L652 150 L354 150 L354 172"/>
+
+        <rect class="bx bxd" x="240" y="176" width="228" height="52" rx="6"/>
+        <text class="tw" x="354" y="197" text-anchor="middle">API — GET /v1/empresas/{rut}</text>
+        <text class="tsw" x="354" y="214" text-anchor="middle">Cloudflare Workers · borde · &lt;200 ms de caché</text>
+
+        <line class="ln" x1="240" y1="202" x2="205" y2="202"/>
+        <rect class="bx" x="90" y="176" width="112" height="52" rx="6"/>
+        <text class="tt" x="146" y="197" text-anchor="middle">Cliente</text>
+        <text class="ts" x="146" y="212" text-anchor="middle">un curl, un webhook</text>
+
+        <line class="ln" x1="470" y1="202" x2="502" y2="202"/>
+        <rect class="bx" x="505" y="176" width="203" height="52" rx="6"/>
+        <text class="tt" x="606" y="194" text-anchor="middle">log de uso → cobro y abono</text>
+        <text class="ts" x="606" y="209" text-anchor="middle">estado_respuesta ≠ completo</text>
+        <text class="ts" x="606" y="221" text-anchor="middle">⇒ facturado = false</text>
+
+        <!-- lazo de autorreparación -->
+        <path class="lnr" d="M596 254 L208 254 L208 122"/>
+        <rect x="596" y="240" width="112" height="46" rx="6" fill="#fdeded" stroke="#d03b3b" stroke-width="1.2"/>
+        <text class="tt" x="652" y="258" text-anchor="middle" fill="#a52a2a">Reparador (IA)</text>
+        <text class="ts" x="652" y="272" text-anchor="middle" fill="#a52a2a">Sonnet 5 · Golden set</text>
+        <text class="ts" x="300" y="250" fill="#a52a2a">cobertura &lt; 90% ⇒ re-derivar el parser y desplegar</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELO DE DATOS ============ -->
+<section class="seccion">
+  <div class="container">
+    <span class="eyebrow">02 · Modelo de datos</span>
+    <h2 style="margin-top:0">Trece tablas. La que importa es <code style="font-size:.7em">captura</code>.</h2>
+    <p class="max-60 peq">Todo lo demás se puede reconstruir. <code>captura</code> —el documento crudo con
+    su hash y su hora— es lo que nos permite responder «de dónde salió esto». Sin esa tabla no hay
+    producto, sólo un scraper con buena presentación.</p>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Tabla</th><th>Campos</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr><td><code>empresa</code></td><td class="mono peq">rut PK · cuerpo · dv · razon_social · razon_social_norm · tipo · estado · creada · actualizada</td><td>La entidad. El RUT es una clave fuerte: en Chile la resolución de entidades es casi trivial y eso nos ahorra el problema más caro que tienen los proveedores gringos.</td></tr>
+          <tr style="background:var(--cobalto-claro)"><td><code>captura</code></td><td class="mono peq">id · fuente_id · rut · capturado_en · http_estado · r2_key · sha256 · adaptador_version · ok</td><td><strong>El documento crudo, inmutable.</strong> Es la evidencia. Todo <code>_meta</code> apunta acá.</td></tr>
+          <tr><td><code>campo</code></td><td class="mono peq">id · rut · bloque · clave · valor_json · captura_id FK · vigente_hasta · estado</td><td>El dato normalizado. <code>estado</code> ∈ {vigente, vencido, no_disponible} se calcula contra <code>vigente_hasta</code>, no se escribe a mano.</td></tr>
+          <tr><td><code>fuente</code></td><td class="mono peq">id · nombre · url_base · cadencia · ventana_frescura_s · robots_ok · licitud_revisada_en · estado</td><td><code>licitud_revisada_en</code> es una fecha, no un booleano: si está vencida, la fuente se apaga sola.</td></tr>
+          <tr><td><code>adaptador</code></td><td class="mono peq">id · fuente_id · version · spec_json · golden_set_id · cobertura_pct · desplegado_en</td><td>Versionado. El reparador de IA crea versiones nuevas; sólo se despliegan si pasan el conjunto dorado.</td></tr>
+          <tr><td><code>golden_set</code></td><td class="mono peq">id · fuente_id · casos_json <span class="peq">(40 RUT con respuesta conocida)</span></td><td>La compuerta. Es lo único que impide que un agente despliegue basura a producción.</td></tr>
+          <tr><td><code>cliente</code></td><td class="mono peq">id · email · plan · stripe_customer_id · creado · estado</td><td>Correo y nada más. No pedimos RUT, ni nombre, ni teléfono.</td></tr>
+          <tr><td><code>llave</code></td><td class="mono peq">id · cliente_id · prefijo · hash · entorno · creada · revocada</td><td>Se guarda el hash, nunca la llave.</td></tr>
+          <tr><td><code>uso</code></td><td class="mono peq">id · llave_id · ts · rut · bloques · estado_respuesta · facturado · ms · motivo_no_facturado</td><td>Una fila por respuesta. Es la fuente de la factura <em>y</em> del abono. La misma tabla nos cobra y nos castiga.</td></tr>
+          <tr><td><code>abono</code></td><td class="mono peq">id · cliente_id · periodo · consultas · monto_clp · regla_aplicada · generado_en</td><td>Se genera solo, del log. <code>regla_aplicada</code> permite auditar por qué se devolvió la plata.</td></tr>
+          <tr><td><code>vigilancia</code></td><td class="mono peq">id · cliente_id · rut · bloques · webhook_url · secreto · creada</td><td>El producto que retiene: $290 por RUT vigilado al mes.</td></tr>
+          <tr><td><code>entrega_webhook</code></td><td class="mono peq">id · vigilancia_id · payload_json · intento · http_estado · entregado_en</td><td>Reintentos con retroceso exponencial. Firma HMAC en la cabecera.</td></tr>
+          <tr><td><code>supresion</code></td><td class="mono peq">id · rut · solicitado_en · ejecutado_en · alcance</td><td>Baja de las páginas públicas indexables en 48 h. Corre sola.</td></tr>
+          <tr><td><code>incidente</code></td><td class="mono peq">id · fuente_id · abierto_en · cerrado_en · causa · post_mortem_md · publicado</td><td>Alimenta la página de estado <em>y</em> el canal de marketing. La caída es contenido.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AGENTES ============ -->
+<section class="seccion seccion--gris">
+  <div class="container">
+    <span class="eyebrow">03 · Los agentes de IA</span>
+    <h2 style="margin-top:0">Cinco agentes. Uno solo puede escribir en producción.</h2>
+
+    <div style="margin-top:var(--sp-m)">
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>1 · Extractor de publicaciones</h3>
+          <span class="eti eti--cob mono">claude-haiku-4-5-20251001</span>
+        </div>
+        <div class="agente__cue">
+          <dl>
+            <div><dt>Qué hace</dt><dd>Convierte el extracto de constitución o modificación publicado en el Diario Oficial (texto legal corrido) en JSON: razón social, tipo, capital, domicilio, fecha.</dd></div>
+            <div><dt>Herramientas</dt><dd>Ninguna. Sólo salida estructurada contra un esquema.</dd></div>
+            <div><dt>Guardarraíl</dt><dd><strong>Cada campo se contrasta carácter a carácter contra el texto original.</strong> Si el RUT, la razón social o el capital no aparecen literalmente en el documento, la extracción se rechaza y el documento queda marcado. Un modelo puede inventar un capital que suena bien; por eso no le creemos, lo verificamos.</dd></div>
+            <div><dt>Volumen</dt><dd>~120 documentos al día · 3.600 al mes</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="agente" style="border-color:var(--falla)">
+        <div class="agente__cab" style="background:var(--falla-fondo);border-color:#f0c4c4">
+          <h3>2 · Reparador de adaptadores</h3>
+          <span class="eti eti--fa mono">claude-sonnet-5</span>
+          <span class="eti eti--fa"><span class="punto"></span>escribe en producción</span>
+        </div>
+        <div class="agente__cue">
+          <dl>
+            <div><dt>Qué hace</dt><dd>Cuando la cobertura de una fuente cae bajo 90% en dos corridas seguidas, va al HTML nuevo, re-deriva los selectores y el parser, y despliega una versión nueva del adaptador.</dd></div>
+            <div><dt>Herramientas</dt><dd><code>obtener_html</code> · <code>probar_selector</code> · <code>correr_golden_set</code> · <code>desplegar_adaptador</code></dd></div>
+            <div><dt>La compuerta</dt><dd><strong>No puede desplegar si el conjunto dorado —40 empresas con respuesta conocida— no pasa al 100%.</strong> Es el único agente con permiso de escritura y es la única razón por la que este sistema puede correr sin nadie mirando. Si el conjunto dorado no pasa tres veces seguidas, la fuente se marca <code>no_disponible</code>, se abre un incidente público, y las consultas que la tocan dejan de cobrarse. No hay escalada a un humano porque no hay humano.</dd></div>
+            <div><dt>Lo que NO puede</dt><dd>Resolver un captcha, crear una cuenta, aceptar términos de uso, ni pasar por un login. Si la fuente cambia de régimen, el agente abre el incidente y se detiene. Eso es un juicio de licitud y <a href="negocio.html#autonomia">no lo automatizamos</a>.</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>3 · Asistente de documentación</h3>
+          <span class="eti eti--cob mono">claude-haiku-4-5-20251001</span>
+        </div>
+        <div class="agente__cue">
+          <dl>
+            <div><dt>Qué hace</dt><dd>Contesta preguntas de integración. Nada más.</dd></div>
+            <div><dt>Herramientas</dt><dd><code>buscar_docs</code> · <code>estado_fuentes</code> · <code>abonar_consultas</code></dd></div>
+            <div><dt>El prompt, en esencia</dt><dd><em>«Responde SÓLO con lo que puedas citar textualmente de los documentos entregados. Si no puedes citar, responde exactamente: <strong>No tengo cómo responder esto</strong>, llama a <code>abonar_consultas</code> y registra el caso.»</em></dd></div>
+            <div><dt>Prohibición dura</dt><dd><strong>No tiene acceso a la API de empresas.</strong> Nunca opina sobre si una empresa está inhábil o en el Boletín Concursal. Alucinar sobre un hecho jurídico de un tercero es el peor error que este negocio puede cometer, y la forma de evitarlo no es un prompt mejor: es no darle la herramienta.</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>4 · Generador de páginas (SEO programático)</h3>
+          <span class="eti eti--cob mono">claude-sonnet-5</span>
+        </div>
+        <div class="agente__cue">
+          <dl>
+            <div><dt>Qué hace</dt><dd>Traduce el catálogo de campos y el log de incidentes a páginas estáticas: una por fuente, una por caso de uso, una por pregunta long-tail. Corre en lote una vez a la semana.</dd></div>
+            <div><dt>Guardarraíl</dt><dd>No inventa hechos: sólo reescribe lo que ya está en la base. Si la ventana de frescura de INAPI cambia, la página cambia sola. El contenido es verdadero porque sale del sistema.</dd></div>
+            <div><dt>Prohibido</dt><dd>Generar perfiles públicos que contengan datos de personas naturales. El generador no tiene acceso a esos campos porque esos campos no existen.</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>5 · Clasificador de ICP</h3>
+          <span class="eti eti--cob mono">claude-haiku-4-5-20251001</span>
+        </div>
+        <div class="agente__cue">
+          <dl>
+            <div><dt>Qué hace</dt><dd>Mira el dominio del correo de registro y decide a qué secuencia de correo entra la cuenta. Trabajo mecánico y barato.</dd></div>
+            <div><dt>Herramientas</dt><dd>Ninguna. Clasificación pura.</dd></div>
+          </dl>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="aviso">
+      <span class="aviso__tit">El juez no vive acá</span>
+      <p class="peq">La IA que decide si la idea sigue viva es del sistema meta (<code>00-sistema/</code>),
+      no nuestra. Nosotros sólo exponemos <code>/metrics</code> y el <code>autopilot.json</code> con los
+      criterios de muerte copiados del <a href="roadmap.html">roadmap</a>. El juez los aplica y no puede
+      moverlos — que es exactamente el punto de escribirlos antes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TERCEROS ============ -->
+<section class="seccion">
+  <div class="container">
+    <span class="eyebrow">04 · Qué hay que contratar</span>
+    <h2 style="margin-top:0">Servicios de terceros</h2>
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Trámite real</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Stripe</strong></td><td>Tarjeta + Billing con medidor de uso</td><td>Cuenta con RUT de la sociedad. <span class="eti eti--val">por validar</span> la cobertura plena de Stripe en Chile hoy; el respaldo es <strong>Flow.cl</strong> (Webpay) para tarjetas chilenas.</td></tr>
+          <tr><td><strong>Integrador DTE</strong><br><span class="peq">OpenFactura / LibreDTE</span></td><td>Emitir boleta y factura electrónica contra el SII, automáticamente</td><td>Certificado digital de la sociedad + folios CAF del SII. <strong>Este trámite lo hace una persona una vez.</strong></td></tr>
+          <tr><td><strong>API de Mercado Público</strong></td><td>Órdenes de compra y licitaciones</td><td>Ticket gratuito de ChileCompra. Es la única fuente con API oficial de verdad.</td></tr>
+          <tr><td><strong>Cloudflare</strong></td><td>Workers (la API), R2 (documentos), Queues, Pages (docs y SEO)</td><td>Tarjeta. Inmediato.</td></tr>
+          <tr><td><strong>Neon</strong> (Postgres)</td><td>El almacén de campos y capturas</td><td>Tarjeta. Inmediato.</td></tr>
+          <tr><td><strong>Proxies residenciales</strong></td><td>Las fuentes que hay que raspar sin API</td><td>Tarjeta. <span class="eti eti--val">por validar</span> que su uso sea compatible con los términos de cada portal — parte de la revisión legal del mes 1.</td></tr>
+          <tr><td><strong>Resend</strong></td><td>Correo transaccional (la llave, la baja en un clic)</td><td>Tarjeta + verificación del dominio.</td></tr>
+          <tr><td><strong>Google Ads API</strong></td><td>El canal pagado, operado por el sistema meta</td><td>Cuenta de anunciante + token de desarrollador.</td></tr>
+          <tr><td><strong>X API · LinkedIn API</strong></td><td>La cuenta propia de la marca publicando el estado de las fuentes</td><td>Aplicación aprobada. Nunca cuentas falsas.</td></tr>
+          <tr><td><strong>RapidAPI</strong></td><td>Listado en marketplace de APIs</td><td>Comisión ~20% del ingreso originado.</td></tr>
+          <tr><td><strong>Abogado</strong></td><td>Revisión de licitud de las 11 fuentes + política de datos</td><td><strong>Una persona. $1.200.000, una vez, el mes 1.</strong> Es lo único de esta lista que no se contrata con una tarjeta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ENV ============ -->
+<section class="seccion seccion--gris">
+  <div class="container">
+    <span class="eyebrow">05 · Variables de entorno</span>
+    <h2 style="margin-top:0"><code style="font-size:.7em">.env</code></h2>
+    <div class="env" style="margin-top:var(--sp-m)">
+<span class="c"># --- núcleo ---</span>
+<span class="v">DATABASE_URL</span>=<span class="s">postgres://…neon.tech/fedatia</span>
+<span class="v">R2_BUCKET</span>=<span class="s">fedatia-capturas</span>
+<span class="v">R2_ACCESS_KEY_ID</span>=<span class="s">…</span>
+<span class="v">R2_SECRET_ACCESS_KEY</span>=<span class="s">…</span>
+<span class="v">HMAC_WEBHOOK_SECRET</span>=<span class="s">…</span>   <span class="c"># firma de las entregas</span>
+<span class="v">API_KEY_PEPPER</span>=<span class="s">…</span>             <span class="c"># las llaves se guardan hasheadas</span>
+
+<span class="c"># --- IA ---</span>
+<span class="v">ANTHROPIC_API_KEY</span>=<span class="s">sk-ant-…</span>
+<span class="v">MODELO_EXTRACTOR</span>=<span class="s">claude-haiku-4-5-20251001</span>
+<span class="v">MODELO_REPARADOR</span>=<span class="s">claude-sonnet-5</span>
+<span class="v">MODELO_SOPORTE</span>=<span class="s">claude-haiku-4-5-20251001</span>
+<span class="v">TOPE_IA_USD_MES</span>=<span class="s">60</span>              <span class="c"># tope duro; sobre esto, se apaga</span>
+
+<span class="c"># --- fuentes ---</span>
+<span class="v">MERCADOPUBLICO_TICKET</span>=<span class="s">…</span>
+<span class="v">PROXY_URL</span>=<span class="s">http://usuario:clave@proxy…:8000</span>
+<span class="v">PROXY_TOPE_GB_MES</span>=<span class="s">30</span>
+
+<span class="c"># --- cobro ---</span>
+<span class="v">STRIPE_SECRET_KEY</span>=<span class="s">sk_live_…</span>
+<span class="v">STRIPE_WEBHOOK_SECRET</span>=<span class="s">whsec_…</span>
+<span class="v">FLOW_API_KEY</span>=<span class="s">…</span>                  <span class="c"># respaldo para tarjetas chilenas</span>
+<span class="v">DTE_TOKEN</span>=<span class="s">…</span>                     <span class="c"># integrador de boleta electrónica</span>
+<span class="v">DTE_RUT_EMISOR</span>=<span class="s">77.XXX.XXX-X</span>
+
+<span class="c"># --- marketing autónomo (lo usa 00-sistema) ---</span>
+<span class="v">GOOGLE_ADS_DEVELOPER_TOKEN</span>=<span class="s">…</span>
+<span class="v">X_BEARER_TOKEN</span>=<span class="s">…</span>
+<span class="v">LINKEDIN_ACCESS_TOKEN</span>=<span class="s">…</span>
+<span class="v">RESEND_API_KEY</span>=<span class="s">…</span>
+
+<span class="c"># --- topes del piloto automático ---</span>
+<span class="v">TOPE_DIARIO_CLP</span>=<span class="s">25000</span>
+<span class="v">TOPE_MENSUAL_CLP</span>=<span class="s">600000</span>
+<span class="v">INTERRUPTOR_GLOBAL</span>=<span class="s">on</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COSTOS ============ -->
+<section class="seccion" id="costos">
+  <div class="container">
+    <span class="eyebrow">06 · Costo mensual</span>
+    <h2 style="margin-top:0">La aritmética que <a href="negocio.html#economia">negocio.html</a> descuenta del margen</h2>
+    <p class="max-60 peq">Todo a $950 por dólar. Si esta página y la de negocio no cuadran, ésta manda.</p>
+
+    <h3>Inferencia de IA — mes típico en régimen</h3>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Agente</th><th>Modelo</th><th>Volumen</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">USD/mes</th></tr></thead>
+        <tbody>
+          <tr><td>Extractor</td><td class="mono peq">haiku-4-5</td><td>3.600 documentos</td><td class="num">9,0 MTok<br><span class="peq">× US$1</span></td><td class="num">2,16 MTok<br><span class="peq">× US$5</span></td><td class="num">$19,80</td></tr>
+          <tr><td>Reparador</td><td class="mono peq">sonnet-5</td><td>20 activaciones</td><td class="num">1,2 MTok<br><span class="peq">× US$3</span></td><td class="num">0,16 MTok<br><span class="peq">× US$15</span></td><td class="num">$6,00</td></tr>
+          <tr><td>Soporte</td><td class="mono peq">haiku-4-5</td><td>300 consultas</td><td class="num">1,8 MTok<br><span class="peq">× US$1</span></td><td class="num">0,12 MTok<br><span class="peq">× US$5</span></td><td class="num">$2,40</td></tr>
+          <tr><td>Generador SEO</td><td class="mono peq">sonnet-5</td><td>40 páginas</td><td class="num">0,6 MTok</td><td class="num">0,12 MTok</td><td class="num">$3,40</td></tr>
+          <tr><td>Clasificador ICP</td><td class="mono peq">haiku-4-5</td><td>190 registros</td><td class="num">0,4 MTok</td><td class="num">0,02 MTok</td><td class="num">$1,00</td></tr>
+          <tr style="background:var(--cobalto-claro)"><td colspan="5"><strong>Total inferencia</strong></td><td class="num"><strong>US$32,60</strong></td></tr>
+          <tr style="background:var(--cobalto-claro)"><td colspan="5"><strong>En pesos</strong> (× $950)</td><td class="num"><strong>$31.000</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="peq" style="margin-top:.5rem">
+      Que la IA cueste <strong>$31.000 al mes</strong> es la razón por la que este negocio existe. El
+      trabajo que reemplaza —leer 3.600 publicaciones legales y reparar parsers rotos— costaría un
+      sueldo. La IA no es el producto: es el que hace que el costo del producto sea cero.
+    </p>
+
+    <h3>Infraestructura — a escala del mes 24</h3>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Servicio</th><th>Qué</th><th class="num">USD/mes</th><th class="num">CLP/mes</th></tr></thead>
+        <tbody>
+          <tr><td>Neon</td><td>Postgres, 8 GB + réplica de lectura</td><td class="num">69</td><td class="num">$65.550</td></tr>
+          <tr><td>Cloudflare Workers</td><td>La API, en el borde</td><td class="num">25</td><td class="num">$23.750</td></tr>
+          <tr><td>Cloudflare R2 + Queues</td><td>400 GB de documentos crudos + colas</td><td class="num">12</td><td class="num">$11.400</td></tr>
+          <tr><td>VPS de crawlers</td><td>2 × Hetzner con Playwright</td><td class="num">28</td><td class="num">$26.600</td></tr>
+          <tr><td>Upstash Redis</td><td>Caché caliente de RUT</td><td class="num">20</td><td class="num">$19.000</td></tr>
+          <tr><td>Sentry + Axiom</td><td>Errores y observabilidad</td><td class="num">51</td><td class="num">$48.450</td></tr>
+          <tr><td>Resend</td><td>Correo transaccional</td><td class="num">20</td><td class="num">$19.000</td></tr>
+          <tr><td>Staging + backups + dominio</td><td>Entorno espejo, snapshots, DNS</td><td class="num">45</td><td class="num">$42.750</td></tr>
+          <tr style="background:var(--papel-3)"><td colspan="2"><strong>Subtotal infraestructura</strong></td><td class="num"><strong>270</strong></td><td class="num"><strong>$258.000</strong></td></tr>
+          <tr><td>Proxies residenciales</td><td>~27 GB de raspado programado, a US$3/GB</td><td class="num">80</td><td class="num">$76.000</td></tr>
+          <tr><td>Integrador DTE</td><td>Boleta y factura electrónica</td><td class="num">16</td><td class="num">$15.000</td></tr>
+          <tr><td>Inferencia de IA</td><td>Los cinco agentes</td><td class="num">33</td><td class="num">$31.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>El COGS completo, y el margen</h3>
+    <div style="background:var(--papel-2);border:1px solid var(--linea);border-radius:var(--radio);padding:var(--sp-s);font-family:'Geist Mono',monospace;font-size:.78rem;line-height:1.9;overflow-x:auto;color:var(--tinta-2);margin-top:var(--sp-s)">
+      <span style="color:var(--tinta-3)">// A un MRR de $6.600.000 (escenario base, mes 24)</span><br>
+      Infraestructura &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$258.000<br>
+      Proxies (raspado programado) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;76.000<br>
+      Inferencia de IA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;31.000<br>
+      Integrador DTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;15.000<br>
+      Comisión de pago (3,5% de $6.600.000) &nbsp;$231.000<br>
+      Variable por consulta &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$119.000<br>
+      <span style="color:var(--tinta-3)">&nbsp;&nbsp;└ 15% de las consultas van a la fuente en vivo (fallo de caché).</span><br>
+      <span style="color:var(--tinta-3)">&nbsp;&nbsp;&nbsp;&nbsp;Cada fetch ≈ 200 KB de proxy a US$3/GB = $0,57 CLP.</span><br>
+      <span style="color:var(--tinta-3)">&nbsp;&nbsp;&nbsp;&nbsp;0,15 × $0,57 = $0,09 por consulta × 1.320.000 consultas = $119.000</span><br>
+      <span style="color:var(--tinta-3)">────────────────────────────────────────────</span><br>
+      <b style="color:var(--tinta)">COGS = $730.000/mes</b><br>
+      <span style="color:var(--cobalto)">Margen bruto</span> = 1 − 730.000 / 6.600.000 = <b style="color:var(--tinta)">88,9%</b> → usamos <b style="color:var(--tinta)">88%</b><br><br>
+      <span style="color:var(--tinta-3)">// Y el costo marginal de una consulta más:</span><br>
+      <span style="color:var(--cobalto)">Costo marginal</span> ≈ <b style="color:var(--tinta)">$0,09 CLP</b> &nbsp;&nbsp;contra un precio de <b style="color:var(--tinta)">$4 a $8</b>.<br>
+      <span style="color:var(--tinta-3)">// Por eso el plan gratis de 500 consultas cuesta $45 al mes por usuario</span><br>
+      <span style="color:var(--tinta-3)">// y es el canal de adquisición más barato que tenemos.</span>
+    </div>
+
+    <p class="peq" style="margin-top:var(--sp-s)">
+      Al principio (meses 1–6) la infraestructura corre en los planes chicos: <strong>$180.000/mes en
+      total</strong>, que es el número que usa la curva de quema del <a href="roadmap.html">roadmap</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FALSEADO ============ -->
+<section class="seccion seccion--tinta">
+  <div class="container">
+    <span class="eyebrow">07 · Honestidad</span>
+    <h2 style="margin-top:0;color:#fff">Qué está falseado en el demo</h2>
+    <div class="rejilla rejilla--2" style="margin-top:var(--sp-m)">
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--ok"><span class="punto"></span>Real, corre de verdad</span>
+        <ul class="lista" style="margin-top:var(--sp-s);color:#a9b6c6">
+          <li>El validador de dígito verificador. Es módulo 11 de verdad, escrito en <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">explorador.js</code>. Escriba cualquier RUT y compruébelo.</li>
+          <li>El formato de los cuerpos JSON y de <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">_meta</code>.</li>
+          <li>Los códigos de error y cuándo se devuelve cada uno.</li>
+          <li>La lógica de facturación: si <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">estado_respuesta ≠ completo</code>, no se cobra.</li>
+          <li>El formato del payload del webhook de vigilancia.</li>
+          <li>Los RUT reservados del sandbox: todos terminan en <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">-K</code> y ninguno cumple módulo 11.</li>
+        </ul>
+      </div>
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--fa"><span class="punto"></span>Falseado</span>
+        <ul class="lista" style="margin-top:var(--sp-s);color:#a9b6c6">
+          <li><strong style="color:#fff">No hay red.</strong> Las once fuentes están mockeadas dentro del JavaScript. No se raspa nada.</li>
+          <li>Las empresas, los montos, las licitaciones, las marcas y las multas son <strong style="color:#fff">inventados</strong>. Verosímiles, pero inventados.</li>
+          <li>Los hash de documento (<code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">sha256:9f2c…</code>) son de adorno.</li>
+          <li>La salud de las fuentes es un objeto en memoria, no una sonda real.</li>
+          <li>No hay llaves, ni cobro, ni Stripe, ni base de datos.</li>
+          <li>La latencia que se muestra (148 ms, 6.042 ms) es una constante, no una medición.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lede" style="color:#fff;margin-top:var(--sp-l);max-width:62ch">
+      Lo que el demo demuestra de verdad no es que tengamos los datos. Es
+      <strong>la forma del contrato</strong>: procedencia por campo, estado explícito cuando algo falla,
+      y una política de cobro que se castiga a sí misma. Eso sí es una decisión de producto, y eso sí
+      se puede juzgar antes de escribir el primer crawler.
+    </p>
+  </div>
+</section>
+
+<!-- ============ DOMINIO ============ -->
+<section class="seccion">
+  <div class="container">
+    <span class="eyebrow">08 · Marca y dominio</span>
+    <h2 style="margin-top:0">La evidencia</h2>
+    <p class="max-60"><strong>Fedatia</strong>, de <em>fedatario</em>: quien da fe. Es exactamente lo
+    que hace el producto — no entrega el dato, da fe de dónde salió.</p>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Dominio</th><th>.com — Verisign RDAP</th><th>.cl — NIC Chile</th><th>Verificado</th></tr></thead>
+        <tbody>
+          <tr style="background:var(--cobalto-claro)">
+            <td><strong>fedatia.com</strong> <span class="eti eti--cob">elegido</span></td>
+            <td><span class="eti eti--ok"><span class="punto"></span>HTTP 404 · DISPONIBLE</span></td>
+            <td><span class="eti eti--ok"><span class="punto"></span>disponible</span></td>
+            <td class="mono peq">2026-07-13</td>
+          </tr>
+          <tr><td>catastria.com</td><td><span class="eti eti--ok"><span class="punto"></span>HTTP 404 · DISPONIBLE</span></td><td><span class="eti eti--ok"><span class="punto"></span>disponible</span></td><td class="mono peq">2026-07-13</td></tr>
+          <tr><td>veritanda.com</td><td><span class="eti eti--ok"><span class="punto"></span>HTTP 404 · DISPONIBLE</span></td><td><span class="eti eti--ok"><span class="punto"></span>disponible</span></td><td class="mono peq">2026-07-13</td></tr>
+          <tr><td>fedante.com</td><td><span class="eti eti--ok"><span class="punto"></span>HTTP 404 · DISPONIBLE</span></td><td><span class="eti eti--ok"><span class="punto"></span>disponible</span></td><td class="mono peq">2026-07-13</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="peq" style="margin-top:.6rem">
+      Comprobado con <code>_kit/check-domain.sh</code>: RDAP de Verisign devuelve
+      <strong>HTTP 404</strong> para <code>fedatia.com</code>, que es la evidencia de que el dominio no
+      está registrado. Descartados por estar tomados: <code>rolario</code>, <code>acervia</code>,
+      <code>escrutia</code>, <code>padronia</code>, <code>fuentia</code>, <code>protocola</code>,
+      <code>rutela</code>, <code>rutoteca</code>, <code>constatia</code>.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Fedatia</strong> — <span class="mono">fedatia.com</span> · nada de esta infraestructura
+    está aprovisionada. Está documentada, que es lo que corresponde a un prototipo honesto.</p>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

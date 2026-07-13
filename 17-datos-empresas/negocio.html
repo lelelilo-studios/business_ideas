@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Fedatia</title>
+<meta name="description" content="ICP, tamaño de mercado con la aritmética a la vista, competencia, economía unitaria, canales automatizables y cómo se opera sin un solo humano.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .calc {
+    background: var(--papel-2); border: 1px solid var(--linea); border-radius: var(--radio);
+    padding: var(--sp-s); font-family: "Geist Mono", monospace; font-size: .78rem;
+    line-height: 1.9; overflow-x: auto; color: var(--tinta-2);
+  }
+  .calc .r { color: var(--tinta); font-weight: 500; }
+  .calc .c { color: var(--tinta-3); }
+  .calc .k { color: var(--cobalto); }
+  .calc b { color: var(--tinta); font-weight: 600; }
+  .canal { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); align-items: start;
+    padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea); }
+  .canal__n { font-family: "Geist Mono", monospace; font-size: 1.15rem; color: var(--cobalto);
+    font-weight: 500; width: 2ch; }
+  .canal h3 { margin: 0 0 .2rem; font-size: var(--step-0); }
+  .canal p { margin: 0; }
+  .veto { border-left: 3px solid var(--falla); padding-left: var(--sp-s); }
+  .cuadro-2 { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .cuadro-2 { grid-template-columns: 1fr 1fr; } }
+  .paso { display: grid; grid-template-columns: 6rem 1fr; gap: var(--sp-s);
+    padding: var(--sp-xs) 0; border-bottom: 1px solid var(--linea); }
+  .paso__d { font-family: "Geist Mono", monospace; font-size: .74rem; color: var(--cobalto);
+    letter-spacing: .04em; padding-top: .15rem; }
+  .paso p { margin: 0; font-size: var(--step--1); }
+  .paso strong { display: block; color: var(--tinta); font-size: var(--step-0); font-weight: 600; margin-bottom: .1rem; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" stroke="#1b5fd0" stroke-width="1.6"/>
+        <path d="M7 8.5h10M7 12h6M7 15.5h8" stroke="#1b5fd0" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="n">Fedatia</span><span class="v">v1</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="seccion">
+  <div class="container">
+    <span class="eyebrow">Negocio</span>
+    <h1 style="font-size:var(--step-3);max-width:20ch">Un mercado chico, un margen alto y cero sueldos.</h1>
+    <p class="lede max-60" style="margin-top:var(--sp-s)">
+      Este documento llega a una conclusión incómoda y no la esconde: <strong>Chile solo no
+      alcanza para financiar un equipo</strong>. El SAM nacional que derivamos abajo es de
+      unos US$2,5 millones al año. Ninguna empresa de treinta personas cabe ahí.
+      Una operación sin planilla, sí — y por eso esta idea pertenece a este lote y no a otro.
+    </p>
+  </div>
+</section>
+
+<!-- ============ ICP ============ -->
+<section class="seccion seccion--gris" id="icp">
+  <div class="container">
+    <span class="eyebrow">01 · Cliente objetivo</span>
+    <h2 style="margin-top:0">Quién es, exactamente</h2>
+
+    <div class="rejilla rejilla--2" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <span class="eti eti--cob">Cuña · el primero que ganamos</span>
+        <h3 style="margin-top:.6rem">La fintech o el marketplace que hace onboarding de empresas</h3>
+        <ul class="lista">
+          <li><strong>Segmento:</strong> plataformas que abren cuentas, dan crédito o habilitan
+          vendedores empresa. Fintech de pagos, factoring digital, marketplaces B2B.</li>
+          <li><strong>Tamaño:</strong> 5 a 80 personas, con equipo de producto propio.</li>
+          <li><strong>Quién firma:</strong> nadie firma. Un CTO o un ingeniero pone la tarjeta.
+          Ticket bajo el umbral de aprobación: por eso el precio de entrada es $29.000.</li>
+          <li><strong>Quién lo usa:</strong> el backend, en el flujo de alta. No hay usuario humano.</li>
+          <li><strong>Dónde ya está:</strong> con un scraper propio que se rompe, o con un analista
+          revisando el SII a mano.</li>
+          <li><strong>Por qué duele:</strong> el tiempo de verificación se ve directo en la tasa de
+          conversión del onboarding. Es una métrica que ya miran.</li>
+        </ul>
+      </div>
+
+      <div class="ficha">
+        <span class="eti eti--fa">Explícitamente NO es nuestro cliente</span>
+        <h3 style="margin-top:.6rem">El banco regulado</h3>
+        <p class="peq">Es el que mejor paga y lo estamos dejando pasar a propósito. Un banco exige
+        contrato de tratamiento de datos firmado, cuestionario de proveedor crítico, revisión de
+        seguridad y probablemente una visita. Todo eso lo firma una persona.</p>
+        <p class="peq"><strong>Un producto que se opera sin humanos no puede vender a quien exige un
+        humano.</strong> Lo decimos en la primera pantalla en lugar de hacerle perder tres semanas
+        y descubrirlo en la última.</p>
+        <p class="peq">Tampoco es cliente el que quiere datos de personas: no los tenemos y no los
+        vamos a tener. Ver <a href="index.html#personas">la línea que trazamos</a>.</p>
+      </div>
+    </div>
+
+    <h3>Los otros tres que compran, en orden</h3>
+    <div class="rejilla rejilla--3" style="margin-top:var(--sp-s)">
+      <div class="ficha">
+        <h4 style="margin-top:0">Equipo comercial B2B</h4>
+        <p class="peq">Califica prospectos: quién vende al Estado, quién creció, quién tiene marcas.
+        Enriquece una planilla de 4.000 RUT. Compra volumen por lotes.</p>
+      </div>
+      <div class="ficha">
+        <h4 style="margin-top:0">Software PYME y ERPs</h4>
+        <p class="peq">Defontana, Nubox, Bsale y los que vengan: autocompletan la ficha del cliente
+        con el RUT. Nos integran una vez y quedamos adentro. Distribución, no venta.</p>
+      </div>
+      <div class="ficha">
+        <h4 style="margin-top:0">Compliance de proveedores</h4>
+        <p class="peq">La empresa grande que revisa 900 proveedores al año. Compra
+        <strong>vigilancia</strong>, no consultas: quiere el webhook cuando uno cae al Boletín Concursal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MERCADO ============ -->
+<section class="seccion" id="mercado">
+  <div class="container">
+    <span class="eyebrow">02 · Tamaño de mercado</span>
+    <h2 style="margin-top:0">TAM, SAM y SOM con la aritmética a la vista</h2>
+    <p class="max-60">
+      Ninguna cifra de abajo es oficial. Todas son <strong>estimaciones nuestras</strong>,
+      construidas de abajo hacia arriba, con cada supuesto declarado. Preferimos un número que
+      usted pueda discutir a un número que no pueda auditar.
+    </p>
+
+    <h3>Supuesto 1 — no contamos empresas, contamos compradores</h3>
+    <p class="max-60 peq">El error clásico sería decir «hay 1,4 millones de empresas con inicio de
+    actividades en Chile». Cierto e irrelevante: esas son el <em>objeto</em> del dato, no el
+    cliente. Nuestro cliente es la organización que verifica empresas de forma sistemática.
+    Las contamos una por una:</p>
+
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Organizaciones que verifican empresas en Chile</th><th class="num">Cuántas</th><th>De dónde sale el número</th></tr></thead>
+        <tbody>
+          <tr><td>Bancos, cooperativas y cajas de compensación</td><td class="num">40</td><td>Conteo directo de entidades fiscalizadas por la CMF <span class="eti eti--val">por validar</span></td></tr>
+          <tr><td>Compañías de seguros</td><td class="num">60</td><td>Registro CMF <span class="eti eti--val">por validar</span></td></tr>
+          <tr><td>Factoring, leasing y financiamiento no bancario</td><td class="num">220</td><td>Socios de ACHEF más el estimado de no bancarios</td></tr>
+          <tr><td>Fintech inscritas o en proceso ante la CMF (Ley 21.521)</td><td class="num">250</td><td>Estimación propia sobre el registro de la Ley Fintec <span class="eti eti--val">por validar</span></td></tr>
+          <tr><td>Marketplaces y plataformas B2B con vendedores empresa</td><td class="num">120</td><td>Estimación propia</td></tr>
+          <tr><td>ERPs, facturadores y software PYME</td><td class="num">300</td><td>Estimación propia sobre el ecosistema de integradores DTE</td></tr>
+          <tr><td>Grandes empresas con compliance de proveedores</td><td class="num">1.000</td><td>Aproximado a las 1.000 empresas más grandes del país</td></tr>
+          <tr><td>Estudios jurídicos, auditoras y consultoras de riesgo</td><td class="num">250</td><td>Estimación propia</td></tr>
+          <tr><td>Equipos comerciales B2B que califican con datos</td><td class="num">1.800</td><td>Estimación propia; es la línea más blanda de la tabla</td></tr>
+          <tr style="background:var(--papel-3)"><td><strong>Total — universo TAM</strong></td><td class="num"><strong>4.040</strong></td><td>Suma</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Supuesto 2 — cuánto paga cada uno</h3>
+    <div class="calc">
+      <span class="c">// Mezcla de planes supuesta, con el consumo por sobre la cuota incluido</span><br>
+      <span class="k">ARPA</span> = 0,65 × $42.000 <span class="c">(Desarrollador, con excedente)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0,28 × $185.000 <span class="c">(Escala, con excedente)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0,07 × $450.000 <span class="c">(Volumen)</span><br>
+      <span class="k">ARPA</span> = 27.300 + 51.800 + 31.500 = <b>$110.600/mes</b> → redondeamos a <b>$110.000/mes</b><br>
+      <span class="k">ACV</span> = 110.000 × 12 = <b>$1.320.000/año</b>
+    </div>
+
+    <h3>Supuesto 3 — la aritmética</h3>
+    <div class="calc">
+      <span class="k">TAM</span> <span class="c">(Chile, todas las organizaciones que verifican)</span><br>
+      &nbsp;&nbsp;= 4.040 × $1.320.000 = <b>$5.333 millones CLP/año</b> ≈ <b>US$5,6M</b> <span class="c">(a $950/USD)</span><br><br>
+      <span class="k">SAM</span> <span class="c">(las que pueden consumir una API sin un proyecto de integración:</span><br>
+      &nbsp;&nbsp;<span class="c">excluimos ~55% de los equipos comerciales y de las grandes empresas)</span><br>
+      &nbsp;&nbsp;= 4.040 × 45% ≈ 1.800 organizaciones<br>
+      &nbsp;&nbsp;= 1.800 × $1.320.000 = <b>$2.376 millones CLP/año</b> ≈ <b>US$2,5M</b><br><br>
+      <span class="k">SOM</span> <span class="c">(mes 24, escenario base — ver</span> <a href="roadmap.html">roadmap</a><span class="c">)</span><br>
+      &nbsp;&nbsp;= 60 cuentas pagando × $110.000 = <b>$6,6M CLP/mes</b> = <b>$79M CLP/año</b> ≈ <b>US$83k ARR</b><br>
+      &nbsp;&nbsp;= <b>3,3% del SAM</b>
+    </div>
+
+    <div class="aviso aviso--al" style="margin-top:var(--sp-m)">
+      <span class="aviso__tit">La conclusión que un pitch deck escondería</span>
+      <p>US$2,5M de SAM no financia una empresa con inversionistas. Con un sueldo de fundador de
+      $3.000.000 al mes, el escenario base del mes 24 ($6,6M CLP de MRR) alcanza para dos
+      personas y nada más. <strong>Este negocio no es viable con planilla y sí lo es sin ella.</strong>
+      Ése es literalmente el motivo por el que existe: es la idea correcta para un sistema que
+      opera solo, y sería una idea mediocre para un equipo.</p>
+    </div>
+
+    <h3>La extensión: el mismo código, otro mapa de fuentes</h3>
+    <p class="max-60">El problema es idéntico en Perú (SUNAT + OSCE + INDECOPI), Colombia
+    (RUES + SECOP + SIC) y México (RFC + CompraNet + IMPI). Lo que se reusa es el 80%: el modelo
+    de datos, <code>_meta</code>, la facturación por frescura, el motor de vigilancia. Lo que se
+    construye de nuevo es el mapa de fuentes de cada país.</p>
+    <div class="calc">
+      <span class="c">// Estimación gruesa, no una cifra citada</span><br>
+      SAM LatAm hispanohablante ≈ SAM Chile × 6 a 8 <span class="c">(por PIB y por densidad de fintech)</span><br>
+      ≈ <b>US$15M a US$20M/año</b>. Sigue siendo un mercado chico. Sigue siendo suficiente<br>
+      para una operación sin sueldos, y sigue siendo insuficiente para levantar capital de riesgo.
+    </div>
+  </div>
+</section>
+
+<!-- ============ POSICIONAMIENTO ============ -->
+<section class="seccion seccion--gris" id="posicion">
+  <div class="container">
+    <span class="eyebrow">03 · Posicionamiento</span>
+    <h2 style="margin-top:0">La cuña: el segundo en que se decide un onboarding</h2>
+    <div class="cuadro-2" style="margin-top:var(--sp-m)">
+      <div>
+        <h3 style="margin-top:0">Por qué ese segmento y no otro</h3>
+        <ul class="lista">
+          <li><strong>Ya tienen desarrolladores.</strong> No hay que enseñarles qué es un endpoint.
+          La venta es la documentación.</li>
+          <li><strong>Ya tienen el presupuesto.</strong> Hoy lo gastan en horas de analista o en
+          mantener un scraper. No estamos creando una línea nueva, la estamos reemplazando.</li>
+          <li><strong>El dolor es medible.</strong> Verificación lenta = conversión de onboarding
+          más baja. Es un número que ya está en su tablero.</li>
+          <li><strong>Compran sin reunión.</strong> Éste es el único segmento donde el piloto
+          automático funciona de verdad. Los demás llegan después, por SEO, solos.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-top:0">La frase</h3>
+        <div class="ficha" style="background:var(--papel)">
+          <p class="lede" style="margin:0">«Un RUT entra, sale la empresa entera —y cada campo dice
+          de qué fuente vino y cuándo. Si una fuente se cayó, la respuesta lo dice y esa consulta
+          no se cobra.»</p>
+        </div>
+        <p class="peq" style="margin-top:var(--sp-s)">El diferenciador no es tener los datos:
+        cualquiera raspa un portal una tarde. Es <strong>responder por ellos</strong>. La
+        procedencia y la política de cobro por frescura son lo que un scraper casero
+        estructuralmente no puede ofrecer, porque nadie se cobra a sí mismo por su propia falla.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPETENCIA ============ -->
+<section class="seccion" id="competencia">
+  <div class="container">
+    <span class="eyebrow">04 · Competencia</span>
+    <h2 style="margin-top:0">Contra quién peleamos de verdad</h2>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th>Competidor</th><th>Qué cuesta hoy</th><th>Dónde gana él</th><th>Dónde ganamos nosotros</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>El becario</strong><br><span class="peq">el titular del puesto</span></td>
+            <td>Analista junior a ~$700.000/mes. Verificar una empresa a mano toma 25–40 min:
+            <span class="mono">≈14 empresas/día</span>. <span class="eti eti--val">estimación</span></td>
+            <td>Cero fricción de compra. Ya está contratado. Entiende los casos raros.</td>
+            <td>50.000 consultas por $149.000/mes contra 300 al mes por $700.000. La comparación
+            no es cerrada, es absurda — y aun así el becario sigue ganando, porque nadie lo despide
+            por no comprar una API.</td>
+          </tr>
+          <tr>
+            <td><strong>El scraper propio</strong></td>
+            <td>2–3 semanas de un dev senior: <span class="mono">$3.000.000–$4.500.000</span> una vez,
+            más mantención perpetua. <span class="eti eti--val">estimación</span></td>
+            <td>Es gratis después de construido. El equipo lo controla. No hay proveedor.</td>
+            <td>No competimos por no romperlo: nosotros también nos rompemos. Competimos porque
+            cuando nos rompemos <em>se lo decimos y no le cobramos</em>. El scraper propio le sirve
+            un dato de hace tres semanas con cara de dato fresco.</td>
+          </tr>
+          <tr>
+            <td><strong>Clearbit, People Data Labs</strong><br><span class="peq">enriquecimiento internacional</span></td>
+            <td>Desde US$100/mes</td>
+            <td>Excelente cobertura de firmographics en EE.UU. y Europa. Marca conocida.</td>
+            <td>No tienen Diario Oficial, ni Mercado Público, ni INAPI, ni Boletín Concursal.
+            En Chile devuelven el sitio web y el rubro. Eso no sirve para decidir un onboarding.</td>
+          </tr>
+          <tr>
+            <td><strong>Equifax / Boletín Comercial</strong></td>
+            <td>Contrato anual, informe por consulta</td>
+            <td>Tienen morosidad comercial, que nosotros no tenemos ni vamos a tener.</td>
+            <td>Producto distinto y regulado por la Ley 20.575. No competimos: a veces se usan
+            juntos. Nuestra ventaja no es contra ellos, es que somos JSON y no PDF.</td>
+          </tr>
+          <tr>
+            <td><strong>Informes comerciales chilenos</strong></td>
+            <td>$8.000–$25.000 por informe <span class="eti eti--val">estimación</span></td>
+            <td>Ya venden en Chile, ya tienen clientes, algunos tienen datos de personas.</td>
+            <td>Entregan un PDF a un humano. Nosotros entregamos JSON a un servidor, con
+            procedencia por campo. Y no vendemos datos de personas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-m)">
+      <span class="aviso__tit">La diferenciación honesta</span>
+      <p>Nada de lo que hacemos es difícil de copiar en una tarde. Lo difícil es hacerlo
+      <em>todos los días durante dos años</em>: once fuentes que cambian sin avisar, adaptadores
+      que se reparan solos, y una política de cobro que nos castiga a nosotros cuando fallamos.
+      El foso no es el código: es la disciplina operacional, y la disciplina operacional se
+      acumula con el tiempo, no con la plata.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ECONOMÍA UNITARIA ============ -->
+<section class="seccion seccion--gris" id="economia">
+  <div class="container">
+    <span class="eyebrow">05 · Precio y economía unitaria</span>
+    <h2 style="margin-top:0">Los números, y por qué el bueno es una mala noticia</h2>
+
+    <h3>Margen bruto — descontando el costo de IA que declara Arquitectura</h3>
+    <p class="peq max-60">Los costos vienen de <a href="stack.html#costos">stack.html</a>. Si esa
+    página y ésta no cuadran, ésta está mal.</p>
+    <div class="calc">
+      <span class="c">// A un MRR de $6.600.000 (escenario base, mes 24)</span><br>
+      Infraestructura fija <span class="c">(Postgres, Workers, R2, VPS de crawlers)</span> &nbsp;&nbsp;$258.000<br>
+      Proxies residenciales <span class="c">(las fuentes que hay que raspar)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;76.000<br>
+      <span class="k">Inferencia de IA</span> <span class="c">(extracción + autorreparación + soporte)</span> &nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;31.000<br>
+      Emisión de boleta/factura electrónica (integrador DTE) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;15.000<br>
+      Comisión de pago <span class="c">(3,5% sobre $6.600.000)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$231.000<br>
+      Costo variable por consulta <span class="c">(1,3M consultas × $0,09)</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$119.000<br>
+      <span class="c">────────────────────────────────────────────────</span><br>
+      <b>COGS = $730.000/mes</b> → <span class="k">margen bruto</span> = 1 − 730.000 / 6.600.000 = <b>88,9%</b><br>
+      <span class="c">// Usamos 88% en todas las proyecciones, por prudencia.</span>
+    </div>
+
+    <h3>LTV, CAC y payback</h3>
+    <div class="calc">
+      <span class="c">// Churn: nuestros supuestos por plan dan un ponderado por ingreso de 2,1%/mes.</span><br>
+      <span class="c">// Usamos 3,0% igual. Motivo declarado: un producto sin contacto humano no tiene</span><br>
+      <span class="c">// quién rescate una cuenta que se está yendo. Es un castigo deliberado.</span><br>
+      <span class="k">Vida media</span> = 1 / 0,030 = <b>33 meses</b><br>
+      <span class="k">LTV</span> = ARPA × margen × vida = 110.000 × 0,88 × 33 = <b>$3.194.000</b><br><br>
+      <span class="c">// CAC modelado por canal:</span><br>
+      SEO programático &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ ~$12.000 &nbsp;<span class="c">(55% de los pagos)</span><br>
+      Google Ads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ $145.833 <span class="c">(25%) = CPC $700 / (8% registro × 6% pago)</span><br>
+      Marketplace de APIs &nbsp;→ $580.000 <span class="c">(20%) = 20% de comisión sobre el ingreso</span><br>
+      <span class="k">CAC mezclado</span> = 0,55×12.000 + 0,25×145.833 + 0,20×580.000 = <b>$159.058</b><br><br>
+      <span class="c">// Planificamos contra un techo de $320.000, el doble del modelo, porque</span><br>
+      <span class="c">// el CAC real siempre supera al modelado.</span><br>
+      <span class="k">Payback</span> = 320.000 / (110.000 × 0,88) = <b>3,3 meses</b><br>
+      <span class="k">LTV/CAC</span> = 3.194.000 / 320.000 = <b>10,0×</b>
+    </div>
+
+    <div class="aviso aviso--al">
+      <span class="aviso__tit">Un LTV/CAC de 10 no es una virtud. Es un síntoma.</span>
+      <p>Si pudiéramos comprar clientes a $320.000 y valen $3.194.000, deberíamos estar gastando
+      todo lo que tengamos en anuncios. No lo hacemos por una razón simple: <strong>no hay dónde
+      gastarlo</strong>. En Chile hay unas pocas centenas de búsquedas al mes con intención real de
+      comprar una API de datos de empresas. El cuello de botella de este negocio no es el costo de
+      adquisición: es el <strong>volumen de demanda</strong>.</p>
+      <p>Por eso el gráfico que importa en el <a href="roadmap.html">roadmap</a> es el embudo de
+      activación, no la curva de MRR. Y por eso el criterio de muerte del hito 4 está escrito
+      sobre el volumen del canal y no sobre el CAC.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUTONOMÍA ============ -->
+<section class="seccion seccion--tinta" id="autonomia">
+  <div class="container">
+    <span class="eyebrow">06 · Autonomía</span>
+    <h2 style="margin-top:0;color:#fff">Cómo se vende, se entrega, se cobra y se soporta sin un solo humano</h2>
+    <p class="lede" style="color:#a9b6c6;max-width:62ch">
+      Esta idea no es «automatizable en el margen». Está construida para que no haya nadie.
+      Abajo está cada eslabón, y al final las cuatro cosas que <strong>no</strong> logramos automatizar.
+    </p>
+
+    <div class="rejilla rejilla--2" style="margin-top:var(--sp-l)">
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--cob" style="background:#1c2b44;border-color:#2d4870;color:#9dc0f0">Vender</span>
+        <h3 style="margin-top:.6rem;color:#fff">La documentación es el vendedor</h3>
+        <p class="peq" style="color:#a9b6c6">
+          No hay demo agendada ni llamada de descubrimiento. Hay documentación, un sandbox de 500
+          consultas sin tarjeta, y <strong style="color:#fff">la tarifa completa publicada hasta el
+          último tramo</strong> — incluido el de volumen, donde todo el mundo pone «contáctanos».
+          El acto de venta es leer la página y hacer un <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">curl</code>.
+        </p>
+        <p class="peq" style="color:#a9b6c6">Adquisición: SEO programático + Google Ads sobre
+        intención de desarrollador + listado en marketplaces de API + la cuenta de la marca.
+        Todo con API, todo medible, todo apagable. Detalle en el bloque 07.</p>
+      </div>
+
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--cob" style="background:#1c2b44;border-color:#2d4870;color:#9dc0f0">Entregar</span>
+        <h3 style="margin-top:.6rem;color:#fff">HTTP. Eso es todo.</h3>
+        <p class="peq" style="color:#a9b6c6">
+          Se registra con correo, se verifica el correo, se emite la llave. Menos de un minuto,
+          sin intervención. No hay implementación, no hay capacitación, no hay «kickoff».
+          El producto se entrega en el primer <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">200 OK</code>.
+        </p>
+        <p class="peq" style="color:#a9b6c6"><strong style="color:#fff">Activación</strong>, definida
+        honestamente: la cuenta hizo <strong style="color:#fff">100 consultas exitosas desde al menos
+        dos direcciones IP distintas</strong>. Eso significa que salió del cuaderno del desarrollador
+        y entró a un servidor. Todo lo anterior es curiosidad.</p>
+      </div>
+
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--cob" style="background:#1c2b44;border-color:#2d4870;color:#9dc0f0">Cobrar</span>
+        <h3 style="margin-top:.6rem;color:#fff">El medidor cobra; el log abona</h3>
+        <p class="peq" style="color:#a9b6c6">
+          Cada respuesta escribe una línea de uso. A fin de mes el medidor cobra la tarjeta (Stripe;
+          Flow como respaldo para tarjetas chilenas) y un integrador DTE emite la boleta o factura
+          electrónica contra el SII. Sin cobranza, sin factura a mano.
+        </p>
+        <p class="peq" style="color:#a9b6c6">Y al revés: <strong style="color:#fff">el mismo log
+        calcula los abonos.</strong> Si <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">estado_respuesta ≠ completo</code>,
+        la consulta no entra a la factura. Nadie tiene que pedirlo.</p>
+      </div>
+
+      <div class="ficha" style="background:#161d27;border-color:#232c39">
+        <span class="eti eti--al" style="background:#3a2c10;border-color:#6b5220;color:#f0b429">Soportar</span>
+        <h3 style="margin-top:.6rem;color:#fff">Reembolso automático, no un agente que improvisa</h3>
+        <p class="peq" style="color:#a9b6c6">
+          Ésta es la decisión de diseño más importante de todo el documento, así que la justificamos.
+        </p>
+        <p class="peq" style="color:#a9b6c6">
+          Un agente LLM contestando «¿por qué su API dice que mi proveedor está inhábil?» va a
+          alucinar sobre un hecho jurídico y financiero. Una respuesta inventada acá <strong
+          style="color:#fff">le cuesta plata al cliente y nos cuesta el negocio</strong>. Un
+          reembolso, en cambio, es una acción acotada, auditable, reversible y barata.
+          <strong style="color:#fff">Preferimos devolver la plata antes que inventar una explicación.</strong>
+        </p>
+      </div>
+    </div>
+
+    <h3 style="color:#fff;margin-top:var(--sp-xl)">La escalera de soporte, completa</h3>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla tabla--fija">
+        <thead><tr><th style="color:#7d8b9c;border-color:#2b3644">Nivel</th><th style="color:#7d8b9c;border-color:#2b3644">Qué es</th><th style="color:#7d8b9c;border-color:#2b3644">Qué resuelve</th></tr></thead>
+        <tbody style="color:#a9b6c6">
+          <tr><td style="border-color:#232c39;color:#fff"><strong>0</strong></td><td style="border-color:#232c39;color:#a9b6c6">La respuesta misma. <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">_meta</code> y <code style="background:#0d1219;border-color:#2b3644;color:#9dc0f0">avisos</code>.</td><td style="border-color:#232c39;color:#a9b6c6">La mayoría de las preguntas, antes de que se hagan. «¿Por qué está vacío?» ya viene contestado adentro.</td></tr>
+          <tr><td style="border-color:#232c39;color:#fff"><strong>1</strong></td><td style="border-color:#232c39;color:#a9b6c6">Documentación + página de estado pública + post-mortems de cada caída.</td><td style="border-color:#232c39;color:#a9b6c6">«¿Está caído o soy yo?» — se contesta sin escribirle a nadie.</td></tr>
+          <tr><td style="border-color:#232c39;color:#fff"><strong>2</strong></td><td style="border-color:#232c39;color:#a9b6c6">Asistente de <strong style="color:#fff">recuperación estricta</strong> sobre la documentación y el log de estado. Nunca sobre el dato de una empresa.</td><td style="border-color:#232c39;color:#a9b6c6">Preguntas de integración. Si no puede citar la doc, no responde.</td></tr>
+          <tr><td style="border-color:#232c39;color:#fff"><strong>3</strong></td><td style="border-color:#232c39;color:#a9b6c6">«No tengo cómo responder esto.» Abono automático de las consultas del caso + registro público.</td><td style="border-color:#232c39;color:#a9b6c6">Todo lo demás. Se pierde plata a propósito para no perder credibilidad.</td></tr>
+          <tr><td style="border-color:#232c39;color:#fff"><strong>4</strong></td><td style="border-color:#232c39;color:#a9b6c6"><em>No existe.</em> No hay un humano detrás.</td><td style="border-color:#232c39;color:#a9b6c6">Y lo decimos en la documentación. Mentir sobre esto es lo único que convertiría un producto honesto en una estafa.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="color:#fff;margin-top:var(--sp-xl)">Lo que NO logramos automatizar</h3>
+    <p class="peq" style="color:#a9b6c6;max-width:62ch">Cuatro cosas. Ninguna se resuelve con un
+    prompt mejor.</p>
+
+    <div class="rejilla rejilla--2" style="margin-top:var(--sp-s)">
+      <div class="ficha" style="background:transparent;border-color:#3a2c30;border-left:3px solid #f0655f">
+        <h4 style="margin-top:0;color:#fff">1 · Firmar</h4>
+        <p class="peq" style="color:#a9b6c6">Un banco exige contrato de tratamiento de datos, cuestionario
+        de proveedor crítico y revisión de seguridad. Eso lo firma una persona jurídica con un abogado.
+        <strong style="color:#fff">Consecuencia: renunciamos al segmento que mejor paga.</strong> No hay
+        vuelta: es el precio de no tener a nadie.</p>
+      </div>
+      <div class="ficha" style="background:transparent;border-color:#3a2c30;border-left:3px solid #f0655f">
+        <h4 style="margin-top:0;color:#fff">2 · Decidir cuando una fuente cambia de régimen</h4>
+        <p class="peq" style="color:#a9b6c6">Si cambia un selector, el adaptador se repara solo: se detecta
+        la caída de cobertura, un agente re-deriva el parser y lo valida contra un conjunto dorado. Pero si
+        la fuente pone captcha, exige login o lo prohíbe en sus términos, la decisión —negociar, pagar o
+        perder la fuente— es un <strong style="color:#fff">juicio de licitud</strong>. Automatizarlo mal es
+        exactamente cómo un sistema autónomo se mete en un problema legal.</p>
+      </div>
+      <div class="ficha" style="background:transparent;border-color:#3a2c30;border-left:3px solid #f0655f">
+        <h4 style="margin-top:0;color:#fff">3 · Contestarle a la autoridad</h4>
+        <p class="peq" style="color:#a9b6c6">El endpoint de supresión corre solo. Pero explicarle a la
+        Agencia de Protección de Datos cuál es la base de licitud de un tratamiento es un acto jurídico,
+        no una respuesta HTTP. Ahí hay que aparecer.</p>
+      </div>
+      <div class="ficha" style="background:transparent;border-color:#3a2c30;border-left:3px solid #f0655f">
+        <h4 style="margin-top:0;color:#fff">4 · Añadir una fuente nueva</h4>
+        <p class="peq" style="color:#a9b6c6">Raspar el portal es trivial y lo hace un agente en una tarde.
+        Decidir <em>si se puede</em> —términos de uso, robots.txt, si hay datos personales adentro— es el
+        trabajo caro, y es criterio, no cómputo.</p>
+      </div>
+    </div>
+
+    <p class="lede" style="color:#fff;margin-top:var(--sp-l);max-width:60ch">
+      Resumido: el piloto automático <strong>vende, entrega, cobra y se disculpa</strong> solo.
+      Lo que no puede hacer solo es <strong>firmar</strong> y <strong>decidir qué es lícito</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ CANALES ============ -->
+<section class="seccion" id="canales">
+  <div class="container">
+    <span class="eyebrow">07 · Canales de adquisición</span>
+    <h2 style="margin-top:0">Rankeados, y todos ejecutables por una máquina</h2>
+    <p class="max-60">Un canal que necesita a alguien no es un canal para este negocio. Éstos
+    corren por API, se miden solos y se apagan solos cuando el juez lo dice.</p>
+
+    <div style="margin-top:var(--sp-m)">
+      <div class="canal">
+        <span class="canal__n">1</span>
+        <div>
+          <h3>SEO programático en dominio propio</h3>
+          <p class="peq">Una página por fuente (11), una por caso de uso (18), una por pregunta
+          long-tail («cómo saber si una empresa es proveedora del Estado», «qué significa inhábil en
+          ChileProveedores», «cómo validar un RUT en producción»), y <strong>perfiles públicos
+          parciales</strong> de hasta 50.000 empresas — sólo hechos societarios, jamás una persona
+          natural, con endpoint de supresión honrado en 48 h.</p>
+          <p class="peq">Las páginas se generan solas desde el catálogo de campos y desde el log de
+          incidentes. Son verdaderas porque salen del sistema, no de un prompt creativo.
+          <strong>Costo marginal ≈ 0. Es el canal principal y es el que decide si esto vive.</strong></p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">2</span>
+        <div>
+          <h3>La documentación misma</h3>
+          <p class="peq">La landing <em>es</em> la doc. Un desarrollador que busca «api rut chile json»
+          tiene que caer en una página donde ya puede copiar el <code>curl</code>. No hay página de
+          producto separada porque no hay nada que vender aparte del endpoint.</p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">3</span>
+        <div>
+          <h3>Google Ads sobre intención de desarrollador</h3>
+          <p class="peq">Términos con intención pura: «api rut chile», «api mercado publico proveedor»,
+          «consultar empresa por rut api», «validar rut api». <strong>CPC estimado $700</strong>,
+          conversión a registro 8%, de registro a pago 6% → <strong>CAC $145.833</strong>
+          <span class="eti eti--val">estimación</span>.</p>
+          <p class="peq">El problema no es el precio: es que el volumen de búsqueda mensual en Chile es de
+          pocos cientos. Tope duro de $25.000/día en <code>autopilot.json</code>, más que suficiente para
+          agotar el inventario.</p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">4</span>
+        <div>
+          <h3>Marketplaces de API</h3>
+          <p class="peq">Listado propio en RapidAPI y equivalentes. Comisión ~20% del ingreso originado:
+          caro, pero sin caja adelantada y con intención pura. Es el único canal donde el cliente llega
+          ya sabiendo que quiere comprar una API.</p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">5</span>
+        <div>
+          <h3>La cuenta de la marca publicando el estado de las fuentes</h3>
+          <p class="peq">Cada vez que una fuente se cae o cambia de maqueta, publicamos el incidente con
+          su diff: «INAPI cambió el formulario del buscador el 3 de junio; nuestro adaptador estuvo caído
+          6 horas; acá está el parche». Es contenido útil, es verdad, es indexable, y <strong>es la prueba
+          del producto</strong>.</p>
+          <p class="peq">Es nuestra marca hablando con su nombre en su propia cuenta. Permitido, honesto y
+          automatizable de punta a punta.</p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">6</span>
+        <div>
+          <h3>Correo a quien se registró</h3>
+          <p class="peq">Sólo opt-in, baja en un clic honrada al instante. Tres correos: la llave, el
+          primer <code>curl</code>, el primer webhook. Después, silencio hasta que pase algo real.</p>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">7</span>
+        <div>
+          <h3>Patrocinio comprado en newsletters de desarrolladores</h3>
+          <p class="peq">Declarado como publicidad. Barato en LatAm. Es el único gasto de marca que hacemos.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--sp-xl)">Lo que NO vamos a hacer, y por qué</h3>
+    <div class="veto" style="margin-top:var(--sp-s)">
+      <p><strong>Foros y comunidades con cuentas que fingen ser usuarios orgánicos.</strong>
+      Está prohibido por el kernel del sistema, y además nos quemaría el único lugar donde los
+      desarrolladores todavía confían en algo. Un sistema autónomo que hace astroturfing no es un
+      negocio autónomo: es una máquina de destruir sus propios canales. Si algún día participamos en
+      una comunidad, será con la cuenta de la marca, identificada, y aceptando que nos moderen.</p>
+      <p><strong>Outbound en frío a listas raspadas de LinkedIn o WhatsApp.</strong> Choca con la
+      Ley 19.628 y, sobre todo, choca con nuestra propia posición sobre datos personales. Sería
+      vendible y sería una hipocresía.</p>
+      <p><strong>Meta Ads e Instagram.</strong> No está prohibido: simplemente no sirve. Nadie compra
+      una API de verificación de empresas mientras mira reels. Lo escribimos para no llenar la casilla
+      con un canal que sabemos que no funciona.</p>
+      <p><strong>Llamadas salientes con voz sintética.</strong> No. <code>voz_saliente: false</code> en
+      el manifiesto, y no es un ajuste que pensemos cambiar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IA EN EL MARKETING ============ -->
+<section class="seccion seccion--gris" id="ia">
+  <div class="container">
+    <span class="eyebrow">08 · IA en el marketing</span>
+    <h2 style="margin-top:0">Dónde ayuda de verdad y dónde es una pérdida de tiempo</h2>
+    <div class="cuadro-2" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <span class="eti eti--ok"><span class="punto"></span>Sí, y mueve la aguja</span>
+        <ul class="lista" style="margin-top:var(--sp-s)">
+          <li><strong>Generar y mantener las páginas de SEO programático.</strong> No inventando texto:
+          <em>traduciendo el catálogo de campos y el log de incidentes a páginas</em>. El contenido es
+          verdadero porque sale del sistema. Si cambia la frescura de INAPI, la página cambia sola.</li>
+          <li><strong>Escribir y matar variantes de anuncios.</strong> Veinte titulares, se prueban, se
+          apagan por CTR. Trabajo mecánico, sin criterio, perfecto para una máquina.</li>
+          <li><strong>Clasificar los registros nuevos por ICP</strong> a partir del dominio del correo,
+          para decidir a qué secuencia entran. Un clasificador barato con Haiku.</li>
+          <li><strong>Redactar los post-mortems</strong> desde el log real de la caída. El hecho es del
+          sistema; la IA sólo lo pone en castellano.</li>
+        </ul>
+      </div>
+      <div class="ficha">
+        <span class="eti eti--fa"><span class="punto"></span>No, y decirlo importa</span>
+        <ul class="lista" style="margin-top:var(--sp-s)">
+          <li><strong>No genera confianza técnica.</strong> Un desarrollador huele un post escrito por
+          IA en el primer párrafo. Lo que convierte es el post-mortem de una caída de verdad, y ése no
+          se puede inventar: hay que tener la caída.</li>
+          <li><strong>No decide el precio.</strong> El precio es una posición, no una optimización. Que
+          la tarifa de volumen esté publicada es una decisión de identidad, no un test A/B.</li>
+          <li><strong>No hace ventas</strong>, porque no hay ventas. El día que necesitemos un agente de
+          IA que convenza a alguien de comprar, la tesis del producto ya falló.</li>
+          <li><strong>No contesta preguntas sobre el dato de una empresa.</strong> Prohibido en el nivel
+          2 del soporte. Alucinar sobre si una empresa está en el Boletín Concursal es el peor error que
+          este negocio puede cometer.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 90 DÍAS ============ -->
+<section class="seccion" id="dias">
+  <div class="container">
+    <span class="eyebrow">09 · Primeros 90 días</span>
+    <h2 style="margin-top:0">La secuencia de lanzamiento</h2>
+    <div style="margin-top:var(--sp-m)">
+      <div class="paso"><span class="paso__d">DÍA 1–15</span>
+        <p><strong>El núcleo</strong>Los tres adaptadores que importan (Diario Oficial, SII,
+        Mercado Público), el objeto <code>empresa</code>, <code>_meta</code>, y la página de estado
+        pública desde el primer día. Si la página de estado no está, no salimos.</p></div>
+      <div class="paso"><span class="paso__d">DÍA 16–30</span>
+        <p><strong>El sandbox y las docs</strong>500 consultas sin tarjeta. 40 páginas de SEO
+        programático generadas del catálogo. Google Ads con tope de $8.000/día. Primer registro.</p></div>
+      <div class="paso"><span class="paso__d">DÍA 31–45</span>
+        <p><strong>Cobrar</strong>Medidor de uso, Stripe, integrador DTE para la boleta electrónica, y
+        la lógica de abono automático. <strong>El primer peso cobrado sin que nadie hable con nadie es
+        el hito que valida la tesis entera.</strong></p></div>
+      <div class="paso"><span class="paso__d">DÍA 46–60</span>
+        <p><strong>Vigilancia</strong>Webhooks de cambio y suscripción por RUT — el producto que
+        retiene. Listado en RapidAPI. Los ocho adaptadores restantes.</p></div>
+      <div class="paso"><span class="paso__d">DÍA 61–75</span>
+        <p><strong>El motor de SEO</strong>Perfiles públicos parciales de 10.000 empresas, sin una sola
+        persona natural, con el endpoint de supresión funcionando antes de publicar la primera página.
+        En ese orden, no al revés.</p></div>
+      <div class="paso"><span class="paso__d">DÍA 76–90</span>
+        <p><strong>El juicio</strong>Se revisa contra el criterio de muerte del hito 1. Si hay menos de
+        5 llaves activas con ≥100 consultas cada una y ya se gastaron $900.000 en anuncios, se pausa. Sin
+        conversación, sin «démosle un mes más».</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUÉ LO MATA ============ -->
+<section class="seccion seccion--gris" id="riesgo">
+  <div class="container">
+    <span class="eyebrow">10 · Qué mataría esto</span>
+    <h2 style="margin-top:0">Tres formas de morir, en orden de probabilidad</h2>
+
+    <div class="rejilla rejilla--3" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <span class="eti eti--fa"><span class="punto"></span>La más probable</span>
+        <h3 style="margin-top:.6rem">No hay suficiente gente buscando</h3>
+        <p class="peq">El LTV/CAC de 10 lo grita: el problema no es convertir, es que aparezca alguien.
+        Si el volumen de búsqueda en Chile es de 300 personas al mes y sólo el 6% paga, el techo del
+        canal automatizable es de ~18 clientes nuevos al mes en el mejor caso, y muchos menos en la
+        realidad. Es el riesgo número uno y está en el criterio de muerte del hito 4.</p>
+      </div>
+      <div class="ficha">
+        <span class="eti eti--al"><span class="punto"></span>La que más duele</span>
+        <h3 style="margin-top:.6rem">El Estado publica la API</h3>
+        <p class="peq">Si aparece un servicio estatal unificado, con SLA, versionado y las once fuentes
+        normalizadas, el plan básico se muere. Nuestra defensa —que el Estado no va a hacer vigilancia,
+        ni trazabilidad para auditoría, ni se va a cobrar a sí mismo por una falla— es real pero
+        estrecha. Está escrito como criterio de muerte del hito 5, mes 18.</p>
+        <p class="peq">Matiz importante: si el Estado publica <em>una</em> fuente, nos hace más baratos.
+        Sólo el servicio <em>unificado</em> nos mata.</p>
+      </div>
+      <div class="ficha">
+        <span class="eti eti--al"><span class="punto"></span>La silenciosa</span>
+        <h3 style="margin-top:.6rem">Una fuente se cierra</h3>
+        <p class="peq">Si el SII pone captcha o exige ClaveÚnica para la consulta de terceros, perdemos
+        el bloque <code>actividad</code>, que es la mitad del valor. No hay alternativa legal y no hay
+        agente que resuelva eso. Es el escenario en que hay que aparecer con una persona a negociar — y
+        no tenemos persona.</p>
+      </div>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-m)">
+      <span class="aviso__tit">Lo que no nos mata</span>
+      <p>Que alguien copie el producto. Cualquiera puede levantar esto en un mes; lo que no puede es
+      mantenerlo dos años y castigarse a sí mismo cada vez que falla. En un mercado de US$2,5M, además,
+      el segundo entrante descubre rápido que no hay espacio para dos — y esa es, paradójicamente, la
+      mejor protección que tenemos.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Fedatia</strong> — toda cifra de esta página está citada o marcada como estimación con
+    su aritmética a la vista. Las que no nos constan van con
+    <span class="eti eti--val">por validar</span>.</p>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

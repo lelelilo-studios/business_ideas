@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero · Cuantario</title>
+<meta name="description" content="El tablero de Cuantario: gasto contra ingreso de 21 ideas, la bitácora del juez y las acciones que el kernel bloqueó.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&family=Martian+Mono:wght@600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../cuantario.css">
+<style>
+  /* ---- barra de estado del portafolio ---- */
+  .estado {
+    border-bottom: 1px solid var(--line); background: var(--s1);
+    position: sticky; top: 52px; z-index: 50;
+  }
+  .estado-in { display: flex; align-items: center; gap: var(--sp-xs); flex-wrap: wrap; padding: 8px 0; }
+  .luz { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--ink-2); }
+  .luz .pt { width: 7px; height: 7px; background: var(--in); flex: none; }
+  .luz.off .pt { background: var(--out); }
+  .estado .rel { margin-left: auto; font-size: 0.7rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  #armar { min-height: 34px; padding: 0 10px; }
+
+  /* ---- detalle ---- */
+  #detalle[hidden] { display: none; }
+  .det-g { display: grid; gap: 1px; background: var(--line); }
+  @media (min-width: 62em) { .det-g { grid-template-columns: 1.35fr 1fr; } }
+  .det-c { background: var(--s1); padding: var(--sp-s); }
+  .canal { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 0.78rem; }
+  .canal:last-child { border-bottom: 0; }
+  .canal .k { display: flex; align-items: center; gap: 7px; }
+  .canal .k .sw { width: 9px; height: 9px; }
+  .canal .meta { grid-column: 1 / -1; font-size: 0.68rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .canal .v { font-variant-numeric: tabular-nums; text-align: right; }
+
+  .barra-tope { height: 24px; border: 1px solid var(--line-2); display: flex; background: var(--bg); }
+  .barra-tope i { display: block; height: 100%; }
+
+  .apagado { opacity: .35; pointer-events: none; }
+  .vacio { padding: var(--sp-m); text-align: center; color: var(--ink-3); font-size: 0.8rem; border-bottom: 1px solid var(--line); background: var(--s1); }
+  .ctl { display: flex; gap: var(--sp-xs); flex-wrap: wrap; align-items: center; margin-bottom: var(--sp-s); }
+  .ctl label { font-family: var(--disp); font-weight: 600; font-size: 0.55rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="../index.html">
+      <svg class="glifo" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 10.5 L6.6 6.2 L9.2 8.6 L12 3.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      Cuantario
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Qué es</a></li>
+        <li><a href="index.html" aria-current="page">Tablero</a></li>
+        <li><a href="../arquitectura.html">Arquitectura</a></li>
+        <li><a href="../integracion.html">Integración</a></li>
+        <li><a href="../economia.html">Economía</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<div class="estado">
+  <div class="wrap estado-in">
+    <span class="luz" id="luz"><span class="pt"></span> <b id="luz-t">ARMADO</b></span>
+    <button class="chip" id="armar" aria-pressed="false">Interruptor global</button>
+    <span class="rel">Portafolio 2026 · corte al 13-07-2026 · 21 ideas · 16 operadas</span>
+  </div>
+</div>
+
+<main id="app">
+
+<!-- ============ P&L ============ -->
+<section class="wrap">
+  <span class="kicker">P&amp;L del portafolio · acumulado 6 meses</span>
+  <h1 style="margin-bottom:var(--sp-s)">Lo que entró, lo que salió, lo que queda.</h1>
+
+  <div class="fichas" id="fichas"></div>
+
+  <div class="panel" style="margin-top:var(--sp-s)">
+    <div class="panel-h"><h3>Ingreso y gasto acumulados</h3></div>
+    <div class="panel-b">
+      <figure>
+        <div class="gwrap" id="g-pl"></div>
+        <div class="leyenda">
+          <span><i class="sw" style="background:var(--in)"></i> Ingreso acumulado</span>
+          <span><i class="sw" style="background:var(--out)"></i> Gasto de canal acumulado</span>
+          <span><i class="sw" style="background:var(--steel)"></i> Costo del sistema acumulado</span>
+        </div>
+        <figcaption>
+          El valle fue en junio: <span class="out num">−$13.214.885</span>. En julio el ingreso mensual
+          (<span class="num">$10.076.000</span>) superó por primera vez al gasto de canal
+          (<span class="num">$7.900.000</span>) y el acumulado empezó a subir.
+          <button class="ver-datos" aria-controls="t-pl" aria-expanded="false">Ver los datos como tabla</button>
+        </figcaption>
+        <div class="datos-tabla" id="t-pl" hidden></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ASIGNACIÓN ============ -->
+<section class="wrap" style="padding-top:0">
+  <div class="panel">
+    <div class="panel-h">
+      <h3>Asignación del mes en curso</h3>
+      <span class="mut" style="font-size:.7rem">El juez asigna dentro del tope. No puede levantarlo.</span>
+    </div>
+    <div class="panel-b">
+      <div class="barra-tope" id="barra-tope" role="img" aria-label="De un tope de portafolio de $9.000.000 mensuales, el juez asignó $8.180.000 y dejó $820.000 sin asignar."></div>
+      <div style="display:flex;justify-content:space-between;gap:var(--sp-xs);flex-wrap:wrap;margin-top:8px;font-size:.74rem" class="num">
+        <span><span class="rot">Asignado</span>$8.180.000</span>
+        <span><span class="rot">Sin asignar</span><span class="mut">$820.000</span></span>
+        <span style="text-align:right"><span class="rot">Tope de portafolio</span>$9.000.000</span>
+      </div>
+      <div class="nota ok" style="margin-top:var(--sp-s)">
+        El juez liberó <b>$1.400.000/mes</b> al matar 04-inventario, pausar 08-laboral y reducir 06-arriendos.
+        Sólo pudo reasignar <b>$590.000</b>: al intentar colocar el resto, 05-contratos y 17-datos-empresas
+        tocaron su tope de escalamiento de +40% por ciclo. Pidió una excepción. <b>El kernel se la negó.</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLA ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">Las 16 ideas en operación</span>
+  <h2 style="margin-bottom:var(--sp-s)">Cada idea, su plata y su semáforo.</h2>
+
+  <div class="ctl">
+    <div class="chips" id="filtros" role="group" aria-label="Filtrar por veredicto">
+      <button class="chip" data-f="todo" aria-pressed="true">Todas <span class="mut" id="n-todo"></span></button>
+      <button class="chip" data-f="escalar" aria-pressed="false">Escalar</button>
+      <button class="chip" data-f="mantener" aria-pressed="false">Mantener</button>
+      <button class="chip" data-f="reducir" aria-pressed="false">Reducir</button>
+      <button class="chip" data-f="pausar" aria-pressed="false">Pausar</button>
+      <button class="chip" data-f="matar" aria-pressed="false">Matar</button>
+      <button class="chip" data-f="sin" aria-pressed="false">Sin veredicto</button>
+    </div>
+    <label for="orden" style="margin-left:auto">Ordenar</label>
+    <select id="orden">
+      <option value="gasto">Gasto ↓</option>
+      <option value="ing">Ingreso ↓</option>
+      <option value="cac">CAC ↑</option>
+      <option value="payback">Payback ↑</option>
+      <option value="runway">Runway ↑</option>
+      <option value="mrr">MRR ↓</option>
+      <option value="id">Carpeta</option>
+    </select>
+  </div>
+
+  <div class="scroll-x">
+    <div class="tabla" id="tabla">
+      <div class="r cab" role="row">
+        <span class="c c-id">Idea</span>
+        <span class="c">Veredicto</span>
+        <span class="c c-n">Gasto</span>
+        <span class="c c-n">Ingreso</span>
+        <span class="c c-n">CAC</span>
+        <span class="c c-n">Payback</span>
+        <span class="c c-n">Activación</span>
+        <span class="c c-n">Churn</span>
+        <span class="c c-n">Runway</span>
+      </div>
+    </div>
+  </div>
+  <p class="mut" style="font-size:.72rem;margin-top:8px">
+    Toca una fila para ver su presupuesto por canal, el bandit reasignando y el embudo.
+    Las 5 nuevas se identifican por su id de carpeta hasta que el orquestador publique su marca:
+    el sistema conoce la idea por el <code>autopilot.json</code>, no por el nombre.
+  </p>
+</section>
+
+<!-- ============ DETALLE ============ -->
+<section class="wrap" style="padding-top:0" id="detalle" hidden>
+  <div class="panel">
+    <div class="panel-h">
+      <h3 id="det-t">Detalle</h3>
+      <span id="det-s"></span>
+      <button class="chip" id="det-x" style="margin-left:auto">Cerrar</button>
+    </div>
+    <div class="det-g">
+      <div class="det-c">
+        <div class="fig-h">
+          <span class="rot">El bandit reasignando · 8 semanas</span>
+          <button class="chip" id="play">Reproducir</button>
+        </div>
+        <div class="gwrap" id="g-band"></div>
+        <figcaption id="band-cap"></figcaption>
+        <button class="ver-datos" aria-controls="t-band" aria-expanded="false">Ver los datos como tabla</button>
+        <div class="datos-tabla" id="t-band" hidden></div>
+      </div>
+      <div class="det-c">
+        <span class="rot" style="margin-bottom:8px">Presupuesto por canal · mes en curso</span>
+        <div id="canales"></div>
+        <span class="rot" style="margin:var(--sp-m) 0 8px">Embudo · acumulado</span>
+        <div class="gwrap" id="g-emb"></div>
+        <figcaption id="emb-cap"></figcaption>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BITÁCORA ============ -->
+<section class="wrap">
+  <span class="kicker">La bitácora del juez</span>
+  <h2 style="margin-bottom:var(--sp-xs)">Nueve decisiones. Ninguna regla inventada.</h2>
+  <p class="prosa prose-max" style="margin-bottom:var(--sp-s)">
+    Cada entrada cita la regla que aplicó y de dónde salió: del <code>roadmap.html</code> que la idea
+    escribió antes de recibir el primer peso. El juez lee ese criterio; no lo escribe.
+    Fíjate en las tres que no son una muerte: son las que prueban que el arco está clavado.
+  </p>
+
+  <div class="ctl">
+    <div class="chips" id="fbit" role="group" aria-label="Filtrar la bitácora">
+      <button class="chip" data-b="todo" aria-pressed="true">Todas</button>
+      <button class="chip" data-b="matar" aria-pressed="false">Muertes</button>
+      <button class="chip" data-b="freno" aria-pressed="false">Frenos al gasto</button>
+      <button class="chip" data-b="sin" aria-pressed="false">Sin veredicto</button>
+    </div>
+  </div>
+
+  <div class="log" id="bitacora"></div>
+</section>
+
+<!-- ============ KERNEL ============ -->
+<section class="wrap">
+  <span class="kicker">El núcleo de cumplimiento</span>
+  <h2 style="margin-bottom:var(--sp-xs)">Las acciones que el kernel no dejó salir.</h2>
+  <p class="prosa prose-max" style="margin-bottom:var(--sp-s)">
+    Un sistema autónomo sin bitácora de lo que <em>no</em> hizo es un sistema que no se puede auditar.
+    Esto no es una lista de recomendaciones ignoradas: son acciones que el motor de campañas
+    <b>intentó emitir</b> y que el kernel bloqueó antes de que tocaran una API.
+  </p>
+
+  <div class="ctl">
+    <div class="chips" id="fker" role="group" aria-label="Filtrar acciones del kernel">
+      <button class="chip" data-k="todo" aria-pressed="true">Todas</button>
+      <button class="chip" data-k="bloq" aria-pressed="false">Bloqueadas</button>
+      <button class="chip" data-k="rec" aria-pressed="false">Recortadas</button>
+      <button class="chip" data-k="perm" aria-pressed="false">Emitidas</button>
+    </div>
+  </div>
+
+  <div class="kx" id="kernel"></div>
+</section>
+
+<!-- ============ FUERA ============ -->
+<section class="wrap">
+  <span class="kicker">Fuera del sistema</span>
+  <h2 style="margin-bottom:var(--sp-xs)">Cinco ideas que no se enchufan, y por qué.</h2>
+  <p class="prosa prose-max" style="margin-bottom:var(--sp-s)">
+    Gasto asignado: <b>$0</b>. No es un pendiente de integración: es el resultado de aplicarles el
+    criterio. Un sistema que dijera «todas pueden» estaría gastando presupuesto de anuncios para
+    llegar a un gerente de operaciones que compra con una homologación y un piloto de 14 semanas.
+    <a href="../integracion.html">La tabla completa está en Integración.</a>
+  </p>
+  <div class="tabla" id="fuera"></div>
+</section>
+
+<footer class="pie">
+  <div class="wrap">
+    Datos mock, aritméticamente consistentes: la suma del gasto de las 16 ideas es el gasto del
+    portafolio ($38.530.000), y la suma de los presupuestos asignados cabe bajo el tope
+    ($8.180.000 ≤ $9.000.000). Ninguna cifra de esta página está suelta.
+  </div>
+</footer>
+
+</main>
+
+<script src="../comun.js"></script>
+<script src="../datos.js"></script>
+<script>
+/* ==================== estado ==================== */
+var ARMADO = true;
+var filtro = 'todo', orden = 'gasto', sel = null, semana = 8, anim = null;
+
+var SEM = {
+  escalar:     ['Escalar',        'M3 3.5 L6 1 L9 3.5 M6 1.5 V11'],
+  mantener:    ['Mantener',       'M1.5 6 H10.5'],
+  reducir:     ['Reducir',        'M3 8.5 L6 11 L9 8.5 M6 10.5 V1'],
+  pausar:      ['Pausada',        'M4 1.5 V10.5 M8 1.5 V10.5'],
+  matar:       ['Matada',         'M2 2 L10 10 M10 2 L2 10'],
+  sin_muestra: ['Sin muestra',    'M6 1.5 A4.5 4.5 0 0 1 6 10.5 M6 10.5 A4.5 4.5 0 0 1 6 1.5'],
+  sin_dato:    ['Sin dato',       'M6 1.5 A4.5 4.5 0 0 1 6 10.5 M6 10.5 A4.5 4.5 0 0 1 6 1.5']
+};
+function semHTML(v) {
+  var s = SEM[v];
+  return '<span class="sem sem-' + v + '"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true">' +
+    '<path d="' + s[1] + '" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" ' +
+    (v.indexOf('sin') === 0 ? 'stroke-dasharray="2 2"' : '') + '/></svg>' + s[0] + '</span>';
+}
+var MARC = {
+  bloq: ['Bloqueada', 'M2 2 L10 10', 'marc-bloq'],
+  rec:  ['Recortada', 'M1.5 2 H10.5 L6.8 6.4 V10.5 L5.2 9.5 V6.4 Z', 'marc-rec'],
+  perm: ['Emitida',   'M2 6.2 L4.8 9 L10 2.6', 'marc-perm']
+};
+function marcHTML(k) {
+  var m = MARC[k];
+  return '<span class="marc ' + m[2] + '"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true">' +
+    (k === 'bloq' ? '<circle cx="6" cy="6" r="4.6" stroke="currentColor" stroke-width="1.3"/>' : '') +
+    '<path d="' + m[1] + '" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '</svg>' + m[0] + '</span>';
+}
+function rw(v) { return v === 'inf' ? '∞' : (v === null ? '—' : dec(v) + ' m'); }
+function nom(i) { return i.marca || i.id.replace(/^\d+-/, ''); }
+
+/* ==================== fichas ==================== */
+(function () {
+  var f = [
+    ['Ingreso acumulado', clp(P.ing), 'in', '324 clientes pagando · MRR ' + clp(P.mrr)],
+    ['Gasto de canal', clp(P.gasto), 'out', 'De un tope total asignado de ' + clp(P.topes)],
+    ['Costo del sistema', clp(P.sist_acum), 'out', clp(P.sist_mes) + '/mes · 6 meses'],
+    ['Resultado acumulado', clp(P.resultado), 'out', 'Run-rate del mes: ' + clp(P.runrate, true) + '/mes']
+  ];
+  document.getElementById('fichas').innerHTML = f.map(function (x) {
+    return '<div class="ficha"><span class="rot">' + x[0] + '</span>' +
+      '<span class="v ' + x[2] + '">' + x[1] + '</span><span class="n">' + x[3] + '</span></div>';
+  }).join('');
+})();
+
+/* ==================== barra de tope ==================== */
+(function () {
+  var b = document.getElementById('barra-tope');
+  var a = P.asig / P.tope_port * 100;
+  b.innerHTML = '<i style="width:' + a + '%;background:var(--in-dim)"></i>' +
+                '<i style="width:' + (100 - a) + '%;background:repeating-linear-gradient(135deg,transparent 0 3px,var(--line) 3px 6px)"></i>';
+})();
+
+/* ==================== gráfico P&L ==================== */
+fluido(document.getElementById('g-pl'), function (host, W, tip) {
+  tip = tip || tipDe(host);
+  var chico = W < 520;
+  var H = chico ? 240 : 300;
+  var m = { t: 14, r: chico ? 12 : 58, b: 26, l: chico ? 44 : 58 };
+  var iw = W - m.l - m.r, ih = H - m.t - m.b;
+  var max = 40e6;
+  var X = function (k) { return m.l + k * iw / (SERIE.length - 1); };
+  var Y = function (v) { return m.t + ih - v / max * ih; };
+
+  var s = el('svg', { class: 'g', viewBox: '0 0 ' + W + ' ' + H, role: 'img',
+    'aria-label': 'Ingreso y gasto acumulados del portafolio en seis meses. El gasto de canal llega a 38,5 millones y el ingreso a 30,2 millones.' });
+
+  for (var v = 0; v <= max; v += 10e6) {
+    s.appendChild(el('line', { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), class: 'grid-l' }));
+    s.appendChild(el('text', { x: m.l - 6, y: Y(v) + 3, class: 'gx', 'text-anchor': 'end' }, v ? (v / 1e6) + ' M' : '0'));
+  }
+  SERIE.forEach(function (d, k) {
+    s.appendChild(el('text', { x: X(k), y: H - 8, class: 'gxl', 'text-anchor': 'middle' }, d.m));
+  });
+
+  /* área entre gasto e ingreso: la pérdida acumulada, a la vista */
+  var area = SERIE.map(function (d, k) { return X(k) + ',' + Y(d.agasto); })
+    .concat(SERIE.map(function (d, k) { return X(SERIE.length - 1 - k) + ',' + Y(SERIE[SERIE.length - 1 - k].aing); }));
+  s.appendChild(el('polygon', { points: area.join(' '), fill: 'var(--out)', 'fill-opacity': .07 }));
+
+  function linea(campo, color, ancho) {
+    var p = SERIE.map(function (d, k) { return (k ? 'L' : 'M') + X(k) + ' ' + Y(d[campo]); }).join(' ');
+    s.appendChild(el('path', { d: p, fill: 'none', stroke: color, 'stroke-width': ancho || 2,
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+  }
+  linea('asist', 'var(--steel)', 1.5);
+  linea('agasto', 'var(--out)');
+  linea('aing', 'var(--in)');
+
+  SERIE.forEach(function (d, k) {
+    s.appendChild(el('circle', { cx: X(k), cy: Y(d.aing), r: 3, fill: 'var(--in)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+    s.appendChild(el('circle', { cx: X(k), cy: Y(d.agasto), r: 3, fill: 'var(--out)', stroke: 'var(--s1)', 'stroke-width': 2 }));
+  });
+
+  if (!chico) {
+    var L = SERIE.length - 1;
+    s.appendChild(el('text', { x: X(L) + 8, y: Y(SERIE[L].agasto) + 3, class: 'gx', fill: 'var(--out)' }, '38,5 M'));
+    s.appendChild(el('text', { x: X(L) + 8, y: Y(SERIE[L].aing) + 3, class: 'gx', fill: 'var(--in)' }, '30,2 M'));
+    s.appendChild(el('text', { x: X(L) + 8, y: Y(SERIE[L].asist) + 3, class: 'gx' }, '3,2 M'));
+  }
+  /* el valle */
+  s.appendChild(el('line', { x1: X(4), x2: X(4), y1: m.t, y2: m.t + ih, stroke: 'var(--line-2)',
+    'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+  s.appendChild(el('text', { x: X(4), y: m.t - 3, class: 'gxl', 'text-anchor': 'middle', fill: 'var(--ink-2)' }, 'valle'));
+
+  /* crosshair */
+  var vl = el('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--line-2)', 'stroke-width': 1, opacity: 0 });
+  s.appendChild(vl);
+  var hit = el('rect', { x: m.l, y: m.t, width: iw, height: ih, fill: 'transparent' });
+  s.appendChild(hit);
+  function mover(ev) {
+    var r = s.getBoundingClientRect();
+    var px = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) * (W / r.width);
+    var k = Math.max(0, Math.min(SERIE.length - 1, Math.round((px - m.l) / (iw / (SERIE.length - 1)))));
+    var d = SERIE[k];
+    vl.setAttribute('x1', X(k)); vl.setAttribute('x2', X(k)); vl.setAttribute('opacity', 1);
+    mostrarTip(tip, host, X(k) * (r.width / W), Y(d.aing) * (r.height / H),
+      '<b>' + d.m + ' 2026</b>' +
+      '<span class="in">Ingreso ' + clp(d.aing) + '</span><br>' +
+      '<span class="out">Gasto&nbsp; ' + clp(d.agasto) + '</span><br>' +
+      '<span class="mut">Sistema ' + clp(d.asist) + '</span><br>' +
+      'Resultado <b class="' + (d.res < 0 ? 'out' : 'in') + '">' + clp(d.res) + '</b>');
+  }
+  hit.addEventListener('mousemove', mover);
+  hit.addEventListener('touchstart', mover, { passive: true });
+  hit.addEventListener('touchmove', mover, { passive: true });
+  hit.addEventListener('mouseleave', function () { vl.setAttribute('opacity', 0); ocultarTip(tip); });
+  host.insertBefore(s, tip);
+});
+
+document.getElementById('t-pl').innerHTML =
+  '<table><thead><tr><th>Mes</th><th>Ingreso</th><th>Gasto de canal</th><th>Costo del sistema</th><th>Resultado acum.</th></tr></thead><tbody>' +
+  SERIE.map(function (d) {
+    return '<tr><td>' + d.m + '</td><td>' + clp(d.aing) + '</td><td>' + clp(d.agasto) +
+      '</td><td>' + clp(d.asist) + '</td><td>' + clp(d.res) + '</td></tr>';
+  }).join('') + '</tbody></table>';
+
+/* ==================== tabla de ideas ==================== */
+function pasaFiltro(i) {
+  if (filtro === 'todo') return true;
+  if (filtro === 'sin') return i.ver.indexOf('sin') === 0;
+  return i.ver === filtro;
+}
+function ordenar(a, b) {
+  if (orden === 'id') return a.id.localeCompare(b.id);
+  if (orden === 'cac' || orden === 'payback') return a[orden] - b[orden];
+  if (orden === 'runway') {
+    var f = function (x) { return x.runway === null ? 1e9 : (x.runway === 'inf' ? 1e8 : x.runway); };
+    return f(a) - f(b);
+  }
+  return b[orden] - a[orden];
+}
+function pintarTabla() {
+  var t = document.getElementById('tabla');
+  t.querySelectorAll('.r:not(.cab), .vacio').forEach(function (n) { n.remove(); });
+  var vis = IDEAS.filter(pasaFiltro).sort(ordenar);
+  if (!vis.length) {
+    var v = document.createElement('div'); v.className = 'vacio';
+    v.textContent = 'Ninguna idea con ese veredicto.'; t.appendChild(v); return;
+  }
+  vis.forEach(function (i) {
+    var r = document.createElement('div');
+    r.className = 'r click' + (sel === i.id ? ' sel' : '');
+    r.tabIndex = 0; r.setAttribute('role', 'button');
+    r.setAttribute('aria-label', 'Ver el detalle de ' + nom(i));
+    r.innerHTML =
+      '<span class="c c-id"><span class="fid num">' + i.id + '</span>' +
+        '<span class="fmarca">' + (i.marca || '—') + '</span>' +
+        (i.clase === 'parcial' ? '<span class="mut" style="font-size:.6rem">PARCIAL</span>' : '') + '</span>' +
+      '<span class="c c-ver">' + semHTML(i.ver) + '</span>' +
+      '<span class="c c-n out" data-l="Gasto">' + clp(i.gasto) + '</span>' +
+      '<span class="c c-n in" data-l="Ingreso">' + clp(i.ing) + '</span>' +
+      '<span class="c c-n" data-l="CAC">' + clp(i.cac) + '</span>' +
+      '<span class="c c-n" data-l="Payback">' + dec(i.payback) + ' m</span>' +
+      '<span class="c c-n" data-l="Activación">' + (i.act === null ? '<span class="mut">sin dato</span>' : pct(i.act, 0)) + '</span>' +
+      '<span class="c c-n" data-l="Churn">' + (i.churn === null ? '<span class="mut">—</span>' : pct(i.churn)) + '</span>' +
+      '<span class="c c-n" data-l="Runway">' + rw(i.runway) + '</span>';
+    r.addEventListener('click', function () { abrir(i.id); });
+    r.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(i.id); }
+    });
+    t.appendChild(r);
+  });
+}
+document.getElementById('n-todo').textContent = IDEAS.length;
+document.getElementById('filtros').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  filtro = b.dataset.f;
+  this.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
+  pintarTabla();
+});
+document.getElementById('orden').addEventListener('change', function () { orden = this.value; pintarTabla(); });
+
+/* ==================== detalle ==================== */
+function canalesDe(id) { return (CAN[id] || CAN_DEF).map(function (c) { return c.slice(); }); }
+function cuota(cs, sem) {
+  /* interpolación lineal cuota inicial → final; se normaliza a 100 siempre */
+  var raw = cs.map(function (c) { return c[1] + (c[2] - c[1]) * (sem - 1) / 7; });
+  var s = raw.reduce(function (a, b) { return a + b; }, 0);
+  return raw.map(function (v) { return v / s * 100; });
+}
+var RAMPA = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)'];
+
+function abrir(id) {
+  sel = id; semana = 8;
+  var i = IDEAS.find(function (x) { return x.id === id; });
+  var d = document.getElementById('detalle');
+  d.hidden = false;
+  document.getElementById('det-t').textContent = i.id + ' · ' + (i.marca || 'sin marca aún');
+  document.getElementById('det-s').innerHTML = semHTML(i.ver) +
+    (i.clase === 'parcial' ? ' <span class="mut" style="font-size:.68rem">autonomía parcial — el sistema opera sólo el tope del embudo</span>' : '');
+  pintarTabla(); pintarCanales(i); pintarBandit(i); pintarEmbudo(i);
+  d.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
+document.getElementById('det-x').addEventListener('click', function () {
+  document.getElementById('detalle').hidden = true; sel = null; pintarTabla();
+});
+
+function pintarCanales(i) {
+  var cs = canalesDe(i.id), q = cuota(cs, 8);
+  var pres = i.presup;
+  document.getElementById('canales').innerHTML = cs.map(function (c, k) {
+    var monto = Math.round(pres * q[k] / 100);
+    return '<div class="canal"><span class="k"><i class="sw" style="background:' + RAMPA[k] + '"></i>' +
+      '<code style="background:none;border:0;padding:0;color:var(--ink)">' + c[0] + '</code></span>' +
+      '<span class="v">' + clp(monto) + '</span>' +
+      '<span class="meta">cuota ' + dec(q[k], 0) + '%' +
+      (c[3] ? ' · CAC ' + clp(c[3]) + ' · n=' + c[4] : ' · sin muestra suficiente') + '</span></div>';
+  }).join('') +
+  '<div class="canal" style="border-top:1px solid var(--line-2);margin-top:4px"><span class="k"><b>Total</b></span>' +
+  '<span class="v"><b>' + clp(pres) + '</b></span>' +
+  '<span class="meta">' + (pres === 0 ? 'Presupuesto en cero: el juez la ' + (i.ver === 'matar' ? 'mató' : 'pausó') + '.' : 'Tope mensual del manifiesto.') + '</span></div>';
+}
+
+function pintarBandit(i) {
+  var cs = canalesDe(i.id);
+  fluido(document.getElementById('g-band'), function (host, W, tip) {
+    tip = tip || tipDe(host);
+    var H = 220, m = { t: 10, r: 8, b: 24, l: 30 };
+    var iw = W - m.l - m.r, ih = H - m.t - m.b;
+    var bw = iw / 8 * 0.74, gap = iw / 8;
+    var s = el('svg', { class: 'g', viewBox: '0 0 ' + W + ' ' + H, role: 'img',
+      'aria-label': 'Cuota del presupuesto por canal, semana a semana. El bandit mueve presupuesto hacia el canal de menor CAC.' });
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      var y = m.t + ih - v / 100 * ih;
+      s.appendChild(el('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, class: 'grid-l' }));
+      s.appendChild(el('text', { x: m.l - 5, y: y + 3, class: 'gx', 'text-anchor': 'end' }, v + '%'));
+    });
+    for (var w = 1; w <= semana; w++) {
+      var q = cuota(cs, w), acc = 0;
+      var x = m.l + (w - 1) * gap + (gap - bw) / 2;
+      for (var k = 0; k < cs.length; k++) {
+        var h = q[k] / 100 * ih;
+        var y = m.t + ih - acc - h;
+        var rect = el('rect', { x: x, y: y, width: bw, height: Math.max(0, h - 2), fill: RAMPA[k] });
+        rect.appendChild(el('title', {}, cs[k][0] + ' · semana ' + w + ' · ' + dec(q[k], 0) + '%'));
+        s.appendChild(rect);
+        acc += h;
+      }
+      s.appendChild(el('text', { x: x + bw / 2, y: H - 8, class: 'gxl', 'text-anchor': 'middle' }, 's' + w));
+    }
+    host.insertBefore(s, tip);
+  });
+  var q1 = cuota(cs, 1), q8 = cuota(cs, 8);
+  var gan = 0; for (var k = 1; k < cs.length; k++) if (q8[k] - q1[k] > q8[gan] - q1[gan]) gan = k;
+  var per = 0; for (var k2 = 1; k2 < cs.length; k2++) if (q8[k2] - q1[k2] < q8[per] - q1[per]) per = k2;
+  var cap = document.getElementById('band-cap');
+  if (cs[gan][3]) {
+    cap.innerHTML = 'En 8 semanas el bandit movió el presupuesto de <code>' + cs[per][0] + '</code> (CAC ' +
+      clp(cs[per][3]) + ') a <code>' + cs[gan][0] + '</code> (CAC ' + clp(cs[gan][3]) + ', n=' + cs[gan][4] + '). ' +
+      '<b>No movió un peso hasta tener n ≥ 30 por brazo</b>: las primeras 3 semanas son exploración a cuota fija.';
+  } else {
+    cap.innerHTML = 'Esta idea todavía no tiene muestra por canal suficiente para que el bandit asigne. ' +
+      'Reparto de exploración a cuota fija hasta n ≥ 30 por brazo.';
+  }
+  document.getElementById('t-band').innerHTML =
+    '<table><thead><tr><th>Canal</th><th>Semana 1</th><th>Semana 8</th><th>CAC</th><th>n</th></tr></thead><tbody>' +
+    cs.map(function (c, k) {
+      return '<tr><td>' + c[0] + '</td><td>' + dec(q1[k], 0) + '%</td><td>' + dec(q8[k], 0) + '%</td><td>' +
+        (c[3] ? clp(c[3]) : '—') + '</td><td>' + (c[4] || '—') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+function pintarEmbudo(i) {
+  var host = document.getElementById('g-emb');
+  var cap = document.getElementById('emb-cap');
+  if (i.act === null) {
+    host.innerHTML = '<div class="nota aviso">El manifiesto de ' + nom(i) + ' <b>no publica el evento de activación</b>. ' +
+      'El embudo tiene un hueco y el juez no lo rellena con un supuesto: emite una falla de manifiesto.</div>';
+    cap.innerHTML = 'Visitas y registros se miden; activación, no. El criterio de muerte de esta idea depende justo de ese dato.';
+    return;
+  }
+  var pagando = i.cli;
+  var activados = Math.round(pagando / 0.53);
+  var registros = Math.round(activados / i.act);
+  var visitas = Math.round(registros / 0.031);
+  var E = [['Visitas', visitas], ['Registros', registros], ['Activados', activados], ['Pagando', pagando]];
+  fluido(host, function (h, W, tip) {
+    tip = tip || tipDe(h);
+    var fh = 34, H = E.length * fh + 8, m = { l: 78, r: 4 };
+    var iw = W - m.l - m.r;
+    var s = el('svg', { class: 'g', viewBox: '0 0 ' + W + ' ' + H, role: 'img',
+      'aria-label': 'Embudo: ' + E.map(function (e) { return e[0] + ' ' + e[1]; }).join(', ') });
+    E.forEach(function (e, k) {
+      var y = k * fh + 4;
+      var w = Math.max(2, e[1] / E[0][1] * iw);
+      s.appendChild(el('text', { x: m.l - 7, y: y + 15, class: 'gxl', 'text-anchor': 'end' }, e[0]));
+      var r = el('rect', { x: m.l, y: y, width: w, height: fh - 10, fill: RAMPA[k + 1] });
+      r.appendChild(el('title', {}, e[0] + ': ' + miles(e[1])));
+      s.appendChild(r);
+      var dentro = w > 66;
+      /* la rampa va de claro (c2) a oscuro (c5): tinta oscura sobre los dos pasos claros */
+      s.appendChild(el('text', {
+        x: dentro ? m.l + w - 6 : m.l + w + 6, y: y + 15, class: 'gx',
+        'text-anchor': dentro ? 'end' : 'start',
+        fill: dentro ? (k <= 1 ? '#0B0E10' : 'var(--ink)') : 'var(--ink)'
+      }, miles(e[1])));
+    });
+    h.insertBefore(s, tip);
+  });
+  cap.innerHTML = 'Registro ' + pct(registros / visitas, 1) + ' · <b>activación ' + pct(i.act, 0) +
+    '</b> (la definición que la idea declaró en su manifiesto) · pago ' + pct(pagando / activados, 0) +
+    ' de los activados. CAC resultante: <b>' + clp(i.cac) + '</b>.';
+}
+
+/* reproducir la reasignación */
+document.getElementById('play').addEventListener('click', function () {
+  if (!sel || anim) return;
+  var i = IDEAS.find(function (x) { return x.id === sel; });
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if (reduce) { semana = 8; pintarBandit(i); return; }
+  semana = 1; this.setAttribute('aria-pressed', 'true');
+  var b = this;
+  anim = setInterval(function () {
+    pintarBandit(i);
+    if (++semana > 8) { clearInterval(anim); anim = null; semana = 8; pintarBandit(i); b.removeAttribute('aria-pressed'); }
+  }, 260);
+});
+
+/* ==================== bitácora ==================== */
+function pintarBit() {
+  var f = document.querySelector('#fbit .chip[aria-pressed="true"]').dataset.b;
+  var vis = BIT.filter(function (e) {
+    if (f === 'todo') return true;
+    if (f === 'matar') return e.d === 'matar';
+    if (f === 'freno') return ['pausar', 'reducir', 'tope'].indexOf(e.d) >= 0;
+    if (f === 'sin') return e.d.indexOf('sin') === 0;
+    return true;
+  });
+  document.getElementById('bitacora').innerHTML = vis.map(function (e) {
+    var et = e.d === 'tope'
+      ? '<span class="marc marc-bloq"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.6" stroke="currentColor" stroke-width="1.3"/><path d="M2.7 2.7 L9.3 9.3" stroke="currentColor" stroke-width="1.5"/></svg>Tope duro</span>'
+      : semHTML(e.d);
+    return '<article class="log-e' + (e.destaca ? ' destaca' : '') + '">' +
+      '<div class="log-h">' + et +
+        '<span class="log-i"><b>' + e.idea + '</b>' + (e.marca ? ' · ' + e.marca : '') + '</span>' +
+        '<span class="log-f" style="margin-left:auto">' + e.f + '</span></div>' +
+      '<blockquote class="cita">« ' + e.regla + ' »<span class="fuente">' + e.fuente + '</span></blockquote>' +
+      '<div class="ev">' + e.ev.map(function (x) { return '<span class="kv">· ' + x + '</span>'; }).join('') +
+        '<span class="kv" style="margin-top:8px;color:var(--ink)"><b>Acción:</b> ' + e.acc + '</span></div>' +
+      '</article>';
+  }).join('');
+}
+document.getElementById('fbit').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  this.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
+  pintarBit();
+});
+
+/* ==================== kernel ==================== */
+function pintarKer() {
+  var f = document.querySelector('#fker .chip[aria-pressed="true"]').dataset.k;
+  var vis = KER.filter(function (e) { return f === 'todo' || e.est === f; });
+  document.getElementById('kernel').innerHTML = vis.map(function (e) {
+    return '<div class="kx-e ' + e.est + '">' +
+      '<div>' + marcHTML(e.est) + '<div class="kx-m" style="margin-top:5px">' + e.f + '</div>' +
+        '<div class="kx-m">' + e.idea + '</div></div>' +
+      '<div class="kx-a">' + e.a + '</div>' +
+      '<div class="kx-m"><b>' + e.m + '</b><br>' + e.r + '</div></div>';
+  }).join('');
+  var nb = KER.filter(function (e) { return e.est === 'bloq'; }).length;
+  document.getElementById('ker-n').textContent = nb;
+}
+document.getElementById('fker').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  this.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
+  pintarKer();
+});
+
+/* ==================== fuera del sistema ==================== */
+document.getElementById('fuera').innerHTML = FUERA.map(function (f) {
+  return '<div class="r"><span class="c c-id"><span class="fid num">' + f.id + '</span>' +
+    '<span class="fmarca">' + f.marca + '</span></span>' +
+    '<span class="c c-ver"><span class="sem sem-matar" style="background:transparent;color:var(--out);border-color:var(--out)">No se enchufa</span></span>' +
+    '<span class="c" style="grid-column:1/-1;font-size:.76rem;color:var(--ink-2)">' + f.motivo + '</span>' +
+    '<span class="c c-n out" data-l="Gasto">$0</span>' +
+    '<span class="c c-n in" data-l="Ingreso">$0</span></div>';
+}).join('');
+
+/* ==================== interruptor global ==================== */
+document.getElementById('armar').addEventListener('click', function () {
+  ARMADO = !ARMADO;
+  this.setAttribute('aria-pressed', ARMADO ? 'false' : 'true');
+  this.textContent = ARMADO ? 'Interruptor global' : 'Rearmar';
+  var l = document.getElementById('luz');
+  l.classList.toggle('off', !ARMADO);
+  document.getElementById('luz-t').textContent = ARMADO ? 'ARMADO' : 'DETENIDO';
+  document.getElementById('app').classList.toggle('apagado', !ARMADO);
+  if (!ARMADO) {
+    document.querySelector('.estado .rel').innerHTML =
+      '<b class="out">Todas las campañas pausadas. 0 acciones emitidas. El gasto se detuvo en ' + clp(P.gasto) + '.</b>';
+  } else {
+    document.querySelector('.estado .rel').textContent =
+      'Portafolio 2026 · corte al 13-07-2026 · 21 ideas · 16 operadas';
+  }
+});
+
+/* ==================== arranque ==================== */
+pintarTabla(); pintarBit();
+var span = document.createElement('span'); span.id = 'ker-n'; span.hidden = true;
+document.body.appendChild(span);
+pintarKer();
+</script>
+</body>
+</html>

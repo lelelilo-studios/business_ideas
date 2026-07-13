@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Cotejia · Pizarra de precios</title>
+<meta name="description" content="La pizarra de Cotejia: tu precio contra el de la competencia, el margen en juego y la sugerencia con la regla que la generó.">
+<!-- DIRECCIÓN DE ARTE: cinta de cotizaciones / mesa de trading. Fondo casi negro,
+     cifras monoespaciadas tabulares, verde y rojo como DATO (sube/baja), densidad alta. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* ---------- demo: la pizarra ---------- */
+  .demo-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+  }
+  .demo-bar-in {
+    max-width: var(--maxw); margin: 0 auto; padding: 0 16px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  }
+  .shop {
+    font-family: var(--mono); font-size: .78rem; color: var(--ink-2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .shop b { color: var(--ink); font-weight: 500; }
+  .conn {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-3);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .conn::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--up); box-shadow: 0 0 0 2px rgba(22,179,100,.18);
+  }
+  .spacer { flex: 1 1 auto; }
+
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--line);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    background: none; border: 0; border-bottom: 2px solid transparent;
+    color: var(--ink-3); font-family: var(--mono); font-size: .76rem;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 0 14px; min-height: 46px; cursor: pointer; white-space: nowrap;
+  }
+  .tab[aria-selected="true"] { color: var(--amber); border-bottom-color: var(--amber); }
+  .tab:hover { color: var(--ink); }
+  .tab .badge {
+    display: inline-block; margin-left: 6px; padding: 1px 5px;
+    border-radius: 2px; background: var(--surface-3); color: var(--ink-2);
+    font-size: .64rem;
+  }
+  .panel[hidden] { display: none; }
+
+  /* barra de estado */
+  .statbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+  @media (min-width: 760px) { .statbar { grid-template-columns: repeat(4, 1fr); } }
+  .statbar .stat { padding: 10px 12px; }
+  .statbar .stat .v { font-size: 1.15rem; }
+
+  /* alerta de bucle */
+  .alarm {
+    border: 1px solid rgba(242,85,90,.45);
+    border-left: 3px solid var(--down);
+    background: linear-gradient(90deg, rgba(242,85,90,.09), transparent 60%);
+    border-radius: var(--r);
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  }
+  .alarm .txt { flex: 1 1 240px; font-size: .9rem; color: var(--ink-2); }
+  .alarm .txt b { color: var(--ink); }
+  .alarm .ttl {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--down); display: block; margin-bottom: 2px;
+  }
+
+  /* filas de la pizarra */
+  .pz { display: flex; flex-direction: column; gap: 8px; }
+  .row {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--line-2);
+    border-radius: var(--r);
+    padding: 12px;
+  }
+  .row.act-subir   { border-left-color: var(--up); }
+  .row.act-bajar   { border-left-color: var(--s2); }
+  .row.act-congelar{ border-left-color: var(--down); }
+  .row.act-mantener{ border-left-color: var(--line-2); }
+  .row.aplicada { opacity: .62; }
+
+  .row-head { display: flex; align-items: flex-start; gap: 10px; }
+  .row-name { flex: 1 1 auto; min-width: 0; }
+  .row-name .n {
+    font-weight: 600; font-size: .95rem; color: var(--ink); display: block;
+    line-height: 1.3;
+  }
+  .row-name .m {
+    font-family: var(--mono); font-size: .68rem; color: var(--ink-3);
+    letter-spacing: .04em; display: block; margin-top: 3px;
+  }
+  .cells {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px;
+    margin: 12px 0 10px;
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+  }
+  .cell .k {
+    font-size: .62rem; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--ink-3); display: block;
+  }
+  .cell .v { font-size: .92rem; color: var(--ink); display: block; margin-top: 2px; }
+  .cell .v small { font-size: .72rem; color: var(--ink-3); font-weight: 400; }
+  .spark { display: none; }
+
+  .sugg {
+    border-top: 1px dashed var(--line-2);
+    padding-top: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .sugg-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sugg-price {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    font-size: 1rem; font-weight: 600; color: var(--ink);
+  }
+  .sugg-delta { font-family: var(--mono); font-size: .82rem; }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .why { font-size: .84rem; color: var(--ink-2); }
+  .why b { color: var(--ink); font-weight: 500; }
+
+  @media (min-width: 1000px) {
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 0 16px; align-items: start; padding: 12px 14px; }
+    .row-head { grid-column: 1 / -1; }
+    .cells {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(6, minmax(0,1fr));
+      margin: 10px 0 10px;
+    }
+    .spark { display: block; }
+    .sugg { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; }
+    .sugg .left { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; }
+  }
+
+  /* detalle */
+  .detail {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(6,8,11,.78);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+  }
+  .detail[hidden] { display: none; }
+  .detail-box {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: var(--r) var(--r) 0 0;
+    width: 100%; max-width: 860px;
+    max-height: 92vh; overflow-y: auto;
+    padding: 16px;
+  }
+  @media (min-width: 760px) {
+    .detail { align-items: center; padding: 24px; }
+    .detail-box { border-radius: var(--r); padding: 22px; }
+  }
+  .detail-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 4px; }
+  .x-btn {
+    background: transparent; border: 1px solid var(--line-2); color: var(--ink-2);
+    width: 44px; height: 44px; min-width: 44px; border-radius: var(--r);
+    font-family: var(--mono); font-size: 1rem; cursor: pointer; line-height: 1;
+  }
+  .x-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  .chart-wrap { position: relative; margin: 8px 0 0; }
+  .tip {
+    position: absolute; pointer-events: none;
+    background: var(--surface-3); border: 1px solid var(--line-2);
+    border-radius: var(--r); padding: 8px 10px;
+    font-family: var(--mono); font-size: .72rem; line-height: 1.5;
+    color: var(--ink-2); white-space: nowrap; z-index: 5;
+    box-shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+  .tip[hidden] { display: none; }
+  .tip .d { color: var(--ink-3); display: block; margin-bottom: 3px; }
+  .tip .r { display: flex; align-items: center; gap: 6px; }
+  .tip .r .sw { width: 10px; height: 3px; border-radius: 2px; }
+  .tip .r b { color: var(--ink); font-weight: 500; margin-left: auto; padding-left: 12px; font-variant-numeric: tabular-nums; }
+
+  /* reglas */
+  .rules { display: grid; gap: 14px; }
+  @media (min-width: 860px) { .rules { grid-template-columns: 1.1fr .9fr; align-items: start; } }
+  .fld { margin-bottom: 18px; }
+  .fld label {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px;
+  }
+  .fld label .val { color: var(--amber); font-size: .86rem; letter-spacing: 0; text-transform: none; }
+  .fld .hint { font-size: .8rem; color: var(--ink-3); margin-top: 6px; line-height: 1.45; }
+  input[type=range] {
+    width: 100%; height: 44px; background: transparent; -webkit-appearance: none; appearance: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 3px; background: var(--line-2); border-radius: 2px;
+  }
+  input[type=range]::-moz-range-track { height: 3px; background: var(--line-2); border-radius: 2px; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--amber); border: 0; margin-top: -8px;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--amber); border: 0;
+  }
+  .seg { display: flex; gap: 0; border: 1px solid var(--line-2); border-radius: var(--r); overflow: hidden; }
+  .seg button {
+    flex: 1; background: transparent; border: 0; border-right: 1px solid var(--line-2);
+    color: var(--ink-2); font-family: var(--mono); font-size: .74rem;
+    min-height: 44px; padding: 0 8px; cursor: pointer;
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--surface-3); color: var(--amber); }
+  .sw-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line); min-height: 44px;
+  }
+  .sw-row:last-child { border-bottom: 0; }
+  .sw-row .t { font-size: .9rem; color: var(--ink); }
+  .sw-row .t small { display: block; color: var(--ink-3); font-size: .78rem; margin-top: 2px; }
+  .toggle {
+    position: relative; width: 52px; height: 28px; min-width: 52px;
+    background: var(--surface-3); border: 1px solid var(--line-2);
+    border-radius: 16px; cursor: pointer; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--ink-3); transition: transform .16s ease, background .16s ease;
+  }
+  .toggle[aria-pressed="true"] { border-color: var(--amber); }
+  .toggle[aria-pressed="true"]::after { transform: translateX(24px); background: var(--amber); }
+  @media (prefers-reduced-motion: reduce) { .toggle::after { transition: none; } }
+
+  /* bitácora */
+  .log { list-style: none; padding: 0; margin: 0; }
+  .log li {
+    display: flex; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: .78rem; color: var(--ink-2);
+    align-items: flex-start;
+  }
+  .log li .ts { color: var(--ink-3); min-width: 46px; }
+  .log li .bd { flex: 1; }
+  .log li .bd b { color: var(--ink); font-weight: 500; }
+  .log-empty { color: var(--ink-3); font-family: var(--mono); font-size: .82rem; padding: 16px 0; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+    background: var(--surface-3); border: 1px solid var(--amber);
+    color: var(--ink); font-family: var(--mono); font-size: .78rem;
+    padding: 10px 14px; border-radius: var(--r); z-index: 80;
+    box-shadow: 0 8px 30px rgba(0,0,0,.6); max-width: 92vw; text-align: center;
+  }
+  .toast[hidden] { display: none; }
+</style>
+</head>
+<body>
+<a class="skip" href="#pz">Saltar a la pizarra</a>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../index.html"><span class="dot" aria-hidden="true"></span>COTEJIA</a>
+    <div class="nav-links">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menú</button>
+  </div>
+  <div class="nav-drawer" id="drawer">
+    <a href="../../index.html">← Ideas</a>
+    <a href="../index.html">Producto</a>
+    <a href="index.html" aria-current="page">Demo</a>
+    <a href="../negocio.html">Negocio</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../stack.html">Arquitectura</a>
+  </div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickTrack"></div>
+</div>
+
+<div class="demo-bar">
+  <div class="demo-bar-in">
+    <span class="shop"><b>Tienda Kütral</b> · Sofía Ilabaca · 76.912.480-3</span>
+    <span class="conn">Mercado Libre</span>
+    <span class="conn">Falabella</span>
+    <span class="conn">Paris</span>
+    <span class="conn">Jumpseller</span>
+    <span class="spacer"></span>
+    <span class="shop" id="clock">—</span>
+  </div>
+</div>
+
+<main class="wrap" id="pz">
+
+  <div class="tabs" role="tablist" aria-label="Secciones del demo">
+    <button class="tab" id="tab-pizarra" role="tab" aria-selected="true" aria-controls="p-pizarra">Pizarra <span class="badge" id="badgeSugg">9</span></button>
+    <button class="tab" id="tab-reglas" role="tab" aria-selected="false" aria-controls="p-reglas">Mis reglas</button>
+    <button class="tab" id="tab-log" role="tab" aria-selected="false" aria-controls="p-log">Bitácora <span class="badge" id="badgeLog">0</span></button>
+  </div>
+
+  <!-- ======================= PIZARRA ======================= -->
+  <div class="panel" id="p-pizarra" role="tabpanel" aria-labelledby="tab-pizarra">
+
+    <div class="statbar">
+      <div class="stat">
+        <span class="v num" id="stMesa">$0</span>
+        <span class="l">Plata sobre la mesa</span>
+        <span class="s">Podrías cobrar más y no lo sabías</span>
+      </div>
+      <div class="stat">
+        <span class="v num" id="stPerdida">$0</span>
+        <span class="l">Venta en riesgo (est.)</span>
+        <span class="s">Margen mensual de los SKU donde estás sobre el mercado, por un 35% de riesgo de perder la venta</span>
+      </div>
+      <div class="stat">
+        <span class="v num" id="stCambios">0 / 2</span>
+        <span class="l">Cambios hoy · tope</span>
+        <span class="s">Tu regla, no la nuestra</span>
+      </div>
+      <div class="stat">
+        <span class="v num" id="stPiso">22%</span>
+        <span class="l">Piso de margen</span>
+        <span class="s">Nunca se cruza. Ni por ti.</span>
+      </div>
+    </div>
+
+    <div class="alarm" id="alarm">
+      <div class="txt">
+        <span class="ttl">Bucle detectado · 06:14 de guerra</span>
+        <b>Termo Stanley Classic 1,4 L</b> — llevas <b>14 bajadas en 6 horas</b> persiguiendo a
+        <b>MegaStock SPA</b>. Responde en 4–7 minutos, siempre con −$490. No es una persona: es un bot.
+        <b>Para de perseguirlo.</b>
+      </div>
+      <button class="btn sm" id="verBucle">Ver la guerra</button>
+    </div>
+
+    <div class="pz" id="pzList"></div>
+
+    <p class="note amber" style="margin-top:16px">
+      <b>Cómo leer esto:</b> cada fila trae la sugerencia y —abajo— <b>la regla que la generó</b>.
+      Si no te gusta la sugerencia, no discutas con ella: <a href="#" id="goRules">cambia la regla</a>
+      y la pizarra entera se recalcula.
+    </p>
+  </div>
+
+  <!-- ======================= REGLAS ======================= -->
+  <div class="panel" id="p-reglas" role="tabpanel" aria-labelledby="tab-reglas" hidden>
+    <div class="rules" style="margin-top:20px">
+      <div class="card">
+        <span class="kicker">Las reglas mandan</span>
+        <h2 style="font-size:1.2rem">Tú defines el juego. El motor no improvisa.</h2>
+        <p style="font-size:.9rem;color:var(--ink-2)">
+          Mueve un control y mira la pizarra: las sugerencias se recalculan con aritmética,
+          no con corazonadas. Ninguna regla puede pedirle al sistema que cruce tu piso de margen.
+        </p>
+
+        <div class="fld">
+          <label for="rPiso">Piso de margen <span class="val" id="vPiso">costo + 22%</span></label>
+          <input type="range" id="rPiso" min="5" max="45" step="1" value="22">
+          <p class="hint">El precio <b>nunca</b> baja de aquí. Es una pared, no una sugerencia:
+            si la regla de precio pide cruzarla, el motor se detiene y te lo dice.</p>
+        </div>
+
+        <div class="fld">
+          <label for="rCambios">Máximo de cambios por día <span class="val" id="vCambios">2</span></label>
+          <input type="range" id="rCambios" min="1" max="8" step="1" value="2">
+          <p class="hint">El freno anti-guerra. Un repricer sin tope es una máquina de
+            regalar margen: 20 cambios al día es un bot peleando con otro bot.</p>
+        </div>
+
+        <div class="fld">
+          <label for="rBajada">Bajada máxima por cambio <span class="val" id="vBajada">$1.500</span></label>
+          <input type="range" id="rBajada" min="200" max="6000" step="100" value="1500">
+          <p class="hint">Cuánto puede ceder el motor de una vez. Bajadas chicas descubren
+            el precio que gana la venta; bajadas grandes queman margen que nunca recuperas.</p>
+        </div>
+
+        <div class="fld">
+          <label>A quién le apunto</label>
+          <div class="seg" id="segObj" role="group" aria-label="Objetivo de precio">
+            <button data-obj="segundo" aria-pressed="true">2º más barato − $10</button>
+            <button data-obj="primero" aria-pressed="false">El más barato</button>
+            <button data-obj="mediana" aria-pressed="false">Mediana + 3%</button>
+          </div>
+          <p class="hint"><b>Por defecto apuntamos al segundo</b>, no al primero. El más barato suele
+            ser un vendedor sin reputación, sin stock o un bot suicida. Perseguirlo es correr al fondo.</p>
+        </div>
+
+        <div class="sw-row">
+          <span class="t">Respetar mi ventaja de despacho
+            <small>Si mi envío es gratis y el del otro no, no lo persigo: el comprador paga el total.</small></span>
+          <button class="toggle" id="swVentaja" aria-pressed="true" aria-label="Respetar ventaja de despacho"></button>
+        </div>
+        <div class="sw-row">
+          <span class="t">Cortar cuando detecte un bot
+            <small>Si el competidor responde a mis cambios en minutos, congelo y te aviso.</small></span>
+          <button class="toggle" id="swBot" aria-pressed="true" aria-label="Cortar bucles contra bots"></button>
+        </div>
+        <div class="sw-row">
+          <span class="t">Piloto automático
+            <small>Aplica solo las sugerencias que cumplen todas mis reglas. Las dudosas te las deja a ti.</small></span>
+          <button class="toggle" id="swAuto" aria-pressed="false" aria-label="Piloto automático"></button>
+        </div>
+      </div>
+
+      <div class="card" style="border-left:2px solid var(--amber)">
+        <span class="kicker">Simulación con tus reglas</span>
+        <div id="ruleSim"></div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+        <h3 style="font-size:.95rem">El piso no es negociable</h3>
+        <p style="font-size:.86rem;color:var(--ink-2);margin-bottom:0">
+          Puedes bajarlo hasta 5% si quieres liquidar stock. Lo que no puedes es pedirle al motor
+          que lo ignore "sólo por hoy". Un repricer que cruza el piso una vez lo cruza siempre,
+          y el margen no vuelve.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= BITÁCORA ======================= -->
+  <div class="panel" id="p-log" role="tabpanel" aria-labelledby="tab-log" hidden>
+    <div class="card" style="margin-top:20px">
+      <span class="kicker">Todo lo que hice, y todo lo que me negué a hacer</span>
+      <h2 style="font-size:1.2rem">Bitácora</h2>
+      <p style="font-size:.88rem;color:var(--ink-2)">
+        Cada cambio de precio queda escrito con la regla que lo autorizó. Y cada acción
+        que el motor <b>bloqueó</b> también: un sistema automático sin registro de lo que
+        <i>no</i> hizo es un sistema que no se puede auditar.
+      </p>
+      <ul class="log" id="logList"></ul>
+      <p class="log-empty" id="logEmpty">Todavía no aplicas ningún cambio. Vuelve a la pizarra.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ======================= DETALLE ======================= -->
+<div class="detail" id="detail" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="detail-box" id="detailBox">
+    <div class="detail-head">
+      <div style="flex:1">
+        <span class="kicker mute" id="dSku">SKU</span>
+        <h2 id="dTitle" style="font-size:1.2rem;margin-bottom:2px">—</h2>
+        <p class="mono" id="dMeta" style="font-size:.76rem;color:var(--ink-3);margin:0"></p>
+      </div>
+      <button class="x-btn" id="dClose" aria-label="Cerrar detalle">✕</button>
+    </div>
+    <div id="dBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<footer>
+  <div class="wrap">
+    <p>Datos de demostración. Tienda, competidores y precios son ficticios pero verosímiles —
+      productos y marketplaces reales del comercio chileno. Nada aquí se conecta a un marketplace de verdad.</p>
+    <p><a href="../index.html">Cotejia</a> · <a href="../stack.html">Qué está falseado en este demo</a></p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================================
+   COTEJIA — demo. Estado en el cliente, motor de reglas determinista.
+   El motor NO usa IA: es aritmética. La IA sólo empareja productos
+   (¿es el mismo termo?) y escribe el resumen semanal. Ver stack.html.
+   ========================================================================= */
+
+const CLP = n => "$" + Math.round(n).toLocaleString("es-CL");
+const CLPs = n => (n >= 0 ? "+" : "−") + "$" + Math.abs(Math.round(n)).toLocaleString("es-CL");
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- PRNG determinista, para que las series no bailen entre cargas ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+
+/* ---------- Catálogo (mock) ---------- */
+const PRODUCTOS = [
+  {
+    sku: "TK-1042", nombre: "Termo Stanley Classic 1,4 L verde", canal: "Mercado Libre",
+    costo: 28400, precio: 39990, precioAyer: 46990, ventas: 96, demanda: "alta",
+    envioGratis: true, reputacion: "MercadoLíder",
+    comps: [
+      { t: "MegaStock SPA", mk: "Mercado Libre", p: 39500, rep: "Verde", envio: true, bot: true },
+      { t: "OutdoorChile",  mk: "Mercado Libre", p: 44990, rep: "Verde", envio: true, bot: false },
+      { t: "Falabella.com", mk: "Falabella",     p: 47990, rep: "Retail", envio: false, bot: false }
+    ],
+    bucle: true, seed: 11
+  },
+  {
+    sku: "TK-2210", nombre: "Freidora de aire Oster 5,5 L", canal: "Mercado Libre",
+    costo: 31200, precio: 52990, precioAyer: 52990, ventas: 62, demanda: "alta",
+    envioGratis: false, reputacion: "Verde",
+    comps: [
+      { t: "MegaStock SPA",   mk: "Mercado Libre", p: 47990, rep: "Verde", envio: true, bot: true },
+      { t: "Hogar&Cocina SpA",mk: "Mercado Libre", p: 51990, rep: "Verde", envio: true, bot: false },
+      { t: "Paris.cl",        mk: "Paris",         p: 54990, rep: "Retail", envio: false, bot: false }
+    ],
+    palancaEnvio: true, costoEnvio: 2390, seed: 22
+  },
+  {
+    sku: "TK-3301", nombre: "Zapatilla Adidas Runfalcon 3.0 hombre", canal: "Falabella",
+    costo: 27900, precio: 44990, precioAyer: 44990, ventas: 92, demanda: "media",
+    envioGratis: true, reputacion: "MercadoLíder",
+    comps: [
+      { t: "TiendaExpress2020", mk: "Falabella", p: 41990, rep: "Amarilla", envio: false, envioCosto: 3990, bot: false },
+      { t: "SportLine Chile",   mk: "Falabella", p: 44590, rep: "Verde", envio: false, envioCosto: 3490, bot: false },
+      { t: "Ripley.cl",         mk: "Ripley",    p: 46990, rep: "Retail", envio: false, envioCosto: 2990, bot: false }
+    ],
+    noBajar: true, seed: 33
+  },
+  {
+    sku: "TK-1180", nombre: "Saco de dormir Doite Rapel 2 estaciones", canal: "Mercado Libre",
+    costo: 19900, precio: 32990, precioAyer: 32990, ventas: 48, demanda: "alta",
+    envioGratis: true, reputacion: "MercadoLíder",
+    comps: [
+      { t: "CasaOutdoor",   mk: "Mercado Libre", p: 36190, rep: "Verde", envio: true, bot: false },
+      { t: "DeportesGO",    mk: "Mercado Libre", p: 37990, rep: "Verde", envio: true, bot: false },
+      { t: "Falabella.com", mk: "Falabella",     p: 39990, rep: "Retail", envio: false, bot: false }
+    ],
+    seed: 44
+  },
+  {
+    sku: "TK-1501", nombre: "Carpa Coleman Sundome 4 personas", canal: "Mercado Libre",
+    costo: 74500, precio: 109990, precioAyer: 109990, ventas: 22, demanda: "media",
+    envioGratis: true, reputacion: "MercadoLíder",
+    comps: [
+      { t: "DeportesGO",   mk: "Mercado Libre", p: 103990, rep: "Verde", envio: true, bot: false },
+      { t: "CasaOutdoor",  mk: "Mercado Libre", p: 106490, rep: "Verde", envio: true, bot: false },
+      { t: "OutletCamping",mk: "Mercado Libre", p: 99990,  rep: "Amarilla", envio: false, envioCosto: 4990, bot: false }
+    ],
+    seed: 55
+  },
+  {
+    sku: "TK-4020", nombre: "Parlante JBL Flip 6 azul", canal: "Paris",
+    costo: 69900, precio: 89990, precioAyer: 89990, ventas: 35, demanda: "media",
+    envioGratis: false, reputacion: "Verde",
+    comps: [
+      { t: "MegaStock SPA", mk: "Mercado Libre", p: 79990, rep: "Verde", envio: true, bot: true },
+      { t: "Paris.cl",      mk: "Paris",         p: 84990, rep: "Retail", envio: false, bot: false },
+      { t: "Ripley.cl",     mk: "Ripley",        p: 86990, rep: "Retail", envio: false, bot: false }
+    ],
+    seed: 66
+  },
+  {
+    sku: "TK-2760", nombre: "Mochila Totto Tracer 3 gris", canal: "Tienda propia (Jumpseller)",
+    costo: 23400, precio: 39990, precioAyer: 39990, ventas: 40, demanda: "baja",
+    envioGratis: true, reputacion: "Propia",
+    comps: [
+      { t: "Totto.cl",      mk: "Tienda oficial", p: 44990, rep: "Marca", envio: true, bot: false },
+      { t: "Falabella.com", mk: "Falabella",      p: 42990, rep: "Retail", envio: false, bot: false },
+      { t: "MochilasYa",    mk: "Mercado Libre",  p: 41490, rep: "Verde", envio: true, bot: false }
+    ],
+    seed: 77
+  },
+  {
+    sku: "TK-5090", nombre: "Bicicleta Oxford Baltoro aro 29", canal: "Mercado Libre",
+    costo: 189000, precio: 279990, precioAyer: 279990, ventas: 8, demanda: "baja",
+    envioGratis: false, reputacion: "MercadoLíder",
+    comps: [
+      { t: "BiciMundo",   mk: "Mercado Libre", p: 264990, rep: "Verde", envio: true, bot: false },
+      { t: "DeportesGO",  mk: "Mercado Libre", p: 269990, rep: "Verde", envio: true, bot: false },
+      { t: "Ripley.cl",   mk: "Ripley",        p: 274990, rep: "Retail", envio: false, bot: false }
+    ],
+    seed: 88
+  },
+  {
+    sku: "TK-3910", nombre: "Set de sartenes Tramontina 3 piezas", canal: "Ripley",
+    costo: 22800, precio: 34990, precioAyer: 34990, ventas: 55, demanda: "media",
+    envioGratis: false, reputacion: "Verde",
+    comps: [
+      { t: "Hogar&Cocina SpA", mk: "Mercado Libre", p: 32490, rep: "Verde", envio: true, bot: false },
+      { t: "Ripley.cl",        mk: "Ripley",        p: 33990, rep: "Retail", envio: false, bot: false },
+      { t: "Paris.cl",         mk: "Paris",         p: 35990, rep: "Retail", envio: false, bot: false }
+    ],
+    seed: 99
+  }
+];
+
+/* ---------- Estado ---------- */
+const S = {
+  piso: 22, maxCambios: 2, bajadaMax: 1500, obj: "segundo",
+  ventaja: true, cortarBot: true, auto: false,
+  cambiosHoy: 0, aplicadas: {}, ignoradas: {}, log: []
+};
+
+/* ---------- Series de precio (14 días) ---------- */
+function serie(p) {
+  const rnd = mulberry32(p.seed);
+  const dias = 14;
+  const mio = [], c = p.comps.map(() => []);
+  let base = p.precioAyer;
+  for (let d = 0; d < dias; d++) {
+    // mi precio: escalones (cambio sólo algunos días)
+    if (d === 0) mio.push(base);
+    else {
+      const salto = rnd() < 0.22 ? Math.round((rnd() * 2 - 1) * 1200 / 10) * 10 : 0;
+      base = Math.max(p.costo * 1.15, base + salto);
+      mio.push(Math.round(base / 10) * 10);
+    }
+    p.comps.forEach((cp, i) => {
+      const drift = cp.bot ? -0.0016 : (rnd() - 0.48) * 0.004;
+      const prev = d === 0 ? cp.p * (1 + (cp.bot ? 0.14 : 0.03)) : c[i][d - 1];
+      c[i].push(Math.round(prev * (1 + drift + (rnd() - 0.5) * 0.006) / 10) * 10);
+    });
+  }
+  // el último punto es el precio real de hoy
+  mio[dias - 1] = p.precio;
+  p.comps.forEach((cp, i) => { c[i][dias - 1] = cp.p; });
+  return { mio, comps: c };
+}
+PRODUCTOS.forEach(p => { p.serie = serie(p); });
+
+/* ---------- La guerra: 6 horas del bucle (Termo Stanley) ---------- */
+const BUCLE = (() => {
+  const t = [];
+  let mio = 46990, otro = 46490;
+  const h0 = 20 * 60; // 20:00 de ayer
+  for (let i = 0; i < 15; i++) {
+    t.push({ min: h0 + i * 25, mio, otro });
+    if (i < 14) { mio = otro - 500; otro = mio - 490; }
+  }
+  return t;
+})();
+
+/* =========================================================================
+   EL MOTOR. Aritmética pura, sin IA. Devuelve accion + precio + regla + plata.
+   ========================================================================= */
+function evaluar(p) {
+  const piso = Math.round(p.costo * (1 + S.piso / 100) / 10) * 10;
+  // "margen" aquí es margen sobre costo (markup), la misma unidad que el piso:
+  // costo + X%. Mezclar margen-sobre-precio con piso-sobre-costo es el error clásico
+  // que hace que un repricer venda bajo el costo creyendo que va bien.
+  const margenHoy = (p.precio - p.costo) / p.costo;
+  const ordenados = [...p.comps].sort((a, b) => a.p - b.p);
+  const c1 = ordenados[0], c2 = ordenados[1];
+  const mediana = ordenados[Math.floor(ordenados.length / 2)].p;
+
+  const R = { piso, margenHoy, c1, c2, ordenados };
+
+  // -- 1. BUCLE contra un bot: manda por sobre todo lo demás.
+  if (p.bucle && S.cortarBot) {
+    R.accion = "CONGELAR";
+    R.nuevo = p.precio;
+    R.regla = "R0 · Bucle: MegaStock SPA respondió 14 de 14 veces en menos de 7 minutos, siempre con −$490. Eso no es una persona: es un repricer. Congelo 24 h.";
+    R.detalle = "Bajaste $7.000 por unidad en 6 horas persiguiendo a un bot que siempre te deja $490 abajo. Si sigues, cruzas tu piso (" + CLP(piso) + ") el jueves a las 02:10. La guerra no la ganas: la pagas. Congelo en " + CLP(p.precio) + " por 24 h; si el bot se queda solo, en dos días te subo de vuelta bajo " + c2.t + " (" + CLP(c2.p - 10) + ").";
+    R.plata = Math.round(7000 * p.ventas / 30);
+    R.plataTxt = "Ya quemaste ~" + CLP(R.plata) + "/día de margen";
+    R.cuidado = true;
+    return R;
+  }
+
+  // -- 2. Precio objetivo según la regla del cliente.
+  //    Si ya soy el más barato, el techo es quedar justo bajo el más barato (no dejar
+  //    plata sobre la mesa). Si estoy caro, apunto a quien mi regla diga.
+  const soyMasBarato = p.precio < c1.p;
+  let objetivo;
+  if (S.obj === "mediana")      objetivo = Math.round(mediana * 1.03 / 10) * 10;
+  else if (soyMasBarato)        objetivo = c1.p - 10;
+  else if (S.obj === "primero") objetivo = c1.p - 10;
+  else                          objetivo = c2.p - 10; // por defecto: el 2º más barato
+
+  // demanda baja: subo sólo la mitad de la holgura. No inventes demanda que no existe.
+  if (objetivo > p.precio && p.demanda === "baja") {
+    objetivo = p.precio + Math.round((objetivo - p.precio) * 0.5 / 10) * 10;
+  }
+
+  // -- 2b. Ya estoy bajo mi propio piso. La única dirección válida es hacia arriba.
+  if (p.precio < piso) {
+    R.accion = "SUBIR";
+    R.nuevo = piso;
+    R.regla = "R1b · Estás vendiendo bajo tu piso: " + CLP(p.precio) + " contra un piso de " + CLP(piso) + " (costo " + CLP(p.costo) + " + " + S.piso + "%). Ninguna regla de competencia puede pedirte que te quedes aquí.";
+    R.detalle = "Cada unidad que vendes a este precio te deja " + CLP(p.precio - piso) + " menos de lo que decidiste que era tu mínimo. Vuelvo al piso: " + CLP(piso) + ". Si eso te saca del primer lugar, que te saque — el primer lugar a pérdida no es un lugar.";
+    R.plata = (piso - p.precio) * p.ventas;
+    R.plataTxt = "Recuperas " + CLP(R.plata) + "/mes";
+    R.mesa = true;
+    return R;
+  }
+
+  // -- 3. Ventaja de despacho: el comprador paga el TOTAL, no el precio de vitrina.
+  if (S.ventaja && p.envioGratis && objetivo < p.precio) {
+    const sinEnvio = ordenados.filter(c => !c.envio && c.envioCosto && c.p < p.precio);
+    if (sinEnvio.length) {
+      const rival = sinEnvio[0];
+      const totalRival = rival.p + rival.envioCosto;
+      if (totalRival > p.precio) {
+        const bajarHasta = c1.p - 10;
+        const costoBajar = (p.precio - bajarHasta) * p.ventas;
+        R.accion = "MANTENER";
+        R.nuevo = p.precio;
+        R.regla = "R4 · Ventaja de despacho: " + rival.t + " aparece " + CLP(p.precio - rival.p) + " más barato, pero cobra " + CLP(rival.envioCosto) + " de despacho. Total al comprador: " + CLP(totalRival) + " contra tus " + CLP(p.precio) + " con envío gratis. Con despacho incluido, el más barato eres tú.";
+        R.detalle = "Bajar hasta " + CLP(bajarHasta) + " para ganarle en la vitrina te costaría " + CLP(costoBajar) + " al mes (" + CLP(p.precio - bajarHasta) + " × " + p.ventas + " unidades) y no te traería una sola venta más: el comprador ya paga menos contigo.";
+        R.plata = costoBajar;
+        R.plataTxt = "No bajar te ahorra " + CLP(R.plata) + "/mes";
+        R.noBajar = true;
+        return R;
+      }
+    }
+  }
+
+  // -- 4. Palanca no-precio: a veces la respuesta es el despacho, no los $500.
+  if (p.palancaEnvio && !p.envioGratis && c1.envio && c1.p < p.precio) {
+    const bajarHasta = c1.p - 10;
+    const costoBajar = (p.precio - bajarHasta) * p.ventas;
+    const costoEnvio = p.costoEnvio * p.ventas;
+    if (costoEnvio < costoBajar) {
+      R.accion = "MANTENER";
+      R.nuevo = p.precio;
+      R.regla = "R5 · El precio no es la única palanca: ganarle a " + c1.t + " bajando el precio cuesta " + CLP(costoBajar) + "/mes. Activar Envío Full cuesta " + CLP(costoEnvio) + "/mes, y Mercado Libre pondera el envío en el orden de los resultados.";
+      R.detalle = "Bajar " + CLP(p.precio - bajarHasta) + " × " + p.ventas + " unidades = " + CLP(costoBajar) + " de margen al mes, para siempre. El despacho gratis te cuesta " + CLP(p.costoEnvio) + " sólo en las ventas que ocurren: " + CLP(costoEnvio) + " al mes. Ahorras " + CLP(costoBajar - costoEnvio) + " y además subes en el listado. Tu problema aquí no es el precio: es el despacho.";
+      R.plata = costoBajar - costoEnvio;
+      R.plataTxt = "Ahorras " + CLP(R.plata) + "/mes vs. bajar";
+      R.noBajar = true;
+      R.alternativa = "Activar Envío Full";
+      return R;
+    }
+  }
+
+  // -- 5. Piso duro. Es una pared, no una sugerencia.
+  if (objetivo < piso) {
+    R.accion = "MANTENER";
+    R.nuevo = p.precio;
+    R.regla = "R1 · Piso de margen: tu objetivo sería " + CLP(objetivo) + " y tu piso es " + CLP(piso) + " (costo " + CLP(p.costo) + " + " + S.piso + "%). El motor se detiene en la pared.";
+    R.detalle = c1.t + " está vendiendo a " + CLP(c1.p) + ": o compra más barato que tú, o está vendiendo casi sin margen. Igualarlo es vender a pérdida disfrazada de venta. Mantengo " + CLP(p.precio) + " y te aviso si se le acaba el stock — es lo que suele pasar.";
+    R.plata = 0;
+    R.plataTxt = "Piso protegido: " + CLP(piso);
+    R.bloqueado = true;
+    return R;
+  }
+
+  // -- 6. Subir / bajar / mantener.
+  const delta = objetivo - p.precio;
+  if (Math.abs(delta) < 200) {
+    R.accion = "MANTENER";
+    R.nuevo = p.precio;
+    R.regla = "R6 · Ruido: la diferencia con tu objetivo es " + CLP(Math.abs(delta)) + ". No vale un cambio de precio.";
+    R.detalle = "Cambiar el precio por menos de $200 no mueve la venta y te gasta uno de tus " + S.maxCambios + " cambios del día.";
+    R.plata = 0;
+    R.plataTxt = "Nada que hacer";
+    return R;
+  }
+
+  if (delta > 0) {
+    R.accion = "SUBIR";
+    R.nuevo = Math.round(objetivo / 10) * 10;
+    const dem = p.demanda === "alta" ? "vendiste " + p.ventas + " unidades este mes"
+              : p.demanda === "media" ? "la demanda está estable"
+              : "la demanda está baja, así que subo sólo la mitad de la holgura";
+    R.regla = "R2 · Plata sobre la mesa: eres el más barato por " + CLP(c1.p - p.precio) + " sobre " + c1.t + " y " + dem + ". Techo: quedar $10 bajo el más barato = " + CLP(c1.p - 10) + ".";
+    R.detalle = "Subes " + CLP(delta) + " y <b>sigues siendo el más barato del listado</b>. " + CLP(delta) + " × " + p.ventas + " unidades = " + CLP(delta * p.ventas) + " al mes que hoy estás regalando sin que nadie te lo pida.";
+    R.plata = delta * p.ventas;
+    R.plataTxt = "Sobre la mesa: " + CLP(R.plata) + "/mes";
+    R.mesa = true;
+    return R;
+  }
+
+  // bajar, con el freno de bajada máxima
+  let bajada = Math.min(Math.abs(delta), S.bajadaMax);
+  let nuevo = Math.max(piso, p.precio - bajada);
+  const gradual = Math.abs(delta) > S.bajadaMax;
+  R.accion = "BAJAR";
+  R.nuevo = Math.round(nuevo / 10) * 10;
+  R.regla = "R3 · Estás caro: " + c1.t + " está en " + CLP(c1.p) + " y tú en " + CLP(p.precio) + ". Objetivo " + CLP(objetivo) + ", bajada máxima por cambio " + CLP(S.bajadaMax) + "." + (gradual ? " Bajo por escalones, no de un salto." : "");
+  const margenNuevo = ((R.nuevo - p.costo) / p.costo * 100).toFixed(1);
+  R.detalle = "Margen sobre costo después del cambio: " + margenNuevo + "% (tu piso es " + S.piso + "%). " + (gradual ? "Quedan " + CLP(Math.abs(delta) - bajada) + " para llegar al objetivo; si no vendes, el motor baja otro escalón mañana. Bajar por escalones descubre el precio que gana la venta; bajar de un salto regala margen que no vuelve." : "Con esto quedas bajo " + (S.obj === "primero" ? c1.t : c2.t) + " en el listado.");
+  R.plata = Math.round((p.precio - p.costo) * p.ventas * 0.35);
+  R.plataTxt = "Venta en juego: ~" + CLP(R.plata) + "/mes";
+  R.perdida = true;
+  return R;
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+const $ = id => document.getElementById(id);
+
+function sparkSVG(p) {
+  const s = p.serie, w = 84, h = 26, pad = 2;
+  const all = [...s.mio, ...s.comps.flat()];
+  const mn = Math.min(...all), mx = Math.max(...all);
+  const x = i => pad + i * (w - pad * 2) / (s.mio.length - 1);
+  const y = v => h - pad - (v - mn) / (mx - mn || 1) * (h - pad * 2);
+  const path = arr => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ");
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" aria-hidden="true">' +
+    '<path d="' + path(s.comps[0]) + '" fill="none" stroke="var(--s2)" stroke-width="1" opacity=".55"/>' +
+    '<path d="' + path(s.mio) + '" fill="none" stroke="var(--s1)" stroke-width="1.6"/>' +
+    '<circle cx="' + x(13).toFixed(1) + '" cy="' + y(s.mio[13]).toFixed(1) + '" r="2" fill="var(--s1)"/>' +
+    '</svg>';
+}
+
+function tagFor(a) {
+  if (a === "SUBIR") return '<span class="tag up">▲ Subir</span>';
+  if (a === "BAJAR") return '<span class="tag down">▼ Bajar</span>';
+  if (a === "CONGELAR") return '<span class="tag down">◼ Congelar</span>';
+  return '<span class="tag hold">— Mantener</span>';
+}
+
+function render() {
+  const list = $("pzList");
+  list.innerHTML = "";
+  let mesa = 0, perdida = 0;
+
+  PRODUCTOS.forEach(p => {
+    const R = evaluar(p);
+    p._R = R;
+    if (R.mesa) mesa += R.plata;
+    if (R.perdida) perdida += R.plata;
+
+    const ordenados = R.ordenados;
+    const pos = 1 + ordenados.filter(c => c.p < p.precio).length;
+    const margen = (R.margenHoy * 100).toFixed(1);
+    const aplicada = S.aplicadas[p.sku];
+    const cls = "row act-" + R.accion.toLowerCase() + (aplicada ? " aplicada" : "");
+
+    const el = document.createElement("article");
+    el.className = cls;
+    el.innerHTML =
+      '<div class="row-head">' +
+        '<div class="row-name">' +
+          '<span class="n">' + p.nombre + '</span>' +
+          '<span class="m">' + p.sku + ' · ' + p.canal + ' · ' + p.ventas + ' u/mes · demanda ' + p.demanda + '</span>' +
+        '</div>' + tagFor(R.accion) +
+      '</div>' +
+      '<div class="cells">' +
+        '<div class="cell"><span class="k">Mi precio</span><span class="v">' + CLP(p.precio) + '</span></div>' +
+        '<div class="cell"><span class="k">Más barato</span><span class="v">' + CLP(R.c1.p) + ' <small>' + R.c1.t + '</small></span></div>' +
+        '<div class="cell"><span class="k">2º más barato</span><span class="v">' + CLP(R.c2.p) + ' <small>' + R.c2.t + '</small></span></div>' +
+        '<div class="cell"><span class="k">Posición</span><span class="v">' + pos + '° <small>de ' + (ordenados.length + 1) + '</small></span></div>' +
+        '<div class="cell"><span class="k">Margen s/ costo</span><span class="v ' + (R.margenHoy * 100 < S.piso ? "down" : "") + '">' + margen + '% <small>piso ' + S.piso + '%</small></span></div>' +
+        '<div class="cell spark"><span class="k">14 días</span>' + sparkSVG(p) + '</div>' +
+      '</div>' +
+      '<div class="sugg">' +
+        '<div class="left">' +
+          '<div class="sugg-line">' +
+            (aplicada
+              ? '<span class="sugg-price">' + CLP(p.precio) + '</span><span class="tag up">✓ ' + (R.accion === "CONGELAR" ? "Congelado" : "Aplicado") + '</span>'
+              : '<span class="sugg-price">' + CLP(R.nuevo) + '</span>' +
+                (R.nuevo !== p.precio
+                  ? '<span class="sugg-delta ' + (R.nuevo > p.precio ? "up" : "down") + '">' + CLPs(R.nuevo - p.precio) + '</span>'
+                  : '<span class="sugg-delta hold">' + (R.accion === "CONGELAR" ? "congelar 24 h" : "no tocar el precio") + '</span>')) +
+            '<span class="mono" style="font-size:.74rem;color:var(--ink-3)">' + (R.plataTxt || "") + '</span>' +
+          '</div>' +
+          '<span class="rule-chip"><b>' + R.regla.split("·")[0].trim() + '</b> · ' + R.regla.split("·").slice(1).join("·").trim() + '</span>' +
+        '</div>' +
+        '<div class="acts">' +
+          (aplicada ? ''
+            : R.accion === "CONGELAR" ? '<button class="btn sm" data-apply="' + p.sku + '">Congelar 24 h</button>'
+            : R.alternativa ? '<button class="btn sm" data-apply="' + p.sku + '">' + R.alternativa + '</button>'
+            : R.nuevo !== p.precio ? '<button class="btn sm" data-apply="' + p.sku + '">Aplicar</button>'
+            : '') +
+          '<button class="btn sm ghost" data-detail="' + p.sku + '">Detalle</button>' +
+        '</div>' +
+      '</div>';
+    list.appendChild(el);
+  });
+
+  $("stMesa").textContent = CLP(mesa);
+  $("stMesa").className = "v num up";
+  $("stPerdida").textContent = CLP(perdida);
+  $("stPerdida").className = "v num down";
+  $("stCambios").textContent = S.cambiosHoy + " / " + S.maxCambios;
+  $("stPiso").textContent = S.piso + "%";
+  $("badgeSugg").textContent = PRODUCTOS.filter(p =>
+    !S.aplicadas[p.sku] && (p._R.nuevo !== p.precio || p._R.accion === "CONGELAR" || p._R.alternativa)).length;
+  $("badgeLog").textContent = S.log.length;
+  $("alarm").hidden = !S.cortarBot || !!S.aplicadas["TK-1042"];
+
+  renderSim();
+  renderLog();
+}
+
+function renderSim() {
+  const box = $("ruleSim");
+  const cuenta = { SUBIR: 0, BAJAR: 0, MANTENER: 0, CONGELAR: 0 };
+  let mesa = 0, bloqueados = 0;
+  PRODUCTOS.forEach(p => {
+    const R = evaluar(p);
+    cuenta[R.accion]++;
+    if (R.mesa) mesa += R.plata;
+    if (R.bloqueado || R.noBajar) bloqueados++;
+  });
+  const objTxt = S.obj === "primero" ? "al más barato del listado"
+              : S.obj === "mediana" ? "a la mediana + 3%" : "al 2º más barato − $10";
+  box.innerHTML =
+    '<div class="statbar" style="grid-template-columns:1fr 1fr;margin:0 0 14px">' +
+      '<div class="stat"><span class="v num up">' + cuenta.SUBIR + '</span><span class="l">Subir</span></div>' +
+      '<div class="stat"><span class="v num down">' + cuenta.BAJAR + '</span><span class="l">Bajar</span></div>' +
+      '<div class="stat"><span class="v num">' + cuenta.MANTENER + '</span><span class="l">Mantener</span></div>' +
+      '<div class="stat"><span class="v num down">' + cuenta.CONGELAR + '</span><span class="l">Congelar (bucle)</span></div>' +
+    '</div>' +
+    '<p style="font-size:.88rem;color:var(--ink-2)">Con estas reglas apuntas <b>' + objTxt + '</b>, ' +
+    'con piso en <b>costo + ' + S.piso + '%</b> y máximo <b>' + S.maxCambios + ' cambios/día</b>. ' +
+    'El motor recupera <b class="up">' + CLP(mesa) + '/mes</b> de plata sobre la mesa y ' +
+    '<b>bloquea ' + bloqueados + ' bajadas</b> que te habrían costado margen sin traerte la venta.</p>' +
+    (S.obj === "primero"
+      ? '<p class="note warn" style="font-size:.84rem">Apuntar <b>al más barato</b> es lo que te mete en la carrera al fondo. Ese vendedor suele ser un bot o alguien sin reputación que no te está quitando la venta. Lo dejamos disponible porque es tu tienda — pero es la regla que más margen destruye.</p>'
+      : '');
+}
+
+function renderLog() {
+  const ul = $("logList");
+  ul.innerHTML = "";
+  $("logEmpty").hidden = S.log.length > 0;
+  S.log.forEach(l => {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="ts">' + l.h + '</span><span class="bd">' + l.txt + '</span>';
+    ul.appendChild(li);
+  });
+}
+
+function log(txt) {
+  const d = new Date();
+  S.log.unshift({ h: String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"), txt });
+}
+
+function toast(msg) {
+  const t = $("toast");
+  t.innerHTML = msg;
+  t.hidden = false;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.hidden = true; }, 4200);
+}
+
+/* ---------- aplicar un cambio ---------- */
+function aplicar(sku) {
+  const p = PRODUCTOS.find(x => x.sku === sku);
+  const R = p._R;
+  if (S.cambiosHoy >= S.maxCambios) {
+    log('<b>BLOQUEADO</b> — cambio en ' + p.nombre + ' rechazado: alcanzaste tu tope de ' + S.maxCambios + ' cambios hoy. <span style="color:var(--ink-3)">(regla del cliente, no del sistema)</span>');
+    toast("Tope de cambios alcanzado (" + S.maxCambios + "/día). El motor no lo pasa por encima.");
+    renderLog(); $("badgeLog").textContent = S.log.length;
+    return;
+  }
+  if (R.accion === "CONGELAR") {
+    S.aplicadas[sku] = true;
+    log('<b>CONGELADO</b> — ' + p.nombre + ' fijado en ' + CLP(R.nuevo) + ' por 24 h. Bucle contra MegaStock SPA cortado. <span style="color:var(--ink-3)">R0 · anti-bucle</span>');
+    toast("Precio congelado. Dejaste de perseguir al bot.");
+    render();
+    return;
+  }
+  if (R.alternativa) {
+    S.aplicadas[sku] = true;
+    log('<b>ENVÍO FULL</b> — ' + p.nombre + ': despacho gratis activado en vez de bajar ' + CLP(p.precio - (R.c1.p - 10)) + '. Precio intacto en ' + CLP(p.precio) + '. <span style="color:var(--ink-3)">R5 · palanca no-precio</span>');
+    toast("Envío Full activado. El precio no se tocó: te ahorras " + CLP(R.plata) + "/mes.");
+    render();
+    return;
+  }
+  const antes = p.precio;
+  p.precio = R.nuevo;
+  p.serie.mio[13] = R.nuevo;
+  S.cambiosHoy++;
+  S.aplicadas[sku] = true;
+  log('<b>' + R.accion + '</b> — ' + p.nombre + ': ' + CLP(antes) + ' → <b>' + CLP(R.nuevo) + '</b> en ' + p.canal +
+      ' <span style="color:var(--ink-3)">(' + R.regla.split("·")[0].trim() + ')</span>');
+  toast(R.accion === "SUBIR"
+    ? "Subido a " + CLP(R.nuevo) + ". Sigues siendo el más barato."
+    : "Bajado a " + CLP(R.nuevo) + ". Margen sobre el piso.");
+  render();
+}
+
+/* ---------- detalle con gráfico ---------- */
+let tipHandler = null;
+
+function abrirDetalle(sku) {
+  const p = PRODUCTOS.find(x => x.sku === sku);
+  const R = p._R;
+  $("dSku").textContent = p.sku + " · " + p.canal;
+  $("dTitle").textContent = p.nombre;
+  $("dMeta").textContent = "Costo " + CLP(p.costo) + " · piso " + CLP(R.piso) + " · " + p.ventas + " u/mes · " + p.reputacion;
+
+  const esBucle = p.bucle && S.cortarBot;
+  $("dBody").innerHTML =
+    (esBucle ? bloqueBucle(p, R) : "") +
+    '<div class="chart-wrap" id="chartWrap">' +
+      '<div class="scroll-x"><div id="chartHost"></div></div>' +
+      '<div class="tip" id="tip" hidden></div>' +
+    '</div>' +
+    '<ul class="legend" id="lg"></ul>' +
+    '<div class="note ' + (R.noBajar ? "good" : R.bloqueado ? "amber" : "") + '" style="margin:16px 0">' +
+      '<span class="kicker" style="margin-bottom:6px">' + R.accion + (R.alternativa ? " · " + R.alternativa : "") + '</span>' +
+      '<p style="margin:0 0 8px"><b>' + (R.nuevo === p.precio ? "Mantener " + CLP(p.precio) : CLP(p.precio) + " → " + CLP(R.nuevo)) + '</b> — ' + R.detalle + '</p>' +
+      '<span class="rule-chip">' + R.regla + '</span>' +
+    '</div>' +
+    '<div class="scroll-x"><table><thead><tr><th>Vendedor</th><th>Marketplace</th><th class="t-r">Precio</th><th class="t-r">Despacho</th><th>Reputación</th></tr></thead><tbody>' +
+      '<tr><td><b>Tienda Kütral (tú)</b></td><td>' + p.canal + '</td><td class="t-r"><b>' + CLP(p.precio) + '</b></td><td class="t-r">' + (p.envioGratis ? '<span class="up">Gratis</span>' : '$3.990') + '</td><td>' + p.reputacion + '</td></tr>' +
+      R.ordenados.map(c =>
+        '<tr><td>' + c.t + (c.bot ? ' <span class="tag down">bot</span>' : '') + '</td><td>' + c.mk + '</td><td class="t-r">' + CLP(c.p) + '</td><td class="t-r">' + (c.envio ? '<span class="up">Gratis</span>' : CLP(c.envioCosto || 3990)) + '</td><td>' + c.rep + '</td></tr>'
+      ).join("") +
+    '</tbody></table></div>' +
+    '<div class="acts" style="margin-top:16px">' +
+      (S.aplicadas[p.sku] ? ''
+        : R.accion === "CONGELAR" ? '<button class="btn" data-apply="' + p.sku + '">Congelar 24 h en ' + CLP(p.precio) + '</button>'
+        : R.alternativa ? '<button class="btn" data-apply="' + p.sku + '">' + R.alternativa + '</button>'
+        : R.nuevo !== p.precio ? '<button class="btn" data-apply="' + p.sku + '">Aplicar ' + CLP(R.nuevo) + '</button>'
+        : '') +
+      '<button class="btn ghost" id="dIgnorar">Ignorar por hoy</button>' +
+      '<button class="btn ghost" id="dReglas">Cambiar la regla</button>' +
+    '</div>';
+
+  $("detail").hidden = false;
+  document.body.style.overflow = "hidden";
+  dibujarChart(p);
+  $("dClose").focus();
+
+  $("dIgnorar").onclick = () => {
+    S.ignoradas[p.sku] = true;
+    log('<b>IGNORADO</b> — ' + p.nombre + ': sugerencia descartada por la dueña. El motor no insiste hasta mañana.');
+    cerrarDetalle(); render();
+    toast("Sugerencia ignorada. No se repite hoy.");
+  };
+  $("dReglas").onclick = () => { cerrarDetalle(); irA("reglas"); };
+}
+
+function bloqueBucle(p, R) {
+  const w = 640, h = 200, pl = 54, pr = 12, pt = 14, pb = 26;
+  const pts = BUCLE;
+  const all = pts.flatMap(x => [x.mio, x.otro]).concat([R.piso]);
+  const mn = Math.min(...all) - 800, mx = Math.max(...all) + 600;
+  const x = i => pl + i * (w - pl - pr) / (pts.length - 1);
+  const y = v => pt + (mx - v) / (mx - mn) * (h - pt - pb);
+  const step = (key, color) => {
+    let d = "";
+    pts.forEach((pt2, i) => {
+      const px = x(i), py = y(pt2[key]);
+      d += i === 0 ? "M" + px + "," + py : "H" + px + "V" + py;
+    });
+    return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round"/>';
+  };
+  const ticks = [0, 4, 8, 12, 14].map(i => {
+    const m = pts[i].min, hh = String(Math.floor(m / 60) % 24).padStart(2, "0"), mm = String(m % 60).padStart(2, "0");
+    return '<text x="' + x(i) + '" y="' + (h - 8) + '" text-anchor="middle">' + hh + ":" + mm + '</text>';
+  }).join("");
+  const yt = [40000, 43000, 46000].map(v =>
+    '<line class="grid-l" x1="' + pl + '" y1="' + y(v) + '" x2="' + (w - pr) + '" y2="' + y(v) + '"/>' +
+    '<text x="' + (pl - 8) + '" y="' + (y(v) + 3) + '" text-anchor="end">' + CLP(v) + '</text>').join("");
+
+  return '<div class="note warn" style="margin:0 0 16px">' +
+    '<span class="kicker" style="color:var(--down);margin-bottom:6px">La guerra · 14 bajadas en 6 h</span>' +
+    '<div class="scroll-x"><svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" style="min-width:520px;max-width:640px" role="img" aria-label="Escalera de precios: cada bajada mía es respondida por MegaStock SPA en menos de 7 minutos, siempre con 490 pesos menos.">' +
+      yt +
+      '<line class="axis-l" x1="' + pl + '" y1="' + y(R.piso) + '" x2="' + (w - pr) + '" y2="' + y(R.piso) + '" stroke="var(--down)" stroke-dasharray="4 3"/>' +
+      '<text x="' + (w - pr) + '" y="' + (y(R.piso) - 6) + '" text-anchor="end" fill="var(--down)">piso de margen ' + CLP(R.piso) + '</text>' +
+      step("otro", "var(--s3)") + step("mio", "var(--s1)") +
+      ticks +
+    '</svg></div>' +
+    '<ul class="legend"><li><span class="sw" style="background:var(--s1)"></span>Tienda Kütral (tú)</li>' +
+    '<li><span class="sw" style="background:var(--s3)"></span>MegaStock SPA <span class="tag down">bot</span></li></ul>' +
+    '<p style="margin:12px 0 0;font-size:.88rem">Le bajas $500, te responde con −$490 a los 4–7 minutos. Catorce veces. ' +
+    'En seis horas te sacó <b>$7.000 de margen por unidad</b> y sigue teniendo el precio más bajo. ' +
+    'A este ritmo cruzas tu piso (' + CLP(R.piso) + ') <b>el jueves a las 02:10</b>. ' +
+    '<b>Esta guerra no la ganas: la pagas.</b> Congela aquí y deja de responderle: el bot no tiene ' +
+    'cómo saber que dejaste de jugar, y su dueño sí va a notar que está vendiendo a ' + CLP(R.c1.p) + '.</p>' +
+    '</div>';
+}
+
+function dibujarChart(p) {
+  const host = $("chartHost");
+  const W = Math.max(520, Math.min(760, $("detailBox").clientWidth - 44));
+  const H = 220, pl = 62, pr = 14, pt = 16, pb = 28;
+  const s = p.serie;
+  const series = [
+    { n: "Tú (Tienda Kütral)", v: s.mio, c: "var(--s1)", w: 2.4 },
+    { n: p.comps[0].t, v: s.comps[0], c: "var(--s2)", w: 1.8 },
+    { n: p.comps[1].t, v: s.comps[1], c: "var(--s3)", w: 1.8 },
+    { n: p.comps[2].t, v: s.comps[2], c: "var(--s4)", w: 1.8 }
+  ];
+  const piso = p._R.piso;
+  const all = series.flatMap(x => x.v).concat([piso]);
+  const mn = Math.min(...all) * 0.985, mx = Math.max(...all) * 1.015;
+  const X = i => pl + i * (W - pl - pr) / 13;
+  const Y = v => pt + (mx - v) / (mx - mn) * (H - pt - pb);
+  const line = a => a.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(v).toFixed(1)).join(" ");
+
+  const nTicks = 4;
+  const gy = [];
+  for (let i = 0; i <= nTicks; i++) {
+    const v = mn + (mx - mn) * i / nTicks;
+    const vr = Math.round(v / 1000) * 1000;
+    gy.push('<line class="grid-l" x1="' + pl + '" y1="' + Y(vr) + '" x2="' + (W - pr) + '" y2="' + Y(vr) + '"/>' +
+            '<text x="' + (pl - 8) + '" y="' + (Y(vr) + 3) + '" text-anchor="end">' + CLP(vr) + '</text>');
+  }
+  const gx = [0, 4, 7, 10, 13].map(i =>
+    '<text x="' + X(i) + '" y="' + (H - 8) + '" text-anchor="middle">' + (i === 13 ? "hoy" : "d-" + (13 - i)) + '</text>').join("");
+
+  host.innerHTML =
+    '<svg class="chart" id="svgChart" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Precio de los últimos 14 días: tu precio contra tres competidores. Tabla equivalente más abajo.">' +
+      gy.join("") +
+      '<line class="axis-l" x1="' + pl + '" y1="' + Y(piso) + '" x2="' + (W - pr) + '" y2="' + Y(piso) + '" stroke="var(--down)" stroke-dasharray="4 3" opacity=".8"/>' +
+      '<text x="' + (W - pr) + '" y="' + (Y(piso) - 5) + '" text-anchor="end" fill="var(--down)" font-size="10">piso ' + CLP(piso) + '</text>' +
+      series.slice(1).map(x => '<path d="' + line(x.v) + '" fill="none" stroke="' + x.c + '" stroke-width="' + x.w + '" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>').join("") +
+      '<path d="' + line(series[0].v) + '" fill="none" stroke="' + series[0].c + '" stroke-width="' + series[0].w + '" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<circle cx="' + X(13) + '" cy="' + Y(s.mio[13]) + '" r="3.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>' +
+      gx +
+      '<line id="cross" x1="0" y1="' + pt + '" x2="0" y2="' + (H - pb) + '" stroke="var(--line-2)" stroke-width="1" opacity="0"/>' +
+      '<rect id="hit" x="' + pl + '" y="0" width="' + (W - pl - pr) + '" height="' + H + '" fill="transparent"/>' +
+    '</svg>';
+
+  $("lg").innerHTML = series.map(x =>
+    '<li><span class="sw" style="background:' + x.c + '"></span>' + x.n + ' <b class="mono" style="color:var(--ink)">' + CLP(x.v[13]) + '</b></li>').join("");
+
+  const svg = $("svgChart"), tip = $("tip"), cross = $("cross"), wrap = $("chartWrap");
+  const move = e => {
+    const r = svg.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    const px = cx / r.width * W;
+    let i = Math.round((px - pl) / ((W - pl - pr) / 13));
+    i = Math.max(0, Math.min(13, i));
+    cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", "1");
+    tip.hidden = false;
+    tip.innerHTML = '<span class="d">' + (i === 13 ? "Hoy" : "Hace " + (13 - i) + " días") + '</span>' +
+      series.map(x => '<span class="r"><span class="sw" style="background:' + x.c + '"></span>' + x.n + '<b>' + CLP(x.v[i]) + '</b></span>').join("");
+    const left = Math.min(Math.max(X(i) / W * r.width - 90, 4), wrap.clientWidth - 210);
+    tip.style.left = left + "px";
+    tip.style.top = "6px";
+  };
+  const out = () => { tip.hidden = true; cross.setAttribute("opacity", "0"); };
+  svg.addEventListener("mousemove", move);
+  svg.addEventListener("mouseleave", out);
+  svg.addEventListener("touchstart", move, { passive: true });
+  svg.addEventListener("touchmove", move, { passive: true });
+  svg.addEventListener("touchend", out);
+}
+
+function cerrarDetalle() {
+  $("detail").hidden = true;
+  document.body.style.overflow = "";
+}
+
+/* ---------- tabs ---------- */
+function irA(name) {
+  ["pizarra", "reglas", "log"].forEach(n => {
+    const t = $("tab-" + n), pnl = $("p-" + n);
+    const on = n === name;
+    t.setAttribute("aria-selected", on ? "true" : "false");
+    pnl.hidden = !on;
+  });
+  window.scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" });
+}
+["pizarra", "reglas", "log"].forEach(n => $("tab-" + n).onclick = () => irA(n));
+$("goRules").onclick = e => { e.preventDefault(); irA("reglas"); };
+$("verBucle").onclick = () => abrirDetalle("TK-1042");
+
+/* ---------- delegación de clicks ---------- */
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-apply]");
+  if (a) { aplicar(a.dataset.apply); if (!$("detail").hidden) cerrarDetalle(); return; }
+  const d = e.target.closest("[data-detail]");
+  if (d) { abrirDetalle(d.dataset.detail); return; }
+});
+$("dClose").onclick = cerrarDetalle;
+$("detail").addEventListener("click", e => { if (e.target.id === "detail") cerrarDetalle(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("detail").hidden) cerrarDetalle(); });
+
+/* ---------- controles de reglas ---------- */
+$("rPiso").oninput = e => { S.piso = +e.target.value; $("vPiso").textContent = "costo + " + S.piso + "%"; render(); };
+$("rCambios").oninput = e => { S.maxCambios = +e.target.value; $("vCambios").textContent = S.maxCambios; render(); };
+$("rBajada").oninput = e => { S.bajadaMax = +e.target.value; $("vBajada").textContent = CLP(S.bajadaMax); render(); };
+$("segObj").addEventListener("click", e => {
+  const b = e.target.closest("[data-obj]"); if (!b) return;
+  S.obj = b.dataset.obj;
+  [...$("segObj").children].forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  render();
+});
+function toggle(id, key, msgOn, msgOff) {
+  $(id).onclick = () => {
+    S[key] = !S[key];
+    $(id).setAttribute("aria-pressed", S[key] ? "true" : "false");
+    if (key === "auto" && S.auto) pilotoAutomatico();
+    if (key === "cortarBot" && !S.cortarBot) {
+      log('<b>AVISO</b> — apagaste el corte de bucles. El motor va a seguir persiguiendo a MegaStock SPA hasta el piso.');
+      toast(msgOff);
+    } else if (S[key] && msgOn) toast(msgOn);
+    render();
+  };
+}
+toggle("swVentaja", "ventaja", "Ahora el motor compara el precio <b>total</b>, con despacho incluido.", "");
+toggle("swBot", "cortarBot", "", "Corte de bucles APAGADO. Vas a seguir bajando contra un bot.");
+toggle("swAuto", "auto", "", "");
+
+function pilotoAutomatico() {
+  const pend = PRODUCTOS.filter(p => p._R.nuevo !== p.precio && !S.aplicadas[p.sku] && !S.ignoradas[p.sku] && !p._R.cuidado);
+  if (!pend.length) { toast("Piloto automático encendido. No hay nada que aplicar ahora."); return; }
+  let i = 0;
+  const paso = () => {
+    if (!S.auto || i >= pend.length || S.cambiosHoy >= S.maxCambios) {
+      if (S.cambiosHoy >= S.maxCambios) {
+        log('<b>DETENIDO</b> — piloto automático llegó a tu tope de ' + S.maxCambios + ' cambios diarios y se detuvo. Sigue mañana.');
+        toast("Piloto detenido: tope de " + S.maxCambios + " cambios/día alcanzado.");
+        render();
+      }
+      return;
+    }
+    aplicar(pend[i].sku);
+    i++;
+    setTimeout(paso, RM ? 0 : 900);
+  };
+  toast("Piloto automático encendido. Aplicando lo que cumple tus reglas…");
+  setTimeout(paso, RM ? 0 : 600);
+}
+
+/* ---------- cinta de cotizaciones ---------- */
+function pintarCinta() {
+  const items = [];
+  PRODUCTOS.forEach(p => {
+    const R = p._R || evaluar(p);
+    const d = p.precio - p.precioAyer;
+    const cls = d > 0 ? "up" : d < 0 ? "down" : "hold";
+    const flecha = d > 0 ? "▲" : d < 0 ? "▼" : "—";
+    items.push('<span class="tick"><b>' + p.sku + '</b> ' + CLP(p.precio) +
+      ' <span class="' + cls + '">' + flecha + ' ' + (d === 0 ? "0" : CLPs(d)) + '</span></span>');
+    items.push('<span class="tick" style="color:var(--ink-3)">' + R.c1.t + ' ' + CLP(R.c1.p) + '</span>');
+  });
+  $("tickTrack").innerHTML = items.join("") + items.join("");
+}
+
+/* movimiento del mercado: un competidor mueve el precio cada tanto */
+function latido() {
+  const p = PRODUCTOS[Math.floor(Math.random() * PRODUCTOS.length)];
+  const c = p.comps[Math.floor(Math.random() * p.comps.length)];
+  if (c.mk.includes("Falabella") || c.mk.includes("Paris") || c.mk.includes("Ripley")) return;
+  const d = (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.7 ? 90 : 490);
+  c.p = Math.round((c.p + d) / 10) * 10;
+  p.serie.comps[p.comps.indexOf(c)][13] = c.p;
+  render();
+  pintarCinta();
+}
+
+$("clock").textContent = "Última lectura: hace 3 min · próxima en 57 min";
+render();
+pintarCinta();
+if (!RM) setInterval(latido, 7000);
+
+/* ---------- menú móvil ---------- */
+$("menuBtn").onclick = () => {
+  const d = $("drawer"), open = d.classList.toggle("open");
+  $("menuBtn").setAttribute("aria-expanded", open ? "true" : "false");
+};
+</script>
+</body>
+</html>

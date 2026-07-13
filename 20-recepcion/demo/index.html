@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Fonalta</title>
+<meta name="description" content="Una llamada de verdad, turno a turno: la divulgación de IA en el segundo 3, el reloj de latencia en cada respuesta, el cliente interrumpiendo, y el momento en que la IA no sabe algo y lo admite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/demo.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__in">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 12h2.5M7 12V6M11 12V3M15 12v-7M19 12V8M22 12h-1" stroke="#F0A93F"/>
+        <path d="M2 16h20" opacity=".3"/>
+      </svg>
+      Fonalta
+    </a>
+    <button class="nav__btn" aria-expanded="false" aria-controls="nav-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+    <nav class="nav__menu" id="nav-menu" data-abierto="no" aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="demo">
+  <div class="container">
+
+    <p class="kicker">Demo · llamada simulada</p>
+    <h1 style="font-size:var(--step-3);margin-bottom:var(--sp-2xs)">Una llamada, turno a turno.</h1>
+    <p style="color:var(--tiza-2);max-width:64ch;margin-bottom:var(--sp-m)">
+      Dale a <strong>Contestar</strong> y mira el reloj de la esquina: es la latencia real de cada turno.
+      Vas a ver la divulgación de IA en el segundo 3, a la clienta interrumpiendo, y el momento en que la IA
+      <strong>no sabe algo y lo admite</strong> en vez de inventarlo. Si tienes apuro, usa los saltos de abajo.
+    </p>
+
+    <div class="pest" role="tablist" aria-label="Vistas del demo">
+      <button role="tab" aria-selected="true" data-vista="vista-llamada">La llamada</button>
+      <button role="tab" aria-selected="false" data-vista="vista-panel">Lo que ve el dueño</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ VISTA: LA LLAMADA ═══ -->
+    <div class="vista" id="vista-llamada">
+
+      <div class="llams" role="group" aria-label="Elegir llamada">
+        <button data-id="vet" aria-pressed="true"><b>Veterinaria Los Aromos</b><span>mar 19:42 · cerrado</span></button>
+        <button data-id="taller" aria-pressed="false"><b>Taller Hnos. Peña</b><span>jue 11:20 · hora punta</span></button>
+        <button data-id="hotel" aria-pressed="false"><b>Hotel Casa Nogal</b><span>sáb 02:47 · de madrugada</span></button>
+      </div>
+
+      <div class="consola">
+
+        <!-- la línea -->
+        <div class="linea-caja" id="linea-caja" data-estado="espera">
+          <div class="lc__cab">
+            <span class="lc__luz"><i></i> LÍNEA</span>
+            <span id="lc-meta">+56 9 8472 1103 · Ñuñoa · martes 19:42</span>
+            <span class="lc__reloj" id="reloj">0:00</span>
+          </div>
+
+          <div class="lc__onda">
+            <span class="lc__quien" id="quien" data-a="sys">◤ en espera</span>
+            <canvas id="onda"></canvas>
+          </div>
+
+          <div class="hud">
+            <div class="hud__n" id="hud-n">—</div>
+            <div>
+              <div class="hud__b" id="hud-b"></div>
+              <div class="hud__d" id="hud-d"></div>
+            </div>
+          </div>
+          <p class="hud__p" id="hud-p"></p>
+
+          <div class="trans" id="trans" aria-live="polite" aria-label="Transcripción de la llamada"></div>
+
+          <div class="mando">
+            <button class="primario" id="btn-play">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> Contestar
+            </button>
+            <button id="btn-reset">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reiniciar
+            </button>
+            <div class="vel" role="group" aria-label="Velocidad">
+              <button data-v="1" aria-pressed="true">1×</button>
+              <button data-v="2" aria-pressed="false">2×</button>
+              <button data-v="4" aria-pressed="false">4×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- lo que ve el sistema -->
+        <div class="diag">
+          <div class="diag__caja" id="diag-nota-caja" data-vivo="no">
+            <p class="diag__t">Qué está pasando <span class="dato" id="lc-ctx" style="text-transform:none;letter-spacing:0"></span></p>
+            <p class="diag__n" id="diag-nota"></p>
+          </div>
+
+          <div class="diag__caja">
+            <p class="diag__t">Lo que el sistema extrajo</p>
+            <dl id="diag-campos"></dl>
+          </div>
+
+          <div class="diag__caja">
+            <p class="diag__t">Herramientas llamadas</p>
+            <div class="herr" id="diag-herr"></div>
+            <p class="dato" style="margin-top:var(--sp-xs);line-height:1.5">
+              Regla dura: el modelo <strong style="color:var(--tiza-2)">no puede afirmar</strong> nada que no venga
+              de una herramienta. Punto rojo = la herramienta no encontró nada → la única salida permitida es admitirlo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="saltos" id="saltos" aria-label="Saltar a un momento de la llamada"></div>
+
+      <div class="wa mt-l" id="wa" data-ver="no">
+        <p class="wa__cab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-4-1L3 21l2.1-5a8.4 8.4 0 0 1-1-4 8.4 8.4 0 0 1 8.4-8.4 8.4 8.4 0 0 1 8.5 8.4z"/></svg>
+          WhatsApp al dueño · <span id="wa-titulo"></span>
+        </p>
+        <p class="wa__msg" id="wa-cuerpo"></p>
+      </div>
+
+      <p class="nota mt-l">
+        <strong style="color:var(--tiza-2)">Qué es falso acá y qué no.</strong>
+        La máquina de estados de la llamada, el barge-in (que trunca el turno del modelo, no sólo el audio), la regla
+        de «sin herramienta no hay afirmación» y el resumen: eso es el diseño real del producto.
+        <strong style="color:var(--tiza-2)">No hay audio</strong>: no hay telefonía, no hay transcripción y no hay
+        voz sintética — la forma de onda es una función, no un micrófono. Y los milisegundos son el
+        <strong style="color:var(--tiza-2)">presupuesto de arquitectura</strong>, no una medición.
+        Todo lo que habría que construir para que fuera real está en <a href="../stack.html#falso">Arquitectura</a>.
+      </p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ VISTA: EL DUEÑO ═════ -->
+    <div class="vista" id="vista-panel" hidden>
+
+      <p style="color:var(--tiza-2);max-width:64ch;margin-bottom:var(--sp-m)">
+        Esto es lo que ve don Patricio el lunes a las 8 de la mañana. Cada llamada perdida se volvió un dato.
+      </p>
+
+      <dl class="fichas">
+        <div class="ficha">
+          <dt>Llamadas · 7 días</dt>
+          <dd class="cifra">47</dd>
+          <p>Todas contestadas. Antes: 26 contestadas, 21 a la casilla.</p>
+        </div>
+        <div class="ficha">
+          <dt>Horas agendadas</dt>
+          <dd class="cifra">19</dd>
+          <p>De ésas, 6 entraron fuera de horario.</p>
+        </div>
+        <div class="ficha">
+          <dt>Minutos usados</dt>
+          <dd class="cifra">78<span style="font-size:1rem;color:var(--tiza-3)"> / 400</span></dd>
+          <p>Plan Recepción. Vas holgado; no hay excedente.</p>
+        </div>
+        <div class="ficha" style="border-left-color:var(--c3)">
+          <dt>No supe responder</dt>
+          <dd class="cifra" id="sin-respuesta">3</dd>
+          <p>Contéstalas una vez y no vuelven a fallar.</p>
+        </div>
+      </dl>
+
+      <div class="rejilla rejilla--3-2" style="align-items:start">
+
+        <!-- bandeja de lo que no supo: el bucle de mejora, sin humanos de nuestro lado -->
+        <div>
+          <h2 style="font-size:var(--step-1);margin-bottom:var(--sp-2xs)">Lo que la IA no supo</h2>
+          <p style="color:var(--tiza-2);font-size:0.92rem;margin-bottom:var(--sp-s)">
+            La IA no inventa: cuando no encuentra algo en tu ficha, lo admite en la llamada y te lo deja acá.
+            Respóndelo una vez y queda aprendido. <strong>Es todo el mantenimiento que tiene el producto.</strong>
+          </p>
+
+          <div class="bandeja">
+            <div class="pregunta" data-resuelta="no">
+              <p class="pregunta__q">«¿Atienden gatos?»</p>
+              <p class="pregunta__m">3 personas lo preguntaron esta semana · última: mar 19:44, Marcela Fuentes</p>
+              <form class="pregunta__f">
+                <label class="visually-hidden" for="r1">Respuesta para: ¿atienden gatos?</label>
+                <input id="r1" type="text" placeholder="Sí, con la doctora Rojas, martes y jueves" autocomplete="off">
+                <button type="submit" class="btn btn--chico">Guardar en la ficha</button>
+              </form>
+              <p class="pregunta__ok"></p>
+            </div>
+
+            <div class="pregunta" data-resuelta="no">
+              <p class="pregunta__q">«¿Cuánto sale una radiografía?»</p>
+              <p class="pregunta__m">2 personas lo preguntaron esta semana · última: vie 09:12</p>
+              <form class="pregunta__f">
+                <label class="visually-hidden" for="r2">Respuesta para: ¿cuánto sale una radiografía?</label>
+                <input id="r2" type="text" placeholder="$38.000 la placa, $52.000 con informe" autocomplete="off">
+                <button type="submit" class="btn btn--chico">Guardar en la ficha</button>
+              </form>
+              <p class="pregunta__ok"></p>
+            </div>
+
+            <div class="pregunta" data-resuelta="no">
+              <p class="pregunta__q">«¿Tienen estacionamiento?»</p>
+              <p class="pregunta__m">2 personas lo preguntaron esta semana · última: sáb 11:30</p>
+              <form class="pregunta__f">
+                <label class="visually-hidden" for="r3">Respuesta para: ¿tienen estacionamiento?</label>
+                <input id="r3" type="text" placeholder="No, pero hay estacionamiento público a media cuadra" autocomplete="off">
+                <button type="submit" class="btn btn--chico">Guardar en la ficha</button>
+              </form>
+              <p class="pregunta__ok"></p>
+            </div>
+
+            <div class="aviso" id="bandeja-vacia" hidden>
+              <strong>Bandeja vacía.</strong> Todo lo que la IA no supo esta semana ya está en la ficha.
+              La próxima persona que pregunte cualquiera de esas tres cosas va a tener respuesta.
+            </div>
+          </div>
+        </div>
+
+        <!-- la semana -->
+        <div class="apilar">
+          <figure class="fig">
+            <figcaption class="fig__t">Llamadas contestadas, últimos 7 días</figcaption>
+            <p class="fig__s">47 en total. Las 3 del domingo son las que antes se perdían enteras.</p>
+            <svg viewBox="0 0 320 124" role="img" aria-labelledby="t-sem d-sem">
+              <title id="t-sem">Llamadas contestadas por día, últimos siete días</title>
+              <desc id="d-sem">Lunes 9, martes 7, miércoles 11, jueves 8, viernes 9, sábado 2, domingo 1. Total 47.</desc>
+              <line class="malla" x1="26" y1="96" x2="312" y2="96"/>
+              <line class="malla" x1="26" y1="52" x2="312" y2="52"/>
+              <line class="malla" x1="26" y1="8" x2="312" y2="8"/>
+              <text class="ejeT" x="20" y="99.5" text-anchor="end">0</text>
+              <text class="ejeT" x="20" y="55.5" text-anchor="end">6</text>
+              <text class="ejeT" x="20" y="11.5" text-anchor="end">12</text>
+              <path d="M36.43,96 L36.43,34 Q36.43,30 40.43,30 L52.43,30 Q56.43,30 56.43,34 L56.43,96 Z" fill="var(--c1)"/>
+              <path d="M77.29,96 L77.29,48.67 Q77.29,44.67 81.29,44.67 L93.29,44.67 Q97.29,44.67 97.29,48.67 L97.29,96 Z" fill="var(--c1)"/>
+              <path d="M118.14,96 L118.14,19.33 Q118.14,15.33 122.14,15.33 L134.14,15.33 Q138.14,15.33 138.14,19.33 L138.14,96 Z" fill="var(--c1)"/>
+              <path d="M159,96 L159,41.33 Q159,37.33 163,37.33 L175,37.33 Q179,37.33 179,41.33 L179,96 Z" fill="var(--c1)"/>
+              <path d="M199.86,96 L199.86,34 Q199.86,30 203.86,30 L215.86,30 Q219.86,30 219.86,34 L219.86,96 Z" fill="var(--c1)"/>
+              <path d="M240.71,96 L240.71,85.33 Q240.71,81.33 244.71,81.33 L256.71,81.33 Q260.71,81.33 260.71,85.33 L260.71,96 Z" fill="var(--c1)"/>
+              <path d="M281.57,96 L281.57,92.67 Q281.57,88.67 285.57,88.67 L297.57,88.67 Q301.57,88.67 301.57,92.67 L301.57,96 Z" fill="var(--c1)"/>
+              <text class="ejeT" x="46.43" y="112" text-anchor="middle">lun</text>
+              <text class="ejeT" x="87.29" y="112" text-anchor="middle">mar</text>
+              <text class="ejeT" x="128.14" y="112" text-anchor="middle">mié</text>
+              <text class="ejeT" x="169" y="112" text-anchor="middle">jue</text>
+              <text class="ejeT" x="209.86" y="112" text-anchor="middle">vie</text>
+              <text class="ejeT" x="250.71" y="112" text-anchor="middle">sáb</text>
+              <text class="ejeT" x="291.57" y="112" text-anchor="middle">dom</text>
+              <text class="marcaT" x="128.14" y="10" text-anchor="middle" fill="var(--ambar)">11</text>
+            </svg>
+          </figure>
+
+          <div class="card">
+            <h3 style="font-size:1rem">Devoluciones pendientes</h3>
+            <p style="font-size:0.9rem">
+              <strong>1</strong> · Rodrigo Salinas, +56 9 6631 4478, hoy 14:00–15:00.
+              Consentimiento grabado el jue 11:23.
+            </p>
+            <p class="dato mt-m">Fonalta no llama sola a nadie que no haya dicho que sí. Esta devolución la haces tú, o la hace la IA porque él la autorizó en la llamada.</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 style="font-size:var(--step-1);margin:var(--sp-xl) 0 var(--sp-s)">El registro</h2>
+      <div class="scroll-x">
+        <table class="reg">
+          <caption class="visually-hidden">Registro de las últimas llamadas</caption>
+          <thead>
+            <tr><th>Cuándo</th><th>De</th><th>Para qué llamó</th><th class="res">Resultado</th><th class="res">Duración</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>sáb 02:47</td><td>+56 2 2789 3341</td><td>Reserva doble, 18–20 sep. Preguntó por mascotas.</td><td class="res"><span class="pin pin--ok">Reserva</span></td><td class="res mono">1:22</td></tr>
+            <tr><td>vie 20:15</td><td>+56 9 7712 0984</td><td>Hora para vacuna, gato.</td><td class="res"><span class="pin pin--ok">Agendada</span></td><td class="res mono">1:12</td></tr>
+            <tr><td>vie 09:12</td><td>+56 9 5540 3319</td><td>Precio de radiografía. La IA no supo.</td><td class="res"><span class="pin pin--grave">No supo</span></td><td class="res mono">0:48</td></tr>
+            <tr><td>jue 11:20</td><td>+56 9 6631 4478</td><td>Pidió hablar con don Patricio. Hilux del lunes.</td><td class="res"><span class="pin pin--ambar">Recado</span></td><td class="res mono">1:10</td></tr>
+            <tr><td>mié 18:40</td><td>+56 9 3218 7745</td><td>Confirmar dirección y horario.</td><td class="res"><span class="pin">Respondida</span></td><td class="res mono">0:31</td></tr>
+            <tr><td>mar 19:42</td><td>+56 9 8472 1103</td><td>Hora para perro con cojera. Preguntó por gatos.</td><td class="res"><span class="pin pin--ok">Agendada</span></td><td class="res mono">1:10</td></tr>
+            <tr><td>lun 13:05</td><td>+56 9 9024 6612</td><td>Llamó en la colación. Cotizó desparasitación.</td><td class="res"><span class="pin pin--ambar">Recado</span></td><td class="res mono">0:56</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nota mt-m">Datos de ejemplo. En la cuenta real cada fila trae la grabación, la transcripción completa y el desglose de latencia turno por turno.</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container pie__in">
+    <div>
+      <p><strong style="color:var(--tiza)">Fonalta</strong> · el teléfono que siempre contesta.</p>
+      <p style="margin-top:6px">Demo sin backend. La llamada es un guión, no audio.</p>
+    </div>
+    <nav aria-label="Pie">
+      <div class="fila">
+        <a href="../../index.html">← Ideas</a>
+        <a href="../index.html">Producto</a>
+        <a href="../negocio.html">Negocio</a>
+        <a href="../roadmap.html">Roadmap</a>
+        <a href="../stack.html">Arquitectura</a>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script src="../assets/sitio.js"></script>
+<script src="../assets/demo.js"></script>
+</body>
+</html>

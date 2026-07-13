@@ -1,0 +1,22 @@
+{
+  "folder": "18-alertas",
+  "brand": "Pregonia",
+  "domain": "pregonia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/pregonia.com -> HTTP 404 (disponible), verificado con _kit/check-domain.sh el 2026-07-13. pregonia.cl también disponible (NIC Chile: 'no existe').",
+  "alternates": ["avizorio.com", "cribante.com", "atisbia.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE. (avizor.com, avizora.com, atisbo.com y cernida.com están TOMADAS — HTTP 200.)",
+  "tagline": "Todo se pregona. Casi nada te toca. Vigilamos el Diario Oficial y los reguladores por tu RUT, el de tus clientes y tu marca — y te escribimos sólo cuando algo te afecta.",
+  "category": "Vigilancia regulatoria · SaaS legal B2B autoservicio",
+  "market": "Chile → LatAm hispanohablante (México, Perú, Colombia)",
+  "icp": "Estudio de abogados boutique de 3 a 15 abogados (corporativo, propiedad industrial, concursal) que lleva 10-80 empresas como clientes y hoy tiene a un procurador revisando el Diario Oficial a mano cada mañana. Segundo anillo: oficina contable con cartera. Tercero, sin perseguirlo: la PYME con marca registrada.",
+  "price_clp": "Vigía $14.900/mes · Estudio $79.000/mes · Cartera $249.000/mes · 14 días de prueba sin tarjeta",
+  "accent": "#FF3B30",
+  "problem": "Todos los días se publica en el Diario Oficial que un competidor se constituyó, que a un cliente lo liquidaron, que objetaron tu marca o que cambió la norma de tu rubro — y nadie lo lee. La PYME se entera tarde; el estudio de abogados le paga a un pasante para que lo revise a mano a las 8:30, y el día que el pasante falta, se pierde un plazo.",
+  "solution": "Defines qué te importa (tu RUT, el de tus clientes, tu marca, tu rubro, una comuna) y el sistema vigila el Diario Oficial, INAPI, el Boletín Concursal, la CMF, el SEIA y la Dirección del Trabajo. La búsqueda de texto la hace Postgres; lo que hace el modelo es DECIDIR si esta publicación le importa a este cliente, explicarlo en una frase y decirle qué hacer antes de que venza el plazo. Lo que descarta también se muestra, con el motivo escrito: nunca omitimos en silencio.",
+  "wedge": "La oposición marcaria. Cuando alguien pide en INAPI una marca parecida a la de tu cliente, el plazo para oponerse corre desde la publicación del extracto (Ley 19.039, art. 5) y no lo detiene nadie. Es binario, es caro de perder, y la culpa es del estudio — no del cliente. Ese miedo es el mejor vendedor que tenemos y no hay que fabricarlo.",
+  "art_direction": "Boletín / teletipo de agencia de cable. Fondo casi negro de monitor (#0A0D0E), reglas finas, metadatos en monoespaciada (DM Mono: hora, folio, CVE, RUT), titulares en gótica de prensa (Libre Franklin, linaje Franklin Gothic) y UN SOLO acento de urgencia — el rojo de FLASH (#FF3B30) — usado con avaricia absoluta: aparece en la insignia URGENTE, en la métrica estrella y en el foco de teclado, y en ningún otro lugar. Esa avaricia no es estética: es la tesis del producto. Si todo está en rojo, nada está en rojo.",
+  "metrica_estrella": "Señal = alertas accionadas / alertas enviadas. No cuántas alertas mandamos. Si baja de 40%, se mata el producto (criterio M1, mes 2).",
+  "autonomia": "Total. Se vende por SEO programático y Google Ads, se prueba sin tarjeta, se cobra por Flow, se entrega por correo y WhatsApp, se soporta con un agente que muestra el descarte y su motivo. Lo que NO se automatiza: rehacer un parser cuando el Estado cambia el formato de una fuente (~4 h/mes en régimen), los trámites de una vez ante Meta y el SII, y un reclamo grave por una alerta omitida.",
+  "honesty": "El margen es hermoso (90%) y el payback es de medio mes: este negocio no muere por caja — el valle de runway es de $2,9 millones de pesos, unos US$3.000. Muere por dos cosas. Primera: que el filtro no sirva, y eso se sabe en 8 semanas (criterio M1: señal < 40% = matar). Segunda, y más probable: el techo del canal. En Chile hay poca gente buscando esto, el TAM completo es de US$14,4M/año, y aunque ganáramos el 100% del mercado chileno no sería una empresa de venture capital. Un LTV/CAC de 44x no es una buena noticia: es la señal de que el cuello de botella está en la demanda, no en la eficiencia. Probabilidad: 25-35% de llegar a US$250k de ARR al mes 24 condicional a pasar M3 en el mes 8; 4-8% de llegar a algo venture-scale, y eso exige salir de Chile a tres países.",
+  "status": "prototipo"
+}

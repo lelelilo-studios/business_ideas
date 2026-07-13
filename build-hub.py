@@ -7,8 +7,10 @@ Ojo: es un f-string, así que las llaves del CSS van dobladas: {{ }}.
 """
 import json, glob, html, re, colorsys
 
-ideas = [json.load(open(f)) for f in sorted(glob.glob("*/meta.json"))]
-assert len(ideas) == 16, f"esperaba 16 ideas, encontré {len(ideas)}"
+todo    = [json.load(open(f)) for f in sorted(glob.glob("*/meta.json"))]
+sistema = next(d for d in todo if d.get("kind") == "sistema")
+ideas   = [d for d in todo if d.get("kind") != "sistema"]
+assert len(ideas) == 21, f"esperaba 21 ideas, encontré {len(ideas)}"
 
 # Dos familias: las 10 de PYME y las 5 de minería. Se separan porque el comprador
 # es otro (una dueña que contesta el WhatsApp vs. un gerente de operaciones), el
@@ -16,9 +18,10 @@ assert len(ideas) == 16, f"esperaba 16 ideas, encontré {len(ideas)}"
 # cuenta sólo en un párrafo: cambia el suelo (tinta cálida → grafito frío), cambia
 # la densidad (diez tarjetas a dos columnas → cinco tarjetas anchas) y cambia la
 # ficha de la familia. Se tiene que *sentir* que entraste a otra pieza.
-pyme    = [d for d in ideas if int(d["folder"][:2]) <= 10]
-minera  = [d for d in ideas if 11 <= int(d["folder"][:2]) <= 15]
-consumo = [d for d in ideas if int(d["folder"][:2]) >= 16]
+pyme      = [d for d in ideas if int(d["folder"][:2]) <= 10]
+minera    = [d for d in ideas if 11 <= int(d["folder"][:2]) <= 15]
+consumo   = [d for d in ideas if int(d["folder"][:2]) == 16]
+autonomas = [d for d in ideas if int(d["folder"][:2]) >= 17]
 
 
 # ---------------------------------------------------------------- color derivado
@@ -136,7 +139,7 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     <section class="fam fam--{fid}" id="{fid}" aria-labelledby="h-{fid}">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 3</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 4</p>
           <h2 class="fam__title" id="h-{fid}">{titulo}</h2>
           <p class="fam__count mono"><b>{len(items):02d}</b><span>ideas</span></p>
           <p class="fam__lede">{bajada}</p>
@@ -149,10 +152,46 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     </section>'''
 
 
-BG_PYME, BG_MINERA, BG_CONSUMO = "#191612", "#111922", "#181428"
+def banda_sistema(d):
+    acc = d["accent"]
+    return f"""
+    <section class="sis" id="sistema" aria-labelledby="h-sis" style="--acc:{acc};--acc-on:{on_accent(acc)}">
+      <div class="container">
+        <p class="sis__kicker mono"><span class="sis__dot"></span>El sistema · opera las 21</p>
+        <div class="sis__top">
+          <div>
+            <h2 class="sis__title" id="h-sis">{e(d['brand'])}</h2>
+            <p class="sis__domain mono">{e(d['domain'])}<span class="idea__free">libre</span></p>
+          </div>
+          <p class="sis__tagline">{e(d['tagline'])}</p>
+        </div>
+        <p class="sis__problem">{e(d['problem'])}</p>
+        <dl class="sis__facts mono">
+          <div><dt>El juez</dt><dd>Aplica los criterios de muerte que cada idea firmó <em>antes</em> de recibir el primer peso. No puede editarlos, ni levantarse un tope.</dd></div>
+          <div><dt>El kernel</dt><dd>Bloquea la acción antes de que toque una API. Nada de cuentas falsas, reseñas inventadas ni llamadas en frío con voz sintética.</dd></div>
+          <div><dt>Se enchufan</dt><dd>8 de las 16 viejas, del todo. 3 a medias. Las 5 de minería, no. Las 5 nuevas nacen enchufadas.</dd></div>
+          <div><dt>Se paga solo</dt><dd>Con 15 ideas, no con 2. La cuenta cómoda está descartada en su propia página.</dd></div>
+        </dl>
+        <nav class="sis__links" aria-label="{e(d['brand'])}">
+          <a class="sis__cta" href="00-sistema/demo/index.html"><span>Abrir el tablero</span>
+            <svg viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          </a>
+          <span class="sis__docs mono">
+            <a href="00-sistema/index.html">Qué es</a>
+            <a href="00-sistema/arquitectura.html">Arquitectura</a>
+            <a href="00-sistema/integracion.html">Integración</a>
+            <a href="00-sistema/economia.html">Economía</a>
+          </span>
+        </nav>
+      </div>
+    </section>"""
+
+
+BG_PYME, BG_MINERA, BG_CONSUMO, BG_AUTO = "#191612", "#111922", "#181428", "#12171B"
 
 secciones = (
-    family(
+    banda_sistema(sistema)
+    + family(
         "pyme", "01", "PYME chilena",
         "Diez problemas que hoy se resuelven en Excel, en un cuaderno o no se resuelven. "
         "Se venden solos: la dueña prueba el demo y decide.",
@@ -181,6 +220,16 @@ secciones = (
          ("Ciclo de venta", "Minutos con el papá. Cuatro a seis meses con el banco."),
          ("El rival real", "Que el niño se aburra y juegue otra cosa.")],
         consumo, BG_CONSUMO, show_market=True)
+    + family(
+        "autonomas", "04", "Autónomas",
+        "Cinco ideas elegidas por una sola razón: se venden, se entregan, se cobran y se "
+        "soportan sin que una persona intervenga. Son las que el sistema de arriba puede "
+        "operar de verdad — y la razón por la que existe.",
+        [("Comprador", "Se registra solo. Nunca habla con nadie, y no quiere hacerlo."),
+         ("Entrega", "Software: una API, una alerta, una llamada. Nada físico."),
+         ("El humano que queda", "Casi ninguno — y cada idea declara cuál, en vez de decir cero."),
+         ("El cuello real", "No el CAC. La demanda: el mercado chileno es chico y lo dicen.")],
+        autonomas, BG_AUTO, show_market=True)
 )
 
 doc = f'''<!doctype html>
@@ -188,7 +237,7 @@ doc = f'''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>16 ideas de negocio — lelelilo studios</title>
+<title>21 ideas + el sistema que las opera — lelelilo studios</title>
 <meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -587,9 +636,9 @@ body {{
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>16 ideas</span><span>·</span><span>2026</span></p>
-    <h1>Dieciséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería, una de consumo— con
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>21 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
+    <h1>Veintiún negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Veintiún problemas reales —PYME, minería, consumo, y cinco que se operan solas— con
       un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
       arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
 
@@ -609,6 +658,11 @@ body {{
         <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
+      <a href="#autonomas">
+        <span class="jump__n mono">{len(autonomas):02d}</span>
+        <span class="jump__t">Autónomas<small>Se operan solas · nadie en el loop</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
     </nav>
 
     <div class="note">
@@ -621,7 +675,7 @@ body {{
       </div>
       <div>
         <h2>Dominios</h2>
-        <p><em>Los dieciséis dominios están verificados como libres</em> al 13 de julio de 2026
+        <p><em>Los veintidós dominios están verificados como libres</em> al 13 de julio de 2026
           (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
           <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
           antes de comprarlo.</p>
@@ -659,7 +713,7 @@ body {{
 '''
 
 open("index.html", "w").write(doc)
-print(f"hub generado: {len(ideas)} ideas ({len(pyme)} PYME, {len(minera)} minería, {len(consumo)} consumo)")
+print(f"hub generado: {len(ideas)} ideas + sistema ({len(pyme)} PYME, {len(minera)} minería, {len(consumo)} consumo, {len(autonomas)} autónomas)")
 for d in ideas:
     n = int(d["folder"][:2])
     bg = BG_PYME if n <= 10 else BG_MINERA

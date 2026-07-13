@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Pregonia · La bandeja</title>
+<meta name="description" content="La bandeja de Pregonia funcionando: alertas del Diario Oficial, INAPI y el Boletín Concursal, la bandeja de descartadas con el motivo escrito, y el pulgar que entrena el filtro en vivo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* ====================================================================
+     EL DEMO. Mobile-first de verdad: la alerta se lee en el teléfono,
+     ése es el caso central. En escritorio aparece el riel a la izquierda.
+     ==================================================================== */
+  body { padding-bottom: 76px; } /* espacio para la barra de pestañas móvil */
+  @media (min-width: 62em) { body { padding-bottom: 0; } }
+
+  .app { display: block; }
+  @media (min-width: 62em) {
+    .app { display: grid; grid-template-columns: 232px 1fr; gap: var(--sp-l); align-items: start; }
+  }
+
+  /* --- Riel de escritorio --- */
+  .riel { display: none; }
+  @media (min-width: 62em) {
+    .riel { display: block; position: sticky; top: 82px; padding-top: var(--sp-s); }
+    .riel ul { list-style: none; display: grid; gap: 2px; }
+    .riel button {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      padding: 10px 10px; min-height: 44px; text-align: left;
+      font-family: var(--mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--texto-3); border-left: 2px solid transparent;
+    }
+    .riel button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; flex: none; }
+    .riel button:hover { color: var(--texto); background: var(--panel); }
+    .riel button[aria-current="true"] { color: var(--texto); border-left-color: var(--flash); background: var(--panel); }
+    .riel .cnt { margin-left: auto; font-size: 0.7rem; color: var(--texto-3); }
+    .riel button[aria-current="true"] .cnt { color: var(--flash); }
+  }
+
+  /* --- Barra de pestañas móvil --- */
+  .tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--panel); border-top: 1px solid var(--linea-2);
+  }
+  @media (min-width: 62em) { .tabs { display: none; } }
+  .tabs button {
+    display: grid; justify-items: center; gap: 3px; padding: 8px 2px 10px; min-height: 62px;
+    font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--texto-3); border-top: 2px solid transparent;
+  }
+  .tabs button svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+  .tabs button[aria-current="true"] { color: var(--texto); border-top-color: var(--flash); }
+  .tabs .bolita { position: absolute; }
+  .tabs .cnt {
+    font-family: var(--mono); font-size: 0.56rem; background: var(--linea-2); color: var(--texto);
+    padding: 0 4px; border-radius: 6px; min-width: 15px; line-height: 1.5;
+  }
+  .tabs button[aria-current="true"] .cnt { background: var(--flash); color: #0A0D0E; }
+
+  /* --- Cabecera de la app --- */
+  .app-top {
+    display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap;
+    padding-block: var(--sp-s); border-bottom: 1px solid var(--linea);
+  }
+  .app-top .cuenta { display: grid; }
+  .app-top .cuenta b { font-size: 0.95rem; font-weight: 800; letter-spacing: -0.01em; }
+  .app-top .cuenta span { font-family: var(--mono); font-size: 0.64rem; color: var(--texto-3); letter-spacing: 0.08em; }
+  .medidor { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .medidor .v { font-family: var(--display); font-weight: 900; font-size: 1.35rem; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--flash); }
+  .medidor .k { font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--texto-3); line-height: 1.3; max-width: 8rem; }
+
+  .vista { padding-block: var(--sp-s); display: none; }
+  .vista.activa { display: block; }
+  .vista > h2 { font-size: var(--step-1); margin-bottom: 4px; }
+  .vista > .intro { font-size: 0.88rem; color: var(--texto-3); line-height: 1.5; margin-bottom: var(--sp-s); max-width: 62ch; }
+
+  /* --- Tira del día --- */
+  .tira {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--panel-2); border: 1px solid var(--linea);
+    padding: 10px 12px; margin-bottom: var(--sp-s);
+    font-family: var(--mono); font-size: 0.7rem; color: var(--texto-3); letter-spacing: 0.04em; line-height: 1.6;
+  }
+  .tira b { color: var(--texto); font-weight: 500; }
+  .tira .f { color: var(--flash); }
+  .tira a { color: var(--texto-2); display: inline-flex; align-items: center; min-height: 44px; }
+
+  /* --- La cola de las 18:00 --- */
+  .cola { border: 1px dashed var(--linea-2); padding: 10px 12px; margin-bottom: var(--sp-s); }
+  .cola summary { cursor: pointer; list-style: none; font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--texto-3); display: flex; gap: 8px; align-items: center; min-height: 24px; }
+  .cola summary::-webkit-details-marker { display: none; }
+  .cola summary::before { content: "▸"; color: var(--flash); }
+  .cola[open] summary::before { content: "▾"; }
+  .cola ul { list-style: none; margin-top: 10px; display: grid; gap: 6px; }
+  .cola li { font-family: var(--mono); font-size: 0.7rem; color: var(--texto-2); line-height: 1.5; display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+  .cola li .fuente { font-size: 0.55rem; padding: 1px 4px; }
+  .cola li.muerta { color: var(--texto-3); text-decoration: line-through; text-decoration-color: var(--flash); }
+
+  .lista-alertas { display: grid; gap: var(--sp-s); }
+  .vacio { border: 1px dashed var(--linea-2); padding: var(--sp-m) var(--sp-s); text-align: center; }
+  .vacio p { font-size: 0.9rem; }
+  .vacio .rotulo { display: block; margin-bottom: 8px; color: var(--flash); }
+
+  /* --- El panel de "¿por qué no?" --- */
+  .porque-no { border-top: 1px solid var(--flash-bord); background: var(--flash-apag); padding: 12px; display: grid; gap: 10px; }
+  .porque-no[hidden] { display: none; }
+  .porque-no .rotulo { color: var(--texto-2); }
+  .porque-no .ops { display: grid; gap: 4px; }
+  .porque-no label {
+    display: flex; align-items: center; gap: 9px; min-height: 44px;
+    font-size: 0.86rem; color: var(--texto-2); cursor: pointer;
+    border: 1px solid transparent; padding: 4px 8px;
+  }
+  .porque-no label:hover { border-color: var(--linea-2); color: var(--texto); }
+  .porque-no input[type="radio"] { accent-color: #FF3B30; width: 16px; height: 16px; flex: none; }
+
+  /* --- Publicación completa --- */
+  .completa { border-top: 1px solid var(--linea); padding-top: 10px; }
+  .completa[hidden] { display: none; }
+  .completa pre {
+    font-family: var(--mono); font-size: 0.72rem; line-height: 1.65; color: var(--texto-2);
+    background: #0D1113; border: 1px solid var(--linea); padding: 10px 12px;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  /* --- Toast --- */
+  .avisos { position: fixed; left: 8px; right: 8px; bottom: 84px; z-index: 70; display: grid; gap: 6px; pointer-events: none; }
+  @media (min-width: 62em) { .avisos { left: auto; right: 20px; bottom: 20px; width: 380px; } }
+  .aviso {
+    background: var(--panel-3); border: 1px solid var(--flash-bord); border-left: 3px solid var(--flash);
+    padding: 10px 12px; font-size: 0.82rem; color: var(--texto); line-height: 1.45;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  }
+  .aviso b { color: var(--flash); font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em; display: block; margin-bottom: 3px; }
+
+  /* --- Formularios --- */
+  .campo { display: grid; gap: 5px; }
+  .campo label { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--texto-3); }
+  input[type="text"], select, input[type="tel"] {
+    background: #0D1113; border: 1px solid var(--linea-2); color: var(--texto);
+    padding: 10px 11px; min-height: 44px; font-size: 0.9rem; border-radius: var(--radio); width: 100%;
+  }
+  input[type="text"]:focus, select:focus { border-color: var(--flash); outline: none; }
+  .forma { display: grid; gap: 10px; }
+  @media (min-width: 48em) { .forma { grid-template-columns: 10rem 1fr 1fr auto; align-items: end; } }
+
+  /* --- Sujetos --- */
+  .sujeto { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .sujeto .val { font-size: 0.9rem; color: var(--texto); font-weight: 700; line-height: 1.3; }
+  .sujeto .sub { font-family: var(--mono); font-size: 0.68rem; color: var(--texto-3); letter-spacing: 0.04em; }
+  .sujeto .quitar { color: var(--texto-3); font-family: var(--mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid var(--linea); padding: 6px 8px; }
+  .sujeto .quitar:hover { color: var(--flash); border-color: var(--flash-bord); }
+
+  .regla-item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .regla-item p { font-size: 0.86rem; color: var(--texto-2); line-height: 1.45; }
+  .regla-item .meta { font-family: var(--mono); font-size: 0.64rem; color: var(--texto-3); letter-spacing: 0.06em; margin-top: 3px; }
+
+  /* --- Entrega --- */
+  .switch { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+  .switch input { accent-color: #FF3B30; width: 17px; height: 17px; flex: none; }
+  .switch span { font-size: 0.9rem; color: var(--texto-2); }
+  .switch input:checked + span { color: var(--texto); }
+  input[type="range"] { width: 100%; accent-color: #FF3B30; min-height: 44px; }
+  .umbral-marcas { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.6rem; color: var(--texto-3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .previo {
+    background: #0D1113; border: 1px solid var(--linea-2); padding: 12px;
+    font-family: var(--mono); font-size: 0.76rem; line-height: 1.6; color: var(--texto-2);
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+  .previo b { color: var(--texto); font-weight: 500; }
+  .barra-umbral { height: 10px; background: var(--linea); display: flex; overflow: hidden; }
+  .barra-umbral i { display: block; height: 100%; }
+
+  /* --- Onboarding --- */
+  .onb { position: fixed; inset: 0; z-index: 90; background: rgba(10,13,14,.97); overflow-y: auto; padding: var(--sp-s); }
+  .onb[hidden] { display: none; }
+  .onb-caja { max-width: 640px; margin: var(--sp-l) auto var(--sp-xl); border: 1px solid var(--linea-2); background: var(--panel); padding: var(--sp-m) var(--sp-s); }
+  .onb-caja h2 { font-size: var(--step-2); }
+  .onb-caja > p { margin-top: 8px; font-size: 0.92rem; line-height: 1.55; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-s); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 10px;
+    border: 1px solid var(--linea-2); font-family: var(--mono); font-size: 0.7rem; color: var(--texto-2);
+    letter-spacing: 0.04em;
+  }
+  /* El acento se gasta con avaricia: el chip marcado se distingue por contraste,
+     no por color. El rojo aparece sólo en el ✓, que es el dato. */
+  .chip[aria-pressed="true"] { border-color: var(--texto-2); background: var(--panel-3); color: var(--texto); }
+  .chip[aria-pressed="true"]::before { content: "✓"; color: var(--flash); }
+  .escaneo { margin-top: var(--sp-m); border-top: 1px solid var(--linea); padding-top: var(--sp-s); }
+  .escaneo[hidden] { display: none; }
+  .escaneo .lineas { font-family: var(--mono); font-size: 0.76rem; color: var(--texto-3); line-height: 2; }
+  .escaneo .lineas b { color: var(--texto); font-weight: 500; }
+  .escaneo .lineas .f { color: var(--flash); }
+
+  .pie-demo { border-top: 1px solid var(--linea); padding-block: var(--sp-m); margin-top: var(--sp-l); }
+  .pie-demo p { font-size: 0.76rem; color: var(--texto-3); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="container cabecera-in">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 9v6M3 12h4l8-5v10l-8-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 8c1.6 1.1 1.6 6.9 0 8" stroke="#FF3B30" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Pregonia<span class="pt">.</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+  <div class="container" id="menuMovil">
+    <ul role="list">
+      <li><a href="../../index.html">← Ideas</a></li>
+      <li><a href="../index.html">Producto</a></li>
+      <li><a href="index.html" aria-current="page">Demo</a></li>
+      <li><a href="../negocio.html">Negocio</a></li>
+      <li><a href="../roadmap.html">Roadmap</a></li>
+      <li><a href="../stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="app-top">
+    <div class="cuenta">
+      <b>Estudio Lagos &amp; Ruiz</b>
+      <span>PLAN ESTUDIO · <span id="nSujetos">34</span> SUJETOS VIGILADOS</span>
+    </div>
+    <div class="medidor">
+      <span class="v" id="medSenal">67%</span>
+      <span class="k">Señal:<br>alertas accionadas</span>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- Riel de escritorio -->
+    <nav class="riel" aria-label="Secciones del producto">
+      <ul>
+        <li><button data-vista="bandeja" aria-current="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>
+          Bandeja <span class="cnt" id="rcBandeja">5</span></button></li>
+        <li><button data-vista="descartadas">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+          Descartadas <span class="cnt" id="rcDesc">6</span></button></li>
+        <li><button data-vista="vigilancia">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 21 21"/></svg>
+          Vigilancia</button></li>
+        <li><button data-vista="entrega">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg>
+          Entrega</button></li>
+        <li><button data-vista="senal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-4"/></svg>
+          Señal</button></li>
+      </ul>
+    </nav>
+
+    <div>
+
+    <!-- ================= BANDEJA ================= -->
+    <section class="vista activa" id="v-bandeja" aria-labelledby="h-bandeja">
+      <h2 id="h-bandeja">Bandeja</h2>
+      <p class="intro">Lo que se publicó hoy y te toca. Cada alerta dice por qué te importa <em>a ti</em> y qué hacer. El pulgar abajo no la borra: te pregunta por qué y corrige el filtro.</p>
+
+      <div class="tira">
+        <span><b>D.O. Nº 44.187</b> · 10 JUL 2026</span>
+        <span>·</span>
+        <span><b id="tAvisos">613</b> avisos publicados</span>
+        <span>·</span>
+        <span><b id="tCand">41</b> mencionan algo tuyo</span>
+        <span>·</span>
+        <span class="f"><b id="tEnv">5</b> te llegaron</span>
+        <span style="margin-left:auto"><a href="#" data-ir="descartadas">Ver las 36 descartadas →</a></span>
+      </div>
+
+      <details class="cola" id="colaBox">
+        <summary>En cola para el envío de las 18:00 · <span id="nCola">4</span> publicaciones</summary>
+        <ul id="listaCola"></ul>
+        <p class="nota" style="margin-top:10px">El juez todavía no las evalúa. Si entrenas el filtro ahora, la regla se les aplica <b>antes</b> de que salgan.</p>
+      </details>
+
+      <div class="lista-alertas" id="listaBandeja"></div>
+
+      <div class="vacio" id="bandejaVacia" hidden>
+        <span class="rotulo">Bandeja limpia</span>
+        <p>No queda nada por revisar. <b>Un día sin alertas es una buena noticia</b>, no un producto roto: hoy no se publicó nada que te tocara.</p>
+      </div>
+    </section>
+
+    <!-- ================= DESCARTADAS ================= -->
+    <section class="vista" id="v-descartadas" aria-labelledby="h-desc">
+      <h2 id="h-desc">Descartadas</h2>
+      <p class="intro">Lo que mencionaba algo tuyo y <b>decidimos no mandarte</b>, con el motivo escrito. Nunca omitimos en silencio. Si alguna sí te importaba, súbela: el filtro aprende y no vuelve a descartarla.</p>
+      <div class="lista-alertas" id="listaDescartadas"></div>
+    </section>
+
+    <!-- ================= VIGILANCIA ================= -->
+    <section class="vista" id="v-vigilancia" aria-labelledby="h-vig">
+      <h2 id="h-vig">Vigilancia</h2>
+      <p class="intro">Qué estamos mirando por ti. Agrega un sujeto y buscamos 90 días hacia atrás en todas las fuentes antes de vigilarlo hacia adelante.</p>
+
+      <div class="panel" style="margin-bottom:var(--sp-m)">
+        <p class="rotulo" style="margin-bottom:10px">Agregar sujeto</p>
+        <div class="forma">
+          <div class="campo">
+            <label for="fTipo">Tipo</label>
+            <select id="fTipo">
+              <option value="rut">RUT de empresa</option>
+              <option value="marca">Marca (INAPI)</option>
+              <option value="rubro">Rubro / giro</option>
+              <option value="comuna">Comuna</option>
+              <option value="clave">Palabra clave</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="fValor">Valor</label>
+            <input type="text" id="fValor" placeholder="77.104.559-6">
+          </div>
+          <div class="campo">
+            <label for="fEtiq">Nombre o nota</label>
+            <input type="text" id="fEtiq" placeholder="Constructora Peñuelas SpA">
+          </div>
+          <button class="btn" id="btnAgregar">Vigilar</button>
+        </div>
+        <p class="nota" style="margin-top:12px">Un estudio real pega acá el CSV con la cartera completa. Para el demo, agrega uno y mira lo que aparece.</p>
+      </div>
+
+      <div class="titulo-seccion" style="margin-bottom:0">
+        <h2 style="font-size:var(--step-1)">Sujetos vigilados</h2>
+        <span class="rotulo"><span id="nSujetos2">34</span> de 60 del plan</span>
+      </div>
+      <div id="listaSujetos"></div>
+
+      <div class="titulo-seccion" style="margin-top:var(--sp-l);margin-bottom:0">
+        <h2 style="font-size:var(--step-1)">Reglas que aprendió el filtro</h2>
+        <span class="rotulo">De tus pulgares</span>
+      </div>
+      <div id="listaReglas"></div>
+      <p class="nota" style="margin-top:var(--sp-s)">Cada regla es tuya, no del sistema: se puede deshacer, y al deshacerla vuelven a la bandeja las alertas que descartó. El filtro no es una caja negra que decide por ti; es una caja que puedes abrir.</p>
+    </section>
+
+    <!-- ================= ENTREGA ================= -->
+    <section class="vista" id="v-entrega" aria-labelledby="h-ent">
+      <h2 id="h-ent">Entrega</h2>
+      <p class="intro">Cómo y cuándo te escribimos. El umbral es la perilla que decide cuánto ruido aguantas: muévela y mira lo que habrías recibido esta semana.</p>
+
+      <div class="rejilla rejilla-2">
+        <div class="panel">
+          <p class="rotulo" style="margin-bottom:10px">Canales</p>
+          <label class="switch"><input type="checkbox" id="cCorreo" checked><span>Correo · lagos@lagosruiz.cl</span></label>
+          <label class="switch"><input type="checkbox" id="cWa" checked><span>WhatsApp · +56 9 8432 1176</span></label>
+          <label class="switch"><input type="checkbox" id="cUrg" checked><span>Lo urgente, al instante (no espera el resumen)</span></label>
+          <div class="campo" style="margin-top:12px">
+            <label for="cHora">Hora del envío diario</label>
+            <select id="cHora">
+              <option>06:30 — apenas sale la edición</option>
+              <option selected>08:00 — antes de la primera reunión</option>
+              <option>13:00 — al almuerzo</option>
+              <option>18:00 — cierre del día</option>
+            </select>
+          </div>
+          <p class="nota" style="margin-top:12px">WhatsApp sale por la API oficial con plantilla aprobada, y sólo a quien dejó su número. Baja en un clic, honrada al instante.</p>
+        </div>
+
+        <div class="panel">
+          <p class="rotulo" style="margin-bottom:10px">Umbral del filtro</p>
+          <input type="range" id="umbral" min="1" max="5" value="3" step="1" aria-describedby="umbralTxt">
+          <div class="umbral-marcas" aria-hidden="true">
+            <span>Sólo urgente</span><span>Crudo</span>
+          </div>
+          <p id="umbralTxt" style="margin-top:12px;font-size:.92rem;color:var(--texto);line-height:1.5" role="status"></p>
+          <div class="barra-umbral" style="margin-top:12px" aria-hidden="true">
+            <i id="bU1" style="background:#FF3B30"></i>
+            <i id="bU2" style="background:var(--linea-2)"></i>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px" class="rotulo">
+            <span id="bUa">5 enviadas</span><span id="bUb">36 descartadas</span>
+          </div>
+          <p class="nota" style="margin-top:12px" id="umbralNota"></p>
+        </div>
+      </div>
+
+      <div class="titulo-seccion" style="margin-top:var(--sp-l)">
+        <h2 style="font-size:var(--step-1)">Así se ve en tu teléfono</h2>
+        <span class="rotulo">Vista previa en vivo</span>
+      </div>
+      <div class="previo" id="previoWa"></div>
+      <p class="nota" style="margin-top:10px">La alerta tiene que caber en una notificación y leerse en veinte segundos, parado en un ascensor. Si no cabe, no la mandamos: la dejamos en el resumen.</p>
+    </section>
+
+    <!-- ================= SEÑAL ================= -->
+    <section class="vista" id="v-senal" aria-labelledby="h-sen">
+      <h2 id="h-sen">Señal</h2>
+      <p class="intro">La única métrica que importa: de las alertas que te mandamos, <b>cuántas abriste y accionaste</b>. Si esto baja de 40% el producto está roto, y es nuestro criterio de muerte declarado en el roadmap.</p>
+
+      <div class="rejilla rejilla-3" style="margin-bottom:var(--sp-m)">
+        <div class="panel"><div class="cifra"><span class="k">Señal · últimas 4 semanas</span><span class="v f" id="sSenal">67%</span><span class="n">De 21 alertas enviadas, 14 fueron abiertas y accionadas.</span></div></div>
+        <div class="panel"><div class="cifra"><span class="k">Alertas por semana</span><span class="v" id="sPorSem">5,2</span><span class="n">Sube cuando hay algo. La semana del 22 de junio no te mandamos ninguna.</span></div></div>
+        <div class="panel"><div class="cifra"><span class="k">Descartadas por tus reglas</span><span class="v" id="sDesc">61</span><span class="n">Publicaciones que mencionaban algo tuyo y no llegaron a tu correo este mes.</span></div></div>
+      </div>
+
+      <figure class="figura" style="margin-bottom:var(--sp-m)">
+        <h3>Señal semana a semana</h3>
+        <p class="sub">Fracción de las alertas enviadas que el estudio abrió y accionó. La línea de 40% es el piso: bajo eso, el producto se apaga solo.</p>
+        <div class="scroll-x">
+          <svg viewBox="0 0 480 200" width="480" height="200" role="img" aria-labelledby="tSen dSen" style="min-width:480px">
+            <title id="tSen">Señal semanal</title>
+            <desc id="dSen">Semana 1: 38%. Semana 2: 52%. Semana 3: 61%. Semana 4: 58%. Semana 5: 67%. Semana 6: 71%. El piso de muerte es 40%.</desc>
+            <g class="grid">
+              <line x1="40" y1="20" x2="465" y2="20"/><line x1="40" y1="55" x2="465" y2="55"/>
+              <line x1="40" y1="90" x2="465" y2="90"/><line x1="40" y1="125" x2="465" y2="125"/>
+              <line x1="40" y1="160" x2="465" y2="160"/>
+            </g>
+            <text class="et" x="34" y="24" text-anchor="end">100%</text>
+            <text class="et" x="34" y="94" text-anchor="end">50%</text>
+            <text class="et" x="34" y="164" text-anchor="end">0%</text>
+            <!-- Piso de muerte 40% -> y = 160 - 0.40*140 = 104 -->
+            <line x1="40" y1="104" x2="465" y2="104" stroke="#6B7679" stroke-width="1" stroke-dasharray="4 4"/>
+            <text class="et" x="465" y="99" text-anchor="end" fill="#98A3A8">Piso: 40% · criterio de muerte</text>
+            <!-- puntos: x = 60 + i*80 ; y = 160 - v*1.4 -->
+            <polyline fill="none" stroke="#FF3B30" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+              points="60,106.8 140,87.2 220,74.6 300,78.8 380,66.2 460,60.6"/>
+            <g fill="#FF3B30" stroke="#12171A" stroke-width="2">
+              <circle cx="60" cy="106.8" r="4.5"/><circle cx="140" cy="87.2" r="4.5"/><circle cx="220" cy="74.6" r="4.5"/>
+              <circle cx="300" cy="78.8" r="4.5"/><circle cx="380" cy="66.2" r="4.5"/><circle cx="460" cy="60.6" r="5.5"/>
+            </g>
+            <text class="dl" x="460" y="50" text-anchor="end">71%</text>
+            <text class="et" x="60" y="122" text-anchor="middle" fill="#6B7679">38%</text>
+            <line class="eje" x1="40" y1="160" x2="465" y2="160"/>
+            <g class="et">
+              <text x="60" y="178" text-anchor="middle">S1</text><text x="140" y="178" text-anchor="middle">S2</text>
+              <text x="220" y="178" text-anchor="middle">S3</text><text x="300" y="178" text-anchor="middle">S4</text>
+              <text x="380" y="178" text-anchor="middle">S5</text><text x="460" y="178" text-anchor="middle">S6</text>
+            </g>
+            <text class="et" x="40" y="196">S1 = primera semana, sin filtro entrenado. S6 = con 9 pulgares.</text>
+          </svg>
+        </div>
+        <figcaption><span class="supuesto">Datos del demo</span> La curva sube porque el usuario entrenó el filtro: es exactamente lo que el producto tiene que probar en los design partners antes del mes 2. Si no sube, se mata.</figcaption>
+      </figure>
+
+      <div class="titulo-seccion"><h2 style="font-size:var(--step-1)">Tus alertas de esta semana</h2></div>
+      <div class="scroll-x">
+        <table>
+          <thead><tr><th>Fuente</th><th>Alerta</th><th>Qué hiciste</th></tr></thead>
+          <tbody id="tablaSenal"></tbody>
+        </table>
+      </div>
+    </section>
+
+    </div>
+  </div>
+
+  <footer class="pie-demo">
+    <p><b style="color:var(--texto-2)">Demo de Pregonia.</b> Todos los datos son ficticios: las empresas, los RUT, los folios y los expedientes están inventados y no corresponden a personas ni sociedades reales. El <b>formato</b> de los extractos sí imita el de las publicaciones reales del Diario Oficial, INAPI y el Boletín Concursal. Ningún dato sale del navegador: el estado vive en esta pestaña y se pierde al recargar. Lo que está falseado y lo que costaría hacerlo real está detallado en <a href="../stack.html">Arquitectura</a>.</p>
+  </footer>
+</main>
+
+<!-- Barra de pestañas móvil -->
+<nav class="tabs" aria-label="Secciones">
+  <button data-vista="bandeja" aria-current="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>
+    <span>Bandeja <span class="cnt" id="tcBandeja">5</span></span>
+  </button>
+  <button data-vista="descartadas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+    <span>Descart. <span class="cnt" id="tcDesc">6</span></span>
+  </button>
+  <button data-vista="vigilancia">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 21 21"/></svg>
+    <span>Vigilar</span>
+  </button>
+  <button data-vista="entrega">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg>
+    <span>Entrega</span>
+  </button>
+  <button data-vista="senal">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-4"/></svg>
+    <span>Señal</span>
+  </button>
+</nav>
+
+<div class="avisos" id="avisos" aria-live="polite"></div>
+
+<!-- ================= ONBOARDING ================= -->
+<div class="onb" id="onb">
+  <div class="onb-caja">
+    <p class="rotulo">Pregonia · Puesta en marcha · 4 minutos</p>
+    <h2 style="margin-top:8px">¿Qué vigilamos por ti?</h2>
+    <p>Importamos la cartera del estudio desde el CSV: <b>12 clientes por RUT, 6 marcas, 3 rubros, 2 comunas y 11 palabras clave</b>. Desmarca lo que no quieras. Esto es todo el onboarding: no hay llamada, no hay implementación, no hay ejecutivo.</p>
+
+    <div class="chips" id="chipsOnb"></div>
+
+    <div class="fila" style="margin-top:var(--sp-m)">
+      <button class="btn" id="btnVigilar">Empezar a vigilar</button>
+      <button class="btn btn-2" id="btnSaltar">Saltar</button>
+    </div>
+
+    <div class="escaneo" id="escaneo" hidden>
+      <p class="lineas" id="lineasEscaneo"></p>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-m)">Al terminar, buscamos 90 días hacia atrás en todas las fuentes. La primera bandeja casi siempre trae algo que el estudio no sabía.</p>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   PREGONIA · demo. Estado en el cliente, sin red, sin dependencias.
+   El corazón del producto es el JUEZ: decide si una publicación le importa
+   a esta cuenta. Acá está simulado con reglas, pero la estructura de datos
+   es la real (ver ../stack.html): candidato -> juez -> alerta | descarte.
+   ========================================================================= */
+
+/* ---------- Datos mock ------------------------------------------------- */
+/* La cartera del estudio son 34 sujetos. Acá se listan los 7 que tuvieron
+   actividad; los otros 27 están vigilados y en silencio. Que un sujeto NO
+   genere nada es el caso normal, y decirlo es parte del producto. */
+var OTROS_SUJETOS = 27;
+var SUJETOS = [
+  { id:'s1', tipo:'marca',  valor:'ANDESPACK · clase 19', etiq:'Marca de Áridos del Maipo SpA', desde:'12 mar 2026', hits:3 },
+  { id:'s2', tipo:'rut',    valor:'76.412.883-9',         etiq:'Áridos del Maipo SpA (cliente)', desde:'12 mar 2026', hits:7 },
+  { id:'s3', tipo:'rut',    valor:'76.902.551-4',         etiq:'Transportes Cerro Negro Ltda (deudor de Sercon)', desde:'04 abr 2026', hits:1 },
+  { id:'s4', tipo:'rut',    valor:'77.256.019-1',         etiq:'Sercon Ingeniería SpA (cliente)', desde:'12 mar 2026', hits:4 },
+  { id:'s5', tipo:'rubro',  valor:'Extracción de áridos y hormigón', etiq:'CIIU 08101 · 2 clientes en el rubro', desde:'12 mar 2026', hits:9 },
+  { id:'s6', tipo:'comuna', valor:'Buin',                 etiq:'Planta de Áridos del Maipo, rol 331-12', desde:'12 mar 2026', hits:6 },
+  { id:'s7', tipo:'clave',  valor:'"sustancias peligrosas"', etiq:'Palabra clave del estudio', desde:'20 may 2026', hits:4 }
+];
+
+var ALERTAS = [
+  {
+    id:'A1', estado:'bandeja', urgente:true, familia:'marca',
+    fuente:'INAPI', fecha:'10 JUL · 09:12', dt:'2026-07-10T09:12', folio:'SOL. 1.584.902',
+    titulo:'Alguien pidió la marca ANDESPAK en la misma clase que tu cliente',
+    extracto:'«Solicitud N° 1.584.902. Marca denominativa <mark>ANDESPAK</mark>. Solicitante: COMERCIALIZADORA VILUCO SPA, RUT 77.318.446-2, domicilio Av. Vicuña Mackenna 8420, La Florida. Clase <mark>19</mark>: materiales de construcción no metálicos; hormigón; áridos; morteros.»',
+    cve:'Publicado en el Diario Oficial N° 44.187, sección Solicitudes de Marcas Comerciales.',
+    porque:'Tu cliente <b>Áridos del Maipo SpA</b> tiene registrada ANDESPACK en la <b>misma clase 19</b>. Un tercero está pidiendo un signo casi idéntico para los mismos productos: si no se opone, se registra.',
+    hacer:'<b>Qué hacer:</b> deducir oposición ante INAPI. El plazo corre desde la publicación del extracto (Ley 19.039, art. 5).',
+    plazo:'Quedan 26 de 30 días · vence el 09/08/2026',
+    sujeto:'s1',
+    completa:'DIARIO OFICIAL DE LA REPÚBLICA DE CHILE\nN° 44.187 — Viernes 10 de julio de 2026\nINSTITUTO NACIONAL DE PROPIEDAD INDUSTRIAL\nSolicitudes de registro de marcas comerciales\n\nSolicitud N° 1.584.902\nSigno: ANDESPAK (denominativa)\nSolicitante: COMERCIALIZADORA VILUCO SPA\nRUT: 77.318.446-2\nDomicilio: Av. Vicuña Mackenna 8420, La Florida, Región Metropolitana\nClase 19: Materiales de construcción no metálicos; hormigón; áridos;\n          morteros; tubos rígidos no metálicos para la construcción.\nFecha de presentación: 26 de junio de 2026\n\n— Se hace presente que dentro del plazo legal cualquier interesado podrá\n   deducir oposición al registro solicitado.'
+  },
+  {
+    id:'A2', estado:'bandeja', urgente:false, familia:'concursal',
+    fuente:'Boletín concursal', fecha:'10 JUL · 08:40', dt:'2026-07-10T08:40', folio:'C-2.114-2026',
+    titulo:'Un deudor de tu cliente entró en liquidación',
+    extracto:'«Resolución de liquidación. Empresa deudora: <mark>TRANSPORTES CERRO NEGRO LTDA.</mark>, RUT <mark>76.902.551-4</mark>, domicilio en San Bernardo. Liquidador titular designado. Plazo de verificación ordinaria de créditos: 30 días contados desde la publicación.»',
+    cve:'2° Juzgado Civil de San Miguel · Boletín Concursal (Ley 20.720).',
+    porque:'Ese RUT está en la nómina que tu cliente <b>Sercon Ingeniería SpA</b> te pasó a vigilar: le factura desde 2024 y hoy pasa a ser acreedor en un concurso.',
+    hacer:'<b>Qué hacer:</b> verificar el crédito ante el liquidador dentro del período ordinario. Después se puede verificar igual, pero se cobra después que todos los demás.',
+    plazo:'Quedan 30 días · vence el 09/08/2026',
+    sujeto:'s3',
+    completa:'BOLETÍN CONCURSAL\nSuperintendencia de Insolvencia y Reemprendimiento\nPublicación del 10 de julio de 2026\n\nProcedimiento: LIQUIDACIÓN FORZOSA\nRol: C-2.114-2026 · 2° Juzgado Civil de San Miguel\nEmpresa deudora: TRANSPORTES CERRO NEGRO LTDA.\nRUT: 76.902.551-4\nDomicilio: Camino Lo Blanco 1290, San Bernardo\n\nSe designa liquidador titular y suplente de la nómina.\nSe fija el plazo de 30 días para la verificación ordinaria de créditos,\ncontado desde la publicación de esta resolución en el Boletín Concursal.'
+  },
+  {
+    id:'A3', estado:'bandeja', urgente:false, familia:'competencia',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', dt:'2026-07-10T06:00', folio:'CVE 2.634.918',
+    titulo:'Se constituyó un competidor directo de tu cliente, en su misma comuna',
+    extracto:'«Extracto. Con fecha 06/07/2026 se constituyó <mark>ÁRIDOS SANTA ELENA SPA</mark>, RUT 77.904.112-6, domicilio en <mark>Buin</mark>, objeto: extracción, procesamiento y comercialización de <mark>áridos</mark> y hormigón premezclado. Capital: $180.000.000, suscrito y pagado.»',
+    cve:'Diario Oficial N° 44.187 · Registro de Empresas y Sociedades (Ley 20.659).',
+    porque:'Tu cliente <b>Áridos del Maipo SpA</b> es hoy el único con planta en Buin. Acaba de constituirse un competidor con $180 millones de capital pagado, mismo giro y misma comuna.',
+    hacer:'<b>Qué hacer:</b> avisarle hoy, antes de que se entere por un cliente perdido. Si tiene contrato de suministro con la Municipalidad, revisar la fecha de renovación y la cláusula de exclusividad.',
+    plazo:'',
+    sujeto:'s6',
+    completa:'DIARIO OFICIAL DE LA REPÚBLICA DE CHILE\nN° 44.187 — Viernes 10 de julio de 2026\nCVE 2.634.918\n\nEXTRACTO — REGISTRO DE EMPRESAS Y SOCIEDADES (Ley N° 20.659)\n\nCon fecha 6 de julio de 2026 se constituyó la sociedad\nÁRIDOS SANTA ELENA SPA, RUT 77.904.112-6.\nDomicilio: Ruta 5 Sur km 32, Buin, Región Metropolitana.\nObjeto: la extracción, procesamiento y comercialización de áridos,\ngravas, arenas y hormigón premezclado; el transporte de los mismos.\nCapital: $180.000.000, dividido en 1.000 acciones nominativas,\nsuscrito y pagado en su totalidad al momento de la constitución.\nDuración: indefinida.'
+  },
+  {
+    id:'A4', estado:'bandeja', urgente:false, familia:'norma-rubro',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', dt:'2026-07-10T06:00', folio:'CVE 2.634.702',
+    titulo:'Cambian las exigencias de encarpado y pesaje para camiones de áridos',
+    extracto:'«Decreto Supremo N° 112 del Ministerio de Transportes y Telecomunicaciones. Modifica exigencias de cubierta y control de peso para el transporte de <mark>áridos</mark> a granel en vías urbanas. Entrada en vigencia: 90 días desde su publicación.»',
+    cve:'Diario Oficial N° 44.187 · Normas Generales.',
+    porque:'Dos de tus clientes (<b>Áridos del Maipo</b> y <b>Sercon Ingeniería</b>) transportan áridos a granel con flota propia. Esto les cambia el equipamiento de los camiones y tienen 90 días.',
+    hacer:'<b>Qué hacer:</b> mandar la minuta a los dos clientes esta semana. El que se adecúe tarde se come la multa y la detención del camión, no el estudio.',
+    plazo:'Entra en vigencia el 08/10/2026 · quedan 90 días',
+    sujeto:'s5',
+    completa:'DIARIO OFICIAL DE LA REPÚBLICA DE CHILE\nN° 44.187 — Viernes 10 de julio de 2026\nCVE 2.634.702\n\nMINISTERIO DE TRANSPORTES Y TELECOMUNICACIONES\nSubsecretaría de Transportes\n\nDECRETO SUPREMO N° 112\nModifica exigencias de cubierta, encarpado y control de peso por eje\npara el transporte de áridos y materiales a granel en vías urbanas.\n\nArtículo transitorio: el presente decreto entrará en vigencia\ntranscurridos 90 días desde su publicación en el Diario Oficial.\n\n(Documento ficticio del demo. El formato es el real; el decreto no existe.)'
+  },
+  {
+    id:'A5', estado:'bandeja', urgente:false, familia:'norma',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', dt:'2026-07-10T06:00', folio:'CVE 2.634.744',
+    titulo:'La SEREMI de Salud RM actualizó su listado de sustancias peligrosas',
+    extracto:'«Resolución Exenta N° 3.902. Actualiza el listado de <mark>sustancias peligrosas</mark> sujetas a declaración para establecimientos industriales de la Región Metropolitana. Se agregan 14 sustancias al anexo B.»',
+    cve:'Diario Oficial N° 44.187 · Normas Particulares.',
+    porque:'Coincide con tu palabra clave «sustancias peligrosas», pero <b>no encontramos ninguna de las 14 sustancias nuevas en el giro de tus clientes</b>. Te la mandamos igual porque tú pediste esa palabra: si no te sirve, dale el pulgar abajo y dejamos de mandarte normas generales sin sujeto identificado.',
+    hacer:'<b>Qué hacer:</b> probablemente nada. Es la alerta que sobra, y está acá a propósito: pruébale el pulgar abajo.',
+    plazo:'',
+    sujeto:'s7',
+    completa:'DIARIO OFICIAL DE LA REPÚBLICA DE CHILE\nN° 44.187 — Viernes 10 de julio de 2026\nCVE 2.634.744\n\nMINISTERIO DE SALUD\nSecretaría Regional Ministerial de Salud, Región Metropolitana\n\nRESOLUCIÓN EXENTA N° 3.902\nActualiza el listado de sustancias peligrosas sujetas a declaración\npor parte de establecimientos industriales, incorporando 14 sustancias\nal Anexo B del decreto respectivo.\n\n(Documento ficticio del demo.)'
+  }
+];
+
+var DESCARTES = [
+  {
+    id:'D1', estado:'descartada', estrella:true, familia:'homonimia',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', folio:'CVE 2.634.871',
+    titulo:'Constitución de COMERCIAL LAGOS Y RUIZ SPA',
+    extracto:'«Extracto. Por escritura de 07/07/2026 se constituyó <mark>COMERCIAL LAGOS Y RUIZ SPA</mark>, RUT 77.912.408-K, domicilio Chillán, giro: venta al por menor de abarrotes. Capital: $2.000.000.»',
+    motivo:'<b>Coincide con el nombre de tu estudio, pero es otra empresa.</b> RUT distinto, giro de abarrotes, domicilio en Chillán, y ninguno de los socios comparte RUT con los tuyos. Es homonimia de razón social. Si te la mandáramos —y sus 5 hermanas del mes— en dos semanas tendrías las notificaciones apagadas.',
+    porQuien:'Descartada por el juez · confianza 0,94'
+  },
+  {
+    id:'D2', estado:'descartada', familia:'marca',
+    fuente:'INAPI', fecha:'10 JUL · 09:12', folio:'SOL. 1.584.877',
+    titulo:'Solicitud de marca ANDES PACK, clase 30',
+    extracto:'«Solicitud N° 1.584.877. Marca <mark>ANDES PACK</mark>. Solicitante: ALIMENTOS DEL VALLE LTDA. Clase <mark>30</mark>: café, té, harinas, preparaciones a base de cereales.»',
+    motivo:'Se parece a ANDESPACK, pero pide la <b>clase 30 (alimentos)</b> y la marca de tu cliente está en la <b>clase 19 (materiales de construcción)</b>. No hay coincidencia de productos ni base evidente de confusión, y deducir oposición cuesta tasa y tiempo. <b>Si igual las quieres ver todas</b>, súbela: dejamos de descartar solicitudes de clases distintas para ANDESPACK.',
+    porQuien:'Descartada por el juez · confianza 0,71 · escalada a modelo mayor'
+  },
+  {
+    id:'D3', estado:'descartada', familia:'norma',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', folio:'CVE 2.634.690',
+    titulo:'Resolución del SII sobre timbraje en Zona Franca de Iquique',
+    extracto:'«Resolución Exenta N° 68. Modifica el procedimiento de timbraje de documentos para <mark>contribuyentes</mark> acogidos al régimen de Zona Franca de Iquique.»',
+    motivo:'Menciona tu palabra clave «contribuyentes», pero aplica <b>sólo a Zona Franca de Iquique</b>. Ninguno de tus 12 clientes tiene domicilio, sucursal ni faena en Tarapacá.',
+    porQuien:'Descartada por el juez · confianza 0,97'
+  },
+  {
+    id:'D4', estado:'descartada', familia:'comuna',
+    fuente:'Diario oficial', fecha:'10 JUL · 06:00', folio:'CVE 2.634.803',
+    titulo:'Remate de inmueble rol 2145-8, comuna de Buin',
+    extracto:'«Aviso de remate. Inmueble rol de avalúo <mark>2145-8</mark>, comuna de <mark>Buin</mark>. Mínimo: $84.500.000. Fecha: 05/08/2026, 2° Juzgado de Letras de Buin.»',
+    motivo:'Coincide con la comuna que vigilas, pero <b>tú vigilas Buin por un predio específico</b> (el rol 331-12 de la planta de Áridos del Maipo), no por la comuna entera. El ejecutado es un tercero sin relación con ninguno de tus sujetos.',
+    porQuien:'Descartada por el juez · confianza 0,89'
+  },
+  {
+    id:'D5', estado:'descartada', familia:'norma',
+    fuente:'CMF', fecha:'09 JUL · 17:20', folio:'OC 1.284',
+    titulo:'Oficio Circular sobre envío de información de intermediarios de valores',
+    extracto:'«Oficio Circular N° 1.284. Imparte instrucciones sobre el envío de información periódica de los <mark>intermediarios de valores</mark> inscritos en el Registro.»',
+    motivo:'Vigilas normativa financiera porque tienes un cliente en inversiones. Pero esto aplica sólo a <b>intermediarios inscritos en el Registro de la CMF</b>, e Inversiones Aconcagua Ltda no lo es: es una sociedad de inversión cerrada, no un corredor.',
+    porQuien:'Descartada por el juez · confianza 0,86'
+  },
+  {
+    id:'D6', estado:'descartada', familia:'norma',
+    fuente:'Diario oficial', fecha:'09 JUL · 06:00', folio:'3 avisos',
+    titulo:'Tres normas generales más mencionan «áridos»',
+    extracto:'«Bases de licitación MOP · Convenio marco de ChileCompra · Modificación de un plan regulador en Coquimbo.»',
+    motivo:'Normas de alcance general que mencionan tu rubro pero <b>no nombran a ningún sujeto tuyo ni afectan su operación</b>. Esta regla la aprendimos de tu pulgar abajo del 3 de julio.',
+    porQuien:'Descartada por tu regla del 03/07 · no la evaluó el juez'
+  }
+];
+
+var COLA = [
+  { id:'Q1', fuente:'Diario oficial', familia:'norma', titulo:'Decreto MINVU N° 47: modifica la Ordenanza General de Urbanismo y Construcciones', viva:true },
+  { id:'Q2', fuente:'Diario oficial', familia:'norma', titulo:'Resolución SEC: fija procedimiento de inscripción de instaladores eléctricos', viva:true },
+  { id:'Q3', fuente:'INAPI', familia:'marca', titulo:'Solicitud de marca MAIPO GRÁFICA, clase 16 (imprenta)', viva:true },
+  { id:'Q4', fuente:'Diario oficial', familia:'cliente', titulo:'Sercon Ingeniería SpA aumentó su capital ante otro estudio', viva:true }
+];
+
+var REGLAS = [
+  { id:'R0', texto:'Descartar normas de alcance general que no nombren a un sujeto vigilado ni afecten a su rubro.', origen:'Tu pulgar abajo del 03/07 en «Bases de licitación MOP»', mata:['norma'], descarto:12, fija:true }
+];
+
+var MOTIVOS = {
+  'homonimia':   { etiqueta:'Es otra empresa con nombre parecido', regla:'Descartar coincidencias de razón social cuando el RUT no calza con ningún sujeto vigilado.', mata:['homonimia'] },
+  'rubro':       { etiqueta:'No es de mi rubro',                   regla:'Descartar publicaciones fuera de los giros CIIU 08101 (áridos) y 41 (construcción).', mata:['norma'] },
+  'sabia':       { etiqueta:'Ya lo sabía',                         regla:'No repetir actos del mismo expediente o del mismo sujeto dentro de 30 días.', mata:[] },
+  'no-accion':   { etiqueta:'No puedo hacer nada con esto',        regla:'Descartar avisos sin plazo, sin parte y sin acto que requiera respuesta.', mata:['norma'] },
+  'general':     { etiqueta:'Demasiado general',                   regla:'Descartar normas de alcance general que no nombren a un sujeto vigilado.', mata:['norma'] }
+};
+
+/* ---------- Estado ------------------------------------------------------ */
+var estado = {
+  enviadas: 21,      // últimas 4 semanas
+  accionadas: 14,
+  descartadasMes: 61,
+  votos: {}
+};
+var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Utilidades -------------------------------------------------- */
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function avisar(titulo, texto) {
+  var caja = $('avisos');
+  // En un teléfono, tres avisos apilados tapan el producto. Máximo dos.
+  while (caja.children.length >= 2) caja.firstElementChild.remove();
+  var d = document.createElement('div');
+  d.className = 'aviso';
+  d.innerHTML = '<b>' + titulo + '</b>' + texto;
+  caja.appendChild(d);
+  setTimeout(function () { d.remove(); }, 7000);
+}
+
+function senal() {
+  return estado.enviadas ? Math.round(estado.accionadas / estado.enviadas * 100) : 0;
+}
+
+function pintarMedidores() {
+  var s = senal() + '%';
+  $('medSenal').textContent = s;
+  $('sSenal').textContent = s;
+  $('sDesc').textContent = estado.descartadasMes;
+  $('sPorSem').textContent = (estado.enviadas / 4).toFixed(1).replace('.', ',');
+  var enB = ALERTAS.filter(function (a) { return a.estado === 'bandeja'; }).length;
+  var enD = DESCARTES.filter(function (a) { return a.estado === 'descartada'; }).length;
+  $('rcBandeja').textContent = enB; $('tcBandeja').textContent = enB;
+  $('rcDesc').textContent = enD;    $('tcDesc').textContent = enD;
+  $('tEnv').textContent = enB;
+  $('nSujetos').textContent = SUJETOS.length + OTROS_SUJETOS;
+  $('nSujetos2').textContent = SUJETOS.length + OTROS_SUJETOS;
+  $('bandejaVacia').hidden = enB > 0;
+}
+
+/* ---------- Iconos ------------------------------------------------------ */
+var ICO_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V10l5-7 1 1a3 3 0 0 1 .6 3L13 10h5a2 2 0 0 1 2 2.3l-1.1 6A2 2 0 0 1 17 20H7z"/><path d="M7 10H4v11h3"/></svg>';
+var ICO_DOWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v11l-5 7-1-1a3 3 0 0 1-.6-3L11 14H6a2 2 0 0 1-2-2.3l1.1-6A2 2 0 0 1 7 4h10z"/><path d="M17 14h3V3h-3"/></svg>';
+var ICO_RELOJ = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+/* ---------- Pintar la bandeja ------------------------------------------ */
+function pintarBandeja() {
+  var cont = $('listaBandeja');
+  cont.innerHTML = '';
+  ALERTAS.filter(function (a) { return a.estado === 'bandeja'; }).forEach(function (a) {
+    var art = document.createElement('article');
+    art.className = 'alerta' + (a.urgente ? ' urgente' : '');
+    art.id = 'al-' + a.id;
+    art.innerHTML =
+      '<div class="alerta-meta">' +
+        (a.urgente ? '<span class="flash">Urgente</span>' : '<span class="grado">Revisar</span>') +
+        '<span class="fuente">' + a.fuente + '</span>' +
+        '<time datetime="' + a.dt + '">' + a.fecha + '</time>' +
+        '<span class="folio">' + a.folio + '</span>' +
+      '</div>' +
+      '<h3>' + a.titulo + '</h3>' +
+      '<div class="extracto">' + a.extracto + '<span class="cve">' + a.cve + '</span></div>' +
+      '<div class="porque"><span class="rotulo">Por qué te importa</span><p>' + a.porque + '</p></div>' +
+      '<div class="hacer">' + ICO_RELOJ + '<p>' + a.hacer +
+        (a.plazo ? '<span class="plazo">' + a.plazo + '</span>' : '') + '</p></div>' +
+      '<div class="acciones">' +
+        '<button class="pulgar arriba" data-up="' + a.id + '" aria-pressed="false">' + ICO_UP + ' Útil</button>' +
+        '<button class="pulgar abajo" data-down="' + a.id + '" aria-pressed="false">' + ICO_DOWN + ' No me sirve</button>' +
+        '<span class="sep"></span>' +
+        '<button class="btn btn-2 btn-sm" data-ver="' + a.id + '">Ver publicación</button>' +
+        '<button class="btn btn-2 btn-sm" data-reenviar="' + a.id + '">Reenviar al cliente</button>' +
+      '</div>' +
+      '<div class="completa" id="full-' + a.id + '" hidden><span class="rotulo">Texto íntegro de la publicación</span><pre>' + esc(a.completa) + '</pre></div>' +
+      '<div class="porque-no" id="pn-' + a.id + '" hidden>' +
+        '<span class="rotulo">¿Por qué no te sirvió? La respuesta corrige el filtro.</span>' +
+        '<div class="ops">' +
+          Object.keys(MOTIVOS).map(function (k) {
+            return '<label><input type="radio" name="pn-' + a.id + '" value="' + k + '"><span>' + MOTIVOS[k].etiqueta + '</span></label>';
+          }).join('') +
+        '</div>' +
+        '<div class="fila">' +
+          '<button class="btn btn-sm" data-aplicar="' + a.id + '">Aplicar y descartar</button>' +
+          '<button class="btn btn-2 btn-sm" data-cancelar="' + a.id + '">Cancelar</button>' +
+        '</div>' +
+      '</div>';
+    cont.appendChild(art);
+  });
+  pintarMedidores();
+}
+
+/* ---------- Pintar descartadas ----------------------------------------- */
+function pintarDescartadas() {
+  var cont = $('listaDescartadas');
+  cont.innerHTML = '';
+  var ds = DESCARTES.filter(function (d) { return d.estado === 'descartada'; });
+  if (!ds.length) {
+    cont.innerHTML = '<div class="vacio"><span class="rotulo">Nada descartado</span><p>Todo lo que mencionó algo tuyo te llegó. Ojo: eso normalmente significa que el umbral está muy abajo.</p></div>';
+    return;
+  }
+  ds.forEach(function (d) {
+    var div = document.createElement('div');
+    div.className = 'descarte';
+    div.id = 'ds-' + d.id;
+    div.innerHTML =
+      '<div class="alerta-meta">' +
+        '<span class="grado">Descartada</span>' +
+        '<span class="fuente">' + d.fuente + '</span>' +
+        '<time>' + d.fecha + '</time>' +
+        '<span class="folio">' + d.folio + '</span>' +
+        (d.estrella ? '<span class="flash" title="El descarte que decide el negocio">El filtro trabajando</span>' : '') +
+      '</div>' +
+      '<h4>' + d.titulo + '</h4>' +
+      '<div class="extracto">' + d.extracto + '</div>' +
+      '<p class="motivo"><b>Por qué no te la mandamos:</b> ' + d.motivo + '</p>' +
+      '<div class="acciones">' +
+        '<span class="rotulo">' + d.porQuien + '</span>' +
+        '<span class="sep"></span>' +
+        '<button class="pulgar arriba" data-rescate="' + d.id + '" aria-pressed="false">' + ICO_UP + ' Esto sí me importa</button>' +
+      '</div>';
+    cont.appendChild(div);
+  });
+  pintarMedidores();
+}
+
+/* ---------- Cola -------------------------------------------------------- */
+function pintarCola() {
+  var ul = $('listaCola');
+  ul.innerHTML = '';
+  COLA.forEach(function (q) {
+    var li = document.createElement('li');
+    li.className = q.viva ? '' : 'muerta';
+    li.innerHTML = '<span class="fuente">' + q.fuente + '</span><span>' + q.titulo +
+      (q.viva ? '' : ' <span style="color:var(--flash);text-decoration:none">· descartada por tu regla</span>') + '</span>';
+    ul.appendChild(li);
+  });
+  var vivas = COLA.filter(function (q) { return q.viva; }).length;
+  $('nCola').textContent = vivas;
+}
+
+/* ---------- Sujetos y reglas ------------------------------------------- */
+var NOMBRE_TIPO = { rut:'RUT', marca:'Marca', rubro:'Rubro', comuna:'Comuna', clave:'Clave' };
+
+function pintarSujetos() {
+  var cont = $('listaSujetos');
+  cont.innerHTML = '';
+  SUJETOS.forEach(function (s) {
+    var div = document.createElement('div');
+    div.className = 'sujeto';
+    div.innerHTML =
+      '<span class="fuente">' + NOMBRE_TIPO[s.tipo] + '</span>' +
+      '<span><span class="val">' + s.valor + '</span><br><span class="sub">' + s.etiq + ' · desde ' + s.desde + ' · ' + s.hits + ' alertas</span></span>' +
+      '<button class="quitar" data-quitar="' + s.id + '">Quitar</button>';
+    cont.appendChild(div);
+  });
+  var silencio = document.createElement('div');
+  silencio.className = 'sujeto';
+  silencio.innerHTML =
+    '<span class="fuente">Silencio</span>' +
+    '<span><span class="val">' + OTROS_SUJETOS + ' sujetos más, sin publicaciones en 90 días</span><br>' +
+    '<span class="sub">Vigilados y callados. Que un sujeto no genere nada es el caso normal — y es la mitad del valor.</span></span>' +
+    '<span class="rotulo">Activos</span>';
+  cont.appendChild(silencio);
+  pintarMedidores();
+}
+
+function pintarReglas() {
+  var cont = $('listaReglas');
+  cont.innerHTML = '';
+  if (!REGLAS.length) {
+    cont.innerHTML = '<p class="nota" style="margin-top:12px">Todavía no le has enseñado nada al filtro. Dale pulgar abajo a algo en la bandeja.</p>';
+    return;
+  }
+  REGLAS.forEach(function (r) {
+    var div = document.createElement('div');
+    div.className = 'regla-item';
+    div.innerHTML =
+      '<div><p>' + r.texto + '</p><p class="meta">' + r.origen + ' · descartó ' + r.descarto + ' publicaciones</p></div>' +
+      (r.fija ? '<span class="rotulo">Activa</span>' : '<button class="quitar" data-deshacer="' + r.id + '">Deshacer</button>');
+    cont.appendChild(div);
+  });
+}
+
+/* ---------- El juez: aplicar una regla nueva ---------------------------- */
+function aplicarRegla(motivoKey, alertaId) {
+  var m = MOTIVOS[motivoKey];
+  var a = ALERTAS.find(function (x) { return x.id === alertaId; });
+
+  // 1. La alerta se va a descartadas, con el motivo del usuario.
+  a.estado = 'movida';
+  DESCARTES.unshift({
+    id: 'X' + a.id, estado: 'descartada', familia: a.familia,
+    fuente: a.fuente, fecha: a.fecha, folio: a.folio, titulo: a.titulo,
+    extracto: a.extracto,
+    motivo: 'La descartaste tú: «' + m.etiqueta.toLowerCase() + '». El filtro guardó la regla y la aplica de aquí en adelante.',
+    porQuien: 'Descartada por tu pulgar abajo del 10/07'
+  });
+
+  // 2. Nace la regla.
+  var rid = 'R' + (REGLAS.length + 1);
+  var muertas = 0;
+  COLA.forEach(function (q) {
+    if (q.viva && m.mata.indexOf(q.familia) !== -1) { q.viva = false; muertas++; }
+  });
+  REGLAS.push({ id: rid, texto: m.regla, origen: 'Tu pulgar abajo del 10/07 en «' + a.titulo.slice(0, 42) + '…»', mata: m.mata, descarto: muertas, fija: false, alertaOrigen: a.id });
+
+  // 3. La señal se recalcula: la alerta enviada no fue accionada.
+  estado.descartadasMes += muertas + 1;
+
+  pintarBandeja(); pintarDescartadas(); pintarCola(); pintarReglas();
+
+  if (muertas > 0) {
+    avisar('El filtro entrenó y ya trabajó',
+      'Regla nueva: <b>' + m.regla + '</b> Se aplicó de inmediato a <b>' + muertas + ' publicaciones que estaban en cola</b> para el envío de las 18:00. No las vas a recibir.');
+  } else {
+    avisar('Regla guardada',
+      'Regla nueva: <b>' + m.regla + '</b> No había nada en cola que calzara con ella, así que hoy no cambia nada. Se aplica de aquí en adelante — y te lo decimos en vez de fingir que hizo algo.');
+  }
+}
+
+function deshacerRegla(rid) {
+  var i = REGLAS.findIndex(function (r) { return r.id === rid; });
+  if (i < 0) return;
+  var r = REGLAS[i];
+  REGLAS.splice(i, 1);
+  // Vuelven las de la cola que mató.
+  var revividas = 0;
+  COLA.forEach(function (q) {
+    if (!q.viva && r.mata.indexOf(q.familia) !== -1) { q.viva = true; revividas++; }
+  });
+  // Y vuelve la alerta que la originó.
+  if (r.alertaOrigen) {
+    var a = ALERTAS.find(function (x) { return x.id === r.alertaOrigen; });
+    if (a) a.estado = 'bandeja';
+    var j = DESCARTES.findIndex(function (d) { return d.id === 'X' + r.alertaOrigen; });
+    if (j >= 0) DESCARTES.splice(j, 1);
+  }
+  estado.descartadasMes = Math.max(0, estado.descartadasMes - revividas - 1);
+  pintarBandeja(); pintarDescartadas(); pintarCola(); pintarReglas();
+  avisar('Regla deshecha', 'Volvieron ' + (revividas + 1) + ' publicaciones a la bandeja. El filtro es tuyo: si te equivocaste enseñándole, se desenseña.');
+}
+
+/* ---------- Eventos ----------------------------------------------------- */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button, a[data-ir]');
+  if (!t) return;
+
+  // Navegación entre vistas
+  var ir = t.dataset.ir || t.dataset.vista;
+  if (ir) {
+    e.preventDefault();
+    mostrarVista(ir);
+    return;
+  }
+
+  // Pulgar arriba en la bandeja
+  if (t.dataset.up) {
+    var ya = t.getAttribute('aria-pressed') === 'true';
+    t.setAttribute('aria-pressed', ya ? 'false' : 'true');
+    if (!ya) {
+      estado.accionadas = Math.min(estado.enviadas, estado.accionadas + 1);
+      pintarMedidores();
+      avisar('Anotado', 'El juez va a subir el peso de <b>' + t.closest('.alerta').querySelector('.fuente').textContent +
+        '</b> para tus sujetos. Señal de las últimas 4 semanas: <b>' + senal() + '%</b>.');
+    } else {
+      estado.accionadas = Math.max(0, estado.accionadas - 1);
+      pintarMedidores();
+    }
+    return;
+  }
+
+  // Pulgar abajo: abre el "¿por qué no?"
+  if (t.dataset.down) {
+    var pn = $('pn-' + t.dataset.down);
+    pn.hidden = !pn.hidden;
+    t.setAttribute('aria-pressed', pn.hidden ? 'false' : 'true');
+    if (!pn.hidden) pn.querySelector('input').focus();
+    return;
+  }
+  if (t.dataset.cancelar) {
+    $('pn-' + t.dataset.cancelar).hidden = true;
+    document.querySelector('[data-down="' + t.dataset.cancelar + '"]').setAttribute('aria-pressed', 'false');
+    return;
+  }
+  if (t.dataset.aplicar) {
+    var id = t.dataset.aplicar;
+    var sel = document.querySelector('input[name="pn-' + id + '"]:checked');
+    if (!sel) {
+      avisar('Falta el motivo', 'Elige por qué no te sirvió. Sin el motivo, el pulgar abajo sólo borra la alerta y el filtro no aprende nada — que es exactamente el error que este producto no quiere cometer.');
+      return;
+    }
+    aplicarRegla(sel.value, id);
+    return;
+  }
+
+  // Ver publicación completa
+  if (t.dataset.ver) {
+    var f = $('full-' + t.dataset.ver);
+    f.hidden = !f.hidden;
+    t.textContent = f.hidden ? 'Ver publicación' : 'Ocultar publicación';
+    return;
+  }
+
+  // Reenviar al cliente (marca blanca)
+  if (t.dataset.reenviar) {
+    var al = ALERTAS.find(function (x) { return x.id === t.dataset.reenviar; });
+    estado.accionadas = Math.min(estado.enviadas, estado.accionadas + 1);
+    pintarMedidores();
+    avisar('Reenviado con tu membrete',
+      '«' + al.titulo + '» salió a <b>rvaldes@aridosdelmaipo.cl</b> con el logo del estudio y sin marca de Pregonia. Tu cliente ve al estudio trabajando; no ve la herramienta. Eso cuenta como alerta accionada.');
+    return;
+  }
+
+  // Rescatar una descartada
+  if (t.dataset.rescate) {
+    var d = DESCARTES.find(function (x) { return x.id === t.dataset.rescate; });
+    d.estado = 'rescatada';
+    t.setAttribute('aria-pressed', 'true');
+    estado.enviadas += 1; estado.accionadas += 1;
+    estado.descartadasMes = Math.max(0, estado.descartadasMes - 1);
+    REGLAS.push({
+      id: 'R' + (REGLAS.length + 1),
+      texto: 'No descartar por «' + d.familia + '»: el usuario dijo que sí le importa.',
+      origen: 'Tu pulgar arriba del 10/07 en «' + d.titulo.slice(0, 40) + '…»',
+      mata: [], descarto: 0, fija: false
+    });
+    pintarDescartadas(); pintarReglas(); pintarMedidores();
+    avisar('El filtro se corrigió',
+      'Ya no vamos a descartar esto. <b>Ojo con el costo:</b> por esta regla vas a recibir unas <b>6 alertas más al mes</b>. Te las contamos para que sepas lo que estás pagando en ruido.');
+    return;
+  }
+
+  // Quitar sujeto
+  if (t.dataset.quitar) {
+    var sid = t.dataset.quitar;
+    var k = SUJETOS.findIndex(function (s) { return s.id === sid; });
+    if (k >= 0) {
+      var quitado = SUJETOS.splice(k, 1)[0];
+      pintarSujetos();
+      avisar('Dejamos de vigilarlo', '<b>' + quitado.valor + '</b> sale de la vigilancia. Las alertas que ya generó se quedan en tu histórico.');
+    }
+    return;
+  }
+
+  // Deshacer regla
+  if (t.dataset.deshacer) { deshacerRegla(t.dataset.deshacer); return; }
+});
+
+/* ---------- Agregar sujeto (con búsqueda retroactiva) ------------------- */
+$('btnAgregar').addEventListener('click', function () {
+  var tipo = $('fTipo').value;
+  var valor = $('fValor').value.trim() || $('fValor').placeholder;
+  var etiq = $('fEtiq').value.trim() || $('fEtiq').placeholder;
+  var id = 's' + (SUJETOS.length + 1) + '-' + Date.now();
+  SUJETOS.push({ id: id, tipo: tipo, valor: valor, etiq: etiq, desde: 'hoy', hits: 1 });
+  $('fValor').value = ''; $('fEtiq').value = '';
+  pintarSujetos();
+
+  // Búsqueda retroactiva de 90 días: siempre encuentra algo, y eso es lo que engancha.
+  var nueva = {
+    id: 'N' + Date.now(), estado: 'bandeja', urgente: false, familia: 'nuevo',
+    fuente: 'SEIA', fecha: 'RETRO · 22 MAY', dt: '2026-05-22T10:00', folio: 'DIA 2026-0913',
+    titulo: 'Hallazgo retroactivo: ' + etiq + ' tiene un proyecto en evaluación ambiental',
+    extracto: '«Declaración de Impacto Ambiental. Titular: <mark>' + esc(etiq) + '</mark>, RUT <mark>' + esc(valor) + '</mark>. Proyecto: planta de hormigón premezclado. Ingreso: 22/05/2026. Estado: en calificación. Participación ciudadana: abierta.»',
+    cve: 'Servicio de Evaluación Ambiental · e-SEIA.',
+    porque: 'Acabas de agregarlo y buscamos 90 días hacia atrás: <b>ya tenía un proyecto ingresado</b> que nadie del estudio estaba mirando. El plazo de observaciones ciudadanas de terceros vence pronto, y ahí es donde aparecen las oposiciones.',
+    hacer: '<b>Qué hacer:</b> revisar si hay observaciones ingresadas por vecinos u organizaciones. Es la primera señal de un conflicto que después llega a tribunales.',
+    plazo: 'Observaciones ciudadanas: quedan 9 días',
+    sujeto: id,
+    completa: 'SERVICIO DE EVALUACIÓN AMBIENTAL\nDeclaración de Impacto Ambiental\n\nTitular: ' + etiq + '\nRUT: ' + valor + '\nProyecto: Planta de hormigón premezclado\nFecha de ingreso: 22 de mayo de 2026\nEstado: En calificación\nParticipación ciudadana: abierta\n\n(Documento ficticio del demo.)'
+  };
+  ALERTAS.unshift(nueva);
+  pintarBandeja();
+  avisar('Búsqueda retroactiva: 1 hallazgo',
+    'Vigilamos <b>' + valor + '</b> hacia adelante, y buscamos 90 días hacia atrás en las 6 fuentes. Encontramos <b>1 publicación</b> que el estudio no tenía. Está en la bandeja.');
+});
+
+/* ---------- Entrega: el umbral ------------------------------------------ */
+var NIVELES = [
+  { env: 1,  txt: 'Sólo lo urgente: cosas con plazo legal que corre. <b>Habrías recibido 1</b> de los 41 candidatos de esta semana.', nota: 'El estudio que ya tiene un pasante mirando el D.O. suele empezar acá. Dura poco: se da cuenta de que quiere las otras.' },
+  { env: 3,  txt: 'Lo que tiene plazo o parte identificada. <b>Habrías recibido 3</b> de los 41 candidatos.', nota: 'Buen umbral para el abogado que sólo quiere no perder plazos.' },
+  { env: 5,  txt: 'Recomendado: todo lo que afecta a un sujeto tuyo, con o sin plazo. <b>Habrías recibido 5</b> de los 41.', nota: 'Es el umbral con el que la señal de nuestros usuarios llega a 67%. Es el que dejamos por defecto.' },
+  { env: 11, txt: 'Amplio: se suman las normas de tu rubro sin sujeto identificado. <b>Habrías recibido 11</b> de los 41.', nota: 'Empieza a doler. Si lo dejas acá, mira tu tasa de señal en dos semanas: normalmente cae bajo 40%.' },
+  { env: 41, txt: 'Crudo: todo lo que mencione cualquier cosa tuya, sin juez. <b>Habrías recibido los 41.</b>', nota: 'Esto es Ctrl+F con delivery. Es gratis de hacer y por eso no vale nada: en dos semanas tienes la notificación apagada y estás peor que antes, porque crees que estás cubierto.' }
+];
+
+function pintarUmbral() {
+  var v = parseInt($('umbral').value, 10);
+  var n = NIVELES[v - 1];
+  $('umbralTxt').innerHTML = n.txt;
+  $('umbralNota').innerHTML = n.nota;
+  var pct = Math.round(n.env / 41 * 100);
+  $('bU1').style.width = pct + '%';
+  $('bU2').style.width = (100 - pct) + '%';
+  $('bUa').textContent = n.env + ' enviadas';
+  $('bUb').textContent = (41 - n.env) + ' descartadas';
+  pintarPrevio(n.env);
+}
+
+function pintarPrevio(env) {
+  var wa = $('cWa').checked;
+  var cab = wa
+    ? 'WhatsApp · Pregonia · hoy ' + ($('cHora').value.slice(0, 5)) + '\n────────────────────────────'
+    : 'Correo · Asunto: Pregonia · ' + env + (env === 1 ? ' alerta' : ' alertas') + ' del Diario Oficial de hoy\n────────────────────────────';
+  var cuerpo =
+    '\n🔴 <b>URGENTE · INAPI</b>\nPidieron ANDESPAK en clase 19,\nla misma marca de Áridos del Maipo.\n\n<b>Por qué te importa:</b> signo casi\nidéntico, mismos productos. Si no\nse opone, se registra.\n\n<b>Qué hacer:</b> deducir oposición.\nQuedan 26 de 30 días (09/08).\n\n👍 Útil   👎 No me sirve\n' +
+    (env > 1 ? '\n────────────────────────────\n<b>' + (env - 1) + (env - 1 === 1 ? ' alerta más' : ' alertas más') + '</b> en la bandeja:\nliquidación de un deudor, competidor\nnuevo en Buin' + (env > 3 ? ', decreto de camiones' : '') + (env > 5 ? ', y ' + (env - 4) + ' normas generales del rubro' : '') + '.\nVer todas → pregonia.com/b/44187\n' : '') +
+    '\n────────────────────────────\n<b>' + (41 - env) + ' publicaciones descartadas</b> hoy,\ncada una con su motivo. Verlas →\n\nBaja: responde BAJA.';
+  $('previoWa').innerHTML = cab + cuerpo;
+}
+
+$('umbral').addEventListener('input', pintarUmbral);
+$('cWa').addEventListener('change', pintarUmbral);
+$('cCorreo').addEventListener('change', pintarUmbral);
+$('cHora').addEventListener('change', pintarUmbral);
+$('cUrg').addEventListener('change', function () {
+  avisar($('cUrg').checked ? 'Urgente al instante, activado' : 'Urgente al instante, apagado',
+    $('cUrg').checked
+      ? 'Lo que tiene un plazo legal corriendo te va a llegar apenas se publique, sin esperar el resumen de las ' + $('cHora').value.slice(0, 5) + '.'
+      : 'Todo va a esperar el resumen diario. <b>Ojo:</b> el plazo de oposición marcaria son 30 días corridos; un día perdido es un día perdido.');
+});
+
+/* ---------- Tabla de señal ---------------------------------------------- */
+var SEMANA = [
+  ['INAPI', 'Solicitud ANDESPAK clase 19', 'Abierta · reenviada al cliente · oposición en preparación'],
+  ['Boletín concursal', 'Liquidación de Transportes Cerro Negro', 'Abierta · crédito verificado el 11/07'],
+  ['Diario oficial', 'Constitución de Áridos Santa Elena SpA', 'Abierta · reenviada al cliente'],
+  ['Diario oficial', 'Decreto de encarpado de camiones', 'Abierta · minuta enviada a 2 clientes'],
+  ['Diario oficial', 'Listado de sustancias peligrosas SEREMI', 'No abierta'],
+  ['CMF', 'NCG 521 sobre reportes de sostenibilidad', 'Abierta · sin acción'],
+  ['Diario oficial', 'Remate rol 118-4, San Bernardo', 'No abierta']
+];
+function pintarTablaSenal() {
+  $('tablaSenal').innerHTML = SEMANA.map(function (f) {
+    var ok = f[2].indexOf('No abierta') === -1;
+    return '<tr><td><span class="fuente">' + f[0] + '</span></td><td><b>' + f[1] + '</b></td><td style="color:' +
+      (ok ? 'var(--texto-2)' : 'var(--texto-3)') + '">' + f[2] + '</td></tr>';
+  }).join('');
+}
+
+/* ---------- Vistas ------------------------------------------------------ */
+function mostrarVista(v) {
+  document.querySelectorAll('.vista').forEach(function (s) { s.classList.remove('activa'); });
+  $('v-' + v).classList.add('activa');
+  document.querySelectorAll('[data-vista]').forEach(function (b) {
+    b.setAttribute('aria-current', b.dataset.vista === v ? 'true' : 'false');
+  });
+  window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+}
+
+/* ---------- Onboarding -------------------------------------------------- */
+var CHIPS = [
+  'RUT · 12 clientes', 'Marca ANDESPACK cl. 19', 'Marca CERRO ALTO cl. 37', 'Rubro: áridos y hormigón',
+  'Rubro: construcción', 'Comuna: Buin', 'Comuna: San Bernardo', 'Clave: "sustancias peligrosas"',
+  'Clave: "expropiación"', 'Competencia: 4 RUT', 'Deudores de clientes: 9 RUT'
+];
+(function () {
+  var cont = $('chipsOnb');
+  CHIPS.forEach(function (c, i) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.setAttribute('aria-pressed', i === 9 ? 'false' : 'true');
+    b.textContent = c;
+    b.addEventListener('click', function () {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+    cont.appendChild(b);
+  });
+})();
+
+function cerrarOnb() { $('onb').hidden = true; }
+$('btnSaltar').addEventListener('click', cerrarOnb);
+$('btnVigilar').addEventListener('click', function () {
+  var cajaEsc = $('escaneo');
+  var lin = $('lineasEscaneo');
+  cajaEsc.hidden = false;
+  $('btnVigilar').disabled = true;
+  $('btnVigilar').style.opacity = '.5';
+  var pasos = [
+    'Bajando el Diario Oficial N° 44.187…  <b>613 avisos</b>',
+    'INAPI, Boletín Concursal, CMF, SEIA, Dir. del Trabajo…  <b>+ 168 documentos</b>',
+    'Cruzando con tus sujetos vigilados…  <b>41 candidatos</b>',
+    'El juez evalúa cada candidato contra tu perfil…',
+    'Descartados <b>36</b> · <span class="f">te tocan <b>5</b></span>',
+    'Listo. Y esto pasa todos los días a las 6:00, sin que nadie apriete un botón.'
+  ];
+  var i = 0;
+  function paso() {
+    lin.innerHTML += (i ? '<br>' : '') + '› ' + pasos[i];
+    i++;
+    if (i < pasos.length) setTimeout(paso, reduce ? 0 : 520);
+    else setTimeout(cerrarOnb, reduce ? 0 : 900);
+  }
+  paso();
+});
+
+/* ---------- Menú móvil -------------------------------------------------- */
+(function () {
+  var b = $('btnMenu'), m = $('menuMovil');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('abierto');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+
+/* ---------- Arranque ---------------------------------------------------- */
+pintarBandeja();
+pintarDescartadas();
+pintarCola();
+pintarSujetos();
+pintarReglas();
+pintarTablaSenal();
+pintarUmbral();
+</script>
+</body>
+</html>

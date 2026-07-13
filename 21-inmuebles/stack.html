@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caprato — Arquitectura</title>
+<meta name="description" content="Modelo de datos, agentes de IA con su modelo y sus reglas duras, APIs a contratar, variables de entorno, costo mensual con la aritmética, qué está falseado en el demo y la evidencia del dominio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  .doc-h { padding-block: var(--sp-l) var(--sp-m); border-bottom: 2px solid var(--tinta); }
+  .doc-h h1 { max-width: 20ch; }
+  .bloque { padding-block: var(--sp-xl); border-top: var(--hair); }
+  .bloque > h2 { max-width: 28ch; margin-bottom: var(--sp-s); }
+  .bloque p { max-width: 72ch; }
+  .bloque p + p { margin-top: var(--sp-s); }
+  .num-bloque { font-family: var(--mono); font-size: .7rem; color: var(--azul); letter-spacing: .1em; font-weight: 700; }
+
+  code, pre { font-family: var(--mono); font-size: .82rem; }
+  code { background: var(--papel-2); padding: .1em .3em; border: 1px solid var(--linea); }
+  pre {
+    background: var(--tinta); color: #C9D4DA; padding: var(--sp-s); overflow-x: auto;
+    border-left: 3px solid var(--azul); line-height: 1.6; font-size: .78rem;
+  }
+  pre .k { color: #7FA1DC; }
+  pre .s { color: #9FD8BE; }
+  pre .c { color: #8A959B; }
+
+  .tablas { display: grid; gap: var(--sp-s); }
+  @media (min-width: 52em) { .tablas { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 78em) { .tablas { grid-template-columns: repeat(3, 1fr); } }
+  .tabla-def { border: var(--hair-2); background: var(--papel-3); }
+  .tabla-def h3 {
+    font-family: var(--mono); font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+    background: var(--papel-2); padding: .5rem .7rem; border-bottom: var(--hair-2); color: var(--azul-osc);
+  }
+  .tabla-def ul { list-style: none; padding: .5rem .7rem; }
+  .tabla-def li {
+    font-family: var(--mono); font-size: .72rem; padding: .22rem 0; color: var(--tinta-2);
+    display: flex; justify-content: space-between; gap: .6rem;
+  }
+  .tabla-def li b { color: var(--tinta); font-weight: 500; }
+  .tabla-def li span { color: var(--tinta-4); font-size: .66rem; text-align: right; }
+  .tabla-def .pk b { color: var(--azul); }
+
+  .agente { border: var(--borde); background: var(--papel-3); margin-bottom: var(--sp-m); }
+  .agente-h {
+    display: flex; flex-wrap: wrap; gap: .4rem; justify-content: space-between; align-items: baseline;
+    background: var(--tinta); color: var(--papel); padding: .55rem var(--sp-s);
+  }
+  .agente-h b { font-family: var(--mono); letter-spacing: .06em; }
+  .agente-h span { font-family: var(--mono); font-size: .68rem; color: #9FB6D8; }
+  .agente-b { padding: var(--sp-s); }
+  .agente-b dl { display: grid; gap: .4rem; font-size: .88rem; }
+  .agente-b dt { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); }
+  .agente-b dd { color: var(--tinta-2); margin-bottom: .4rem; }
+  .regla {
+    border-left: 3px solid var(--ambar); background: var(--ambar-lav); padding: .6rem .7rem;
+    font-size: .84rem; line-height: 1.55; margin-top: .5rem;
+  }
+
+  .costos { width: 100%; font-size: .84rem; min-width: 520px; }
+  .costos th { text-align: left; font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); padding: .45rem .7rem .45rem 0; border-bottom: 1.5px solid var(--tinta); }
+  .costos td { padding: .5rem .7rem .5rem 0; border-bottom: var(--hair); }
+  .costos td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .costos .sub td { background: var(--papel-2); font-weight: 700; }
+  .costos .total td { border-top: 1.5px solid var(--tinta); border-bottom: 0; font-weight: 700; }
+
+  .caja { border: var(--borde); background: var(--papel-3); padding: var(--sp-m); margin-top: var(--sp-m); }
+  .caja-ambar { border-color: var(--ambar); background: var(--ambar-lav); }
+  .caja-azul { border-color: var(--azul); background: var(--azul-lav); }
+  .caja h3 { margin-bottom: .4rem; }
+  .caja p { max-width: 68ch; }
+
+  .lista-p { max-width: 72ch; }
+  .lista-p li { margin-bottom: .6rem; padding-left: 1.1rem; position: relative; font-size: .92rem; color: var(--tinta-2); }
+  .lista-p li::before { content: ""; position: absolute; left: 0; top: .55rem; width: 6px; height: 6px; background: var(--azul); }
+  .lista-p li strong { color: var(--tinta); }
+  .lista-p li.mal::before { background: var(--ambar); }
+
+  .env { width: 100%; font-size: .78rem; min-width: 520px; }
+  .env td { padding: .35rem .7rem .35rem 0; border-bottom: var(--hair); font-family: var(--mono); }
+  .env td:first-child { color: var(--azul-osc); white-space: nowrap; font-weight: 500; }
+  .env td:last-child { color: var(--tinta-3); font-family: var(--sans); font-size: .8rem; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M5 21 L5 12 L11 7 L17 12 L17 21" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M13 21 L13 15 L21 15 L21 21" fill="none" stroke="#1A5FC8" stroke-width="1.5"/>
+        <circle cx="21" cy="15" r="2" fill="#1A5FC8"/>
+      </svg>
+      <span class="marca-txt">Caprato</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" id="navBtn">Menú</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="doc-h">
+  <p class="rotulo">Arquitectura · qué habría que configurar de verdad</p>
+  <h1>El cálculo es determinista. La IA sólo lee y redacta.</h1>
+  <p class="lead mt-s">
+    La regla que ordena todo el sistema: <strong>ningún número de este producto sale de un modelo de lenguaje.</strong>
+    Sale de Postgres o no se publica. Un LLM que estima una vacancia es exactamente el humo contra el que
+    Caprato existe.
+  </p>
+</div>
+
+<!-- ============ FLUJO ============ -->
+<section class="bloque">
+  <p class="num-bloque">01</p>
+  <h2>El flujo, de la publicación a la alerta</h2>
+  <figure class="chart mt-m">
+    <div class="scroll-x">
+      <svg viewBox="0 0 700 170" role="img" aria-labelledby="flujo-t flujo-d" style="min-width:660px">
+        <title id="flujo-t">Diagrama del flujo de datos</title>
+        <desc id="flujo-d">Ingesta de publicaciones y datos públicos, extracción con Haiku, resolución de edificio, motor de cálculo determinista en Postgres, comparación contra los filtros de los usuarios y entrega de la alerta por correo y WhatsApp. La narrativa la escribe Sonnet sobre un cálculo ya hecho.</desc>
+
+        <!-- cajas -->
+        <g>
+          <rect x="8" y="40" width="96" height="52" fill="#F8F9F7" stroke="#14191C" stroke-width="1.5"/>
+          <text x="56" y="60" text-anchor="middle" class="eje-l">Ingesta</text>
+          <text x="56" y="72" text-anchor="middle" class="eje">portales +</text>
+          <text x="56" y="82" text-anchor="middle" class="eje">SII + CBR</text>
+        </g>
+        <g>
+          <rect x="128" y="40" width="96" height="52" fill="#F8F9F7" stroke="#14191C" stroke-width="1.5"/>
+          <text x="176" y="58" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">Extractor</text>
+          <text x="176" y="70" text-anchor="middle" class="eje">Haiku 4.5</text>
+          <text x="176" y="82" text-anchor="middle" class="eje">texto → JSON</text>
+        </g>
+        <g>
+          <rect x="248" y="40" width="96" height="52" fill="#F8F9F7" stroke="#14191C" stroke-width="1.5"/>
+          <text x="296" y="58" text-anchor="middle" class="eje-l" style="fill:#1A5FC8">Resolutor</text>
+          <text x="296" y="70" text-anchor="middle" class="eje">dirección →</text>
+          <text x="296" y="82" text-anchor="middle" class="eje">edificio · dedupe</text>
+        </g>
+        <g>
+          <rect x="368" y="26" width="112" height="80" fill="#1A5FC8" stroke="#14191C" stroke-width="1.5"/>
+          <text x="424" y="48" text-anchor="middle" class="eje-l" style="fill:#fff">MOTOR</text>
+          <text x="424" y="62" text-anchor="middle" class="eje" style="fill:#D5E1F6">SQL determinista</text>
+          <text x="424" y="76" text-anchor="middle" class="eje" style="fill:#D5E1F6">cap rate honesto</text>
+          <text x="424" y="90" text-anchor="middle" class="eje" style="fill:#D5E1F6">sin IA</text>
+        </g>
+        <g>
+          <rect x="504" y="40" width="96" height="52" fill="#F8F9F7" stroke="#14191C" stroke-width="1.5"/>
+          <text x="552" y="58" text-anchor="middle" class="eje-l">Filtros</text>
+          <text x="552" y="70" text-anchor="middle" class="eje">¿pasa?</text>
+          <text x="552" y="82" text-anchor="middle" class="eje">sí / no</text>
+        </g>
+        <g>
+          <rect x="624" y="40" width="68" height="52" fill="#F8F9F7" stroke="#14191C" stroke-width="1.5"/>
+          <text x="658" y="58" text-anchor="middle" class="eje-l">Alerta</text>
+          <text x="658" y="70" text-anchor="middle" class="eje">correo</text>
+          <text x="658" y="82" text-anchor="middle" class="eje">WhatsApp</text>
+        </g>
+
+        <!-- flechas -->
+        <g stroke="#14191C" stroke-width="1.5" fill="none">
+          <path d="M104 66 L124 66 M118 62 L124 66 L118 70"/>
+          <path d="M224 66 L244 66 M238 62 L244 66 L238 70"/>
+          <path d="M344 66 L364 66 M358 62 L364 66 L358 70"/>
+          <path d="M480 66 L500 66 M494 62 L500 66 L494 70"/>
+          <path d="M600 66 L620 66 M614 62 L620 66 L614 70"/>
+        </g>
+
+        <!-- narrador, colgando -->
+        <g>
+          <rect x="504" y="118" width="96" height="40" fill="#F8F9F7" stroke="#B07400" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="552" y="134" text-anchor="middle" class="eje-l" style="fill:#B07400">Narrador</text>
+          <text x="552" y="148" text-anchor="middle" class="eje">Sonnet 5 · sólo redacta</text>
+          <path d="M552 92 L552 114 M548 108 L552 114 L556 108" stroke="#B07400" stroke-width="1.5" fill="none"/>
+        </g>
+        <text x="8" y="130" class="eje">La IA entra dos veces: para leer un aviso y para redactar el porqué.</text>
+        <text x="8" y="142" class="eje">Nunca para decidir si algo pasa el filtro, y nunca para producir una cifra.</text>
+      </svg>
+    </div>
+  </figure>
+</section>
+
+<!-- ============ MODELO DE DATOS ============ -->
+<section class="bloque">
+  <p class="num-bloque">02</p>
+  <h2>Modelo de datos</h2>
+  <p>
+    Postgres 16 con PostGIS. La pieza no obvia es que <strong>la unidad de análisis no es la publicación: es el
+    edificio.</strong> Todo el producto depende de poder decir «este aviso pertenece a este edificio, y este
+    edificio arrienda a $430.000», y ahí es donde está el 80% de la dificultad técnica real.
+  </p>
+
+  <div class="tablas mt-m">
+    <div class="tabla-def">
+      <h3>edificio</h3>
+      <ul>
+        <li class="pk"><b>id</b><span>uuid</span></li>
+        <li><b>comuna_id</b><span>fk</span></li>
+        <li><b>direccion_norm</b><span>text</span></li>
+        <li><b>geo</b><span>geography(Point)</span></li>
+        <li><b>n_unidades</b><span>int</span></li>
+        <li><b>anio_entrega</b><span>int</span></li>
+        <li><b>gc_uf_m2</b><span>numeric</span></li>
+        <li><b>rol_matriz</b><span>text</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>unidad</h3>
+      <ul>
+        <li class="pk"><b>id</b><span>uuid</span></li>
+        <li><b>edificio_id</b><span>fk</span></li>
+        <li><b>rol_sii</b><span>text</span></li>
+        <li><b>m2_utiles</b><span>numeric</span></li>
+        <li><b>dormitorios / banos</b><span>int</span></li>
+        <li><b>piso · orientacion</b><span>int · text</span></li>
+        <li><b>avaluo_fiscal</b><span>bigint</span></li>
+        <li><b>contribuciones_anuales</b><span>bigint</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>publicacion</h3>
+      <ul>
+        <li class="pk"><b>id</b><span>uuid</span></li>
+        <li><b>portal · url_hash</b><span>text</span></li>
+        <li><b>edificio_id · unidad_id</b><span>fk</span></li>
+        <li><b>tipo</b><span>venta|arriendo</span></li>
+        <li><b>precio_uf · arriendo_clp</b><span>numeric</span></li>
+        <li><b>gc_clp</b><span>int</span></li>
+        <li><b>vista_primera · vista_ultima</b><span>date</span></li>
+        <li><b>bajadas_precio</b><span>jsonb[]</span></li>
+        <li><b>fuente</b><span>ingesta|link_usuario</span></li>
+        <li><b>grupo_dedupe</b><span>uuid</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>estimacion_arriendo</h3>
+      <ul>
+        <li class="pk"><b>edificio_id · tipologia</b><span>pk compuesta</span></li>
+        <li><b>mediana · p25 · p75</b><span>int</span></li>
+        <li><b>n</b><span>int</span></li>
+        <li><b>confianza</b><span>1..3</span></li>
+        <li><b>calculado_en</b><span>timestamptz</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>estimacion_vacancia</h3>
+      <ul>
+        <li class="pk"><b>edificio_id</b><span>fk</span></li>
+        <li><b>dias_vacio_anual</b><span>numeric</span></li>
+        <li><b>permanencia_meses</b><span>numeric</span></li>
+        <li><b>n_avisos</b><span>int</span></li>
+        <li><b>confianza</b><span>1..3</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>calculo</h3>
+      <ul>
+        <li class="pk"><b>publicacion_id</b><span>fk</span></li>
+        <li><b>capital · bruto · efectivo</b><span>bigint</span></li>
+        <li><b>vacancia · contrib · gc_vacio</b><span>bigint</span></li>
+        <li><b>admin · rearriendo · mantencion</b><span>bigint</span></li>
+        <li><b>noi</b><span>bigint</span></li>
+        <li><b>cap_honesto · cap_folleto</b><span>numeric(4,2)</span></li>
+        <li><b>version_modelo</b><span>text</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>usuario · filtro · alerta</h3>
+      <ul>
+        <li class="pk"><b>usuario.id</b><span>uuid</span></li>
+        <li><b>email · telefono_e164</b><span>text</span></li>
+        <li><b>consentimiento_wa</b><span>bool + ts</span></li>
+        <li><b>filtro.comunas</b><span>text[]</span></li>
+        <li><b>filtro.presupuesto_uf · cap_min</b><span>numeric</span></li>
+        <li><b>alerta.enviada · abierta</b><span>ts</span></li>
+        <li><b>alerta.desglose_abierto</b><span>ts · activación</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>evento</h3>
+      <ul>
+        <li class="pk"><b>id</b><span>bigserial</span></li>
+        <li><b>usuario_id</b><span>fk nullable</span></li>
+        <li><b>tipo</b><span>visita|registro|<br>activacion|pago|churn</span></li>
+        <li><b>payload</b><span>jsonb</span></li>
+        <li><b>ts</b><span>timestamptz</span></li>
+      </ul>
+    </div>
+    <div class="tabla-def">
+      <h3>bloqueo_kernel</h3>
+      <ul>
+        <li class="pk"><b>id</b><span>bigserial</span></li>
+        <li><b>accion_intentada</b><span>text</span></li>
+        <li><b>regla</b><span>text</span></li>
+        <li><b>dominio · canal</b><span>text</span></li>
+        <li><b>ts</b><span>timestamptz</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="caja caja-azul">
+    <h3>El motor de cálculo: 12 líneas de SQL y ninguna IA</h3>
+<pre><span class="c">-- cap_honesto: la única fórmula que importa. Cada parámetro versionado.</span>
+<span class="k">WITH</span> e <span class="k">AS</span> (
+  <span class="k">SELECT</span> p.id,
+    ea.mediana * <span class="s">12</span>                                    <span class="k">AS</span> bruto,
+    ea.mediana * <span class="s">12</span> * (ev.dias_vacio_anual / <span class="s">365.0</span>)      <span class="k">AS</span> vacancia,
+    u.contribuciones_anuales                            <span class="k">AS</span> contrib,
+    p.gc_clp * (ev.dias_vacio_anual / <span class="s">30.4</span>)              <span class="k">AS</span> gc_vacio,
+    ea.mediana * <span class="s">12</span> * (<span class="s">1</span> - ev.dias_vacio_anual/<span class="s">365.0</span>) * <span class="s">0.08</span> <span class="k">AS</span> admin,
+    ea.mediana * <span class="s">0.5</span> * <span class="s">1.19</span> * (<span class="s">12.0</span> / ev.permanencia_meses)  <span class="k">AS</span> rearriendo,
+    ea.mediana * <span class="s">12</span> * (<span class="s">1</span> - ev.dias_vacio_anual/<span class="s">365.0</span>) * <span class="s">0.03</span> <span class="k">AS</span> mantencion,
+    p.precio_clp * <span class="s">1.012</span>                                 <span class="k">AS</span> capital
+  <span class="k">FROM</span> publicacion p
+  <span class="k">JOIN</span> estimacion_arriendo ea <span class="k">USING</span> (edificio_id, tipologia)
+  <span class="k">JOIN</span> estimacion_vacancia ev <span class="k">USING</span> (edificio_id)
+  <span class="k">JOIN</span> unidad u <span class="k">ON</span> u.id = p.unidad_id
+  <span class="k">WHERE</span> p.tipo = <span class="s">'venta'</span> <span class="k">AND</span> p.estado = <span class="s">'vigente'</span>
+)
+<span class="k">SELECT</span> id,
+  (bruto - vacancia - contrib - gc_vacio - admin - rearriendo - mantencion)
+    / capital * <span class="s">100</span> <span class="k">AS</span> cap_honesto
+<span class="k">FROM</span> e;</pre>
+    <p class="nota mt-s">
+      Que sea aburrido es la característica, no el defecto. Esta consulta se puede auditar, se puede versionar y
+      da el mismo resultado dos veces. Un LLM no.
+    </p>
+  </div>
+</section>
+
+<!-- ============ AGENTES ============ -->
+<section class="bloque">
+  <p class="num-bloque">03</p>
+  <h2>Los agentes de IA</h2>
+  <p>
+    Cuatro agentes, todos con la misma regla dura: <strong>ninguno produce una cifra.</strong> Leen, estructuran
+    o redactan sobre cifras que ya existen en la base.
+  </p>
+
+  <div class="agente mt-m">
+    <div class="agente-h"><b>1 · Extractor de publicaciones</b><span>claude-haiku-4-5-20251001 · temp 0</span></div>
+    <div class="agente-b">
+      <dl>
+        <dt>Qué hace</dt>
+        <dd>Recibe el texto de un aviso y devuelve JSON estricto: precio, arriendo pedido, gastos comunes,
+          m², dormitorios, baños, piso, orientación, estacionamiento, bodega, si el GC incluye calefacción.</dd>
+        <dt>Herramientas</dt>
+        <dd>Ninguna. Extracción pura, salida validada contra JSON Schema.</dd>
+        <dt>Volumen</dt>
+        <dd>~52.000 publicaciones/mes (Gran Santiago + Valparaíso + Concepción + La Serena, antes de dedupe).</dd>
+      </dl>
+      <div class="regla">
+        <strong>Regla dura:</strong> todo campo que no aparezca explícito en el aviso vuelve <code>null</code>.
+        Nunca infiere, nunca completa, nunca «estima». Un validador posterior descarta cualquier salida con
+        valores fuera de rango (arriendo &lt; $150.000 o &gt; $3.000.000, GC &gt; $500.000) y la marca para revisión
+        en vez de aceptarla.
+      </div>
+    </div>
+  </div>
+
+  <div class="agente">
+    <div class="agente-h"><b>2 · Resolutor de edificio</b><span>claude-haiku-4-5-20251001 · con herramientas</span></div>
+    <div class="agente-b">
+      <dl>
+        <dt>Qué hace</dt>
+        <dd>«Av. Irarrázaval 5240 dpto 1204» y «Irarrázaval #5.240, Depto 1204, Ñuñoa» son el mismo edificio y
+          la misma unidad. Este agente lo resuelve y dispara el dedupe: un aviso publicado por tres corredores
+          es una publicación, no tres.</dd>
+        <dt>Herramientas</dt>
+        <dd><code>buscar_edificio(direccion, lat, lng, radio_m)</code> ·
+          <code>listar_unidades(edificio_id)</code> · <code>crear_edificio(...)</code> ·
+          <code>geocodificar(direccion)</code> (Nominatim propio, no un CDN).</dd>
+        <dt>Por qué es el trabajo difícil</dt>
+        <dd>Sin esto, el «arriendo real del edificio» no existe y el producto entero se cae. Es el 80% del riesgo
+          técnico, no el cálculo.</dd>
+      </dl>
+      <div class="regla">
+        <strong>Regla dura:</strong> si la confianza de la resolución es baja, la publicación queda
+        <em>sin edificio</em> y no se calcula nada. Preferimos no mostrar una ficha antes que mostrar una ficha
+        con el edificio equivocado — que sería precisamente inventar el número.
+      </div>
+    </div>
+  </div>
+
+  <div class="agente">
+    <div class="agente-h"><b>3 · Narrador de la ficha</b><span>claude-sonnet-5 · sólo redacta</span></div>
+    <div class="agente-b">
+      <dl>
+        <dt>Qué hace</dt>
+        <dd>Recibe el JSON del cálculo <em>ya hecho</em> y escribe en 3–4 frases el «por qué pasa» o el «por qué
+          se descarta», en español de Chile, sin adjetivos de folleto.</dd>
+        <dt>Herramientas</dt>
+        <dd>Ninguna. Entra JSON, sale texto.</dd>
+        <dt>Volumen</dt>
+        <dd>~2,2 alertas por cuenta al mes. 880 llamadas/mes a 400 cuentas.</dd>
+      </dl>
+      <div class="regla">
+        <strong>Regla dura, verificada por código:</strong> un validador extrae con regex todos los números del
+        texto generado y los compara contra el payload de entrada. <strong>Si aparece un número que no venía en
+        el JSON, el texto se rechaza y se reintenta.</strong> Tres rechazos seguidos y la ficha se publica con la
+        tabla sola, sin narrativa. La tabla nunca miente; la prosa es opcional.
+      </div>
+    </div>
+  </div>
+
+  <div class="agente">
+    <div class="agente-h"><b>4 · Soporte</b><span>claude-haiku-4-5 · escala a claude-sonnet-5</span></div>
+    <div class="agente-b">
+      <dl>
+        <dt>Qué hace</dt>
+        <dd>Responde por chat y correo. Explica un cálculo con la ficha delante, corrige un filtro, pausa,
+          reembolsa y cierra cuentas.</dd>
+        <dt>Herramientas</dt>
+        <dd><code>ver_cuenta(id)</code> · <code>ver_ficha(publicacion_id)</code> ·
+          <code>editar_filtro(filtro_id, cambios)</code> · <code>pausar_suscripcion(id)</code> ·
+          <code>reembolsar_mes(id, motivo)</code> · <code>cerrar_cuenta(id)</code>.</dd>
+      </dl>
+      <div class="regla">
+        <strong>Dos reglas duras.</strong> (1) <strong>No da recomendaciones de inversión.</strong> Si le
+        preguntan «¿me conviene?», responde el límite: no somos asesores registrados ante la CMF, acá está el
+        cálculo y los supuestos, la decisión es suya. (2) <strong>Cuando no puede resolver algo, lo dice y
+        reembolsa:</strong> <em>«No tengo cómo pasarte con una persona. Te devuelvo el mes y te dejo el detalle
+        por correo.»</em> Y ejecuta <code>reembolsar_mes()</code>. Nunca promete que «un ejecutivo te contactará»,
+        porque no existe ningún ejecutivo.
+      </div>
+    </div>
+  </div>
+
+  <div class="agente">
+    <div class="agente-h"><b>5 · Redactor de páginas de comuna (SEO)</b><span>claude-sonnet-5 · una pasada al mes</span></div>
+    <div class="agente-b">
+      <dl>
+        <dt>Qué hace</dt>
+        <dd>Toma las métricas de la comuna desde Postgres (mediana honesta, arriendo real, vacancia, gastos
+          comunes, cuántas publicaciones superan el 4,8%) y escribe la interpretación de esa comuna, distinta
+          para cada una, refrescada mensualmente.</dd>
+        <dt>Volumen</dt>
+        <dd>~2.400 páginas × 1 pasada/mes. Corre en lote, fuera de hora punta.</dd>
+      </dl>
+      <div class="regla">
+        <strong>Mismo validador de números que el narrador.</strong> Si el dato no está en la base, la frase no
+        se escribe. Una página de comuna sin datos suficientes se publica diciendo <em>«todavía no tenemos
+        observaciones suficientes en esta comuna»</em>, que es feo para el SEO y honesto para el lector. Elegimos
+        lo segundo, y no es negociable.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATOS Y LEGALIDAD ============ -->
+<section class="bloque">
+  <p class="num-bloque">04</p>
+  <h2>De dónde salen los datos, y qué está por validar</h2>
+  <p>
+    Esta sección es la que decide si el negocio existe. La escribo con las dudas puestas, no resueltas.
+  </p>
+
+  <div class="scroll-x mt-m">
+    <table class="costos">
+      <caption class="visually-hidden">Fuentes de datos y su estado legal</caption>
+      <thead>
+        <tr><th scope="col">Fuente</th><th scope="col">Qué entrega</th><th scope="col" class="n">Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Avalúo fiscal y rol · <strong>SII</strong></td>
+          <td>Avalúo por rol, base de las contribuciones. Consulta pública, sin API oficial.</td>
+          <td class="n"><span class="pv">por validar</span></td>
+        </tr>
+        <tr>
+          <td>Inscripciones · <strong>Conservador de Bienes Raíces</strong></td>
+          <td>Compraventas inscritas: el precio al que <em>de verdad</em> se vendió el de al lado.</td>
+          <td class="n"><span class="pv">por validar</span></td>
+        </tr>
+        <tr>
+          <td>Publicaciones de portales</td>
+          <td>El inventario vivo: precios pedidos, arriendos pedidos, cuánto duran publicados.</td>
+          <td class="n"><span class="pv">ToS por portal</span></td>
+        </tr>
+        <tr>
+          <td>Link pegado por el usuario</td>
+          <td>El plan B. El usuario abre la publicación y nos pasa la URL: el acceso lo hace él.</td>
+          <td class="n">Lícito</td>
+        </tr>
+        <tr>
+          <td>Observatorio del Mercado Inmobiliario · CChC</td>
+          <td>Estadísticas agregadas de precios y stock por comuna.</td>
+          <td class="n">Público</td>
+        </tr>
+        <tr>
+          <td>Contratos de arriendo</td>
+          <td class="n" colspan="2"><strong>No existen en ningún registro público chileno.</strong> Por eso el
+            producto <em>estima</em> el arriendo real y declara su n, su rango y su confianza. Es la limitación
+            central y está impresa en cada ficha.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="caja caja-ambar">
+    <h3>Las reglas de ingesta, escritas como código, no como intención</h3>
+    <ul class="lista-p mt-s">
+      <li><strong><code>robots.txt</code> se respeta y punto.</strong> El kernel del piloto automático bloquea
+        cualquier petición a una ruta prohibida y <em>registra el bloqueo</em> en <code>bloqueo_kernel</code>.
+        Aparece en el tablero: un sistema autónomo sin bitácora de lo que <em>no</em> hizo no se puede auditar.</li>
+      <li><strong>Un request cada 3 segundos por dominio</strong>, <em>user-agent</em> identificado con nuestro
+        dominio y un correo de contacto. No sobrecargamos a nadie. No es cortesía: un portal que nos nota por la
+        carga es un portal que nos bloquea.</li>
+      <li class="mal"><strong>Cero datos personales.</strong> No guardamos el nombre del corredor, ni su teléfono,
+        ni el del vendedor, ni el del arrendatario. Nada de lo que la Ley 19.628 y la Ley 21.719 protegen. Las
+        publicaciones se guardan sin los campos de contacto, y eso está en el extractor: el schema
+        <strong>no tiene</strong> campo para teléfono.</li>
+      <li class="mal"><strong>Donde no nos consta que sea lícito, no se hace.</strong> Los ToS de cada portal son
+        distintos entre sí; la interpretación es un juicio jurídico que un agente no puede hacer. Todo lo marcado
+        <span class="pv">por validar</span> queda apagado hasta que un abogado lo revise. Eso es una dependencia
+        humana y está declarada como tal en <a href="negocio.html#autonomia">Autonomía</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ APIS ============ -->
+<section class="bloque">
+  <p class="num-bloque">05</p>
+  <h2>Qué hay que contratar</h2>
+  <ul class="lista-p mt-m">
+    <li><strong>Flow</strong> — pagos y suscripciones recurrentes en CLP con tarjeta chilena.
+      Comisión <span class="num">3,19% + IVA</span> <span class="pv">tarifa por validar</span>. Requiere KYC de
+      una persona natural o jurídica: <strong>éste es el trámite que ningún agente puede hacer.</strong></li>
+    <li><strong>Stripe</strong> — para quien paga desde fuera de Chile. Suscripciones y reembolsos por API,
+      que es lo que el agente de soporte necesita para poder devolver el mes solo.</li>
+    <li><strong>Meta WhatsApp Cloud API</strong> — alertas. Plantillas aprobadas, <strong>sólo a quien se
+      registró y dejó su número</strong>. Baja en un clic, honrada al instante.</li>
+    <li><strong>Amazon SES o Resend</strong> — correo transaccional y el boletín semanal. SPF, DKIM y DMARC
+      configurados el día 1, o el correo de alertas termina en spam y el producto no entrega nada.</li>
+    <li><strong>Anthropic API</strong> — los cinco agentes.</li>
+    <li><strong>Google Ads API y Meta Marketing API</strong> — las opera el <em>sistema meta</em>, no esta idea.
+      Caprato sólo declara sus topes en <code>autopilot.json</code>.</li>
+    <li><strong>Nominatim autohospedado</strong> — geocodificación. Autohospedado a propósito: evita depender de
+      un servicio externo para la pieza que resuelve el edificio, que es la que no puede fallar.</li>
+    <li><strong>Cloudflare</strong> — las 2.400 páginas de comuna en el borde. Sin esto, el SEO paga latencia.</li>
+  </ul>
+</section>
+
+<!-- ============ COSTOS ============ -->
+<section class="bloque">
+  <p class="num-bloque">06</p>
+  <h2>Costo mensual, con la aritmética</h2>
+  <p>
+    Este número es el que <a href="negocio.html#economia">negocio.html</a> descuenta del margen. Las dos páginas
+    cuadran: <strong>US$382 al mes</strong> a 400 cuentas pagadas, tipo de cambio <span class="num">$960</span>.
+  </p>
+
+  <div class="scroll-x mt-m">
+    <table class="costos">
+      <caption class="visually-hidden">Costo mensual de IA e infraestructura, con la derivación</caption>
+      <thead>
+        <tr><th scope="col">Concepto</th><th scope="col">Aritmética</th><th scope="col" class="n">USD/mes</th></tr>
+      </thead>
+      <tbody>
+        <tr class="sub"><td colspan="3">Inferencia · Anthropic API</td></tr>
+        <tr>
+          <td>Extractor · entrada</td>
+          <td class="mono" style="font-size:.76rem">52.000 avisos × 1.400 tok = 72,8 MTok × US$1</td>
+          <td class="n">$72,80</td>
+        </tr>
+        <tr>
+          <td>Extractor · salida</td>
+          <td class="mono" style="font-size:.76rem">52.000 × 320 tok = 16,64 MTok × US$5</td>
+          <td class="n">$83,20</td>
+        </tr>
+        <tr>
+          <td>Narrador · Sonnet 5</td>
+          <td class="mono" style="font-size:.76rem">880 × (3.500 in × $3 + 700 out × $15) / 1M</td>
+          <td class="n">$18,48</td>
+        </tr>
+        <tr>
+          <td>Soporte · Haiku 4.5</td>
+          <td class="mono" style="font-size:.76rem">320 conv. × (6.000 in × $1 + 500 out × $5) / 1M</td>
+          <td class="n">$2,72</td>
+        </tr>
+        <tr class="sub"><td colspan="2">Subtotal IA</td><td class="n">$177,20</td></tr>
+
+        <tr class="sub"><td colspan="3">Infraestructura</td></tr>
+        <tr><td>Postgres 16 + PostGIS gestionado</td><td class="mono" style="font-size:.76rem">4 GB RAM · 40 GB disco</td><td class="n">$55,00</td></tr>
+        <tr><td>IP salientes para la ingesta</td><td class="mono" style="font-size:.76rem">respetando rate limit de 1 req / 3 s por dominio</td><td class="n">$80,00</td></tr>
+        <tr><td>Fly.io · web + worker</td><td class="mono" style="font-size:.76rem">2 × shared-cpu-2x</td><td class="n">$32,00</td></tr>
+        <tr><td>Cloudflare Pro</td><td class="mono" style="font-size:.76rem">2.400 páginas en el borde</td><td class="n">$20,00</td></tr>
+        <tr><td>Redis · colas</td><td class="mono" style="font-size:.76rem">BullMQ, idempotencia por url_hash</td><td class="n">$10,00</td></tr>
+        <tr><td>Object storage</td><td class="mono" style="font-size:.76rem">pHash de fotos y miniaturas, no las fotos</td><td class="n">$8,00</td></tr>
+        <tr class="sub"><td colspan="2">Subtotal infra</td><td class="n">$205,00</td></tr>
+
+        <tr class="total"><td>Total</td><td class="mono" style="font-size:.76rem">US$382,20 × $960</td><td class="n">$367.000 CLP</td></tr>
+        <tr><td>Por cuenta (400 cuentas)</td><td></td><td class="n">$918 CLP</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g2 mt-m">
+    <div class="caja caja-azul">
+      <h3>El ahorro que no cuento</h3>
+      <p>
+        El prompt del extractor tiene un prefijo estable de ~4.600 tokens (instrucciones + schema), por sobre el
+        mínimo de caché. Con <em>prompt caching</em>, la entrada baja del orden del 60%: unos
+        <strong>US$44 menos al mes</strong>. No lo descuento en la tabla porque prefiero que el margen de
+        <a href="negocio.html">negocio.html</a> se sostenga sin trucos.
+      </p>
+    </div>
+    <div class="caja caja-ambar">
+      <h3>Lo que sí escala mal</h3>
+      <p>
+        El costo del extractor <strong>no depende de cuántos clientes tengas</strong>: depende de cuántas
+        publicaciones existan. Es un costo fijo disfrazado de variable, y es la razón por la que el margen bruto
+        es 41% a 40 cuentas y 88% a 400. Duplicar la cobertura geográfica duplica el costo de IA aunque no
+        llegue ni un cliente nuevo.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ENV ============ -->
+<section class="bloque">
+  <p class="num-bloque">07</p>
+  <h2>Variables de entorno</h2>
+  <div class="scroll-x mt-m">
+    <table class="env">
+      <caption class="visually-hidden">Variables de entorno</caption>
+      <tbody>
+        <tr><td>DATABASE_URL</td><td>Postgres 16 con PostGIS</td></tr>
+        <tr><td>REDIS_URL</td><td>Colas de ingesta y de alertas</td></tr>
+        <tr><td>ANTHROPIC_API_KEY</td><td>Los cinco agentes</td></tr>
+        <tr><td>MODELO_EXTRACTOR</td><td>claude-haiku-4-5-20251001</td></tr>
+        <tr><td>MODELO_NARRADOR</td><td>claude-sonnet-5</td></tr>
+        <tr><td>FLOW_API_KEY · FLOW_SECRET</td><td>Cobro recurrente en CLP</td></tr>
+        <tr><td>STRIPE_SECRET_KEY</td><td>Cobro fuera de Chile</td></tr>
+        <tr><td>WHATSAPP_TOKEN · WHATSAPP_PHONE_ID</td><td>Alertas, sólo a quien dio consentimiento</td></tr>
+        <tr><td>SES_ACCESS_KEY · SES_SECRET</td><td>Correo transaccional y boletín</td></tr>
+        <tr><td>NOMINATIM_URL</td><td>Geocodificador autohospedado</td></tr>
+        <tr><td>UF_FEED_URL</td><td>Valor diario de la UF (mindicador o SII)</td></tr>
+        <tr><td>INGESTA_USER_AGENT</td><td>Identificado, con dominio y correo de contacto</td></tr>
+        <tr><td>INGESTA_RATE_MS</td><td>3000 · un request cada 3 segundos por dominio</td></tr>
+        <tr><td>DOMINIOS_BLOQUEADOS</td><td>Lista dura que el kernel no puede saltarse</td></tr>
+        <tr><td>METRICS_ENDPOINT</td><td>Donde el sistema meta lee visita/registro/activación/pago/churn</td></tr>
+        <tr><td>TOPE_ADS_DIARIO_CLP</td><td>18000 · el kernel no puede levantarlo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ FALSEADO ============ -->
+<section class="bloque">
+  <p class="num-bloque">08</p>
+  <h2>Qué está falseado en el demo</h2>
+
+  <div class="g2 mt-m">
+    <div class="caja caja-ambar">
+      <h3>Falso</h3>
+      <ul class="lista-p mt-s">
+        <li class="mal">Las <strong>cinco publicaciones</strong>, los edificios, los roles, los avalúos fiscales y
+          los arriendos observados. Inventados, aunque construidos para ser plausibles.</li>
+        <li class="mal">La <strong>UF a $40.180</strong>: es un valor plausible para julio de 2026, no el real.</li>
+        <li class="mal">Los <strong>cap rates medianos por comuna</strong> del mapa, y el mapa mismo, que es un
+          esquema dibujado a mano y no un mapa a escala. Lo dice en el propio gráfico.</li>
+        <li class="mal">No hay <strong>ingesta</strong>: el corpus está escrito a mano en el JavaScript.</li>
+        <li class="mal">No se <strong>envía</strong> ninguna alerta: la vista de la alerta es una maqueta.</li>
+        <li class="mal">No hay <strong>cobro</strong>: Flow y Stripe no están conectados.</li>
+        <li class="mal">La <strong>vacancia y la permanencia</strong> son supuestos por edificio. En producción se
+          estiman de los datos, con su n y su intervalo.</li>
+      </ul>
+    </div>
+    <div class="caja caja-azul">
+      <h3>Verdadero</h3>
+      <ul class="lista-p mt-s">
+        <li><strong>El cálculo.</strong> La aritmética del cap rate honesto del demo es exactamente la fórmula que
+          correría en producción, con los mismos siete descuentos. Las cinco fichas cuadran línea por línea: se
+          pueden auditar con una calculadora, y sería vergonzoso que no cuadraran.</li>
+        <li><strong>La estructura de la ficha</strong>, incluida la evidencia del arriendo con su n, su rango y su
+          nivel de confianza. Eso es el producto.</li>
+        <li><strong>El comportamiento del filtro.</strong> Sube el mínimo a 5,2% y el demo te muestra cero
+          resultados, porque eso es lo que pasaría de verdad.</li>
+        <li><strong>El simulador con crédito</strong> usa la fórmula de amortización francesa real, con tasa
+          referencial declarada.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="caja">
+    <h3>Qué faltaría para que fuera real</h3>
+    <ol class="lista-p mt-s" style="list-style:none">
+      <li><strong>El corpus de 12 meses.</strong> 4 a 6 semanas de ingesta y limpieza antes de poder decir una
+        sola cosa cierta sobre un edificio. Es el trabajo más caro y el que no se puede saltar: sin histórico, el
+        «arriendo real» no existe.</li>
+      <li><strong>La validación legal de la ingesta</strong> portal por portal. Es la dependencia humana que
+        declaramos en <a href="negocio.html#autonomia">Autonomía</a>.</li>
+      <li><strong>Validar el modelo de vacancia</strong> contra la realidad — el hito M1 del
+        <a href="roadmap.html">roadmap</a>, con su criterio de muerte: si nuestro arriendo estimado se aleja más
+        de 15% del real, no hay producto.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ DOMINIO ============ -->
+<section class="bloque">
+  <p class="num-bloque">09</p>
+  <h2>Evidencia del dominio</h2>
+  <p>
+    Verificado con <code>_kit/check-domain.sh</code> el <strong>13 de julio de 2026</strong>. RDAP de Verisign
+    para <code>.com</code> (HTTP 404 = disponible) y NIC Chile para <code>.cl</code>.
+  </p>
+  <div class="scroll-x mt-m">
+    <table class="costos">
+      <caption class="visually-hidden">Disponibilidad de dominios verificada</caption>
+      <thead>
+        <tr><th scope="col">Nombre</th><th scope="col" class="n">.com</th><th scope="col" class="n">HTTP</th><th scope="col" class="n">.cl</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>caprato</strong> — el elegido</td>
+          <td class="n" style="color:var(--azul);font-weight:700">AVAILABLE</td>
+          <td class="n">404</td>
+          <td class="n" style="color:var(--azul);font-weight:700">AVAILABLE</td>
+        </tr>
+        <tr><td>cabidal</td><td class="n">AVAILABLE</td><td class="n">404</td><td class="n">AVAILABLE</td></tr>
+        <tr><td>catastria</td><td class="n">AVAILABLE</td><td class="n">404</td><td class="n">AVAILABLE</td></tr>
+        <tr><td>deslindo</td><td class="n">AVAILABLE</td><td class="n">404</td><td class="n">AVAILABLE</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="nota mt-s">
+    <strong>Caprato</strong>: de <em>cap rate</em>, que es literalmente el producto, dicho en una palabra que se
+    puede pronunciar en español sin sonar a traducción. Las tres alternativas salen del vocabulario del catastro:
+    <em>cabida</em> (la superficie de un predio), <em>catastro</em> y <em>deslinde</em>.
+  </p>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <p class="marca-txt">Caprato</p>
+      <p class="nota mt-s" style="max-width:56ch">
+        Nada de esta infraestructura está aprovisionada. Este documento es lo que habría que configurar para que
+        funcionara de verdad, con los costos derivados a la vista.
+      </p>
+    </div>
+    <p class="rotulo">caprato.com · verificado 2026-07-13</p>
+  </div>
+</footer>
+
+<script>
+  var btn = document.getElementById('navBtn');
+  var links = document.getElementById('nav-links');
+  btn.addEventListener('click', function () {
+    var abierto = links.classList.toggle('abierto');
+    btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  });
+</script>
+
+</body>
+</html>

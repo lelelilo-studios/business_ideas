@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fonalta — el teléfono que siempre contesta</title>
+<meta name="description" content="Una recepcionista de IA que contesta el teléfono de tu PYME 24/7, en chileno. Se declara IA en los primeros 5 segundos, responde en menos de 800 ms y te manda el resumen por WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  /* ---- hero: la centralita ---- */
+  .hero { padding: var(--sp-l) 0 var(--sp-xl); position: relative; }
+  .hero h1 { margin: var(--sp-s) 0 var(--sp-s); }
+  .hero .lede { max-width: 46ch; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-top: var(--sp-m); }
+  .hero__onda { height: 76px; margin: var(--sp-m) 0 0; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea); }
+  @media (min-width: 62em) {
+    .hero__in { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2xl); align-items: center; }
+    .hero__onda { display: none; }
+  }
+
+  /* ---- mini reproductor de llamada (el producto, en vivo) ---- */
+  .mini {
+    background: var(--panel);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio);
+    overflow: hidden;
+    margin-top: var(--sp-l);
+  }
+  @media (min-width: 62em) { .mini { margin-top: 0; } }
+  .mini__cab {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2xs);
+    padding: 10px var(--sp-s);
+    border-bottom: 1px solid var(--linea);
+    background: var(--panel-2);
+    font-family: 'Chivo Mono', monospace; font-size: 0.72rem; color: var(--tiza-3);
+  }
+  .mini__luz { display: inline-flex; align-items: center; gap: 7px; color: var(--ambar); }
+  .mini__luz i { width: 7px; height: 7px; border-radius: 50%; background: var(--ambar); animation: latido 1.6s ease-in-out infinite; }
+  .mini__onda { height: 62px; padding: 0 var(--sp-s); }
+  .mini__cuerpo { padding: var(--sp-s); min-height: 214px; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; }
+  .mini__t { display: grid; grid-template-columns: 46px 1fr; gap: var(--sp-2xs); font-size: 0.9rem; line-height: 1.45; }
+  .mini__q { font-family: 'Chivo Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; padding-top: 4px; }
+  .mini__t[data-a="ia"] .mini__q { color: var(--ambar); }
+  .mini__t[data-a="cliente"] .mini__q { color: var(--tiza-3); }
+  .mini__t[data-a="ia"] p { color: var(--tiza); }
+  .mini__t[data-a="cliente"] p { color: var(--tiza-2); }
+  .mini__lat {
+    grid-column: 2;           /* el badge vive en la columna del texto, no bajo el rótulo */
+    justify-self: start;
+    margin-top: 5px;
+    font-family: 'Chivo Mono', monospace; font-size: 0.66rem;
+    color: var(--ambar); border: 1px solid var(--ambar-deep);
+    background: var(--ambar-wash); border-radius: 2px; padding: 1px 6px;
+    white-space: nowrap;
+  }
+  .mini__pie {
+    border-top: 1px solid var(--linea); padding: 10px var(--sp-s);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2xs);
+    font-family: 'Chivo Mono', monospace; font-size: 0.68rem; color: var(--tiza-3);
+  }
+  .mini__pie a { color: var(--ambar); text-decoration: none; font-weight: 600; }
+
+  /* ---- reloj de los 5 segundos ---- */
+  .reloj { display: grid; gap: var(--sp-s); }
+  .reloj__pista {
+    position: relative; height: 44px;
+    border: 1px solid var(--linea-2); border-radius: var(--radio);
+    background: var(--panel); overflow: hidden;
+  }
+  .reloj__lleno { position: absolute; inset: 0 auto 0 0; width: 68%; background: var(--ambar-wash); border-right: 2px solid var(--ambar); }
+  .reloj__et {
+    position: absolute; inset: 0; display: flex; align-items: center; padding: 0 var(--sp-xs);
+    font-family: 'Chivo Mono', monospace; font-size: 0.72rem; color: var(--tiza-2);
+    justify-content: space-between;
+  }
+  .reloj__marca { font-family: 'Chivo Mono', monospace; font-size: 0.68rem; color: var(--tiza-3); display: flex; justify-content: space-between; }
+
+  /* ---- comparación chileno ---- */
+  .par { display: grid; gap: 0; border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+  @media (min-width: 48em) { .par { grid-template-columns: 1fr 1fr; } }
+  .par__c { padding: var(--sp-s); }
+  .par__c:first-child { background: var(--panel); border-bottom: 1px solid var(--linea); }
+  @media (min-width: 48em) { .par__c:first-child { border-bottom: 0; border-right: 1px solid var(--linea); } }
+  .par__c:last-child { background: var(--panel-2); border-left: 2px solid var(--ambar); }
+  .par__c h4 { font-family: 'Chivo Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: var(--sp-xs); }
+  .par__c:first-child h4 { color: var(--tiza-3); }
+  .par__c:last-child h4 { color: var(--ambar); }
+  .par__c ul { list-style: none; display: grid; gap: var(--sp-xs); }
+  .par__c li { font-size: 0.94rem; line-height: 1.45; }
+  .par__c:first-child li { color: var(--tiza-3); text-decoration: line-through; text-decoration-color: var(--linea-2); }
+  .par__c:last-child li { color: var(--tiza); }
+
+  /* ---- precios ---- */
+  .plan { display: grid; gap: var(--sp-xs); }
+  .plan__p { display: flex; align-items: baseline; gap: 6px; }
+  .plan__p b { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.03em; }
+  .plan__p span { font-family: 'Chivo Mono', monospace; font-size: 0.76rem; color: var(--tiza-3); }
+  .plan ul { list-style: none; display: grid; gap: 7px; font-size: 0.88rem; color: var(--tiza-2); }
+  .plan li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; }
+  .plan li svg { width: 13px; height: 13px; margin-top: 5px; color: var(--ambar); }
+
+  .cierre { text-align: center; padding: var(--sp-2xl) 0; }
+  .cierre h2 { max-width: 20ch; margin: 0 auto var(--sp-s); }
+  .cierre .lede { margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 12h2.5M7 12V6M11 12V3M15 12v-7M19 12V8M22 12h-1" stroke="#F0A93F"/>
+        <path d="M2 16h20" opacity=".3"/>
+      </svg>
+      Fonalta
+    </a>
+    <button class="nav__btn" aria-expanded="false" aria-controls="nav-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+    <nav class="nav__menu" id="nav-menu" data-abierto="no" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════ HERO ═══════ -->
+<section class="hero">
+  <div class="container hero__in">
+    <div>
+      <p class="kicker">Recepcionista de IA · Chile</p>
+      <h1>El teléfono que siempre contesta.</h1>
+      <p class="lede">Tu número suena a las 20:40, un sábado, mientras tú estás abajo de un auto. Hoy eso es una casilla de voz. Con Fonalta es una hora agendada.</p>
+      <div class="hero__cta">
+        <a class="btn" href="demo/index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></svg>
+          Escuchar una llamada
+        </a>
+        <a class="btn btn--fantasma" href="#precio">Ver precios</a>
+      </div>
+      <p class="dato mt-m">Desvías tu número. Nadie te vende nada, nadie te instala nada. En 15 minutos está contestando.</p>
+      <div class="hero__onda"><canvas class="onda" data-onda data-barras="52"></canvas></div>
+    </div>
+
+    <!-- El producto, en vivo. No es un screenshot: se está reproduciendo. -->
+    <div class="mini" id="mini">
+      <div class="mini__cab">
+        <span class="mini__luz"><i></i> LÍNEA ACTIVA</span>
+        <span id="mini-meta">+56 9 8472 1103 · Ñuñoa · 19:42</span>
+      </div>
+      <div class="mini__onda"><canvas class="onda" id="mini-onda"></canvas></div>
+      <div class="mini__cuerpo" id="mini-cuerpo" aria-live="polite"></div>
+      <div class="mini__pie">
+        <span id="mini-p50">latencia p50 —</span>
+        <a href="demo/index.html">Ver la llamada completa →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ EL PROBLEMA ═══════ -->
+<section id="problema">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker kicker--mudo">El problema</p>
+      <h2>El que no contesta pierde al cliente. No lo pierde después: lo pierde ahí.</h2>
+      <p>Nadie llama dos veces al taller que no contestó. Llama al siguiente de la lista, le da la hora, y ese taller lo tiene para siempre. La llamada perdida no es una llamada perdida: es un cliente que se fue y ni siquiera sabes que existió.</p>
+    </div>
+
+    <div class="rejilla rejilla--3 mb-m">
+      <div class="metrica">
+        <dt>Una recepcionista</dt>
+        <dd class="cifra">$625.000</dd>
+        <p>al mes. Sueldo mínimo 2026 (~$500.000) más ~25% de cargas. Contesta 8 horas, 5 días. Se enferma, sale a colación, se va de vacaciones. <span class="dato">Derivación propia.</span></p>
+      </div>
+      <div class="metrica">
+        <dt>La casilla de voz</dt>
+        <dd class="cifra">$0</dd>
+        <p>y ahí es exactamente donde van los clientes a morir. Nadie deja mensaje. El que deja mensaje ya llamó a otro mientras tanto.</p>
+      </div>
+      <div class="metrica">
+        <dt>Fonalta</dt>
+        <dd class="cifra">$29.000</dd>
+        <p>al mes. Contesta 24 horas, 7 días, todas las llamadas a la vez. No se enferma. Y te dice qué preguntó cada uno.</p>
+      </div>
+    </div>
+
+    <figure class="fig">
+      <figcaption class="fig__t">Cuándo suena el teléfono y cuándo hay alguien</figcaption>
+      <p class="fig__s">Una consulta dental de 3 sillones, un mes. De 227 llamadas entrantes, <strong>122 (54%) no las contestó nadie</strong>: la colación, la hora punta, después de las 19:00 y el fin de semana.</p>
+      <div class="leyenda">
+        <span><i style="background:var(--c1)"></i> No contestadas · 122</span>
+        <span><i style="background:var(--c2)"></i> Contestadas · 105</span>
+      </div>
+      <div class="scroll-x">
+<svg viewBox="0 0 720 252" role="img" aria-labelledby="t-horas d-horas">
+  <title id="t-horas">Llamadas entrantes por hora, un mes</title>
+  <desc id="d-horas">De 227 llamadas entrantes en un mes, 122 (54%) no fueron contestadas. Las horas sin nadie son la colación, después de las 19:00 y el fin de semana.</desc>
+  <line class="malla" x1="40" y1="206" x2="712" y2="206"/>
+  <text class="ejeT" x="32" y="209.5" text-anchor="end">0</text>
+  <line class="malla" x1="40" y1="167.6" x2="712" y2="167.6"/>
+  <text class="ejeT" x="32" y="171.1" text-anchor="end">5</text>
+  <line class="malla" x1="40" y1="129.2" x2="712" y2="129.2"/>
+  <text class="ejeT" x="32" y="132.7" text-anchor="end">10</text>
+  <line class="malla" x1="40" y1="90.8" x2="712" y2="90.8"/>
+  <text class="ejeT" x="32" y="94.3" text-anchor="end">15</text>
+  <line class="malla" x1="40" y1="52.4" x2="712" y2="52.4"/>
+  <text class="ejeT" x="32" y="55.9" text-anchor="end">20</text>
+  <line class="malla" x1="40" y1="14" x2="712" y2="14"/>
+  <text class="ejeT" x="32" y="17.5" text-anchor="end">25</text>
+  <path d="M47.67,204 L47.67,177.28 Q47.67,173.28 51.67,173.28 L65.67,173.28 Q69.67,173.28 69.67,177.28 L69.67,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="58.67" y="222" text-anchor="middle">00–06</text>
+  <path d="M85,204 L85,177.28 Q85,173.28 89,173.28 L103,173.28 Q107,173.28 107,177.28 L107,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="96" y="222" text-anchor="middle">07</text>
+  <rect x="122.33" y="167.6" width="22" height="38.4" fill="var(--c2)"/>
+  <path d="M122.33,165.6 L122.33,131.2 Q122.33,127.2 126.33,127.2 L140.33,127.2 Q144.33,127.2 144.33,131.2 L144.33,165.6 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="133.33" y="222" text-anchor="middle">08</text>
+  <rect x="159.67" y="106.16" width="22" height="99.84" fill="var(--c2)"/>
+  <path d="M159.67,104.16 L159.67,39.04 Q159.67,35.04 163.67,35.04 L177.67,35.04 Q181.67,35.04 181.67,39.04 L181.67,104.16 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="170.67" y="222" text-anchor="middle">09</text>
+  <rect x="197" y="106.16" width="22" height="99.84" fill="var(--c2)"/>
+  <path d="M197,104.16 L197,39.04 Q197,35.04 201,35.04 L215,35.04 Q219,35.04 219,39.04 L219,104.16 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="208" y="222" text-anchor="middle">10</text>
+  <rect x="234.33" y="136.88" width="22" height="69.12" fill="var(--c2)"/>
+  <path d="M234.33,134.88 L234.33,77.44 Q234.33,73.44 238.33,73.44 L252.33,73.44 Q256.33,73.44 256.33,77.44 L256.33,134.88 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="245.33" y="222" text-anchor="middle">11</text>
+  <rect x="271.67" y="144.56" width="22" height="61.44" fill="var(--c2)"/>
+  <path d="M271.67,142.56 L271.67,108.16 Q271.67,104.16 275.67,104.16 L289.67,104.16 Q293.67,104.16 293.67,108.16 L293.67,142.56 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="282.67" y="222" text-anchor="middle">12</text>
+  <rect x="309" y="175.28" width="22" height="30.72" fill="var(--c2)"/>
+  <path d="M309,173.28 L309,108.16 Q309,104.16 313,104.16 L327,104.16 Q331,104.16 331,108.16 L331,173.28 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="320" y="222" text-anchor="middle">13</text>
+  <rect x="346.33" y="167.6" width="22" height="38.4" fill="var(--c2)"/>
+  <path d="M346.33,165.6 L346.33,108.16 Q346.33,104.16 350.33,104.16 L364.33,104.16 Q368.33,104.16 368.33,108.16 L368.33,165.6 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="357.33" y="222" text-anchor="middle">14</text>
+  <rect x="383.67" y="136.88" width="22" height="69.12" fill="var(--c2)"/>
+  <path d="M383.67,134.88 L383.67,100.48 Q383.67,96.48 387.67,96.48 L401.67,96.48 Q405.67,96.48 405.67,100.48 L405.67,134.88 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="394.67" y="222" text-anchor="middle">15</text>
+  <rect x="421" y="106.16" width="22" height="99.84" fill="var(--c2)"/>
+  <path d="M421,104.16 L421,46.72 Q421,42.72 425,42.72 L439,42.72 Q443,42.72 443,46.72 L443,104.16 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="432" y="222" text-anchor="middle">16</text>
+  <rect x="458.33" y="106.16" width="22" height="99.84" fill="var(--c2)"/>
+  <path d="M458.33,104.16 L458.33,46.72 Q458.33,42.72 462.33,42.72 L476.33,42.72 Q480.33,42.72 480.33,46.72 L480.33,104.16 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="469.33" y="222" text-anchor="middle">17</text>
+  <rect x="495.67" y="136.88" width="22" height="69.12" fill="var(--c2)"/>
+  <path d="M495.67,134.88 L495.67,69.76 Q495.67,65.76 499.67,65.76 L513.67,65.76 Q517.67,65.76 517.67,69.76 L517.67,134.88 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="506.67" y="222" text-anchor="middle">18</text>
+  <rect x="533" y="175.28" width="22" height="30.72" fill="var(--c2)"/>
+  <path d="M533,173.28 L533,77.44 Q533,73.44 537,73.44 L551,73.44 Q555,73.44 555,77.44 L555,173.28 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="544" y="222" text-anchor="middle">19</text>
+  <path d="M570.33,204 L570.33,146.56 Q570.33,142.56 574.33,142.56 L588.33,142.56 Q592.33,142.56 592.33,146.56 L592.33,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="581.33" y="222" text-anchor="middle">20</text>
+  <path d="M607.67,204 L607.67,169.6 Q607.67,165.6 611.67,165.6 L625.67,165.6 Q629.67,165.6 629.67,169.6 L629.67,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="618.67" y="222" text-anchor="middle">21</text>
+  <path d="M645,204 L645,177.28 Q645,173.28 649,173.28 L663,173.28 Q667,173.28 667,177.28 L667,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="656" y="222" text-anchor="middle">22</text>
+  <path d="M682.33,204 L682.33,200.32 Q682.33,196.32 686.33,196.32 L700.33,196.32 Q704.33,196.32 704.33,200.32 L704.33,204 Z" fill="var(--c1)"/>
+  <text class="ejeT" x="693.33" y="222" text-anchor="middle">23</text>
+  <text class="marcaT" x="544" y="65.44" text-anchor="middle" fill="var(--ambar)">13 perdidas</text>
+  <text class="ejeT" x="40" y="240">hora del día · llamadas del mes</text>
+</svg>
+      </div>
+      <p class="fig__n">Ejemplo ilustrativo con el patrón horario típico de una consulta médica: dato de diseño, no una medición. La primera cosa que Fonalta hace en tu cuenta es dibujarte <em>este mismo gráfico con tus llamadas de verdad</em>.</p>
+    </figure>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ LA DIVULGACIÓN (posicionamiento) -->
+<section id="honestidad">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker">Nuestra postura</p>
+      <h2>Se declara IA en los primeros 5 segundos. Siempre.</h2>
+      <p>Hay servicios de voz que apuestan a que el que llama no se dé cuenta. Es una apuesta mala. La credibilidad no la mata saber que estás hablando con una máquina: la mata <strong>enterarte después</strong> de que te la estaban escondiendo. Ese es el minuto en que un cliente deja de confiar en tu negocio, no en el nuestro.</p>
+    </div>
+
+    <div class="rejilla rejilla--3-2">
+      <div class="reloj">
+        <div class="reloj__pista">
+          <div class="reloj__lleno" style="width:68%"></div>
+          <div class="reloj__et">
+            <span><strong style="color:var(--tiza)">«Aló, le habla la asistente virtual de Veterinaria Los Aromos.»</strong></span>
+          </div>
+        </div>
+        <div class="reloj__marca">
+          <span>0,0 s</span>
+          <span style="color:var(--ambar)">↑ declarada a los 3,4 s</span>
+          <span>5,0 s</span>
+        </div>
+        <p class="nota">El saludo va pre-sintetizado en caché: suena en el milisegundo 40, sin esperar al modelo. La palabra «virtual» sale de la boca de la IA antes de que el que llama alcance a decir «aló».</p>
+      </div>
+
+      <div class="apilar">
+        <div class="card card--vivo">
+          <h3>Nunca clonamos a nadie</h3>
+          <p>La voz es de una locutora chilena contratada, con cesión escrita de derechos para uso sintético. No clonamos la voz de tu recepcionista, ni la tuya, ni la de nadie. Y la IA jamás dice ser una persona.</p>
+        </div>
+        <div class="card card--vivo">
+          <h3>No llamamos a nadie en frío</h3>
+          <p>Fonalta contesta llamadas entrantes. Devuelve el llamado <strong>sólo</strong> a quien dejó su número y dijo que sí, con el consentimiento grabado. Las robocalls con voz sintética chocan con el registro No Molestar (Ley 21.398) y en EE.UU. la FCC ya las declaró ilegales bajo la TCPA. No es un escrúpulo: es que te queman el número.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="aviso mt-l">
+      <strong>Cuando el que llama pide un humano y no hay humano, el sistema lo dice.</strong><br>
+      <span class="mono" style="color:var(--tiza)">«No tengo cómo pasarle con una persona en este minuto —soy la asistente virtual y no hay nadie tomando llamadas ahora. Lo que sí puedo: le dejo el recado y él le devuelve el llamado, o le agendo una devolución.»</span><br>
+      Nunca «se lo transfiero» hacia un timbre que no suena en ninguna parte. Mentir ahí es lo único que convierte un producto honesto en una estafa.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ LA LATENCIA ═══════ -->
+<section id="latencia">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker">El argumento técnico</p>
+      <h2>Lo que hace creíble a una voz es la latencia, no el timbre.</h2>
+      <p>Una voz preciosa que se queda tres segundos en silencio suena a robot. Una voz normal que responde al tiro suena viva. Por eso todo el presupuesto de ingeniería se gasta en el silencio entre que tú terminas de hablar y la IA empieza: <strong>menos de 800 milisegundos</strong>, con streaming en las tres capas.</p>
+    </div>
+
+    <figure class="fig">
+      <figcaption class="fig__t">A qué se le va el tiempo entre que dejas de hablar y te contestan</figcaption>
+      <p class="fig__s">El turno mediano suma <strong>730 ms</strong>. El que duele es el p95: 1.180 ms. Regla de diseño: si un turno pasa de 900 ms, la IA emite un relleno («mmm, déjeme ver…») mientras llega el primer token, en vez de dejarte en el vacío.</p>
+      <div class="leyenda">
+        <span><i style="background:var(--c2)"></i> Red telefónica</span>
+        <span><i style="background:var(--c1)"></i> ASR (streaming)</span>
+        <span><i style="background:var(--c5)"></i> LLM (primer token)</span>
+        <span><i style="background:var(--c4)"></i> TTS (primer byte)</span>
+        <span><i style="background:var(--c3)"></i> Jitter + salida</span>
+      </div>
+      <div class="scroll-x">
+<svg viewBox="0 0 720 180" role="img" aria-labelledby="t-lat d-lat">
+  <title id="t-lat">Presupuesto de latencia punta a punta, por etapa</title>
+  <desc id="d-lat">El turno mediano suma 730 ms y el percentil 95 suma 1.180 ms. El presupuesto de diseño son 800 ms.</desc>
+  <line class="malla" x1="52" y1="18" x2="52" y2="146"/>
+  <text class="ejeT" x="52" y="162" text-anchor="middle">0</text>
+  <line class="malla" x1="151.69" y1="18" x2="151.69" y2="146"/>
+  <text class="ejeT" x="151.69" y="162" text-anchor="middle">200</text>
+  <line class="malla" x1="251.38" y1="18" x2="251.38" y2="146"/>
+  <text class="ejeT" x="251.38" y="162" text-anchor="middle">400</text>
+  <line class="malla" x1="351.08" y1="18" x2="351.08" y2="146"/>
+  <text class="ejeT" x="351.08" y="162" text-anchor="middle">600</text>
+  <line class="malla" x1="450.77" y1="18" x2="450.77" y2="146"/>
+  <text class="ejeT" x="450.77" y="162" text-anchor="middle">800</text>
+  <line class="malla" x1="550.46" y1="18" x2="550.46" y2="146"/>
+  <text class="ejeT" x="550.46" y="162" text-anchor="middle">1.000</text>
+  <line class="malla" x1="650.15" y1="18" x2="650.15" y2="146"/>
+  <text class="ejeT" x="650.15" y="162" text-anchor="middle">1.200</text>
+  <text class="ejeT" x="700" y="176" text-anchor="end">milisegundos</text>
+  <text class="ejeL" x="42" y="65" text-anchor="end">p50</text>
+  <rect x="52" y="44" width="37.88" height="30" fill="var(--c2)"/>
+  <rect x="91.88" y="44" width="87.72" height="30" fill="var(--c1)"/>
+  <rect x="181.6" y="44" width="157.51" height="30" fill="var(--c5)"/>
+  <rect x="341.11" y="44" width="42.86" height="30" fill="var(--c4)"/>
+  <path d="M385.97,44 L411.88,44 Q415.88,44 415.88,48 L415.88,70 Q415.88,74 411.88,74 L385.97,74 Z" fill="var(--c3)"/>
+  <text class="marcaT" x="424.88" y="64">730 ms</text>
+  <text class="ejeL" x="42" y="113" text-anchor="end">p95</text>
+  <rect x="52" y="92" width="57.82" height="30" fill="var(--c2)"/>
+  <rect x="111.82" y="92" width="127.6" height="30" fill="var(--c1)"/>
+  <rect x="241.42" y="92" width="302.06" height="30" fill="var(--c5)"/>
+  <rect x="545.48" y="92" width="52.83" height="30" fill="var(--c4)"/>
+  <path d="M600.31,92 L636.19,92 Q640.19,92 640.19,96 L640.19,118 Q640.19,122 636.19,122 L600.31,122 Z" fill="var(--c3)"/>
+  <text class="marcaT" x="649.18" y="112">1.180 ms</text>
+  <line x1="450.77" y1="14" x2="450.77" y2="146" stroke="var(--tiza)" stroke-width="1.5"/>
+  <text class="marcaT" x="450.77" y="8" text-anchor="middle">presupuesto 800 ms</text>
+</svg>
+      </div>
+      <div class="scroll-x mt-m">
+        <table class="tabla">
+          <caption class="visually-hidden">Presupuesto de latencia por etapa, en milisegundos</caption>
+          <thead><tr><th>Etapa</th><th class="n">p50</th><th class="n">p95</th><th>Cómo se consigue</th></tr></thead>
+          <tbody>
+            <tr><td>Red telefónica</td><td class="n mono">80</td><td class="n mono">120</td><td>Twilio Media Streams · media server en São Paulo (RTT desde Santiago ~40 ms)</td></tr>
+            <tr><td>ASR</td><td class="n mono">180</td><td class="n mono">260</td><td>Deepgram Nova-3 en streaming · endpointing de 150 ms + detección semántica de fin de turno</td></tr>
+            <tr><td>LLM</td><td class="n mono">320</td><td class="n mono">610</td><td>Claude Haiku 4.5 · prompt cacheado · el TTS arranca con la <em>primera frase</em>, no espera el turno completo</td></tr>
+            <tr><td>TTS</td><td class="n mono">90</td><td class="n mono">110</td><td>ElevenLabs Flash v2.5 en streaming (~75 ms al primer byte)</td></tr>
+            <tr><td>Jitter + salida</td><td class="n mono">60</td><td class="n mono">80</td><td>Buffer de 2 tramas de 20 ms</td></tr>
+            <tr><td>Total</td><td class="n mono">730</td><td class="n mono">1.180</td><td>El p50 cabe en el presupuesto. El p95 es el que hay que vigilar.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fig__n">Estos son los tiempos <em>presupuestados</em>, no medidos: es una meta de arquitectura, no un benchmark. El día que exista el pipeline se mide y se publica el número real, sea el que sea.</p>
+    </figure>
+
+    <div class="rejilla rejilla--2 mt-l">
+      <div class="card">
+        <h3>Se le puede interrumpir</h3>
+        <p>Si el que llama habla encima de la IA, la IA se calla. Detección de voz entrante a los 120 ms, el audio que ya salió se purga del buffer de la operadora, y —el detalle que casi nadie hace— <strong>el turno del modelo se trunca a lo que alcanzó a decir de verdad</strong>. Si no lo truncas, el modelo cree que dijo una frase que el cliente nunca escuchó, y la conversación se descarrila dos turnos más adelante.</p>
+      </div>
+      <div class="card">
+        <h3>Cuando no sabe, lo dice</h3>
+        <p>El modelo no puede afirmar nada que no venga de una herramienta. Si busca en la ficha de tu negocio y no encuentra, la única salida que el sistema le permite es admitirlo: <em>«eso no lo tengo y no se lo voy a inventar»</em>. Y esa pregunta te llega a ti, por WhatsApp, para que la contestes una vez y no vuelva a fallar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ CÓMO FUNCIONA ═════ -->
+<section id="como">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker kicker--mudo">Cómo funciona</p>
+      <h2>Tres pasos y ya está contestando.</h2>
+    </div>
+    <ol class="pasos rejilla rejilla--3" style="gap:var(--sp-m)">
+      <li>
+        <div>
+          <h3>Te damos un número</h3>
+          <p style="color:var(--tiza-2)">Un +56 2 de verdad, tuyo. Lo tienes en el minuto uno de creada la cuenta.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Desvías tu número al nuestro</h3>
+          <p style="color:var(--tiza-2)">Marcas un código en tu teléfono y listo. Te damos el código exacto según tu operadora —Entel, Movistar, WOM, Claro, VTR— y te decimos si quieres desviar <em>todo</em>, sólo lo que no contestas, o sólo fuera de horario.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Cargas lo que sabes</h3>
+          <p style="color:var(--tiza-2)">Horarios, dirección, precios, servicios. Pegas el texto o nos das la URL de tu web y la leemos. Lo que falte, la IA lo va a admitir en vez de inventarlo — y te lo va a preguntar.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ CHILENO ═══════════ -->
+<section id="chileno">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker">El acento</p>
+      <h2>Una IA que dice «¿me regalas tu nombre?» ya se delató.</h2>
+      <p>Los servicios de recepcionista IA que existen hablan español neutro o mexicano. Y no es sólo el acento: es el vocabulario. El que llama no sabría explicarte por qué, pero cuelga con la sensación de que algo estaba raro.</p>
+    </div>
+
+    <div class="par">
+      <div class="par__c">
+        <h4>La IA importada, traducida</h4>
+        <ul>
+          <li>«¿Me regalas tu nombre, por favor?»</li>
+          <li>«Con gusto le agendo una cita.»</li>
+          <li>«¿Desea que le tome un mensaje?»</li>
+          <li>«Permítame un momento, voy a checar.»</li>
+          <li>«Le voy a transferir con un asesor.» <span class="dato">(no hay ningún asesor)</span></li>
+        </ul>
+      </div>
+      <div class="par__c">
+        <h4>Fonalta</h4>
+        <ul>
+          <li>«¿Cómo te llamas?»</li>
+          <li>«Le puedo dar hora para el jueves a las 4.»</li>
+          <li>«¿Le dejo el recado?»</li>
+          <li>«Déjeme ver… ya, acá está.»</li>
+          <li>«No tengo cómo pasarle con una persona ahora, pero le agendo una devolución.»</li>
+        </ul>
+      </div>
+    </div>
+    <p class="nota mt-m">Se trata con usted a quien llama, salvo que quien llama trate de tú primero. Es una regla del guión, no una casualidad del modelo. Un taller en Maipú y una consulta en Vitacura no suenan igual, y el guión de cada cliente se ajusta al rubro.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ LÍMITES ═══════════ -->
+<section id="limites">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker kicker--mudo">Lo que no hace</p>
+      <h2>Lo que Fonalta no va a hacer, y no vamos a fingir que sí.</h2>
+    </div>
+    <div class="rejilla rejilla--2">
+      <ul class="lista">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No reemplaza a tu recepcionista</strong> si la tienes. Contesta cuando ella no está: la colación, la hora punta, después del cierre, el fin de semana, y la tercera llamada simultánea.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No atiende una emergencia.</strong> Si alguien llama porque su perro se está muriendo, la IA no sirve. Detecta la urgencia, corta el guión y te llama al celular al tiro. Eso no es automatizar: es reconocer un límite.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No negocia ni cierra ventas complejas.</strong> Toma el dato y te lo pasa. Una cotización de obra no la hace una IA por teléfono, y quien te diga lo contrario te está vendiendo humo.</span>
+        </li>
+      </ul>
+      <ul class="lista">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No inventa.</strong> Si tu ficha no dice si atiendes gatos, la IA dice que no sabe. Suena peor por un segundo y te salva un cliente enojado por semana.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No llama a vender.</strong> Ni por ti, ni por nosotros. Sólo devuelve el llamado a quien lo pidió y lo autorizó, con el consentimiento grabado.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <span><strong>No entiende todo.</strong> Con ruido de taller de fondo, con alguien que habla muy rápido o muy bajo, el ASR falla. Cuando falla dos veces seguidas, la IA deja de porfiar y ofrece el recado.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ PRECIO ════════════ -->
+<section id="precio">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker">Precio</p>
+      <h2>En pesos, con boleta, con tarjeta, sin contrato.</h2>
+      <p>Todos los planes incluyen minutos. Si te pasas, el excedente son <strong>$89 el minuto</strong> y se cobra en el ciclo siguiente. No hay costo de instalación porque no hay instalación.</p>
+    </div>
+
+    <div class="rejilla rejilla--3">
+      <div class="card">
+        <div class="plan">
+          <h3>Recado</h3>
+          <div class="plan__p"><b class="cifra">$29.000</b><span>/ mes + IVA</span></div>
+          <p class="dato">100 minutos · 1 número</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Contesta 24/7 y toma el recado</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Responde horario, dirección y precios</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Resumen por WhatsApp de cada llamada</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Grabación y transcripción</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card card--vivo">
+        <div class="plan">
+          <div class="fila" style="justify-content:space-between">
+            <h3>Recepción</h3>
+            <span class="pin pin--ambar">El que se lleva casi todo</span>
+          </div>
+          <div class="plan__p"><b class="cifra">$69.000</b><span>/ mes + IVA</span></div>
+          <p class="dato">400 minutos · 1 número · 3 destinos de derivación</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Todo lo de Recado, más:</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> <strong>Agenda horas</strong> contra tu Google Calendar</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Devolución de llamada con consentimiento grabado</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Bandeja de «lo que no supe»: la IA te pregunta y aprende</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Panel con todas las llamadas y por qué llamaron</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="plan">
+          <h3>Central</h3>
+          <div class="plan__p"><b class="cifra">$159.000</b><span>/ mes + IVA</span></div>
+          <p class="dato">1.200 minutos · 3 números / sucursales</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Todo lo de Recepción, más:</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Varias sucursales con guiones distintos</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Reglas por horario y por día</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Webhook: manda cada llamada a tu CRM</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="fila mt-l" style="gap:var(--sp-s)">
+      <span class="pin pin--ok">30 minutos de prueba, sin tarjeta</span>
+      <span class="pin">Se cancela desde el panel, en un clic</span>
+      <span class="pin">Boleta electrónica automática</span>
+    </div>
+    <p class="nota mt-m">Cifra honesta: un minuto de llamada nos cuesta <strong>$50,3</strong> entre telefonía, transcripción, modelo y voz — y casi la mitad de eso es la voz sintética. Está desglosado con la aritmética a la vista en <a href="stack.html#costo">Arquitectura</a>, y de ahí sale el margen de 69% que declaramos en <a href="negocio.html#economia">Negocio</a>. No hay número escondido.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ FAQ ═══════════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="enc">
+      <p class="kicker kicker--mudo">Preguntas</p>
+      <h2>Lo que todos preguntan.</h2>
+    </div>
+    <div style="max-width:64ch">
+      <details open>
+        <summary>¿No se va a enojar el cliente cuando escuche que es una máquina?</summary>
+        <p>Algunos sí, y no lo vamos a esconder: es el riesgo más grande de este producto y lo estamos midiendo. Nuestra apuesta es que enojarse con una máquina que <em>te contestó</em> es menos malo que quedarse hablándole a una casilla de voz que <em>no te contestó</em>. Y que el enojo de verdad viene cuando te das cuenta de que te engañaron. Por eso lo decimos en el segundo 3.</p>
+      </details>
+      <details>
+        <summary>¿Y si el que llama insiste en hablar con una persona?</summary>
+        <p>Si configuraste un destino de derivación —tu celular, el del jefe de taller—, la IA transfiere de verdad. Si no hay nadie, <strong>lo dice</strong> y ofrece dejar el recado o agendar una devolución. Nunca simula una transferencia. Nunca deja a alguien en espera hacia un timbre que no suena.</p>
+      </details>
+      <details>
+        <summary>¿Tengo que cambiar de número?</summary>
+        <p>No. Te quedas con el tuyo y lo desvías al nuestro. El desvío lo activas tú desde tu teléfono con un código de tu operadora (te damos el exacto). Si quieres, puedes desviar sólo las llamadas que no alcanzas a contestar, o sólo las de fuera de horario.</p>
+      </details>
+      <details>
+        <summary>¿Cuánto se demora en contestar?</summary>
+        <p>Contesta al primer tono. Después, entre que tú dejas de hablar y ella empieza pasan unos 730 milisegundos en la mediana. Eso es más rápido que una persona distraída. El desglose completo está más arriba, y es un presupuesto de diseño, no un benchmark medido —cuando exista el pipeline publicamos el número real.</p>
+      </details>
+      <details>
+        <summary>¿Graban las llamadas? ¿Qué pasa con los datos?</summary>
+        <p>Sí, y se avisa en los primeros 5 segundos, en la misma frase de la divulgación. La grabación y la transcripción son tuyas y las ves en el panel. Los datos se guardan en Chile o en la región más cercana, y se borran a los 12 meses o cuando tú lo pidas. Ley 19.628 y Ley 21.719.</p>
+      </details>
+      <details>
+        <summary>¿Y si la IA se equivoca y me agenda mal una hora?</summary>
+        <p>Pasa. Por eso cada llamada te llega resumida por WhatsApp en menos de un minuto, con lo que agendó y con lo que <em>no supo</em>. Puedes deshacer una hora desde el mismo mensaje. Y la IA no puede agendar en un bloque ocupado: la disponibilidad no la decide el modelo, la decide tu calendario.</p>
+      </details>
+      <details>
+        <summary>¿Funciona con una línea fija antigua?</summary>
+        <p>Si tu línea fija admite desvío (casi todas lo admiten, pero algunas centrales viejas requieren que la operadora lo active por mesa de ayuda), sí. Esa llamada a tu operadora la tienes que hacer tú: no podemos actuar sobre tu cuenta. Es lo único del proceso que no podemos hacer por ti, y lo decimos antes de que pagues.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="cierre">
+  <div class="container">
+    <p class="kicker" style="justify-content:center">Empieza hoy</p>
+    <h2>La próxima llamada que no contestes ya se fue a otro lado.</h2>
+    <p class="lede" style="max-width:44ch">30 minutos de prueba, sin tarjeta. Si en esos 30 minutos no contesta bien, no pagas nada y desactivas el desvío.</p>
+    <div class="fila mt-m" style="justify-content:center">
+      <a class="btn" href="demo/index.html">Escuchar una llamada de verdad</a>
+      <a class="btn btn--fantasma" href="stack.html">Ver cómo está hecho</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__in">
+    <div>
+      <p><strong style="color:var(--tiza)">Fonalta</strong> · fonalta.com · Recepcionista de IA para PYMEs chilenas.</p>
+      <p style="margin-top:6px">Prototipo navegable. No hay backend, no hay telefonía conectada y la llamada del demo es un guión, no audio. Todo eso está declarado en <a href="stack.html#falso">Arquitectura</a>.</p>
+    </div>
+    <nav aria-label="Pie">
+      <div class="fila">
+        <a href="../index.html">← Ideas</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html">Negocio</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="stack.html">Arquitectura</a>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/sitio.js"></script>
+<script>
+/* El mini-reproductor del hero: el producto, funcionando, en la portada.
+   Es el mismo guión que el demo, recortado a lo esencial. */
+(function () {
+  'use strict';
+  var cuerpo = document.getElementById('mini-cuerpo');
+  var lienzo = document.getElementById('mini-onda');
+  var p50el  = document.getElementById('mini-p50');
+  if (!cuerpo || !lienzo) return;
+
+  var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var guion = [
+    { a: 'ia',      t: 'Aló, le habla la asistente virtual de Veterinaria Los Aromos. Soy una inteligencia artificial y la llamada queda grabada. ¿En qué le puedo ayudar?', dur: 5600, lat: 0 },
+    { a: 'cliente', t: 'Aló… eh, sí. Necesito una hora para mi perro, está con una cojera hace dos días.', dur: 4200 },
+    { a: 'ia',      t: '¿Es urgente, o el perro está comiendo y caminando normal aparte de la cojera?', dur: 3400, lat: 690 },
+    { a: 'cliente', t: 'No, come bien. Camina no más que cojeando.', dur: 2400 },
+    { a: 'ia',      t: 'Tengo mañana miércoles a las 10:30 o el jueves a las 16:00 con el doctor Cárdenas. ¿Cuál le acomoda?', dur: 4600, lat: 705 },
+    { a: 'cliente', t: 'Mañana a las diez y media, sí.', dur: 1900 },
+    { a: 'ia',      t: 'Ya. ¿Me da su nombre y el nombre del perro?', dur: 2300, lat: 668 }
+  ];
+
+  var lats = [], i = 0, timer = null;
+
+  /* --- forma de onda: ámbar cuando habla la IA, tiza cuando habla el cliente --- */
+  var ctx = lienzo.getContext('2d'), W = 0, H = 0, energia = 0, quien = 'ia';
+  function medir() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = lienzo.getBoundingClientRect();
+    W = Math.max(r.width, 1); H = Math.max(r.height, 1);
+    lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function onda(ms) {
+    var t = ms / 1000, n = 46, paso = W / n, ancho = Math.max(2, paso * 0.45), medio = H / 2;
+    ctx.clearRect(0, 0, W, H);
+    var col = quien === 'ia' ? '#F0A93F' : '#B8AB9C';
+    for (var k = 0; k < n; k++) {
+      var x = k / n;
+      var a = Math.abs(0.4 + 0.32 * Math.sin(x * 8.3 + t * 3.1) + 0.22 * Math.sin(x * 19 - t * 4.4));
+      a = Math.max(0.04, Math.min(1, a * (0.3 + 0.7 * Math.sin(Math.PI * x)) * energia + 0.03));
+      var alto = Math.max(2, a * (H - 8));
+      ctx.globalAlpha = 0.2 + 0.8 * a;
+      ctx.fillStyle = col;
+      var px = k * paso + (paso - ancho) / 2, py = medio - alto / 2;
+      if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(px, py, ancho, alto, 2); ctx.fill(); }
+      else ctx.fillRect(px, py, ancho, alto);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(onda);
+  }
+  medir();
+  window.addEventListener('resize', medir);
+  if (!reducido) requestAnimationFrame(onda); else { energia = 0.5; onda(1200); }
+
+  function fila(paso) {
+    var d = document.createElement('div');
+    d.className = 'mini__t';
+    d.dataset.a = paso.a;
+    var q = document.createElement('span');
+    q.className = 'mini__q';
+    q.textContent = paso.a === 'ia' ? 'IA' : 'Cliente';
+    var p = document.createElement('p');
+    d.appendChild(q); d.appendChild(p);
+    cuerpo.appendChild(d);
+    while (cuerpo.children.length > 4) cuerpo.removeChild(cuerpo.firstChild);
+    return p;
+  }
+
+  function escribir(p, texto, dur, listo) {
+    if (reducido) { p.textContent = texto; setTimeout(listo, 900); return; }
+    var n = texto.length, t0 = performance.now();
+    (function paso(ahora) {
+      var k = Math.min(1, (ahora - t0) / dur);
+      p.textContent = texto.slice(0, Math.round(k * n));
+      energia = 0.55 + 0.45 * Math.abs(Math.sin(ahora / 190));
+      if (k < 1) requestAnimationFrame(paso);
+      else { energia = 0.06; listo(); }
+    })(t0);
+  }
+
+  function siguiente() {
+    if (i >= guion.length) {
+      i = 0; lats = [];
+      timer = setTimeout(function () { cuerpo.innerHTML = ''; siguiente(); }, 2600);
+      return;
+    }
+    var paso = guion[i++];
+    quien = paso.a;
+    var p = fila(paso);
+
+    function hablar() {
+      if (paso.lat) {
+        lats.push(paso.lat);
+        var b = document.createElement('span');
+        b.className = 'mini__lat';
+        b.textContent = paso.lat + ' ms';
+        p.parentNode.appendChild(b);
+        var med = lats.slice().sort(function (a, c) { return a - c; })[Math.floor(lats.length / 2)];
+        p50el.textContent = 'latencia p50 ' + med + ' ms · presupuesto 800 ms';
+      }
+      escribir(p, paso.t, reducido ? 0 : paso.dur, function () {
+        timer = setTimeout(siguiente, 420);
+      });
+    }
+
+    if (paso.lat && !reducido) {
+      /* el silencio de pensar: la onda se aplana y el reloj corre */
+      energia = 0.05;
+      p.innerHTML = '<span style="color:var(--tiza-3)">…</span>';
+      timer = setTimeout(function () { p.textContent = ''; hablar(); }, paso.lat);
+    } else {
+      hablar();
+    }
+  }
+
+  /* arranca sólo cuando el hero está a la vista, para no gastar batería */
+  var arrancado = false;
+  var obs = new IntersectionObserver(function (e) {
+    if (e[0].isIntersecting && !arrancado) { arrancado = true; siguiente(); }
+  }, { threshold: 0.2 });
+  obs.observe(document.getElementById('mini'));
+})();
+</script>
+</body>
+</html>

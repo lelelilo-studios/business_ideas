@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotejia — Inteligencia de precios para el e-commerce chico</title>
+<meta name="description" content="Vigila tu precio y el de tu competencia en Mercado Libre, Falabella, Paris y tu propia tienda. Te dice dónde estás regalando margen y dónde se te escapa la venta. Con tu regla, cambia el precio solo.">
+<!-- DIRECCIÓN DE ARTE: cinta de cotizaciones / pantalla de mercado en vivo. Fondo casi
+     negro azulado, IBM Plex Mono tabular para todo número, Archivo para el texto.
+     Verde y rojo son DATO (sube/baja), nunca decoración. Un solo acento: ámbar de tubo. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero { padding: 44px 0 40px; }
+  .hero h1 { max-width: 16ch; }
+  .hero .lede { max-width: 52ch; font-size: 1.1rem; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .hero-note { font-family: var(--mono); font-size: .74rem; color: var(--ink-3); margin-top: 14px; }
+
+  /* mini pizarra en vivo */
+  .board {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-top: 28px;
+  }
+  .board-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    font-family: var(--mono); font-size: .68rem;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .board-top .live { color: var(--up); display: flex; align-items: center; gap: 6px; }
+  .board-top .live::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--up); animation: pulse 2s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .board-top .live::before { animation: none; } }
+  .brow {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 12px;
+    padding: 12px; border-bottom: 1px solid var(--line);
+  }
+  .brow:last-child { border-bottom: 0; }
+  .brow .nm { font-size: .9rem; font-weight: 600; grid-column: 1; grid-row: 1; }
+  .brow .sub {
+    font-family: var(--mono); font-size: .7rem; color: var(--ink-3);
+    grid-column: 1; grid-row: 2; margin-top: 2px;
+  }
+  .brow .px {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    text-align: right; grid-column: 2; grid-row: 1 / span 2; align-self: center;
+  }
+  .brow .px .p { font-size: 1rem; font-weight: 600; display: block; }
+  .brow .px .d { font-size: .72rem; display: block; color: var(--ink-3); }
+  .brow .rc { grid-column: 1 / -1; grid-row: 3; margin-top: 8px; }
+
+  .steps { counter-reset: s; }
+  .step {
+    display: grid; grid-template-columns: 34px 1fr; gap: 14px;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .step:last-child { border-bottom: 0; }
+  .step::before {
+    counter-increment: s; content: "0" counter(s);
+    font-family: var(--mono); font-size: .78rem; color: var(--amber);
+    padding-top: 2px;
+  }
+  .step h3 { font-size: 1rem; margin-bottom: .25em; }
+  .step p { font-size: .92rem; color: var(--ink-2); margin: 0; }
+
+  blockquote {
+    margin: 0; padding: 0 0 0 16px;
+    border-left: 2px solid var(--amber);
+    font-size: 1.05rem; line-height: 1.6;
+  }
+  blockquote cite {
+    display: block; font-style: normal; font-family: var(--mono);
+    font-size: .74rem; color: var(--ink-3); margin-top: 12px;
+  }
+
+  .plans { display: grid; gap: 12px; margin-top: 20px; }
+  @media (min-width: 700px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1060px) { .plans { grid-template-columns: repeat(4, 1fr); } }
+  .plan {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 16px; display: flex; flex-direction: column;
+  }
+  .plan.destacado { border-color: var(--amber); }
+  .plan .pn {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .plan.destacado .pn { color: var(--amber); }
+  .plan .pp {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    font-size: 1.6rem; font-weight: 600; margin: 8px 0 2px;
+  }
+  .plan .pu { font-family: var(--mono); font-size: .7rem; color: var(--ink-3); }
+  .plan ul { list-style: none; padding: 0; margin: 14px 0 0; font-size: .86rem; }
+  .plan li {
+    color: var(--ink-2); padding: 6px 0 6px 16px; position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  .plan li:last-child { border-bottom: 0; }
+  .plan li::before {
+    content: ""; position: absolute; left: 0; top: 14px;
+    width: 6px; height: 1px; background: var(--line-2);
+  }
+
+  details {
+    border-bottom: 1px solid var(--line);
+    padding: 4px 0;
+  }
+  summary {
+    cursor: pointer; padding: 14px 0; font-weight: 600; font-size: .96rem;
+    list-style: none; display: flex; justify-content: space-between; gap: 12px;
+    min-height: 44px; align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+"; font-family: var(--mono); color: var(--amber); font-size: 1.1rem;
+  }
+  details[open] summary::after { content: "−"; }
+  details p { font-size: .92rem; color: var(--ink-2); padding-bottom: 10px; margin: 0; }
+  details p + p { padding-top: 10px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html"><span class="dot" aria-hidden="true"></span>COTEJIA</a>
+    <div class="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menú</button>
+  </div>
+  <div class="nav-drawer" id="drawer">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html" aria-current="page">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html">Arquitectura</a>
+  </div>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickTrack"></div>
+</div>
+
+<main id="contenido">
+
+  <section class="hero wrap">
+    <span class="kicker">Inteligencia de precios · Mercado Libre · Falabella · Paris · Ripley · tu tienda</span>
+    <h1>Te bajaron el precio a las 3 de la mañana.</h1>
+    <p class="lede">
+      Tú te enteras el viernes, cuando ves que no vendiste. Cotejia mira los precios de tu
+      competencia cada hora, te dice <strong>dónde estás regalando margen</strong> y
+      <strong>dónde se te está escapando la venta</strong>, y —con la regla que tú definiste—
+      cambia el precio solo.
+    </p>
+    <div class="hero-cta">
+      <a class="btn" href="demo/index.html">Ver la pizarra en vivo</a>
+      <a class="btn ghost" href="#precio">Precios desde $29.900</a>
+    </div>
+    <p class="hero-note">Conectas con OAuth. Sin instalación, sin reunión, sin vendedor. 14 días sin tarjeta.</p>
+
+    <div class="board" id="board">
+      <div class="board-top">
+        <span class="live">En vivo</span>
+        <span>Tienda Kütral · demo</span>
+        <span style="margin-left:auto" class="mono" id="bClock">lectura hace 3 min</span>
+      </div>
+      <div id="boardRows"></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="grid g2">
+      <div>
+        <span class="kicker">El problema, en sus palabras</span>
+        <blockquote>
+          "Reviso los precios cuando puedo, un rato, después de despachar. Tengo 340 productos.
+          Alcanzo a mirar veinte. Y siempre pasa lo mismo: o bajé más de lo que necesitaba, o
+          me enteré tarde de que ya no era el más barato."
+          <cite>Sofía Ilabaca · Tienda Kütral · 340 SKU en Mercado Libre, Falabella y Jumpseller</cite>
+        </blockquote>
+      </div>
+      <div>
+        <span class="kicker mute">Lo que pasa mientras duermes</span>
+        <ul class="clean">
+          <li>Un vendedor te baja $500 a las 02:40. Tu producto cae al cuarto lugar del listado.</li>
+          <li>Otro <em>sube</em> el precio y tú no te enteras: podías haber cobrado $2.000 más y no lo supiste.</li>
+          <li>Bajas $3.000 para "asegurar" la venta. Con $800 bastaba. Los otros $2.200 los regalaste.</li>
+          <li>Persigues a un competidor que es un bot. Él baja, tú bajas, él baja. A las 6 horas los dos venden a pérdida.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <span class="kicker">Cómo funciona</span>
+    <h2>Cuatro pasos. Ninguno tiene una persona adentro.</h2>
+    <div class="steps narrow">
+      <div class="step">
+        <div>
+          <h3>Conectas tu tienda</h3>
+          <p>OAuth con Mercado Libre, Falabella Seller Center, Jumpseller, Bsale o Shopify.
+            Nosotros leemos tu catálogo, tus costos y tus ventas. Dos minutos, sin subir un Excel.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Emparejamos tus productos con los de la competencia</h3>
+          <p>Un modelo compara título, marca, modelo, EAN y atributos, y decide si el
+            "Termo Stanley 1,4L verde" del otro vendedor es el mismo termo que el tuyo.
+            Lo que queda dudoso te lo preguntamos, no lo adivinamos.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Escribes tus reglas</h3>
+          <p>Nunca bajo costo + 22%. Máximo 2 cambios al día. Iguala al segundo más barato,
+            no al primero. Si mi despacho es gratis y el del otro no, no lo persigo.
+            Las reglas son tuyas: el motor no improvisa.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Te sugiere el precio — y con tu permiso, lo cambia</h3>
+          <p>Cada sugerencia viene con la regla que la generó a la vista. Puedes aplicarla con
+            un clic, ignorarla, o dejar el piloto automático encendido. Todo queda en la bitácora.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <span class="kicker">La parte que nadie te dice</span>
+    <h2>Un repricer tonto destruye tu margen. Y el de todo el mercado.</h2>
+    <p class="lede narrow">
+      La guerra de precios es una carrera al fondo, y el fondo es tu costo. Si vendemos una máquina
+      de bajar precios, lo que vendemos es una máquina de quebrar más rápido. Por eso Cotejia
+      tiene tres frenos y no se pueden apagar del todo.
+    </p>
+    <div class="grid g3" style="margin-top:22px">
+      <div class="card">
+        <span class="kicker">Freno 1</span>
+        <h3>Piso de margen duro</h3>
+        <p style="font-size:.92rem;color:var(--ink-2)">
+          Costo + el porcentaje que tú digas. Ninguna regla, ninguna guerra, ningún "sólo por hoy"
+          lo cruza. Si el objetivo cae bajo el piso, el motor se detiene y te explica por qué.
+        </p>
+      </div>
+      <div class="card">
+        <span class="kicker">Freno 2</span>
+        <h3>Tope de cambios al día</h3>
+        <p style="font-size:.92rem;color:var(--ink-2)">
+          Por defecto, dos. Veinte cambios en un día no es una estrategia de precios: es un bot
+          peleando con otro bot, y los dos pierden. El tope es la diferencia entre reaccionar y entrar en pánico.
+        </p>
+      </div>
+      <div class="card" style="border-color:rgba(242,85,90,.4)">
+        <span class="kicker" style="color:var(--down)">Freno 3 · el corazón</span>
+        <h3>Detector de bucle</h3>
+        <p style="font-size:.92rem;color:var(--ink-2)">
+          Si el "competidor" responde a cada cambio tuyo en minutos, con el mismo delta, no es una
+          persona: es un repricer en bucle contigo. Cotejia lo detecta, congela tu precio y te lo dice
+          con nombre y apellido.
+        </p>
+      </div>
+    </div>
+
+    <div class="note warn" style="margin-top:20px">
+      <span class="kicker" style="color:var(--down)">El aviso que vale la suscripción</span>
+      <p style="margin:0 0 10px;font-size:1rem;color:var(--ink)">
+        <b>"Llevas 14 bajadas en 6 horas contra un bot. Para de perseguirlo."</b>
+      </p>
+      <p style="margin:0;font-size:.92rem">
+        MegaStock SPA responde entre 4 y 7 minutos después de cada cambio tuyo, siempre con −$490.
+        Catorce veces seguidas. En seis horas te sacó $7.000 de margen por unidad y sigue teniendo el
+        precio más bajo. A ese ritmo cruzas tu piso el jueves a las 02:10.
+        <a href="demo/index.html">Mira la escalera completa en el demo →</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="grid g2">
+      <div>
+        <span class="kicker">Y además</span>
+        <h2>El precio no es la única palanca.</h2>
+        <p style="color:var(--ink-2)">
+          A veces la respuesta correcta no es bajar $500. Es el despacho, la foto, el título, el
+          combo. Un repricer que sólo sabe mover el precio siempre va a mover el precio — es lo
+          único que tiene.
+        </p>
+        <p style="color:var(--ink-2)">
+          Cotejia compara el <strong>costo real de cada palanca</strong> antes de recomendar la más barata.
+          Cuando la respuesta es "no toques el precio", eso es lo que dice.
+        </p>
+      </div>
+      <div class="card">
+        <span class="kicker mute">Caso real del demo · Freidora Oster 5,5 L</span>
+        <table style="margin-top:8px">
+          <tr>
+            <td>Bajar a $47.980 para ganarle a MegaStock<br><small style="color:var(--ink-3)">$5.010 × 62 unidades/mes</small></td>
+            <td class="t-r down"><b>−$310.620</b><br><small>al mes, para siempre</small></td>
+          </tr>
+          <tr>
+            <td>Activar Envío Full y no tocar el precio<br><small style="color:var(--ink-3)">$2.390 × 62 ventas/mes</small></td>
+            <td class="t-r"><b>−$148.180</b><br><small>al mes, sólo si vendes</small></td>
+          </tr>
+          <tr style="border-bottom:0">
+            <td><b>Ahorro de no bajar el precio</b></td>
+            <td class="t-r up"><b>$162.440/mes</b></td>
+          </tr>
+        </table>
+        <p style="font-size:.86rem;color:var(--ink-2);margin:12px 0 0">
+          Y de yapa: Mercado Libre pondera el envío en el orden de los resultados.
+          El despacho te sube en el listado; los $500 no.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="precio">
+    <span class="kicker">Precio</span>
+    <h2>Suscripción, no comisión. Y te digo por qué.</h2>
+    <p class="lede narrow">
+      Podríamos cobrarte un porcentaje del "margen defendido". Sería más caro para ti y más
+      rentable para nosotros. No lo hacemos, y el motivo es incómodo: <strong>ese número lo
+      calcularíamos nosotros mismos.</strong>
+    </p>
+
+    <div class="plans">
+      <div class="plan">
+        <span class="pn">Vitrina</span>
+        <span class="pp">$0</span>
+        <span class="pu">para siempre</span>
+        <ul>
+          <li>25 SKU vigilados</li>
+          <li>1 lectura al día</li>
+          <li>Alertas por correo</li>
+          <li>Sin cambio de precio</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <span class="pn">Cinta</span>
+        <span class="pp">$29.900</span>
+        <span class="pu">/mes + IVA</span>
+        <ul>
+          <li>250 SKU vigilados</li>
+          <li>Lectura cada 3 horas</li>
+          <li>2 canales</li>
+          <li>Reglas y sugerencias</li>
+          <li>Aplicas tú, con un clic</li>
+        </ul>
+      </div>
+      <div class="plan destacado">
+        <span class="pn">Pizarra · el que se vende</span>
+        <span class="pp">$59.900</span>
+        <span class="pu">/mes + IVA</span>
+        <ul>
+          <li>1.000 SKU vigilados</li>
+          <li>Lectura cada 30 min</li>
+          <li>Canales ilimitados</li>
+          <li><b>Cambio automático de precio</b></li>
+          <li><b>Detector de bucle</b></li>
+          <li>Margen defendido medido con grupo de control</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <span class="pn">Mesa</span>
+        <span class="pp">$129.900</span>
+        <span class="pu">/mes + IVA</span>
+        <ul>
+          <li>5.000 SKU vigilados</li>
+          <li>Lectura cada 10 min</li>
+          <li>Reglas por categoría</li>
+          <li>API y webhooks</li>
+          <li>Varias tiendas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note amber" style="margin-top:20px">
+      <span class="kicker">La aritmética de la comisión, con los números a la vista</span>
+      <p style="margin:0 0 8px">
+        Una tienda que vende <b>$30.000.000</b> al mes con 30% de margen bruto gana <b>$9.000.000</b> de margen.
+        Si Cotejia le mejora el margen efectivo en 1,5 puntos, son <b class="up">$450.000</b> más al mes.
+        Una comisión del 15% sobre eso serían <b>$67.500</b> — más que el plan Pizarra ($59.900).
+      </p>
+      <p style="margin:0">
+        <b>Pero:</b> ese 1,5 punto es un contrafactual. Nadie sabe qué habría pasado si no cambiabas el precio —
+        salvo nosotros, que lo calcularíamos. <b>Un proveedor que mide su propio valor y te factura sobre esa
+        medición tiene un conflicto de interés estructural</b>, y además la comisión sobre margen empuja al sistema
+        a subir precios aunque pierdas ventas. Cobramos una suscripción plana: para la tienda de arriba es el
+        <b>0,2% de sus ventas</b> y el <b>13% del margen extra</b> que le devolvemos. Si no se lo devolvemos, se va —
+        y es lo correcto.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <span class="kicker">Postura explícita</span>
+    <h2>Sobre mirar precios ajenos</h2>
+    <div class="grid g2">
+      <div>
+        <p style="color:var(--ink-2)">
+          Un precio publicado en una vitrina es información pública de mercado. No es un dato personal,
+          no está detrás de un login y cualquier comprador lo ve. Leerlo con un programa no es distinto,
+          en esencia, de mirarlo con los ojos. <strong>Pero eso no nos da permiso para todo</strong>, y
+          preferimos decir dónde está la raya:
+        </p>
+        <ul class="clean">
+          <li><strong>Primero la API oficial.</strong> Mercado Libre —que es cerca del 70% del volumen que
+            miramos— tiene API pública. La usamos con nuestra app registrada y respetamos su límite de tasa.</li>
+          <li><strong>Donde no hay API</strong>, leemos la misma página pública que ve tu navegador:
+            respetando <code>robots.txt</code>, con un User-Agent que dice quiénes somos
+            (<code>CotejiaBot/1.0</code>), una request cada pocos segundos por dominio y backoff ante un 429.</li>
+          <li><strong>Nunca detrás de un login</strong>, nunca saltando un captcha, nunca datos personales
+            de nadie, nunca republicando catálogos ajenos.</li>
+          <li><strong>Si un marketplace nos pide parar, paramos</strong> — y te avisamos ese mismo día que
+            ese canal quedó sin cobertura. No te vamos a cobrar por un dato que dejamos de tener.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="kicker mute">El riesgo, dicho de frente</span>
+        <p style="font-size:.92rem;color:var(--ink-2)">
+          Que Falabella o Paris cambien sus términos y nos bloqueen es un riesgo real, no teórico.
+          Si pasa, Cotejia pierde cobertura en ese canal y el producto vale menos.
+        </p>
+        <p style="font-size:.92rem;color:var(--ink-2)">
+          Por eso el núcleo del producto está apoyado en la API oficial de Mercado Libre, que es un
+          contrato y no una tolerancia; y por eso este riesgo aparece escrito como
+          <a href="roadmap.html">criterio de muerte en el roadmap</a>, no escondido en un pie de página.
+        </p>
+        <p style="font-size:.92rem;color:var(--ink-2);margin-bottom:0">
+          Un producto que depende de raspar y no lo dice es un producto que te va a dejar botada un martes
+          cualquiera, sin explicación.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <span class="kicker">Preguntas</span>
+    <h2>Lo que todos preguntan</h2>
+    <div class="narrow">
+      <details>
+        <summary>¿Van a bajarme los precios sin que yo sepa?</summary>
+        <p>No, salvo que enciendas el piloto automático — y ahí sólo dentro de las reglas que tú
+          escribiste: nunca bajo tu piso, nunca más cambios de los que autorizaste, nunca persiguiendo
+          a un bot. Cada cambio queda en la bitácora con la regla que lo autorizó y llega a tu correo.
+          Puedes revertir cualquiera con un clic.</p>
+      </details>
+      <details>
+        <summary>¿Y si mi competencia también usa un repricer?</summary>
+        <p>Es exactamente el caso que más nos importa. Si los dos persiguen al otro, los dos terminan
+          vendiendo a pérdida. Cotejia detecta el patrón —respuestas en minutos, siempre con el mismo
+          delta— congela tu precio y te avisa. El que se sale del bucle primero conserva su margen; el
+          otro se queda vendiendo barato y solo.</p>
+      </details>
+      <details>
+        <summary>¿Necesito saber de tecnología?</summary>
+        <p>Necesitas saber tu costo. Eso es todo. La conexión es un botón de "autorizar" en Mercado Libre
+          o en tu tienda; el catálogo lo leemos nosotros. Si no tienes los costos cargados, te mostramos
+          igual dónde estás caro o barato, pero sin piso de margen no encendemos el piloto automático:
+          sería irresponsable.</p>
+      </details>
+      <details>
+        <summary>¿Por qué no me igualan siempre al más barato?</summary>
+        <p>Porque el más barato del listado, muy seguido, es alguien sin reputación, sin stock real o un
+          bot que va camino a su propia quiebra. Perseguirlo es correr al fondo. La regla por defecto
+          apunta al <b>segundo</b> más barato. Puedes cambiarla —es tu tienda—, pero te vamos a mostrar,
+          con tus números, cuánto margen te cuesta.</p>
+      </details>
+      <details>
+        <summary>¿Qué pasa si el sistema se equivoca de producto?</summary>
+        <p>Pasa. El emparejamiento automático acierta la gran mayoría de las veces, pero no todas: hay
+          títulos que mienten y variantes que se parecen. Cuando el modelo no está seguro, no adivina:
+          te lo pregunta y no cambia nada hasta que confirmes. Un emparejamiento errado que baja un
+          precio es el peor error posible, y lo tratamos como tal.</p>
+      </details>
+      <details>
+        <summary>¿Hay alguien humano ahí?</summary>
+        <p>No, y no te vamos a decir que sí. Cotejia se vende, se entrega, se cobra y se soporta sola.
+          Si escribes al soporte te responde un agente automático que tiene acceso de lectura a tu cuenta
+          y sabe explicarte por qué el motor sugirió lo que sugirió. Cuando no sabe, te lo dice y te deja
+          un ticket. No hay un vendedor esperando llamarte, y no lo va a haber.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="wrap" style="text-align:center">
+    <h2>Deja de mirar precios a mano.</h2>
+    <p class="lede" style="margin-left:auto;margin-right:auto">
+      El demo trae una tienda con nueve productos, tres marketplaces y una guerra de precios en curso.
+      Se recorre entero, en el teléfono, sin registrarte.
+    </p>
+    <div class="hero-cta" style="justify-content:center">
+      <a class="btn" href="demo/index.html">Abrir la pizarra</a>
+      <a class="btn ghost" href="negocio.html">Ver el negocio</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Cotejia · cotejia.com · Santiago de Chile · Prototipo. Datos de demostración: la tienda,
+      los competidores y los precios son ficticios; los productos y los marketplaces, reales.</p>
+    <p><a href="../index.html">← Volver a las ideas</a></p>
+  </div>
+</footer>
+
+<script>
+/* ---------- cinta + mini pizarra en vivo ---------- */
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const CLP = n => "$" + Math.round(n).toLocaleString("es-CL");
+const CLPs = n => (n >= 0 ? "+" : "−") + "$" + Math.abs(Math.round(n)).toLocaleString("es-CL");
+
+const CINTA = [
+  ["TK-1042", "Termo Stanley 1,4 L", 39990, -7000],
+  ["TK-2210", "Freidora Oster 5,5 L", 52990, 0],
+  ["TK-3301", "Adidas Runfalcon 3.0", 44990, 0],
+  ["TK-1180", "Saco Doite Rapel 2", 32990, 0],
+  ["TK-1501", "Carpa Coleman Sundome 4P", 109990, -1500],
+  ["TK-4020", "JBL Flip 6", 89990, 0],
+  ["TK-2760", "Mochila Totto Tracer 3", 39990, 750],
+  ["TK-5090", "Oxford Baltoro aro 29", 279990, -1500],
+  ["TK-3910", "Sartenes Tramontina 3p", 34990, -1010]
+];
+document.getElementById("tickTrack").innerHTML = (() => {
+  const its = CINTA.map(([sku, n, p, d]) => {
+    const cls = d > 0 ? "up" : d < 0 ? "down" : "hold";
+    const fl = d > 0 ? "▲" : d < 0 ? "▼" : "—";
+    return '<span class="tick"><b>' + sku + '</b> ' + n + ' ' + CLP(p) +
+      ' <span class="' + cls + '">' + fl + ' ' + (d ? CLPs(d) : "0") + '</span></span>';
+  }).join("");
+  return its + its;
+})();
+
+/* mini pizarra: tres filas, con la sugerencia y su regla */
+const FILAS = [
+  {
+    n: "Termo Stanley Classic 1,4 L", sub: "Mercado Libre · costo $28.400 · 96 u/mes",
+    p: 39990, comp: 39500, compT: "MegaStock SPA",
+    tag: '<span class="tag down">◼ Congelar</span>',
+    rc: '<b>R0 · Bucle</b> · MegaStock respondió 14 de 14 veces en menos de 7 min, siempre con −$490. Es un bot. Congelo 24 h.'
+  },
+  {
+    n: "Saco de dormir Doite Rapel 2", sub: "Mercado Libre · costo $19.900 · 48 u/mes",
+    p: 32990, comp: 36190, compT: "CasaOutdoor",
+    tag: '<span class="tag up">▲ Subir a $36.180</span>',
+    rc: '<b>R2 · Plata sobre la mesa</b> · Eres el más barato por $3.200 y vendiste 48 unidades este mes. Subo $3.190 y sigues siendo el más barato: <b>$153.120/mes</b> que hoy regalas.'
+  },
+  {
+    n: "Zapatilla Adidas Runfalcon 3.0", sub: "Falabella · costo $27.900 · 92 u/mes",
+    p: 44990, comp: 41990, compT: "TiendaExpress2020",
+    tag: '<span class="tag hold">— No bajar</span>',
+    rc: '<b>R4 · Ventaja de despacho</b> · Aparece $3.000 más barato, pero cobra $3.990 de envío: total $45.980 contra tus $44.990 con envío gratis. Bajar te costaría $276.920/mes y no te trae una venta más.'
+  }
+];
+document.getElementById("boardRows").innerHTML = FILAS.map((f, i) =>
+  '<div class="brow">' +
+    '<span class="nm">' + f.n + '</span>' +
+    '<span class="sub">' + f.sub + '</span>' +
+    '<span class="px"><span class="p" id="bp' + i + '">' + CLP(f.p) + '</span>' +
+    '<span class="d mono" id="bd' + i + '">vs ' + CLP(f.comp) + ' ' + f.compT + '</span></span>' +
+    '<span class="rc"><span class="rule-chip">' + f.rc + '</span>' +
+    '<span style="display:inline-block;margin-top:8px">' + f.tag + '</span></span>' +
+  '</div>').join("");
+
+/* el mercado se mueve: un competidor cambia el precio cada tanto */
+if (!RM) {
+  setInterval(() => {
+    const i = Math.floor(Math.random() * FILAS.length);
+    const f = FILAS[i];
+    f.comp += (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.7 ? 90 : 490);
+    f.comp = Math.round(f.comp / 10) * 10;
+    const el = document.getElementById("bd" + i);
+    el.textContent = "vs " + CLP(f.comp) + " " + f.compT;
+    el.className = "d mono " + (f.comp < f.p ? "down" : "up");
+  }, 3400);
+}
+
+/* ---------- menú móvil ---------- */
+document.getElementById("menuBtn").onclick = function () {
+  const d = document.getElementById("drawer");
+  const open = d.classList.toggle("open");
+  this.setAttribute("aria-expanded", open ? "true" : "false");
+};
+</script>
+</body>
+</html>

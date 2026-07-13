@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuantario · El portafolio de ideas que se opera solo</title>
+<meta name="description" content="Cuantario reparte presupuesto entre 21 ideas, las promociona por canales legítimos, mide gasto contra ingreso y una IA jueza decide si escalar, mantener, reducir, pausar o matar — contra criterios que la idea firmó antes de recibir el primer peso.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&family=Martian+Mono:wght@600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="cuantario.css">
+<style>
+  .hero { padding-block: var(--sp-xl) var(--sp-l); border-bottom: 1px solid var(--line); }
+  .hero h1 { font-size: var(--step-4); max-width: 17ch; margin-bottom: var(--sp-s); }
+  .hero .baja { font-family: var(--prosa); font-size: 1.06rem; line-height: 1.62; color: var(--ink-2); max-width: 54ch; }
+  .hero .baja b { color: var(--ink); }
+  .cta { display: flex; gap: var(--sp-xs); flex-wrap: wrap; margin-top: var(--sp-m); }
+  .cta .btn-in { background: var(--in); color: #06170E; border-color: var(--in); font-weight: 700; }
+  .cta .btn-in:hover { background: #3FE28C; }
+
+  .cifras { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line);
+            border: 1px solid var(--line); margin-top: var(--sp-l); }
+  @media (min-width: 48em) { .cifras { grid-template-columns: repeat(4, 1fr); } }
+  .cifras > div { background: var(--bg); padding: var(--sp-s); }
+  .cifras .v { display: block; font-size: 1.3rem; font-weight: 600; font-variant-numeric: tabular-nums;
+               letter-spacing: -.02em; margin-top: 3px; }
+  .cifras .n { display: block; font-size: .68rem; color: var(--ink-3); margin-top: 3px; }
+
+  .piezas { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (min-width: 48em) { .piezas { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 76em) { .piezas { grid-template-columns: repeat(3, 1fr); } }
+  .pieza { background: var(--s1); padding: var(--sp-m) var(--sp-s); }
+  .pieza .ix { width: 26px; height: 26px; color: var(--in); margin-bottom: var(--sp-xs); display: block; }
+  .pieza h3 { margin-bottom: 6px; }
+  .pieza p { font-size: .82rem; color: var(--ink-2); margin: 0; line-height: 1.6; }
+  .pieza p b { color: var(--ink); }
+
+  .dos { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .dos { grid-template-columns: 1fr 1fr; gap: var(--sp-xl); } }
+
+  .faq dt { font-family: var(--disp); font-weight: 700; font-size: .84rem; margin-top: var(--sp-m); }
+  .faq dd { margin: 6px 0 0; font-family: var(--prosa); font-size: .94rem; line-height: 1.65; color: var(--ink-2); }
+  .faq dd b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="index.html">
+      <svg class="glifo" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 10.5 L6.6 6.2 L9.2 8.6 L12 3.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      Cuantario
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Qué es</a></li>
+        <li><a href="demo/index.html">Tablero</a></li>
+        <li><a href="arquitectura.html">Arquitectura</a></li>
+        <li><a href="integracion.html">Integración</a></li>
+        <li><a href="economia.html">Economía</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="kicker">El sistema meta · no es una idea, es la máquina que las opera</span>
+    <h1>Veintiuna ideas. Un dueño. Cero personas en el loop.</h1>
+    <p class="baja">
+      Cuantario le da presupuesto a cada idea del repositorio, la promociona por canales que se pueden
+      automatizar sin quemarlos, mide lo que gastó contra lo que entró, y <b>una IA jueza decide si
+      escalar, mantener, reducir, pausar o matar</b> — evaluándola contra los criterios que esa misma
+      idea escribió, en frío, antes de recibir el primer peso.
+    </p>
+    <p class="baja" style="margin-top:var(--sp-s)">
+      El dueño mira un tablero. Nada más.
+    </p>
+    <div class="cta">
+      <a class="btn btn-in" href="demo/index.html" style="display:inline-flex;align-items:center">Abrir el tablero</a>
+      <a class="btn" href="integracion.html" style="display:inline-flex;align-items:center">Cómo se enchufa una idea</a>
+    </div>
+
+    <div class="cifras">
+      <div><span class="rot">Ideas en operación</span><span class="v">16 <span class="mut" style="font-size:.8rem">de 21</span></span><span class="n">5 no se enchufan, y está bien</span></div>
+      <div><span class="rot">Costo de correr el sistema</span><span class="v">$536.977<span class="mut" style="font-size:.8rem">/mes</span></span><span class="n">Fijo $446.689 + $5.643 × 16 ideas</span></div>
+      <div><span class="rot">Se paga solo desde</span><span class="v">2 ideas</span><span class="n">Con su construcción amortizada a 24 meses</span></div>
+      <div><span class="rot">Capital que el juez no dejó gastar</span><span class="v in">$5.170.000</span><span class="n">Una idea matada, otra pausada</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EL PROBLEMA ============ -->
+<section class="wrap">
+  <div class="dos">
+    <div>
+      <span class="kicker">El problema</span>
+      <h2 style="margin-bottom:var(--sp-s)">Un humano puede correr dos ideas. Y jamás mata la suya.</h2>
+      <div class="prosa">
+        <p>
+          En este repositorio hay 21 ideas. Cada una necesita campañas, creatividades, un embudo medido
+          y alguien que revise los números todas las semanas y decida qué hacer con la plata.
+          Un operador de <i>growth</i> decente lleva bien <b>dos</b> a la vez. Veintiuna serían
+          once personas y <b>$25.300.000 al mes</b> en sueldos.
+        </p>
+        <p>
+          Pero el problema caro no es el sueldo. Es el sesgo.
+        </p>
+        <p>
+          <b>Nadie mata su propia idea.</b> El fundador que lleva seis meses y $3.400.000 gastados en una
+          apuesta que no convierte no escribe «se acabó»: escribe «hay que iterar el mensaje». Encuentra
+          la razón. Siempre la encuentra. Ese es el costo hundido operando como si fuera estrategia, y es
+          exactamente el sesgo que desaparece cuando el que decide no es el que se enamoró.
+        </p>
+        <p>
+          El contrato de este repositorio ya obligó a cada idea a escribir <b>sus criterios de muerte</b>:
+          la observación concreta que debería hacerla parar. Están ahí, en los <code>roadmap.html</code>,
+          escritos cuando todavía éramos honestos. Nunca nadie los ejecutó.
+        </p>
+        <p><b>Cuantario los ejecuta.</b></p>
+      </div>
+    </div>
+
+    <div>
+      <span class="kicker">El lazo</span>
+      <h2 style="margin-bottom:var(--sp-s)">Cómo funciona, en un dibujo.</h2>
+      <figure>
+        <svg viewBox="0 0 460 330" class="g" role="img" aria-labelledby="lazo-t">
+          <title id="lazo-t">El lazo de operación: el manifiesto de la idea entra al kernel de cumplimiento; el kernel deja pasar sólo las acciones permitidas hacia los canales y los bandits; los canales generan métricas; las métricas alimentan al juez; el juez reasigna presupuesto y su decisión vuelve a entrar por el kernel, siempre dentro del tope.</title>
+          <defs>
+            <marker id="fl" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L8 4 L0 8 z" fill="#8FA0AC"/>
+            </marker>
+            <marker id="flv" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L8 4 L0 8 z" fill="#2ED47F"/>
+            </marker>
+          </defs>
+          <!-- manifiesto -->
+          <rect x="172" y="6" width="156" height="34" fill="none" stroke="#2ED47F" stroke-width="1.4"/>
+          <text x="250" y="22" class="gxl" fill="#2ED47F" text-anchor="middle">autopilot.json</text>
+          <text x="250" y="33" class="gx" text-anchor="middle">el único acoplamiento</text>
+
+          <!-- kernel -->
+          <rect x="138" y="66" width="224" height="46" fill="#171D21" stroke="#FF5B4E" stroke-width="1.4"/>
+          <text x="250" y="84" class="gxl" fill="#FF5B4E" text-anchor="middle">Kernel de cumplimiento</text>
+          <text x="250" y="97" class="gx" text-anchor="middle">bloquea la acción · no la recomienda</text>
+          <text x="250" y="107" class="gx" fill="#7C8892" text-anchor="middle">falla cerrado</text>
+
+          <!-- canales -->
+          <rect x="56" y="140" width="180" height="46" fill="none" stroke="#37434c" stroke-width="1.2"/>
+          <text x="146" y="158" class="gxl" text-anchor="middle">Canales</text>
+          <text x="146" y="171" class="gx" text-anchor="middle">ads · marca propia · SEO</text>
+          <text x="146" y="181" class="gx" text-anchor="middle">email · WhatsApp · voz</text>
+
+          <!-- bandits -->
+          <rect x="264" y="140" width="180" height="46" fill="none" stroke="#37434c" stroke-width="1.2"/>
+          <text x="354" y="158" class="gxl" text-anchor="middle">Bandits</text>
+          <text x="354" y="171" class="gx" text-anchor="middle">reparten el presupuesto</text>
+          <text x="354" y="181" class="gx" text-anchor="middle">n ≥ 30 antes de mover</text>
+
+          <!-- métricas -->
+          <rect x="138" y="214" width="224" height="44" fill="none" stroke="#37434c" stroke-width="1.2"/>
+          <text x="250" y="229" class="gxl" text-anchor="middle">Métricas</text>
+          <text x="250" y="241" class="gx" text-anchor="middle">visita · registro · activación</text>
+          <text x="250" y="252" class="gx" text-anchor="middle">pago · churn</text>
+
+          <!-- juez -->
+          <rect x="138" y="278" width="224" height="46" fill="#171D21" stroke="#2ED47F" stroke-width="1.4"/>
+          <text x="250" y="296" class="gxl" fill="#2ED47F" text-anchor="middle">El juez</text>
+          <text x="250" y="309" class="gx" text-anchor="middle">escalar · mantener · reducir</text>
+          <text x="250" y="319" class="gx" text-anchor="middle">pausar · matar</text>
+
+          <!-- flechas -->
+          <path d="M250 40 V62" stroke="#8FA0AC" stroke-width="1.2" marker-end="url(#fl)"/>
+          <path d="M190 112 V126 H146 V136" stroke="#8FA0AC" stroke-width="1.2" fill="none" marker-end="url(#fl)"/>
+          <path d="M310 112 V126 H354 V136" stroke="#8FA0AC" stroke-width="1.2" fill="none" marker-end="url(#fl)"/>
+          <path d="M146 186 V200 H190 V210" stroke="#8FA0AC" stroke-width="1.2" fill="none" marker-end="url(#fl)"/>
+          <path d="M354 186 V200 H310 V210" stroke="#8FA0AC" stroke-width="1.2" fill="none" marker-end="url(#fl)"/>
+          <path d="M250 258 V274" stroke="#8FA0AC" stroke-width="1.2" marker-end="url(#fl)"/>
+          <!-- retorno del juez: vuelve a entrar POR el kernel, no lo esquiva -->
+          <path d="M138 301 H22 V89 H134" stroke="#2ED47F" stroke-width="1.2" fill="none"
+                stroke-dasharray="4 3" marker-end="url(#flv)"/>
+          <text x="13" y="195" class="gx" fill="#2ED47F" transform="rotate(-90 13 195)" text-anchor="middle">reasigna presupuesto</text>
+        </svg>
+        <figcaption>
+          Fíjate en la flecha de vuelta: <b>el juez no le habla a los canales.</b> Su decisión vuelve a
+          entrar por el kernel, igual que cualquier otra acción. Si el juez pide subir un tope, el kernel
+          lo rechaza — y lo rechaza <em>a él</em>.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ LAS PIEZAS ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="kicker">Las cinco piezas</span>
+  <h2 style="margin-bottom:var(--sp-m)">Un kernel, unos canales, unos bandits, un juez y un tablero.</h2>
+
+  <div class="piezas">
+    <div class="pieza">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="20" height="20" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 8 L18 18 M18 8 L8 18" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <h3>El núcleo de cumplimiento</h3>
+      <p>
+        <b>Bloquea acciones. No las recomienda.</b> Sin humano que ataje un error, la escala lo amplifica
+        diez mil veces. Un prompt se puede convencer; un kernel no. El argumento es económico antes que
+        ético: <b>el canal es el activo</b>, y un sistema que hace astroturfing se quema Meta, X y su
+        propio dominio en semanas.
+      </p>
+    </div>
+
+    <div class="pieza">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M13 3 V8 M13 18 V23 M3 13 H8 M18 13 H23 M6 6 L9.5 9.5 M16.5 16.5 L20 20 M20 6 L16.5 9.5 M9.5 16.5 L6 20"
+              stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <h3>Los canales</h3>
+      <p>
+        Anuncios por API (Meta, Google, TikTok — la plataforma los rotula). Cuentas propias de marca
+        hablando con su nombre. SEO programático en dominio propio. Email y WhatsApp <b>sólo a quien se
+        registró</b>. Voz entrante, o saliente sólo a quien dejó su número. Todo automatizable de punta
+        a punta, y nada de eso quema un canal.
+      </p>
+    </div>
+
+    <div class="pieza">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <path d="M4 22 V14 M10 22 V6 M16 22 V17 M22 22 V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M2 4 H24" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/>
+      </svg>
+      <h3>El motor de experimentación</h3>
+      <p>
+        Bandits repartiendo presupuesto entre canales y creatividades, con honestidad estadística:
+        <b>nada de declarar un ganador con 12 conversiones</b>. Tamaño mínimo de muestra y prueba
+        secuencial antes de mover un peso. En el tablero vas a ver al juez negarse a escalar la mejor
+        idea del portafolio porque le faltan 7 conversiones.
+      </p>
+    </div>
+
+    <div class="pieza">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <path d="M13 3 V23 M5 8 H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M5 8 L2 16 H8 Z M21 8 L18 16 H24 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M9 23 H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h3>El juez</h3>
+      <p>
+        Aplica los criterios que la idea se comprometió de antemano y <b>no puede moverlos</b>.
+        Un juez que puede mover el arco siempre encuentra una razón para seguir gastando — que es
+        justo el sesgo que se elimina al sacar al humano. Opera dentro de los topes; no puede
+        levantarlos. Cada decisión queda con su regla citada y su evidencia.
+      </p>
+    </div>
+
+    <div class="pieza">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="2" y="4" width="22" height="18" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M2 9 H24 M9 9 V22 M15 13 H21 M15 17 H19" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <h3>El tablero</h3>
+      <p>
+        Gasto contra ingreso por idea y por portafolio. CAC, payback, activación, churn, runway.
+        La bitácora del juez con la regla que aplicó. Y — lo que casi ningún sistema autónomo muestra —
+        <b>las acciones que el kernel bloqueó</b>. Un sistema sin bitácora de lo que <em>no</em> hizo
+        no se puede auditar.
+      </p>
+    </div>
+
+    <div class="pieza" style="border-left:2px solid var(--in)">
+      <svg class="ix" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <path d="M6 3 H16 L21 8 V23 H6 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 3 V8 H21" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9.5 13 H17 M9.5 17 H14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <h3>El manifiesto <code style="font-size:.78rem">autopilot.json</code></h3>
+      <p>
+        <b>El único punto de acoplamiento.</b> El sistema no sabe nada de una idea salvo lo que ese
+        archivo dice. Una idea futura se enchufa escribiéndolo — sin tocar una línea de Cuantario.
+        Esto es lo que hace al sistema reutilizable, y es la pieza que más importa.
+        <a href="integracion.html" style="color:var(--in)">Campo por campo →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ HONESTIDAD ============ -->
+<section class="wrap" style="padding-top:0">
+  <div class="dos">
+    <div>
+      <span class="kicker">Lo que este sistema NO es</span>
+      <h2 style="margin-bottom:var(--sp-s)">Cinco de las veintiuna ideas no se enchufan. Decir que sí sería cómodo y falso.</h2>
+      <div class="prosa">
+        <p>
+          Las cinco ideas de minería (<b>11-correas, 12-seguridad, 13-contratistas, 14-permisos y
+          15-agua</b>) tienen ciclos de venta de 8 semanas a 18 meses, exigen un piloto firmado, una
+          homologación en faena y —tres de las cinco— <b>hardware instalado en terreno</b>. No hay
+          campaña de anuncios que convierta a un gerente de operaciones que compra con una orden de
+          compra de $28.000.000 y un comité.
+        </p>
+        <p>
+          Enchufarlas no sería ambición: sería quemar presupuesto contra un embudo que no existe.
+          El sistema les asigna <b>$0</b> y lo dice en el tablero.
+        </p>
+        <p>
+          <b>16-finakids es parcial</b>: la línea de familias a $4.990/mes se automatiza entera; el
+          contrato con el banco a $54.000.000 al año pasa por un comité legal y un RFP, y eso no lo
+          hace una máquina. Cuantario opera la primera y no toca la segunda.
+        </p>
+        <p>
+          Un sistema meta que dijera «todas pueden» sería un sistema que no leyó las ideas.
+          <a href="integracion.html">La tabla completa, con el motivo de cada una →</a>
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <span class="kicker">Preguntas incómodas</span>
+      <h2 style="margin-bottom:var(--sp-s)">Las que haría alguien que desconfía.</h2>
+      <dl class="faq">
+        <dt>¿De verdad no hay ningún humano?</dt>
+        <dd>
+          No hay ninguno <b>en el loop de decisión</b>: nadie aprueba una campaña, nadie perdona un
+          criterio de muerte. Pero sí hay <b>4 horas al mes</b> de mantención de plataforma —
+          una API que se deprecia, una cuenta publicitaria que hay que apelar. Están en el costo
+          ($128.000/mes) y no las escondemos. Decir «cero humanos» a secas sería el tipo de afirmación
+          que este mismo kernel bloquearía.
+        </dd>
+
+        <dt>¿Qué impide que el juez se convenza a sí mismo?</dt>
+        <dd>
+          Que <b>no escribe los criterios y no puede editarlos</b>. Los lee de un archivo firmado antes
+          de que existiera gasto. Y no puede levantar un tope: cuando pidió subir el de 05-contratos de
+          +40% a +70%, <b>el kernel se lo negó</b> y quedó registrado. Está en el tablero.
+        </dd>
+
+        <dt>¿Y si el juez se equivoca y mata algo bueno?</dt>
+        <dd>
+          Pasa, y es el precio. Pero el criterio que lo mató lo escribió la idea, no el juez, y matar
+          barato temprano cuesta menos que un zombi caro durante dos años. En el ciclo mostrado, matar
+          04-inventario y pausar 08-laboral <b>preservó $5.170.000</b> — casi diez meses de operación
+          del sistema completo.
+        </dd>
+
+        <dt>¿Por qué no hacer astroturfing si funciona?</dt>
+        <dd>
+          Porque no funciona: <b>el canal es el activo</b>. Meta cierra la cuenta publicitaria, Reddit
+          marca el dominio, la operadora quema el número. Un sistema autónomo que se quema sus propios
+          canales no es un negocio autónomo — es una máquina de destruir activos rápido. Y a eso se le
+          suman la Ley 19.496, la Ley 19.628 y el registro No Molestar.
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="cta" style="margin-top:var(--sp-xl)">
+    <a class="btn btn-in" href="demo/index.html" style="display:inline-flex;align-items:center">Ver el tablero funcionando</a>
+    <a class="btn" href="economia.html" style="display:inline-flex;align-items:center">Cuánto cuesta correrlo</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    Cuantario · <code>cuantario.com</code> verificado libre el 13-07-2026 (RDAP Verisign, HTTP 404).
+    Prototipo navegable: el tablero corre con datos mock aritméticamente consistentes, no con plata real.
+  </div>
+</footer>
+
+<script src="comun.js"></script>
+</body>
+</html>

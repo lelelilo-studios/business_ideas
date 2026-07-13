@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Cotejia</title>
+<meta name="description" content="Modelo de datos, agentes de IA, el detector de bucle, APIs a contratar, variables de entorno, costo mensual con la aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  pre {
+    font-family: var(--mono); font-size: .76rem; line-height: 1.6;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-left: 2px solid var(--amber-dim);
+    border-radius: var(--r); padding: 14px; overflow-x: auto;
+    color: var(--ink-2); margin: 0 0 16px;
+  }
+  pre b { color: var(--ink); font-weight: 500; }
+  pre .c { color: var(--ink-3); }
+  pre .k { color: var(--amber); }
+  .calc {
+    font-family: var(--mono); font-size: .82rem; font-variant-numeric: tabular-nums;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-left: 2px solid var(--amber-dim);
+    border-radius: var(--r); padding: 12px 14px; color: var(--ink-2); overflow-x: auto;
+  }
+  .calc b { color: var(--ink); font-weight: 500; }
+  .calc .sup { color: var(--ink-3); }
+  h2 { scroll-margin-top: 70px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none; }
+  .toc a {
+    font-family: var(--mono); font-size: .72rem; color: var(--ink-2);
+    border: 1px solid var(--line-2); border-radius: var(--r);
+    padding: 7px 10px; display: inline-block; min-height: 38px; line-height: 24px;
+  }
+  .toc a:hover { border-color: var(--amber); color: var(--amber); text-decoration: none; }
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html"><span class="dot" aria-hidden="true"></span>COTEJIA</a>
+    <div class="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">Menú</button>
+  </div>
+  <div class="nav-drawer" id="drawer">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html" aria-current="page">Arquitectura</a>
+  </div>
+</nav>
+
+<main id="contenido">
+
+<section class="wrap">
+  <span class="kicker">Arquitectura</span>
+  <h1>Qué habría que configurar para que esto exista de verdad.</h1>
+  <p class="lede narrow">
+    Nada de lo que sigue está aprovisionado: está <strong>documentado</strong>. Y una advertencia que
+    va primero porque es la más importante:
+    <strong>el motor de precios no es un modelo de lenguaje.</strong> Es aritmética determinista, con
+    tests, que corre en milisegundos y da siempre el mismo resultado. La IA hace otras tres cosas,
+    y ninguna de ellas es decidir tu precio.
+  </p>
+  <ul class="toc">
+    <li><a href="#no-ia">Dónde NO hay IA</a></li>
+    <li><a href="#datos">Modelo de datos</a></li>
+    <li><a href="#lectores">Lectores</a></li>
+    <li><a href="#bucle">Detector de bucle</a></li>
+    <li><a href="#agentes">Agentes de IA</a></li>
+    <li><a href="#terceros">APIs a contratar</a></li>
+    <li><a href="#env">Variables de entorno</a></li>
+    <li><a href="#costo">Costo mensual</a></li>
+    <li><a href="#falso">Qué está falseado</a></li>
+    <li><a href="#dominio">Dominio</a></li>
+  </ul>
+</section>
+
+<section class="wrap">
+  <h2 id="no-ia">Dónde NO hay IA, y por qué</h2>
+  <div class="grid g2">
+    <div class="card" style="border-left:2px solid var(--down)">
+      <span class="kicker" style="color:var(--down)">Prohibido meterle un LLM</span>
+      <ul class="clean">
+        <li><b>La decisión de precio.</b> Determinista, auditable, con tests unitarios. Si un cliente
+          pregunta "¿por qué me sugeriste $36.180?", la respuesta tiene que ser una regla y una resta,
+          no "el modelo lo consideró apropiado". Un LLM decidiendo precios es un generador de
+          alucinaciones con acceso a tu margen.</li>
+        <li><b>El piso de margen.</b> Es un <code>if</code>. No se le pregunta a nadie.</li>
+        <li><b>El detector de bucle.</b> Es estadística de series de tiempo (abajo está el algoritmo).
+          Un LLM aquí sería más caro, más lento y menos confiable.</li>
+        <li><b>El tope de cambios diarios.</b> Un contador.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:2px solid var(--up)">
+      <span class="kicker">Ahí sí, y se gana el sueldo</span>
+      <ul class="clean">
+        <li><b>Emparejar productos.</b> "Termo Stanley Classic 1,4L verde original" vs "Stanley Legendary
+          Classic 1.4 lts verde con garantía". <b>Este es el problema difícil de verdad</b>, no tiene
+          solución con reglas, y en Mercado Libre no hay ASIN que te salve.</li>
+        <li><b>Autorreparar los lectores</b> cuando un marketplace cambia su HTML.</li>
+        <li><b>Explicarle al cliente</b> lo que el motor hizo, en su idioma, con sus números.</li>
+        <li><b>Escribir el contenido SEO</b> sobre datos que ya tenemos.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="datos">Modelo de datos</h2>
+  <pre><span class="c">-- PostgreSQL. Las series de precios son el activo: todo lo demás se puede reconstruir.</span>
+
+<b>tienda</b>            id · rut · razon_social · email · plan · estado_pago · creada_en
+                  oauth_ml_token · oauth_ml_refresh · oauth_jumpseller_token · …
+
+<b>producto</b>          id · tienda_id · sku · titulo · marca · modelo · ean
+                  <span class="k">costo_clp</span>          <span class="c">-- sin esto no hay piso de margen, y sin piso no hay piloto</span>
+                  precio_actual_clp · stock · ventas_30d · categoria
+                  canal (ml | falabella | paris | ripley | jumpseller | shopify)
+                  listing_id_externo
+
+<b>oferta_rival</b>      id · producto_id · marketplace · vendedor · vendedor_id_externo
+                  url · reputacion · envio_gratis · envio_costo_clp
+                  <span class="k">confianza_match</span>    <span class="c">-- 0..1, la da el emparejador</span>
+                  <span class="k">confirmado_por_cliente</span> <span class="c">-- bool. Si confianza &lt; 0.85, esto manda.</span>
+                  es_bot            <span class="c">-- lo marca el detector de bucle</span>
+
+<b>lectura_precio</b>    id · oferta_rival_id | producto_id · precio_clp · envio_clp
+                  stock · posicion_listado · leido_en   <span class="c">-- ~400k filas/mes/cliente</span>
+                  <span class="c">Particionada por mes. Retención caliente 90 días, luego a objeto frío.</span>
+
+<b>regla</b>             id · tienda_id · ambito (global | categoria | sku)
+                  piso_margen_pct · max_cambios_dia · bajada_max_clp
+                  objetivo (segundo | primero | mediana)
+                  respetar_ventaja_envio · cortar_bucle · auto_aplicar
+
+<b>sugerencia</b>        id · producto_id · accion (SUBIR|BAJAR|MANTENER|CONGELAR)
+                  precio_sugerido_clp · <span class="k">regla_id · regla_texto</span>
+                  plata_en_juego_clp · generada_en
+                  estado (pendiente | aplicada | ignorada | bloqueada)
+                  <span class="c">regla_texto se guarda literal: si mañana cambia el motor, la</span>
+                  <span class="c">explicación que vio el cliente ese día no cambia. Es su bitácora.</span>
+
+<b>cambio_precio</b>     id · producto_id · precio_antes · precio_despues
+                  sugerencia_id · origen (auto | manual) · aplicado_en
+                  respuesta_marketplace · revertido_en
+
+<b>bucle</b>             id · producto_id · oferta_rival_id · detectado_en
+                  n_respuestas · latencia_mediana_seg · delta_mediano_clp
+                  margen_quemado_clp · congelado_hasta
+
+<b>holdout</b>           producto_id · grupo (tratado | control) · asignado_en
+                  <span class="c">10% al azar por cuenta. Es la prueba del hito M4 del roadmap.</span>
+
+<b>bloqueo_kernel</b>    id · tienda_id · accion_intentada · regla_violada · ts
+                  <span class="c">Todo lo que el sistema se negó a hacer. Sin esto no hay auditoría.</span></pre>
+</section>
+
+<section class="wrap">
+  <h2 id="lectores">Los lectores (donde vive el riesgo)</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Canal</th><th>Cómo se lee</th><th class="t-r">% del volumen</th><th>Riesgo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>Mercado Libre</b></td>
+          <td><b>API oficial</b> (<code>/sites/MLC/search</code>, <code>/items</code>). App registrada,
+            OAuth del vendedor, rate limit respetado. Es un contrato, no una tolerancia.</td>
+          <td class="t-r">~70%</td>
+          <td><span class="tag up">Bajo</span></td>
+        </tr>
+        <tr>
+          <td><b>Falabella / Paris / Ripley</b></td>
+          <td>Lectura del mismo endpoint público de búsqueda que usa su propio sitio.
+            <code>robots.txt</code> respetado, User-Agent <code>CotejiaBot/1.0 (+cotejia.com/bot)</code>,
+            1 request cada 4 s por dominio, backoff exponencial ante 429/503, sin login, sin captcha,
+            sin datos personales.</td>
+          <td class="t-r">~25%</td>
+          <td><span class="tag down">Alto</span> <small>ver M3</small></td>
+        </tr>
+        <tr>
+          <td><b>Tiendas propias</b> (Jumpseller, Shopify, Bsale)</td>
+          <td>API oficial con OAuth del cliente. Es su propia tienda: nos autoriza él.</td>
+          <td class="t-r">~5%</td>
+          <td><span class="tag up">Bajo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note warn" style="margin-top:14px">
+    <b>La postura, otra vez, porque es donde más fácil se resbala uno:</b> un precio de vitrina es
+    información pública de mercado y leerlo con un programa no es raspar datos personales — no hay
+    persona en un precio. Pero <b>público no significa "todo vale"</b>: respetamos
+    <code>robots.txt</code>, nos identificamos, no sobrecargamos, no entramos detrás de un login, no
+    republicamos catálogos ajenos y, si un marketplace nos pide parar, <b>paramos ese día</b> y le
+    avisamos al cliente que perdió cobertura en ese canal.
+    <a href="roadmap.html">Está escrito como criterio de muerte en M3</a>, no escondido en los términos.
+  </p>
+
+  <h3 style="margin-top:20px">Cadencia adaptativa (esto es lo que hace que el costo cierre)</h3>
+  <div class="calc">
+    Leer 1.000 SKU cada 30 minutos serían 48.000 lecturas al día por cliente. <b>No hace falta.</b><br>
+    Los precios no se mueven parejo: el 20% de los SKU concentra casi todo el movimiento.<br><br>
+    <b>Nivel A — 20% más volátil</b> (cambió ≥1 vez en los últimos 7 días): cada <b>30 min</b><br>
+    &nbsp;&nbsp;200 SKU × 48 = <b>9.600 lecturas/día</b><br>
+    <b>Nivel B — el resto</b>: cada <b>6 h</b><br>
+    &nbsp;&nbsp;800 SKU × 4 = <b>3.200 lecturas/día</b><br>
+    <b>Total = 12.800 lecturas/día</b>, y como una sola request de listado trae ~4 ofertas del mismo
+    producto: <b>≈3.200 requests/día</b> = <b>96.000 requests/mes</b> por cliente Pizarra.<br>
+    <span class="sup">De esas, ~70% van a la API de Mercado Libre (gratis, con rate limit) y ~30% a
+    lectores HTTP con proxy (28.800/mes × 60 KB ≈ 1,7 GB/mes por cliente).</span>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="bucle">El detector de bucle — el algoritmo, no la metáfora</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Es el corazón del producto y no tiene una línea de IA. Es una prueba de <b>respuesta condicional</b>
+    sobre dos series de tiempo: la mía y la del competidor.
+  </p>
+  <pre><span class="c">Para cada par (mi_producto, oferta_rival) con ≥5 cambios míos en 72 h:</span>
+
+  <b>1. Latencia de respuesta.</b>
+     Para cada cambio mío en t, ¿hubo un cambio del rival en (t, t+30min]?
+     tasa_respuesta = respuestas / mis_cambios
+     latencia_mediana = mediana de (t_rival − t_mio)
+
+  <b>2. Consistencia del delta.</b>
+     delta_i = precio_rival_despues − mi_precio_nuevo
+     cv = desviación_estándar(delta) / |media(delta)|   <span class="c">← coeficiente de variación</span>
+     Un humano no te deja SIEMPRE $490 abajo. Un bot, sí.
+
+  <b>3. Direccionalidad.</b>
+     ¿Todas las respuestas van en la misma dirección que mi cambio? (yo bajo → él baja)
+
+  <b>4. Contraste con un grupo de control.</b>
+     Los otros vendedores del mismo listado, ¿también se movieron? Si TODOS bajaron,
+     no es un bucle contigo: es el mercado. <span class="c">Sin este paso, el detector grita</span>
+     <span class="c">cada vez que hay un CyberDay. Es el paso que la gente olvida.</span>
+
+  <b>DECLARO BUCLE si:</b>
+     tasa_respuesta ≥ 0,70   <b>y</b>   latencia_mediana ≤ 15 min
+     <b>y</b> cv(delta) ≤ 0,25   <b>y</b>   direccionalidad = 100%
+     <b>y</b> el resto del listado NO se movió en el mismo periodo
+     <b>y</b> n ≥ 5 respuestas   <span class="c">← no declaramos un bot con 2 datos</span>
+
+  <b>ACCIÓN:</b> congelar el precio 24 h · marcar oferta_rival.es_bot = true
+          · avisar con la aritmética: cuánto margen quemaste y cuándo cruzas tu piso
+          · NO volver a responderle a ese vendedor aunque baje más</pre>
+  <div class="note amber">
+    <b>El falso positivo que importa:</b> declarar "bot" a un vendedor humano que simplemente revisa
+    precios todos los días a la misma hora. Por eso exigimos latencia ≤15 min <b>y</b> un coeficiente de
+    variación bajísimo <b>y</b> que el resto del listado no se haya movido. Prefiero no detectar un bucle
+    a congelarle el precio a alguien por error: el costo de los dos errores no es simétrico.
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="agentes">Los agentes de IA</h2>
+
+  <h3>1. Emparejador de productos — el que se gana el sueldo</h3>
+  <div class="scroll-x">
+    <table>
+      <tbody>
+        <tr><th style="width:130px">Modelo</th><td><code>claude-haiku-4-5-20251001</code> — barato, rápido, y esta tarea no necesita más.</td></tr>
+        <tr><th>Entrada</th><td>Mi producto (título, marca, modelo, EAN, atributos, categoría) + hasta 10 candidatos del listado del marketplace.</td></tr>
+        <tr><th>Salida</th><td>JSON estricto: <code>[{oferta_id, es_el_mismo: bool, confianza: 0..1, motivo: "…"}]</code></td></tr>
+        <tr><th>Herramientas</th><td>Ninguna. Es clasificación pura sobre texto. Un agente con herramientas aquí sería sobre-ingeniería cara.</td></tr>
+        <tr><th>La regla dura</th><td><b>Si <code>confianza &lt; 0,85</code>, la oferta NO entra en el cálculo del precio</b> hasta que el cliente la confirme con un botón. Un emparejamiento errado que baja un precio es el peor error que este producto puede cometer, y no lo vamos a cometer por ahorrarnos una pregunta.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <pre><span class="c">// prompt (resumido)</span>
+Eres un verificador de identidad de productos para e-commerce chileno.
+Te doy UN producto de referencia y CANDIDATOS publicados por otros vendedores.
+
+Para cada candidato responde si es EXACTAMENTE el mismo producto:
+misma marca, mismo modelo, misma capacidad/talla/color, mismo contenido de caja.
+
+<b>NO es el mismo</b> si cambia: la capacidad (1,4 L ≠ 1,0 L), el pack (1 unidad ≠ pack de 3),
+la generación (Flip 6 ≠ Flip 5), si es réplica/genérico, o si es un accesorio del producto.
+Los vendedores chilenos escriben títulos con palabras de relleno ("ORIGINAL", "ENVIO GRATIS",
+"OFERTA", "GARANTIA"). Ignóralas: no cambian la identidad del producto.
+
+Si dudas, <b>confianza baja</b>. Un falso positivo le baja el precio a un producto que no
+corresponde y le cuesta plata real a una persona. Un falso negativo sólo pierde una comparación.
+<b>Los dos errores NO valen lo mismo.</b>
+
+Responde SÓLO JSON.</pre>
+
+  <h3 style="margin-top:22px">2. Reparador de lectores</h3>
+  <div class="scroll-x">
+    <table>
+      <tbody>
+        <tr><th style="width:130px">Modelo</th><td><code>claude-opus-4-8</code> — se invoca poco (cuando un lector se rompe) y ahí la calidad importa más que el costo.</td></tr>
+        <tr><th>Disparador</th><td>El lector de un canal devuelve 0 precios válidos en 3 corridas seguidas, o los precios salen fuera de rango.</td></tr>
+        <tr><th>Herramientas</th><td><code>fetch_html(url)</code>, <code>probar_selector(sel)</code>, <code>validar_contra_precios_conocidos()</code>, <code>abrir_ticket_humano()</code></td></tr>
+        <tr><th>Salida</th><td>Un parche de selectores, validado contra ≥20 productos cuyo precio ya conocemos. Si no valida, <b>no se despliega</b>: abre el ticket y avisa al contratista.</td></tr>
+        <tr><th>Honestidad</th><td>Esto <b>no</b> resuelve el 100% de los casos. Cuando Falabella cambia de framework, hay que meter la mano. Está declarado como <a href="negocio.html#autonomia">lo que no logro automatizar</a> y cuesta $600.000/mes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:22px">3. Explicador / soporte</h3>
+  <div class="scroll-x">
+    <table>
+      <tbody>
+        <tr><th style="width:130px">Modelo</th><td><code>claude-sonnet-5</code></td></tr>
+        <tr><th>Herramientas</th><td><code>leer_pizarra(tienda_id)</code>, <code>leer_bitacora(tienda_id)</code>, <code>leer_reglas(tienda_id)</code>, <code>buscar_docs()</code>, <code>abrir_ticket()</code> — <b>todas de sólo lectura.</b> El agente de soporte <b>no puede cambiar un precio ni una regla</b>. Jamás.</td></tr>
+        <tr><th>Trabajo</th><td>Responder "¿por qué me sugirió esto?" leyendo la bitácora real del cliente. Y escribir el resumen semanal: "esta semana te subí 4 precios (+$84.000/mes), bloqueé 3 bajadas que no te habrían traído ventas, y congelé el termo porque MegaStock es un bot".</td></tr>
+        <tr><th>La regla</th><td>Cuando no sabe, <b>dice que no sabe</b> y abre un ticket. No hay nadie a quien transferir la llamada y el agente lo declara: <i>"no tengo cómo pasarte con una persona; te respondo por correo"</i>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:22px">4. Redactor de SEO programático</h3>
+  <div class="scroll-x">
+    <table>
+      <tbody>
+        <tr><th style="width:130px">Modelo</th><td><code>claude-haiku-4-5-20251001</code>, en lote nocturno</td></tr>
+        <tr><th>Trabajo</th><td>400 páginas de <b>índice de precios por categoría</b> en cotejia.com, con datos reales: mediana, dispersión, quién bajó esta semana. <b>Los números salen de la base de datos, no del modelo.</b> El modelo escribe la vuelta editorial alrededor.</td></tr>
+        <tr><th>Prohibido</th><td>Inventar una cifra. El prompt recibe los datos y tiene una sola instrucción dura: <b>si un número no está en los datos que te di, no lo escribas.</b> Una página de SEO que miente un precio es un problema legal, no un problema de marketing.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="terceros">APIs y servicios que hay que contratar</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Servicio</th><th>Para qué</th><th class="t-r">Costo</th><th>Trámite humano</th></tr></thead>
+      <tbody>
+        <tr><td><b>Mercado Libre Developers</b></td><td>API oficial: catálogo, ofertas, cambiar precio del vendedor</td><td class="t-r">$0</td><td>Registrar la app (una vez)</td></tr>
+        <tr><td><b>Falabella Seller API</b></td><td>Leer y actualizar el precio del cliente en su seller center</td><td class="t-r">$0</td><td>Solicitud como partner</td></tr>
+        <tr><td><b>Jumpseller / Bsale / Shopify Apps</b></td><td>OAuth, catálogo, precio. <b>Y el canal #1 de adquisición.</b></td><td class="t-r">15–20% rev-share</td><td>Publicar la app; revisión de la plataforma</td></tr>
+        <tr><td><b>Anthropic API</b></td><td>Los cuatro agentes de arriba</td><td class="t-r">ver abajo</td><td>Tarjeta</td></tr>
+        <tr><td><b>Hetzner</b> (2× CPX21)</td><td>Workers de lectura, motor de reglas, API</td><td class="t-r">≈US$19/mes</td><td>Tarjeta</td></tr>
+        <tr><td><b>Neon / Supabase</b> (Postgres)</td><td>Las series de precios. Es el activo.</td><td class="t-r">≈US$69/mes</td><td>Tarjeta</td></tr>
+        <tr><td><b>Proxies datacenter</b></td><td>Pool de IPs para los lectores HTTP (no MELI)</td><td class="t-r">≈US$60/mes</td><td>Tarjeta</td></tr>
+        <tr><td><b>Cloudflare</b></td><td>DNS, CDN, WAF, páginas SEO</td><td class="t-r">≈US$5/mes</td><td>Tarjeta</td></tr>
+        <tr><td><b>Sentry + Better Stack</b></td><td>Errores y uptime. Sin humano de guardia, la alerta ES la guardia.</td><td class="t-r">≈US$20/mes</td><td>Tarjeta</td></tr>
+        <tr><td><b>Flow</b> (o Webpay Oneclick)</td><td>Suscripción con tarjeta en CLP</td><td class="t-r">3,5% + IVA</td><td><b>Contrato + RUT + cuenta bancaria</b></td></tr>
+        <tr><td><b>Proveedor DTE</b> (LibreDTE / Bsale)</td><td>Boleta/factura electrónica al SII</td><td class="t-r">≈$15.000/mes</td><td>Certificado digital + habilitación SII</td></tr>
+        <tr><td><b>Resend / Postmark</b></td><td>Correo transaccional: alertas, resumen semanal, dunning</td><td class="t-r">≈US$15/mes</td><td>Tarjeta + verificar dominio</td></tr>
+        <tr><td><b>Google Ads API</b></td><td>El canal pagado, operado por el sistema</td><td class="t-r">gasto: tope $400.000/mes</td><td>Cuenta + facturación</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:14px">
+    Las tres filas con <b>trámite humano</b> (Flow, DTE, publicar la app) son exactamente lo que
+    <a href="negocio.html#autonomia">declaro que no puedo automatizar</a>. Se hacen una vez, antes del
+    día 1, y no vuelven a aparecer. Un sistema autónomo no significa que nadie firmó nunca nada:
+    significa que <b>nadie tiene que firmar algo cada vez que entra un cliente</b>.
+  </p>
+</section>
+
+<section class="wrap">
+  <h2 id="env">Variables de entorno</h2>
+  <pre><span class="c"># --- marketplaces</span>
+ML_APP_ID / ML_SECRET / ML_REDIRECT_URI
+FALABELLA_SELLER_KEY / FALABELLA_SELLER_SECRET
+JUMPSELLER_APP_ID / JUMPSELLER_SECRET
+BSALE_APP_TOKEN
+SHOPIFY_API_KEY / SHOPIFY_API_SECRET
+
+<span class="c"># --- IA</span>
+ANTHROPIC_API_KEY
+MODELO_EMPAREJADOR=claude-haiku-4-5-20251001
+MODELO_REPARADOR=claude-opus-4-8
+MODELO_SOPORTE=claude-sonnet-5
+UMBRAL_CONFIANZA_MATCH=0.85          <span class="c"># bajo esto, pregunta y no calcula</span>
+
+<span class="c"># --- lectores</span>
+USER_AGENT="CotejiaBot/1.0 (+https://cotejia.com/bot)"
+RATE_LIMIT_POR_DOMINIO_SEG=4
+RESPETAR_ROBOTS_TXT=true             <span class="c"># no es configurable en producción: es una constante</span>
+PROXY_POOL_URL / PROXY_POOL_TOKEN
+
+<span class="c"># --- kernel del motor (topes duros, no ajustables por el cliente)</span>
+PISO_MARGEN_MINIMO_PCT=5             <span class="c"># nadie puede poner el piso bajo esto</span>
+MAX_CAMBIOS_DIA_TECHO=8              <span class="c"># ni aunque el cliente quiera 50</span>
+BUCLE_MIN_RESPUESTAS=5
+BUCLE_MAX_LATENCIA_MIN=15
+BUCLE_MAX_CV_DELTA=0.25
+
+<span class="c"># --- pagos, correo, datos</span>
+FLOW_API_KEY / FLOW_SECRET
+DTE_TOKEN / DTE_RUT_EMISOR
+RESEND_API_KEY
+DATABASE_URL
+SENTRY_DSN
+
+<span class="c"># --- piloto automático (topes del portafolio; los lee el sistema meta)</span>
+ADS_TOPE_DIARIO_CLP=15000
+ADS_TOPE_MENSUAL_CLP=400000
+METRICS_ENDPOINT=https://cotejia.com/api/metrics</pre>
+</section>
+
+<section class="wrap">
+  <h2 id="costo">Costo mensual estimado — con la aritmética</h2>
+  <p style="color:var(--ink-2)" class="narrow">
+    Este es el número que <a href="negocio.html#economia">negocio.html</a> descuenta del margen.
+    Si las dos páginas no cuadran, una de las dos miente. Dólar supuesto: <b>$950</b>.
+  </p>
+
+  <h3>IA por cliente Pizarra (1.000 SKU) al mes</h3>
+  <div class="calc">
+    <b>Emparejamiento inicial</b> <span class="sup">(una vez, en el onboarding)</span><br>
+    1.000 SKU × 8 candidatos = 8.000 pares<br>
+    Haiku 4.5: <b>US$1 / MTok entrada</b>, <b>US$5 / MTok salida</b><br>
+    entrada: 8.000 × 700 tok = 5,6 MTok → 5,6 × 1 = <b>US$5,60</b><br>
+    salida:&nbsp; 8.000 × 60 tok = 0,48 MTok → 0,48 × 5 = <b>US$2,40</b><br>
+    → <b>US$8,00 una sola vez</b> = $7.600 CLP → <span class="sup">va al CAC, no al costo mensual</span><br><br>
+
+    <b>Emparejamiento continuo</b> <span class="sup">(ofertas nuevas que aparecen)</span><br>
+    ≈600 pares nuevos/mes → entrada 0,42 MTok = US$0,42 · salida 0,036 MTok = US$0,18<br>
+    → <b>US$0,60/mes</b><br><br>
+
+    <b>Resumen semanal</b> (Sonnet 5: US$3 / US$15 por MTok)<br>
+    4 envíos × (8.000 tok entrada + 1.200 salida)<br>
+    entrada 0,032 MTok × 3 = US$0,10 · salida 0,0048 × 15 = US$0,07 → <b>US$0,17/mes</b><br><br>
+
+    <b>Soporte</b> (Sonnet 5): ≈0,4 conversaciones/cliente/mes × 12k tok → <b>US$0,05/mes</b><br>
+    <b>Reparador</b> (Opus 4.8): ~US$40/mes para <i>toda</i> la flota ÷ 100 clientes → <b>US$0,40/mes</b><br><br>
+    ─────────────────────────────<br>
+    <b class="up">IA = US$1,22/cliente/mes ≈ $1.160 CLP</b>
+    <span class="sup">(en negocio.html uso $760 para la mezcla completa de tramos, donde el cliente
+    medio tiene ~350 SKU y no 1.000; el cálculo de arriba es del tramo más caro)</span>
+  </div>
+
+  <h3 style="margin-top:22px">Infraestructura, con 100 clientes</h3>
+  <div class="calc">
+    Hetzner 2× CPX21 &nbsp;&nbsp;&nbsp;&nbsp;US$19<br>
+    Postgres (Neon) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;US$69 &nbsp;<span class="sup">(100 clientes × 400k filas/mes ≈ 40M filas/mes, particionadas)</span><br>
+    Proxies datacenter &nbsp;&nbsp;US$60<br>
+    Cloudflare &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;US$5<br>
+    Sentry + uptime &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;US$20<br>
+    ─────────────────────────────<br>
+    <b>US$173/mes ÷ 100 clientes = US$1,73 = $1.640 CLP por cliente</b><br><br>
+    <b>Costo mensual total de la operación (100 clientes):</b><br>
+    infra US$173 ($164.350) + IA 100 × $760 ($76.000) <span class="sup">(promedio de la mezcla: el cliente
+    medio tiene ~350 SKU, no 1.000)</span> + correo/DTE ($30.000)<br>
+    + <b>mantención humana de lectores ($600.000)</b> + Google Ads ($400.000) + contabilidad ($80.000)<br>
+    = <b class="down">$1.350.350 CLP/mes</b> contra un MRR de ≈$5.200.000 con 100 clientes.
+  </div>
+
+  <div class="note" style="margin-top:16px">
+    <b>El costo que nadie pone en estas páginas:</b> los <b>$600.000/mes</b> del contratista que arregla
+    los lectores cuando Falabella cambia su HTML. Es el 44% de la estructura de costos y es
+    <b>trabajo humano</b>. Lo pongo primero en la lista, no en una nota al pie, porque un sistema que
+    se declara 100% autónomo y esconde su costo humano se descubre en el primer trimestre.
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="falso">Qué está falseado en el demo</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>En el demo</th><th>En la realidad</th></tr></thead>
+      <tbody>
+        <tr><td>Los 9 productos, los costos, las ventas y los 3 marketplaces conectados.</td>
+          <td>Datos inventados (verosímiles: precios y márgenes de e-commerce chileno real).
+            Los productos y los marketplaces existen; la tienda "Kütral", sus competidores y sus
+            precios, no.</td></tr>
+        <tr><td>Las series de 14 días se generan en el navegador con un PRNG con semilla fija.</td>
+          <td>Vendrían de la tabla <code>lectura_precio</code>: ~400.000 filas al mes por cliente.</td></tr>
+        <tr><td>El bucle contra MegaStock SPA está guionado: 15 puntos, escalera perfecta.</td>
+          <td>El detector real corre sobre la serie de cambios con los umbrales de arriba
+            (tasa ≥0,70, latencia ≤15 min, cv ≤0,25, n≥5, y el resto del listado quieto).</td></tr>
+        <tr><td>El emparejamiento ya está hecho: los competidores aparecen mágicamente asociados.</td>
+          <td><b>Es el trabajo más difícil del producto</b> y lo hace Haiku 4.5, con confirmación del
+            cliente bajo 0,85 de confianza. En el demo no hay ni una llamada a un modelo.</td></tr>
+        <tr><td>"Aplicar" cambia el precio en la pantalla.</td>
+          <td>Sería un <code>PUT /items/{id}</code> a la API de Mercado Libre con el token OAuth del
+            cliente, más el registro en <code>cambio_precio</code>, más el correo.</td></tr>
+        <tr><td>El mercado "se mueve" con un <code>setInterval</code> que empuja precios al azar.</td>
+          <td>Se movería porque otros vendedores cambian sus precios de verdad. El azar del demo es
+            teatro honesto: sirve para que se sienta el movimiento, y lo digo aquí.</td></tr>
+        <tr><td>La sugerencia se recalcula al instante al mover un slider.</td>
+          <td>Eso <b>sí es real</b>: el motor es determinista y corre en milisegundos. Es el mismo
+            código que correría en el servidor. <b>Esta parte del demo no está falseada.</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 id="dominio">Evidencia del dominio</h2>
+  <div class="calc">
+    <b>cotejia.com</b><br>
+    <span class="sup">$ curl -o /dev/null -w '%{http_code}' https://rdap.verisign.com/com/v1/domain/cotejia.com</span><br>
+    → <b class="up">HTTP 404 = DISPONIBLE</b> · verificado el 2026-07-13<br>
+    <span class="sup">$ curl https://www.nic.cl/registry/Whois.do?d=cotejia.cl → "no existe"</span><br>
+    → <b class="up">cotejia.cl DISPONIBLE</b> · misma fecha<br><br>
+    <b>Alternativas verificadas el mismo día</b> (por si otra idea del lote elige el mismo nombre):<br>
+    repricia.com → <b>HTTP 404 (libre)</b> · repricia.cl libre<br>
+    cotizal.com &nbsp;→ <b>HTTP 404 (libre)</b> · cotizal.cl libre<br>
+    pizarria.com → <b>HTTP 404 (libre)</b> · pizarria.cl libre<br><br>
+    <span class="sup">El nombre viene de <b>cotejar</b>: comparar dos cosas para ver en qué se
+    diferencian. Que es, literalmente, todo el producto.</span>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Cotejia · Ninguna infraestructura de esta página está aprovisionada. Todo es documentación
+      de lo que habría que configurar.</p>
+    <p><a href="../index.html">← Volver a las ideas</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a></p>
+  </div>
+</footer>
+
+<script>
+document.getElementById("menuBtn").onclick = function () {
+  const d = document.getElementById("drawer");
+  const open = d.classList.toggle("open");
+  this.setAttribute("aria-expanded", open ? "true" : "false");
+};
+</script>
+</body>
+</html>

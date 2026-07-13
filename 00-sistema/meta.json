@@ -1,0 +1,21 @@
+{
+  "folder": "00-sistema",
+  "kind": "sistema",
+  "brand": "Cuantario",
+  "domain": "cuantario.com",
+  "domain_evidence": "_kit/check-domain.sh cuantario -> rdap.verisign.com/com/v1/domain/cuantario.com HTTP 404 (AVAILABLE), 2026-07-13. Control: google.com -> HTTP 200 (TAKEN), o sea que el chequeo distingue. cuantario.cl -> NIC Chile 'no existe' (AVAILABLE) la misma fecha.",
+  "alternates": ["asignaria.com", "ponderario.com", "juzgaria.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE. También libres y verificadas ese día: cuantaria.com, cuantero.com. TOMADAS y descartadas: veredicta, arbitria, asignia, ponderia, timonera, fondaria, regenta, tesoria, capitanea, mandoria, arbitrario, sentencio, rectoria, vedaria.",
+  "tagline": "Veintiuna ideas. Un dueño. Cero personas en el loop.",
+  "category": "Sistema meta · piloto automático de portafolio",
+  "market": "Este repositorio, y cualquier idea que venga después",
+  "icp": "El dueño de un portafolio de ideas de software que quiere operarlas todas a la vez sin contratar a nadie, y que sabe que jamás va a matar una idea suya por su cuenta.",
+  "price_clp": "$536.977/mes con 16 ideas operadas · $446.689 fijos + $5.643 por idea",
+  "accent": "#2ED47F",
+  "problem": "Un operador humano lleva bien dos ideas a la vez, y nunca mata la suya: con seis meses y $3.400.000 gastados en una apuesta que no convierte, no escribe «se acabó», escribe «hay que iterar el mensaje». Los criterios de muerte de las 16 ideas ya están escritos en sus roadmap.html, en frío, antes del primer peso. Nunca nadie los ejecutó.",
+  "solution": "Un kernel de cumplimiento que bloquea la acción antes de que toque una API (no la recomienda: la bloquea, y falla cerrado), canales que se pueden automatizar sin quemarlos, bandits con honestidad estadística, y una IA jueza que aplica los criterios que cada idea firmó de antemano y no puede moverlos ni levantar un tope. Una idea futura se enchufa escribiendo un autopilot.json y nada más.",
+  "wedge": "El manifiesto autopilot.json es el único punto de acoplamiento. El sistema operó 17-datos-empresas —le asignó presupuesto, corrió campañas, midió el embudo y decidió escalarla con n=34— sin saber cómo se llama la marca. Si una idea sin nombre se puede operar, una idea que todavía no existe también.",
+  "art_direction": "Terminal de mando. Tinta casi negra (#0B0E10), densidad tabular alta, monoespaciada protagonista (Martian Mono para rótulos, Spline Sans Mono para todo dato, Chivo sólo para prosa), cifras a la derecha con tabular-nums. Dos colores de señal porque un tablero de plata necesita exactamente dos: verde #2ED47F para lo que entra, rojo #FF5B4E para lo que sale. Deliberadamente NO es la sala de control de 11-correas (ámbar y cian sobre grafito): eso monitorea máquinas, esto administra capital. Sin ámbar, sin cian, sin radios, sin degradados, sin sombras. Rampa de gráficos azul ordinal validada con el validador de la skill dataviz.",
+  "honesty": "Cinco de las 16 ideas existentes NO se enchufan (las cinco de minería: hardware en faena, homologación, pilotos firmados, ciclos de 8 semanas a 18 meses) y tres son parciales (04-inventario, 07-terreno, 16-finakids). Decir que todas pueden sería el resultado cómodo y falso. Y el sistema se paga solo desde 2 ideas SÓLO si la alternativa es contratar a alguien; medido como % del gasto de canal que administra, no tiene sentido correrlo bajo 15 ideas — con 2, cuesta $1.395.475 al mes para repartir $1.022.500 en anuncios. El juez, por sí solo, tampoco paga el sistema: preservó $5.170.000 en seis meses contra un costo de $8.846.862. La escala paga el sistema; el juez hace que la escala no arruine al dueño.",
+  "status": "prototipo"
+}

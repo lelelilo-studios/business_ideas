@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caprato — Negocio</title>
+<meta name="description" content="Cliente objetivo, tamaño de mercado con la aritmética a la vista, competencia, economía unitaria, canales, autonomía total y el riesgo que mata el negocio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  .doc-h { padding-block: var(--sp-l) var(--sp-m); border-bottom: 2px solid var(--tinta); }
+  .doc-h h1 { max-width: 18ch; }
+  .indice { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: var(--sp-m); }
+  .indice a {
+    font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--tinta-2); text-decoration: none; border-bottom: 1px solid var(--linea-2); padding-bottom: 2px;
+  }
+  .indice a:hover { color: var(--azul); border-color: var(--azul); }
+
+  .bloque { padding-block: var(--sp-xl); border-top: var(--hair); }
+  .bloque > h2 { max-width: 26ch; margin-bottom: var(--sp-s); }
+  .bloque p { max-width: 70ch; }
+  .bloque p + p { margin-top: var(--sp-s); }
+  .num-bloque { font-family: var(--mono); font-size: .7rem; color: var(--azul); letter-spacing: .1em; font-weight: 700; }
+
+  .caja { border: var(--borde); background: var(--papel-3); padding: var(--sp-m); margin-top: var(--sp-m); }
+  .caja-ambar { border-color: var(--ambar); background: var(--ambar-lav); }
+  .caja-azul { border-color: var(--azul); background: var(--azul-lav); }
+  .caja h3 { margin-bottom: .4rem; }
+  .caja p { max-width: 66ch; }
+
+  .aritmetica { font-family: var(--mono); font-size: .8rem; }
+  .aritmetica td:first-child { width: 55%; }
+  .aritmetica .nota { font-family: var(--sans); }
+
+  .comp { width: 100%; font-size: .86rem; min-width: 620px; }
+  .comp th { text-align: left; font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); padding: .5rem .8rem .5rem 0; border-bottom: 1.5px solid var(--tinta); }
+  .comp td { padding: .7rem .8rem .7rem 0; border-bottom: var(--hair); vertical-align: top; }
+  .comp td:first-child { font-weight: 700; white-space: nowrap; }
+
+  .cronograma { display: grid; gap: 0; margin-top: var(--sp-m); }
+  .cron-f { display: grid; grid-template-columns: 84px 1fr; gap: var(--sp-s); padding-block: var(--sp-s); border-bottom: var(--hair); }
+  .cron-f:last-child { border-bottom: 0; }
+  .cron-f > span { font-family: var(--mono); font-size: .72rem; color: var(--azul); font-weight: 700; padding-top: .15rem; }
+  .cron-f h4 { font-size: .95rem; }
+  .cron-f p { font-size: .86rem; color: var(--tinta-2); margin-top: .2rem; }
+
+  .auto-tabla { width: 100%; font-size: .86rem; min-width: 640px; }
+  .auto-tabla th { text-align: left; font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); padding: .5rem .8rem .5rem 0; border-bottom: 1.5px solid var(--tinta); }
+  .auto-tabla td { padding: .7rem .8rem .7rem 0; border-bottom: var(--hair); vertical-align: top; }
+  .auto-tabla td:first-child { font-weight: 700; white-space: nowrap; width: 1%; }
+  .auto-tabla .si { color: var(--azul); font-family: var(--mono); font-size: .68rem; font-weight: 700; white-space: nowrap; }
+  .auto-tabla .no { color: var(--ambar); font-family: var(--mono); font-size: .68rem; font-weight: 700; white-space: nowrap; }
+
+  .lista-p { max-width: 70ch; }
+  .lista-p li { margin-bottom: .7rem; padding-left: 1.1rem; position: relative; font-size: .95rem; color: var(--tinta-2); }
+  .lista-p li::before { content: ""; position: absolute; left: 0; top: .55rem; width: 6px; height: 6px; background: var(--azul); }
+  .lista-p li strong { color: var(--tinta); }
+  ol.lista-p { list-style: none; counter-reset: li; }
+  ol.lista-p li { counter-increment: li; padding-left: 1.8rem; }
+  ol.lista-p li::before {
+    content: counter(li, decimal-leading-zero); background: none; font-family: var(--mono);
+    font-size: .72rem; font-weight: 700; color: var(--azul); top: .1rem; width: auto; height: auto;
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M5 21 L5 12 L11 7 L17 12 L17 21" fill="none" stroke="#14191C" stroke-width="1.5"/>
+        <path d="M13 21 L13 15 L21 15 L21 21" fill="none" stroke="#1A5FC8" stroke-width="1.5"/>
+        <circle cx="21" cy="15" r="2" fill="#1A5FC8"/>
+      </svg>
+      <span class="marca-txt">Caprato</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" id="navBtn">Menú</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="doc-h">
+  <p class="rotulo">Plan de negocio · julio 2026</p>
+  <h1>Vender el número que nadie quiere escuchar.</h1>
+  <p class="lead mt-s">
+    Un producto cuyo resultado más frecuente es «no compres» es más valioso y más difícil de vender.
+    Este documento no esquiva esa contradicción: la usa como eje.
+  </p>
+  <nav class="indice" aria-label="Secciones">
+    <a href="#icp">Cliente</a>
+    <a href="#mercado">Mercado</a>
+    <a href="#cuna">Cuña</a>
+    <a href="#competencia">Competencia</a>
+    <a href="#economia">Economía unitaria</a>
+    <a href="#canales">Canales</a>
+    <a href="#autonomia">Autonomía</a>
+    <a href="#ia">IA en el marketing</a>
+    <a href="#dias">90 días</a>
+    <a href="#muerte">Qué lo mata</a>
+  </nav>
+</div>
+
+<!-- ============ ICP ============ -->
+<section class="bloque" id="icp">
+  <p class="num-bloque">01</p>
+  <h2>Cliente objetivo</h2>
+  <p>
+    <strong>El inversionista hormiga de departamentos.</strong> Persona natural, 34 a 55 años, profesional
+    o pequeño empresario, ingreso familiar sobre $3.000.000. Tiene uno o dos departamentos arrendados
+    —comprados con crédito, en verde, en 2018 o 2021— y quiere el tercero. O no tiene ninguno y está por
+    dar el paso.
+  </p>
+  <p>
+    <strong>Quién firma y quién lo usa son la misma persona.</strong> No hay comité, no hay compras, no
+    hay «lo tengo que ver con mi socio». Es una tarjeta de crédito personal y una decisión de un minuto.
+    Ese es el motivo por el que este producto se puede operar sin humanos: el ciclo de venta B2C no tiene
+    dónde meter a un vendedor.
+  </p>
+  <p>
+    <strong>Dónde ya está:</strong> con Portal Inmobiliario abierto un domingo por la noche. Sigue dos o
+    tres cuentas de finanzas personales chilenas en Instagram. Está en un grupo de WhatsApp donde alguien
+    manda «miren esta oportunidad». Busca en Google «rentabilidad departamento Ñuñoa» y llega a un blog
+    de una corredora que le dice que sí.
+  </p>
+  <div class="caja">
+    <h3>Presupuesto que ya gasta</h3>
+    <p>
+      La comisión del corredor en una compra de 2.500 UF (≈ <span class="num">$100.450.000</span>) es
+      <span class="num">2% + IVA ≈ $2.390.000</span>. La suscripción anual al plan Inversionista cuesta
+      <span class="num">$238.800</span>: <strong>10% de una comisión</strong>, y compite con la parte de
+      esa comisión que nadie está prestando —el consejo de no comprar—.
+    </p>
+  </div>
+  <div class="caja caja-ambar">
+    <h3>El sesgo del comprador, dicho de frente</h3>
+    <p>
+      Nuestro cliente <em>quiere</em> que le digamos que sí. Ya se imaginó arrendándolo. Ya calculó el
+      dividendo. Un producto que le dice «esto rinde 3,1%, no lo compres» pelea contra su propia
+      motivación, y eso tiene tres consecuencias comerciales que no vamos a maquillar:
+    </p>
+    <ul class="lista-p mt-s">
+      <li><strong>La conversión de prueba a pago será más baja</strong> que la de un producto que promete
+        oportunidades. Modelamos 10–12%, no el 25% de un producto que halaga.</li>
+      <li><strong>El churn será más alto en los primeros 60 días</strong>: el que llega buscando permiso
+        para comprar se va cuando no se lo damos. Ese churn es sano y no lo vamos a combatir bajando el
+        estándar del cálculo.</li>
+      <li><strong>El que se queda vale mucho más.</strong> El inversionista que ya se quemó una vez con una
+        rentabilidad de folleto es el que renueva. Toda la retención se construye sobre él.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ MERCADO ============ -->
+<section class="bloque" id="mercado">
+  <p class="num-bloque">02</p>
+  <h2>Tamaño de mercado</h2>
+  <p>
+    Cada línea de abajo es un supuesto declarado, no un dato oficial. Donde no hay cifra publicada que nos
+    conste, lo decimos y ponemos <span class="pv">por validar</span>. Este mercado es <strong>chico</strong>,
+    y preferimos que se vea chico y verdadero a que se vea grande y falso.
+  </p>
+
+  <div class="scroll-x mt-m">
+    <table class="tabla aritmetica" style="min-width:560px">
+      <caption class="visually-hidden">Derivación del TAM, SAM y SOM para Chile</caption>
+      <thead>
+        <tr><th scope="col">Supuesto</th><th scope="col" class="n">Valor</th><th scope="col" class="n">De dónde sale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Hogares en Chile</td><td class="n">6.700.000</td><td class="n"><span class="pv">por validar</span></td></tr>
+        <tr><td>× viviendas en arriendo (≈20%)</td><td class="n">1.340.000</td><td class="n"><span class="pv">orden CASEN</span></td></tr>
+        <tr><td>÷ viviendas por propietario-inversionista (2,4)</td><td class="n">558.000</td><td class="n"><span class="nota">supuesto propio</span></td></tr>
+        <tr><td>× buscando comprar otra en 12 meses (12%)</td><td class="n">67.000</td><td class="n"><span class="nota">supuesto propio</span></td></tr>
+        <tr><td>+ primera compra de inversión</td><td class="n">18.000</td><td class="n"><span class="nota">supuesto propio</span></td></tr>
+        <tr class="total"><td>Buscadores activos al año (Chile)</td><td class="n">85.000</td><td class="n"></td></tr>
+        <tr><td>× ARPU anual ($17.300 × 12)</td><td class="n">$207.600</td><td class="n"><span class="nota">§05</span></td></tr>
+        <tr class="total"><td>TAM Chile</td><td class="n">$17.646 MM ≈ US$18,4M</td><td class="n"><span class="nota">TC $960</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g2 mt-m">
+    <div class="caja">
+      <h3>SAM · US$13,2M al año</h3>
+      <p>
+        Sólo donde vamos a tener densidad de datos suficiente para que el número sea honesto: Gran Santiago,
+        Valparaíso–Viña, Concepción y La Serena–Coquimbo. Ahí está el <span class="num">72%</span> del stock
+        de departamentos del país <span class="pv">por validar</span>.
+      </p>
+      <p class="nota mt-s"><span class="num">85.000 × 0,72 = 61.200 buscadores × $207.600 = $12.705 MM/año.</span></p>
+    </div>
+    <div class="caja">
+      <h3>SOM año 3 · US$489.000 de ARR</h3>
+      <p>
+        <span class="num">1.950</span> cuentas pagadas (3,2% del SAM en cuentas) más
+        <span class="num">1.100</span> informes sueltos al mes.
+      </p>
+      <p class="nota mt-s">
+        <span class="num">1.950 × $207.600 = $404,8 MM</span> · informes:
+        <span class="num">1.100 × $4.900 × 12 = $64,7 MM</span> · total <span class="num">$469,5 MM/año</span>.
+      </p>
+    </div>
+  </div>
+
+  <div class="caja caja-ambar">
+    <h3>La extensión global, sin humo</h3>
+    <p>
+      El mismo producto sobre México, Perú, Colombia y España. No voy a poner un número de TAM global con dos
+      decimales, porque el modelo depende de algo que en cada país es distinto y que todavía no verifico:
+      <strong>que exista una fuente observable de arriendos por edificio</strong>. En Chile la construimos con
+      publicaciones. En España, Idealista ya publica índices por zona y el juego es otro. El orden de magnitud
+      honesto, si la fuente existe, es <strong>US$120–200M al año</strong> de TAM combinado; la probabilidad de
+      que la fuente exista en los cuatro países es lo que no sé, y hasta saberlo esto es una idea, no un plan.
+    </p>
+  </div>
+</section>
+
+<!-- ============ CUÑA ============ -->
+<section class="bloque" id="cuna">
+  <p class="num-bloque">03</p>
+  <h2>Posicionamiento y cuña</h2>
+  <p>
+    <strong>Cabeza de playa:</strong> el comprador de departamento de renta en el Gran Santiago, entre
+    <span class="num">1.500 y 3.500 UF</span>, que compra con crédito y busca flujo —no plusvalía—.
+  </p>
+  <ul class="lista-p mt-m">
+    <li><strong>Es el que más se equivoca.</strong> Compra un departamento de 3.000 UF en Ñuñoa creyendo que
+      rinde 6% y rinde 3,6%. La diferencia son <span class="num">$2.900.000</span> al año, todos los años.</li>
+    <li><strong>Es el que compra con deuda.</strong> Un error no le duele en una planilla: le duele en el
+      dividendo, cada mes. Eso hace que el dolor sea recurrente y la disposición a pagar, real.</li>
+    <li><strong>Su intención es capturable.</strong> Ya está escribiendo «rentabilidad departamento
+      Independencia» en Google. Nadie tiene que crearle el problema: sólo hay que estar en la respuesta.</li>
+    <li><strong>Es el único segmento donde el silencio vale.</strong> A una inmobiliaria no le puedes cobrar
+      por decirle que no construya. A este señor sí le puedes cobrar por decirle que no compre.</li>
+  </ul>
+  <div class="caja caja-azul">
+    <h3>La frase de posicionamiento</h3>
+    <p style="font-size:var(--step-1);font-weight:600;color:var(--tinta)">
+      «Todo el rubro cobra por venderte. Nosotros cobramos por decirte que no.»
+    </p>
+  </div>
+</section>
+
+<!-- ============ COMPETENCIA ============ -->
+<section class="bloque" id="competencia">
+  <p class="num-bloque">04</p>
+  <h2>Competencia</h2>
+  <p>
+    El titular del puesto no es una app: es <strong>una pestaña de Portal Inmobiliario y una calculadora</strong>.
+    Todo lo demás es contexto.
+  </p>
+
+  <div class="scroll-x mt-m">
+    <table class="comp">
+      <caption class="visually-hidden">Competidores y diferenciación</caption>
+      <thead>
+        <tr><th scope="col">Quién</th><th scope="col">Qué hace</th><th scope="col">Por qué no resuelve esto</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Buscar a mano</td>
+          <td>Portal Inmobiliario, Yapo, Mercado Libre y una planilla. Gratis, 6–10 horas por semana.</td>
+          <td><strong>Es el competidor real y va ganando.</strong> No le falta esfuerzo: le falta el dato. Sin
+            saber cuánto arrienda de verdad ese edificio, la planilla más prolija del mundo produce un número
+            equivocado con tres decimales.</td>
+        </tr>
+        <tr>
+          <td>Toctoc</td>
+          <td>Portal con datos de mercado y tasación automatizada. El más cercano a nosotros en datos.</td>
+          <td>Su modelo vive del cierre de la operación y de vender a inmobiliarias. <strong>Si mañana deciden
+            hacer esto, tienen los datos y nosotros no.</strong> Es el riesgo competitivo más serio y no tengo
+            un foso que lo detenga, sólo velocidad y un incentivo que ellos no pueden copiar sin canibalizarse.</td>
+        </tr>
+        <tr>
+          <td>Portal Inmobiliario / Yapo</td>
+          <td>El inventario. Filtros, fotos, contacto con el corredor.</td>
+          <td>Son el catálogo, no el análisis. Su negocio es la publicación: mostrarte que el 94% de los avisos
+            rinde menos de lo que promete iría contra su propio inventario.</td>
+        </tr>
+        <tr>
+          <td>El corredor</td>
+          <td>Te muestra, negocia, tramita. Comisión 2% + IVA.</td>
+          <td>Conflicto estructural: gana si compras. Es un buen servicio para ejecutar la compra y un pésimo
+            consultor para decidirla. No competimos con él; lo complementamos.</td>
+        </tr>
+        <tr>
+          <td>Colliers, GfK, Inciti</td>
+          <td>Informes de mercado a inmobiliarias y bancos, desde varios miles de dólares.</td>
+          <td>El inversionista hormiga jamás va a comprar un informe de US$2.000 para decidir una compra de
+            US$100.000. El producto correcto para él cuesta $19.900 al mes.</td>
+        </tr>
+        <tr>
+          <td>Calculadoras de cap rate</td>
+          <td>Planillas gratis, videos de YouTube, la fórmula.</td>
+          <td>La aritmética nunca fue el problema. <strong>El insumo lo es.</strong> Te dan la fórmula y te
+            piden que tú pongas el arriendo esperado; y el arriendo esperado que pones es el del aviso.</td>
+        </tr>
+        <tr>
+          <td><a href="../06-arriendos/index.html">Conserjo</a></td>
+          <td>Administra el arriendo que ya tienes: filtra arrendatarios, cobra, gestiona reparaciones.</td>
+          <td>No es competencia, es la otra mitad. Ellos operan el activo; nosotros decidimos si comprarlo.
+            Nuestra frontera es dura: <strong>Caprato no cobra arriendos ni administra nada.</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="caja caja-ambar">
+    <h3>Nuestra desventaja honesta</h3>
+    <p>
+      No somos dueños de los datos. Un portal tiene el histórico completo de publicaciones y contactos;
+      nosotros lo reconstruimos por observación, y esa reconstrucción es más frágil y más lenta. Lo único que
+      no pueden copiarnos es el incentivo: <strong>ellos no pueden ganar plata diciéndote que no compres.</strong>
+      Ese es todo el foso, y es más delgado de lo que a un pitch le gustaría.
+    </p>
+  </div>
+</section>
+
+<!-- ============ ECONOMÍA ============ -->
+<section class="bloque" id="economia">
+  <p class="num-bloque">05</p>
+  <h2>Precio y economía unitaria</h2>
+
+  <div class="scroll-x">
+    <table class="tabla" style="min-width:560px">
+      <caption class="visually-hidden">Planes y mezcla esperada</caption>
+      <thead>
+        <tr><th scope="col">Plan</th><th scope="col">Para quién</th><th scope="col" class="n">Precio</th><th scope="col" class="n">Mezcla</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Radar</td><td>Primera compra. 1 filtro, alerta semanal.</td><td class="n">$9.900/mes</td><td class="n">55%</td></tr>
+        <tr><td>Inversionista</td><td>Va por el tercero. 3 filtros, alerta diaria, crédito.</td><td class="n">$19.900/mes</td><td class="n">35%</td></tr>
+        <tr><td>Cartera</td><td>5+ unidades. 10 filtros, 3 ciudades, API.</td><td class="n">$49.000/mes</td><td class="n">10%</td></tr>
+        <tr class="total"><td>ARPU mezclado</td><td><span class="nota">0,55×9.900 + 0,35×19.900 + 0,10×49.000</span></td><td class="n">$17.310</td><td class="n">→ $17.300</td></tr>
+        <tr><td>Informe suelto</td><td>Pega el link, recibe la ficha. Sin cuenta.</td><td class="n">$4.900</td><td class="n"><span class="nota">aparte</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g2 mt-m">
+    <div class="caja">
+      <h3>Margen bruto · 88% en régimen, 41% al principio</h3>
+      <table class="tabla aritmetica mt-s">
+        <tbody>
+          <tr><td>IA (corpus + alertas + soporte)</td><td class="n">US$177/mes</td></tr>
+          <tr><td>Infra (Postgres/PostGIS, colas, proxies, CDN)</td><td class="n">US$205/mes</td></tr>
+          <tr class="total"><td>Costo tecnológico fijo</td><td class="n">$367.000/mes</td></tr>
+          <tr><td>÷ 400 cuentas</td><td class="n">$918/cuenta</td></tr>
+          <tr><td>+ pasarela (3,19% + IVA)</td><td class="n">$657</td></tr>
+          <tr><td>+ mensajería (WhatsApp + correo)</td><td class="n">$320</td></tr>
+          <tr class="total"><td>Costo por cuenta</td><td class="n">$1.895</td></tr>
+          <tr class="total"><td>Margen bruto a 400 cuentas</td><td class="n">89% → uso 88%</td></tr>
+        </tbody>
+      </table>
+      <p class="nota mt-s">
+        Detalle del costo de IA y de infra en <a href="stack.html">Arquitectura</a>. Las dos páginas cuadran:
+        US$382/mes totales, tipo de cambio $960.
+      </p>
+    </div>
+
+    <div class="caja caja-ambar">
+      <h3>La trampa del costo fijo</h3>
+      <p>
+        Casi todo el costo <strong>no escala con los usuarios</strong>: mantener el corpus de publicaciones
+        cuesta lo mismo con 10 clientes que con 1.000. Eso es maravilloso arriba y brutal abajo.
+      </p>
+      <table class="tabla aritmetica mt-s">
+        <tbody>
+          <tr><td>Margen bruto a 40 cuentas</td><td class="n">41%</td></tr>
+          <tr><td>Margen bruto a 120 cuentas</td><td class="n">73%</td></tr>
+          <tr><td>Margen bruto a 400 cuentas</td><td class="n">88%</td></tr>
+        </tbody>
+      </table>
+      <p class="nota mt-s">
+        Bajo <strong>120 cuentas esto no tiene margen de SaaS</strong>. El punto en que deja de ser un hobby
+        caro está en <span class="num">~$367.000</span> de ingreso mensual, es decir
+        <span class="num">21 cuentas</span> sólo para pagar los servidores. Ese es el primer hito real.
+      </p>
+    </div>
+  </div>
+
+  <figure class="chart mt-m">
+    <div class="chart-h">
+      <h3>CAC por canal, contra el techo que la unidad soporta</h3>
+      <p class="nota">
+        El techo es LTV ÷ 3 = <span class="num">$78.150</span>. Sólo el SEO programático deja margen de sobra;
+        los pagados van justos y sólo funcionan mezclados.
+      </p>
+    </div>
+    <svg viewBox="0 0 400 190" role="img" aria-labelledby="cac-t cac-d">
+      <title id="cac-t">CAC estimado por canal</title>
+      <desc id="cac-d">SEO programático 2.070 pesos, Meta Ads 141.333, Google Ads 166.667. El techo sostenible (LTV dividido por 3) es 78.150 pesos. La mezcla objetivo 55% SEO, 30% Google, 15% Meta da un CAC combinado de 72.339 pesos, bajo el techo.</desc>
+      <!-- escala: 0..180.000 -> x 92..380 -->
+      <line x1="92" y1="24" x2="92" y2="140" stroke="#9EA8A3" stroke-width="1"/>
+      <line x1="92" y1="140" x2="384" y2="140" stroke="#9EA8A3" stroke-width="1"/>
+      <line x1="172" y1="24" x2="172" y2="140" class="grid-l"/>
+      <line x1="252" y1="24" x2="252" y2="140" class="grid-l"/>
+      <line x1="332" y1="24" x2="332" y2="140" class="grid-l"/>
+      <text x="92" y="152" text-anchor="middle" class="eje">0</text>
+      <text x="172" y="152" text-anchor="middle" class="eje">$50k</text>
+      <text x="252" y="152" text-anchor="middle" class="eje">$100k</text>
+      <text x="332" y="152" text-anchor="middle" class="eje">$150k</text>
+
+      <!-- barras: x = 92 + v/180000*288 ; altura 18, gap 2px de superficie -->
+      <text x="86" y="38" text-anchor="end" class="eje-l">SEO progr.</text>
+      <rect x="92" y="28" width="4" height="18" rx="2" fill="#1A5FC8"/>
+      <text x="104" y="42" class="eje-l" style="fill:#1A5FC8">$2.070</text>
+
+      <text x="86" y="70" text-anchor="end" class="eje-l">Meta Ads</text>
+      <rect x="92" y="60" width="226" height="18" rx="2" fill="#1A5FC8"/>
+      <text x="322" y="74" class="eje-l">$141.333</text>
+
+      <text x="86" y="102" text-anchor="end" class="eje-l">Google Ads</text>
+      <rect x="92" y="92" width="267" height="18" rx="2" fill="#1A5FC8"/>
+      <text x="363" y="106" text-anchor="end" class="eje-l" style="fill:#F8F9F7">$166.667</text>
+
+      <text x="86" y="134" text-anchor="end" class="eje-l" style="font-weight:700">Mezcla 55/30/15</text>
+      <rect x="92" y="124" width="116" height="18" rx="2" fill="#0E8A5F"/>
+      <text x="212" y="138" class="eje-l" style="fill:#0E8A5F">$72.339</text>
+
+      <!-- techo -->
+      <line x1="217" y1="18" x2="217" y2="146" stroke="#B07400" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="221" y="16" class="eje" style="fill:#B07400;font-weight:700">techo $78.150 (LTV÷3)</text>
+
+      <text x="92" y="176" class="eje">CAC estimado por cliente pagado · pesos chilenos</text>
+      <text x="92" y="186" class="eje">Derivación de cada canal en §06. Todos son estimaciones propias.</text>
+    </svg>
+    <div class="leyenda">
+      <span><i style="background:#1A5FC8"></i>CAC por canal</span>
+      <span><i style="background:#0E8A5F"></i>CAC de la mezcla objetivo</span>
+      <span><i style="background:#B07400"></i>Techo sostenible</span>
+    </div>
+  </figure>
+
+  <div class="g2 mt-m">
+    <div class="caja">
+      <h3>LTV, payback y la razón</h3>
+      <table class="tabla aritmetica mt-s">
+        <tbody>
+          <tr><td>ARPU mensual</td><td class="n">$17.300</td></tr>
+          <tr><td>Churn mensual (declarado alto: producto de búsqueda)</td><td class="n">6,5%</td></tr>
+          <tr><td>Vida media = 1 ÷ 0,065</td><td class="n">15,4 meses</td></tr>
+          <tr><td>× margen bruto 0,88</td><td class="n"></td></tr>
+          <tr class="total"><td>LTV</td><td class="n">$234.450</td></tr>
+          <tr><td>CAC mezclado</td><td class="n">$72.339</td></tr>
+          <tr class="total"><td>LTV / CAC</td><td class="n">3,24</td></tr>
+          <tr><td>Payback = CAC ÷ (ARPU × margen)</td><td class="n">4,8 meses</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="caja caja-ambar">
+      <h3>Todo depende de una sola cosa</h3>
+      <p>
+        Si el SEO programático <strong>no</strong> llega a ser al menos la mitad de la adquisición, la mezcla
+        se vuelve <span class="num">0/70/30</span> y el CAC salta a <span class="num">$159.267</span>. Con un
+        LTV de <span class="num">$234.450</span>, eso es <strong>LTV/CAC = 1,47</strong> y un payback de
+        <span class="num">10,5 meses</span>: el negocio no cierra.
+      </p>
+      <p class="nota mt-s">
+        Por eso el criterio de muerte M3 del <a href="roadmap.html">roadmap</a> es exactamente ése, y por eso
+        está copiado tal cual en <code>autopilot.json</code>: si al mes 6 el SEO no trae el 35% de los
+        registros, el sistema pausa el gasto y avisa.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CANALES ============ -->
+<section class="bloque" id="canales">
+  <p class="num-bloque">06</p>
+  <h2>Canales de adquisición, rankeados</h2>
+
+  <ol class="lista-p mt-m">
+    <li>
+      <strong>SEO programático — el canal y el producto a la vez.</strong>
+      Una página por comuna × tipología: «Cuánto rinde de verdad arrendar un 2D en Ñuñoa», con la mediana
+      honesta, el arriendo real, la vacancia observada y la tabla de los últimos 12 meses. Son
+      <span class="num">~2.400</span> páginas de datos <em>reales</em> —no plantillas rellenadas— que se
+      refrescan solas cada mes. Esto es long-tail puro: nadie compite por «vacancia departamentos Quinta
+      Normal» porque nadie tiene el dato.
+      <br><span class="nota">Proyección régimen (mes 12+): 18.000 visitas/mes → 3,2% registro = 576 → 10% paga = 58 clientes/mes. Costo atribuible $120.000/mes ÷ 58 = <b class="num">CAC $2.070</b>. Estimación propia.</span>
+    </li>
+    <li>
+      <strong>Google Ads sobre intención de compra.</strong>
+      «departamento para inversión Santiago», «conviene comprar departamento para arrendar», «rentabilidad
+      departamento [comuna]». No pujamos por «venta departamento»: ahí compiten las inmobiliarias con bolsillos
+      infinitos y el clic vale cuatro veces más.
+      <br><span class="nota">CPC estimado $900 · visita→registro 4,5% · registro→pago 12% → <b class="num">CAC $166.667</b>. Estimación propia; el CPC real es lo primero que hay que medir.</span>
+    </li>
+    <li>
+      <strong>Meta Ads — el creativo es el número, no la foto.</strong>
+      «El aviso dice 6,8%. La cuenta real dice 3,8%.» Nada de renders de living con vista. Retargeting sobre
+      quien ya visitó una página de comuna, que es tráfico con intención probada.
+      <br><span class="nota">CPM $3.500 · CTR 1,1% → CPC $318 · visita→registro 2,5% · registro→pago 9% → <b class="num">CAC $141.333</b>.</span>
+    </li>
+    <li>
+      <strong>El informe suelto de $4.900.</strong> No es un plan, es una puerta. Casi todo el tráfico llega con
+      <em>un</em> departamento específico en la cabeza. Cobrarle $4.900 por esa respuesta convierte al curioso en
+      cliente pagado el primer día, y el 22% de ellos se suscribe dentro de 30 días
+      <span class="pv">supuesto a validar</span>.
+    </li>
+    <li>
+      <strong>Cuentas propias de la marca</strong> (Instagram, X, LinkedIn). Publicamos «el descarte de la
+      semana»: el aviso que se veía bien y por qué no era. Es contenido que sólo nosotros podemos hacer y es
+      literalmente el producto. Es nuestra marca hablando con su nombre: legítimo y automatizable.
+    </li>
+    <li>
+      <strong>Boletín semanal</strong> a quien se registró: la tabla de las 52 comunas con su cap rate honesto.
+      Baja en un clic, honrada al instante.
+    </li>
+    <li>
+      <strong>Patrocinio declarado</strong> en podcasts y newsletters de finanzas personales chilenas. Se compra,
+      se rotula como publicidad, se mide con un código propio.
+    </li>
+  </ol>
+
+  <div class="caja caja-ambar">
+    <h3>Lo que no vamos a hacer, y no es por buenos</h3>
+    <p>
+      Nada de cuentas falsas en foros ni en grupos de Facebook de inversionistas. Nada de reseñas plantadas.
+      Nada de comentarios «orgánicos» escritos por el sistema. No es un escrúpulo decorativo: <strong>el canal
+      es el activo</strong>. Un sistema autónomo que hace astroturfing se quema el dominio, la cuenta
+      publicitaria y la marca en semanas, y una máquina que destruye sus propios canales no es un negocio: es
+      una trituradora. El kernel del piloto automático lo bloquea y registra cada intento en el tablero.
+    </p>
+  </div>
+</section>
+
+<!-- ============ AUTONOMÍA ============ -->
+<section class="bloque" id="autonomia">
+  <p class="num-bloque">07</p>
+  <h2>Autonomía: cómo esto opera sin ningún ser humano</h2>
+  <p>
+    Caprato está diseñado para ser comercializado y administrado por un sistema automático. No es que «se
+    podría automatizar»: es que <strong>no hay dónde meter a una persona</strong> sin empeorarlo. Abajo está
+    el detalle, y después está lo que <em>no</em> se puede automatizar, que importa más.
+  </p>
+
+  <div class="scroll-x mt-m">
+    <table class="auto-tabla">
+      <caption class="visually-hidden">Qué está automatizado y cómo</caption>
+      <thead>
+        <tr><th scope="col">Función</th><th scope="col">Cómo opera sin humano</th><th scope="col" class="n">Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Venta</td>
+          <td>No hay venta: hay descubrimiento. SEO programático (2.400 páginas que son el producto en su
+            versión gratis) + Google Ads + Meta Ads + cuentas propias. Las campañas las crea, rota y mata el
+            sistema meta vía API, dentro de topes duros. Ningún vendedor, ninguna demo agendada.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Registro</td>
+          <td>Correo + clave, o Google. Sin verificación manual, sin lista de espera, sin «te contactamos».</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Activación</td>
+          <td>El usuario define un filtro en 3 minutos. El radar ya tiene el corpus histórico cargado, así que
+            la primera ficha honesta se entrega <strong>en el mismo minuto</strong>, sin esperar a la siguiente
+            publicación. La activación es que abra el desglose.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Entrega</td>
+          <td>Una alerta. Correo y WhatsApp (plantilla aprobada, sólo a quien se registró y dejó su número).
+            La ficha vive en la web. No hay implementación, no hay onboarding, no hay capacitación.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Cobro</td>
+          <td>Flow para tarjetas chilenas (suscripción recurrente), Stripe para el resto. Reintentos
+            automáticos, aviso de tarjeta vencida, y <strong>cancelación en un clic sin flujo de retención</strong>:
+            si te quieres ir, te vas. Retener por fricción es la manera más rápida de perder una cuenta
+            publicitaria por reclamos.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Soporte</td>
+          <td>Agente de IA con acceso a la ficha, la metodología y el estado de la cuenta. Puede explicar un
+            cálculo, corregir un filtro, pausar, reembolsar y cerrar la cuenta. Cuando no puede, lo dice:
+            <em>«No tengo cómo pasarte con una persona. Te devuelvo el mes y te dejo el detalle por correo.»</em>
+            Y ejecuta el reembolso.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Precio y experimentos</td>
+          <td>El sistema meta corre pruebas A/B de landing, creativo y precio, con tamaño de muestra mínimo y
+            prueba secuencial. No declara un ganador con 12 conversiones.</td>
+          <td class="si">Total</td>
+        </tr>
+        <tr>
+          <td>Decisión de seguir o morir</td>
+          <td>El juez del sistema meta aplica los <code>criterios_de_muerte</code> que este proyecto ya declaró
+            en el roadmap. No puede modificarlos: sólo aplicarlos.</td>
+          <td class="si">Total</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="caja caja-ambar">
+    <h3>Lo que no logro automatizar — y lo digo antes de que lo descubra el sistema</h3>
+    <ol class="lista-p mt-s">
+      <li>
+        <strong>Existir legalmente.</strong> Constituir la sociedad, obtener RUT, abrir cuenta bancaria y firmar
+        el contrato con Flow y con Stripe exige KYC de una persona natural con cédula. Un agente no tiene cédula.
+        <strong>Alguien de carne y hueso tiene que firmar una vez</strong>, y esa es la única forma de que exista
+        una cuenta donde caiga la plata.
+      </li>
+      <li>
+        <strong>La relación con los portales.</strong> Si Portal Inmobiliario manda una carta de sus abogados,
+        eso no lo contesta un agente: lo contesta un abogado. Y la negociación de un acuerdo de datos —el único
+        camino que vuelve este negocio robusto— es una conversación entre humanos. <strong>Este es el punto donde
+        el piloto automático se queda corto y donde el negocio se juega la vida.</strong>
+      </li>
+      <li>
+        <strong>Interpretar qué es lícito.</strong> El kernel puede bloquear un dominio cuyo <code>robots.txt</code>
+        lo prohíbe, y lo hace. Lo que no puede hacer es leer los términos de servicio de un portal y decidir si
+        cierta forma de acceso es legítima. Eso es un juicio jurídico. Donde no nos consta, el producto lo marca
+        <span class="pv">por validar</span> y no avanza.
+      </li>
+      <li>
+        <strong>Recalibrar el modelo contra la realidad.</strong> El sistema detecta <em>drift</em> —que sus
+        estimaciones de vacancia se alejen de lo observado— y lo reporta. Pero decidir que el modelo de vacancia
+        cambió porque cambió el mercado, y no porque hay un error, es una llamada de juicio. Presupuesto honesto:
+        <strong>~4 horas de una persona al mes</strong>, y no cero.
+      </li>
+      <li>
+        <strong>Dar una recomendación de inversión.</strong> Esto no es que «no pueda»: es que <strong>no debe</strong>.
+        No somos asesores registrados ante la CMF. El sistema entrega cálculo, supuestos y evidencia; nunca
+        «cómprelo» ni «no lo compre» como consejo personalizado. Es la única línea que ningún agente tiene permiso
+        de cruzar, y está en el prompt y en el kernel.
+      </li>
+      <li>
+        <strong>Un reclamo que escale.</strong> Un chargeback se resuelve solo. Una demanda en el SERNAC, no.
+        La política es reembolsar rápido y sin discutir —cuesta menos que la disputa— pero si alguien insiste,
+        hace falta un humano.
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ IA EN EL MARKETING ============ -->
+<section class="bloque" id="ia">
+  <p class="num-bloque">08</p>
+  <h2>La IA en el marketing: dónde sirve y dónde estorba</h2>
+  <div class="g2 mt-m">
+    <div class="caja caja-azul">
+      <h3>Donde sí</h3>
+      <ul class="lista-p mt-s">
+        <li><strong>Redactar las 2.400 páginas de comuna.</strong> Cada una con datos distintos y prosa distinta;
+          la IA escribe la <em>interpretación</em> («en Quinta Normal los gastos comunes bajos compran 0,3 puntos
+          de cap rate que Ñuñoa no tiene») a partir de números que ya están en la base. Si el dato no está, la
+          frase no se escribe: no hay relleno.</li>
+        <li><strong>Escribir 60 variantes de anuncio</strong> y dejar que el gasto decida. Un humano escribe
+          cuatro y se enamora de una.</li>
+        <li><strong>Extraer los campos de cada publicación</strong> (arriendo, gastos comunes, orientación,
+          si el GC incluye calefacción). Es el trabajo sucio y es donde la IA se paga sola.</li>
+        <li><strong>El soporte.</strong> Es explicar un cálculo con la ficha delante: exactamente lo que un
+          modelo hace bien.</li>
+      </ul>
+    </div>
+    <div class="caja">
+      <h3>Donde no</h3>
+      <ul class="lista-p mt-s">
+        <li><strong>Producir cifras.</strong> Ningún número de una página pública sale de un modelo: sale de
+          Postgres o no se publica. Un LLM que estima una vacancia es exactamente el humo contra el que este
+          producto existe.</li>
+        <li><strong>Fabricar comunidad.</strong> Nada de comentarios, reseñas ni cuentas que fingen ser
+          usuarios. Prohibido por el kernel y, además, suicida.</li>
+        <li><strong>Voz saliente.</strong> No llamamos a nadie. Ni siquiera a quien dejó su número: no hay nada
+          que este producto tenga que decir por teléfono que no quepa en una alerta.</li>
+        <li><strong>Escribir el veredicto.</strong> El «pasa» o «se descarta» lo decide la aritmética, no el
+          modelo. El modelo sólo lo redacta, y la ficha muestra la tabla que lo respalda.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 90 DÍAS ============ -->
+<section class="bloque" id="dias">
+  <p class="num-bloque">09</p>
+  <h2>Primeros 90 días</h2>
+  <div class="cronograma">
+    <div class="cron-f">
+      <span>Día 1–14</span>
+      <div>
+        <h4>El corpus, antes que nada</h4>
+        <p>Ingesta, normalización de direcciones, asignación a edificio, dedupe. Cargar 12 meses de histórico de
+          publicaciones donde sea lícito hacerlo. <strong>Sin corpus histórico el producto no tiene nada que
+          decir el primer día</strong>, y el primer día es el único que importa para la activación.</p>
+      </div>
+    </div>
+    <div class="cron-f">
+      <span>Día 15–30</span>
+      <div>
+        <h4>300 páginas y una caja registradora</h4>
+        <p>Las 52 comunas del Gran Santiago × tipologías principales. Sitemap, datos estructurados, indexación.
+          Landing, checkout con Flow, checkout con Stripe. Todo público, todo indexable.</p>
+      </div>
+    </div>
+    <div class="cron-f">
+      <span>Día 31–45</span>
+      <div>
+        <h4>El primer peso: el informe suelto</h4>
+        <p>«Pega el link, te devolvemos la ficha honesta, $4.900.» Es la validación más barata que existe: si
+          nadie paga $4.900 por saber la verdad de <em>un</em> departamento, nadie va a pagar $19.900 al mes.</p>
+      </div>
+    </div>
+    <div class="cron-f">
+      <span>Día 46–60</span>
+      <div>
+        <h4>Google Ads, con el tope puesto</h4>
+        <p>$8.000 al día, tope mensual $400.000. Medir el CPC real y el costo por registro, que son los dos
+          números que hoy son estimaciones y mañana tienen que ser hechos. Primer suscriptor.</p>
+      </div>
+    </div>
+    <div class="cron-f">
+      <span>Día 61–90</span>
+      <div>
+        <h4>Alertas y los primeros 25 pagados</h4>
+        <p>Alertas por correo y WhatsApp. Expansión a 1.200 páginas. Primeros 25 suscriptores. Evaluación de M1:
+          si el CAC de registro pasa de $35.000, se pausan los pagados y se vive del SEO hasta que indexe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUÉ LO MATA ============ -->
+<section class="bloque" id="muerte">
+  <p class="num-bloque">10</p>
+  <h2>Qué mataría esto</h2>
+
+  <div class="caja caja-ambar">
+    <h3>1 · El acceso a los datos. El riesgo mortal, y es binario.</h3>
+    <p>
+      Sin publicaciones no hay radar. Un portal cambia sus términos, activa protección contra bots o manda una
+      carta, y el producto se queda ciego en una semana. No hay forma de que esto no sea el riesgo número uno y
+      cualquiera que te diga lo contrario no ha construido esto.
+    </p>
+    <p class="mt-s"><strong>Lo que tenemos:</strong></p>
+    <ul class="lista-p mt-s">
+      <li>El <strong>corpus histórico ya construido</strong> no se borra: la mediana de arriendo por edificio de
+        los últimos 12 meses sigue siendo válida meses después del bloqueo.</li>
+      <li>El <strong>plan B del link pegado</strong>: el usuario abre la publicación y nos pasa la URL. El acceso
+        lo hace él, que tiene todo el derecho de mirar un aviso público. Es un producto peor —no vigila, sólo
+        evalúa— pero sobrevive.</li>
+      <li>Fuentes <strong>públicas</strong>: avalúo fiscal del SII, inscripciones del Conservador, estadísticas
+        del Observatorio del Mercado Inmobiliario. Nadie puede quitárnoslas.</li>
+      <li>La salida buena: <strong>un acuerdo de datos</strong> con un portal. Es una negociación humana y por eso
+        está en la lista de lo que el piloto automático no puede hacer.</li>
+    </ul>
+  </div>
+
+  <div class="g2 mt-m">
+    <div class="caja">
+      <h3>2 · El churn estructural</h3>
+      <p>
+        El cliente compra el departamento y se va. Es el problema de todo producto de búsqueda. Modelamos 6,5%
+        mensual; si se estabiliza sobre <strong>9%</strong>, el LTV cae a $169.000 y ningún canal pagado cierra.
+        La única defensa real es la vigilancia post-compra: «tu arriendo quedó 12% bajo el de tu edificio». Y esa
+        defensa todavía no está probada.
+      </p>
+    </div>
+    <div class="caja">
+      <h3>3 · Que nadie quiera oír el número</h3>
+      <p>
+        El riesgo de producto, y el más incómodo: la gente dice que quiere la verdad y compra el sueño. Si la
+        activación —abrir el desglose completo— queda bajo el <strong>20%</strong>, significa que construimos un
+        producto sobre una virtud que el mercado no compra, y hay que matarlo rápido en vez de convertirlo en un
+        buscador más de «oportunidades».
+      </p>
+    </div>
+  </div>
+
+  <div class="caja">
+    <h3>4 · Que Toctoc lo haga gratis</h3>
+    <p>
+      Tienen los datos y tienen el tráfico. Lo que no tienen es el incentivo: su negocio vive del cierre de la
+      operación, y un producto que dice «no compres» les come el propio inventario. Es un foso hecho de conflicto
+      de interés ajeno, no de tecnología propia. Sirve, pero no es eterno.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <p class="marca-txt">Caprato</p>
+      <p class="nota mt-s" style="max-width:56ch">
+        Toda cifra de este documento está citada o es una estimación con su aritmética a la vista. Donde no nos
+        consta el dato, dice <span class="pv">por validar</span>. Ninguna es una recomendación de inversión.
+      </p>
+    </div>
+    <p class="rotulo">caprato.com</p>
+  </div>
+</footer>
+
+<script>
+  var btn = document.getElementById('navBtn');
+  var links = document.getElementById('nav-links');
+  btn.addEventListener('click', function () {
+    var abierto = links.classList.toggle('abierto');
+    btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  });
+</script>
+
+</body>
+</html>

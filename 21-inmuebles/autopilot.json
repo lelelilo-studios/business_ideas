@@ -1,0 +1,115 @@
+{
+  "idea": "21-inmuebles",
+  "brand": "Caprato",
+  "autonomia": "total",
+  "por_que": "Producto digital B2C de autoservicio. El cliente se registra solo, define su filtro solo, paga con tarjeta y la entrega es una alerta automática. No hay venta consultiva, no hay onboarding, no hay implementación: no existe un lugar donde meter a un humano sin empeorarlo. El soporte es un agente con herramientas que puede reembolsar y cerrar cuentas por sí mismo.",
+
+  "oferta": {
+    "landing": "https://caprato.com",
+    "checkout": "flow",
+    "checkout_secundario": "stripe",
+    "modelo": "freemium",
+    "precio_clp": 19900,
+    "planes": [
+      { "nombre": "Radar", "precio_clp": 9900, "mezcla": 0.55 },
+      { "nombre": "Inversionista", "precio_clp": 19900, "mezcla": 0.35 },
+      { "nombre": "Cartera", "precio_clp": 49000, "mezcla": 0.10 }
+    ],
+    "arpu_clp": 17300,
+    "producto_de_entrada": { "nombre": "Informe suelto", "precio_clp": 4900, "tipo": "pago_unico" },
+    "prueba_sin_tarjeta": true,
+    "nota_prueba": "Las ~2.400 páginas públicas de comuna son el producto en su versión gratis: sin registro y sin tarjeta. Al registrarse, una ficha completa gratis."
+  },
+
+  "publico": {
+    "icp": "Inversionista hormiga de departamentos en Chile: persona natural, 34-55 años, con 1 o 2 departamentos arrendados que va por el siguiente, presupuesto 1.500-3.500 UF, compra con crédito y busca renta.",
+    "geo": ["CL"],
+    "canales": ["seo", "google_ads", "meta_ads", "instagram_propio", "x_propio", "linkedin_propio", "email_optin", "whatsapp_optin", "patrocinios_declarados"],
+    "canal_principal": "seo",
+    "nota_canal": "El SEO programático (una página por comuna × tipología con su cap rate honesto real) es a la vez el canal y la demostración del producto. Todo el modelo de CAC depende de que sea al menos el 35% de los registros: es el criterio de muerte M3.",
+    "canales_prohibidos": ["foros", "sockpuppets", "resenas_plantadas", "voz_saliente_en_frio", "comentarios_organicos_simulados"]
+  },
+
+  "presupuesto": {
+    "tope_diario_clp": 18000,
+    "tope_mensual_clp": 450000,
+    "tope_total_antes_de_revisar_clp": 1800000
+  },
+
+  "metricas": {
+    "endpoint": "https://caprato.com/api/metrics",
+    "eventos": ["visita", "registro", "activacion", "pago", "churn"],
+    "activacion": "El usuario abre el desglose completo del cap rate de una ficha. No basta con registrarse ni con crear un filtro: la activación es el momento en que ve de dónde sale cada punto porcentual y decide si le cree al número. Es lo único que entrega valor."
+  },
+
+  "criterios_de_muerte": [
+    {
+      "hito": "M1",
+      "mes": 2,
+      "condicion": "En edificios con n >= 8 observaciones, el error mediano de nuestro arriendo estimado supera el 15% respecto de lo que reporta el dueño",
+      "accion": "matar"
+    },
+    {
+      "hito": "M2",
+      "mes": 4,
+      "condicion": "CAC de registro > $35.000 CLP sostenido durante 30 días con anuncios activos",
+      "accion": "pausar"
+    },
+    {
+      "hito": "M3",
+      "mes": 6,
+      "condicion": "El SEO orgánico aporta menos del 35% de los registros",
+      "accion": "pausar"
+    },
+    {
+      "hito": "M3b",
+      "mes": 9,
+      "condicion": "El SEO orgánico sigue bajo el 35% de los registros después de 90 días de pausa de los pagados",
+      "accion": "matar"
+    },
+    {
+      "hito": "M4",
+      "mes": 12,
+      "condicion": "Menos de 100 cuentas pagadas, o churn mensual > 9% durante tres meses seguidos",
+      "accion": "reducir"
+    },
+    {
+      "hito": "M5",
+      "mes": 18,
+      "condicion": "Un portal bloquea el acceso a las publicaciones y ninguna fuente alternativa cubre el 70% del stock publicado",
+      "accion": "matar"
+    },
+    {
+      "hito": "M6",
+      "mes": 24,
+      "condicion": "MRR < $8.000.000 CLP",
+      "accion": "matar"
+    }
+  ],
+
+  "economia": {
+    "cac_objetivo_clp": 72000,
+    "ltv_estimado_clp": 234450,
+    "margen_bruto": 0.88,
+    "churn_mensual_supuesto": 0.065,
+    "payback_meses": 4.8,
+    "nota_margen": "88% a 400 cuentas. A 40 cuentas el margen bruto es 41%: el costo del corpus de publicaciones es fijo y no escala con los usuarios. Bajo 120 cuentas esto no tiene margen de SaaS."
+  },
+
+  "cumplimiento": {
+    "voz_saliente": false,
+    "voz_entrante": false,
+    "datos_personales": "Sólo el correo de quien se registra y, si lo entrega con consentimiento explícito, su teléfono para WhatsApp. La ingesta de publicaciones NO guarda datos personales: el schema del extractor no tiene campo para nombre ni teléfono de corredores, vendedores ni arrendatarios. Sin datos de menores.",
+    "robots_txt": "respetado por el kernel; cada bloqueo se registra en la tabla bloqueo_kernel y aparece en el tablero",
+    "rate_limit_ingesta": "1 request cada 3 segundos por dominio, user-agent identificado con dominio y correo de contacto",
+    "riesgo_declarado": "El acceso a los datos es el riesgo mortal y es binario: si un portal cambia sus ToS, activa protección anti-bot o manda una carta legal, el radar queda ciego. Los ToS de cada portal están marcados 'por validar' y la interpretación jurídica es una dependencia humana que el sistema NO puede resolver. Segundo riesgo: el churn estructural (el cliente compra el departamento y se va). Tercero: que el mercado diga que quiere la verdad y compre el sueño.",
+    "limite_duro": "Caprato NO da recomendaciones de inversión. No somos asesores registrados ante la CMF. Los agentes entregan cálculo, supuestos y evidencia; nunca 'cómprelo' ni 'no lo compre' como consejo personalizado. Ningún agente tiene permiso de cruzar esta línea, y está tanto en el prompt como en el kernel.",
+    "no_automatizable": [
+      "Constituir la sociedad, obtener RUT y firmar el contrato con Flow y Stripe: exige KYC de una persona natural con cédula.",
+      "Responder una carta legal de un portal o negociar un acuerdo de datos. Es la salida buena del riesgo mortal y es una conversación entre humanos.",
+      "Interpretar los términos de servicio de cada portal para decidir si cierta forma de acceso es lícita.",
+      "Recalibrar el modelo de vacancia cuando el sistema detecta drift: ~4 horas de una persona al mes.",
+      "Un reclamo que escale a SERNAC. La política es reembolsar rápido y sin discutir, pero si el reclamante insiste, hace falta un humano."
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "idea": "19-precios",
+  "brand": "Cotejia",
+  "autonomia": "alta",
+  "por_que": "Producto digital puro: el cliente se convence mirando sus propios precios en la prueba gratis, se conecta con OAuth, define tres reglas y paga con tarjeta. Entrega, valor y soporte son software. NO declaro 'total' porque hay un costo humano real e irreducible: cuando un marketplace cambia su HTML, los lectores se rompen y hay casos que el reparador automático no resuelve (~1-3 h/semana de un contratista, $600.000/mes). Un manifiesto que dijera 'total' estaría mintiéndole al juez.",
+
+  "oferta": {
+    "landing": "https://cotejia.com",
+    "checkout": "flow",
+    "modelo": "suscripcion",
+    "precio_clp": 29900,
+    "prueba_sin_tarjeta": true
+  },
+
+  "publico": {
+    "icp": "Tienda online chilena que revende productos de terceros: 60-3.000 SKU, ventas de $8M a $150M CLP/mes, publica en Mercado Libre y en al menos uno de Falabella / Paris / Ripley / tienda propia (Jumpseller, Bsale, Shopify). Quien firma es la dueña, y es la misma persona que hoy revisa los precios a mano.",
+    "geo": ["CL"],
+    "canales": [
+      "app_store_jumpseller",
+      "app_store_bsale",
+      "app_store_shopify",
+      "seo",
+      "google_ads",
+      "meta_ads",
+      "instagram_propio",
+      "x_propio",
+      "linkedin_propio",
+      "whatsapp_optin",
+      "email_optin",
+      "patrocinio_newsletter",
+      "voz_entrante"
+    ],
+    "canales_prohibidos_explicitamente": [
+      "Publicar en grupos de Facebook o WhatsApp de vendedores de Mercado Libre haciéndose pasar por un vendedor más. Es astroturfing, viola los ToS de la plataforma y la Ley 19.496, y quema el canal para siempre. El kernel lo bloquea y lo registra.",
+      "Reseñas escritas por nosotros o por un modelo.",
+      "Llamadas salientes con voz sintética a quien no dejó su número."
+    ]
+  },
+
+  "presupuesto": {
+    "tope_diario_clp": 15000,
+    "tope_mensual_clp": 400000,
+    "tope_total_antes_de_revisar_clp": 1200000
+  },
+
+  "metricas": {
+    "endpoint": "https://cotejia.com/api/metrics",
+    "eventos": ["visita", "instalacion_app", "registro", "conexion_oauth", "regla_definida", "activacion", "pago", "churn"],
+    "activacion": "El cliente conectó su tienda, definió al menos una regla y APLICÓ AL MENOS UN CAMBIO DE PRECIO SUGERIDO dentro de los primeros 14 días. No cuenta 'inició sesión', no cuenta 'vio el dashboard': si no movió un precio, Cotejia no le entregó nada."
+  },
+
+  "criterios_de_muerte": [
+    {
+      "hito": "M0",
+      "mes": 1.5,
+      "condicion": "Menos de 5 de 8 design partners conectan OAuth de solo lectura en 2 semanas, O la precisión del emparejador de productos queda bajo 90% con falsos positivos que habrían bajado un precio",
+      "accion": "matar"
+    },
+    {
+      "hito": "M1",
+      "mes": 3,
+      "condicion": "CAC > 3x el precio mensual (> $180.000 CLP) sostenido 4 semanas con al menos 40 pruebas iniciadas",
+      "accion": "pausar"
+    },
+    {
+      "hito": "M2",
+      "mes": 6,
+      "condicion": "activacion < 20%",
+      "accion": "matar"
+    },
+    {
+      "hito": "M3",
+      "mes": 12,
+      "condicion": "churn > 8% mensual durante 3 meses seguidos",
+      "accion": "matar"
+    },
+    {
+      "hito": "M3b",
+      "mes": 12,
+      "condicion": "Mercado Libre corta el acceso a su API, O Falabella y Paris bloquean los lectores y la cobertura cae bajo el 60% de los SKU de los clientes",
+      "accion": "pausar"
+    },
+    {
+      "hito": "M4",
+      "mes": 18,
+      "condicion": "El grupo de control (10% de los SKU de cada cuenta, sin repricing automático) muestra con significancia estadística que el margen defendido es menor que la suscripción cobrada",
+      "accion": "matar"
+    },
+    {
+      "hito": "M5",
+      "mes": 24,
+      "condicion": "Menos de 150 clientes pagando",
+      "accion": "matar"
+    }
+  ],
+
+  "economia": {
+    "cac_objetivo_clp": 49300,
+    "ltv_estimado_clp": 850000,
+    "margen_bruto": 0.85
+  },
+
+  "cumplimiento": {
+    "voz_saliente": false,
+    "datos_personales": "Solo el correo, RUT y datos de facturación de quien se registra. Los precios que leemos son de vitrina pública: no hay dato personal en un precio. No guardamos datos de los compradores finales del cliente. Sin datos de menores.",
+    "riesgo_declarado": "Dependencia de lectura de precios públicos. El 70% del volumen va por la API oficial de Mercado Libre (contrato). El 30% restante (Falabella, Paris, Ripley) se lee del endpoint público del sitio respetando robots.txt, con User-Agent identificado (CotejiaBot/1.0), 1 request cada 4 s por dominio y backoff ante 429, sin login, sin captcha, sin datos personales. Si un marketplace pide parar, se para ese dia y se le avisa al cliente que perdio cobertura en ese canal. Segundo riesgo, y es el que mata: un emparejamiento errado que baje el precio de un producto comparandolo con otro que no es. Por eso, bajo 0,85 de confianza el sistema pregunta y no calcula."
+  }
+}

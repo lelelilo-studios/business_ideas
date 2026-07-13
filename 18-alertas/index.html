@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pregonia — Todo se pregona. Casi nada te toca.</title>
+<meta name="description" content="Pregonia vigila el Diario Oficial, INAPI, la CMF y el Boletín Concursal por tu RUT, el de tus clientes, tu marca y tu rubro. Te escribe sólo cuando algo te afecta, te explica por qué en una frase y te dice qué hacer antes de que venza el plazo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* ---- Portada: la primera plana del cable ---- */
+  .hero { padding-block: var(--sp-l) var(--sp-l); }
+  .hero-grid { display: grid; gap: var(--sp-l); }
+  @media (min-width: 68em) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-xl); align-items: start; } }
+  .hero h1 { font-size: var(--step-4); font-weight: 900; letter-spacing: -0.035em; line-height: 0.98; }
+  .hero h1 em { font-style: normal; color: var(--texto-3); }
+  .bajada { font-size: var(--step-1); color: var(--texto-2); line-height: 1.42; margin-top: var(--sp-s); max-width: 44ch; }
+  .bajada b { color: var(--texto); font-weight: 700; }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--sp-m); }
+  .hero-pie { margin-top: var(--sp-s); }
+
+  /* El contador del ruido: 613 → 41 → 3 */
+  .embudo { border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea); padding-block: var(--sp-s); margin-top: var(--sp-m); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-2xs); }
+  .embudo .cifra .v { font-size: var(--step-2); }
+  .embudo .paso-3 .v { color: var(--flash); }
+
+  /* Bandeja en vivo de la portada */
+  .bandeja-vivo { border: 1px solid var(--linea-2); background: var(--panel); }
+  .bandeja-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--linea-2); background: var(--panel-2); flex-wrap: wrap; }
+  .bandeja-top .punto { width: 7px; height: 7px; background: var(--flash); flex: none; }
+  .bandeja-cuerpo { padding: 10px; display: grid; gap: 10px; background: #0C1012; }
+  .bandeja-nota { font-family: var(--mono); font-size: 0.68rem; color: var(--texto-3); letter-spacing: 0.04em; padding: 8px 10px; border: 1px dashed var(--linea-2); line-height: 1.5; }
+  .bandeja-nota b { color: var(--texto-2); font-weight: 500; }
+  .toast { font-family: var(--mono); font-size: 0.7rem; color: var(--flash); letter-spacing: 0.05em; padding: 8px 10px; border: 1px solid var(--flash-bord); background: var(--flash-apag); line-height: 1.5; }
+  .toast[hidden] { display: none; }
+
+  /* Pasos */
+  .paso { display: grid; grid-template-columns: 2.6rem 1fr; gap: var(--sp-s); padding-block: var(--sp-s); border-top: 1px solid var(--linea); }
+  .paso-n { font-family: var(--mono); font-size: 0.8rem; color: var(--texto-3); padding-top: 4px; letter-spacing: 0.1em; }
+  .paso h3 { font-size: 1.06rem; margin-bottom: 5px; }
+  .paso p { font-size: 0.92rem; line-height: 1.55; }
+
+  /* Precios */
+  .plan { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-s); display: grid; gap: 12px; align-content: start; }
+  .plan.destacado { border-color: var(--flash-bord); background: var(--panel-2); }
+  .plan-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .plan h3 { font-size: 1.05rem; }
+  .plan .precio { font-family: var(--display); font-weight: 900; font-size: var(--step-2); letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .plan .precio small { font-family: var(--mono); font-size: 0.66rem; font-weight: 400; color: var(--texto-3); letter-spacing: 0.08em; display: block; margin-top: 5px; }
+  .plan ul { list-style: none; display: grid; gap: 7px; }
+  .plan li { font-size: 0.85rem; color: var(--texto-2); line-height: 1.45; display: grid; grid-template-columns: 12px 1fr; gap: 8px; }
+  .plan li::before { content: ""; width: 5px; height: 5px; background: var(--linea-2); margin-top: 8px; }
+  .plan.destacado li::before { background: var(--flash); }
+  .plan .quien { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--texto-3); border-top: 1px solid var(--linea); padding-top: 10px; line-height: 1.5; }
+
+  /* Fuentes vigiladas */
+  .fuente-fila { display: grid; gap: 6px; padding-block: var(--sp-s); border-top: 1px solid var(--linea); }
+  @media (min-width: 48em) { .fuente-fila { grid-template-columns: 13rem 1fr; gap: var(--sp-s); align-items: start; } }
+  .fuente-fila p { font-size: 0.88rem; line-height: 1.5; }
+
+  /* FAQ */
+  details { border-top: 1px solid var(--linea); }
+  details summary { cursor: pointer; padding: 14px 0; font-weight: 700; font-size: 0.98rem; list-style: none; display: flex; gap: 10px; align-items: baseline; min-height: 44px; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "+"; font-family: var(--mono); color: var(--flash); flex: none; }
+  details[open] summary::before { content: "−"; }
+  details p { font-size: 0.9rem; line-height: 1.6; padding-bottom: 14px; max-width: 66ch; }
+
+  .cierre { border: 1px solid var(--linea-2); background: var(--panel); padding: var(--sp-m) var(--sp-s); text-align: center; }
+  .cierre h2 { max-width: 20ch; margin-inline: auto; }
+  .cierre p { max-width: 52ch; margin: var(--sp-s) auto 0; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="container cabecera-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 9v6M3 12h4l8-5v10l-8-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 8c1.6 1.1 1.6 6.9 0 8" stroke="#FF3B30" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Pregonia<span class="pt">.</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+  <div class="container" id="menuMovil">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html" aria-current="page">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="cinta" aria-hidden="true">
+  <div class="cinta-in">
+    <span><b>D.O. Nº 44.187</b> · EDICIÓN DEL VIERNES 10 DE JULIO DE 2026 · 613 AVISOS</span>
+    <span>INAPI · <b>142</b> SOLICITUDES DE MARCA PUBLICADAS</span>
+    <span>BOLETÍN CONCURSAL · <b>19</b> RESOLUCIONES</span>
+    <span class="f">CMF · NCG Nº 521</span>
+    <span>SEIA · <b>7</b> PROYECTOS INGRESADOS</span>
+    <span>D.O. Nº 44.187 · 613 AVISOS · TE TOCAN <b>3</b></span>
+  </div>
+</div>
+
+<main>
+
+<!-- ============================ PORTADA ============================ -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="rotulo">Vigilancia del Diario Oficial y los reguladores · Chile</p>
+      <h1>Hoy el Estado publicó 613 avisos.<br><em>Tres te tocan.</em></h1>
+      <p class="bajada">Pregonia lee todos los días el Diario Oficial, INAPI, la CMF y el Boletín Concursal buscando tu RUT, el de tus clientes, tu marca, tu rubro y tu comuna. <b>Te escribe sólo cuando algo te afecta</b>, te explica por qué en una frase y te dice qué hacer antes de que venza el plazo.</p>
+
+      <div class="embudo">
+        <div class="cifra">
+          <span class="v num">613</span>
+          <span class="k">Publicado hoy</span>
+        </div>
+        <div class="cifra">
+          <span class="v num">41</span>
+          <span class="k">Mencionan algo tuyo</span>
+        </div>
+        <div class="cifra paso-3">
+          <span class="v num f">3</span>
+          <span class="k">Te llegan</span>
+        </div>
+      </div>
+      <p class="nota hero-pie">Las otras 38 quedan en la bandeja <b>Descartadas</b>, cada una con el motivo escrito. No las escondemos: te explicamos por qué no te tocan. <span class="supuesto">Ejemplo</span> Las cifras del ejemplo son un día representativo, no un promedio auditado.</p>
+
+      <div class="hero-btns">
+        <a class="btn" href="demo/index.html">Ver la bandeja funcionando</a>
+        <a class="btn btn-2" href="#precios">Precios</a>
+      </div>
+    </div>
+
+    <!-- Producto en vivo: la bandeja, funcionando de verdad -->
+    <div>
+      <div class="bandeja-vivo">
+        <div class="bandeja-top">
+          <span class="punto" aria-hidden="true"></span>
+          <span class="rotulo">Bandeja · Estudio Lagos &amp; Ruiz</span>
+          <span class="rotulo mono" style="margin-left:auto" id="hContador">3 alertas</span>
+        </div>
+        <div class="bandeja-cuerpo">
+
+          <article class="alerta urgente" id="hA1">
+            <div class="alerta-meta">
+              <span class="flash">Urgente</span>
+              <span class="fuente">INAPI</span>
+              <time datetime="2026-07-10T09:12">10 JUL · 09:12</time>
+              <span class="folio">SOL. 1.584.902</span>
+            </div>
+            <h3>Alguien pidió la marca ANDESPAK en la misma clase que tu cliente</h3>
+            <div class="extracto">
+              «Solicitud N° 1.584.902. Marca denominativa <mark>ANDESPAK</mark>. Solicitante: COMERCIALIZADORA VILUCO SPA, RUT 77.318.446-2. Clase <mark>19</mark>: materiales de construcción no metálicos, hormigón, áridos.»
+              <span class="cve">Publicado en el Diario Oficial N° 44.187, sección Solicitudes de Marcas.</span>
+            </div>
+            <div class="porque">
+              <span class="rotulo">Por qué te importa</span>
+              <p>Tu cliente <b>Áridos del Maipo SpA</b> tiene registrada ANDESPACK en la <b>misma clase 19</b>: un tercero está pidiendo un signo casi idéntico para los mismos productos.</p>
+            </div>
+            <div class="hacer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <p><b>Qué hacer:</b> deducir oposición ante INAPI. El plazo corre desde la publicación del extracto (Ley 19.039, art. 5).
+                <span class="plazo">Quedan 26 de 30 días · vence el 09/08/2026</span></p>
+            </div>
+            <div class="acciones">
+              <button class="pulgar arriba" data-vote="up" data-id="A1" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V10l5-7 1 1a3 3 0 0 1 .6 3L13 10h5a2 2 0 0 1 2 2.3l-1.1 6A2 2 0 0 1 17 20H7z"/><path d="M7 10H4v11h3"/></svg>
+                Útil
+              </button>
+              <button class="pulgar abajo" data-vote="down" data-id="A1" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v11l-5 7-1-1a3 3 0 0 1-.6-3L11 14H6a2 2 0 0 1-2-2.3l1.1-6A2 2 0 0 1 7 4h10z"/><path d="M17 14h3V3h-3"/></svg>
+                No me sirve
+              </button>
+              <span class="sep"></span>
+              <a class="btn btn-2 btn-sm" href="demo/index.html">Ver publicación</a>
+            </div>
+          </article>
+
+          <article class="alerta" id="hA2">
+            <div class="alerta-meta">
+              <span class="grado">Revisar</span>
+              <span class="fuente">Boletín concursal</span>
+              <time datetime="2026-07-10T08:40">10 JUL · 08:40</time>
+              <span class="folio">C-2.114-2026</span>
+            </div>
+            <h3>Un deudor de tu cliente entró en liquidación</h3>
+            <div class="extracto">
+              «Resolución de liquidación. Empresa deudora: <mark>TRANSPORTES CERRO NEGRO LTDA.</mark>, RUT <mark>76.902.551-4</mark>, domicilio en San Bernardo. Liquidador titular designado. Plazo de verificación ordinaria de créditos: 30 días.»
+              <span class="cve">2° Juzgado Civil de San Miguel · Boletín Concursal (Ley 20.720).</span>
+            </div>
+            <div class="porque">
+              <span class="rotulo">Por qué te importa</span>
+              <p>Ese RUT está en la nómina que tu cliente <b>Sercon Ingeniería SpA</b> te dio a vigilar: le factura desde 2024 y hoy pasa a ser acreedor en un concurso.</p>
+            </div>
+            <div class="hacer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <p><b>Qué hacer:</b> verificar el crédito ante el liquidador antes de que cierre el período ordinario. Después se verifica igual, pero se paga después.
+                <span class="plazo">Quedan 30 días · vence el 09/08/2026</span></p>
+            </div>
+            <div class="acciones">
+              <button class="pulgar arriba" data-vote="up" data-id="A2" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V10l5-7 1 1a3 3 0 0 1 .6 3L13 10h5a2 2 0 0 1 2 2.3l-1.1 6A2 2 0 0 1 17 20H7z"/><path d="M7 10H4v11h3"/></svg>
+                Útil
+              </button>
+              <button class="pulgar abajo" data-vote="down" data-id="A2" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v11l-5 7-1-1a3 3 0 0 1-.6-3L11 14H6a2 2 0 0 1-2-2.3l1.1-6A2 2 0 0 1 7 4h10z"/><path d="M17 14h3V3h-3"/></svg>
+                No me sirve
+              </button>
+              <span class="sep"></span>
+              <a class="btn btn-2 btn-sm" href="demo/index.html">Ver publicación</a>
+            </div>
+          </article>
+
+          <p class="bandeja-nota" id="hNota"><b>El filtro descartó 38 publicaciones hoy.</b> Una de ellas mencionaba tu propio nombre:</p>
+
+          <div class="descarte" id="hD1">
+            <div class="alerta-meta">
+              <span class="grado">Descartada</span>
+              <span class="fuente">Diario oficial</span>
+              <time datetime="2026-07-10T06:00">10 JUL · 06:00</time>
+              <span class="folio">CVE 2.634.871</span>
+            </div>
+            <h4>Constitución de COMERCIAL LAGOS Y RUIZ SPA</h4>
+            <div class="extracto">
+              «Extracto. Por escritura pública de 07/07/2026 se constituyó <mark>COMERCIAL LAGOS Y RUIZ SPA</mark>, RUT 77.912.408-K, domicilio Chillán, giro: venta al por menor de abarrotes. Capital: $2.000.000.»
+            </div>
+            <p class="motivo"><b>Por qué no te la mandamos:</b> coincide con el nombre de tu estudio, pero es otra empresa. RUT distinto, giro de abarrotes en Chillán y ninguno de los socios comparte RUT con los tuyos. Es homonimia. <b>Si te la mandáramos, mañana desactivarías las notificaciones.</b></p>
+            <div class="acciones">
+              <button class="pulgar arriba" data-vote="rescue" data-id="D1" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V10l5-7 1 1a3 3 0 0 1 .6 3L13 10h5a2 2 0 0 1 2 2.3l-1.1 6A2 2 0 0 1 17 20H7z"/><path d="M7 10H4v11h3"/></svg>
+                Esto sí me importa
+              </button>
+            </div>
+          </div>
+
+          <p class="toast" id="hToast" hidden role="status"></p>
+
+        </div>
+      </div>
+      <p class="nota" style="margin-top:10px">Esta bandeja funciona: dale al pulgar y mírala reaccionar. Los datos son ficticios pero el formato de las publicaciones es el real. <a href="demo/index.html">El demo completo está acá →</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ EL PROBLEMA ============================ -->
+<section>
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>Alguien en tu oficina abre el Diario Oficial todas las mañanas</h2>
+      <span class="rotulo">01 · El problema</span>
+    </div>
+    <div class="rejilla rejilla-3">
+      <div class="panel">
+        <p class="rotulo">El estudio de abogados</p>
+        <h3 style="margin:8px 0 8px">El pasante de las 8:30</h3>
+        <p style="font-size:.92rem;line-height:1.55">Un procurador abre el PDF del Diario Oficial, le da Ctrl+F a doce nombres, revisa las publicaciones de marcas de INAPI y arma un correo. Le toma entre 40 y 90 minutos <span class="supuesto">estimación</span>. Lo hace bien un mes; al tercero se le pasa una publicación y el cliente pierde el plazo de oposición.</p>
+      </div>
+      <div class="panel">
+        <p class="rotulo">La PYME</p>
+        <h3 style="margin:8px 0 8px">No lo abre nunca</h3>
+        <p style="font-size:.92rem;line-height:1.55">Se entera de que un competidor se fusionó cuando ya se fusionó. De que cambió la norma de su rubro cuando la SEC lo fiscaliza. De que a su mejor cliente lo liquidaron cuando la factura ya es incobrable. No es dejadez: es que el Diario Oficial no está escrito para que ella lo lea.</p>
+      </div>
+      <div class="panel">
+        <p class="rotulo">Google Alerts</p>
+        <h3 style="margin:8px 0 8px">No cubre nada de esto</h3>
+        <p style="font-size:.92rem;line-height:1.55">Google Alerts indexa noticias. El Diario Oficial, el Boletín Concursal y las solicitudes de marca de INAPI no son noticias: son PDF y registros públicos que casi nadie enlaza. Y cuando algo sí aparece, llega igual de crudo y sin decirte si te toca.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ LA TESIS ============================ -->
+<section>
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>El producto no es encontrar. Es descartar.</h2>
+      <span class="rotulo">02 · La tesis</span>
+    </div>
+    <div class="rejilla rejilla-2">
+      <div>
+        <p style="font-size:var(--step-1);line-height:1.45;color:var(--texto)">Buscar tu RUT en un PDF <b>no requiere inteligencia artificial</b>. Es Ctrl+F. Cualquiera lo hace en un fin de semana, y por eso los productos de alertas que existen mandan de todo.</p>
+        <p style="margin-top:var(--sp-s);line-height:1.6">Un producto de alertas que avisa de más se apaga en dos semanas, y una alerta apagada es peor que ninguna alerta: te dejó la sensación de que estabas cubierto. La parte difícil —y la única que vale plata— es <b>decidir si esta publicación le importa a este cliente</b> y decírselo en una frase que se entienda en el celular, entre reunión y reunión.</p>
+        <p style="margin-top:var(--sp-s);line-height:1.6">Por eso nuestra métrica pública no es cuántas alertas mandamos. Es <b>qué fracción de las que mandamos fueron abiertas y accionadas</b>. Si esa cifra baja de 40%, el producto está roto y lo decimos en el roadmap: es nuestro criterio de muerte.</p>
+        <p class="nota" style="margin-top:var(--sp-s)"><b>Y el usuario entrena el filtro.</b> Cada pulgar abajo enseña una regla («no me mandes normas generales sin sujeto identificado»), y esa regla se aplica de inmediato a lo que está en cola. El filtro es tuyo, no nuestro.</p>
+      </div>
+      <figure class="figura">
+        <h3>Un día del Diario Oficial, para un estudio con 34 sujetos vigilados</h3>
+        <p class="sub">De la edición completa a lo que se envía. Las tres etapas cuestan tres cosas distintas.</p>
+        <div class="scroll-x">
+          <svg viewBox="0 0 460 250" width="460" height="250" role="img" aria-labelledby="tEmbudo dEmbudo" style="min-width:460px">
+            <title id="tEmbudo">Embudo de filtrado de un día</title>
+            <desc id="dEmbudo">613 avisos publicados, 41 candidatos que mencionan un sujeto vigilado, 3 alertas enviadas, 2 accionadas por el usuario.</desc>
+            <!-- rampa ordinal roja validada: #8C2A22 #B8352B #E04537 #FF6A5E -->
+            <g>
+              <rect x="0" y="18" width="440" height="36" fill="#8C2A22" rx="2"/>
+              <text class="dl" x="10" y="41" fill="#E8EBEC">613</text>
+              <text class="et-b" x="58" y="41">avisos publicados en la edición</text>
+              <text class="et" x="430" y="41" text-anchor="end">100%</text>
+            </g>
+            <g>
+              <rect x="0" y="72" width="295" height="36" fill="#B8352B" rx="2"/>
+              <text class="dl" x="10" y="95" fill="#E8EBEC">41</text>
+              <text class="et-b" x="48" y="95">mencionan un sujeto vigilado</text>
+              <text class="et" x="430" y="95" text-anchor="end">6,7%</text>
+            </g>
+            <g>
+              <rect x="0" y="126" width="150" height="36" fill="#E04537" rx="2"/>
+              <text class="dl" x="10" y="149" fill="#0A0D0E">3</text>
+              <text class="et-b" x="34" y="149" fill="#E8EBEC">pasan el juez de relevancia</text>
+              <text class="et" x="430" y="149" text-anchor="end">0,5%</text>
+            </g>
+            <g>
+              <rect x="0" y="180" width="100" height="36" fill="#FF6A5E" rx="2"/>
+              <text class="dl" x="10" y="203" fill="#0A0D0E">2</text>
+              <text class="et-b" x="34" y="203" fill="#E8EBEC">las abre y acciona</text>
+              <text class="et" x="430" y="203" text-anchor="end">67% señal</text>
+            </g>
+            <line class="eje" x1="0" y1="228" x2="440" y2="228"/>
+            <text class="et" x="0" y="243">Ctrl+F llega hasta acá ↑ (41). El resto es el producto.</text>
+          </svg>
+        </div>
+        <figcaption><span class="supuesto">Estimación propia</span> Volumen de un día representativo del Diario Oficial y de una cartera de 34 sujetos. No es un promedio auditado; es la forma del embudo, que es lo que importa. La derivación del costo de cada etapa está en <a href="stack.html">Arquitectura</a>.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CÓMO FUNCIONA ============================ -->
+<section>
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>Cómo funciona</h2>
+      <span class="rotulo">03 · Cuatro pasos, ninguno con una persona al otro lado</span>
+    </div>
+    <div class="paso">
+      <span class="paso-n">01</span>
+      <div>
+        <h3>Dices qué te importa</h3>
+        <p>Tu RUT. El de tus clientes (pegas la lista, o subes un CSV). Tu marca y su clase. Tu rubro. Tu comuna. Una palabra clave. Un competidor. Toma cuatro minutos y no hay que hablar con nadie.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <span class="paso-n">02</span>
+      <div>
+        <h3>Vigilamos todos los días, temprano</h3>
+        <p>A las 6:00 baja la edición del Diario Oficial. Se parte en avisos, se le extrae el RUT, la razón social, la comuna y el tipo de acto, y se cruza con tus sujetos. Lo mismo con INAPI, el Boletín Concursal, la CMF, el SEIA y la Dirección del Trabajo. Esa parte no es inteligencia artificial: es búsqueda de texto, y por eso es barata.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <span class="paso-n">03</span>
+      <div>
+        <h3>Un juez decide si te toca, y explica por qué</h3>
+        <p>Acá sí entra el modelo: mira el candidato junto a tu perfil y a tus pulgares anteriores, y decide. Si pasa, escribe la alerta: qué se publicó, <b>por qué te afecta a ti</b> en una frase, qué hacer y cuándo vence el plazo. Si no pasa, escribe el motivo del descarte y lo deja en la bandeja de descartadas, donde puedes revisarlo.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <span class="paso-n">04</span>
+      <div>
+        <h3>Llega al correo o al WhatsApp, y tú corriges el filtro</h3>
+        <p>Se lee en el celular en veinte segundos. Pulgar arriba: más de esto. Pulgar abajo: dinos por qué y esa regla se aplica de inmediato a lo que está en cola. Cada semana te mostramos tu tasa de señal, y si baja te lo decimos nosotros antes de que lo notes tú.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FUENTES ============================ -->
+<section>
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>Qué vigilamos</h2>
+      <span class="rotulo">04 · Fuentes</span>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">Diario oficial</span></div>
+      <p>Constituciones, modificaciones, fusiones y disoluciones de sociedades (Ley 20.659 y escrituras). Extractos de marcas de INAPI. Remates y expropiaciones. Citaciones a junta. Normas de todos los ministerios. <b>Es la fuente madre: casi todo pasa por acá.</b></p>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">INAPI</span></div>
+      <p>Solicitudes de marca publicadas, oposiciones, resoluciones. Si alguien pide un signo parecido al tuyo en tu clase, el reloj de la oposición parte el día de la publicación (Ley 19.039, art. 5) y no lo detiene nadie.</p>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">Boletín concursal</span></div>
+      <p>Resoluciones de liquidación y reorganización (Ley 20.720). Si un cliente tuyo te debe plata y entra en liquidación, tienes un plazo de verificación que corre desde la publicación. Es la alerta que se paga sola.</p>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">CMF</span></div>
+      <p>Normas de carácter general, oficios circulares, sanciones y registros. Relevante si eres o asesoras a un regulado.</p>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">SEIA</span></div>
+      <p>Proyectos ingresados al sistema de evaluación ambiental, por comuna y por titular. Un galpón nuevo al lado de tu faena aparece acá antes que en cualquier otra parte.</p>
+    </div>
+    <div class="fuente-fila">
+      <div><span class="fuente">Dir. del trabajo</span></div>
+      <p>Dictámenes y ordinarios. Cambian la interpretación de una norma laboral sin que cambie la ley, y nadie los lee.</p>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-m)">Las fuentes se agregan por demanda medida: si veinte cuentas piden la SEC, se parsea la SEC. La lista de fuentes pedidas y no cubiertas es pública dentro del producto. <b>No vigilamos Mercado Público</b>: para licitaciones hay productos mejores y no queremos ser mediocres en dos cosas.</p>
+  </div>
+</section>
+
+<!-- ============================ PRECIOS ============================ -->
+<section id="precios">
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>Precios</h2>
+      <span class="rotulo">05 · CLP + IVA · 14 días de prueba sin tarjeta</span>
+    </div>
+    <div class="rejilla rejilla-3">
+      <div class="plan">
+        <div class="plan-top"><h3>Vigía</h3></div>
+        <p class="precio">$14.900<small>al mes · 5 sujetos vigilados</small></p>
+        <ul>
+          <li>Tu RUT, tu marca, tu rubro, tu comuna, una palabra clave</li>
+          <li>Todas las fuentes</li>
+          <li>Alerta por correo, resumen semanal</li>
+          <li>Bandeja de descartadas con el motivo</li>
+          <li>1 usuario</li>
+        </ul>
+        <p class="quien">Para la PYME, el emprendedor con marca registrada, el dueño de una faena.</p>
+      </div>
+      <div class="plan destacado">
+        <div class="plan-top"><h3>Estudio</h3><span class="flash">El que compramos</span></div>
+        <p class="precio">$79.000<small>al mes · 60 sujetos vigilados</small></p>
+        <ul>
+          <li>La cartera completa de tus clientes, por RUT</li>
+          <li>Alertas por WhatsApp además del correo</li>
+          <li><b>Informe semanal con tu logo</b>, listo para reenviar a tu cliente</li>
+          <li>El filtro se entrena por usuario, no por cuenta</li>
+          <li>3 usuarios · sujeto adicional $900/mes</li>
+        </ul>
+        <p class="quien">Para el estudio de abogados boutique, el agente de marcas, la oficina contable con cartera.</p>
+      </div>
+      <div class="plan">
+        <div class="plan-top"><h3>Cartera</h3></div>
+        <p class="precio">$249.000<small>al mes · 300 sujetos vigilados</small></p>
+        <ul>
+          <li>Webhook y API: la alerta entra a tu sistema</li>
+          <li>Exportación del histórico</li>
+          <li>10 usuarios, cada uno con su filtro</li>
+          <li>Reglas duras por sujeto (nunca me mandes X)</li>
+          <li>Sujeto adicional $700/mes</li>
+        </ul>
+        <p class="quien">Para el estudio grande, la corredora, el banco que vigila su cartera de deudores.</p>
+      </div>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-m)">Se paga con tarjeta, se cancela con un clic, y si cancelas seguimos vigilando en silencio 30 días: si algo grave aparece te lo decimos igual, con el asunto tapado. Es la manera más honesta de recuperarte, y funciona mejor que un llamado. <a href="negocio.html">La economía unitaria completa está en Negocio →</a></p>
+  </div>
+</section>
+
+<!-- ============================ FAQ ============================ -->
+<section>
+  <div class="container">
+    <div class="titulo-seccion">
+      <h2>Lo que nos preguntan</h2>
+      <span class="rotulo">06 · Preguntas</span>
+    </div>
+    <details>
+      <summary>¿Y si se les pasa algo que sí me importaba?</summary>
+      <p>Pasa, y por eso la bandeja de <b>Descartadas</b> es visible y buscable: nunca omitimos en silencio. Cada descarte tiene su motivo escrito y un botón para revivirlo, y ese pulgar corrige el filtro. Lo que no hacemos es prometerte exhaustividad legal: <b>Pregonia no es asesoría jurídica y no reemplaza a tu abogado.</b> Es el pasante que nunca falta a las 8:30, no el que firma el escrito.</p>
+    </details>
+    <details>
+      <summary>¿Esto no lo hace ya el buscador del Diario Oficial?</summary>
+      <p>El Diario Oficial tiene buscador y es público: puedes entrar gratis todos los días. La pregunta no es si el dato está —está—, es si alguien lo va a mirar todos los días y va a saber cuál de los 613 avisos le toca. Lo que cobramos es la constancia y el descarte, no el acceso.</p>
+    </details>
+    <details>
+      <summary>¿Por qué no me mandan todo y decido yo?</summary>
+      <p>Porque lo probamos y no funciona: 41 avisos al día se convierten en una carpeta de correo que nadie abre, y a las dos semanas la alerta está silenciada. Un filtro que se equivoca a veces y se corrige es infinitamente mejor que un filtro que no filtra. Igual puedes pedir el modo crudo: en Entrega mueves el umbral y te llega todo lo que mencione algo tuyo. Casi nadie lo deja así más de una semana.</p>
+    </details>
+    <details>
+      <summary>¿Hay alguien detrás? ¿Puedo hablar con una persona?</summary>
+      <p>No, y preferimos decirlo. Pregonia se vende, se entrega, se cobra y se soporta sin intervención humana: por eso cuesta $79.000 y no $400.000. El soporte es un asistente que sabe de tu cuenta y de las fuentes; cuando no puede resolver, no te miente ni te pasea: te dice que no tiene cómo pasarte con una persona y te deja agendada una respuesta por correo, que alguien sí revisa. <a href="negocio.html#autonomia">Está todo explicado, incluido lo que no logramos automatizar →</a></p>
+    </details>
+    <details>
+      <summary>¿Qué hacen con mis datos y con los RUT de mis clientes?</summary>
+      <p>Los RUT que vigilas son tuyos y no se usan para nada más: no se venden, no alimentan un producto de datos, no salen de tu cuenta. Sólo tratamos datos de personas jurídicas y de fuentes públicas. El correo y el teléfono son de quien se registra, y la baja se honra al instante (Leyes 19.628 y 21.719).</p>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cierre">
+      <p class="rotulo">Pregonia</p>
+      <h2 style="margin-top:8px">Todo se pregona. Casi nada te toca.</h2>
+      <p>Catorce días de prueba, sin tarjeta. Si en catorce días no te llegó ni una alerta que te sirviera, no pagas y nos lo dices con el pulgar abajo.</p>
+      <div class="hero-btns" style="justify-content:center">
+        <a class="btn" href="demo/index.html">Abrir la bandeja</a>
+        <a class="btn btn-2" href="stack.html">Cómo está hecho</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b style="color:var(--texto-2)">Pregonia</b> · pregonia.com · Prototipo. Los datos de la bandeja son ficticios; el formato de las publicaciones es el real. Ninguna empresa nombrada en este sitio es un cliente real.</p>
+    <p style="margin-top:8px"><a href="../index.html">← Volver a las ideas</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+// Menú móvil
+(function () {
+  var b = document.getElementById('btnMenu'), m = document.getElementById('menuMovil');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('abierto');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+
+// La bandeja de la portada reacciona de verdad.
+(function () {
+  var cont = document.getElementById('hContador');
+  var toast = document.getElementById('hToast');
+  var nota = document.getElementById('hNota');
+  var enviadas = 3, utiles = 2;
+
+  function decir(txt) {
+    toast.textContent = txt;
+    toast.hidden = false;
+  }
+
+  document.querySelectorAll('.bandeja-cuerpo .pulgar').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var yaMarcado = btn.getAttribute('aria-pressed') === 'true';
+      var tipo = btn.dataset.vote;
+      var art = btn.closest('article, .descarte');
+
+      // Un voto por alerta: se apaga el hermano.
+      art.querySelectorAll('.pulgar').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+      btn.setAttribute('aria-pressed', yaMarcado ? 'false' : 'true');
+      if (yaMarcado) { toast.hidden = true; return; }
+
+      if (tipo === 'up') {
+        utiles = Math.min(enviadas, utiles + 1);
+        decir('Anotado. El filtro va a subir el peso de esta fuente para tus sujetos. Señal de la semana: ' + Math.round(utiles / enviadas * 100) + '%.');
+      } else if (tipo === 'down') {
+        art.style.opacity = '.45';
+        enviadas = Math.max(1, enviadas);
+        var restantes = document.querySelectorAll('.bandeja-cuerpo article .pulgar.abajo[aria-pressed="true"]').length;
+        cont.textContent = (3 - restantes) + ' alertas';
+        decir('Se fue a Descartadas y quedó la regla. En el demo te preguntamos POR QUÉ no te sirvió, y esa razón se aplica de inmediato a lo que está en cola.');
+      } else if (tipo === 'rescue') {
+        nota.innerHTML = '<b>Ok: la subimos a la bandeja.</b> Y aprendimos que las homonimias de razón social sí las quieres ver. Vas a recibir 6 más al mes <span style="color:var(--texto-3)">(las contamos)</span>.';
+        cont.textContent = '4 alertas';
+        decir('Regla aprendida: NO descartar coincidencias de razón social por homonimia. Se puede deshacer en Vigilancia.');
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

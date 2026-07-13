@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Cuantario</title>
+<meta name="description" content="El sistema completo: el kernel de cumplimiento que falla cerrado, los canales, los bandits, el juez sellado por hash, la cadena de voz con presupuesto de latencia, el modelo de datos y el costo mensual con su aritmética.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&family=Martian+Mono:wght@600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="cuantario.css">
+<style>
+  .cap { font-family: var(--disp); font-weight: 700; font-size: .58rem; letter-spacing: .14em;
+         text-transform: uppercase; color: var(--ink-3); border-top: 1px solid var(--line-2);
+         padding-top: 8px; margin-bottom: var(--sp-s); display: block; }
+  .ok  { color: var(--in); }
+  .bad { color: var(--out); }
+  .paso { display: grid; grid-template-columns: 30px 1fr; gap: var(--sp-xs);
+          padding: var(--sp-s) 0; border-bottom: 1px solid var(--line); }
+  .paso .n { font-family: var(--disp); font-weight: 700; font-size: .84rem; color: var(--out); }
+  .paso h4 { margin-bottom: 4px; }
+  .paso p { font-size: .84rem; color: var(--ink-2); margin: 0; line-height: 1.6; }
+  .paso p b { color: var(--ink); }
+  .paso code { font-size: .76rem; }
+  .dos { display: grid; gap: var(--sp-l); }
+  @media (min-width: 68em) { .dos { grid-template-columns: 1fr 1fr; gap: var(--sp-xl); align-items: start; } }
+  .tot-fila { background: var(--s2) !important; }
+  .tot-fila td { border-top: 1px solid var(--line-2); font-weight: 700; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="marca" href="index.html">
+      <svg class="glifo" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 10.5 L6.6 6.2 L9.2 8.6 L12 3.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      Cuantario
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Qué es</a></li>
+        <li><a href="demo/index.html">Tablero</a></li>
+        <li><a href="arquitectura.html" aria-current="page">Arquitectura</a></li>
+        <li><a href="integracion.html">Integración</a></li>
+        <li><a href="economia.html">Economía</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="wrap">
+  <span class="kicker">Arquitectura</span>
+  <h1 style="margin-bottom:var(--sp-s);max-width:22ch">Un kernel que muerde, y todo lo demás detrás de él.</h1>
+  <p class="prosa prose-max">
+    Nada de esta página está aprovisionado: está documentado. Es lo que habría que configurar para que
+    el tablero corriera con plata de verdad, con los costos y la aritmética a la vista.
+  </p>
+</section>
+
+<!-- ============ 1. KERNEL ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">01 · El núcleo de cumplimiento</span>
+  <div class="dos">
+    <div>
+      <h2 style="margin-bottom:var(--sp-s)">No es un prompt. Es un puerto de salida.</h2>
+      <div class="prosa">
+        <p>
+          <b>Ninguna acción llega a una API de terceros sin pasar por acá.</b> No es una capa de
+          consejo que el agente pueda ignorar cuando encuentra un argumento mejor: es la única función
+          que tiene permiso para hablar con Meta, Google, Twilio o el servidor de correo. El motor de
+          campañas y el juez <em>proponen</em>. El kernel <em>emite</em>.
+        </p>
+        <p>
+          Un LLM se puede convencer. Se lo puede convencer con una racha buena, con una excepción
+          razonable, con un «esta vez es distinto». Por eso el kernel evalúa <b>en cuatro pasos, y los
+          dos primeros no son un LLM</b>.
+        </p>
+      </div>
+
+      <div style="margin-top:var(--sp-s)">
+        <div class="paso">
+          <span class="n">1</span>
+          <div>
+            <h4>Reglas duras · código determinístico</h4>
+            <p>
+              ¿El canal está en <code>publico.canales</code>? ¿El gasto cabe en
+              <code>tope_diario_clp</code>? ¿El número está en la lista de supresión o en el registro
+              No Molestar? ¿Hay consentimiento con timestamp para este teléfono? ¿El manifiesto tiene el
+              hash vigente? <b>Esto es un <code>if</code>, no una opinión.</b> Aquí muere el 80% de lo que
+              se bloquea, y muere sin gastar un token.
+            </p>
+          </div>
+        </div>
+        <div class="paso">
+          <span class="n">2</span>
+          <div>
+            <h4>Topes · el freno que el sistema no puede soltar</h4>
+            <p>
+              Tope diario, mensual y total por idea. Tope de portafolio. Tope de escalamiento (+40% por
+              ciclo). <b>El juez opera dentro; no puede levantarlos.</b> Cuando pidió subir el de
+              05-contratos de +40% a +70%, esta regla lo rechazó — y quedó en la bitácora del kernel,
+              con el juez como solicitante.
+            </p>
+          </div>
+        </div>
+        <div class="paso">
+          <span class="n">3</span>
+          <div>
+            <h4>Clasificador de contenido · <code>claude-haiku-4-5</code></h4>
+            <p>
+              Lo que no se puede decidir con un <code>if</code>: ¿este texto se hace pasar por un usuario
+              orgánico? ¿esta afirmación es verificable con un dato que tenemos? ¿este anuncio promete un
+              resultado? Salida estructurada, con la regla de <code>autopilot.md §1</code> citada.
+              <b>Y no decide solo: su veredicto vuelve a pasar por las reglas duras.</b>
+            </p>
+          </div>
+        </div>
+        <div class="paso" style="border-bottom:0">
+          <span class="n">4</span>
+          <div>
+            <h4>Falla cerrado</h4>
+            <p>
+              Si el clasificador se cae, si hay ambigüedad, si el manifiesto no declara algo, si el
+              timeout se vence: <b>la acción no sale.</b> Un sistema autónomo que ante la duda actúa es
+              un sistema que ante la duda comete el error diez mil veces. Ante la duda, éste no hace nada
+              — y lo registra.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:var(--sp-s)">Los canales</h3>
+      <div class="scroll-x">
+        <table class="t" style="min-width:480px">
+          <thead><tr><th>Canal</th><th>API</th><th>Regla del kernel</th></tr></thead>
+          <tbody>
+            <tr><td class="ok"><b>Anuncios pagados</b></td><td>Meta Ads · Google Ads · TikTok Ads</td>
+                <td>Permitido. La plataforma los rotula como publicidad. Automatizable de punta a punta.</td></tr>
+            <tr><td class="ok"><b>Cuentas propias</b></td><td>Instagram Graph · X · LinkedIn</td>
+                <td>Permitido <b>con el nombre de la marca a la vista</b>. Una cuenta que no se identifica es un sockpuppet.</td></tr>
+            <tr><td class="ok"><b>SEO programático</b></td><td>Dominio propio · DataForSEO</td>
+                <td>Permitido. Útil, indexable, tuyo. Es el canal de menor CAC del portafolio ($19.800 en 17-datos-empresas).</td></tr>
+            <tr><td class="ok"><b>Email / WhatsApp</b></td><td>Resend · WhatsApp Business API</td>
+                <td><b>Sólo a quien se registró.</b> Plantillas aprobadas. Baja en un clic, honrada al instante.</td></tr>
+            <tr><td class="ok"><b>Patrocinios</b></td><td>Compra directa</td>
+                <td>Permitido, declarados como publicidad.</td></tr>
+            <tr><td class="ok"><b>Voz</b></td><td>Twilio</td>
+                <td>Entrante siempre. Saliente <b>sólo a quien dejó su número y consintió</b>. Ver §4.</td></tr>
+
+            <tr><td class="bad"><b>Astroturfing</b></td><td>—</td>
+                <td>Rechazado. Cuentas falsas, sockpuppets, posts en foros como usuario orgánico. Viola los ToS de toda plataforma y <b>te cuesta el canal</b>.</td></tr>
+            <tr><td class="bad"><b>Reseñas falsas</b></td><td>—</td>
+                <td>Rechazado. Mismo motivo, más responsabilidad legal directa.</td></tr>
+            <tr><td class="bad"><b>Voz en frío</b></td><td>—</td>
+                <td>Rechazado. Ley 21.398 (No Molestar) y Ley 19.496 en Chile; la FCC ya declaró ilegales las robocalls con voz de IA bajo la TCPA.</td></tr>
+            <tr><td class="bad"><b>Voz que no se declara IA</b></td><td>—</td>
+                <td>Rechazado. Y nunca clonar a una persona real.</td></tr>
+            <tr><td class="bad"><b>Afirmaciones no verificables</b></td><td>—</td>
+                <td>Rechazado. Toda cifra citada o con su derivación. «Recupera el 90% de tu cartera» con n=3 no sale.</td></tr>
+            <tr><td class="bad"><b>Datos raspados</b></td><td>—</td>
+                <td>Rechazado. Ley 19.628 y Ley 21.719. Un directorio profesional no es consentimiento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mut" style="font-size:.74rem;margin-top:8px">
+        <b>El argumento es económico antes que ético.</b> El canal es el activo: Meta cierra la cuenta
+        publicitaria, X banea, Reddit marca el dominio, la operadora quema el número. Un sistema autónomo
+        que se quema sus propios canales no es un negocio autónomo — es una máquina de destruir activos
+        rápido.
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ 2. BANDITS ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">02 · El motor de experimentación</span>
+  <div class="dos">
+    <div>
+      <h2 style="margin-bottom:var(--sp-s)">Bandits, con el freno de mano puesto.</h2>
+      <div class="prosa">
+        <p>
+          Cada par <b>(canal × creatividad)</b> es un brazo. La asignación es <b>Thompson sampling</b>
+          sobre una Beta-Bernoulli: cada brazo lleva su <code>(α, β)</code>, se muestrea una tasa de
+          conversión de la posterior y el presupuesto del día se reparte proporcional a la probabilidad
+          de que cada brazo sea el mejor.
+        </p>
+        <p>
+          Thompson explora solo, sin que nadie decida cuándo parar de explorar. Eso es exactamente lo que
+          se necesita cuando no hay humano mirando. Pero tiene un problema conocido y hay que atajarlo:
+          <b>con muestras chicas se enamora rápido de un brazo con suerte.</b>
+        </p>
+        <p>Por eso hay tres frenos, y los tres están declarados:</p>
+      </div>
+      <ul class="lista" style="margin-top:var(--sp-s)">
+        <li><b>Piso de exploración.</b> Ningún brazo baja de <b>5%</b> del presupuesto mientras tenga
+          <code>n &lt; 30</code>. Un brazo con mala suerte los primeros tres días no se muere de hambre.</li>
+        <li><b>Cuota fija al arranque.</b> Las primeras <b>3 semanas</b> el reparto es plano. El bandit
+          mira, no toca. (En el tablero: las 3 primeras barras de la reasignación son iguales.)</li>
+        <li><b>Prueba secuencial (mSPRT).</b> Para <em>declarar</em> un ganador —no para inclinar el
+          reparto, sino para que el <b>juez</b> lo use como evidencia— se exige <code>n ≥ 30</code>
+          conversiones por brazo y que la razón de verosimilitud mixta cruce el umbral de α = 0,05.
+          <b>Un peek diario sin corrección secuencial infla el falso positivo a más del 30%</b>; con
+          mSPRT el α se mantiene aunque se mire todos los días, que es justo lo que hace un sistema que
+          corre sin parar.</li>
+      </ul>
+      <div class="nota" style="margin-top:var(--sp-s)">
+        <b>La distinción que importa.</b> El bandit puede inclinar el reparto con poca evidencia —eso es
+        lo que un bandit hace, y el costo de equivocarse es unos pesos mal puestos. El <b>juez</b> no:
+        para matar, pausar o escalar necesita que la prueba secuencial haya cruzado. Mover presupuesto
+        entre creatividades y <b>matar una idea</b> son decisiones de peso muy distinto, y exigen
+        evidencia de peso muy distinto.
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:var(--sp-s)">El juez</h3>
+      <div class="prosa">
+        <p>
+          Corre <b>una vez al día por idea</b>. Recibe tres cosas y sólo tres: el manifiesto sellado, la
+          serie de métricas del endpoint de la idea, y su propia bitácora anterior.
+        </p>
+      </div>
+      <div class="scroll-x">
+        <table class="t" style="min-width:440px">
+          <thead><tr><th>Puede</th><th>No puede</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="ok">Leer los <code>criterios_de_muerte</code> del manifiesto.</td>
+              <td class="bad"><b>Editarlos.</b> El manifiesto viene sellado con un hash; el juez lo recibe como texto y no tiene herramienta de escritura sobre él.</td>
+            </tr>
+            <tr>
+              <td class="ok">Emitir <code>escalar</code>, <code>mantener</code>, <code>reducir</code>, <code>pausar</code>, <code>matar</code>.</td>
+              <td class="bad">Inventar una decisión que no esté en esa lista, o «matar a medias».</td>
+            </tr>
+            <tr>
+              <td class="ok">Reasignar presupuesto <b>dentro</b> de los topes.</td>
+              <td class="bad"><b>Levantar un tope.</b> Lo pidió; el kernel lo rechazó. Está registrado.</td>
+            </tr>
+            <tr>
+              <td class="ok">Declarar que <b>no puede decidir</b> por falta de muestra o de dato.</td>
+              <td class="bad">Sustituir un criterio que no puede medir por otro que sí. Eso es mover el arco, y es lo único que este diseño existe para impedir.</td>
+            </tr>
+            <tr>
+              <td class="ok">Citar la evidencia y la regla en su veredicto.</td>
+              <td class="bad">Emitir un veredicto sin cita. Un veredicto sin regla citada se descarta y se registra como falla del juez.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota ok" style="margin-top:var(--sp-s)">
+        <b>Por qué el sello importa.</b> Un juez que puede editar el criterio con el que se lo evalúa
+        siempre encuentra una razón para seguir gastando — con seis meses invertidos, «relajar el umbral
+        de activación de 15% a 11%» suena razonable. Suena razonable <em>porque</em> hay seis meses
+        invertidos. Ese es el sesgo entero, y la única defensa es que el arco no se pueda mover.
+      </div>
+      <p class="mut" style="font-size:.74rem;margin-top:var(--sp-s)">
+        Modelo: <code>claude-sonnet-5</code>. No es una tarea trivial de clasificación — hay que leer una
+        condición en prosa, cruzarla con una serie, y razonar sobre si la muestra aguanta la conclusión.
+        Con <code>claude-haiku-4-5</code> la evaluación de los criterios compuestos («A <b>y</b> B, a la
+        vez») falla justo en el caso que más importa: el de 06-arriendos.
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ 3. VOZ ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">03 · La arquitectura de voz</span>
+  <div class="dos">
+    <div>
+      <h2 style="margin-bottom:var(--sp-s)">Lo que hace que una voz suene viva es la latencia, no el timbre.</h2>
+      <figure>
+        <div class="fig-h"><span class="rot">Presupuesto de latencia · punta a punta</span></div>
+        <svg viewBox="0 0 520 130" class="g" role="img" aria-labelledby="lat-t">
+          <title id="lat-t">Presupuesto de latencia de la cadena de voz: telefonía 40 ms, ASR en streaming 180 ms, primer token del LLM 320 ms, primer byte del TTS 120 ms, red y jitter 90 ms. Total 750 ms, bajo el techo de 800 ms.</title>
+          <!-- barra apilada -->
+          <rect x="0"   y="24" width="26.7" height="34" fill="#B7D5FB"/>
+          <rect x="28.7" y="24" width="120" height="34" fill="#89B6F6"/>
+          <rect x="150.7" y="24" width="213.3" height="34" fill="#5A93E8"/>
+          <rect x="366" y="24" width="80" height="34" fill="#3F74C6"/>
+          <rect x="448" y="24" width="60" height="34" fill="#2F639F"/>
+          <!-- techo -->
+          <line x1="533" y1="14" x2="533" y2="68" stroke="#FF5B4E" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <text x="520" y="12" class="gxl" fill="#FF5B4E" text-anchor="end">techo 800 ms</text>
+          <line x1="508" y1="20" x2="508" y2="62" stroke="#2ED47F" stroke-width="1.5"/>
+          <text x="508" y="76" class="gx" fill="#2ED47F" text-anchor="end">750 ms</text>
+          <!-- etiquetas -->
+          <text x="13" y="97" class="gx" fill="#B7D5FB" text-anchor="middle">40</text>
+          <text x="88" y="97" class="gx" fill="#89B6F6" text-anchor="middle">180</text>
+          <text x="257" y="97" class="gx" fill="#5A93E8" text-anchor="middle">320</text>
+          <text x="406" y="97" class="gx" fill="#3F74C6" text-anchor="middle">120</text>
+          <text x="478" y="97" class="gx" fill="#2F639F" text-anchor="middle">90</text>
+          <text x="13" y="112" class="gxl" text-anchor="middle">tel</text>
+          <text x="88" y="112" class="gxl" text-anchor="middle">ASR</text>
+          <text x="257" y="112" class="gxl" text-anchor="middle">LLM · primer token</text>
+          <text x="406" y="112" class="gxl" text-anchor="middle">TTS</text>
+          <text x="478" y="112" class="gxl" text-anchor="middle">red</text>
+        </svg>
+        <figcaption>
+          40 + 180 + 320 + 120 + 90 = <b>750 ms</b>. El techo son 800. Los 320 ms del primer token del
+          LLM son la partida grande y la única que se puede comprimir: <code>claude-haiku-4-5</code> con
+          el prefijo del sistema <b>cacheado</b> (el prompt de la marca, el catálogo y las reglas), de
+          modo que sólo el turno del usuario entra sin caché.
+        </figcaption>
+      </figure>
+      <p class="prosa" style="margin-top:var(--sp-s)">
+        Con <em>barge-in</em>: si la persona interrumpe, el TTS se corta en el siguiente frame de 20 ms.
+        Una voz que no se deja interrumpir se siente como una grabación, y la gente cuelga.
+      </p>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:var(--sp-s)">Y lo que la hace legal es decir que es una IA.</h3>
+      <ul class="lista">
+        <li><b>Divulgación en los primeros 5 segundos.</b> <i>«Te habla un asistente virtual de
+          Antefirma.»</i> Esto <b>no</b> mata la credibilidad: lo que la mata es que la persona se sienta
+          engañada al descubrirlo a los tres minutos. El AI Act europeo (art. 50) ya lo exige y la
+          tendencia es global.</li>
+        <li><b>Voz sintética con licencia.</b> Nunca clonar a una persona real sin consentimiento
+          escrito, nunca hacerse pasar por alguien específico. El kernel bloqueó exactamente eso en
+          06-arriendos.</li>
+        <li><b>Saliente sólo a quien dejó su número.</b> Consentimiento con timestamp y origen. Lista de
+          supresión honrada al instante, registro No Molestar, tope de frecuencia por número. De 296
+          leads de Adjudate, <b>84 calificaban. Se llamó a 84.</b></li>
+        <li><b>Cuando piden un humano y no hay humano, el sistema lo dice.</b> <i>«No tengo cómo pasarte
+          con una persona, pero te dejo agendada una devolución por correo.»</i> Mentir acá es lo único
+          que convierte un producto honesto en una estafa — y es una tentación real, porque la métrica de
+          la llamada mejora si mientes.</li>
+        <li><b>Bitácora.</b> Cada llamada grabada y transcrita, con su aviso de grabación al inicio.</li>
+      </ul>
+      <p class="mut" style="font-size:.74rem;margin-top:var(--sp-s)">
+        Cadena: <b>Twilio</b> (SIP/RTP) → <b>Deepgram</b> (ASR en streaming, con endpointing) →
+        <b>claude-haiku-4-5</b> (con herramientas contra Postgres: nunca inventa disponibilidad ni
+        precios) → <b>Cartesia</b> (TTS en streaming).
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ 4. DATOS ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">04 · El modelo de datos</span>
+  <h2 style="margin-bottom:var(--sp-s)">Nueve tablas. La mitad existen para poder auditar.</h2>
+  <div class="scroll-x">
+    <table class="t" style="min-width:760px">
+      <thead><tr><th>Tabla</th><th>Campos</th><th>Por qué existe</th></tr></thead>
+      <tbody>
+        <tr><td><code>idea</code></td>
+          <td><code>id</code> (pk, = carpeta) · <code>brand</code> · <code>autonomia</code> · <code>estado</code> · <code>manifiesto_hash</code></td>
+          <td>La llave del sistema es la carpeta, no la marca. Por eso el tablero puede operar 17-datos-empresas sin saber cómo se llama.</td></tr>
+        <tr><td><code>manifiesto</code></td>
+          <td><code>idea_id</code> · <code>version</code> · <code>json</code> · <code>hash</code> · <code>sellado_en</code> · <code>sellado_por</code></td>
+          <td><b>Inmutable.</b> Cambiar un criterio crea una versión nueva; la anterior queda. Sin esto, «el criterio siempre fue 11%» es indemostrable.</td></tr>
+        <tr><td><code>criterio</code></td>
+          <td><code>idea_id</code> · <code>hito</code> · <code>mes</code> · <code>condicion</code> · <code>accion</code> · <code>cita</code></td>
+          <td>La <code>cita</code> es texto literal del <code>roadmap.html</code>. Es lo que el juez le lee de vuelta a la idea cuando la mata.</td></tr>
+        <tr><td><code>presupuesto</code></td>
+          <td><code>idea_id</code> · <code>tope_diario</code> · <code>tope_mensual</code> · <code>tope_total</code> · <code>asignado_mes</code> · <code>gastado_acum</code></td>
+          <td>Los topes viven en la base, no en el prompt del juez. Un tope que vive en un prompt es una sugerencia.</td></tr>
+        <tr><td><code>brazo</code></td>
+          <td><code>idea_id</code> · <code>canal</code> · <code>creatividad</code> · <code>alfa</code> · <code>beta</code> · <code>n</code> · <code>conversiones</code></td>
+          <td>El estado de los bandits. En Redis para la lectura caliente, persistido en Postgres cada hora.</td></tr>
+        <tr><td><code>accion</code></td>
+          <td><code>idea_id</code> · <code>canal</code> · <code>tipo</code> · <code>payload</code> · <code>estado</code> (emitida / <b>bloqueada</b> / recortada) · <code>regla</code> · <code>ts</code></td>
+          <td><b>La tabla que hace auditable al sistema.</b> Guarda lo que <em>no</em> se hizo, con la regla que lo impidió. Es lo que alimenta la sección del kernel en el tablero.</td></tr>
+        <tr><td><code>metrica</code></td>
+          <td><code>idea_id</code> · <code>fecha</code> · <code>evento</code> · <code>valor</code></td>
+          <td>Lo que devuelve el endpoint de la idea. Si falta un evento que un criterio necesita, se registra el hueco: no se rellena.</td></tr>
+        <tr><td><code>veredicto</code></td>
+          <td><code>idea_id</code> · <code>fecha</code> · <code>decision</code> · <code>criterio_id</code> · <code>evidencia</code> · <code>presup_antes</code> · <code>presup_despues</code></td>
+          <td>Un veredicto sin <code>criterio_id</code> no se acepta. Fuerza al juez a apuntar a una regla que existe.</td></tr>
+        <tr><td><code>consentimiento</code></td>
+          <td><code>canal</code> · <code>identificador</code> · <code>origen</code> · <code>ts</code> · <code>revocado_en</code></td>
+          <td>Sin fila acá, el kernel no emite ni un correo ni una llamada. La revocación se honra al instante, no en el próximo ciclo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ 5. AGENTES Y COSTO ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">05 · Los agentes y lo que cuestan</span>
+  <h2 style="margin-bottom:var(--sp-s)">Cinco agentes. US$120 al mes de inferencia para 21 ideas.</h2>
+  <p class="prosa prose-max" style="margin-bottom:var(--sp-m)">
+    Precios de lista: <code>claude-sonnet-5</code> US$3 / US$15 por millón de tokens (entrada / salida);
+    <code>claude-haiku-4-5</code> US$1 / US$5. Tipo de cambio supuesto: <b>$960 por dólar</b>.
+    Todo el cálculo es multiplicación; está a la vista para que se pueda discutir paso por paso.
+  </p>
+
+  <div class="scroll-x">
+    <table class="t" style="min-width:820px">
+      <caption>Inferencia mensual, con 21 ideas conectadas.</caption>
+      <thead><tr><th>Agente</th><th>Modelo</th><th>Volumen</th><th class="n">Entrada</th><th class="n">Salida</th><th class="n">US$/mes</th></tr></thead>
+      <tbody>
+        <tr><td><b>El juez</b></td><td><code>claude-sonnet-5</code></td>
+          <td>21 ideas × 30 días = <b>630 corridas</b></td>
+          <td class="n">14.000 tok</td><td class="n">1.200 tok</td>
+          <td class="n">630 × ($0,042 + $0,018) = <b>37,80</b></td></tr>
+        <tr><td><b>El kernel</b> (clasificador)</td><td><code>claude-haiku-4-5</code></td>
+          <td><b>2.400 acciones</b> propuestas</td>
+          <td class="n">3.000 tok</td><td class="n">400 tok</td>
+          <td class="n">2.400 × ($0,003 + $0,002) = <b>12,00</b></td></tr>
+        <tr><td><b>Creatividades</b></td><td><code>claude-sonnet-5</code></td>
+          <td>21 × 12 = <b>252 piezas</b></td>
+          <td class="n">4.000 tok</td><td class="n">800 tok</td>
+          <td class="n">252 × $0,024 = <b>6,05</b></td></tr>
+        <tr><td><b>SEO programático</b></td><td><code>claude-sonnet-5</code></td>
+          <td>21 × 40 = <b>840 páginas</b></td>
+          <td class="n">6.000 tok</td><td class="n">2.500 tok</td>
+          <td class="n">840 × $0,0555 = <b>46,62</b></td></tr>
+        <tr><td><b>Voz</b> (turnos)</td><td><code>claude-haiku-4-5</code></td>
+          <td>900 min × 6 = <b>5.400 turnos</b></td>
+          <td class="n">2.000 tok</td><td class="n">250 tok</td>
+          <td class="n">5.400 × $0,00325 = <b>17,55</b></td></tr>
+        <tr class="tot-fila"><td colspan="5">Inferencia</td><td class="n">US$ 120,02</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="scroll-x" style="margin-top:var(--sp-m)">
+    <table class="t" style="min-width:620px">
+      <caption>Infraestructura y servicios.</caption>
+      <thead><tr><th>Servicio</th><th>Dimensionamiento</th><th class="n">US$/mes</th></tr></thead>
+      <tbody>
+        <tr><td>Fly.io</td><td>2 apps <code>shared-cpu-2x</code>, 4 GB (API + trabajadores)</td><td class="n">58</td></tr>
+        <tr><td>Fly Postgres</td><td>2 vCPU / 4 GB / 80 GB</td><td class="n">62</td></tr>
+        <tr><td>Upstash Redis</td><td>Estado de los bandits, colas idempotentes</td><td class="n">10</td></tr>
+        <tr><td>DataForSEO</td><td>Keywords del SEO programático</td><td class="n">50</td></tr>
+        <tr><td>Axiom</td><td>Logs (500 GB) — incluye la bitácora del kernel</td><td class="n">25</td></tr>
+        <tr><td>Sentry</td><td>Errores (Team)</td><td class="n">26</td></tr>
+        <tr><td>Resend</td><td>50.000 correos/mes</td><td class="n">20</td></tr>
+        <tr><td>Twilio</td><td>5 números + 900 min entrantes</td><td class="n">13</td></tr>
+        <tr><td>Cartesia</td><td>TTS, 1,1 M caracteres</td><td class="n">17</td></tr>
+        <tr><td>Deepgram</td><td>ASR, 900 min</td><td class="n">4</td></tr>
+        <tr><td>Dominios</td><td>21 × US$12/año ÷ 12</td><td class="n">21</td></tr>
+        <tr class="tot-fila"><td colspan="2">Infraestructura</td><td class="n">US$ 306</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="scroll-x" style="margin-top:var(--sp-m)">
+    <table class="t" style="min-width:620px">
+      <caption>El total, en pesos.</caption>
+      <tbody>
+        <tr><td>Inferencia</td><td class="n">US$ 120,02</td><td class="n">$115.219</td></tr>
+        <tr><td>Infraestructura y servicios</td><td class="n">US$ 306,00</td><td class="n">$293.760</td></tr>
+        <tr><td><b>Nube</b> (× $960)</td><td class="n"><b>US$ 426,02</b></td><td class="n"><b>$408.979</b></td></tr>
+        <tr><td>Mantención de plataforma · 4 h × $32.000<br>
+            <span class="mut" style="font-size:.72rem">Deprecaciones de API, apelaciones de cuenta publicitaria.
+            <b>No está en el loop de decisión</b> — pero existe, y decir «cero humanos» a secas sería
+            justo el tipo de afirmación que este kernel bloquea.</span></td>
+          <td class="n">—</td><td class="n">$128.000</td></tr>
+        <tr class="tot-fila"><td>Costo mensual del sistema · 21 ideas</td><td class="n">—</td><td class="n">$536.977</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nota ok" style="margin-top:var(--sp-m)">
+    <b>La forma del costo importa más que el monto.</b> $536.977 = <b>$446.689 fijos</b> + <b>$5.643 por
+    idea operada</b> × 16. El sistema casi no crece con el portafolio: la idea número 17 cuesta $5.643 al mes.
+    <a href="economia.html" style="color:var(--in)">De ahí sale el punto en que se paga solo →</a>
+  </div>
+</section>
+
+<hr class="f">
+
+<!-- ============ 6. FALSEADO ============ -->
+<section class="wrap" style="padding-top:0">
+  <span class="cap">06 · Qué está falseado en el demo</span>
+  <h2 style="margin-bottom:var(--sp-s)">Todo lo que no admite estar falseado, y lo que sí.</h2>
+  <div class="dos">
+    <div>
+      <h3 class="bad" style="margin-bottom:var(--sp-xs)">Falseado</h3>
+      <ul class="lista">
+        <li><b>Las cifras.</b> Ninguna idea ha gastado un peso. Los $38.530.000 de gasto y los
+          $30.176.000 de ingreso son mock — pero <b>aritméticamente consistentes</b>: la suma del gasto
+          de las 16 ideas es el gasto del portafolio, y la suma de los presupuestos asignados cabe bajo
+          el tope. Si no cuadraran, el tablero estaría mintiendo sobre lo único que tiene que saber hacer.</li>
+        <li><b>El bandit no corre.</b> Las cuotas semanales se interpolan entre un inicio y un fin
+          declarados y se normalizan a 100. Thompson real necesita un flujo de conversiones real.</li>
+        <li><b>El juez no es un LLM en esta página.</b> Los nueve veredictos están escritos. Pero las
+          <b>reglas</b> y las <b>citas</b> no: salen textuales de los <code>roadmap.html</code> de las
+          ideas, y las cuentas (11,0% con IC [6,6%–17,9%]; n=441 requerido para Finakids) están hechas.</li>
+        <li><b>El kernel no bloquea nada todavía.</b> Las 11 acciones de la bitácora son plausibles,
+          no reales.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="ok" style="margin-bottom:var(--sp-xs)">Lo que haría falta para que fuera real</h3>
+      <ul class="lista">
+        <li><b>Que las ideas publiquen su endpoint de métricas.</b> Es la dependencia dura y ninguna la
+          tiene hoy. Sin <code>/metrics</code>, el juez es ciego — y ya se ve el síntoma en el tablero
+          con 07-terreno.</li>
+        <li><b>Cuentas publicitarias con historial.</b> Meta y Google no le entregan la API de gasto a
+          una cuenta nueva sin fricción; hay un período de calentamiento que ningún sistema autónomo se
+          salta.</li>
+        <li><b>Personería y pasarela.</b> Flow o Transbank exigen una sociedad con RUT. El sistema puede
+          operar el marketing de una idea que no existe legalmente; no puede cobrarle a nadie.</li>
+        <li><b>Un humano que apriete «armar» la primera vez.</b> Y que pueda apretar el interruptor
+          global. Está en el tablero, arriba a la izquierda, y funciona.</li>
+      </ul>
+      <div class="nota" style="margin-top:var(--sp-s)">
+        <b>Dominio:</b> <code>cuantario.com</code> — RDAP de Verisign devolvió <b>HTTP 404</b> (disponible)
+        el 13-07-2026. Control: <code>google.com</code> → HTTP 200 (tomado), o sea que el chequeo
+        distingue. <code>cuantario.cl</code> también libre en NIC Chile.
+        Alternativas verificadas el mismo día: <code>asignaria.com</code>, <code>ponderario.com</code>,
+        <code>juzgaria.com</code>.
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    Modelos: <code>claude-sonnet-5</code> (juez, creatividades, SEO) y <code>claude-haiku-4-5</code>
+    (kernel, voz). Precios de lista a julio de 2026. Tipo de cambio $960/US$.
+  </div>
+</footer>
+
+<script src="comun.js"></script>
+</body>
+</html>

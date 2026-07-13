@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Pregonia</title>
+<meta name="description" content="A quién le vende Pregonia y por qué: el estudio de abogados que ya paga un pasante para revisar el Diario Oficial. Mercado, precio, economía unitaria, canales y cómo opera sin humanos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc { max-width: 74ch; }
+  .doc p { margin-top: var(--sp-s); line-height: 1.62; }
+  .doc h3 { margin-top: var(--sp-m); }
+  .doc ul { margin-top: var(--sp-s); }
+  .caja { border: 1px solid var(--linea-2); background: var(--panel); padding: var(--sp-s); margin-top: var(--sp-s); }
+  .caja .rotulo { display: block; margin-bottom: 8px; }
+  .caja p:first-of-type { margin-top: 0; }
+  .caja-f { border-color: var(--flash-bord); background: var(--flash-apag); }
+  .calc { font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: var(--texto-2); white-space: pre-wrap; overflow-x: auto; }
+  .calc b { color: var(--texto); font-weight: 500; }
+  .calc .f { color: var(--flash); }
+  .indice { display: flex; flex-wrap: wrap; gap: 6px; padding-block: var(--sp-s); border-bottom: 1px solid var(--linea); margin-bottom: var(--sp-m); }
+  .indice a { font-family: var(--mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-3); text-decoration: none; border: 1px solid var(--linea); padding: 7px 9px; min-height: 44px; display: inline-flex; align-items: center; }
+  .indice a:hover { color: var(--texto); border-color: var(--linea-2); }
+  .veredicto { border-left: 3px solid var(--flash); padding-left: var(--sp-s); margin-top: var(--sp-s); }
+  .veredicto p { color: var(--texto); font-size: 1.02rem; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="container cabecera-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 9v6M3 12h4l8-5v10l-8-5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 8c1.6 1.1 1.6 6.9 0 8" stroke="#FF3B30" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Pregonia<span class="pt">.</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+  <div class="container" id="menuMovil">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <section style="padding-block: var(--sp-l) var(--sp-s)">
+    <p class="rotulo">Pregonia · Plan de negocio</p>
+    <h1 style="margin-top:8px;max-width:20ch">No le vendemos a quien tiene el problema. Le vendemos a quien ya paga por resolverlo.</h1>
+    <p class="bajada" style="font-size:var(--step-1);color:var(--texto-2);margin-top:var(--sp-s);max-width:60ch;line-height:1.45">La PYME tiene el dolor pero no lo siente. El estudio de abogados <b style="color:var(--texto)">ya tiene el costo en la planilla</b>: el pasante que abre el Diario Oficial todas las mañanas.</p>
+
+    <nav class="indice" aria-label="Secciones">
+      <a href="#quien">01 A quién le vendemos</a>
+      <a href="#icp">02 ICP</a>
+      <a href="#mercado">03 Mercado</a>
+      <a href="#cuna">04 Cuña</a>
+      <a href="#competencia">05 Competencia</a>
+      <a href="#economia">06 Economía unitaria</a>
+      <a href="#canales">07 Canales</a>
+      <a href="#ia">08 IA en el marketing</a>
+      <a href="#autonomia">09 Autonomía</a>
+      <a href="#dias">10 Primeros 90 días</a>
+      <a href="#mata">11 Qué lo mata</a>
+    </nav>
+  </section>
+
+  <!-- ===== 01 ===== -->
+  <section id="quien">
+    <div class="titulo-seccion"><h2>A quién le vendemos, con la aritmética a la vista</h2><span class="rotulo">01</span></div>
+    <div class="doc">
+      <p>Hay tres compradores posibles y sólo uno aguanta la aritmética. Los tres candidatos:</p>
+    </div>
+
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table>
+        <thead>
+          <tr><th>Candidato</th><th>Qué gana</th><th>Ticket que aguanta</th><th>El problema</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>La PYME</b><br><span class="dim">Constructora, importadora, restorán con marca</span></td>
+            <td>No perder la marca. No facturarle a un cliente que va a quebrar.</td>
+            <td><b>$14.900/mes</b></td>
+            <td>El dolor es <b>intermitente</b>: pasan seis meses sin que ocurra nada y cancela. Y es difícil de alcanzar: no busca «vigilancia del Diario Oficial», porque no sabe que existe el problema.</td>
+          </tr>
+          <tr>
+            <td><b>El estudio de abogados</b><br><span class="dim">Boutique corporativo, agente de marcas, oficina contable con cartera</span></td>
+            <td>Deja de pagarle 1 hora diaria a un procurador. Deja de arriesgar el plazo de oposición. Y <b>le reenvía la alerta a su cliente con su logo</b>: parece más atento, y no le cuesta nada.</td>
+            <td><b>$79.000–$249.000/mes</b></td>
+            <td>Es conservador y compra lento. Pero <b>ya tiene el costo en la planilla</b>, que es lo único que importa.</td>
+          </tr>
+          <tr>
+            <td><b>El equipo comercial</b><br><span class="dim">Que quiere señales de compra: empresa recién constituida, proyecto SEIA ingresado</span></td>
+            <td>Leads. Una empresa que se acaba de constituir necesita contador, seguro, software.</td>
+            <td><b>$60.000–$150.000/mes</b></td>
+            <td><b>Es otro producto.</b> Quiere volumen, no precisión: quiere las 613, no las 3. Nuestro filtro —que es toda nuestra tesis— le sobra. Y ya hay productos de datos de empresas que lo hacen mejor.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc">
+      <div class="caja caja-f">
+        <span class="rotulo">La decisión</span>
+        <p><b>Vendemos al estudio y a la oficina contable con cartera.</b> No porque tengan más dolor —la PYME tiene más—, sino porque tienen el presupuesto <em>ya asignado</em> y una consecuencia con fecha.</p>
+        <p class="calc" style="margin-top:12px">Costo del pasante que revisa el D.O. a mano
+  Renta bruta de un procurador/egresado      <b>$650.000/mes</b>   <span style="color:var(--texto-3)">(estimación de mercado 2026; verificar)</span>
+  Costo empresa (× 1,25 por leyes sociales)  <b>$812.500/mes</b>
+  Horas al mes                                     176 h
+  Costo por hora                                <b>$4.616</b>
+  1 hora diaria × 22 días hábiles                   22 h
+  <b class="f">Costo directo de revisar el D.O. a mano   $101.500/mes</b>
+
+Y ése es sólo el costo visible. El invisible:
+  Un plazo de oposición marcaria perdido = la marca del cliente.
+  Un crédito no verificado a tiempo = el cliente cobra después de todos.
+  Los dos terminan en el mismo lugar: el estudio pierde al cliente.
+
+<b class="f">Precio de Pregonia Estudio: $79.000/mes.</b>
+Es <b>21% más barato que la hora del pasante</b>, y el pasante igual sigue ahí
+haciendo lo que sí sabe hacer. No vendemos ahorro de personal: vendemos que
+esa hora se ocupe en otra cosa y que el plazo no se pase nunca.</p>
+      </div>
+
+      <p>La PYME <b>igual la vendemos</b> —el tramo Vigía a $14.900— pero no vamos a buscarla: llega por dos vías que no cuestan plata. Por el SEO programático (busca «me objetaron la marca qué hago» y aterriza en nuestra página), y <b>por el propio estudio</b>, que le reenvía la alerta con su logo y le dice «esto lo vigilo con Pregonia, contrátalo tú también para lo tuyo». Ese es el efecto de red del canal profesional y es la razón por la que se empieza por ahí.</p>
+    </div>
+  </section>
+
+  <!-- ===== 02 ===== -->
+  <section id="icp">
+    <div class="titulo-seccion"><h2>Cliente objetivo</h2><span class="rotulo">02 · ICP</span></div>
+    <div class="rejilla rejilla-2">
+      <div class="panel">
+        <p class="rotulo">Cabecera de playa</p>
+        <h3 style="margin:8px 0">El estudio boutique de 3 a 15 abogados</h3>
+        <ul class="lista" style="margin-top:12px">
+          <li class="si"><b>Segmento:</b> derecho corporativo, propiedad industrial, cobranza y concursal. Lleva entre 10 y 80 empresas como clientes recurrentes.</li>
+          <li class="si"><b>Quién firma:</b> el socio. Es la misma persona que se queja de que el procurador «no alcanzó a revisar el Diario Oficial esta semana».</li>
+          <li class="si"><b>Quién lo usa:</b> el asociado y el procurador. Si el procurador lo odia, no se renueva.</li>
+          <li class="si"><b>Dónde ya está:</b> Providencia, Las Condes, el centro de Santiago; también Concepción y Valparaíso. Está en LinkedIn, va a los cursos del Colegio de Abogados, y su nombre aparece en el propio Diario Oficial —lo que lo hace, irónicamente, muy fácil de listar.</li>
+          <li class="si"><b>Qué usa hoy:</b> el PDF del Diario Oficial, Ctrl+F, una planilla con los RUT de los clientes, y la memoria del socio.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <p class="rotulo">Segundo anillo</p>
+        <h3 style="margin:8px 0">La oficina contable con cartera</h3>
+        <ul class="lista" style="margin-top:12px">
+          <li><b>Segmento:</b> contador con 20 a 200 clientes PYME. Vive de una cuota mensual por cliente y compite por precio.</li>
+          <li><b>Por qué compra:</b> le da algo que cobrar además de la contabilidad. «Yo te aviso si te cambian la norma» es un servicio, y el margen es 100% suyo.</li>
+          <li><b>Por qué es el segundo y no el primero:</b> le importa menos el plazo legal (no responde por él) y compra más por precio. La conversación es más lenta.</li>
+        </ul>
+        <p class="nota" style="margin-top:var(--sp-s)"><b>Y el tercero, el que no perseguimos:</b> la PYME sola. Entra por autoservicio a $14.900, no la buscamos, y es la que más churn tiene. Es el 8% de los ingresos proyectados al mes 24, no el 80%.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 ===== -->
+  <section id="mercado">
+    <div class="titulo-seccion"><h2>Tamaño de mercado</h2><span class="rotulo">03 · TAM / SAM / SOM</span></div>
+    <div class="doc">
+      <p>Toda cifra de acá abajo o está citada o es una <b>estimación con su derivación a la vista</b>. Donde el supuesto es frágil, lo digo.</p>
+    </div>
+
+    <div class="caja" style="max-width:74ch">
+      <span class="rotulo">TAM — quién en Chile podría pagar por vigilar el boletín</span>
+      <p class="calc">A) PROFESIONALES QUE VIGILAN POR CUENTA DE TERCEROS  <span style="color:var(--texto-3)">← el mercado real</span>
+
+  Abogados habilitados en Chile              <b>~40.000</b>   <span style="color:var(--texto-3)">orden de magnitud, registro del Poder Judicial</span>
+  × en práctica corporativa/PI/concursal          12%     <span style="color:var(--texto-3)">SUPUESTO — no tengo el dato; es el más frágil</span>
+  = abogados que vigilan carteras            <b>4.800</b>
+  ÷ abogados por estudio                          3,2     <span style="color:var(--texto-3)">SUPUESTO</span>
+  <b>= estudios objetivo                       1.500</b>
+  + agentes de propiedad industrial            <b>120</b>   <span style="color:var(--texto-3)">SUPUESTO — INAPI publica el listado</span>
+  + oficinas contables con cartera ≥20        <b>4.000</b>   <span style="color:var(--texto-3)">SUPUESTO</span>
+  <b class="f">= 5.620 cuentas profesionales</b>
+
+  ARPU profesional (mezcla $79k / $249k)   <b>$110.000/mes</b>
+  <b class="f">SAM profesional = 5.620 × $110.000 × 12 = $7.418 millones CLP/año  ≈ US$7,7M</b>
+
+B) PYME CON DOLOR REAL (tiene marca registrada o contrata con el Estado)
+
+  Marcas vigentes en Chile, stock                <b>~300.000</b>  <span style="color:var(--texto-3)">SUPUESTO: ~40k concesiones/año × 10 años de vigencia</span>
+  ÷ marcas por titular                                3
+  = titulares                                    <b>100.000</b>
+  × titulares chilenos activos                       36%   <span style="color:var(--texto-3)">SUPUESTO</span>
+  <b>= 36.000 empresas</b> × $14.900 × 12
+  <b class="f">= $6.437 millones CLP/año  ≈ US$6,7M</b>
+
+<b class="f">TAM Chile ≈ US$14,4M/año.</b>  <span style="color:var(--texto-3)">Tipo de cambio: $960/US$.</span>
+Es chico, y hay que decirlo en voz alta: <b>este negocio no es venture-scale
+sólo en Chile.</b> Con 100% del mercado chileno, es una empresa de US$14M.</p>
+    </div>
+
+    <div class="caja" style="max-width:74ch">
+      <span class="rotulo">SOM — lo que capturamos en 24 meses</span>
+      <p class="calc">Cuentas profesionales al mes 24        <b>169</b>  = 3,0% del SAM profesional
+Cuentas PYME al mes 24                 <b>108</b>  = 0,3% del SAM PYME
+
+  169 × $110.000 = $18.590.000 MRR
+  108 × $14.900  =  $1.609.200 MRR
+  <b class="f">MRR mes 24 = $20.199.200  →  ARR ≈ $242 millones CLP  ≈ US$252.000</b>
+
+Ese es el escenario base del roadmap, y es coherente con él.
+3% de penetración en 24 meses en un producto de autoservicio con
+payback de medio mes es agresivo pero no delirante. <b>La restricción
+no es la plata: es el volumen de gente que busca esto (ver Canales).</b></p>
+    </div>
+
+    <div class="doc">
+      <h3>La extensión global</h3>
+      <p>Cada país hispanohablante tiene su boletín oficial y su registro de marcas: el DOF mexicano, El Peruano, el Diario Oficial de Colombia, el Boletín Oficial argentino. <b>El motor de relevancia es el mismo; el parser no.</b> Cada país cuesta entre 4 y 8 semanas de ingeniería —el trabajo aburrido de leer un formato nuevo— y esa es exactamente la barrera de entrada, porque a nadie le gusta hacerlo.</p>
+      <p class="calc">PIB de México + Colombia + Perú + Argentina ≈ <b>7× el de Chile</b>  <span style="color:var(--texto-3)">(orden de magnitud, Banco Mundial 2024)</span>
+Supuesto grueso: el mercado de vigilancia escala con el PIB formal.
+<b class="f">SAM LatAm hispanohablante ≈ US$14,4M × 8 ≈ US$115M/año</b>
+<span style="color:var(--texto-3)">Este número es el más flojo de la página. Está acá porque la pregunta
+«¿esto puede ser grande?» hay que responderla, no porque yo confíe en él.
+España (BOE) queda fuera: ahí ya están vLex y Aranzadi, y son buenos.</span></p>
+    </div>
+  </section>
+
+  <!-- ===== 04 ===== -->
+  <section id="cuna">
+    <div class="titulo-seccion"><h2>Posicionamiento y cuña</h2><span class="rotulo">04</span></div>
+    <div class="doc">
+      <h3>La cuña: la oposición marcaria</h3>
+      <p>No entramos por «vigilancia regulatoria», que no le quita el sueño a nadie. Entramos por <b>un plazo con fecha y consecuencia</b>: cuando alguien pide en INAPI una marca parecida a la de tu cliente, el reloj de la oposición parte el día de la publicación del extracto en el Diario Oficial (Ley 19.039, art. 5). Si se pasa, no hay recurso: la marca se registra a nombre del otro.</p>
+      <p>Eso es lo que hace que un socio de estudio pague hoy y no el próximo trimestre:</p>
+      <ul class="lista">
+        <li class="si">Es <b>binario</b>: o se opuso a tiempo o no.</li>
+        <li class="si">Es <b>caro de perder</b>: la marca del cliente vale más que la cuota anual del estudio.</li>
+        <li class="si">Es <b>culpa del estudio</b>, no del cliente. Y eso —el miedo a la responsabilidad profesional— es el mejor vendedor que tenemos, y no hay que fabricarlo.</li>
+        <li class="si">Y es <b>verificable el día 1</b>: le mostramos las publicaciones de INAPI de la semana pasada que mencionan a sus clientes. Si no hay ninguna, no le vendemos nada. Honesto y rápido.</li>
+      </ul>
+      <p>Una vez adentro por la marca, el mismo motor le entrega el resto: el deudor que entró en liquidación, el competidor que se constituyó, la norma que le cambió el rubro. <b>Se entra por una cosa y se paga por seis.</b> Ese es el modelo.</p>
+
+      <h3>Posicionamiento en una frase</h3>
+      <div class="veredicto">
+        <p><b>Pregonia es el pasante que nunca falta a las 8:30 y que además sabe cuál de los 613 avisos te toca.</b> No es un buscador (el Diario Oficial ya tiene uno, gratis). No es un abogado (no firmamos escritos). Es la constancia y el descarte.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 ===== -->
+  <section id="competencia">
+    <div class="titulo-seccion"><h2>Competencia</h2><span class="rotulo">05 · Con nombre y apellido</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Quién</th><th>Qué hace</th><th>Por qué gana hoy</th><th>Dónde lo ganamos, honestamente</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>El pasante</b><br><span class="dim">El titular del puesto</span></td>
+            <td>Abre el PDF del D.O. a las 8:30 y le da Ctrl+F a doce nombres.</td>
+            <td>Cuesta cero marginal (ya está contratado), entiende el contexto del estudio y nadie tiene que aprobar un gasto nuevo.</td>
+            <td>La constancia. El pasante lo hace bien un mes; al tercero se enferma, se va de vacaciones, o le dan otra pega urgente. <b>Nosotros nunca faltamos y no renunciamos en marzo.</b> Y cubrimos 6 fuentes, no una.</td>
+          </tr>
+          <tr>
+            <td><b>Google Alerts</b><br><span class="dim">Gratis</span></td>
+            <td>Alerta por palabra clave sobre lo que Google indexa.</td>
+            <td>Es gratis y toma 30 segundos configurarlo.</td>
+            <td>No cubre nada de lo nuestro: el Diario Oficial, el Boletín Concursal y las solicitudes de INAPI son PDF y registros que casi nadie enlaza, y Google los indexa mal o no los indexa. Y cuando algo aparece, llega crudo. <b>No compite: es de otra categoría.</b></td>
+          </tr>
+          <tr>
+            <td><b>El buscador del propio Diario Oficial</b></td>
+            <td>Busca en la edición. Es público y gratis.</td>
+            <td>Es la fuente. Es gratis. Es la autoridad.</td>
+            <td>Hay que entrar todos los días y saber qué buscar. <b>Y si mañana lanza «alertas por RUT» gratis, nos come el tramo Vigía completo</b> — está en «qué lo mata». No nos come el tramo profesional, que necesita multi-fuente y descarte.</td>
+          </tr>
+          <tr>
+            <td><b>Servicios de vigilancia marcaria</b><br><span class="dim">Estudios de PI que lo ofrecen como servicio</span></td>
+            <td>Vigilan la marca del cliente y avisan de solicitudes parecidas.</td>
+            <td>Tienen la relación, el criterio jurídico y firman la oposición.</td>
+            <td>Cobran por marca y por año, y sólo vigilan marcas. Nosotros somos su herramienta, no su reemplazo: <b>les vendemos a ellos</b> el tramo Cartera y les damos el informe con su logo.</td>
+          </tr>
+          <tr>
+            <td><b>Lexis / vLex / Thomson Reuters</b></td>
+            <td>Bases jurídicas con normativa y jurisprudencia.</td>
+            <td>Son la biblioteca. Todo estudio grande las tiene.</td>
+            <td>Son bibliotecas, no alertas: sirven cuando tú vas a buscar. No te avisan de que a <em>tu cliente</em> le pasó algo hoy. Y su precio es de otra categoría.</td>
+          </tr>
+          <tr>
+            <td><b>Un LLM y un fin de semana</b><br><span class="dim">El competidor de verdad</span></td>
+            <td>Cualquier ingeniero puede scrapear el D.O. y mandarse alertas.</td>
+            <td>Es cierto. La tecnología no es la barrera.</td>
+            <td>La barrera es el <b>trabajo aburrido acumulado</b>: parsear 6 fuentes con formatos distintos, mantenerlas cuando cambian, y —lo único que no se copia— <b>el corpus de pulgares</b> que hace que el filtro sea bueno. La primera semana cualquiera lo iguala. La semana 40, no.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 06 ===== -->
+  <section id="economia">
+    <div class="titulo-seccion"><h2>Precio y economía unitaria</h2><span class="rotulo">06 · CLP, IVA aparte</span></div>
+
+    <div class="scroll-x">
+      <table class="tabla-num">
+        <thead><tr><th>Tramo</th><th>Precio/mes</th><th>Sujetos</th><th>COGS/mes</th><th>Margen bruto</th></tr></thead>
+        <tbody>
+          <tr><td><b>Vigía</b> <span class="dim">— PYME</span></td><td>$14.900</td><td>5</td><td>$1.770</td><td>88,1%</td></tr>
+          <tr><td><b>Estudio</b> <span class="dim">— el que compramos</span></td><td>$79.000</td><td>60</td><td>$5.860</td><td>92,6%</td></tr>
+          <tr><td><b>Cartera</b> <span class="dim">— estudio grande, banco</span></td><td>$249.000</td><td>300</td><td>$20.166</td><td>91,9%</td></tr>
+          <tr><td colspan="4"><b>Margen bruto mezclado declarado</b> <span class="dim">(con holgura para errores de estimación)</span></td><td><b>90%</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:10px">El COGS sale de <a href="stack.html#costos">Arquitectura</a> y las dos páginas cuadran: es costo de inferencia + WhatsApp + infraestructura prorrateada + pasarela de pago. El desglose completo, con el precio por millón de tokens de cada modelo, está allá.</p>
+
+    <div class="caja" style="max-width:74ch">
+      <span class="rotulo">CAC, LTV y payback — tramo Estudio</span>
+      <p class="calc">CAC POR GOOGLE ADS  <span style="color:var(--texto-3)">(mes 1–6, único canal)</span>
+  CPC estimado en las palabras del nicho          <b>$450</b>   <span style="color:var(--texto-3)">ESTIMACIÓN: hay que medirla el día 1 con Keyword Planner</span>
+  Conversión clic → prueba sin tarjeta               6%    <span style="color:var(--texto-3)">SUPUESTO: intención altísima, landing directa</span>
+  Costo por registro                            <b>$7.500</b>
+  Conversión registro → tarjeta                     14%   <span style="color:var(--texto-3)">SUPUESTO: prueba de 14 días con alertas reales</span>
+  <b>CAC bruto                                 $53.571</b>
+  + 20% de holgura (palabras caras, clics basura)
+  <b class="f">CAC Ads ≈ $64.000</b>
+
+CAC MEZCLADO AL MES 12
+  45% Ads ($64.000) + 40% SEO ($8.000) + 15% referido del estudio ($0)
+  <b class="f">CAC mezclado = 0,45×64.000 + 0,40×8.000 + 0,15×0 = $32.000</b>
+
+LTV — TRAMO ESTUDIO
+  Margen por cuenta al mes  = $79.000 × 0,90     <b>$71.100</b>
+  Churn base                                        5%/mes  <span style="color:var(--texto-3)">SUPUESTO — el más peligroso de esta página</span>
+  Vida esperada = 1 / 0,05                          20 meses
+  <b class="f">LTV = $71.100 × 20 = $1.422.000</b>
+
+  <b class="f">LTV / CAC = 1.422.000 / 32.000 = 44×</b>
+  <b class="f">Payback   = 32.000 / 71.100 = 0,45 meses (menos de dos semanas)</b></p>
+    </div>
+
+    <div class="doc">
+      <div class="caja caja-f">
+        <span class="rotulo">Y acá viene la parte honesta</span>
+        <p><b>Un LTV/CAC de 44× no es una buena noticia: es una señal de que el cuello de botella está en otra parte.</b> Si el negocio fuera eficiente <em>y</em> escalable, alguien ya lo habría hecho. La restricción de Pregonia no es el margen ni el payback: es <b>cuánta gente en Chile busca esto al mes</b>.</p>
+        <p>Con payback de medio mes, el negocio se autofinancia desde el mes 8 y no necesita capital. Lo que necesita es <b>demanda</b>, y ahí es donde está el techo. Ver Canales.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 07 ===== -->
+  <section id="canales">
+    <div class="titulo-seccion"><h2>Canales de adquisición</h2><span class="rotulo">07 · Rankeados, con el techo declarado</span></div>
+
+    <figure class="figura" style="margin-bottom:var(--sp-m)">
+      <h3>El techo de cada canal: cuántas cuentas nuevas puede traer al mes, en régimen</h3>
+      <p class="sub">No cuánto convierte: cuántas <em>puede</em> traer. Este gráfico es la restricción real del negocio y por eso está antes que la tabla.</p>
+      <div class="scroll-x">
+        <svg viewBox="0 0 480 250" width="480" height="250" role="img" aria-labelledby="tCan dCan" style="min-width:480px">
+          <title id="tCan">Techo estimado de cuentas nuevas por canal al mes</title>
+          <desc id="dCan">SEO programático 14 cuentas al mes; Google Ads 9; referido del estudio a su cliente 5; contadores como canal 4; gremios y colegios 2; outbound en LinkedIn 2.</desc>
+          <g class="grid">
+            <line x1="150" y1="14" x2="150" y2="214"/><line x1="230" y1="14" x2="230" y2="214"/>
+            <line x1="310" y1="14" x2="310" y2="214"/><line x1="390" y1="14" x2="390" y2="214"/><line x1="470" y1="14" x2="470" y2="214"/>
+          </g>
+          <!-- Énfasis: la historia es UN número (el SEO decide el negocio). El acento
+               marca ese uno; los otros cinco van en gris de contexto. Gastar el rojo
+               en las seis barras sería exactamente el error que este producto denuncia. -->
+          <g>
+            <rect x="150" y="18" width="280" height="22" fill="#FF3B30" rx="3"/>
+            <text class="et-b" x="145" y="33" text-anchor="end" fill="#E8EBEC">SEO programático</text>
+            <text class="dl" x="438" y="33">14</text>
+          </g>
+          <g>
+            <rect x="150" y="50" width="180" height="22" fill="#5A6B72" rx="3"/>
+            <text class="et-b" x="145" y="65" text-anchor="end">Google Ads</text>
+            <text class="dl" x="338" y="65" fill="#98A3A8">9</text>
+          </g>
+          <g>
+            <rect x="150" y="82" width="100" height="22" fill="#5A6B72" rx="3"/>
+            <text class="et-b" x="145" y="97" text-anchor="end">Referido del estudio</text>
+            <text class="dl" x="258" y="97" fill="#98A3A8">5</text>
+          </g>
+          <g>
+            <rect x="150" y="114" width="80" height="22" fill="#5A6B72" rx="3"/>
+            <text class="et-b" x="145" y="129" text-anchor="end">Contadores</text>
+            <text class="dl" x="238" y="129" fill="#98A3A8">4</text>
+          </g>
+          <g>
+            <rect x="150" y="146" width="40" height="22" fill="#5A6B72" rx="3"/>
+            <text class="et-b" x="145" y="161" text-anchor="end">Colegio de Abogados</text>
+            <text class="dl" x="198" y="161" fill="#98A3A8">2</text>
+          </g>
+          <g>
+            <rect x="150" y="178" width="40" height="22" fill="#5A6B72" rx="3"/>
+            <text class="et-b" x="145" y="193" text-anchor="end">LinkedIn saliente</text>
+            <text class="dl" x="198" y="193" fill="#98A3A8">2</text>
+          </g>
+          <line class="eje" x1="150" y1="214" x2="470" y2="214"/>
+          <g class="et">
+            <text x="150" y="230" text-anchor="middle">0</text><text x="230" y="230" text-anchor="middle">4</text>
+            <text x="310" y="230" text-anchor="middle">8</text><text x="390" y="230" text-anchor="middle">12</text>
+            <text x="470" y="230" text-anchor="middle">16</text>
+            <text x="310" y="246" text-anchor="middle">cuentas nuevas al mes · techo estimado</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption><span class="supuesto">Estimación con derivación</span> Suma de los techos: <b>36 cuentas nuevas al mes</b> en régimen. A ese ritmo, 200 cuentas al mes 24 con 5% de churn es alcanzable pero no sobra. <b>Si el SEO no funciona, el techo cae a 22 y el escenario base no se cumple</b> — por eso «SEO &lt; 30% de los registros al mes 18» es un criterio de muerte del roadmap.</figcaption>
+    </figure>
+
+    <div class="doc">
+      <h3>1 · SEO programático — el canal que decide el negocio</h3>
+      <p>Este producto es una mina de long-tail porque <b>el corpus mismo genera las páginas, y son útiles</b>. Cuatro familias:</p>
+      <ul class="lista">
+        <li class="si"><b>Una página por norma publicada.</b> «Decreto Supremo 112 del MTT: qué cambia para los camiones de áridos». El texto oficial, más la explicación de a quién afecta. Se genera el mismo día que se publica, y nadie más la tiene.</li>
+        <li class="si"><b>Una página por regulador y tipo de acto.</b> «Qué publica el Boletín Concursal y qué plazos te corren», «Cómo saber si te objetaron la marca en INAPI».</li>
+        <li class="si"><b>Una página por rubro.</b> «Lo que se publicó este mes que afecta a las constructoras». Se actualiza sola, todos los meses, y es exactamente lo que un gerente busca.</li>
+        <li class="si"><b>Una página por comuna.</b> «Publicaciones del Diario Oficial que afectan a Buin»: remates, expropiaciones, cambios de plan regulador.</li>
+      </ul>
+      <p class="calc">Páginas al mes 18   ≈ <b>8.000</b>
+  ~500 normas nuevas/mes × 12 meses          6.000
+  + reguladores × tipos de acto                180
+  + rubros (CIIU a 2 dígitos) × meses          900
+  + comunas relevantes × trimestre             920
+Supuesto de tráfico: 8.000 páginas × 12 visitas/mes = <b>96.000 visitas/mes</b>
+  <span style="color:var(--texto-3)">SUPUESTO FRÁGIL: 12 visitas/mes por página de long-tail. Puede ser 3.</span>
+× conversión a prueba 0,6%  = <b>576 registros/mes</b>... <span class="f">no.</span>
+<b class="f">Ese número no me lo creo y no lo voy a usar.</b> El modelo del roadmap
+usa <b>14 cuentas nuevas al mes por SEO en régimen</b>, que sale de asumir
+que sólo el 2,5% de esas páginas rankea de verdad. Si me equivoco, me
+equivoco para abajo.</p>
+
+      <div class="caja caja-f">
+        <span class="rotulo">Lo que NO vamos a hacer, y por qué importa</span>
+        <p>La tentación obvia es generar <b>una página por empresa</b>: «Publicaciones del Diario Oficial de Áridos del Maipo SpA». Son 1,3 millones de páginas y traerían tráfico.</p>
+        <p><b>No lo hacemos.</b> Primero, porque es contenido delgado generado en masa y Google lo penaliza —y cuando te penaliza, te penaliza el dominio entero, incluidas las 8.000 páginas que sí valen. Segundo, porque muchas empresas chilenas son personas naturales con giro, y publicar un perfil indexable de la actividad de una persona toca la Ley 19.628 y la 21.719. <b>Quemar el dominio y exponerse a la agencia de protección de datos, por tráfico basura, es el peor negocio de esta página.</b> Las fichas por empresa existen, pero detrás del login.</p>
+      </div>
+
+      <h3>2 · Google Ads</h3>
+      <p>Palabras de intención alta y volumen bajo: «vigilancia diario oficial», «monitoreo de marcas INAPI», «buscar rut en boletín concursal», «me objetaron la marca qué hago», «plazo oposición marca Chile». CPC estimado $450 <span class="supuesto">estimación</span>. Presupuesto inicial $15.000/día. <b>El límite es el volumen de búsqueda, no la plata</b>: mi estimación gruesa es 1.500–3.000 búsquedas/mes en Chile para todo el conjunto, y hay que medirla el primer día. El autopilot pausa solo si el CAC pasa de $237.000.</p>
+
+      <h3>3 · El referido del estudio a su cliente</h3>
+      <p>El informe semanal sale con el logo del estudio. Abajo, en letra chica y honesta, dice «vigilado con Pregonia». El cliente PYME que lo recibe y quiere vigilar lo suyo entra por ahí, y el estudio recibe un mes gratis por cada uno. <b>CAC $0</b> y es el canal con mejor retención, porque llega con la recomendación de su abogado.</p>
+
+      <h3>4 · Contadores y software PYME como distribución</h3>
+      <p>Nubox, Defontana y Bsale tienen la relación con miles de PYME. Una integración («tu contador te avisa si te cambia la norma») es una conversación de partner que toma meses y requiere un humano. <b>Está en el plan del mes 12, no del mes 1</b>, precisamente porque es la parte menos automatizable de todo el negocio.</p>
+
+      <h3>5 · Gremios: Colegio de Abogados, ASECH, Cámara de Comercio</h3>
+      <p>Un webinar de 40 minutos sobre «los plazos que se le pasan a los estudios» en el Colegio de Abogados llega a la audiencia exacta. Requiere una persona hablando: es de los pocos canales que no automatizamos, y por eso está quinto.</p>
+
+      <h3>6 · LinkedIn saliente</h3>
+      <p>Mensaje al socio de un estudio boutique con <b>una publicación real de esta semana que menciona a su cliente</b>. Es el mejor mensaje frío posible porque no es un pitch: es un dato verificable que él no tenía. Lo dejamos al final por volumen (2 cuentas/mes) y porque hay que hacerlo con cuidado: <b>los datos son públicos, pero contactar en frío tiene reglas</b> (Ley 19.628, y desde 2026 la 21.719). Se hace sólo con contactos de segundo grado y con baja inmediata.</p>
+    </div>
+  </section>
+
+  <!-- ===== 08 ===== -->
+  <section id="ia">
+    <div class="titulo-seccion"><h2>La IA en el marketing mismo</h2><span class="rotulo">08 · Dónde sí y dónde no</span></div>
+    <div class="rejilla rejilla-2">
+      <div class="panel">
+        <p class="rotulo" style="color:var(--flash)">Donde la IA sí sirve</p>
+        <ul class="lista" style="margin-top:10px">
+          <li class="si"><b>Escribir las 8.000 páginas del SEO programático.</b> Es el caso perfecto: hay un texto oficial de entrada, una plantilla, y hay que explicar a quién afecta. Sin IA no se hace; con IA cuesta US$0,004 la página <span class="dim">(ver Arquitectura)</span>. <b>Y hay que revisarlas por muestreo</b>: una explicación legal errónea publicada 8.000 veces es un problema serio.</li>
+          <li class="si"><b>Escribir y rotar los anuncios de Google Ads.</b> 40 variantes de copy por grupo, el sistema mide y mata las malas. La plataforma lo permite y lo rotula como publicidad.</li>
+          <li class="si"><b>El mensaje frío de LinkedIn.</b> No para inventar una frase amistosa, sino para lo único que lo hace funcionar: <b>encontrar la publicación real de esta semana que menciona a un cliente de ese estudio</b>. El mensaje es el dato, no el copy.</li>
+          <li class="si"><b>El soporte.</b> Un agente que sabe de las fuentes, de los plazos y de la cuenta del usuario resuelve el 90% de lo que llega.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <p class="rotulo">Donde la IA no sirve, y usarla sería peor</p>
+        <ul class="lista" style="margin-top:10px">
+          <li><b>Hablar en foros y comunidades haciéndose pasar por un usuario.</b> Está prohibido por el kernel del sistema y es una idiotez económica: el día que un abogado descubre que la cuenta que recomendaba Pregonia en un grupo era un bot, el producto está muerto en el gremio más chismoso de Chile. <b>Y en un gremio, la reputación es el único canal.</b></li>
+          <li><b>Reseñas.</b> Cero. Ni una.</li>
+          <li><b>Llamar por teléfono con voz sintética a quien no dejó su número.</b> Choca con el registro No Molestar (Ley 21.398) y con la Ley 19.496. Y a un socio de estudio no se le vende por teléfono.</li>
+          <li><b>El webinar del Colegio de Abogados.</b> Ahí tiene que haber una persona. Un avatar generado hablándole a 60 abogados sobre responsabilidad profesional es la peor primera impresión imaginable.</li>
+          <li><b>Prometer exhaustividad.</b> Ningún copy generado puede decir «nunca se nos pasa nada», porque no es verdad. Es una afirmación no verificable y el kernel la bloquea. La honestidad acá no es virtud: es que la promesa contraria es demandable.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09 AUTONOMÍA ===== -->
+  <section id="autonomia">
+    <div class="titulo-seccion"><h2>Autonomía</h2><span class="rotulo">09 · Cómo opera sin ningún ser humano</span></div>
+    <div class="doc">
+      <p>Pregonia es de los productos más automatizables que existen, y no por mérito nuestro: es que <b>el cliente nunca necesita hablar con nadie</b>. No hay implementación, no hay integración, no hay dato que migrar. Escribe qué le importa, y al día siguiente le llega un correo.</p>
+    </div>
+
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table>
+        <thead><tr><th>Función</th><th>Cómo ocurre sin humano</th><th>Con qué</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Se vende</b></td>
+            <td>El sistema compra tráfico (Google Ads API), genera y publica las páginas del SEO programático en el propio dominio, y publica desde las cuentas de marca. Nadie hace demos. La landing es la demo.</td>
+            <td><span class="mono">google_ads · seo · linkedin_propio · x_propio</span></td>
+          </tr>
+          <tr>
+            <td><b>Se prueba</b></td>
+            <td>Registro con correo, 14 días sin tarjeta. El usuario pega sus RUT y en 90 segundos ve la <b>búsqueda retroactiva de 90 días</b>: casi siempre encuentra algo que no sabía. Ése es el momento de la venta, y ocurre solo.</td>
+            <td><span class="mono">app + motor de ingesta</span></td>
+          </tr>
+          <tr>
+            <td><b>Se cobra</b></td>
+            <td>Tarjeta por Flow o Webpay Oneclick, suscripción mensual, factura electrónica automática al SII. Al día 14, si no puso tarjeta, la cuenta pasa a <b>silencio</b>: sigue vigilando pero no envía, y le dice «tienes 2 alertas retenidas». Es el mejor gatillo de conversión que tenemos y no lo aprieta nadie.</td>
+            <td><span class="mono">flow · webpay_oneclick · integrador DTE</span></td>
+          </tr>
+          <tr>
+            <td><b>Se entrega</b></td>
+            <td>Correo y WhatsApp (API oficial, plantilla aprobada, sólo a quien dejó su número). La alerta se lee en el teléfono en 20 segundos.</td>
+            <td><span class="mono">ses · whatsapp_business_api</span></td>
+          </tr>
+          <tr>
+            <td><b>Se soporta</b></td>
+            <td>Agente de IA con acceso a la cuenta, a las fuentes y a la documentación. Resuelve «¿por qué no me llegó X?» mostrando <b>el descarte y su motivo</b> — que es, literalmente, la mitad del producto. Cuando no puede: <b>«No tengo cómo pasarte con una persona, pero te dejo agendada una respuesta por correo»</b>, y agenda de verdad.</td>
+            <td><span class="mono">agente Haiku 4.5 + bandeja de descartes</span></td>
+          </tr>
+          <tr>
+            <td><b>Se mejora</b></td>
+            <td>Cada pulgar es una etiqueta. El filtro se recalibra por cuenta con los pulgares del propio usuario, y el umbral global se ajusta con la tasa de señal agregada. <b>Nadie ajusta un prompt a mano.</b></td>
+            <td><span class="mono">corpus de pulgares</span></td>
+          </tr>
+          <tr>
+            <td><b>Se mata</b></td>
+            <td>Los criterios de muerte del roadmap están copiados en <span class="mono">autopilot.json</span>. El juez del sistema los aplica y no los puede mover.</td>
+            <td><span class="mono">autopilot.json</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc">
+      <div class="caja caja-f">
+        <span class="rotulo">Lo que NO logramos automatizar — y decirlo es parte del trabajo</span>
+        <p><b>1 · La mantención de los parsers cuando la fuente cambia de formato.</b> Es el punto débil de todo el negocio. Si el Diario Oficial cambia la estructura de su edición electrónica, o INAPI mueve una columna de su tabla, el parser se rompe. El sistema <b>detecta</b> la caída solo (un canario: «hoy se parsearon 0 avisos de INAPI, y el promedio es 142») y hace lo correcto —pausa el envío y le avisa al usuario que esa fuente está caída, en vez de fingir silencio—. Pero <b>rehacer el parser es ingeniería humana</b>. Estimación: <b>4 a 8 horas por trimestre y por fuente que cambie</b>; con 6 fuentes, del orden de <b>30 horas al año</b>.</p>
+        <p><b>2 · Los trámites de una vez que exigen una persona jurídica y un RUT.</b> La verificación de negocio de Meta para la WhatsApp Business API pide documentos de la sociedad. El certificado digital para emitir DTE al SII lo saca una persona natural con su clave única. Son trámites de arranque, no recurrentes, pero <b>un agente no los puede hacer</b>.</p>
+        <p><b>3 · Un reclamo grave.</b> Si un cliente sostiene que le descartamos una publicación que sí importaba y perdió un plazo, ahí hay una conversación —posiblemente con un abogado— que un bot no puede tener y no debe intentar tener. Mitigamos por diseño (la bandeja de descartadas es visible, cada descarte tiene motivo, los términos dicen que no somos asesoría legal), pero <b>no lo eliminamos</b>.</p>
+        <p><b>4 · La decisión de agregar una fuente nueva.</b> El sistema puede medir cuántos usuarios pidieron la SEC y proponerlo con datos. La decisión de gastar tres semanas de ingeniería la toma el operador del portafolio.</p>
+        <p><b>5 · El webinar del gremio y la conversación de partner con Nubox.</b> Canales 4 y 5. Ahí tiene que haber una persona.</p>
+        <p style="border-top:1px solid var(--flash-bord);padding-top:12px;margin-top:14px"><b>Total humano estimado en régimen: ~4 horas al mes</b>, casi todo reactivo. Cero horas de venta, cero de onboarding, cero de soporte de primera línea. <b>Eso es lo que permite cobrar $79.000 en vez de $400.000</b>, y es la razón de que este producto exista.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 10 ===== -->
+  <section id="dias">
+    <div class="titulo-seccion"><h2>Los primeros 90 días</h2><span class="rotulo">10</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Semana</th><th>Qué se hace</th><th>Qué prueba</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1–3</td><td>Parsear el Diario Oficial (edición electrónica) e INAPI. Nada más. Extraer RUT, razón social, comuna, tipo de acto. Sin producto, sin landing.</td><td>Que la ingesta aguanta 21 días seguidos sin caerse. Si el parser se cae 3 veces, el negocio no existe.</td></tr>
+          <tr><td class="mono">4</td><td>Se agregan Boletín Concursal, CMF, SEIA y Dirección del Trabajo.</td><td>Que el costo de agregar una fuente es de días, no de semanas.</td></tr>
+          <tr><td class="mono">5–6</td><td><b>El correo manual.</b> 5 design partners (3 estudios boutique, 1 agente de marcas, 1 contador). El fundador manda la alerta a mano, escrita a mano, todos los días. Sin producto.</td><td>Que la alerta le importa a alguien. <b>Nadie construye el filtro antes de saber qué es una buena alerta.</b> Acá se aprende.</td></tr>
+          <tr><td class="mono">7–8</td><td>Se automatiza el juez con lo aprendido en las 6 semanas anteriores. Los correos escritos a mano son los ejemplos del prompt.</td><td>Que el juez coincide con el fundador en ≥80% de los casos.</td></tr>
+          <tr><td class="mono">9–10</td><td>Producto: bandeja, descartadas, pulgares, entrega. Landing. Pago por Flow.</td><td>La primera tarjeta. Se le cobra a los design partners: si ninguno paga, el resto no importa.</td></tr>
+          <tr><td class="mono">11</td><td>Google Ads con $15.000/día. Las primeras 200 páginas de SEO programático.</td><td>El CPC real. La conversión real. <b>El techo real del canal.</b></td></tr>
+          <tr><td class="mono">12–13</td><td>Se mide la <b>tasa de señal</b> de los design partners a 4 semanas de uso.</td><td><b>El criterio de muerte.</b> Bajo 40%, se para. Está en el roadmap y en el <span class="mono">autopilot.json</span>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)">Nótese que el producto se escribe en la semana 9, no en la 1. Las seis primeras semanas son el fundador mandando correos escritos a mano, porque <b>el filtro es el producto y no se puede diseñar antes de saber qué separa una buena alerta de una mala</b>. Empezar por el código sería construir un filtro con el criterio de nadie.</p>
+  </section>
+
+  <!-- ===== 11 ===== -->
+  <section id="mata">
+    <div class="titulo-seccion"><h2>Qué mataría esto</h2><span class="rotulo">11 · El riesgo honesto</span></div>
+    <div class="rejilla rejilla-2">
+      <div class="panel">
+        <h3>1 · El ruido gana</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">El filtro no llega a 40% de alertas accionadas, el usuario apaga las notificaciones y cancela al segundo mes. <b>Este es el riesgo principal y es el que está en el criterio de muerte del mes 2.</b> No hay mitigación: o el filtro funciona o el producto no existe.</p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>media</b>. Impacto: <b>total</b>.</p>
+      </div>
+      <div class="panel">
+        <h3>2 · El Estado lo hace gratis</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">El Diario Oficial ya es público y tiene buscador. Si mañana ofrece «alertas por RUT» gratis, <b>se lleva el tramo Vigía completo</b>. No se lleva el profesional —que necesita 6 fuentes, descarte y explicación—, pero nos borra el 8% de los ingresos y todo el argumento de crecimiento hacia la PYME.</p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>media-baja</b> (el Estado rara vez construye producto). Impacto: <b>parcial</b>.</p>
+      </div>
+      <div class="panel">
+        <h3>3 · El techo del canal</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">Que en Chile no haya suficiente gente buscando esto. El producto funciona, la economía es hermosa, y llegamos a 60 clientes y ahí nos quedamos. <b>Es el escenario más probable de todos</b>, y no se ve como un fracaso: se ve como un negocio pequeño que no crece. Es peor, porque cuesta más darse cuenta.</p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>alta</b>. Impacto: <b>techo, no muerte</b>. Se detecta en el criterio del mes 18.</p>
+      </div>
+      <div class="panel">
+        <h3>4 · La fuente se cierra o cambia</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">El Diario Oficial es información pública por ley, así que no nos pueden negar el acceso al contenido. Pero pueden cambiar el formato, poner un captcha, o exigir suscripción de pago por volumen. Ninguna nos mata, todas nos cuestan semanas. <b>Es el impuesto permanente de este negocio.</b></p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>alta</b> (pasa cada tanto). Impacto: <b>bajo, pero recurrente</b>.</p>
+      </div>
+      <div class="panel">
+        <h3>5 · La responsabilidad</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">Descartamos algo, el cliente pierde un plazo, y viene el reclamo. Los términos dicen que no somos asesoría legal y la bandeja de descartadas prueba que no ocultamos nada. Pero un juicio con un estudio de abogados como contraparte es una pelea que no se quiere tener. <b>Es la razón por la que la bandeja de descartadas existe, y no es una decisión de diseño: es una decisión legal.</b></p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>baja</b>. Impacto: <b>alto</b>.</p>
+      </div>
+      <div class="panel">
+        <h3>6 · Alguien con distribución lo copia</h3>
+        <p style="margin-top:8px;font-size:.92rem;line-height:1.55">Nubox o Defontana meten «alertas del Diario Oficial» dentro de su producto y se lo regalan a 100.000 PYME. Nos borran el tramo Vigía y nos hacen irrelevantes en el mercado masivo. <b>No nos borran el estudio</b>, que necesita profundidad, no una casilla más en un menú.</p>
+        <p class="nota" style="margin-top:10px">Probabilidad: <b>media</b>. Impacto: <b>parcial</b>. Mitigación real: ser su proveedor antes de ser su competencia.</p>
+      </div>
+    </div>
+    <div class="doc">
+      <div class="veredicto" style="margin-top:var(--sp-m)">
+        <p><b>El resumen honesto:</b> este negocio no muere por caja —el payback es de medio mes— ni por competencia. Muere por dos cosas: porque el filtro no sirva, o porque no haya suficiente gente en Chile que quiera comprarlo. La primera se sabe en 8 semanas. La segunda, en 18 meses. <a href="roadmap.html">Las dos están escritas como criterios de muerte en el roadmap →</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b style="color:var(--texto-2)">Pregonia</b> · Toda cifra de esta página está citada o etiquetada como estimación con su derivación a la vista. Los supuestos frágiles están marcados como tales, porque quien lea esto va a decidir si gasta dos años de su vida en esta idea.</p>
+    <p style="margin-top:8px"><a href="../index.html">← Volver a las ideas</a> · <a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('btnMenu'), m = document.getElementById('menuMovil');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('abierto');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+</script>
+</body>
+</html>

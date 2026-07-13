@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Fonalta</title>
+<meta name="description" content="La cadena de voz completa: telefonía, ASR, LLM y TTS en streaming con barge-in y presupuesto de 800 ms. Modelo de datos, agentes, costo por minuto con la aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  .doc { padding: var(--sp-l) 0 var(--sp-2xl); }
+  .doc h2 { margin-bottom: var(--sp-s); }
+  .doc h3 { margin: var(--sp-l) 0 var(--sp-2xs); }
+  .doc h4 { margin: var(--sp-m) 0 var(--sp-2xs); color: var(--tiza); }
+  .doc p { color: var(--tiza-2); max-width: 68ch; margin-bottom: var(--sp-s); }
+  .doc h2 + p, .doc h3 + p, .doc h4 + p { margin-top: 0; }
+  .doc ul:not(.lista) { margin: 0 0 var(--sp-s) var(--sp-m); color: var(--tiza-2); max-width: 68ch; }
+  .doc li { margin-bottom: 6px; }
+
+  pre {
+    font-family: 'Chivo Mono', monospace; font-size: 0.8rem; line-height: 1.65;
+    background: var(--panel); border: 1px solid var(--linea);
+    border-left: 2px solid var(--ambar); border-radius: var(--radio);
+    padding: var(--sp-s); color: var(--tiza-2);
+    overflow-x: auto; margin-bottom: var(--sp-s);
+  }
+  pre b { color: var(--tiza); font-weight: 600; }
+  pre .c { color: var(--tiza-3); }
+  pre .k { color: var(--ambar); }
+
+  /* ---- la cadena de voz ---- */
+  .cadena {
+    display: grid; gap: 0;
+    border: 1px solid var(--linea); border-radius: var(--radio);
+    overflow: hidden; background: var(--panel);
+    margin-bottom: var(--sp-m);
+  }
+  @media (min-width: 62em) { .cadena { grid-template-columns: repeat(5, 1fr); } }
+  .eslabon { padding: var(--sp-s); border-bottom: 1px solid var(--linea); position: relative; }
+  @media (min-width: 62em) {
+    .eslabon { border-bottom: 0; border-right: 1px solid var(--linea); }
+    .eslabon:last-child { border-right: 0; }
+  }
+  .eslabon:last-child { border-bottom: 0; }
+  .eslabon__n {
+    font-family: 'Chivo Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .eslabon__n i { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+  .eslabon h4 { margin: 0 0 4px; font-size: 0.95rem; }
+  .eslabon p { font-size: 0.82rem; margin: 0 0 var(--sp-2xs); color: var(--tiza-2); }
+  .eslabon .ms {
+    font-family: 'Chivo Mono', monospace; font-size: 1.25rem; font-weight: 600;
+    color: var(--ambar); letter-spacing: -0.02em;
+  }
+  .eslabon .ms small { font-size: 0.68rem; color: var(--tiza-3); font-weight: 400; }
+
+  .agente {
+    border: 1px solid var(--linea); border-radius: var(--radio);
+    background: var(--panel); padding: var(--sp-m); margin-bottom: var(--sp-s);
+  }
+  .agente__c { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); align-items: center; margin-bottom: var(--sp-xs); }
+  .agente h3 { margin: 0; font-size: var(--step-1); }
+  .agente__h { display: grid; gap: 5px; margin-top: var(--sp-xs); font-family: 'Chivo Mono', monospace; font-size: 0.76rem; }
+  .agente__h div { padding: 6px 0; border-bottom: 1px solid var(--linea); color: var(--tiza-2); }
+  .agente__h div:last-child { border-bottom: 0; }
+  .agente__h b { color: var(--ambar); font-weight: 500; }
+
+  .falso { border-left: 2px solid var(--c3); }
+  .real  { border-left: 2px solid var(--c4); }
+  .indice { position: sticky; top: 56px; z-index: 20; background: rgba(20,16,13,.94); border-bottom: 1px solid var(--linea); margin-bottom: var(--sp-l); overflow-x: auto; }
+  .indice ol { list-style: none; display: flex; gap: var(--sp-s); padding: 10px 0; white-space: nowrap; }
+  .indice a { font-family: 'Chivo Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tiza-3); text-decoration: none; }
+  .indice a:hover { color: var(--ambar); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav__in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 12h2.5M7 12V6M11 12V3M15 12v-7M19 12V8M22 12h-1" stroke="#F0A93F"/>
+        <path d="M2 16h20" opacity=".3"/>
+      </svg>
+      Fonalta
+    </a>
+    <button class="nav__btn" aria-expanded="false" aria-controls="nav-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+    <nav class="nav__menu" id="nav-menu" data-abierto="no" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="container">
+    <p class="kicker">Arquitectura</p>
+    <h1 style="font-size:var(--step-3)">Qué habría que configurar para que esto exista de verdad.</h1>
+    <p class="lede" style="max-width:58ch">Nada de esto está aprovisionado. Está documentado, con los precios reales de cada proveedor y la aritmética a la vista.</p>
+  </div>
+
+  <nav class="indice" aria-label="Secciones">
+    <div class="container">
+      <ol>
+        <li><a href="#voz">1 · La cadena de voz</a></li>
+        <li><a href="#reglas">2 · Las reglas duras</a></li>
+        <li><a href="#datos">3 · Modelo de datos</a></li>
+        <li><a href="#agentes">4 · Los agentes</a></li>
+        <li><a href="#costo">5 · El costo por minuto</a></li>
+        <li><a href="#terceros">6 · Terceros y env</a></li>
+        <li><a href="#falso">7 · Qué está falseado</a></li>
+        <li><a href="#dominio">8 · El dominio</a></li>
+      </ol>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- ═══════════════════════════════════════════ 1 · VOZ ═══════════ -->
+    <section id="voz" style="border:0;padding-top:0">
+      <h2>1 · La cadena de voz</h2>
+      <p>Cuatro procesos en streaming, encadenados, con un presupuesto total de <strong>800 milisegundos</strong>. Ninguno espera a que el anterior termine: cada uno empieza a trabajar con el primer fragmento que le llega. Ésa es toda la magia — y toda la dificultad.</p>
+
+      <div class="cadena">
+        <div class="eslabon">
+          <p class="eslabon__n" style="color:var(--c2)"><i style="background:var(--c2)"></i> 1 · TELEFONÍA</p>
+          <h4>Twilio Media Streams</h4>
+          <p>El desvío del cliente entra a un número +56 nuestro. Twilio abre un WebSocket bidireccional con audio μ-law de 8 kHz en tramas de 20 ms.</p>
+          <p class="ms">80 <small>ms p50</small></p>
+        </div>
+        <div class="eslabon">
+          <p class="eslabon__n" style="color:var(--c1)"><i style="background:var(--c1)"></i> 2 · ASR</p>
+          <h4>Deepgram Nova-3</h4>
+          <p>Transcripción en streaming, español. Endpointing de 150 ms más detección semántica de fin de turno: no basta el silencio, hay que saber si la frase <em>terminó</em>.</p>
+          <p class="ms">180 <small>ms p50</small></p>
+        </div>
+        <div class="eslabon">
+          <p class="eslabon__n" style="color:var(--c5)"><i style="background:var(--c5)"></i> 3 · LLM</p>
+          <h4>Claude Haiku 4.5</h4>
+          <p>Streaming, con el prompt del sistema y la ficha del negocio cacheados. <strong>El TTS arranca con la primera frase completa</strong>, no espera el turno entero.</p>
+          <p class="ms">320 <small>ms al primer token</small></p>
+        </div>
+        <div class="eslabon">
+          <p class="eslabon__n" style="color:var(--c4)"><i style="background:var(--c4)"></i> 4 · TTS</p>
+          <h4>ElevenLabs Flash v2.5</h4>
+          <p>~75 ms al primer byte. Voz con licencia (§2). El audio vuelve por el mismo WebSocket, troceado, mientras el modelo sigue generando.</p>
+          <p class="ms">90 <small>ms al primer byte</small></p>
+        </div>
+        <div class="eslabon">
+          <p class="eslabon__n" style="color:var(--c3)"><i style="background:var(--c3)"></i> 5 · SALIDA</p>
+          <h4>Jitter buffer</h4>
+          <p>Dos tramas de 20 ms de colchón. Menos que eso y el audio se entrecorta en una red móvil chilena.</p>
+          <p class="ms">60 <small>ms p50</small></p>
+        </div>
+      </div>
+
+      <figure class="fig">
+        <figcaption class="fig__t">El presupuesto, sumado</figcaption>
+        <p class="fig__s">p50: <strong>730 ms</strong>, dentro del presupuesto. p95: <strong>1.180 ms</strong>, fuera. El p95 es el que hay que vigilar y el que se muestra a propósito en el <a href="demo/index.html">demo</a>.</p>
+        <div class="leyenda">
+          <span><i style="background:var(--c2)"></i> Red telefónica</span>
+          <span><i style="background:var(--c1)"></i> ASR</span>
+          <span><i style="background:var(--c5)"></i> LLM</span>
+          <span><i style="background:var(--c4)"></i> TTS</span>
+          <span><i style="background:var(--c3)"></i> Jitter</span>
+        </div>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 180" role="img" aria-labelledby="t-lat d-lat">
+  <title id="t-lat">Presupuesto de latencia punta a punta, por etapa</title>
+  <desc id="d-lat">El turno mediano suma 730 ms y el percentil 95 suma 1.180 ms. El presupuesto de diseño son 800 ms.</desc>
+  <line class="malla" x1="52" y1="18" x2="52" y2="146"/>
+  <text class="ejeT" x="52" y="162" text-anchor="middle">0</text>
+  <line class="malla" x1="151.69" y1="18" x2="151.69" y2="146"/>
+  <text class="ejeT" x="151.69" y="162" text-anchor="middle">200</text>
+  <line class="malla" x1="251.38" y1="18" x2="251.38" y2="146"/>
+  <text class="ejeT" x="251.38" y="162" text-anchor="middle">400</text>
+  <line class="malla" x1="351.08" y1="18" x2="351.08" y2="146"/>
+  <text class="ejeT" x="351.08" y="162" text-anchor="middle">600</text>
+  <line class="malla" x1="450.77" y1="18" x2="450.77" y2="146"/>
+  <text class="ejeT" x="450.77" y="162" text-anchor="middle">800</text>
+  <line class="malla" x1="550.46" y1="18" x2="550.46" y2="146"/>
+  <text class="ejeT" x="550.46" y="162" text-anchor="middle">1.000</text>
+  <line class="malla" x1="650.15" y1="18" x2="650.15" y2="146"/>
+  <text class="ejeT" x="650.15" y="162" text-anchor="middle">1.200</text>
+  <text class="ejeT" x="700" y="176" text-anchor="end">milisegundos</text>
+  <text class="ejeL" x="42" y="65" text-anchor="end">p50</text>
+  <rect x="52" y="44" width="37.88" height="30" fill="var(--c2)"/>
+  <rect x="91.88" y="44" width="87.72" height="30" fill="var(--c1)"/>
+  <rect x="181.6" y="44" width="157.51" height="30" fill="var(--c5)"/>
+  <rect x="341.11" y="44" width="42.86" height="30" fill="var(--c4)"/>
+  <path d="M385.97,44 L411.88000000000005,44 Q415.88000000000005,44 415.88000000000005,48 L415.88000000000005,70 Q415.88000000000005,74 411.88000000000005,74 L385.97,74 Z" fill="var(--c3)"/>
+  <text class="marcaT" x="424.88" y="64">730 ms</text>
+  <text class="ejeL" x="42" y="113" text-anchor="end">p95</text>
+  <rect x="52" y="92" width="57.82" height="30" fill="var(--c2)"/>
+  <rect x="111.82" y="92" width="127.6" height="30" fill="var(--c1)"/>
+  <rect x="241.42" y="92" width="302.06" height="30" fill="var(--c5)"/>
+  <rect x="545.48" y="92" width="52.83" height="30" fill="var(--c4)"/>
+  <path d="M600.31,92 L636.1899999999999,92 Q640.1899999999999,92 640.1899999999999,96 L640.1899999999999,118 Q640.1899999999999,122 636.1899999999999,122 L600.31,122 Z" fill="var(--c3)"/>
+  <text class="marcaT" x="649.18" y="112">1.180 ms</text>
+  <line x1="450.77" y1="14" x2="450.77" y2="146" stroke="var(--tiza)" stroke-width="1.5"/>
+  <text class="marcaT" x="450.77" y="8" text-anchor="middle">presupuesto 800 ms</text>
+</svg>
+        </div>
+        <p class="fig__n"><strong>Estos números son presupuesto de arquitectura, no una medición.</strong> Salen de las latencias publicadas por cada proveedor más el RTT Santiago→São Paulo (~40 ms, donde iría el media server: Fly.io no tiene región en Chile). El día que exista el pipeline se mide y se publica el número real, sea el que sea.</p>
+      </figure>
+
+      <h3>El barge-in, que es más difícil de lo que parece</h3>
+      <p>Cortar el audio cuando el cliente habla encima es lo fácil. Lo que casi nadie hace bien es lo otro:</p>
+      <pre><span class="c">// El cliente empieza a hablar mientras la IA está hablando.</span>
+<span class="k">on</span>(audioEntrante) {
+  <span class="k">if</span> (vad.energia > UMBRAL <b>&&</b> vad.sostenido(120 /* ms */) <b>&&</b> tts.sonando) {
+
+    <span class="c">// 1. Callar la voz. Obvio.</span>
+    tts.abortar();
+
+    <span class="c">// 2. Purgar el audio que YA salió hacia Twilio y todavía no suena.</span>
+    <span class="c">//    Sin esto, la IA sigue hablando 400 ms después de "callarse".</span>
+    twilio.enviar({ event: <b>'clear'</b>, streamSid });
+
+    <span class="c">// 3. LO IMPORTANTE — truncar el turno del modelo a lo que</span>
+    <span class="c">//    ALCANZÓ A SONAR, no a lo que el modelo generó.</span>
+    <span class="c">//    Si no truncas, el modelo cree que dijo la frase entera,</span>
+    <span class="c">//    y dos turnos después la conversación se descarrila:</span>
+    <span class="c">//    "como le decía, la consulta sale $32.000" — nunca lo dijo.</span>
+    <span class="k">const</span> hablado = tts.caracteresReproducidos();
+    historial.ultimoTurnoIA.contenido = turnoGenerado.slice(0, hablado) + <b>'—'</b>;
+
+    <span class="c">// 4. Volver a escuchar. El ASR nunca se apagó: siempre está corriendo.</span>
+    asr.reanudarTurno();
+  }
+}</pre>
+      <p class="nota">El paso 3 es la diferencia entre una conversación que se recupera de una interrupción y una que se enreda. Se puede ver en el <a href="demo/index.html">demo</a>: la frase de la IA queda cortada a media palabra y el sistema lo declara.</p>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 2 · REGLAS ════════════ -->
+    <section id="reglas">
+      <h2>2 · Las reglas duras — en el kernel, no en el prompt</h2>
+      <p>Un prompt se puede convencer. Un kernel no. Estas cinco reglas <strong>bloquean la acción</strong> antes de que salga por el parlante, y cada bloqueo queda registrado.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card real">
+          <h3 style="margin-top:0">1 · La divulgación es código, no guión</h3>
+          <p>El saludo con la palabra «virtual» va <strong>pre-sintetizado en caché</strong> y se emite en el ms 40. No lo genera el modelo, así que <strong>el modelo no lo puede omitir</strong>, no importa lo que le pidan. Si el archivo de saludo no está, la llamada no se contesta.</p>
+          <p class="dato">Cumple el requisito de divulgación en &lt;5 s. El art. 50 del AI Act europeo ya lo exige y la tendencia es global.</p>
+        </div>
+        <div class="card real">
+          <h3 style="margin-top:0">2 · Sin herramienta, no hay afirmación</h3>
+          <p>El modelo no puede emitir un hecho sobre el negocio (precio, horario, disponibilidad, política) que no venga del resultado de una herramienta en <em>ese</em> turno. El validador de salida compara: si hay una afirmación factual sin herramienta que la respalde, <strong>se descarta y se fuerza la respuesta de «no lo sé»</strong>.</p>
+          <p class="dato">Es lo que impide que la IA invente que atienden gatos.</p>
+        </div>
+        <div class="card real">
+          <h3 style="margin-top:0">3 · «Te transfiero» no existe si no hay a quién</h3>
+          <p>La herramienta <code class="mono">transferir()</code> sólo está en el conjunto de herramientas disponibles <strong>si hay un destino configurado y disponible en ese momento</strong>. Si no lo hay, el modelo literalmente no tiene esa opción — no es que se le pida que no mienta: es que no puede.</p>
+          <p class="dato">La única salida es decirlo y ofrecer recado o devolución.</p>
+        </div>
+        <div class="card real">
+          <h3 style="margin-top:0">4 · Saliente sólo con consentimiento grabado</h3>
+          <p>El worker de devoluciones no marca un número si no existe una fila en <code class="mono">consentimiento</code> con el fragmento de audio del «sí». Antes de marcar consulta la lista de supresión y el registro <em>No Molestar</em>. Tope: 1 devolución por número por día, máximo 2 intentos.</p>
+          <p class="dato">Ley 21.398 y Ley 19.496. Y aunque no fueran ley: te queman el número.</p>
+        </div>
+      </div>
+
+      <div class="aviso mt-m">
+        <strong>5 · La voz no se clona.</strong> La voz base la graba una locutora chilena contratada, con <strong>cesión escrita de derechos para uso sintético</strong>. Ese contrato es la licencia, y sin él no hay voz. Nunca clonamos la voz de la recepcionista del cliente, ni la del dueño, ni la de nadie —aunque lo pidan—, y la IA nunca dice ser una persona específica. La voz de respaldo es una voz neuronal es-CL con licencia del proveedor (Azure: Catalina, Lorenzo), que además es más barata.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 3 · DATOS ═════════════ -->
+    <section id="datos">
+      <h2>3 · Modelo de datos</h2>
+      <p>Postgres 16 con <code class="mono">pgvector</code>. Las tablas que importan:</p>
+      <pre><b>cuenta</b>          id · rut · razon_social · email · plan · estado
+                flow_customer_id · creado_en
+
+<b>numero</b>          id · cuenta_id · e164 · proveedor · tipo(twilio_cl|portado)
+                estado_desvio(pendiente|verificado|roto) · verificado_en
+                <span class="c">-- estado_desvio se chequea solo: si no entra ninguna llamada</span>
+                <span class="c">-- en 48 h desde la activación, se avisa al dueño</span>
+
+<b>negocio</b>         id · cuenta_id · nombre_publico · rubro · direccion · comuna
+                horario_json · zona_horaria · guion_id · voz_id
+
+<b>conocimiento</b>    id · cuenta_id · fuente(texto|url|pdf) · contenido
+                embedding vector(1536) · actualizado_en
+                <span class="c">-- la "ficha". Es lo ÚNICO de lo que la IA puede afirmar algo.</span>
+
+<b>llamada</b>         id · cuenta_id · numero_id · from_e164 · inicio · fin
+                duracion_s · intencion · resumen · resultado
+                grabacion_url · transcripcion_url · costo_clp
+                latencia_p50_ms · latencia_p95_ms
+
+<b>turno</b>           id · llamada_id · orden · actor(ia|cliente)
+                texto · t_inicio_ms · latencia_ms
+                latencia_desglose_json  <span class="c">-- {red,asr,llm,tts,jitter}</span>
+                interrumpido bool · truncado_en_char int
+                confianza_asr numeric
+
+<b class="k">no_supo</b>         id · llamada_id · turno_id · cuenta_id · pregunta
+                agrupado_en · respondido_por_dueno · respuesta · en_ficha bool
+                <span class="c">-- LA TABLA MÁS VALIOSA DEL SISTEMA.</span>
+                <span class="c">-- Alimenta 3 cosas: la mejora de la ficha (sin humanos</span>
+                <span class="c">-- de nuestro lado), el contenido de SEO que nadie más</span>
+                <span class="c">-- puede escribir, y la métrica de calidad del producto.</span>
+
+<b>cita</b>            id · llamada_id · cuenta_id · cliente_nombre · cliente_telefono
+                servicio · inicio · fin · estado · calendar_event_id
+
+<b>recado</b>          id · llamada_id · nombre · telefono · motivo
+                urgencia(normal|alta) · enviado_wa_en
+
+<b class="k">consentimiento</b>  id · llamada_id · e164 · tipo(devolucion|whatsapp)
+                fragmento_audio_url · otorgado_en
+                <span class="c">-- sin una fila acá, el worker de salientes NO marca. Nunca.</span>
+
+<b class="k">supresion</b>       id · e164 · motivo · creado_en
+                <span class="c">-- global, honrada al instante, se consulta antes de cada saliente</span>
+
+<b>suscripcion</b>     id · cuenta_id · plan · minutos_incluidos · minutos_usados
+                periodo_inicio · periodo_fin · estado
+
+<b>evento_kernel</b>   id · cuenta_id · accion_bloqueada · regla · evidencia_json
+                <span class="c">-- la bitácora de lo que el sistema NO hizo. Sale en el tablero.</span></pre>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 4 · AGENTES ═══════════ -->
+    <section id="agentes">
+      <h2>4 · Los agentes</h2>
+      <p>Cinco. Sólo uno está en el camino crítico de latencia, y por eso sólo uno usa el modelo rápido.</p>
+
+      <div class="agente">
+        <div class="agente__c">
+          <h3>Recepcionista</h3>
+          <span class="pin pin--ambar">claude-haiku-4-5</span>
+          <span class="pin">en la llamada · &lt;320 ms al primer token</span>
+        </div>
+        <p>El agente de la conversación. Streaming, con el prompt del sistema y la ficha del negocio en caché (~3.500 tokens, sobre el mínimo de 2.048 de Haiku, así que el caché rinde).</p>
+        <p><strong>Por qué Haiku y no Sonnet:</strong> el presupuesto de primer token son 320 ms. Haiku 4.5 lo cumple en streaming con un prompt cacheado; Sonnet 5 no lo cumple de forma confiable. Y el <strong>94% de los turnos son intención simple</strong> —pedir hora, preguntar precio, preguntar horario—. Gastar un modelo grande ahí es pagar latencia por nada. Sonnet 5 se usa fuera del camino crítico, donde tres segundos no le importan a nadie.</p>
+        <div class="agente__h">
+          <div><b>consultar_agenda</b>(rango, servicio) → bloques libres del Google Calendar del cliente</div>
+          <div><b>agendar</b>(nombre, telefono, servicio, inicio) → crea el evento. Falla si el bloque se ocupó: la disponibilidad la decide el calendario, no el modelo.</div>
+          <div><b>buscar_conocimiento</b>(pregunta) → RAG sobre pgvector, sólo la ficha de ESE cliente</div>
+          <div><b>tomar_recado</b>(nombre, telefono, motivo, urgencia) → dispara el WhatsApp</div>
+          <div><b>marcar_no_supo</b>(pregunta) → escribe en <span class="mono">no_supo</span>. Es la única salida permitida cuando <span class="mono">buscar_conocimiento</span> vuelve vacío.</div>
+          <div><b>agendar_devolucion</b>(telefono, ventana) → exige consentimiento grabado en el mismo turno</div>
+          <div><b>transferir</b>(destino) → <span style="color:var(--c3)">sólo existe si hay un destino disponible</span></div>
+          <div><b>derivar_urgencia</b>() → corta el guión, marca al celular del dueño, manda SMS</div>
+        </div>
+      </div>
+
+      <div class="rejilla rejilla--2">
+        <div class="agente">
+          <div class="agente__c"><h3>Resumidor</h3><span class="pin">claude-haiku-4-5</span></div>
+          <p>Post-llamada, fuera del camino crítico. Clasifica la intención, extrae los campos y escribe el WhatsApp que le llega al dueño. Corre en menos de 2 segundos desde que cuelgan.</p>
+        </div>
+        <div class="agente">
+          <div class="agente__c"><h3>Curador de la ficha</h3><span class="pin pin--ambar">claude-sonnet-5</span></div>
+          <p>Semanal. Lee <code class="mono">no_supo</code>, agrupa las preguntas repetidas y le manda al dueño un WhatsApp concreto: <em>«3 personas preguntaron si atienden gatos. ¿Atienden?»</em>. <strong>Este es el bucle que mejora el producto sin que nadie de nuestro lado toque nada.</strong></p>
+        </div>
+        <div class="agente">
+          <div class="agente__c"><h3>Juez de calidad</h3><span class="pin pin--ambar">claude-sonnet-5</span></div>
+          <p>Muestrea el 5% de las llamadas y las puntúa contra una rúbrica fija: ¿se declaró IA antes de los 5 s? ¿afirmó algo sin herramienta? ¿mintió sobre una transferencia? ¿el p95 pasó de 1.200 ms? Si el puntaje cae bajo el umbral, degrada el guión a un modo conservador y alerta.</p>
+        </div>
+        <div class="agente">
+          <div class="agente__c"><h3>Escritor de SEO</h3><span class="pin">claude-sonnet-5</span></div>
+          <p>Genera las páginas por rubro y comuna. Su materia prima única son las preguntas de <code class="mono">no_supo</code>, agregadas y anonimizadas: <em>«las 12 cosas que más le preguntan por teléfono a una veterinaria en Chile»</em>. El kernel sólo lo deja publicar en <strong>dominio propio</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 5 · COSTO ═════════════ -->
+    <section id="costo">
+      <h2>5 · El costo por minuto — el número que manda</h2>
+      <p>Este es el número del que cuelga todo el negocio. Si sube 30%, el plan Recado deja de tener sentido. <a href="negocio.html#economia">Negocio</a> descuenta exactamente esta cifra del margen.</p>
+
+      <figure class="fig">
+        <figcaption class="fig__t">Un minuto de llamada</figcaption>
+        <p class="fig__s">Supuesto de reparto: en un minuto de llamada la IA habla ~45% del tiempo (≈400 caracteres de voz sintetizada) y hay ~4 turnos.</p>
+        <div class="scroll-x">
+<svg viewBox="0 0 720 268" role="img" aria-labelledby="t-min d-min">
+  <title id="t-min">Costo de un minuto de llamada, en pesos chilenos</title>
+  <desc id="d-min">Un minuto de llamada cuesta 50,3 pesos. La voz sintética es el 46% del costo; la telefonía el 25%.</desc>
+  <rect x="8.0" y="16" width="259.52" height="34" fill="var(--c1)"/>
+  <rect x="269.52" y="16" width="139.66" height="34" fill="var(--c2)"/>
+  <rect x="411.17" y="16" width="81.9" height="34" fill="var(--c4)"/>
+  <rect x="495.08" y="16" width="60.11" height="34" fill="var(--c5)"/>
+  <path d="M557.19,16 L574.98,16 Q578.98,16 578.98,20 L578.98,46 Q578.98,50 574.98,50 L557.19,50 Z" fill="var(--c3)"/>
+  <text class="marcaT" x="588.98" y="39">$50,3 / min</text>
+  <rect x="8" y="75" width="11" height="11" rx="2" fill="var(--c1)"/>
+  <text x="28" y="84" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza-2)">TTS · voz sintética con licencia</text>
+  <text class="ejeL" x="470" y="84" text-anchor="end">US$0.0240</text>
+  <text class="ejeL" x="560" y="84" text-anchor="end">$23,0</text>
+  <text class="ejeT" x="620" y="84" text-anchor="end">46%</text>
+  <rect x="8" y="103" width="11" height="11" rx="2" fill="var(--c2)"/>
+  <text x="28" y="112" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza-2)">Telefonía · Twilio (entrante + media stream)</text>
+  <text class="ejeL" x="470" y="112" text-anchor="end">US$0.0130</text>
+  <text class="ejeL" x="560" y="112" text-anchor="end">$12,5</text>
+  <text class="ejeT" x="620" y="112" text-anchor="end">25%</text>
+  <rect x="8" y="131" width="11" height="11" rx="2" fill="var(--c4)"/>
+  <text x="28" y="140" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza-2)">ASR · Deepgram Nova-3 streaming</text>
+  <text class="ejeL" x="470" y="140" text-anchor="end">US$0.0077</text>
+  <text class="ejeL" x="560" y="140" text-anchor="end">$7,4</text>
+  <text class="ejeT" x="620" y="140" text-anchor="end">15%</text>
+  <rect x="8" y="159" width="11" height="11" rx="2" fill="var(--c5)"/>
+  <text x="28" y="168" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza-2)">LLM · Claude Haiku 4.5</text>
+  <text class="ejeL" x="470" y="168" text-anchor="end">US$0.0057</text>
+  <text class="ejeL" x="560" y="168" text-anchor="end">$5,5</text>
+  <text class="ejeT" x="620" y="168" text-anchor="end">11%</text>
+  <rect x="8" y="187" width="11" height="11" rx="2" fill="var(--c3)"/>
+  <text x="28" y="196" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza-2)">Infra · media server + relay</text>
+  <text class="ejeL" x="470" y="196" text-anchor="end">US$0.0020</text>
+  <text class="ejeL" x="560" y="196" text-anchor="end">$1,9</text>
+  <text class="ejeT" x="620" y="196" text-anchor="end">4%</text>
+  <line class="malla" x1="8" y1="205" x2="620" y2="205"/>
+  <text x="28" y="226" style="font-family:'Chivo',sans-serif;font-size:12.5px;fill:var(--tiza);font-weight:600">Total por minuto de llamada</text>
+  <text class="ejeL" x="470" y="226" text-anchor="end" style="fill:var(--tiza);font-weight:600">US$0.0524</text>
+  <text class="ejeL" x="560" y="226" text-anchor="end" style="fill:var(--tiza);font-weight:600">$50,3</text>
+</svg>
+        </div>
+      </figure>
+
+      <h4>La aritmética, línea por línea</h4>
+      <pre><b>TELEFONÍA</b> — Twilio
+  entrante a número local CL ................ US$0,0090 /min
+  Media Streams (WebSocket bidireccional) ... US$0,0040 /min
+                                              <b>US$0,0130 /min</b>
+
+<b>ASR</b> — Deepgram Nova-3 streaming, español
+  tarifa publicada .......................... <b>US$0,0077 /min</b>
+
+<b>LLM</b> — Claude Haiku 4.5 (US$1 in / US$5 out por MTok; caché: 1,25 write, 0,10 read)
+  4 turnos por minuto de llamada
+  por turno:
+    lectura de caché ... 3.500 tok × US$0,10/MTok .... US$0,00035
+    entrada nueva ...... ~400 tok × US$1,00/MTok ..... US$0,00040
+    salida ............. ~60 tok  × US$5,00/MTok ..... US$0,00030
+                                                       US$0,00105 /turno
+  × 4 turnos ............................................ US$0,0042 /min
+  + escritura del caché, 1 vez por llamada:
+    3.500 tok × US$1,25/MTok = US$0,0044, amortizado en 3 min ... US$0,0015 /min
+                                              <b>US$0,0057 /min</b>
+
+<b>TTS</b> — ElevenLabs Flash v2.5 (voz con licencia)
+  tarifa Business: US$1.320 / 11M caracteres = US$0,00012 /carácter
+  Flash cuesta media credencial por carácter ...... US$0,00006 /carácter
+  ~400 caracteres hablados por minuto de llamada
+  400 × US$0,00006 ......................... <b>US$0,0240 /min</b>
+  <span class="c">^ el 46% del costo. Es la línea que hay que vigilar.</span>
+  <span class="c">  Respaldo: Azure Neural TTS es-CL = US$16/1M chars → US$0,0064/min</span>
+  <span class="c">  (4× más barato, ~100 ms más lento al primer byte). Si el margen</span>
+  <span class="c">  aprieta, se cambia y se pierde un poco de latencia.</span>
+
+<b>INFRA</b> — media server (Fly.io, gru) + relay + Redis, prorrateado
+                                              <b>US$0,0020 /min</b>
+  ──────────────────────────────────────────────────────────────
+  <b class="k">TOTAL ............................ US$0,0524 /min = $50,3 CLP</b>
+                                     (tipo de cambio supuesto: $960/USD)</pre>
+
+      <h4>Costo mensual con 100 clientes</h4>
+      <pre>VARIABLE (escala con los clientes)
+  minutos ...... 100 × 330 min × $50,3 ............... $1.659.900
+  números ...... 100 × US$3/mes × 960 ................ $  288.000
+  WhatsApp ..... 100 × 60 plantillas × US$0,0296 × 960 $  170.500
+                                                       ──────────
+                                                       $2.118.400
+
+FIJA (no escala)
+  Fly.io — media server, 3 réplicas 2 vCPU ... US$120 . $  115.200
+  Neon — Postgres + pgvector ................. US$ 69 . $   66.240
+  Redis (colas, estado de llamada) ........... US$ 20 . $   19.200
+  Sentry + Axiom (logs, trazas) .............. US$ 50 . $   48.000
+                                                       ──────────
+                                                       $  248.640
+
+  <b>COGS TOTAL a 100 clientes ........................ $2.367.040</b>
+  <b>INGRESO   a 100 clientes (ARPU $74.500) .......... $7.450.000</b>
+  <b class="k">MARGEN BRUTO ..................................... 68,2%</b>
+
+  <span class="c">Cuadra con el 68,9% de negocio.html: la diferencia es que allá la</span>
+  <span class="c">infra fija está prorrateada a $2.000/cliente (o sea, supone ~124</span>
+  <span class="c">clientes). A 100 clientes la infra pesa un poco más. Ambos números</span>
+  <span class="c">son correctos; el de negocio.html es el de régimen.</span>
+
+  <span class="c">NO incluido acá (es marketing, no COGS): $350.000/mes de generación</span>
+  <span class="c">de contenido SEO con Sonnet 5. Está en el CAC, en negocio.html.</span></pre>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 6 · TERCEROS ══════════ -->
+    <section id="terceros">
+      <h2>6 · Qué hay que contratar</h2>
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Proveedor</th><th>Para qué</th><th>Fricción real</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Twilio</strong></td><td>Voice + Media Streams + número local +56</td><td>Los números chilenos requieren <strong>bundle regulatorio</strong>: RUT, domicilio en Chile y documento de la empresa. Trámite de días, una sola vez. Es la barrera de entrada más real que tenemos contra un competidor extranjero.</td></tr>
+            <tr><td><strong>Deepgram</strong></td><td>ASR streaming es</td><td>Ninguna. API key y listo.</td></tr>
+            <tr><td><strong>ElevenLabs</strong></td><td>TTS Flash v2.5</td><td>Plan Business. <strong>Y el contrato con la locutora chilena</strong>, que es un documento legal real, no un checkbox.</td></tr>
+            <tr><td><strong>Azure Speech</strong></td><td>TTS de respaldo (es-CL)</td><td>Voces Catalina y Lorenzo, con licencia del proveedor. 4× más barato, algo más lento.</td></tr>
+            <tr><td><strong>Anthropic</strong></td><td>Haiku 4.5 y Sonnet 5</td><td>Ninguna.</td></tr>
+            <tr><td><strong>Meta WhatsApp Cloud API</strong></td><td>El resumen al dueño</td><td>Verificación de negocio + <strong>plantillas de utilidad aprobadas</strong>. La aprobación tarda días y hay que redactarlas bien; si Meta las rechaza, no hay resumen.</td></tr>
+            <tr><td><strong>Flow.cl</strong></td><td>Tarjeta en CLP, suscripción recurrente</td><td>Contrato de comercio. Alternativa: Transbank Webpay Oneclick.</td></tr>
+            <tr><td><strong>SII</strong></td><td>Boleta electrónica</td><td>Certificado digital de la empresa. Trámite humano, una vez.</td></tr>
+            <tr><td><strong>Google Calendar API</strong></td><td>Agenda del cliente</td><td>OAuth. El cliente autoriza en un clic.</td></tr>
+            <tr><td><strong>Neon / Fly.io</strong></td><td>Postgres, media server</td><td><strong>No hay región en Chile.</strong> Lo más cerca es São Paulo (~40 ms de RTT). Cabe en el presupuesto de 80 ms de red, pero es un supuesto que hay que medir el día 1.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Variables de entorno</h3>
+      <pre>TWILIO_ACCOUNT_SID            DEEPGRAM_API_KEY
+TWILIO_AUTH_TOKEN             ELEVENLABS_API_KEY
+TWILIO_NUMBER_POOL            ELEVENLABS_VOICE_ID       <span class="c"># voz con licencia</span>
+TWILIO_WEBHOOK_SECRET         AZURE_SPEECH_KEY          <span class="c"># respaldo es-CL</span>
+
+ANTHROPIC_API_KEY             WHATSAPP_TOKEN
+MODELO_LLAMADA=claude-haiku-4-5    WHATSAPP_PHONE_ID
+MODELO_ANALISIS=claude-sonnet-5    WHATSAPP_PLANTILLA_RESUMEN
+
+FLOW_API_KEY                  DATABASE_URL              <span class="c"># postgres + pgvector</span>
+FLOW_SECRET                   REDIS_URL
+SII_CERT_P12                  GOOGLE_OAUTH_CLIENT_ID
+                              GOOGLE_OAUTH_SECRET
+
+<span class="k">KERNEL_MODE=enforce</span>           <span class="c"># bloquea; nunca "warn" en producción</span>
+<span class="k">DISCLOSURE_AUDIO_URL</span>          <span class="c"># el saludo cacheado. Si falta, NO se contesta.</span>
+<span class="k">DISCLOSURE_MAX_MS=5000</span>
+<span class="k">LATENCY_BUDGET_MS=800</span>
+<span class="k">LATENCY_FILLER_MS=900</span>         <span class="c"># sobre esto, se emite relleno</span>
+<span class="k">SUPPRESSION_LIST_URL</span>          <span class="c"># lista de supresión + registro No Molestar</span>
+<span class="k">OUTBOUND_REQUIRE_CONSENT=true</span> <span class="c"># no hay forma de apagar esto por config</span>
+
+SENTRY_DSN                    AXIOM_TOKEN</pre>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 7 · FALSO ═════════════ -->
+    <section id="falso">
+      <h2>7 · Qué está falseado en el demo</h2>
+      <p>El demo es un prototipo navegable. Esto es lo que <strong>no</strong> es real, dicho sin adornos.</p>
+
+      <div class="rejilla rejilla--2">
+        <div class="card falso">
+          <h3 style="margin-top:0;color:var(--c3)">Falso</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>No hay audio.</strong> Ni telefonía, ni ASR, ni TTS. Nadie habla. La llamada es un guión escrito a mano.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>La forma de onda es una función</strong> —una suma de senos con una envolvente—, no un micrófono. Es honesta en lo que representa (quién habla y con cuánta energía) y falsa en cómo lo obtiene.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>Los milisegundos son el presupuesto, no una medición.</strong> Son los números de esta página, no un benchmark. Lo dice el propio demo.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>No hay LLM.</strong> Las respuestas están escritas; el modelo no está decidiendo nada.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span><strong>El WhatsApp está maquetado</strong>, no enviado. Y los datos de los clientes son inventados (con RUT y comunas bien formateados, eso sí).</span></li>
+          </ul>
+        </div>
+        <div class="card real">
+          <h3 style="margin-top:0;color:var(--c4)">Verdadero — es el diseño real</h3>
+          <ul class="lista">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>La máquina de estados de la llamada</strong>: turnos, latencia, silencio, interrupción, cierre.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>El barge-in con truncado del turno del modelo</strong>, que es el detalle que separa un producto de una demo.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>La regla «sin herramienta no hay afirmación»</strong> y la salida forzada de «no lo sé».</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>El guión de «no hay humano»</strong>, palabra por palabra, y la captura de consentimiento.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span><strong>El bucle de <code class="mono">no_supo</code></strong>: en el panel del dueño se responde una pregunta y de verdad desaparece de la bandeja.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Qué faltaría para que fuera real</h4>
+      <p>Un media server con WebSocket bidireccional (Node 22 + <code class="mono">ws</code>), las tres API keys, un número Twilio con el bundle regulatorio chileno, y el pegamento entre las cuatro etapas con manejo de contrapresión. <strong>Estimación honesta: 2 a 3 semanas para un pipeline que conteste una llamada de verdad</strong>, y otras 4 a 6 para que el barge-in y el p95 estén decentes. Lo difícil no es que funcione: es que funcione rápido y no se caiga.</p>
+    </section>
+
+    <!-- ═══════════════════════════════════════ 8 · DOMINIO ═══════════ -->
+    <section id="dominio">
+      <h2>8 · El dominio</h2>
+      <p>Verificado con <code class="mono">_kit/check-domain.sh</code>: RDAP de Verisign para <code class="mono">.com</code> (HTTP 404 = libre) y NIC Chile para <code class="mono">.cl</code>.</p>
+      <pre>$ ./_kit/check-domain.sh fonalta tonalva aloline lineafon
+
+<b class="k">fonalta                .com AVAILABLE          (http 404)   .cl AVAILABLE</b>
+tonalva                .com AVAILABLE          (http 404)   .cl AVAILABLE
+aloline                .com AVAILABLE          (http 404)   .cl AVAILABLE
+lineafon               .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+<span class="c">verificado el 2026-07-13</span></pre>
+      <p><strong>Fonalta</strong> — «fono», que es exactamente como el chileno llama al teléfono («déjame tu fono»), y «alta», de línea alta, de voz alta. Se pronuncia como se escribe, se escribe como se escucha, y no se parece a nada más. <span class="dato">Alternativas verificadas por si el orquestador la necesita: tonalva.com, aloline.com, lineafon.com.</span></p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container pie__in">
+    <div>
+      <p><strong style="color:var(--tiza)">Fonalta</strong> · el teléfono que siempre contesta.</p>
+      <p style="margin-top:6px">Nada de esta infraestructura está aprovisionada. Está documentada, con precios reales.</p>
+    </div>
+    <nav aria-label="Pie">
+      <div class="fila">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html">Negocio</a>
+        <a href="roadmap.html">Roadmap</a>
+      </div>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/sitio.js"></script>
+</body>
+</html>
