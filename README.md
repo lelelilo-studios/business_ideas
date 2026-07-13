@@ -1,25 +1,45 @@
 # business_ideas
 
-Diez productos de negocio, cada uno llevado hasta una web que se puede recorrer:
+Quince productos de negocio, cada uno llevado hasta una web que se puede recorrer:
 landing, demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura
 que habría que configurar para que existiera de verdad.
 
 **En vivo:** https://lelelilo-studios.github.io/business_ideas/
 
-Foco: problemas reales de PYMEs chilenas, con extensión al mercado global.
+Los quince dominios `.com` y `.cl` están verificados como libres (RDAP de Verisign,
+NIC Chile) al 13 de julio de 2026. Eso caduca: verifica de nuevo antes de comprar.
 
-| # | Idea | Problema |
-|---|------|----------|
-| 01 | [Licitaciones](01-licitaciones/) | Las PYMEs se pierden licitaciones en Mercado Público; postular es manual y contra reloj |
-| 02 | [Cobranza](02-cobranza/) | Facturas impagas que hay que perseguir a mano |
-| 03 | [Agenda](03-agenda/) | No-shows y reservas por WhatsApp en servicios locales |
-| 04 | [Inventario](04-inventario/) | Restaurantes y minimarkets sobre-compran y botan merma |
-| 05 | [Contratos](05-contratos/) | Se firman contratos que nadie alcanzó a leer |
-| 06 | [Arriendos](06-arriendos/) | Administrar arriendos: filtrar, cobrar, reparar |
-| 07 | [Terreno](07-terreno/) | Despacho y cotización en oficios de terreno |
-| 08 | [Laboral](08-laboral/) | Cumplimiento laboral PYME: contratos, finiquitos, Previred |
-| 09 | [Despacho](09-despacho/) | E-commerce malabareando Chilexpress, Starken y Blue Express |
-| 10 | [Contabilidad](10-contabilidad/) | Boletas y gastos → contabilidad → F29 |
+## PYME chilena
+
+El comprador es la dueña que contesta el WhatsApp mientras atiende. Ticket bajo,
+venta rápida, y un competidor que casi siempre es Excel o un cuaderno.
+
+| # | Marca | Dominio | Problema |
+|---|------|---------|----------|
+| 01 | [Adjudate](01-licitaciones/) | adjudate.com | Las PYMEs se pierden licitaciones en Mercado Público; postular es manual y contra reloj |
+| 02 | [Tinoria](02-cobranza/) | tinoria.com | Facturas impagas que hay que perseguir a mano |
+| 03 | [Zurcia](03-agenda/) | zurcia.com | No-shows y reservas por WhatsApp en servicios locales |
+| 04 | [Mermata](04-inventario/) | mermata.com | Restaurantes y minimarkets sobre-compran y botan merma |
+| 05 | [Antefirma](05-contratos/) | antefirma.com | Se firman contratos que nadie alcanzó a leer |
+| 06 | [Conserjo](06-arriendos/) | conserjo.com | Administrar arriendos: filtrar, cobrar, reparar |
+| 07 | [Rutamo](07-terreno/) | rutamo.com | Despacho y cotización en oficios de terreno |
+| 08 | [Contralta](08-laboral/) | contralta.com | Cumplimiento laboral PYME: contratos, finiquitos, Previred |
+| 09 | [Kilonauta](09-despacho/) | kilonauta.com | E-commerce malabareando Chilexpress, Starken y Blue Express |
+| 10 | [Talonio](10-contabilidad/) | talonio.com | Boletas y gastos → contabilidad → F29 |
+
+## Minería
+
+El comprador tiene plata y miedo, pero compra lento: piloto, homologación,
+procurement, 12-18 meses. Por eso cuatro de las cinco no le venden a la minera,
+sino a la contratista que ya está adentro de la faena.
+
+| # | Marca | Dominio | Problema |
+|---|------|---------|----------|
+| 11 | [Cintavia](11-correas/) | cintavia.com | Una correa cortada detiene la faena entera; hoy la inspección es un tipo con una linterna |
+| 12 | [Cuasio](12-seguridad/) | cuasio.com | El casi-accidente es el único aviso antes de la muerte, y es justo el que nadie reporta |
+| 13 | [Torniqua](13-contratistas/) | torniqua.com | El camión parado en portería porque a un operador se le venció el examen de altura |
+| 14 | [Cianota](14-permisos/) | cianota.com | Permitología: un permiso se atrasa un mes y la puesta en marcha se corre tres |
+| 15 | [Freatia](15-agua/) | freatia.com | En Atacama el agua es la licencia para operar, y el relave es el pasivo que no deja dormir |
 
 ## Cómo está hecho
 

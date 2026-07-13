@@ -1,0 +1,15 @@
+{
+  "folder": "12-seguridad",
+  "brand": "Cuasio",
+  "domain": "cuasio.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/cuasio.com -> HTTP 404 (disponible), 13-07-2026. Control: google.com -> HTTP 200 (tomado). cuasio.cl también disponible en NIC Chile (Whois: 'no existe').",
+  "alternates": ["centinelo.com", "senaleo.com", "cuasil.com"],
+  "tagline": "El casi-accidente es el único aviso que vas a recibir. Captúralo en 30 segundos.",
+  "category": "Seguridad y gestión de riesgos para minería",
+  "market": "Chile → minería de LatAm",
+  "icp": "Empresa contratista minera, 80 a 250 personas en faena, en Antofagasta / Atacama / O'Higgins, que hoy gestiona la seguridad con talonario, Excel y Word",
+  "price_clp": "Desde $190.000/mes",
+  "accent": "#FFD100",
+  "problem": "El casi-accidente es la señal temprana que avisa antes de la muerte, y es justo la que se pierde: reportarlo es un trámite de veinte minutos al final del turno y a nadie le pagan por hacerlo.",
+  "status": "prototipo"
+}

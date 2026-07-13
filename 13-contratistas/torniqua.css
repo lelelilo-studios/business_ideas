@@ -1,0 +1,339 @@
+/* ============================================================================
+   TORNIQUA — hoja de estilo del sistema
+   ----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: CREDENCIAL / CONTROL DE ACCESO.
+   La referencia no es un cuaderno ni una revista: es la tarjeta de identificación
+   que cuelga del overol y el torniquete de la portería a las seis de la mañana.
+   De ahí sale todo:
+     - Superficie: acero oscuro. Una faena de noche, una sala de control, un lector.
+       Nunca papel. Nunca fondo claro con serif editorial.
+     - Geometría: la tarjeta. Esquina achaflanada, perforación de cordón, banda de
+       color arriba, zona de foto, y una franja legible por máquina (MRZ) abajo
+       en monoespaciada. Todo lo importante se lee a un metro de distancia.
+     - Tipografía: Archivo (grotesca de señalética, pesos altos, versalitas con
+       tracking abierto) + IBM Plex Mono para TODO lo que es dato: RUT, fechas,
+       folios, códigos. Si es un dato, es monoespaciado. Es una convención de
+       máquina, no una decoración.
+     - Color: un verde-azulado de sistema (teal/acero) y UN SOLO color de alarma
+       (naranja de señalética). No hay semáforo de tres luces: lo que está OK es
+       teal, lo que está por vencer es la alarma en hueco (contorno + rayado de
+       peligro), lo que bloquea es la alarma llena. Dos colores, tres estados,
+       y siempre con texto — nunca color solo.
+   PROHIBIDO en este archivo: papel crema, rojo óxido, serif editorial, degradados
+   violeta, glassmorphism, emojis como iconos.
+   ============================================================================ */
+
+:root {
+  /* --- acero --- */
+  --steel-0:  #06090B;   /* zona legible por máquina, troqueles */
+  --steel-1:  #0B1114;   /* página */
+  --steel-2:  #101A1E;   /* panel */
+  --steel-3:  #16242A;   /* panel elevado / fila */
+  --steel-4:  #1F3138;   /* borde fuerte */
+  --line:     #1B2A31;   /* filete */
+
+  /* --- tinta --- */
+  --ink:      #E9F1F3;
+  --ink-2:    #A6BAC1;
+  --ink-3:    #718A93;
+
+  /* --- sistema (teal/acero) --- */
+  --teal:      #22C3AC;
+  --teal-2:    #0FA894;
+  --teal-3:    #0A5E55;
+  --teal-tint: rgba(34, 195, 172, 0.12);
+
+  /* --- alarma (única) --- */
+  --alarm:      #FF5A2C;
+  --alarm-2:    #C43C16;
+  --alarm-tint: rgba(255, 90, 44, 0.12);
+
+  /* --- serie de gráficos (validada con dataviz/validate_palette.js,
+         modo oscuro, superficie #10171A: los 4 checks PASS) --- */
+  --c1: #0FA894;  /* base      */
+  --c2: #5A8FD8;  /* optimista */
+  --c3: #B8842B;  /* pesimista */
+
+  --radius: 3px;
+  --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* ---------------------------------------------------------------- base ---- */
+
+body {
+  background-color: var(--steel-1);
+  /* trama de acero: líneas finísimas, casi invisibles. Es material, no decoración. */
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,0.014) 0px,
+    rgba(255,255,255,0.014) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  color: var(--ink);
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-size: var(--step-0);
+  font-weight: 400;
+}
+
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: var(--step-4); line-height: 1.05; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); }
+p  { color: var(--ink-2); }
+strong { color: var(--ink); font-weight: 600; }
+a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+
+.mono, code, kbd { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+/* La etiqueta de máquina: lo que en la credencial va impreso en chico y en
+   mayúsculas sobre cada zona. Se usa en todas partes como rótulo de campo. */
+.tag {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.tag--teal  { color: var(--teal); }
+.tag--alarm { color: var(--alarm); }
+
+.num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+.lede { font-size: var(--step-1); color: var(--ink-2); line-height: 1.45; }
+.muted { color: var(--ink-3); }
+.small { font-size: var(--step--1); }
+
+/* ----------------------------------------------------------- navegación ---- */
+
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(11,17,20,0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: saturate(140%);
+}
+.topbar__in {
+  display: flex; align-items: center; gap: var(--sp-s);
+  min-height: 56px;
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+.brand__mark { width: 26px; height: 26px; flex: none; }
+.brand__name {
+  font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  font-size: 0.95rem; color: var(--ink);
+}
+.brand__dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--teal); box-shadow: 0 0 0 3px var(--teal-tint);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .brand__dot { animation: none; } }
+
+.navtoggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--ink-2); background: var(--steel-2);
+}
+.nav { display: none; }
+.nav--open {
+  display: block; position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--steel-2); border-bottom: 1px solid var(--line);
+  padding: var(--sp-2xs) var(--gutter) var(--sp-s);
+}
+.nav ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.nav a {
+  display: flex; align-items: center; min-height: 44px; padding: 0 var(--sp-2xs);
+  text-decoration: none; color: var(--ink-2);
+  font-size: 0.86rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  border-left: 2px solid transparent;
+}
+.nav a:hover { color: var(--ink); background: var(--steel-3); }
+.nav a[aria-current="page"] { color: var(--teal); border-left-color: var(--teal); }
+
+@media (min-width: 60em) {
+  .navtoggle { display: none; }
+  .nav, .nav--open {
+    display: block; position: static; background: none; border: 0; padding: 0;
+  }
+  .nav ul { flex-direction: row; gap: var(--sp-2xs); }
+  .nav a { border-left: 0; border-bottom: 2px solid transparent; padding: 0 10px; }
+  .nav a[aria-current="page"] { border-left: 0; border-bottom-color: var(--teal); background: none; }
+}
+
+/* -------------------------------------------------------------- secciones -- */
+
+.section { padding-block: var(--sp-xl); border-top: 1px solid var(--line); }
+.section--flush { border-top: 0; }
+@media (min-width: 48em) { .section { padding-block: var(--sp-2xl); } }
+
+.section__head { margin-bottom: var(--sp-l); }
+.section__head .tag { display: block; margin-bottom: var(--sp-2xs); }
+
+/* ------------------------------------------------------------------ card --- */
+
+.card {
+  background: var(--steel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--sp-s);
+}
+.card--raised { background: var(--steel-3); }
+.card__hd {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2xs);
+  padding-bottom: var(--sp-2xs); margin-bottom: var(--sp-2xs);
+  border-bottom: 1px solid var(--line);
+}
+
+/* La credencial. Chaflán arriba-derecha, perforación de cordón, banda de estado. */
+.cred {
+  position: relative;
+  background: linear-gradient(180deg, var(--steel-3), var(--steel-2));
+  border: 1px solid var(--steel-4);
+  border-radius: var(--radius);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+  padding: var(--sp-s);
+  box-shadow: var(--shadow);
+}
+.cred::before { /* banda de estado */
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+  background: var(--teal);
+}
+.cred--alarm::before { background: var(--alarm); }
+.cred__punch { /* perforación del cordón */
+  width: 34px; height: 8px; border-radius: 4px;
+  background: var(--steel-0); border: 1px solid var(--steel-4);
+  margin: 0 auto var(--sp-xs);
+}
+/* Zona legible por máquina */
+.mrz {
+  margin-top: var(--sp-s);
+  background: var(--steel-0);
+  border-top: 1px solid var(--steel-4);
+  border-radius: 0 0 2px 2px;
+  padding: 8px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.12em;
+  color: var(--ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.photo {
+  width: 56px; height: 68px; flex: none;
+  background: var(--steel-0); border: 1px solid var(--steel-4);
+  display: grid; place-items: center;
+  font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 1.05rem;
+  color: var(--teal); letter-spacing: 0.06em;
+}
+.photo--alarm { color: var(--alarm); }
+
+/* ------------------------------------------------------------------ chips -- */
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 2px;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.chip--ok    { background: var(--teal-tint);  color: var(--teal);  border-color: rgba(34,195,172,0.35); }
+.chip--warn  { /* por vencer: alarma en hueco + rayado de peligro */
+  color: var(--alarm); border-color: rgba(255,90,44,0.5);
+  background-image: repeating-linear-gradient(45deg,
+    rgba(255,90,44,0.14) 0 6px, transparent 6px 12px);
+}
+.chip--stop  { background: var(--alarm); color: #170703; border-color: var(--alarm); font-weight: 600; }
+.chip--off   { background: var(--steel-3); color: var(--ink-3); border-color: var(--line); }
+
+/* ---------------------------------------------------------------- botones -- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 var(--sp-s);
+  border-radius: var(--radius);
+  font-weight: 600; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: 'Archivo', sans-serif;
+  text-decoration: none; transition: background-color .12s, border-color .12s, color .12s;
+}
+.btn--primary { background: var(--teal); color: #04211C; border: 1px solid var(--teal); }
+.btn--primary:hover { background: #35D6BE; }
+.btn--ghost { background: transparent; color: var(--ink); border: 1px solid var(--steel-4); }
+.btn--ghost:hover { border-color: var(--teal); color: var(--teal); }
+.btn--alarm { background: transparent; color: var(--alarm); border: 1px solid var(--alarm-2); }
+.btn--alarm:hover { background: var(--alarm-tint); }
+.btn--block { width: 100%; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+
+/* ---------------------------------------------------------------- grillas -- */
+
+.grid { display: grid; gap: var(--sp-s); }
+@media (min-width: 48em) {
+  .grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 64em) {
+  .grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .grid--sidebar { grid-template-columns: 1.15fr 0.85fr; gap: var(--sp-l); align-items: start; }
+}
+
+/* ---------------------------------------------------------------- tablas --- */
+
+table.data { width: 100%; font-size: 0.88rem; min-width: 560px; }
+table.data th {
+  text-align: left; padding: 8px 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+  border-bottom: 1px solid var(--steel-4); font-weight: 500; white-space: nowrap;
+}
+table.data td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.data tbody tr:hover { background: var(--steel-3); }
+table.data td.n { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------- listados -- */
+
+.rows { list-style: none; }
+.rows > li {
+  display: flex; align-items: center; gap: var(--sp-2xs);
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.rows > li:last-child { border-bottom: 0; }
+
+/* franja de peligro: sólo para zonas de advertencia reales */
+.hazard {
+  background-image: repeating-linear-gradient(45deg,
+    rgba(255,90,44,0.16) 0 8px, transparent 8px 16px);
+  border: 1px solid rgba(255,90,44,0.4);
+  border-radius: var(--radius);
+  padding: var(--sp-xs);
+}
+
+/* --------------------------------------------------------------- gráficos -- */
+
+.chart { width: 100%; height: auto; display: block; }
+.chart text { font-family: 'IBM Plex Mono', monospace; fill: var(--ink-3); font-size: 10px; }
+.chart .axis { stroke: var(--line); stroke-width: 1; }
+.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-2xs); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--ink-2); }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: block; }
+
+/* ----------------------------------------------------------------- footer -- */
+
+.foot {
+  border-top: 1px solid var(--line); padding-block: var(--sp-l);
+  color: var(--ink-3); font-size: 0.82rem;
+}
+.foot a { color: var(--ink-2); }
+
+/* ------------------------------------------------------------------ misc --- */
+
+.stack > * + * { margin-top: var(--sp-s); }
+.stack-s > * + * { margin-top: var(--sp-2xs); }
+.stack-l > * + * { margin-top: var(--sp-l); }
+.row { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap; }
+.row--between { justify-content: space-between; }
+.icon { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.icon--lg { width: 28px; height: 28px; }
+hr.rule { border: 0; border-top: 1px solid var(--line); margin-block: var(--sp-m); }

@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Cuasio</title>
+<meta name="description" content="Qué habría que configurar para que Cuasio fuera real: modelo de datos, los seis agentes de IA con su modelo y su prompt, las APIs a contratar, el costo mensual con la aritmética, y qué está falseado en el demo.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306111C'/><path d='M16 6 L28 26 L4 26 Z' fill='none' stroke='%23FFD100' stroke-width='3'/><rect x='14.5' y='13' width='3' height='7' fill='%23FFD100'/><rect x='14.5' y='21.5' width='3' height='2.5' fill='%23FFD100'/></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav__barra">
+      <a class="marca" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+          <path d="M13 3 L24 22 L2 22 Z" fill="none" stroke="#FFD100" stroke-width="2.5"/>
+          <rect x="11.7" y="10" width="2.6" height="6" fill="#FFD100"/>
+          <rect x="11.7" y="17.4" width="2.6" height="2.4" fill="#FFD100"/>
+        </svg>
+        <span>Cuasio<span class="marca__punto">.</span></span>
+      </a>
+      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">
+        <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M0 1h16M0 6h16M0 11h16" stroke="currentColor" stroke-width="2"/></svg>
+        Menú
+      </button>
+      <nav class="nav__menu" id="navMenu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">← Ideas</a></li>
+          <li><a href="index.html">Producto</a></li>
+          <li><a href="demo/index.html">Demo</a></li>
+          <li><a href="negocio.html">Negocio</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="rayado" role="presentation"></div>
+
+<main id="principal">
+
+<section class="seccion">
+  <div class="container">
+    <p class="placa">Lo que habría que configurar</p>
+    <h1 class="mt-s" style="font-size:var(--step-4);max-width:22ch">Nada de esto está aprovisionado. Todo está documentado.</h1>
+    <p class="mt-s prose">Esta página existe para que alguien con acceso a una tarjeta de crédito y dos semanas pueda levantar Cuasio de verdad. Incluye la parte incómoda: <strong>qué está falseado en el demo</strong>.</p>
+  </div>
+</section>
+
+<!-- MODELO DE DATOS -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">01 / MODELO DE DATOS</p>
+      <h2>Postgres. Y tres decisiones que no son cosméticas.</h2>
+    </div>
+
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Tabla</th><th>Campos principales</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">empresa</td><td class="mono">id · razon_social · rut · tipo(contratista|mandante) · plan · dotacion_faena</td><td>El RUT es la llave natural del mundo chileno.</td></tr>
+          <tr><td class="mono">faena</td><td class="mono">id · nombre · mandante_id · comuna · region · tipo(rajo|subterranea|planta)</td><td>Una contratista puede estar en varias faenas de varios mandantes.</td></tr>
+          <tr><td class="mono">area</td><td class="mono">id · faena_id · nombre · tipo · geocerca_geojson</td><td>Rampa 7, Botadero Norte, Chancado. La geocerca permite pre-seleccionar el lugar por GPS y ahorrarse un toque.</td></tr>
+          <tr><td class="mono">persona</td><td class="mono">id · empresa_id · nombre · rut · cargo · turno(7x7|4x3) · rol_app · activo</td><td>Cargo real: operador CAEX, jefe de turno, mantenedor, supervisor, experto en prevención.</td></tr>
+          <tr class="destacada"><td class="mono">reporte</td><td class="mono">id · folio · empresa_id · faena_id · area_id · <strong>persona_id (nullable)</strong> · tipo · potencial · relato_texto · audio_url · foto_url · <strong>ocurrido_at</strong> · <strong>recibido_at</strong> · lat · lon · <strong>local_id</strong> · anonimo</td><td>La tabla que importa. Tres campos con decisión adentro, abajo.</td></tr>
+          <tr><td class="mono">triage</td><td class="mono">reporte_id · modelo · version_prompt · energia · control_critico_id · potencial_ia · confianza · tokens_in · tokens_out · costo_usd · aceptado_por · correccion_json</td><td>Guardamos el costo real de cada inferencia. Si no lo mides, el margen es una opinión.</td></tr>
+          <tr><td class="mono">control_critico</td><td class="mono">id · faena_id · empresa_id · nombre · frecuencia · responsable_cargo · estado(operativo|vencido|caido|parcial)</td><td>El puñado que impide la fatalidad. Ocho, no ochenta.</td></tr>
+          <tr><td class="mono">verificacion</td><td class="mono">control_critico_id · persona_id · turno_id · resultado(operativo|caido) · observacion · at · evidencia_url</td><td>Una fila por verificación, con nombre y hora. Es lo que convierte “está en el manual” en “está operativo hoy”.</td></tr>
+          <tr><td class="mono">patron</td><td class="mono">id · faena_id · hipotesis · confianza · ventana · estado(abierto|investigando|descartado) · descartado_por · razon_descarte</td><td><strong>Descartar un patrón deja huella con nombre.</strong> Si mañana pasa algo en esa rampa, esa decisión tiene autor.</td></tr>
+          <tr><td class="mono">patron_reporte</td><td class="mono">patron_id · reporte_id</td><td>La evidencia. Un patrón sin folios que lo sustenten no se muestra. Regla dura del agente 2.</td></tr>
+          <tr><td class="mono">investigacion</td><td class="mono">id · patron_id · folio · estado · borrador_json · <strong>firmada_por</strong> · firmada_at</td><td><code>firmada_por</code> apunta a una persona. Siempre. Nunca a un modelo.</td></tr>
+          <tr><td class="mono">accion</td><td class="mono">investigacion_id · descripcion · responsable_id · plazo · estado · evidencia_url · cerrada_at</td><td>El Excel de acciones correctivas que nadie abre, pero que aquí vence solo y se ve vencido.</td></tr>
+          <tr><td class="mono">exportacion</td><td class="mono">empresa_id · destino(autoridad|mandante) · formato · payload_url · generado_por · at</td><td>Todo lo que sale del sistema queda registrado.</td></tr>
+          <tr class="destacada"><td class="mono">auditoria</td><td class="mono">tabla · registro_id · accion · actor_id · antes_json · despues_json · at</td><td><strong>Append-only, retención 5 años.</strong> En un producto de seguridad la trazabilidad no es una feature: es el producto.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rejilla rejilla--3 mt-m">
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">Decisión 1</div>
+        <h3><code>persona_id</code> es nullable</h3>
+        <p class="mb-0">El anonimato es una <strong>decisión de esquema</strong>, no un switch en la interfaz. Si el sistema puede volver a unir el reporte con la persona, no es anónimo — es anónimo “hasta que alguien con acceso a la base quiera saber”. Cuando el reporte es anónimo, el <code>persona_id</code> es <code>NULL</code> y sólo se guarda un hash irreversible con sal, para detectar spam. Ni el gerente ni nosotros podemos deshacerlo.</p>
+      </div>
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">Decisión 2</div>
+        <h3><code>ocurrido_at</code> ≠ <code>recibido_at</code></h3>
+        <p class="mb-0">El reporte se escribe sin señal a las 19:55 en el fondo del rajo y llega al servidor a las 21:40, cuando el operador pasa por el wifi del comedor. <strong>La hora del evento es la primera, y es la que tiene valor legal y analítico.</strong> Un sistema que sólo guarda la hora de recepción destruye exactamente el dato que hace posible encontrar el patrón del cambio de turno.</p>
+      </div>
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">Decisión 3</div>
+        <h3><code>local_id</code> y la idempotencia</h3>
+        <p class="mb-0">El teléfono genera un UUID local antes de tener conexión. La sincronización es idempotente contra ese id, así que un reintento en una red de mierda no crea siete reportes duplicados. Suena obvio; es la primera cosa que se rompe en terreno.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENTES -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">02 / LOS AGENTES DE IA</p>
+      <h2>Seis. Y una lista de lo que la IA no hace.</h2>
+      <p>Modelos de Anthropic. La regla de asignación es simple: <strong>el modelo más barato que resuelve la tarea</strong>. Pagar Opus por clasificar un reporte no compra nada y se lo come al margen.</p>
+    </div>
+
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Agente</th><th>Modelo</th><th>Qué hace</th><th>Herramientas</th><th>Regla dura</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>1 · Triage</strong></td>
+            <td class="mono">claude-haiku-4-5-20251001</td>
+            <td>Por cada reporte que entra: clasifica tipo de evento, energía involucrada, potencial de severidad y control crítico asociado. Salida en JSON estricto.</td>
+            <td>Ninguna. Salida estructurada contra un esquema.</td>
+            <td>Si la confianza baja de 0,7, el reporte entra a la bandeja marcado <em>“por clasificar”</em> y lo hace una persona. No adivina.</td>
+          </tr>
+          <tr class="destacada">
+            <td><strong>2 · Detector de patrones</strong></td>
+            <td class="mono">claude-sonnet-5</td>
+            <td>Corre semanal por faena. Cruza los reportes entre sí buscando coincidencia de lugar, ventana horaria, equipo, control crítico y léxico. <strong>Es el agente que justifica el producto.</strong></td>
+            <td class="mono">buscar_reportes(filtros) · obtener_verificaciones(control, ventana) · obtener_despacho(ruta, ventana)</td>
+            <td><strong>No puede afirmar un patrón sin citar al menos 3 folios reales.</strong> La respuesta trae la lista de <code>reporte_id</code> que la sustenta, y la interfaz los muestra. Un patrón sin evidencia no se renderiza. Es la barrera anti-alucinación, y es de arquitectura, no de prompt.</td>
+          </tr>
+          <tr>
+            <td><strong>3 · Investigación asistida</strong></td>
+            <td class="mono">claude-sonnet-5</td>
+            <td>Arma el borrador: hechos, línea de tiempo, cinco porqués, acciones correctivas propuestas con responsable sugerido y plazo.</td>
+            <td class="mono">obtener_patron · obtener_reportes · obtener_controles · plantilla_icam</td>
+            <td>Genera un <strong>borrador</strong> y nada más. El campo <code>firmada_por</code> sólo lo puede escribir un usuario autenticado con rol de experto en prevención.</td>
+          </tr>
+          <tr>
+            <td><strong>4 · Reporte regulatorio</strong></td>
+            <td class="mono">claude-sonnet-5</td>
+            <td>Rellena la plantilla del informe con el dato que ya existe en la base. Cero tipeo.</td>
+            <td class="mono">obtener_investigacion · plantilla_regulatoria</td>
+            <td><strong>La plantilla la escribe un abogado, no el modelo.</strong> Todo campo que la plantilla marque como <span class="porvalidar">por validar</span> se emite con la marca puesta en el documento. El modelo <strong>no puede afirmar un plazo legal</strong>: si no está en la plantilla, no existe.</td>
+          </tr>
+          <tr>
+            <td><strong>5 · Resumen semanal</strong></td>
+            <td class="mono">claude-haiku-4-5-20251001</td>
+            <td>El correo del lunes al gerente: cuántos reportaron, qué control está caído, qué acción venció.</td>
+            <td class="mono">obtener_kpis(empresa, semana)</td>
+            <td>Sólo cifras que existen en la base. Prohibido interpretar tendencias con menos de 8 semanas de dato.</td>
+          </tr>
+          <tr>
+            <td><strong>6 · Evaluador de calidad</strong></td>
+            <td class="mono">claude-opus-4-8</td>
+            <td>Mensual y <strong>fuera del camino del usuario</strong>: toma 50 clasificaciones del agente 1 y las juzga contra el criterio del prevencionista asesor. De ahí salen las correcciones al prompt de Haiku.</td>
+            <td class="mono">muestrear_triages · criterio_experto</td>
+            <td>Nunca toca un dato de producción. Es control de calidad, no operación. Es el único uso de Opus, y se justifica porque juzgar bien es más difícil que clasificar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="caja caja--peligro mt-m">
+      <div class="caja__cinta caja__cinta--peligro">Lo que la IA no hace, y no es negociable</div>
+      <ul class="lista lista--muerte" role="list">
+        <li><strong>No cierra una investigación.</strong> Ni una acción correctiva. La firma es de una persona con registro.</li>
+        <li><strong>No afirma una obligación legal.</strong> Si el plazo no está en la plantilla que escribió el abogado, el documento sale con la marca <span class="porvalidar">por validar</span>. Un modelo alucinando el artículo 47 del DS 132 es un pasivo, no un bug.</li>
+        <li><strong>No decide detener una tarea.</strong> Eso lo decide el trabajador y el jefe de turno. El software avisa; no manda.</li>
+        <li><strong>No califica a una persona.</strong> No hay ranking de trabajadores, no hay score de conducta insegura, no hay nada que convierta el reporte en un instrumento de castigo — porque el día que lo sea, se acaban los reportes y se acaba el producto.</li>
+      </ul>
+    </div>
+
+    <div class="caja mt-m">
+      <div class="caja__cinta">El prompt del agente 2, en resumen (es el que importa)</div>
+      <div class="aritmetica">
+SISTEMA
+  Eres un analista de seguridad minera. Recibes N reportes de eventos de una faena.
+  Tu trabajo NO es resumir: es <b>encontrar coincidencias que un humano no cruzaría</b>.
+  Buscas coincidencia en: área, ventana horaria (± 45 min), tipo de equipo,
+  control crítico asociado, y léxico repetido en los relatos.
+
+REGLAS
+  1. Un patrón requiere <b>≥ 3 reportes independientes</b>. Devuelve sus reporte_id.
+  2. Si dos reportes son de la misma persona, cuentan como UNO. (Un reportero
+     entusiasta no es un patrón: es un reportero entusiasta.)
+  3. Declara <b>confianza</b>: alta (≥5 fuentes, ventana estrecha), media, baja.
+  4. Usa obtener_verificaciones() y obtener_despacho() para <b>buscar la causa
+     física</b>, no para adornar. Si no la encuentras, di que no la encontraste.
+  5. <b>Nunca</b> propongas una causa que no esté sustentada por un dato que
+     puedas citar. La hipótesis va etiquetada como hipótesis.
+
+SALIDA
+  { hipotesis, confianza, reporte_ids[], control_critico_id, evidencia_externa[] }
+      </div>
+      <p class="fuente mb-0">La regla 2 salió de mirar el mock: en la Faena Cerro Quemado, Marcelo Ibáñez reportó dos veces. Sin la regla, el modelo cuenta 7 y hay 6 personas. Con la regla, cuenta 6 fuentes independientes — y el patrón sigue siendo sólido, pero ahora es verdad.</p>
+    </div>
+  </div>
+</section>
+
+<!-- APIS -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">03 / QUÉ HAY QUE CONTRATAR</p>
+      <h2>La lista de la compra.</h2>
+    </div>
+
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Anthropic API</strong></td><td>Los seis agentes. Haiku 4.5, Sonnet 5, Opus 4.8.</td><td>Cuenta + límites de tasa por organización.</td></tr>
+          <tr class="destacada"><td><strong>ASR (Deepgram / AssemblyAI / Whisper API)</strong></td><td>Transcribir la voz del operador. <strong>Es la pieza técnica de mayor riesgo del producto.</strong></td><td><span class="porvalidar">POR VALIDAR EN TERRENO</span> — hay que probar la precisión real con motor de CAEX de fondo, con casco, con acento del norte y con léxico minero (CAEX, berma, talud, rajo, chancado, marina, tronadura). Requiere vocabulario personalizado. Si el ASR falla, se cae la promesa de los 30 segundos.</td></tr>
+          <tr><td><strong>Postgres gestionado + pgvector</strong></td><td>La base. Los <em>embeddings</em> de los relatos permiten deduplicar y buscar “reportes parecidos” antes de invocar al agente 2.</td><td>Supabase / Neon / RDS.</td></tr>
+          <tr><td><strong>Object storage S3-compatible</strong></td><td>Fotos y audio. Con cifrado en reposo y URLs firmadas de vida corta.</td><td>Cloudflare R2 / S3.</td></tr>
+          <tr><td><strong>Expo Push + FCM + APNs</strong></td><td>“Control crítico caído en Rampa 7”. Llega al teléfono del jefe de turno.</td><td>App nativa o PWA con notificaciones.</td></tr>
+          <tr><td><strong>Facturación electrónica</strong></td><td>Factura al cliente. Vía un proveedor autorizado por el SII (Nubox, Defontana, LibreDTE u otro).</td><td>El cobro B2B en Chile es factura a 30 días, no tarjeta. No hay <em>self-service checkout</em> y hay que asumirlo en el flujo de caja.</td></tr>
+          <tr class="destacada"><td><strong>Integración con el mandante</strong></td><td>Exportar los eventos al sistema de la minera (SAP EHS, plataforma propia, u otra).</td><td><span class="porvalidar">por validar caso a caso</span>. Se mapea una vez por mandante, en la implementación. Empezamos por CSV, que siempre funciona.</td></tr>
+          <tr class="destacada"><td><strong>Envío a la autoridad</strong></td><td>Entregar el reporte a SERNAGEOMIN.</td><td><span class="porvalidar">NO HAY INTEGRACIÓN</span>. No nos consta que exista una API pública para esto. Cuasio <strong>genera el documento</strong>; la presentación se hace por el canal que la autoridad exija, y ese canal hay que confirmarlo antes de prometer nada.</td></tr>
+          <tr><td><strong>Sistema de despacho de la faena</strong></td><td>El dato del camión regador, del tránsito, de la posición de los equipos. Es lo que permitió confirmar la causa del patrón de la Rampa 7.</td><td><span class="porvalidar">por validar</span>. Es del mandante, no del contratista. Es un “nice to have” potentísimo y una dependencia que no controlamos.</td></tr>
+          <tr><td><strong>Sentry + logs + backups</strong></td><td>Observabilidad y respaldo. Con retención de auditoría de 5 años.</td><td>Estándar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mt-l">Variables de entorno</h3>
+    <div class="aritmetica mt-s">
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL_TRIAGE=claude-haiku-4-5-20251001
+ANTHROPIC_MODEL_ANALISIS=claude-sonnet-5
+ANTHROPIC_MODEL_EVAL=claude-opus-4-8
+ANTHROPIC_MAX_TOKENS_TRIAGE=600
+
+ASR_PROVIDER=deepgram
+ASR_API_KEY=...
+ASR_IDIOMA=es-CL
+ASR_VOCABULARIO=caex,berma,talud,rajo,chancado,marina,tronadura,polvorin,regador
+
+DATABASE_URL=postgres://...
+PGVECTOR_DIM=1024
+STORAGE_ENDPOINT=https://...r2.cloudflarestorage.com
+STORAGE_BUCKET=cuasio-evidencia
+STORAGE_URL_TTL_SEGUNDOS=300
+
+PUSH_FCM_KEY=...
+PUSH_APNS_KEY_ID=...
+
+SII_DTE_PROVEEDOR=nubox
+SII_DTE_TOKEN=...
+
+<b>ANONIMATO_SAL=...            # sal del hash irreversible. Si se filtra, se filtró el anonimato.
+AUDITORIA_RETENCION_DIAS=1825 # 5 años, append-only
+PATRON_MIN_FUENTES=3          # la barrera anti-alucinación del agente 2
+TRIAGE_CONFIANZA_MINIMA=0.7   # bajo esto, lo clasifica una persona</b>
+    </div>
+  </div>
+</section>
+
+<!-- COSTO -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">04 / COSTO MENSUAL</p>
+      <h2>La aritmética que <a href="negocio.html">Negocio</a> le descuenta al margen.</h2>
+      <p>Cliente de referencia: contratista con <strong>200 personas en faena</strong>, <strong>160 reportes al mes</strong> (cobertura 80%), 8 investigaciones y 4 exportaciones. Tipo de cambio usado: <strong>$950 por USD</strong>. Tarifas de los modelos: <span class="porvalidar">las vigentes al momento de contratar · por validar</span>.</p>
+    </div>
+
+    <h3>Inferencia de IA, por cliente y por mes</h3>
+    <div class="aritmetica mt-s">
+AGENTE 1 · Triage (Haiku 4.5 · US$1 entrada / US$5 salida por millón)
+  Por reporte: 2.000 tok entrada + 350 tok salida
+  (2.000/1M × 1) + (350/1M × 5)  =  US$0,00375
+  × 160 reportes                 =  <b>US$ 0,60</b>
+
+AGENTE 2 · Patrones (Sonnet 5 · US$3 / US$15 por millón)
+  Por corrida: 90.000 tok entrada (400 reportes de contexto) + 2.500 salida
+  (90.000/1M × 3) + (2.500/1M × 15)  =  US$0,3075
+  × 4,3 corridas/mes                  =  <b>US$ 1,32</b>
+
+AGENTE 3 · Investigación (Sonnet 5)
+  18.000 entrada + 3.500 salida = US$0,1065  × 8 al mes  =  <b>US$ 0,85</b>
+
+AGENTE 4 · Reporte regulatorio (Sonnet 5)
+  12.000 entrada + 2.500 salida = US$0,0735  × 4 al mes  =  <b>US$ 0,29</b>
+
+AGENTE 5 · Resumen semanal (Haiku 4.5)                   =  <b>US$ 0,10</b>
+AGENTE 5b · Resumen diario de controles (Haiku 4.5)      =  <b>US$ 0,30</b>
+AGENTE 6 · Evaluación con Opus 4.8 (US$6/mes ÷ 40 clientes) = <b>US$ 0,15</b>
+Embeddings para deduplicación                            =  <b>US$ 0,02</b>
+────────────────────────────────────────────────────────────────────
+Subtotal                                                    US$ 3,63
++ 40% de colchón (reintentos, contexto que engorda, prompts que crecen)
+────────────────────────────────────────────────────────────────────
+<b>Total inferencia = US$ 5,08 × $950 = $4.826  →  presupuestamos $5.200 / cliente / mes</b>
+    </div>
+
+    <h3 class="mt-l">Transcripción de voz</h3>
+    <div class="aritmetica mt-s">
+160 reportes × 45 s promedio = 120 minutos de audio al mes
+120 min × US$0,015/min = US$1,80 × $950 = $1.710
++ colchón por reintentos y grabaciones largas
+<b>Presupuestamos $2.100 / cliente / mes</b>
+    </div>
+
+    <h3 class="mt-l">Infraestructura (fija, repartida entre 40 clientes)</h3>
+    <div class="aritmetica mt-s">
+Hosting de la app (2 instancias)                  US$  60
+Postgres gestionado + pgvector                    US$  75
+Object storage (fotos + audio, creciendo)         US$  40
+Egress / CDN                                      US$  30
+Observabilidad (Sentry, logs)                     US$  50
+Correo transaccional                              US$  20
+Backups + réplica                                 US$  40
+Staging + CI                                      US$  40
+WAF, dominio, certificados                        US$  15
+<b>Retención de auditoría append-only, 5 años       US$  80</b>
+──────────────────────────────────────────────────────────
+Total infraestructura                             US$ 450 / mes
+÷ 40 clientes = US$11,25 × $950 = $10.688  →  <b>presupuestamos $11.400 / cliente / mes</b>
+    </div>
+
+    <div class="caja caja--peligro mt-m">
+      <div class="caja__cinta caja__cinta--peligro">El número que cuadra con Negocio</div>
+      <div class="aritmetica">
+Inferencia de IA                    $  5.200
+Transcripción de voz                $  2.100
+Infraestructura asignada            $ 11.400
+────────────────────────────────────────────
+<b>Costo técnico total = $18.700 por cliente / mes</b>
+
+Contra un ARPU de $466.000  →  <b>4,0% del ingreso</b>
+    </div>
+      <p class="mb-0 mt-s">Sumado al soporte ($27.960) y al onboarding amortizado ($6.667), el costo directo total es <strong>$53.327</strong> y el margen bruto es <strong>88,6%</strong>. Es exactamente la cuenta de <a href="negocio.html">Negocio</a>: <strong>las dos páginas cuadran o alguna miente</strong>.</p>
+      <p class="fuente mb-0">Lo interesante: <strong>la IA cuesta el 1,1% del ingreso.</strong> En este producto la IA no es el costo — el costo es la persona que va a la faena a lograr que la gente reporte. Cualquiera que te venda “el costo de la IA” como el problema de este negocio no hizo la cuenta.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FALSEADO -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">05 / QUÉ ESTÁ FALSEADO EN EL DEMO</p>
+      <h2>La lista completa. Sin adornos.</h2>
+    </div>
+
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>En el demo</th><th>En la realidad haría falta</th></tr></thead>
+        <tbody>
+          <tr><td><strong>No hay backend.</strong> Todo el estado vive en la memoria del navegador. Si recargas, se pierde.</td><td>API + Postgres + colas. Nada exótico.</td></tr>
+          <tr><td><strong>No hay IA.</strong> El triage, el patrón de la Rampa 7, la hipótesis del regador y el borrador de investigación <strong>están escritos a mano por nosotros</strong>. Ningún modelo corrió.</td><td>Los seis agentes de arriba. El agente 2 es el único que hay que probar de verdad antes de creerle a este producto: <strong>¿encuentra el patrón cuando el patrón existe, y se calla cuando no?</strong> Eso se mide con un set de evaluación construido a mano sobre reportes reales.</td></tr>
+          <tr><td><strong>El botón de grabar no graba.</strong> No pide permiso de micrófono. La transcripción está escrita y se “tipea” sola.</td><td>MediaRecorder + subida diferida del audio + ASR. Y la validación en terreno con ruido de motor, que es el riesgo técnico n.º 1.</td></tr>
+          <tr><td><strong>El “sin señal” es un botón.</strong> Lo prendes y lo apagas tú.</td><td>Service worker + IndexedDB + cola de sincronización idempotente con reintentos y <em>backoff</em>. Es la parte más aburrida y la más importante del producto.</td></tr>
+          <tr><td><strong>Los datos del regador</strong> (pasadas por hora) son inventados.</td><td>Integración con el sistema de despacho de la faena, que es del mandante. Sin esa integración, el patrón igual se detecta —los 7 reportes bastan— pero la <em>causa física</em> se confirma en terreno, a pie, no en la pantalla.</td></tr>
+          <tr><td><strong>El reporte regulatorio no se envía a ninguna parte</strong> y sus campos son nuestra mejor interpretación.</td><td>La plantilla real, escrita por un abogado con experiencia en minería, contrastada contra el texto vigente del DS 132 y las instrucciones de SERNAGEOMIN. <strong>Presupuestado: $1.500.000 y 3 semanas. No es opcional.</strong></td></tr>
+          <tr><td><strong>Todo dato es inventado.</strong> La Faena Cerro Quemado no existe. Servicios Mineros Aravena tampoco. Los RUT tienen formato válido y titular ficticio. Ninguna cifra sale de una faena real.</td><td>Datos reales, con un acuerdo de confidencialidad firmado antes de tocarlos. Los datos de seguridad de una faena son de lo más sensible que tiene una empresa.</td></tr>
+          <tr><td><strong>No hay autenticación, ni roles, ni permisos.</strong></td><td>Auth con roles (operador / jefe de turno / prevención / gerencia / mandante-lectura) y aislamiento por empresa a nivel de fila. Un contratista no puede ver jamás los reportes de otro; el mandante ve agregados, no nombres.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DOMINIO -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">06 / EL DOMINIO</p>
+      <h2>Verificado, con la evidencia.</h2>
+    </div>
+    <div class="caja">
+      <div class="caja__cinta caja__cinta--peligro">cuasio.com</div>
+      <div class="aritmetica">
+$ ./_kit/check-domain.sh cuasio centinelo senaleo cuasil
+
+cuasio                 .com AVAILABLE          (http 404)   .cl AVAILABLE
+centinelo              .com AVAILABLE          (http 404)   .cl AVAILABLE
+senaleo                .com AVAILABLE          (http 404)   .cl AVAILABLE
+cuasil                 .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+Fuente .com: rdap.verisign.com  →  HTTP 404 = disponible · HTTP 200 = tomado
+Fuente .cl:  nic.cl Whois       →  “no existe” = disponible
+Fecha de la verificación: <b>13-07-2026</b>
+      </div>
+      <p class="mt-s mb-0"><strong>Cuasio</strong> viene de <em>cuasi-accidente</em>, que es el término que la industria de verdad usa para el evento que avisó y no dolió. Es el objeto entero del producto en una palabra que ya está en la boca del cliente. Alternativas verificadas y libres, por si hay colisión: <span class="mono">centinelo.com</span>, <span class="mono">senaleo.com</span>, <span class="mono">cuasil.com</span>.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="rayado" role="presentation"></div>
+
+<footer class="pie">
+  <div class="container">
+    <p class="mono txt-chico">CUASIO · Prototipo · Nada de esta infraestructura está aprovisionado</p>
+    <nav class="pie__links" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var t = document.getElementById('navToggle');
+    var m = document.getElementById('navMenu');
+    t.addEventListener('click', function () {
+      var a = m.classList.toggle('abierto');
+      t.setAttribute('aria-expanded', a ? 'true' : 'false');
+    });
+  })();
+</script>
+
+<style>
+  .seccion--oscura { background: var(--panel); border-block: 2px solid var(--linea); }
+  td.mono, .mono code { font-family: var(--mono); font-size: 0.78rem; }
+  tr.destacada { background: rgba(255, 209, 0, 0.05); }
+  tr.destacada td:first-child { border-left: 3px solid var(--amarillo); }
+  code { color: var(--amarillo); }
+  h3 { margin-bottom: var(--sp-2xs); }
+  .caja h3 { margin-top: var(--sp-2xs); }
+</style>
+
+</body>
+</html>

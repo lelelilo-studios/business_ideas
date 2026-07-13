@@ -147,6 +147,18 @@ Diez ideas no pueden parecer diez páginas de la misma plantilla. Antes de escri
 - Iconos SVG inline, de trazo, dibujados por ti.
 - Contraste AA. Foco de teclado visible. `prefers-reduced-motion` respetado.
 
+## 9-bis. La convergencia (leer sí o sí)
+
+Las primeras 10 ideas se construyeron en paralelo, cada una eligiendo su dirección de arte por su cuenta. **Ocho de las diez terminaron en exactamente el mismo lugar**: papel crema, tipografía serif, filetes de 1px, esquinas rectas y un acento rojo óxido (`#C0362C`, `#A93B22`, `#b8452b`, `#A81E12`, `#B2432A`, `#A8232E`, `#D8461B`, `#c1391c` — mírales el parecido). Cada sitio por separado está bien hecho. Juntos parecen el mismo sitio.
+
+Eso pasó porque la lista de prohibiciones de §9 dice qué **no** hacer, y todos huyeron al mismo refugio seguro. Prohibir el degradado violeta no basta: hay que empujar a lugares distintos.
+
+Por eso, si tu prompt te **asigna un registro visual y una familia de color**, es obligatorio y no es una sugerencia. Y además, para esta tanda:
+
+- **Prohibido el papel crema con acento rojo/óxido/bermellón.** Ya está ocupado ocho veces.
+- **Prohibido el serif editorial sobre fondo claro** como sistema base.
+- Estas son faenas industriales, no cuadernos de contabilidad: el material de referencia es la sala de control, la señalética, la credencial, el plano, la carta topográfica. Ninguna de esas cosas es un libro.
+
 ## 10. Antes de darte por terminado
 
 - [ ] Las 5 páginas cargan y la navegación entre ellas funciona en las cinco.

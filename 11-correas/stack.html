@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cintavia — Arquitectura</title>
+<meta name="description" content="Qué habría que configurar para que esto funcionara de verdad: modelo de datos, agentes de IA, hardware, integraciones, costo mensual derivado y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__in">
+      <a class="brand" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <path d="M2 14 C 6 8, 16 8, 20 14" stroke="#FFB000" stroke-width="1.6"/>
+          <circle cx="5" cy="12.2" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="11" cy="10.4" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="17" cy="12.2" r="1.9" stroke="#FF6152" stroke-width="1.2"/>
+          <path d="M2 18h18" stroke="#22323D" stroke-width="1.2"/>
+        </svg>
+        Cintavia<span class="brand__dot" aria-hidden="true"></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav">Menú</button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section style="padding-top:var(--sp-l)">
+  <div class="container">
+    <p class="eyebrow">Arquitectura · nada de esto está aprovisionado</p>
+    <h1 style="max-width:24ch">Qué habría que configurar para que esto fuera real.</h1>
+    <p class="lede mt-s" style="max-width:64ch">
+      Documentado, no desplegado. El demo es un prototipo con estado en el cliente. Acá está exactamente
+      lo que falta, cuánto costaría al mes y —al final— <strong>qué está falseado</strong>.
+    </p>
+
+    <div class="callout callout--cyan mt-m">
+      <p><strong>La decisión de arquitectura que define el margen bruto:</strong> el cómputo pesado
+      —visión, térmica, acústica, 30 fps— corre <strong>en la estación</strong>, no en la nube.
+      El costo marginal por frame es esencialmente cero porque el hardware ya está pagado.</p>
+      <p><strong>El LLM no ve imágenes.</strong> Claude entra <em>después</em> de la detección, donde de
+      verdad aporta: consolidar 60 detecciones en 6 hallazgos, estimar la vida remanente, redactar el
+      aviso de SAP en el idioma del planificador y responder preguntas abiertas del confiabilista.
+      Meter un LLM multimodal a mirar 30 fps de correa sería 400× más caro y peor.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ FLUJO ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">01 · El flujo, de la cinta a la orden de trabajo</p>
+      <h2>Cuatro capas. La IA está en la tercera.</h2>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th style="width:110px">Capa</th><th>Qué corre</th><th>Dónde</th><th>Latencia</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="mono amber"><strong>1 · BORDE</strong></td>
+            <td>
+              <strong>Detector de polines</strong> — red convolucional tipo YOLO sobre nuestro dataset, 30 fps.<br>
+              <strong>Clasificador térmico</strong> — gradient boosting sobre features de la ROI del rodillo (ΔT vs vecinos, pendiente 7 d y 30 d, área caliente, forma del gradiente).<br>
+              <strong>Rotación</strong> — flujo óptico sobre la ROI del rodillo. Es lo que distingue «caliente» de «trabado».<br>
+              <strong>Acústica</strong> — espectrograma → CNN pequeña, banda 2–6 kHz.<br>
+              <span class="dim">Ninguno es un LLM. Ninguno llama a una API. Se sube el hallazgo (≈40 KB con recorte), no el video.</span>
+            </td>
+            <td>Jetson Orin Nano<br><span class="mono dim">en el gabinete</span></td>
+            <td class="mono">&lt; 1 s</td>
+          </tr>
+          <tr>
+            <td class="mono cyan"><strong>2 · FUSIÓN</strong></td>
+            <td>
+              <strong>Modelo de supervivencia</strong> — Weibull acelerada sobre el histórico del componente,
+              con covariables de tonelaje, temperatura ambiente y horas de operación.
+              Produce la <strong>vida remanente P10/P50/P90</strong>. La banda no es decoración: es el output.
+            </td>
+            <td>Worker en la nube<br><span class="mono dim">Python</span></td>
+            <td class="mono">minutos</td>
+            <td></td>
+          </tr>
+          <tr style="background:rgba(255,176,0,0.04)">
+            <td class="mono amber"><strong>3 · CRITERIO</strong></td>
+            <td>
+              Los <strong>cuatro agentes de Claude</strong>. Triage de eventos dudosos, consolidación del turno,
+              redacción de la OT y análisis abierto. Detalle abajo.
+            </td>
+            <td>Anthropic API</td>
+            <td class="mono">seg – min</td>
+          </tr>
+          <tr>
+            <td class="mono"><strong>4 · ACCIÓN</strong></td>
+            <td>
+              Aviso en <strong>SAP PM</strong> (OData vía el gateway de la minera), escritura de vuelta en
+              <strong>AVEVA PI</strong>, aviso por <strong>WhatsApp</strong> al supervisor de turno,
+              y el tablero del demo.
+            </td>
+            <td>Sistemas de la minera</td>
+            <td class="mono">&lt; 15 min</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ MODELO DE DATOS ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">02 · Modelo de datos</p>
+      <h2>Postgres + TimescaleDB. Una tabla vale más que las otras nueve juntas.</h2>
+    </div>
+
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Catálogo y series</span></div>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Tabla</th><th>Campos</th></tr></thead>
+            <tbody>
+              <tr><td class="mono cyan">faena</td><td class="mono" style="font-size:0.72rem">id · nombre · comuna · region · tpd · ley_cu · recuperacion · buffer_horas · precio_cu_lb · costo_var_lb</td></tr>
+              <tr><td class="mono cyan">correa</td><td class="mono" style="font-size:0.72rem">id · faena_id · tag · descripcion · largo_m · ancho_mm · tph_nominal · velocidad_ms · marca_cinta · tipo_cinta</td></tr>
+              <tr><td class="mono cyan">estacion</td><td class="mono" style="font-size:0.72rem">id · correa_id · tag · metro · lat · lon · modelo_hw · fw_version · <b>calidad_optica</b> · ultima_sincronia · estado</td></tr>
+              <tr><td class="mono cyan">componente</td><td class="mono" style="font-size:0.72rem">id · correa_id · tag · tipo{polin_carga|polin_retorno|polin_impacto|empalme|polea|chute} · metro · fabricante · modelo · fecha_instalacion · horas_operacion</td></tr>
+              <tr><td class="mono cyan">lectura</td><td class="mono" style="font-size:0.72rem"><b>hypertable</b> · time · componente_id · canal{termica|vision|acustica|plc} · valor · unidad</td></tr>
+              <tr><td class="mono cyan">deteccion</td><td class="mono" style="font-size:0.72rem">id · componente_id · estacion_id · ts · canal · score_bruto · recorte_url · bbox</td></tr>
+              <tr><td class="mono cyan">hallazgo</td><td class="mono" style="font-size:0.72rem">id · componente_id · tipo_falla · ts_primera · ts_ultima · confianza · conf_lo · conf_hi · <b>vida_p10 · vida_p50 · vida_p90</b> · estado{abierto|vigilar|ot|descartado}</td></tr>
+              <tr><td class="mono cyan">ventana</td><td class="mono" style="font-size:0.72rem">id · faena_id · codigo · tipo · inicio · fin · horas_totales · horas_comprometidas · cuadrilla</td></tr>
+              <tr><td class="mono cyan">orden_trabajo</td><td class="mono" style="font-size:0.72rem">id · hallazgo_id · ventana_id · aviso_sap · prioridad · horas_est · personas · materiales[] · estado · emitida_ts</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src">
+          Volumen de series por faena: 12 estaciones × 8 canales × 1 Hz = 96 puntos/s → <b>250 M puntos/mes</b>.
+          Comprimidos por Timescale a ~2 B/punto = <b>500 MB/mes/faena</b>. A 24 meses de retención, 12 GB.
+          No es big data y no hay que fingir que lo es.
+        </p>
+      </div>
+
+      <div class="panel" style="border-color:var(--amber)">
+        <div class="panel__head"><span class="panel__title amber">La tabla que vale por todas: <span class="mono">intervencion</span></span></div>
+        <div class="sap" style="border-left-color:var(--amber);margin-bottom:var(--sp-s)">CREATE TABLE intervencion (
+  id             uuid PRIMARY KEY,
+  hallazgo_id    uuid REFERENCES hallazgo,
+  ot_id          uuid REFERENCES orden_trabajo,
+  ts             timestamptz NOT NULL,
+  <b>se_intervino</b>   boolean NOT NULL,   -- ¿alguien abrió el equipo?
+  <b>hallazgo_real</b>  boolean,            -- ¿estaba realmente malo?
+  modo_falla     text,                 -- qué era en verdad
+  horas_reales   numeric,              -- vs. horas_est
+  notas          text,
+  quien          text                  -- el mantenedor que lo confirmó
+);</div>
+        <p style="font-size:var(--step--1)">
+          <strong>Esta tabla es el producto.</strong> Sin ella:
+        </p>
+        <ul class="list list--warn mt-s">
+          <li>No hay <strong>ground truth</strong>, así que no hay reentrenamiento y el modelo nunca mejora en <em>tu</em> faena.</li>
+          <li>No hay <strong>precisión medible</strong>, así que la curva P/R que le mostramos al cliente es humo.</li>
+          <li>No hay <strong>ROI demostrable</strong>, así que en la renovación no tenemos nada que mostrar.</li>
+        </ul>
+        <div class="callout callout--crit mt-s">
+          <p><strong>Y llenarla es un problema humano, no técnico.</strong> El mantenedor que cambió el polín a
+          las 4 AM en la ventana no quiere abrir una app para decirnos si estaba malo. Por eso el botón de
+          «Descartar — falso positivo» está a un toque en el demo, y por eso el cierre de la OT en SAP dispara
+          <em>una sola pregunta</em> por WhatsApp: <span class="mono">«¿El polín estaba realmente malo? SÍ / NO»</span>.
+          Si esa tasa de respuesta baja del 60 %, el producto se degrada solo y nadie se entera.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ AGENTES ============ -->
+<section id="agentes">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">03 · Los agentes de IA</p>
+      <h2>Cuatro agentes. Tres modelos distintos. Cada uno elegido por una razón.</h2>
+    </div>
+
+    <div class="stack">
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h3>1 · Triage de eventos dudosos</h3>
+          <span class="tag">claude-haiku-4-5</span>
+        </div>
+        <div class="grid g2 mt-s">
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Qué hace</p>
+            <p style="font-size:var(--step--1)">
+              El detector del borde emite un score. Los eventos entre <span class="mono">0,35</span> y
+              <span class="mono">0,75</span> son los caros: no son ruido evidente ni señal evidente.
+              Este agente cruza los tres canales, el histórico del componente, el contexto operacional del PLC
+              (¿venía subiendo el tonelaje?) y la <strong>calidad óptica de la estación</strong> (¿o es que el
+              lente está sucio?), y decide.
+            </p>
+            <p class="panel__title" style="margin:var(--sp-s) 0 6px">Por qué Haiku</p>
+            <p style="font-size:var(--step--1)">
+              900 llamadas al mes por faena. Es clasificación con contexto, no razonamiento abierto.
+              Usar Opus acá costaría 5× por cero ganancia. <span class="dim">Sin thinking.</span>
+            </p>
+          </div>
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Herramientas</p>
+            <div class="sap" style="border-left-color:var(--cyan);font-size:0.68rem">leer_historico_componente(componente_id, dias)
+leer_tags_pi(tag[], desde, hasta)
+leer_clima(faena_id, fecha)
+leer_estado_optico(estacion_id)</div>
+            <p class="panel__title" style="margin:var(--sp-s) 0 6px">Salida estructurada</p>
+            <div class="sap" style="border-left-color:var(--cyan);font-size:0.68rem">output_config: { format: { type: "json_schema", schema: {
+  es_real:  boolean,
+  confianza: number,      // 0–1
+  banda: [number, number],// intervalo 90 %
+  canales_concordantes: integer,
+  razon: string           // en castellano de faena
+}}}</div>
+            <p class="src">Salida estructurada obligatoria. Si el triage devuelve prosa, el pipeline se cae.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h3>2 · Consolidador de turno <span class="mono dim" style="font-size:0.72rem">← el que evita que esto sea ruido</span></h3>
+          <span class="tag">claude-sonnet-5</span>
+        </div>
+        <div class="grid g2 mt-s">
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Qué hace</p>
+            <p style="font-size:var(--step--1)">
+              Al cierre de cada turno toma las ~60 detecciones crudas y las convierte en <strong>6 hallazgos</strong>.
+              El mismo polín visto 8 veces por 3 estaciones es <em>un</em> hallazgo, no ocho alarmas. Agrupa por
+              componente, ajusta la curva de vida, cruza con las OT ya abiertas (para no duplicar) y escribe el
+              resumen del turno en el lenguaje del terreno, no del modelo.
+            </p>
+            <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+              <strong>Este agente es la diferencia entre un producto y un tablero de alarmas que nadie mira.</strong>
+            </p>
+            <p class="panel__title" style="margin:var(--sp-s) 0 6px">Configuración</p>
+            <div class="sap" style="border-left-color:var(--s1,#C48400);font-size:0.68rem">model: "claude-sonnet-5"
+thinking: { type: "adaptive" }
+output_config: { effort: "high" }
+cache_control: { type: "ephemeral" }   // el catálogo de
+   // equipos de la faena (~11.000 tok) es estable: se cachea</div>
+          </div>
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Herramientas</p>
+            <div class="sap" style="border-left-color:var(--s1,#C48400);font-size:0.68rem">agrupar_detecciones(componente_id, ventana_t)
+ajustar_curva_vida(serie_termica, modelo="weibull")
+leer_ot_abiertas(correa_id)
+leer_intervenciones(componente_id)   // el ground truth
+escribir_hallazgo(payload)</div>
+            <p class="panel__title" style="margin:var(--sp-s) 0 6px">Fragmento del system prompt</p>
+            <div class="sap" style="border-left-color:var(--s1,#C48400);font-size:0.68rem">Eres el consolidador de turno de una faena de cobre
+en el norte de Chile. Escribes para un planificador
+de mantención con 20 años en terreno.
+
+REGLAS DURAS
+- Nunca declares certeza que no tienes. Toda vida
+  remanente va con su banda P10–P90.
+- Si los canales no concuerdan, DILO. Un hallazgo
+  con 1 de 3 canales concordantes es una sospecha,
+  no un hallazgo.
+- Si la calidad óptica de la estación es &lt; 0,75,
+  degrada la confianza y menciónalo.
+- Nunca inventes un código de repuesto. Si no lo
+  encuentras en SAP MM, di "material por confirmar".
+- Escribe en castellano de Chile. "Polín", no
+  "rodillo". "Ventana", no "parada". Sin adjetivos.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h3>3 · Redactor de la orden de trabajo</h3>
+          <span class="tag">claude-sonnet-5</span>
+        </div>
+        <div class="grid g2 mt-s">
+          <div>
+            <p style="font-size:var(--step--1)">
+              Toma un hallazgo confirmado y escribe el <strong>aviso de SAP PM tipo M2</strong>: descripción,
+              prioridad, ubicación técnica, repuestos con su código de material de SAP MM, horas estimadas,
+              cuadrilla y ventana asignada. Calcula el riesgo de postergar (costo × probabilidad de falla antes
+              de la ventana) y lo pone en el aviso, porque es lo que el planificador usa para priorizar.
+            </p>
+            <p class="src">
+              <b>Strict tool use</b> (<span class="mono">strict: true</span>) en <span class="mono">crear_aviso_sap</span>.
+              Un aviso con un campo mal formado rebota en SAP y se pierden tres días.
+            </p>
+          </div>
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Herramientas</p>
+            <div class="sap" style="border-left-color:var(--s1,#C48400);font-size:0.68rem">buscar_material_sap(descripcion) -> codigo_mm[]
+leer_ventanas(faena_id, desde)
+calcular_riesgo_diferido(hallazgo_id, ventana_id)
+crear_aviso_sap(payload)   <b>← REQUIERE CONFIRMACIÓN HUMANA</b></div>
+            <div class="callout callout--crit mt-s">
+              <p><strong>El aviso a SAP no se emite solo. Nunca.</strong> El agente lo redacta, el planificador
+              lo aprueba con un toque. Una IA creando avisos de avería automáticamente en el sistema de
+              mantención de una minera es exactamente la forma de que te saquen del contrato en una semana.
+              La confianza se construye dejando el dedo humano en el gatillo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h3>4 · Analista de confiabilidad</h3>
+          <span class="tag">claude-opus-4-8</span>
+        </div>
+        <div class="grid g2 mt-s">
+          <div>
+            <p style="font-size:var(--step--1)">
+              El confiabilista pregunta en lenguaje natural sobre todo el histórico:
+            </p>
+            <ul class="list mt-s">
+              <li><span class="mono" style="font-size:0.76rem">«¿Cuántos polines marca X cambiamos por sobretemperatura este año y en qué tramos?»</span></li>
+              <li><span class="mono" style="font-size:0.76rem">«¿El desalineamiento del m 3.020 se correlaciona con el tonelaje o con la temperatura ambiente?»</span></li>
+              <li><span class="mono" style="font-size:0.76rem">«Arma el caso para cambiar el proveedor de polines de la overland.»</span></li>
+            </ul>
+            <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+              Corre <strong>código de verdad</strong> sobre las series (herramienta de ejecución de código del
+              lado del servidor) y devuelve el análisis con el gráfico.
+            </p>
+          </div>
+          <div>
+            <p class="panel__title" style="margin-bottom:6px">Por qué Opus, y por qué sólo acá</p>
+            <p style="font-size:var(--step--1)">
+              Son preguntas <strong>abiertas de análisis</strong>: hay que decidir qué mirar, escribir el
+              análisis, verificarlo y explicarlo. Es el único lugar del sistema donde el razonamiento
+              importa más que el costo. <strong>50 consultas al mes por faena</strong> — el costo total es de
+              US$11,75/mes y compra la conversación que hace que el confiabilista renueve el contrato.
+            </p>
+            <div class="sap" style="border-left-color:var(--st-ok);font-size:0.68rem;margin-top:var(--sp-s)">model: "claude-opus-4-8"
+thinking: { type: "adaptive", display: "summarized" }
+output_config: { effort: "high" }
+tools: [
+  { type: "code_execution_20260521", name: "code_execution" },
+  consultar_timescale(sql),
+  leer_intervenciones_historicas(filtros)
+]</div>
+            <p class="src"><span class="mono">display: "summarized"</span> a propósito: el confiabilista quiere
+            ver <b>cómo</b> llegaste a la conclusión. En este rubro, una respuesta sin el razonamiento no se cree.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ COSTO ============ -->
+<section id="costo">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">04 · Costo mensual estimado</p>
+      <h2>US$85 por faena al mes. Este es el número que <a href="negocio.html#unit">negocio.html</a> descuenta del margen.</h2>
+    </div>
+
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Inferencia de Claude · por faena / mes</span>
+        <span class="panel__meta">Tramo Faena, 12 estaciones</span></div>
+
+        <p class="mono dim" style="font-size:0.7rem;margin-bottom:var(--sp-2xs)">VOLÚMENES SUPUESTOS</p>
+        <div class="scroll-x">
+          <table>
+            <tbody>
+              <tr><td>Detecciones crudas del borde</td><td class="num-r">1.800 /mes</td><td class="dim">12 est × 5/día</td></tr>
+              <tr><td>Eventos dudosos (0,35–0,75) → triage</td><td class="num-r">900 /mes</td><td class="dim">50 %</td></tr>
+              <tr><td>Turnos → consolidación</td><td class="num-r">60 /mes</td><td class="dim">2 turnos × 30 d</td></tr>
+              <tr><td>OT redactadas</td><td class="num-r">22 /mes</td><td class="dim"></td></tr>
+              <tr><td>Consultas del confiabilista</td><td class="num-r">50 /mes</td><td class="dim"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="mono dim" style="font-size:0.7rem;margin:var(--sp-s) 0 var(--sp-2xs)">LA ARITMÉTICA</p>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Agente</th><th>Modelo</th><th class="num-r">Tokens</th><th class="num-r">US$/mes</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Triage</td><td class="mono" style="font-size:0.7rem">haiku-4-5<br><span class="dim">$1 / $5 por MTok</span></td>
+                <td class="num-r" style="font-size:0.72rem">900 × 2.400 in<br>900 × 350 out<br><span class="dim">2,16 M / 0,32 M</span></td>
+                <td class="num-r">$3,74</td>
+              </tr>
+              <tr>
+                <td>Consolidador</td><td class="mono" style="font-size:0.7rem">sonnet-5<br><span class="dim">$3 / $15</span></td>
+                <td class="num-r" style="font-size:0.72rem">60 × 28.000 in<br>60 × 3.000 out<br><span class="dim">1,68 M / 0,18 M</span></td>
+                <td class="num-r">$7,74</td>
+              </tr>
+              <tr>
+                <td>Redactor de OT</td><td class="mono" style="font-size:0.7rem">sonnet-5<br><span class="dim">$3 / $15</span></td>
+                <td class="num-r" style="font-size:0.72rem">22 × 16.000 in<br>22 × 2.200 out<br><span class="dim">0,35 M / 0,05 M</span></td>
+                <td class="num-r">$1,79</td>
+              </tr>
+              <tr>
+                <td>Analista</td><td class="mono" style="font-size:0.7rem">opus-4-8<br><span class="dim">$5 / $25</span></td>
+                <td class="num-r" style="font-size:0.72rem">50 × 34.000 in<br>50 × 2.600 out<br><span class="dim">1,70 M / 0,13 M</span></td>
+                <td class="num-r">$11,75</td>
+              </tr>
+              <tr style="border-top:2px solid var(--amber)">
+                <td colspan="3"><strong>Subtotal IA</strong></td><td class="num-r amber"><strong>US$25,02</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src">
+          <b>No descuento el prompt caching y debería.</b> El catálogo de equipos de la faena (~11.000 tokens)
+          es idéntico en cada llamada del consolidador y del redactor: con <span class="mono">cache_control</span>
+          ese tramo baja a 0,1× y el subtotal caería a ~US$21. Dejo el número sin descontar
+          <b>porque prefiero equivocarme hacia arriba en el costo</b> que hacia abajo en el margen.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Infraestructura · prorrateada a 20 faenas</span></div>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Ítem</th><th>Dimensionamiento</th><th class="num-r">US$/mes<br><span class="dim" style="font-weight:400">por faena</span></th></tr></thead>
+            <tbody>
+              <tr><td>Postgres + TimescaleDB gestionado</td><td class="dim" style="font-size:0.74rem">500 MB/mes/faena comprimido · 24 m de retención · instancia compartida US$620/mes ÷ 20</td><td class="num-r">$31</td></tr>
+              <tr><td>Object storage (recortes)</td><td class="dim" style="font-size:0.74rem">1.800 × 220 KB = 400 MB/mes · 9,5 GB a 24 m · + egress</td><td class="num-r">$6</td></tr>
+              <tr><td>API + workers + cola</td><td class="dim" style="font-size:0.74rem">2 instancias medianas + Redis: US$340/mes ÷ 20</td><td class="num-r">$17</td></tr>
+              <tr><td>Observabilidad, logs, respaldos</td><td class="dim" style="font-size:0.74rem">Grafana + Sentry + snapshots</td><td class="num-r">$6</td></tr>
+              <tr style="border-top:1px solid var(--rule)"><td colspan="2"><strong>Subtotal infra</strong></td><td class="num-r"><strong>US$60</strong></td></tr>
+              <tr style="border-top:2px solid var(--amber)">
+                <td colspan="2"><strong>TOTAL IA + CLOUD</strong></td>
+                <td class="num-r amber"><strong>US$85</strong></td>
+              </tr>
+              <tr><td colspan="2" class="dim">En pesos</td><td class="num-r"><strong>$79.900 CLP</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout mt-s">
+          <p><strong>Contexto: el precio del Tramo Faena es US$4.149/mes.</strong> La IA y la nube son el
+          <strong>2,0 %</strong> del precio. El costo real de este negocio no es el cómputo — es el
+          <strong>ingeniero en Calama (US$563/mes por sitio)</strong> y el <strong>fierro (US$16.800 por faena)</strong>.</p>
+          <p>Cualquiera que te venda una idea de «IA industrial» y te hable del costo de inferencia como si
+          fuera el problema, no ha estado en una faena.</p>
+        </div>
+
+        <p class="mono dim" style="font-size:0.7rem;margin-top:var(--sp-s)">CUADRE CON negocio.html</p>
+        <div class="sap" style="font-size:0.7rem">IA + cloud                      US$  85
+Conectividad LTE (6 × US$25)    US$ 150
+Garantía hardware (5%/año)      US$  70
+Soporte en terreno (÷ 8 sitios) US$ 563
+                                --------
+<b>COGS por faena / mes           US$ 868</b>
+Precio Tramo Faena              US$4.149
+<b>Margen bruto                       79,1 %</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ HARDWARE ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">05 · La estación</p>
+      <h2>US$1.400 de fierro. El componente caro no es el que crees.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">BOM por estación · precio en volumen (100 u)</span></div>
+        <div class="scroll-x">
+          <table>
+            <tbody>
+              <tr><td>Módulo térmico radiométrico LWIR 640×512 · 30 Hz</td><td class="num-r amber"><strong>US$480</strong></td><td class="dim">el caro</td></tr>
+              <tr><td>Cómputo · NVIDIA Jetson Orin Nano 8 GB</td><td class="num-r">US$280</td><td class="dim"></td></tr>
+              <tr><td>Cámara IP66 · global shutter 5 MP · lente 12 mm</td><td class="num-r">US$220</td><td class="dim"></td></tr>
+              <tr><td>Gabinete IP66 + purga de aire + calefactor + <strong>ventana de germanio</strong></td><td class="num-r">US$210</td><td class="dim">el crítico</td></tr>
+              <tr><td>Alimentación PoE++ o solar + batería (según el punto)</td><td class="num-r">US$110</td><td class="dim"></td></tr>
+              <tr><td>Array de micrófonos MEMS + preamplificador</td><td class="num-r">US$60</td><td class="dim"></td></tr>
+              <tr><td>Cableado, montaje, misceláneos</td><td class="num-r">US$40</td><td class="dim"></td></tr>
+              <tr style="border-top:2px solid var(--amber)"><td><strong>BOM</strong></td><td class="num-r amber"><strong>US$1.400</strong></td><td></td></tr>
+              <tr><td>Instalación (2 personas × 4 h, en ventana)</td><td class="num-r">US$600</td><td class="dim"></td></tr>
+              <tr><td><strong>Costo total por estación</strong></td><td class="num-r"><strong>US$2.000</strong></td><td class="dim">precio: $2.250.000 (US$2.394)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title crit">El problema de ingeniería que decide la empresa</span></div>
+        <p style="font-size:var(--step--1)">
+          <strong>El gabinete de US$210, no el sensor de US$480.</strong>
+        </p>
+        <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+          El visor de una estación en una overland de Sierra Gorda ve pasar 6.500 t/h de mineral triturado.
+          Hay polvo, hay viento, hay 30 °C de amplitud térmica diaria y hay lluvia ácida en el invierno
+          altiplánico. <strong>Un lente sucio es un hallazgo perdido</strong>, y peor: es un hallazgo perdido
+          que el sistema no sabe que perdió.
+        </p>
+        <ul class="list list--crit mt-s">
+          <li><strong>Purga de aire positiva</strong> sobre el visor. Necesita aire comprimido de la faena o un
+          compresor pequeño en el gabinete. Consume energía y es un punto de falla más.</li>
+          <li><strong>Ventana de germanio</strong> para la térmica (el vidrio común es opaco al infrarrojo lejano).
+          Se raya con el polvo.</li>
+          <li><strong>Autodiagnóstico óptico:</strong> la estación calcula su propia <span class="mono">calidad_optica</span>
+          con una carta de referencia en el borde del campo. Si baja de 0,75, <strong>degrada la confianza de
+          sus detecciones y lo declara</strong>. Es la diferencia entre un sistema honesto y uno que inventa.</li>
+        </ul>
+        <p class="src">Este es el ítem que más subestimamos y el que aparece como riesgo #4 en
+        <a href="negocio.html">«qué mataría esto»</a>. Si el visor hay que limpiarlo cada 4 días, el costo de
+        soporte en terreno se dispara y el margen de 79 % se convierte en 45 %.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ TERCEROS ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">06 · Terceros — qué hay que contratar y qué hay que negociar</p>
+      <h2>Lo difícil no se contrata. Se negocia con el área de TI de la minera.</h2>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Qué</th><th>Para qué</th><th>Cómo se consigue</th><th class="num-r">Dificultad</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="amber"><strong>SAP PM</strong><br><span class="dim">de la minera</span></td>
+            <td>Crear el aviso M2 con repuesto reservado. <strong>Sin esto, esto es un tablero más.</strong></td>
+            <td>OData o BAPI a través del gateway SAP PI/PO de la minera. Requiere un <strong>proyecto de TI de la minera</strong>, un sponsor interno y una revisión de seguridad.</td>
+            <td class="num-r crit"><strong>6–10 semanas</strong><br><span class="dim">y no depende de ti</span></td>
+          </tr>
+          <tr>
+            <td class="cyan"><strong>AVEVA PI System</strong></td>
+            <td>Leer tonelaje, corriente de motor, velocidad de cinta y temperatura de polea. Y <strong>escribir de vuelta</strong> nuestros tags de salud.</td>
+            <td>PI Web API (REST). La minera abre un usuario de lectura. Escribir requiere más conversación.</td>
+            <td class="num-r warn">2–4 semanas</td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic API</strong></td>
+            <td>Los cuatro agentes. Opus 4.8, Sonnet 5, Haiku 4.5.</td>
+            <td>Cuenta y clave. Es lo más fácil de todo el sistema.</td>
+            <td class="num-r ok">1 día</td>
+          </tr>
+          <tr>
+            <td><strong>Entel o Movistar M2M</strong></td>
+            <td>SIM LTE industrial para las estaciones sin cobertura de la red de faena.</td>
+            <td>Plan M2M corporativo, ~US$25/SIM/mes en Chile. En Sierra Gorda hay cobertura; en la quebrada, no siempre.</td>
+            <td class="num-r ok">2 semanas</td>
+          </tr>
+          <tr>
+            <td><strong>WhatsApp Business API</strong></td>
+            <td>Avisar al supervisor de turno y hacerle <em>la</em> pregunta: «¿el polín estaba realmente malo?».</td>
+            <td>Meta Business + un BSP (Twilio o 360dialog). En Chile el correo no se lee; WhatsApp sí.</td>
+            <td class="num-r ok">1–2 semanas</td>
+          </tr>
+          <tr>
+            <td class="crit"><strong>SEC</strong><br><span class="dim">Superintendencia de Electricidad y Combustibles</span></td>
+            <td>Declaración de la instalación eléctrica de las estaciones. No es opcional.</td>
+            <td>Instalador autorizado + declaración TE-1. La minera lo va a pedir antes de energizar.</td>
+            <td class="num-r warn">3 semanas</td>
+          </tr>
+          <tr>
+            <td class="crit"><strong>Comité paritario<br>+ Dirección del Trabajo</strong></td>
+            <td>Cámaras en el lugar de trabajo. La DT tiene doctrina sobre videovigilancia laboral.</td>
+            <td>Informar al comité paritario, dejar constancia de que las cámaras apuntan a la cinta y de que el firmware <strong>descarta el frame si detecta a una persona</strong>, antes de que salga de la estación.</td>
+            <td class="num-r warn">antes de instalar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout--crit mt-s">
+      <p><strong>La V1 no tiene SAP.</strong> Y hay que decirlo así en la venta. La integración toma 6–10
+      semanas de un proyecto de TI que <em>no controlamos</em>. La versión 1 emite la OT como PDF, la manda por
+      correo y por WhatsApp, y el planificador la copia a SAP a mano. Es feo, es manual, y funciona.
+      <strong>La integración se pelea en el mes 6, con el cliente ya adentro y con un caso de negocio
+      demostrado — no en la venta inicial, donde mata el deal.</strong></p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ ENV ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">07 · Variables de entorno</p>
+      <h2>Lo que habría en el <span class="mono">.env</span>.</h2>
+    </div>
+    <div class="panel">
+      <div class="sap" style="border-left-color:var(--cyan)"># --- Claude ---
+ANTHROPIC_API_KEY=sk-ant-...
+MODELO_TRIAGE=claude-haiku-4-5
+MODELO_CONSOLIDADOR=claude-sonnet-5
+MODELO_REDACTOR_OT=claude-sonnet-5
+MODELO_ANALISTA=claude-opus-4-8
+EFFORT_CONSOLIDADOR=high
+EFFORT_ANALISTA=high
+
+# --- Datos ---
+DATABASE_URL=postgres://cintavia@ts-prod.aws:5432/cintavia
+TIMESCALE_RETENCION_MESES=24
+S3_BUCKET_RECORTES=cintavia-recortes-scl
+S3_REGION=sa-east-1
+REDIS_URL=redis://cola-prod:6379
+
+# --- Sistemas de la minera (uno por faena) ---
+PI_WEB_API_URL=https://pi-web.quebradaamarga.local/piwebapi
+PI_USER=svc_cintavia_ro
+PI_PASSWORD=...
+SAP_ODATA_URL=https://sappo.quebradaamarga.local/sap/opu/odata/sap/ZPM_AVISO_SRV
+SAP_CLIENT=300
+SAP_USER=RFC_CINTAVIA
+SAP_PASSWORD=...
+SAP_TIPO_AVISO=M2
+SAP_EMITIR_AUTOMATICO=false        # NUNCA true. El dedo humano en el gatillo.
+
+# --- Terreno ---
+MQTT_BROKER=mqtts://borde.cintavia.com:8883
+ESTACION_FW_CANAL=stable
+UMBRAL_CALIDAD_OPTICA=0.75         # bajo esto, la estación se declara SIN DATO
+UMBRAL_CONFIANZA_DEFECTO=0.60      # la perilla que el cliente mueve
+
+# --- Aviso ---
+WHATSAPP_BSP=twilio
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_WHATSAPP_FROM=whatsapp:+56...
+
+# --- Negocio ---
+USD_CLP=940
+COBRE_USD_LB=4.10                  # entra en el cálculo de riesgo diferido</div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ QUÉ ESTÁ FALSEADO ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">08 · Qué está falseado en el demo</p>
+      <h2>Todo lo que no es el flujo, la aritmética y la incertidumbre.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title crit">Falso</span></div>
+        <ul class="list list--crit">
+          <li><strong>No hay estaciones.</strong> Las imágenes térmicas están <strong>sintetizadas en SVG</strong>
+          con una gaussiana sobre una grilla de 42×19 celdas. Un recorte real es radiométrico, 640×512, con la
+          temperatura absoluta en cada píxel.</li>
+          <li><strong>No hay modelo.</strong> Las confianzas, las bandas y las vidas remanentes están escritas a
+          mano en <span class="mono">demo/app.js</span>. En producción salen del modelo de supervivencia.</li>
+          <li><strong>La curva precisión/recall es la META del hito M2, no una medición.</strong> Hoy no existe
+          el dataset con el que medirla. Está dicho también en la landing.</li>
+          <li><strong>No hay SAP.</strong> El «aviso emitido» es texto generado en el navegador. El número
+          <span class="mono">AV-4471029</span> es inventado.</li>
+          <li><strong>No hay PI.</strong> Las lecturas del PLC son series sintéticas deterministas
+          (<span class="mono">sin(i × 0,71)</span> y amigos).</li>
+          <li><strong>Las faenas son ficticias.</strong> Quebrada Amarga y Los Cóndores no existen.</li>
+          <li><strong>El estado vive en memoria.</strong> Recargas y vuelve a empezar.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title ok">Real</span></div>
+        <ul class="list">
+          <li><strong>El flujo completo.</strong> Detección → hallazgo con banda → vida remanente → probabilidad
+          de falla antes de la ventana → orden de trabajo → capacidad de la ventana. Eso es el producto y está entero.</li>
+          <li><strong>Toda la aritmética.</strong> El margen de US$140.531/hora, el riesgo diferido
+          (costo × probabilidad), la capacidad de la ventana, la conversión CLP/USD.</li>
+          <li><strong>El modelo de probabilidad.</strong> La <span class="mono">P(falla antes de la ventana)</span>
+          usa una log-normal ajustada a la banda P10–P90 declarada, con la CDF de Abramowitz-Stegun.
+          Está en <span class="mono">app.js:pFalla()</span> y lo puedes leer.</li>
+          <li><strong>La incertidumbre.</strong> El umbral de confianza mueve de verdad qué ves y te dice de
+          verdad cuánto se te escapa. Descartar un falso positivo baja de verdad la precisión de 90 días.</li>
+          <li><strong>Las comunas, las normas y los TAG.</strong> Sierra Gorda, Diego de Almagro, Calama,
+          DS 132, SERNAGEOMIN, el formato <span class="mono">CV-3410</span> y <span class="mono">PL-3410-2180-C</span>.</li>
+          <li><strong>La paleta.</strong> Validada para daltonismo y contraste contra el fondo oscuro con el
+          validador del kit de dataviz. No es decoración: en una sala de control el color significa estado.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel mt-m" style="border-color:var(--amber)">
+      <div class="panel__head"><span class="panel__title amber">Las tres cosas que habría que hacer para que fuera real</span></div>
+      <div class="grid g3 mt-s">
+        <div>
+          <p class="figure figure--amber">01</p>
+          <p class="panel__title mt-s">El dataset</p>
+          <p style="font-size:var(--step--1);margin-top:6px">
+            200+ horas de polines reales, etiquetadas <strong>contra intervención física</strong> — alguien abrió
+            el equipo y confirmó. <strong>No se compra: se filma.</strong> Es el hito M0 y no hay atajo.
+            Todo lo demás depende de esto y nada más importa hasta que exista.
+          </p>
+        </div>
+        <div>
+          <p class="figure figure--amber">02</p>
+          <p class="panel__title mt-s">La integración con SAP PM</p>
+          <p style="font-size:var(--step--1);margin-top:6px">
+            Sin el aviso automático con repuesto reservado, esto es un tablero más y no cambia nada.
+            OData vía el gateway de la minera. <strong>6–10 semanas de un proyecto de TI que no controlamos</strong>,
+            con un sponsor interno. Se pelea en el mes 6, no en la venta.
+          </p>
+        </div>
+        <div>
+          <p class="figure figure--amber">03</p>
+          <p class="panel__title mt-s">La estación que aguanta el desierto</p>
+          <p style="font-size:var(--step--1);margin-top:6px">
+            IP66, purga de aire positiva, ventana de germanio, calefactor y autodiagnóstico óptico.
+            <strong>El problema no es la IA: es que el visor se ensucia</strong> y un lente sucio es un
+            hallazgo perdido que el sistema no sabe que perdió.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ DOMINIO ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">09 · Evidencia de dominio</p>
+      <h2>cintavia.com está libre.</h2>
+    </div>
+    <div class="panel">
+      <div class="sap" style="border-left-color:var(--st-ok)">$ ./_kit/check-domain.sh cintavia rodalto kilocinta tramovia termalta rondavia
+
+cintavia               .com <b>AVAILABLE</b>          (http 404)   .cl <b>AVAILABLE</b>
+rodalto                .com AVAILABLE          (http 404)   .cl AVAILABLE
+kilocinta              .com AVAILABLE          (http 404)   .cl AVAILABLE
+tramovia               .com AVAILABLE          (http 404)   .cl AVAILABLE
+termalta               .com AVAILABLE          (http 404)   .cl AVAILABLE
+rondavia               .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+# rdap.verisign.com/com/v1/domain/cintavia.com -> HTTP 404 = disponible
+# NIC Chile Whois cintavia.cl -> "no existe" = disponible
+# verificado 2026-07-13</div>
+      <div class="grid g2 mt-s">
+        <div>
+          <p class="panel__title" style="margin-bottom:6px">El nombre</p>
+          <p style="font-size:var(--step--1)">
+            <strong>Cintavia</strong> = <em>cinta</em> (la correa) + <em>vía</em> (el recorrido).
+            La correa como una ruta que se recorre kilómetro a kilómetro, que es literalmente lo que hace el
+            producto. Se pronuncia igual en Chile, en Perú y en Brasil, no significa nada raro en inglés,
+            y no colisiona con ninguna marca del rubro.
+          </p>
+        </div>
+        <div>
+          <p class="panel__title" style="margin-bottom:6px">Alternativas verificadas</p>
+          <p style="font-size:var(--step--1)">
+            <span class="tag">rodalto.com</span> <span class="tag">kilocinta.com</span> <span class="tag">tramovia.com</span>
+            — las tres con <span class="mono">.com</span> y <span class="mono">.cl</span> libres al 2026-07-13,
+            verificadas con el mismo script. Registradas en <span class="mono">meta.json</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <span>Cintavia · arquitectura</span>
+      <span>Nada aprovisionado. Todo documentado.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var t = document.getElementById('navToggle'), n = document.getElementById('nav');
+  t.addEventListener('click', function () {
+    var open = n.getAttribute('data-open') === 'true';
+    n.setAttribute('data-open', String(!open));
+    t.setAttribute('aria-expanded', String(!open));
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianota — roadmap, día 1 a mes 24</title>
+<meta name="description" content="Seis hitos con criterio de muerte, trayectoria de ARR en tres escenarios, caja con el valle marcado y probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hito { border-left: 2px solid var(--linea); padding-left: var(--sp-m); position: relative; }
+  .hito::before {
+    content: ""; position: absolute; left: -6px; top: 6px;
+    width: 10px; height: 10px; background: var(--plano);
+    border: 2px solid var(--cian);
+  }
+  .hito.decision::before { border-color: var(--alerta); background: var(--alerta); }
+  .hito + .hito { margin-top: var(--sp-xl); }
+  .hito-cab { display: flex; flex-wrap: wrap; gap: var(--sp-xs); align-items: baseline; }
+  .hito-id { font-family: var(--mono); font-size: 0.8rem; color: var(--cian); letter-spacing: 0.1em; }
+  .hito-dl { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-xs) var(--sp-s); margin-top: var(--sp-s); }
+  @media (min-width: 48em) { .hito-dl { grid-template-columns: repeat(4, 1fr); } }
+  .hito-dl dt {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-3);
+  }
+  .hito-dl dd { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta); }
+  .muerte {
+    border-left: 2px solid var(--critico);
+    background: rgba(229, 84, 78, 0.07);
+    padding: var(--sp-s);
+    margin-top: var(--sp-s);
+    font-size: var(--step--1);
+  }
+  .muerte strong { color: var(--critico); }
+  .scroll-x .fig-wide { min-width: 40rem; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav-fila">
+      <a class="marca" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+          <circle cx="4" cy="4" r="2.2"/><circle cx="18" cy="4" r="2.2"/><circle cx="11" cy="11" r="2.2"/>
+          <circle cx="4" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>
+          <path d="M5.6 5.6 9.4 9.4M16.4 5.6 12.6 9.4M9.4 12.6 5.6 16.4M12.6 12.6l3.8 3.8"/>
+        </svg>
+        Cianota
+      </a>
+      <button class="nav-btn" aria-expanded="false" aria-controls="nav-menu">MENÚ</button>
+    </div>
+    <nav id="nav-menu" class="nav-menu" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="container">
+    <p class="rotulo">Lámina 04 — Roadmap</p>
+    <h1>Del día 1 al mes 24, con los criterios de muerte a la vista</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de esta página declara la observación que <em>debería hacernos parar</em>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ GRÁFICO 1 — ARR -->
+<section>
+  <div class="container">
+    <p class="rotulo">01 — Trayectoria de ingresos</p>
+    <h2>MRR a 24 meses, tres escenarios</h2>
+
+    <div class="fig" style="margin-top:var(--sp-m)">
+      <p class="fig-titulo">MRR mensual — CLP millones</p>
+      <p class="fig-sub">Los tres escenarios se mueven por supuestos declarados de tasa de cierre, ticket y churn</p>
+      <div class="scroll-x">
+        <svg class="fig-wide" viewBox="0 0 660 280" role="img"
+             aria-label="Trayectoria de MRR a 24 meses. El escenario optimista llega a 88 millones de pesos de MRR en el mes 24, el base a 43 y el pesimista a 13.">
+          <!-- malla -->
+          <line class="malla" x1="52" y1="30"  x2="624" y2="30"/>
+          <line class="malla" x1="52" y1="80"  x2="624" y2="80"/>
+          <line class="malla" x1="52" y1="130" x2="624" y2="130"/>
+          <line class="malla" x1="52" y1="180" x2="624" y2="180"/>
+          <line class="eje"   x1="52" y1="230" x2="624" y2="230"/>
+          <line class="eje"   x1="52" y1="30"  x2="52"  y2="230"/>
+          <text class="tick" x="46" y="233" text-anchor="end">0</text>
+          <text class="tick" x="46" y="183" text-anchor="end">22,5</text>
+          <text class="tick" x="46" y="133" text-anchor="end">45</text>
+          <text class="tick" x="46" y="83"  text-anchor="end">67,5</text>
+          <text class="tick" x="46" y="33"  text-anchor="end">90</text>
+          <text class="tick" x="52"  y="246">m1</text>
+          <text class="tick" x="201" y="246" text-anchor="middle">m7</text>
+          <text class="tick" x="350" y="246" text-anchor="middle">m13</text>
+          <text class="tick" x="499" y="246" text-anchor="middle">m19</text>
+          <text class="tick" x="624" y="246" text-anchor="end">m24</text>
+          <text class="tick" x="14" y="130" text-anchor="middle" transform="rotate(-90 14 130)">MRR (M CLP)</text>
+
+          <!-- series -->
+          <polyline fill="none" stroke="#8f83e6" stroke-width="2" points="52,230 76.9,230 101.7,225.3 126.6,225.3 151.5,220.7 176.3,216 201.2,206.7 226.1,202 251,192.7 275.8,183.3 300.7,169.3 325.6,160 350.4,146 375.3,132 400.2,118 425,104 449.9,94.7 474.8,80.7 499.7,71.3 524.5,62 549.4,52.7 574.3,48 599.1,43.3 624,34"/>
+          <polyline fill="none" stroke="#22a6bd" stroke-width="2.5" points="52,230 76.9,230 101.7,230 126.6,226 151.5,226 176.3,222 201.2,218 226.1,214 251,210 275.8,206 300.7,198 325.6,190.2 350.4,186.2 375.3,178.2 400.2,174.2 425,166.2 449.9,162.2 474.8,154.2 499.7,150.2 524.5,146.2 549.4,142.2 574.3,138.2 599.1,138.2 624,134.2"/>
+          <polyline fill="none" stroke="#c98500" stroke-width="2" points="52,230 76.9,230 101.7,230 126.6,230 151.5,227.3 176.3,227.3 201.2,227.3 226.1,224.7 251,224.7 275.8,222 300.7,222 325.6,219.3 350.4,216.7 375.3,216.7 400.2,214 425,211.3 449.9,211.3 474.8,208.7 499.7,206 524.5,206 549.4,203.3 574.3,203.3 599.1,200.7 624,200.7"/>
+
+          <!-- etiquetas directas en el extremo -->
+          <circle cx="624" cy="34" r="4" fill="#8f83e6" stroke="#0d2136" stroke-width="2"/>
+          <circle cx="624" cy="134.2" r="4" fill="#22a6bd" stroke="#0d2136" stroke-width="2"/>
+          <circle cx="624" cy="200.7" r="4" fill="#c98500" stroke="#0d2136" stroke-width="2"/>
+          <text class="serie-et" x="632" y="30" fill="#8f83e6">88,2</text>
+          <text class="serie-et" x="632" y="138" fill="#22a6bd">43,1</text>
+          <text class="serie-et" x="632" y="205" fill="#c98500">13,2</text>
+
+          <!-- hitos -->
+          <line class="malla" x1="325.6" y1="30" x2="325.6" y2="230" stroke-dasharray="0"/>
+          <text class="serie-et" x="330" y="42" fill="#7ea9cc">M3 · mes 12</text>
+        </svg>
+      </div>
+      <div class="leyenda">
+        <span><i style="background:#8f83e6"></i> Optimista — ARR m24: $1.058 M</span>
+        <span><i style="background:#22a6bd"></i> Base — ARR m24: $517 M</span>
+        <span><i style="background:#c98500"></i> Pesimista — ARR m24: $158 M</span>
+      </div>
+    </div>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table>
+        <thead>
+          <tr><th>Escenario</th><th class="num">Cierre sobre cuenta calificada</th><th class="num">Ticket medio</th><th class="num">Churn logo anual</th><th class="num">Cuentas m24</th><th class="num">ARR m24</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span style="color:#c98500">Pesimista</span></td>
+            <td class="num">10 %</td><td class="num">$1.200.000</td><td class="num">45 %</td><td class="num">11</td><td class="num">$158 M</td>
+          </tr>
+          <tr>
+            <td><span style="color:#22a6bd">Base</span></td>
+            <td class="num">18 %</td><td class="num">$1.795.000</td><td class="num">30 %</td><td class="num">24</td><td class="num">$517 M</td>
+          </tr>
+          <tr>
+            <td><span style="color:#8f83e6">Optimista</span></td>
+            <td class="num">26 %</td><td class="num">$2.100.000</td><td class="num">20 %</td><td class="num">42</td><td class="num">$1.058 M</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-xs)">
+      <strong>Qué mueve cada escenario.</strong> Pesimista: el canal de estudios no existe, la mezcla se carga al plan Expediente y el churn es el del proyecto (una cuenta = un proyecto, se acaba y no renueva).
+      Base: un estudio trae clientes desde el mes 15 y el 40 % de los titulares renueva con su siguiente proyecto.
+      Optimista: dos estudios distribuyen, la mezcla se carga al plan Cartera y aparece la primera cuenta en Perú.
+      El escenario optimista es el único que cruza US$ 1 M de ARR (a $950/US$) dentro de los 24 meses.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ GRÁFICO 2 — CAJA -->
+<section>
+  <div class="container">
+    <p class="rotulo">02 — Caja</p>
+    <h2>Quema, ingresos y el valle</h2>
+
+    <div class="fig" style="margin-top:var(--sp-m)">
+      <p class="fig-titulo">Caja — escenario base, CLP millones</p>
+      <p class="fig-sub">Ingresos y gastos son mensuales; el saldo de caja es acumulado. Una sola escala, en millones de pesos.</p>
+      <div class="scroll-x">
+        <svg class="fig-wide" viewBox="0 0 660 280" role="img"
+             aria-label="La caja parte en 140 millones, cae hasta un valle de 49,4 millones en el mes 13 y se recupera hasta 124 millones en el mes 24. Los ingresos cruzan a los gastos en el mes 11.">
+          <line class="malla" x1="52" y1="30"  x2="624" y2="30"/>
+          <line class="malla" x1="52" y1="80"  x2="624" y2="80"/>
+          <line class="malla" x1="52" y1="130" x2="624" y2="130"/>
+          <line class="malla" x1="52" y1="180" x2="624" y2="180"/>
+          <line class="eje"   x1="52" y1="230" x2="624" y2="230"/>
+          <line class="eje"   x1="52" y1="30"  x2="52"  y2="230"/>
+          <text class="tick" x="46" y="233" text-anchor="end">0</text>
+          <text class="tick" x="46" y="183" text-anchor="end">35</text>
+          <text class="tick" x="46" y="133" text-anchor="end">70</text>
+          <text class="tick" x="46" y="83"  text-anchor="end">105</text>
+          <text class="tick" x="46" y="33"  text-anchor="end">140</text>
+          <text class="tick" x="52"  y="246">m1</text>
+          <text class="tick" x="201" y="246" text-anchor="middle">m7</text>
+          <text class="tick" x="350" y="246" text-anchor="middle">m13</text>
+          <text class="tick" x="499" y="246" text-anchor="middle">m19</text>
+          <text class="tick" x="624" y="246" text-anchor="end">m24</text>
+          <text class="tick" x="14" y="130" text-anchor="middle" transform="rotate(-90 14 130)">M CLP</text>
+
+          <!-- zona del valle -->
+          <rect x="300.7" y="30" width="100" height="200" fill="#e5544e" opacity="0.08"/>
+
+          <!-- saldo de caja -->
+          <polyline fill="none" stroke="#8f83e6" stroke-width="2.5" points="52,38.6 76.9,47.1 101.7,55.7 126.6,71.9 151.5,92.1 176.3,105.7 201.2,122.4 226.1,136.7 251,148.3 275.8,157.3 300.7,157.1 325.6,151.7 350.4,159.4 375.3,157.7 400.2,157.7 425,148.4 449.9,140.7 474.8,123.7 499.7,116.9 524.5,107.4 549.4,95.4 574.3,80.9 599.1,70.4 624,53.3"/>
+          <!-- ingresos -->
+          <polyline fill="none" stroke="#22a6bd" stroke-width="2" points="52,230 76.9,230 101.7,230 126.6,223.3 151.5,227.4 176.3,220.7 201.2,218.1 226.1,215.6 251,213 275.8,210.4 300.7,201.1 325.6,196 350.4,197.7 375.3,188.4 400.2,190 425,180.7 449.9,182.3 474.8,173 499.7,174.6 524.5,172 549.4,169.4 574.3,166.9 599.1,171 624,164.3"/>
+          <!-- gastos -->
+          <polyline fill="none" stroke="#c98500" stroke-width="2" points="52,221.4 76.9,221.4 101.7,221.4 126.6,207.1 151.5,207.1 176.3,207.1 201.2,201.4 226.1,201.4 251,201.4 275.8,201.4 300.7,201.4 325.6,201.4 350.4,190 375.3,190 400.2,190 425,190 449.9,190 474.8,190 499.7,181.4 524.5,181.4 549.4,181.4 574.3,181.4 599.1,181.4 624,181.4"/>
+
+          <!-- valle -->
+          <circle cx="350.4" cy="159.4" r="5" fill="#e5544e" stroke="#0d2136" stroke-width="2"/>
+          <line x1="350.4" y1="159.4" x2="350.4" y2="118" stroke="#e5544e" stroke-width="1"/>
+          <text class="serie-et" x="356" y="110" fill="#e5544e">VALLE · mes 13</text>
+          <text class="serie-et" x="356" y="122" fill="#e5544e">$49,4 M — 1,8 meses de gasto</text>
+
+          <!-- cruce -->
+          <circle cx="300.7" cy="201.1" r="4" fill="#22a6bd" stroke="#0d2136" stroke-width="2"/>
+          <text class="serie-et" x="200" y="266" fill="#22a6bd">cruce operacional: mes 11</text>
+          <line x1="300.7" y1="205" x2="300.7" y2="258" stroke="#22a6bd" stroke-width="1" stroke-opacity=".5"/>
+        </svg>
+      </div>
+      <div class="leyenda">
+        <span><i style="background:#8f83e6"></i> Saldo de caja (acumulado)</span>
+        <span><i style="background:#22a6bd"></i> Ingresos del mes</span>
+        <span><i style="background:#c98500"></i> Gastos del mes</span>
+      </div>
+    </div>
+
+    <div class="rejilla rejilla-3" style="margin-top:var(--sp-m)">
+      <div class="caja">
+        <span class="metrica-et">Capital inicial</span>
+        <span class="metrica-valor">$140 M</span>
+        <span class="metrica-pie">fundadores $40 M + ronda ángel $100 M</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">Valle de runway</span>
+        <span class="metrica-valor malo">$49,4 M</span>
+        <span class="metrica-pie">mes 13 — 1,8 meses de gasto en caja</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">Cruce operacional</span>
+        <span class="metrica-valor bien">mes 11</span>
+        <span class="metrica-pie">ingresos $20,2 M vs gastos $20,0 M</span>
+      </div>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)">
+      El valle no está en el mes 10, cuando la caja toca fondo por primera vez: está en el <strong>mes 13</strong>, cuando entra la segunda tanda de contrataciones (gasto sube de $20 M a $28 M) y el crecimiento todavía no la cubre. <strong>Ahí es donde este plan se muere si el mes 12 no cerró 10 cuentas.</strong>
+      Los ingresos incluyen la implementación de $2,9 M por cuenta nueva, que en los primeros meses es una fracción importante de la caja — y es un ingreso que no se repite.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ GRÁFICO 3 — EMBUDO -->
+<section>
+  <div class="container">
+    <p class="rotulo">03 — La restricción real</p>
+    <h2>No es el embudo de marketing. Es que sólo hay 300 cuentas.</h2>
+    <p class="prose">La restricción de este negocio no es la conversión ni la retención: es el <strong>tamaño del universo</strong>. Por eso el gráfico que importa no es una curva de cohortes, es el embudo de cuentas nombradas — y cuánto de ese universo alcanzamos a tocar en 12 meses.</p>
+
+    <div class="fig" style="margin-top:var(--sp-m)">
+      <p class="fig-titulo">Embudo de cuentas nombradas — primeros 12 meses</p>
+      <p class="fig-sub">Escenario base. Cada barra es un número de cuentas, no un porcentaje de tráfico.</p>
+      <svg viewBox="0 0 640 230" role="img"
+           aria-label="De 300 cuentas nombradas, 96 llegan a primer contacto, 62 a reunión, 28 a piloto, 17 a propuesta y 10 cierran.">
+        <g>
+          <rect x="130" y="14"  width="490" height="26" fill="#a5e6f2"/>
+          <text class="serie-et" x="620" y="31" text-anchor="end" fill="#081726" font-weight="600">300</text>
+          <text class="serie-et" x="122" y="31" text-anchor="end" fill="#b9d2e6">Universo alcanzable</text>
+
+          <rect x="130" y="52"  width="157" height="26" fill="#66cde2"/>
+          <text class="serie-et" x="279" y="69" text-anchor="end" fill="#081726" font-weight="600">96</text>
+          <text class="serie-et" x="122" y="69" text-anchor="end" fill="#b9d2e6">Contacto con respuesta</text>
+
+          <rect x="130" y="90"  width="101" height="26" fill="#33b2ca"/>
+          <text class="serie-et" x="223" y="107" text-anchor="end" fill="#081726" font-weight="600">62</text>
+          <text class="serie-et" x="122" y="107" text-anchor="end" fill="#b9d2e6">Reunión de descubrimiento</text>
+
+          <rect x="130" y="128" width="46" height="26" fill="#1d8fa6"/>
+          <text class="serie-et" x="184" y="145" fill="#b9d2e6">28</text>
+          <text class="serie-et" x="122" y="145" text-anchor="end" fill="#b9d2e6">Radiografía / piloto</text>
+
+          <rect x="130" y="166" width="28" height="26" fill="#136c7e"/>
+          <text class="serie-et" x="166" y="183" fill="#b9d2e6">17</text>
+          <text class="serie-et" x="122" y="183" text-anchor="end" fill="#b9d2e6">Propuesta con precio</text>
+
+          <rect x="130" y="204" width="16" height="20" fill="#56d7ef"/>
+          <text class="serie-et" x="154" y="219" fill="#56d7ef" font-weight="600">10 cerradas</text>
+          <text class="serie-et" x="122" y="219" text-anchor="end" fill="#e8f2fa">Cuentas pagando (m12)</text>
+        </g>
+      </svg>
+      <p class="nota" style="margin-top:var(--sp-xs)">
+        Conversión global: <strong>10 de 300 = 3,3 %</strong> en 12 meses. Cierre sobre propuesta: <strong>59 %</strong> — alto, porque para cuando hay propuesta ya vieron su propio grafo.
+        El número que hay que vigilar no es el 3,3 %: es que <strong>en 12 meses sólo alcanzamos a tocar 96 de 300 cuentas</strong>. Ese es el techo, y por eso el canal de estudios importa tanto.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ HITOS -->
+<section>
+  <div class="container">
+    <p class="rotulo">04 — Los seis hitos</p>
+
+    <div class="fig" style="margin-block:var(--sp-m) var(--sp-xl)">
+      <p class="fig-titulo">Línea de tiempo</p>
+      <p class="fig-sub">Los rombos rojos marcan dónde hay un criterio de muerte que se evalúa</p>
+      <div class="scroll-x">
+        <svg class="fig-wide" viewBox="0 0 660 130" role="img"
+             aria-label="Línea de tiempo: M1 mes 2, M2 mes 4, M3 mes 9, M4 mes 12, M5 mes 18, M6 mes 24. Cada uno tiene un criterio de muerte.">
+          <line class="eje" x1="30" y1="70" x2="640" y2="70"/>
+          <!-- M1 mes 2 -->
+          <g><line x1="60" y1="70" x2="60" y2="52" stroke="#56d7ef"/><circle cx="60" cy="70" r="5" fill="#56d7ef"/>
+            <text class="serie-et" x="60" y="44" text-anchor="middle" fill="#e8f2fa">M1</text>
+            <text class="tick" x="60" y="88" text-anchor="middle">mes 2</text>
+            <text class="tick" x="60" y="100" text-anchor="middle" fill="#7ea9cc">design partners</text>
+            <path d="M60 108 l5 6 -5 6 -5 -6 z" fill="#e5544e"/></g>
+          <!-- M2 mes 4 -->
+          <g><line x1="150" y1="70" x2="150" y2="52" stroke="#56d7ef"/><circle cx="150" cy="70" r="5" fill="#56d7ef"/>
+            <text class="serie-et" x="150" y="44" text-anchor="middle" fill="#e8f2fa">M2</text>
+            <text class="tick" x="150" y="88" text-anchor="middle">mes 4</text>
+            <text class="tick" x="150" y="100" text-anchor="middle" fill="#7ea9cc">1ª factura</text>
+            <path d="M150 108 l5 6 -5 6 -5 -6 z" fill="#e5544e"/></g>
+          <!-- M3 mes 9 -->
+          <g><line x1="280" y1="70" x2="280" y2="52" stroke="#56d7ef"/><circle cx="280" cy="70" r="5" fill="#56d7ef"/>
+            <text class="serie-et" x="280" y="44" text-anchor="middle" fill="#e8f2fa">M3</text>
+            <text class="tick" x="280" y="88" text-anchor="middle">mes 9</text>
+            <text class="tick" x="280" y="100" text-anchor="middle" fill="#7ea9cc">5 pagando · precisión</text>
+            <path d="M280 108 l5 6 -5 6 -5 -6 z" fill="#e5544e"/></g>
+          <!-- M4 mes 12 -->
+          <g><line x1="380" y1="70" x2="380" y2="52" stroke="#56d7ef"/><circle cx="380" cy="70" r="6" fill="#e5544e"/>
+            <text class="serie-et" x="380" y="44" text-anchor="middle" fill="#e5544e">M4</text>
+            <text class="tick" x="380" y="88" text-anchor="middle">mes 12</text>
+            <text class="tick" x="380" y="100" text-anchor="middle" fill="#e5544e">10 pagando — o el valle mata</text>
+            <path d="M380 108 l5 6 -5 6 -5 -6 z" fill="#e5544e"/></g>
+          <!-- M5 mes 18 -->
+          <g><line x1="500" y1="70" x2="500" y2="52" stroke="#56d7ef"/><circle cx="500" cy="70" r="5" fill="#56d7ef"/>
+            <text class="serie-et" x="500" y="44" text-anchor="middle" fill="#e8f2fa">M5</text>
+            <text class="tick" x="500" y="88" text-anchor="middle">mes 18</text>
+            <text class="tick" x="500" y="100" text-anchor="middle" fill="#7ea9cc">el canal existe</text>
+            <path d="M500 108 l5 6 -5 6 -5 -6 z" fill="#e5544e"/></g>
+          <!-- M6 mes 24 -->
+          <g><line x1="620" y1="70" x2="620" y2="52" stroke="#e0a53a"/><rect x="614" y="64" width="12" height="12" fill="#e0a53a"/>
+            <text class="serie-et" x="620" y="44" text-anchor="middle" fill="#e0a53a">M6</text>
+            <text class="tick" x="620" y="88" text-anchor="middle">mes 24</text>
+            <text class="tick" x="620" y="100" text-anchor="middle" fill="#e0a53a">decisión</text></g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="stack-l">
+
+      <div class="hito">
+        <div class="hito-cab"><span class="hito-id">M1</span><h3>Tres design partners con un expediente real</h3></div>
+        <p style="margin-top:var(--sp-xs)">Tres titulares o estudios nos entregan un expediente vivo y aceptan revisar el grafo con nosotros en pantalla.</p>
+        <dl class="hito-dl">
+          <div><dt>Fecha objetivo</dt><dd>mes 2</dd></div>
+          <div><dt>Caja requerida</dt><dd>$18 M acumulados</dd></div>
+          <div><dt>Headcount</dt><dd>2 fundadores</dd></div>
+          <div><dt>Qué es cierto si lo logras</dt><dd>El dolor existe y es de ellos</dd></div>
+        </dl>
+        <p class="muerte"><strong>Criterio de muerte:</strong> si a los 60 días ningún titular ni estudio acepta cargar un expediente real —teniendo el grafo hecho gratis y sin condiciones— entonces el dolor no está donde creemos, o el que lo sufre no es el que decide. Parar y volver a entrevistar.</p>
+      </div>
+
+      <div class="hito">
+        <div class="hito-cab"><span class="hito-id">M2</span><h3>La primera factura</h3></div>
+        <p style="margin-top:var(--sp-xs)">Un cliente firma un contrato anual y paga la implementación. No un piloto gratis: una factura.</p>
+        <dl class="hito-dl">
+          <div><dt>Fecha objetivo</dt><dd>mes 4</dd></div>
+          <div><dt>Caja requerida</dt><dd>$45 M acumulados</dd></div>
+          <div><dt>Headcount</dt><dd>2 fundadores + 1 ingeniero + 1 AE</dd></div>
+          <div><dt>Qué es cierto si lo logras</dt><dd>Hay presupuesto, y llega a nosotros</dd></div>
+        </dl>
+        <p class="muerte"><strong>Criterio de muerte:</strong> si los tres design partners usan el producto todas las semanas y ninguno firma dentro de los 90 días posteriores al piloto, esto es un <em>nice to have</em>. Un producto que ahorra US$ 34 millones y no consigue $890.000 al mes no está ahorrando US$ 34 millones.</p>
+      </div>
+
+      <div class="hito">
+        <div class="hito-cab"><span class="hito-id">M3</span><h3>Cinco pagando y el lector medido</h3></div>
+        <p style="margin-top:var(--sp-xs)">Cinco cuentas pagando. Y —lo más importante— la precisión del lector de ICSARA medida contra las Adendas que el cliente ya escribió a mano.</p>
+        <dl class="hito-dl">
+          <div><dt>Fecha objetivo</dt><dd>mes 9</dd></div>
+          <div><dt>MRR</dt><dd>$9,0 M</dd></div>
+          <div><dt>Headcount</dt><dd>6 (con analista regulatorio)</dd></div>
+          <div><dt>Qué es cierto si lo logras</dt><dd>El producto funciona, no sólo el pitch</dd></div>
+        </dl>
+        <p class="muerte"><strong>Criterio de muerte:</strong> si la extracción de observaciones tiene menos de <strong>90 % de recall</strong> (se le pasan observaciones) o si el equipo legal del cliente dice que igual tiene que leer el ICSARA completo, el lector no sirve. Y sin lector, la cuña desaparece y quedamos vendiendo un Gantt bonito.</p>
+      </div>
+
+      <div class="hito">
+        <div class="hito-cab"><span class="hito-id">M4</span><h3>Diez pagando — el hito que decide todo</h3></div>
+        <p style="margin-top:var(--sp-xs)">Diez cuentas pagando al cierre del mes 12. Este es el hito del que cuelga el resto del plan y la probabilidad de éxito de más abajo.</p>
+        <dl class="hito-dl">
+          <div><dt>Fecha objetivo</dt><dd>mes 12</dd></div>
+          <div><dt>MRR</dt><dd>$17,9 M · ARR $215 M</dd></div>
+          <div><dt>Caja en el punto</dt><dd>$54,8 M</dd></div>
+          <div><dt>Headcount</dt><dd>8</dd></div>
+        </dl>
+        <p class="muerte"><strong>Criterio de muerte:</strong> si el CAC real supera <strong>$15.000.000</strong> o el ciclo de venta mediano pasa de <strong>9 meses</strong>, la economía no cierra con este equipo y esta caja. Y si al mes 12 hay menos de 7 cuentas, <strong>no se hace la contratación del mes 13</strong>: el valle se profundiza y no hay cómo salir. Se congela el gasto y se opera como consultora con software hasta que el flujo lo aguante — o se cierra.</p>
+      </div>
+
+      <div class="hito">
+        <div class="hito-cab"><span class="hito-id">M5</span><h3>El canal existe</h3></div>
+        <p style="margin-top:var(--sp-xs)">Tres clientes traídos por un estudio o consultora, sin que nosotros hayamos hecho el primer contacto. Venta repetible: un AE nuevo cierra con el mismo guion.</p>
+        <dl class="hito-dl">
+          <div><dt>Fecha objetivo</dt><dd>mes 18</dd></div>
+          <div><dt>MRR</dt><dd>$34,1 M</dd></div>
+          <div><dt>Headcount</dt><dd>11</dd></div>
+          <div><dt>Qué es cierto si lo logras</dt><dd>El CAC baja y el crecimiento no depende de un fundador</dd></div>
+        </dl>
+        <p class="muerte"><strong>Criterio de muerte:</strong> si en 6 meses ningún estudio trae un solo cliente, el canal de distribución no existe. Sin él, el CAC se queda en $8,2 M, el universo se agota en 24 meses y esto es una consultora con software, no un SaaS. Hay que decirlo así y decidir en consecuencia.</p>
+      </div>
+
+      <div class="hito decision">
+        <div class="hito-cab"><span class="hito-id" style="color:var(--alerta)">M6</span><h3>Punto de decisión: levantar, bootstrapear o matar</h3></div>
+        <p style="margin-top:var(--sp-xs)">24 cuentas, ARR $517 M (≈ US$ 545 mil), caja $123,7 M, primer proyecto en Perú en carga.</p>
+        <dl class="hito-dl">
+          <div><dt>Levantar si…</dt><dd>ARR &gt; US$ 700 k, churn &lt; 25 % y el canal funciona</dd></div>
+          <div><dt>Bootstrapear si…</dt><dd>ARR US$ 400–700 k y caja positiva</dd></div>
+          <div><dt>Matar si…</dt><dd>ARR &lt; US$ 300 k con el canal muerto</dd></div>
+          <div><dt>Y también matar si…</dt><dd>la ventanilla única del Estado salió y funciona</dd></div>
+        </dl>
+        <p class="muerte"><strong>El criterio incómodo:</strong> si a los 24 meses una reforma de permisos entregó una ventanilla única con seguimiento de plazos y API pública, y los clientes empiezan a preguntar “¿para qué te pago si el Estado ya me lo muestra?”, hay que aceptar que la mitad del producto se volvió gratis. La decisión entonces no es crecer: es <strong>vender la compañía a una Enablon o a una consultora grande, mientras el ARR todavía vale algo.</strong></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ PROBABILIDAD -->
+<section>
+  <div class="container">
+    <p class="rotulo">05 — Probabilidad de éxito</p>
+    <h2>Un rango, con la derivación a la vista</h2>
+    <p class="prose">Un número único y confiado (“68 % de éxito”) es autoridad inventada. Lo que sigue es un rango derivado, y donde no tenemos el dato lo decimos.</p>
+
+    <div class="rejilla-lado" style="margin-top:var(--sp-m)">
+      <div class="stack">
+        <div class="caja">
+          <p class="rotulo" style="margin-bottom:var(--sp-xs)">Paso 1 — La clase de referencia</p>
+          <p>Definimos éxito como <strong>llegar a US$ 1 millón de ARR (≈ $950 M CLP) en 36 meses</strong> — el umbral en que esta compañía es financiable o vive sola.</p>
+          <p style="margin-top:var(--sp-s)"><strong>Y aquí viene la parte honesta:</strong> no tenemos una tasa base verificada para “SaaS B2B vertical chileno que llega a US$ 1 M de ARR”. La cifra de “sólo el 5 % de los SaaS llega a US$ 1 M” circula sin fuente sólida y <strong>no la vamos a usar como si fuera un dato</strong>. Tampoco tenemos a mano la supervivencia a 3 años de las startups apoyadas por CORFO. <span class="chip chip-validar">tasa base no verificada</span></p>
+          <p style="margin-top:var(--sp-s)">Así que no derivamos desde una tasa base prestada. Derivamos desde <strong>nuestro propio universo</strong>, que sí conocemos y sí podemos contar.</p>
+        </div>
+
+        <div class="caja">
+          <p class="rotulo" style="margin-bottom:var(--sp-xs)">Paso 2 — La aritmética del universo</p>
+          <ul class="lista">
+            <li>US$ 1 M de ARR ≈ $950 M CLP/año ÷ 12 ÷ ARPU $1.795.000 = <strong>44 cuentas pagando</strong>.</li>
+            <li>Universo alcanzable (SAM en cuentas): 130 titulares grandes + 45 estudios + ~125 medianos con equipo formal = <strong>300 cuentas nombradas</strong>.</li>
+            <li>44 ÷ 300 = <strong>15 % de penetración del universo alcanzable en 36 meses.</strong></li>
+          </ul>
+          <p class="nota" style="margin-top:var(--sp-s)">Ese 15 % es la pregunta entera: ¿es alcanzable para un producto de nicho con dos canales y un equipo de once personas? No es absurdo. Tampoco es fácil.</p>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="caja">
+          <p class="rotulo" style="margin-bottom:var(--sp-xs)">Paso 3 — Los ajustes, uno por uno</p>
+          <table style="margin-top:var(--sp-xs)">
+            <tbody>
+              <tr><td class="bien">↑</td><td>El presupuesto <strong>ya se gasta</strong> — hoy va a consultores. No pedimos plata nueva.</td></tr>
+              <tr><td class="bien">↑</td><td>El dolor está <strong>cuantificado en US$/día</strong> por el propio cliente. La justificación de compra se escribe sola.</td></tr>
+              <tr><td class="bien">↑</td><td>Existe un <strong>canal de distribución real</strong> (los estudios) y un disparador gratuito (el e-SEIA).</td></tr>
+              <tr><td class="bien">↑</td><td><strong>Casi no hay software compitiendo</strong> en la fase pre-RCA. El titular del puesto es Excel.</td></tr>
+              <tr><td class="malo">↓</td><td><strong>Ciclo de venta largo</strong>: 5–9 meses, compra por comité (legal + proyectos + finanzas).</td></tr>
+              <tr><td class="malo">↓</td><td><strong>El universo es de 300 cuentas.</strong> Un error de ICP y no hay a quién venderle.</td></tr>
+              <tr><td class="malo">↓</td><td><strong>Dependencia regulatoria.</strong> Una reforma exitosa recorta el producto a la mitad.</td></tr>
+              <tr><td class="malo">↓</td><td><strong>Churn estructural</strong>: el proyecto se acaba y la cuenta con él.</td></tr>
+              <tr><td class="malo">↓</td><td><strong>Un plazo mal publicado</strong> puede quemar la reputación en un mercado donde todos se conocen.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="caja" style="border-color:var(--cian)">
+          <p class="rotulo" style="margin-bottom:var(--sp-xs)">Paso 4 — El resultado</p>
+          <p style="font-family:var(--cond);font-weight:700;font-size:var(--step-3);color:var(--cian);line-height:1.1">
+            20 – 30 %
+          </p>
+          <p style="margin-top:var(--sp-2xs)">de llegar a US$ 1 M de ARR en 36 meses, <strong>condicional a alcanzar M4 (10 cuentas pagando) en el mes 12</strong>.</p>
+          <p class="nota" style="margin-top:var(--sp-s)">
+            Si M4 no se cumple, la probabilidad cae por debajo del <strong>10 %</strong>: sin 10 cuentas al mes 12 no hay caja para la contratación del mes 13, el valle se traga el plan y el universo alcanzable se agota antes de que la máquina de ventas exista.
+            <br><br>
+            El rango es ancho a propósito. La incertidumbre real está concentrada en <strong>una sola pregunta</strong>: si los estudios distribuyen o no. Con el canal funcionando, el extremo alto del rango es defendible. Sin él, el extremo bajo es optimista.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <dl class="cartucho" style="margin-top:var(--sp-xl)">
+      <div><dt>Proyecto</dt><dd>Cianota</dd></div>
+      <div><dt>Lámina</dt><dd>04 · Roadmap</dd></div>
+      <div><dt>Horizonte</dt><dd>24 meses</dd></div>
+      <div><dt>Rev.</dt><dd>2026-07-13</dd></div>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p>Cianota · Los escenarios se derivan de supuestos declarados. La probabilidad es un rango condicional, no un número. <a href="stack.html">Arquitectura →</a></p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+</body>
+</html>

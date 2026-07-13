@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freatia — el balance hídrico de la faena, auditable hasta el sensor</title>
+<meta name="description" content="Balance hídrico en tiempo real y auditable para faenas mineras del norte de Chile, monitoreo del depósito de relaves con escalamiento, y el reporte al regulador y a la comunidad generado desde el mismo dato.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* Hero: la carta topográfica de fondo */
+  .hero { position: relative; padding-block: var(--sp-xl) var(--sp-l); overflow: hidden; }
+  .hero-curvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; opacity: .55;
+  }
+  .hero-in { position: relative; display: grid; gap: var(--sp-l); }
+  .hero h1 { margin-top: var(--sp-2xs); max-width: 16ch; }
+  .hero-sub { margin-top: var(--sp-s); font-size: var(--step-1); color: var(--txt-2); max-width: 46ch; }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-top: var(--sp-m); }
+  .hero-datos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .hero-datos > div { background: var(--ink-800); padding: var(--sp-xs); }
+  @media (min-width: 62em) {
+    .hero-in { grid-template-columns: 1fr 380px; align-items: center; }
+  }
+  .paso { display: grid; grid-template-columns: 56px 1fr; gap: var(--sp-s); padding: var(--sp-s) 0; border-top: 1px solid var(--linea); }
+  .paso-n { font-family: var(--mono); font-size: var(--step-2); color: var(--agua); line-height: 1; }
+  .paso h3 { margin-bottom: 4px; }
+  .paso p { font-size: var(--step--1); max-width: var(--measure); }
+  .cita { border-left: 2px solid var(--linea-2); padding-left: var(--sp-s); }
+  .cita p { font-size: var(--step-0); color: var(--txt); }
+  .cita footer { margin-top: var(--sp-2xs); font-size: var(--step--1); color: var(--txt-4); font-family: var(--cond); text-transform: uppercase; letter-spacing: .1em; }
+  .precio { display: grid; gap: var(--sp-2xs); }
+  .precio .cifra { font-size: var(--step-2); }
+  .precio ul { list-style: none; display: grid; gap: 6px; margin-top: var(--sp-xs); font-size: var(--step--1); color: var(--txt-2); }
+  .precio li { padding-left: 16px; position: relative; }
+  .precio li::before { content: "—"; position: absolute; left: 0; color: var(--agua); }
+  .precio-dest { border-color: var(--agua); }
+  details { border-bottom: 1px solid var(--linea); }
+  summary { padding: 14px 0; cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; gap: 10px; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "+"; font-family: var(--mono); color: var(--agua); }
+  details[open] summary::before { content: "−"; }
+  details p { padding: 0 0 var(--sp-s) 22px; font-size: var(--step--1); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" stroke-width="1.5" aria-hidden="true">
+        <path d="M1 23c4.5-6 9 2 14.5-3S25 21 31 17" stroke="#7A5C33"/>
+        <path d="M1 28c5-5 9.5 2 15-3s8.5 1 15-3" stroke="#7A5C33"/>
+        <path d="M16 2s7 8.6 7 12.6a7 7 0 1 1-14 0C9 10.6 16 2 16 2Z" stroke="#3F9BD6"/>
+      </svg>
+      <span class="marca-txt">Freatia</span>
+    </a>
+    <nav>
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btn-menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+  </div>
+  <div id="menu" class="container">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html" aria-current="page">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <svg class="hero-curvas" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="#7A5C33" stroke-width="1" opacity=".38">
+      <path d="M-20 470C120 430 200 480 340 440s180-90 330-70 210 100 350 60 230-120 230-120"/>
+      <path d="M-20 430C130 385 210 440 350 396s180-96 330-74 210 104 350 62 210-128 210-128"/>
+      <path d="M-20 388C140 340 220 398 360 350s180-100 330-78 210 108 350 64 190-136 190-136"/>
+      <path d="M-20 344C150 292 230 356 370 302s180-104 330-82 210 112 350 66 170-144 170-144"/>
+      <path d="M-20 298C160 242 240 312 380 252s180-108 330-86 210 116 350 68 150-152 150-152"/>
+      <path d="M-20 250C170 190 250 266 390 200s180-112 330-90 210 120 350 70 130-160 130-160"/>
+      <path d="M-20 200C180 136 260 218 400 146s180-116 330-94 210 124 350 72 110-168 110-168"/>
+    </g>
+    <g fill="none" stroke="#3F9BD6" stroke-width="1.4" opacity=".45">
+      <path d="M-20 505C170 470 300 500 430 470s170-60 300-36 250 70 500 26"/>
+      <path d="M430 470c-30-60-10-120 40-170"/>
+      <path d="M700 462c10-70 60-110 130-140"/>
+    </g>
+  </svg>
+
+  <div class="container hero-in">
+    <div>
+      <span class="rotulo rotulo-agua">Balance hídrico auditable · Depósitos de relaves</span>
+      <h1>El agua de la faena, litro por litro, con la firma del sensor.</h1>
+      <p class="hero-sub">
+        En el norte, el agua es la licencia para operar. Freatia arma el balance hídrico de tu faena en tiempo real
+        —de dónde viene cada litro, dónde se va, cuánto vuelve— con la trazabilidad hasta el instrumento; vigila el
+        depósito de relaves con sus umbrales y su escalamiento; y genera el reporte a la DGA, a la SMA y a la
+        comunidad desde el mismo dato, no rearmado a mano la noche anterior.
+      </p>
+      <div class="hero-btns">
+        <a class="btn" href="demo/index.html">Ver el balance de una faena</a>
+        <a class="btn btn-2" href="#como">Cómo funciona</a>
+      </div>
+    </div>
+
+    <div class="placa placa-alta">
+      <span class="rotulo">Faena Quebrada Seca · junio 2026</span>
+      <div class="cifra cifra-hero" style="color:#B85499;margin-top:8px">40<span class="cifra-u">l/s sin explicar</span></div>
+      <p class="pista" style="margin-bottom:var(--sp-s)">11,7% de las entradas · 3.456 m³/día</p>
+      <div class="hero-datos">
+        <div><span class="rotulo">Entradas</span><div class="num" style="font-size:var(--step-1);color:#3F9BD6">343 l/s</div></div>
+        <div><span class="rotulo">Salidas conocidas</span><div class="num" style="font-size:var(--step-1);color:#B3762F">285 l/s</div></div>
+        <div><span class="rotulo">Recirculado</span><div class="num" style="font-size:var(--step-1);color:#2E9E70">480 l/s</div></div>
+        <div><span class="rotulo">Se acumula</span><div class="num" style="font-size:var(--step-1);color:#7FC0E6">18 l/s</div></div>
+      </div>
+      <p class="pista" style="margin-top:var(--sp-s)">
+        Esa discrepancia es el producto. La planilla del ingeniero la reparte entre las partidas hasta que cierre.
+        Freatia la deja a la vista y te dice dónde buscarla.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="sec sec-borde">
+  <div class="container">
+    <div class="sec-cab">
+      <span class="rotulo">El problema, en las palabras de quien lo tiene</span>
+      <h2>El balance hídrico de una faena de US$2.000 millones vive en la planilla de una persona.</h2>
+    </div>
+    <div class="rej rej-3">
+      <blockquote class="cita">
+        <p>“El balance lo armo yo. Bajo los datos del PI, abro tres PDF del laboratorio, le pido al jefe de camino
+          los metros cúbicos de los aljibes por WhatsApp, y lo cuadro. Si no cierra, ajusto el coeficiente de
+          evaporación hasta que cierre. Todos lo hacemos. Nadie lo dice.”</p>
+        <footer>Ingeniero de procesos · minera mediana, Antofagasta</footer>
+      </blockquote>
+      <blockquote class="cita">
+        <p>“Después de Brumadinho, lo primero que pregunta el directorio en cada sesión es por los piezómetros del
+          tranque. Yo tengo las lecturas. Están en un Excel que actualiza un contratista cada quince días.”</p>
+        <footer>Jefe de Geotecnia · depósito de relaves activo</footer>
+      </blockquote>
+      <blockquote class="cita">
+        <p>“La SMA no me preguntó cuánta agua saqué. Me preguntó cómo lo sé. Y ahí me quedé sin respuesta, porque
+          el número venía de una celda que sumaba otras celdas de un archivo que armó alguien que ya no trabaja acá.”</p>
+        <footer>Gerenta de Medio Ambiente · faena de cobre, Atacama</footer>
+      </blockquote>
+    </div>
+
+    <div class="rej rej-2" style="margin-top:var(--sp-l)">
+      <div class="placa">
+        <span class="rotulo">Lo que se rompe</span>
+        <ul class="lista" style="margin-top:var(--sp-xs)">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span><strong>El dato no es auditable.</strong> El número del reporte no se puede seguir hasta el instrumento que lo midió. En una fiscalización eso no es un detalle: es el hallazgo.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span><strong>La discrepancia se esconde.</strong> Cuando el balance no cierra, se ajusta un coeficiente. El agua que falta sigue faltando; sólo se dejó de mirar.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span><strong>El tranque se mira cada quince días.</strong> Un piezómetro que empieza a subir un lunes se descubre el tercer viernes.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span><strong>Cada reporte es un proyecto.</strong> DGA, SERNAGEOMIN, SMA y la comunidad reciben cuatro documentos que se arman por separado, a última hora, y que a veces no dicen lo mismo.</span></li>
+        </ul>
+      </div>
+      <div class="placa">
+        <span class="rotulo">Con quién compite el agua</span>
+        <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+          Una faena en el desierto de Atacama consume agua donde no hay. Compite por ella con las comunidades, con
+          la agricultura del valle y con el propio ecosistema del salar. Por eso el balance hídrico no es un
+          ejercicio contable: es la prueba que se rinde ante el regulador, ante el vecino y ante el directorio.
+        </p>
+        <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+          La industria se está moviendo al <strong>agua de mar desalada</strong>, que cambia toda la ecuación: el
+          litro deja de ser gratis y escaso para pasar a ser caro y disponible, y el costo se traslada a la energía
+          de bombearlo 3.000 metros cerro arriba. Cuando el agua cuesta dólares por metro cúbico, cada litro que se
+          pierde sin explicación es plata que se evapora — literalmente.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="sec sec-borde" id="como">
+  <div class="container">
+    <div class="sec-cab">
+      <span class="rotulo">Cómo funciona</span>
+      <h2>Tres cosas, y ninguna es un dashboard bonito.</h2>
+    </div>
+
+    <div class="paso">
+      <div class="paso-n">01</div>
+      <div>
+        <h3>Conecta lo que ya existe</h3>
+        <p>Freatia lee del historiador (AVEVA PI, Canary, lo que tengas) o directo de los PLC por OPC-UA. Lo que
+          llega en PDF —informe de la PTAS, certificados de laboratorio, aforos manuales— se extrae y queda
+          registrado como lo que es: un dato de tercero, con su fecha y su firma. Lo que se mide a mano se carga
+          por teléfono, con foto. <strong>Nada se inventa y nada se rellena.</strong></p>
+      </div>
+    </div>
+    <div class="paso">
+      <div class="paso-n">02</div>
+      <div>
+        <h3>Concilia y muestra la discrepancia</h3>
+        <p>Cada hora se recalcula el balance de la frontera: entradas = salidas + acumulación + <em>lo que no se
+          puede explicar</em>. Si sobran 40 litros por segundo, el producto lo dice en la primera pantalla, no en
+          la nota al pie. Después ordena las hipótesis por evidencia y te dice qué hacer primero — empezando por lo
+          barato que descarta más.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <div class="paso-n">03</div>
+      <div>
+        <h3>Vigila el tranque y firma el reporte</h3>
+        <p>Piezómetros, revancha hidráulica y deformación contra sus umbrales, con escalamiento a la persona
+          correcta y bitácora sellada de quién supo qué y cuándo. Y los reportes a la DGA, a SERNAGEOMIN, a la SMA
+          y a la comunidad salen del mismo dato. <strong>Si el balance no cuadra, el reporte no se firma</strong> —
+          o se firma declarando la incertidumbre, y queda registrado quién lo hizo sabiéndolo.</p>
+      </div>
+    </div>
+    <div class="paso" style="border-bottom:1px solid var(--linea)"></div>
+  </div>
+</section>
+
+<!-- PRODUCTO EN VIVO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cab">
+      <span class="rotulo rotulo-agua">El producto, funcionando</span>
+      <h2>Esto no es una captura de pantalla.</h2>
+      <p>Es el producto corriendo en esta página, con los datos de una faena ficticia de 42.000 t/d en Sierra Gorda.
+        Toca un nodo del diagrama.</p>
+    </div>
+
+    <div class="placa">
+      <div class="placa-tit">
+        <h3>Balance hídrico · junio 2026</h3>
+        <span class="rotulo" id="sk-sel">desliza el diagrama →</span>
+      </div>
+      <div class="scroll-x svg-caja">
+        <svg id="sankey" style="min-width:900px"></svg>
+      </div>
+      <div class="leyenda">
+        <span><span class="pt" style="background:#3F9BD6"></span>Agua nueva</span>
+        <span><span class="pt" style="background:#2E9E70"></span>Recirculada</span>
+        <span><span class="pt" style="background:#B3762F"></span>Pérdidas</span>
+        <span><span class="pt" style="background:#7FC0E6"></span>Se acumula</span>
+        <span><span class="pt" style="background:#B85499"></span>Sin explicar</span>
+      </div>
+    </div>
+
+    <div class="rej rej-12-7" style="margin-top:var(--sp-s)">
+      <div class="placa">
+        <div class="placa-tit">
+          <h3>PZ-14 · pie del muro, sector oeste</h3>
+          <span class="chip chip-alerta">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg>
+            en alerta
+          </span>
+        </div>
+        <div class="svg-caja"><svg id="piezo"></svg></div>
+        <div class="leyenda">
+          <span><span class="pt" style="background:#E8574E"></span>PZ-14 · pie del muro oeste</span>
+          <span><span class="pt" style="background:#3F9BD6"></span>PZ-07 · muro central</span>
+          <span><span class="pt" style="background:#2E9E70"></span>PZ-11 · empotramiento este</span>
+          <span><span class="pt" style="background:#B3762F"></span>PZ-18 · aguas abajo</span>
+        </div>
+      </div>
+      <div class="placa placa-alta">
+        <span class="rotulo">El cruce que importa</span>
+        <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+          El nivel freático en el pie del muro sube <strong>4,2 cm al día</strong> desde el 18 de junio.
+          La discrepancia del balance empezó a crecer el 21 de junio. La correlación entre las dos series es
+          <span class="num">0,86</span>.
+        </p>
+        <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+          Ningún sistema de monitoreo geotécnico mira el balance hídrico. Ningún sistema de balance hídrico mira los
+          piezómetros. Están en dos planillas, de dos gerencias distintas, y nadie las cruza.
+          <strong>Ese cruce es la razón de existir de Freatia.</strong>
+        </p>
+        <div class="aviso aviso-alerta">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/><circle cx="8" cy="12" r=".6" fill="currentColor" stroke="none"/></svg>
+          <p>Si la tendencia se mantiene, PZ-14 llega al umbral crítico (cota 2.447,5) en <strong>24 días</strong>.</p>
+        </div>
+        <a class="btn btn-2" href="demo/index.html" style="margin-top:var(--sp-s)">Recorrer el flujo completo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LO QUE NO HACE -->
+<section class="sec sec-borde">
+  <div class="container">
+    <div class="rej rej-2">
+      <div>
+        <span class="rotulo">Honestidad</span>
+        <h2>Lo que Freatia no hace.</h2>
+        <p style="margin-top:var(--sp-s)">
+          Vamos a decir esto antes de cobrarte, y no en la letra chica.
+        </p>
+      </div>
+      <div class="placa">
+        <ul class="lista lista-no">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No arregla un conflicto con una comunidad.</strong> La licencia social no se compra con software. Se gana sentándose, cumpliendo lo que se prometió y aguantando reuniones malas durante años. Lo único que aporta Freatia es que el número que publicas sea el mismo que le entregas al regulador, que se pueda revisar, y que no cambie cuando incomoda. Eso no genera confianza; a lo más deja de destruirla.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No predice la falla de un muro.</strong> El análisis de estabilidad lo hace tu consultor geotécnico con su modelo y su responsabilidad profesional. No vamos a fingir que un software de monitoreo lo reemplaza. Lo que hacemos es que un piezómetro fuera de rango llegue a la persona correcta en minutos y no en quince días.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No mide lo que no tienes instrumentado.</strong> Si el agua de supresión de polvo se anota en un cuaderno, Freatia va a mostrar exactamente eso: una partida con 84% de cobertura y calidad "manual". Te va a decir cuánto baja tu incertidumbre si instalas un caudalímetro, y cuánto cuesta. No va a rellenar el hueco con un modelo.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No te evita una multa.</strong> Te evita llegar a una fiscalización sin poder explicar de dónde salió un número — que es lo que convierte un hallazgo en una sanción.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIOS -->
+<section class="sec sec-borde" id="precios">
+  <div class="container">
+    <div class="sec-cab">
+      <span class="rotulo">Precios</span>
+      <h2>Por faena, en pesos, sin sorpresas.</h2>
+      <p>Contrato anual. Valores netos, más IVA. La implementación se cobra una vez y se factura contra hitos.</p>
+    </div>
+    <div class="rej rej-3">
+      <div class="placa precio">
+        <span class="rotulo rotulo-agua">Cuenca</span>
+        <div class="cifra num">$2.900.000<span class="cifra-u">/mes</span></div>
+        <p class="pista">Faena sin depósito de relaves activo, o que sólo necesita el balance.</p>
+        <ul>
+          <li>Balance hídrico horario, auditable</li>
+          <li>Trazabilidad hasta el instrumento</li>
+          <li>Diagnóstico de la discrepancia</li>
+          <li>Reporte DGA (extracciones) y reporte a la comunidad</li>
+          <li>Hasta 40 señales · 3 usuarios</li>
+        </ul>
+      </div>
+      <div class="placa precio precio-dest">
+        <span class="rotulo rotulo-agua">Tranque</span>
+        <div class="cifra num">$4.900.000<span class="cifra-u">/mes</span></div>
+        <p class="pista">El plan que compra el 70% del mercado: la faena con depósito activo.</p>
+        <ul>
+          <li>Todo lo de Cuenca</li>
+          <li>Piezómetros, revancha y deformación con umbrales</li>
+          <li>Escalamiento 24/7 con bitácora sellada</li>
+          <li>Cruce balance ↔ piezometría</li>
+          <li>Reporte SERNAGEOMIN y reporte SMA</li>
+          <li>Hasta 200 señales · usuarios ilimitados</li>
+        </ul>
+      </div>
+      <div class="placa precio">
+        <span class="rotulo rotulo-agua">Corporativo</span>
+        <div class="cifra num">desde $9.800.000<span class="cifra-u">/mes</span></div>
+        <p class="pista">Compañía con varias faenas y un directorio que pregunta.</p>
+        <ul>
+          <li>Todo lo de Tranque, en todas las faenas</li>
+          <li>Panel corporativo y comparación entre faenas</li>
+          <li>Ambiente de auditoría para terceros (ITO, GISTM)</li>
+          <li>API y exportación de la evidencia</li>
+          <li>Señales ilimitadas · SLA 99,5%</li>
+        </ul>
+      </div>
+    </div>
+    <div class="placa" style="margin-top:var(--sp-s)">
+      <div class="rej rej-2">
+        <div>
+          <span class="rotulo">Implementación (una vez)</span>
+          <div class="cifra num" style="font-size:var(--step-1);margin-top:6px">$12.000.000 – $28.000.000</div>
+          <p class="pista">Levantamiento de la instrumentación, mapa de flujos de la faena, conexión al historiador
+            o a los PLC, definición de umbrales con tu equipo de geotecnia, y el primer balance conciliado.
+            6 a 10 semanas si hay historiador; 10 a 16 si hay que ir a los PLC.</p>
+        </div>
+        <div>
+          <span class="rotulo">Lo que no cobramos</span>
+          <p class="pista" style="margin-top:6px">
+            No cobramos por usuario, porque el día que el operador de turno no entre al sistema por ahorrarse una
+            licencia, el producto dejó de servir. No cobramos por dato almacenado, porque eso empuja a borrar la
+            evidencia. Y no cobramos un porcentaje de la multa que te ahorraste, porque eso sería una estafa
+            elegante.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec sec-borde">
+  <div class="container">
+    <div class="sec-cab">
+      <span class="rotulo">Preguntas que nos hacen</span>
+      <h2>Las incómodas primero.</h2>
+    </div>
+    <div style="max-width:var(--measure)">
+      <details open>
+        <summary>¿Esto reemplaza al PI System?</summary>
+        <p>No. Si ya tienes AVEVA PI o un historiador equivalente, Freatia lee de ahí y no toca nada. El historiador
+          guarda señales; nosotros construimos el balance sobre esas señales, con su procedencia, y lo convertimos
+          en un reporte que alguien puede firmar. Son dos capas distintas y no competimos con la de abajo.</p>
+      </details>
+      <details>
+        <summary>¿Y si mi faena no tiene instrumentos?</summary>
+        <p>Entonces no tienes un problema de software y te lo vamos a decir en la primera reunión. Lo que sí podemos
+          hacer es el levantamiento: cuáles son tus 12 partidas, cuál es la incertidumbre de cada una, y qué
+          caudalímetro comprar primero para que el balance baje del 12% al 4% de error. Eso vale una consultoría
+          corta, no un contrato anual de software.</p>
+      </details>
+      <details>
+        <summary>¿Me evita la multa de la SMA o la caducidad de mis derechos?</summary>
+        <p>No, y desconfía de quien te diga que sí. Te da la trazabilidad para responder una fiscalización con
+          evidencia en vez de con una planilla, y te avisa cuando estás cerca de un umbral. La decisión de operar
+          fuera de la RCA sigue siendo tuya y Freatia la va a dejar registrada.</p>
+      </details>
+      <details>
+        <summary>¿Sirve para la licencia social?</summary>
+        <p>Un dashboard no arregla un conflicto con una comunidad. Lo que sirve —y esto sí lo hemos visto— es
+          publicar todos los meses el mismo número que le entregas al regulador, en castellano, incluyendo el mes
+          en que no cuadra. Freatia hace que eso sea barato y automático en vez de un acto de coraje. El resto lo
+          tiene que hacer una persona sentada frente a otra persona.</p>
+      </details>
+      <details>
+        <summary>¿Predice una falla del depósito?</summary>
+        <p>No. No hacemos modelos de estabilidad física. Hacemos que el dato del piezómetro llegue a tiempo, con su
+          historia, su umbral y su escalamiento registrado. Si tu consultor geotécnico quiere correr su modelo con
+          nuestros datos, se los exportamos con la cadena de custodia incluida.</p>
+      </details>
+      <details>
+        <summary>¿Dónde viven los datos y quién los puede borrar?</summary>
+        <p>En la nube, en una región que se acuerda contigo, con una copia en la faena que sigue funcionando si se
+          cae el enlace satelital. El registro del balance es <em>append-only</em>: se puede corregir un dato, pero
+          la corrección queda como una entrada nueva con autor y hora. Nadie —tampoco nosotros— puede borrar una
+          lectura. Los detalles están en <a href="stack.html">Arquitectura</a>.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec sec-borde">
+  <div class="container">
+    <div class="placa placa-alta" style="text-align:center;padding:var(--sp-l) var(--sp-s)">
+      <span class="rotulo rotulo-agua">Siguiente paso</span>
+      <h2 style="margin:var(--sp-2xs) auto var(--sp-s);max-width:24ch">Muéstranos tu balance hídrico del mes pasado.</h2>
+      <p style="max-width:52ch;margin:0 auto var(--sp-m)">
+        Te decimos, gratis y en una semana, en cuánto no cuadra y de dónde viene la incertidumbre. Si cuadra dentro
+        del 3%, te lo decimos también y no te vendemos nada.
+      </p>
+      <div class="hero-btns" style="justify-content:center">
+        <a class="btn" href="demo/index.html">Ver el demo</a>
+        <a class="btn btn-2" href="negocio.html">Ver el plan de negocio</a>
+      </div>
+    </div>
+
+    <footer class="pie">
+      <p>Freatia · prototipo · Antofagasta – Santiago. Datos ficticios sobre geografía y regulación reales.
+        Las obligaciones normativas que no nos constan están marcadas <strong>por validar</strong>: no las inventamos.</p>
+    </footer>
+  </div>
+</section>
+
+</main>
+
+<script src="graficos.js"></script>
+<script>
+(function () {
+  var b = document.getElementById("btn-menu"), m = document.getElementById("menu");
+  b.addEventListener("click", function () {
+    var a = m.classList.toggle("abierto");
+    b.setAttribute("aria-expanded", a ? "true" : "false");
+  });
+
+  var G = window.FreatiaGraficos, C = G.COLOR;
+
+  /* El mismo modelo que corre en el demo: Faena Quebrada Seca, junio 2026. */
+  G.sankeyHidrico(document.getElementById("sankey"), {
+    columnas: [{ rotulo: "De dónde viene" }, { rotulo: "En qué se usa" }, { rotulo: "Dónde termina" }],
+    nodos: [
+      { id: "R",  col: 0, nombre: "Recirculación del tranque", valor: 480, color: C.recirc },
+      { id: "D",  col: 0, nombre: "Agua de mar desalada",      valor: 210, color: C.agua },
+      { id: "P",  col: 0, nombre: "Pozos DGA",                 valor: 96,  color: C.agua },
+      { id: "C",  col: 0, nombre: "Aguas de contacto",         valor: 37,  color: C.agua },
+      { id: "CO", col: 1, nombre: "Planta concentradora",      valor: 700, color: C.agua },
+      { id: "LX", col: 1, nombre: "Pilas de lixiviación",      valor: 55,  color: C.agua },
+      { id: "SP", col: 1, nombre: "Supresión de polvo",        valor: 48,  color: C.agua },
+      { id: "CS", col: 1, nombre: "Campamento y servicios",    valor: 20,  color: C.agua },
+      { id: "RC", col: 2, nombre: "Vuelve al proceso",         valor: 480, color: C.recirc },
+      { id: "OC", col: 2, nombre: "Ocluida en relaves y pilas",valor: 144, color: C.perdida },
+      { id: "EV", col: 2, nombre: "Evaporación",               valor: 121, color: C.perdida },
+      { id: "IN", col: 2, nombre: "Infiltración y consumo",    valor: 20,  color: C.perdida },
+      { id: "DS", col: 2, nombre: "Δ almacenamiento",          valor: 18,  color: C.acum },
+      { id: "SE", col: 2, nombre: "Sin explicar",              valor: 40,  color: C.sinexpl }
+    ],
+    enlaces: [
+      { de: "R", a: "CO", valor: 480, color: C.recirc },
+      { de: "D", a: "CO", valor: 190, color: C.agua }, { de: "D", a: "LX", valor: 20, color: C.agua },
+      { de: "P", a: "CO", valor: 30,  color: C.agua }, { de: "P", a: "LX", valor: 25, color: C.agua },
+      { de: "P", a: "CS", valor: 20,  color: C.agua }, { de: "P", a: "SP", valor: 21, color: C.agua },
+      { de: "C", a: "SP", valor: 27,  color: C.agua }, { de: "C", a: "LX", valor: 10, color: C.agua },
+      { de: "CO", a: "RC", valor: 480, color: C.recirc },
+      { de: "CO", a: "OC", valor: 128, color: C.perdida },
+      { de: "CO", a: "EV", valor: 20,  color: C.perdida },
+      { de: "CO", a: "IN", valor: 14,  color: C.perdida },
+      { de: "CO", a: "DS", valor: 18,  color: C.acum },
+      { de: "CO", a: "SE", valor: 40,  color: C.sinexpl },
+      { de: "LX", a: "EV", valor: 39,  color: C.perdida },
+      { de: "LX", a: "OC", valor: 16,  color: C.perdida },
+      { de: "SP", a: "EV", valor: 48,  color: C.perdida },
+      { de: "CS", a: "EV", valor: 14,  color: C.perdida },
+      { de: "CS", a: "IN", valor: 6,   color: C.perdida }
+    ]
+  }, function (n) {
+    document.getElementById("sk-sel").textContent = n.nombre + " · " + G.fmt(n.valor) + " l/s";
+  });
+
+  /* Piezómetros: mismas series que el demo. */
+  function rnd(s) { return function () { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; }; }
+  function serie(sem, base, ruido, quiebre, pend) {
+    var r = rnd(sem), o = [];
+    for (var i = 0; i < 90; i++) {
+      var v = base + (r() - 0.5) * ruido;
+      if (quiebre !== undefined && i > quiebre) v += (i - quiebre) * pend;
+      o.push(+v.toFixed(3));
+    }
+    return o;
+  }
+  G.graficoPiezometros(document.getElementById("piezo"), [
+    { id: "PZ-14", nombre: "PZ-14 · pie del muro oeste", color: C.critico, destacada: true,
+      datos: serie(2445520, 2445.52, 0.06, 66, 0.042) },
+    { id: "PZ-07", nombre: "PZ-07 · muro central", color: C.agua, datos: serie(2443100, 2443.10, 0.08) },
+    { id: "PZ-11", nombre: "PZ-11 · empotramiento este", color: C.recirc, datos: serie(2441450, 2441.45, 0.06) },
+    { id: "PZ-18", nombre: "PZ-18 · aguas abajo", color: C.perdida, datos: serie(2438900, 2438.90, 0.05, 0, 0.004) }
+  ], { alerta: 2446.0, critico: 2447.5 },
+     { aria: "Nivel freático de cuatro piezómetros del muro en 90 días. PZ-14 cruzó el umbral de alerta el 2 de julio y sigue subiendo." });
+})();
+</script>
+</body>
+</html>

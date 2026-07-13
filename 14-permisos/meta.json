@@ -1,0 +1,15 @@
+{
+  "folder": "14-permisos",
+  "brand": "Cianota",
+  "domain": "cianota.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/cianota.com -> HTTP 404 (disponible), 2026-07-13 · NIC Chile: cianota.cl disponible a la misma fecha",
+  "alternates": ["isocrona.com", "cianoplano.com", "rutaje.com"],
+  "tagline": "La ruta crítica de tus permisos, en un solo plano.",
+  "category": "RegTech industrial · permitología de proyectos",
+  "market": "Chile → Perú, Brasil, LatAm",
+  "icp": "Titular de proyecto minero/energético/industrial > US$ 100 M en tramitación, y los estudios ambientales que le gestionan los permisos",
+  "price_clp": "Desde $890.000/mes",
+  "accent": "#56d7ef",
+  "problem": "Un permiso se atrasa un mes, arrastra a otros cuatro y la puesta en marcha se corre tres meses — y nadie tenía el grafo de dependencias para verlo venir.",
+  "status": "prototipo"
+}

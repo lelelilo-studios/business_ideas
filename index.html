@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10 ideas de negocio — lelelilo studios</title>
-<meta name="description" content="Diez productos para PYMEs chilenas, cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
+<title>15 ideas de negocio — lelelilo studios</title>
+<meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -52,11 +52,29 @@ body {
 .note p + p { margin-top:var(--sp-s); }
 .note strong { color:var(--paper); font-weight:500; }
 
+/* -- familia (PYME / Minería) -- */
+.fam { margin-block:var(--sp-2xl); }
+.fam__head {
+  display:grid; grid-template-columns:1fr auto; align-items:baseline;
+  gap:var(--sp-s); padding-bottom:var(--sp-s);
+  border-bottom:2px solid var(--paper);
+}
+.fam__head h2 {
+  font-size:var(--step-3); font-weight:700; letter-spacing:-.02em;
+  grid-column:1;
+}
+.fam__head p {
+  grid-column:1; grid-row:2; color:var(--mute); max-width:62ch;
+  font-size:var(--step--1); line-height:1.6; margin-top:var(--sp-2xs);
+}
+.fam__n {
+  grid-column:2; grid-row:1; color:var(--mute-2); font-size:var(--step-2);
+}
+
 /* -- grilla: móvil primero, una columna -- */
 .grid {
   list-style:none; display:grid; gap:1px;
-  background:var(--line); border-block:1px solid var(--line);
-  margin-block:var(--sp-l) var(--sp-2xl);
+  background:var(--line); border-bottom:1px solid var(--line);
 }
 .idea {
   position:relative; background:var(--ink);
@@ -147,11 +165,11 @@ body {
 <div class="container">
 
   <header class="masthead">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>2026</span></p>
-    <h1>Diez negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Cada idea es un problema real de una PYME chilena, con un producto que funciona
-      en el navegador, un plan de marketing, un roadmap a 24 meses y la arquitectura que habría
-      que configurar para que dejara de ser una maqueta.</p>
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>15 ideas</span><span>·</span><span>2026</span></p>
+    <h1>Quince negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería— con
+      un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
+      arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
   </header>
 
   <div class="note">
@@ -159,7 +177,7 @@ body {
       corriendo, ni APIs contratadas. Los demos funcionan con datos falsos —creíbles, pero falsos— y
       cada idea documenta en su página de <em>Arquitectura</em> exactamente qué habría que configurar,
       cuánto costaría al mes y qué parte está fingida.</p>
-    <p><strong>Los diez dominios están verificados como libres</strong> al 13 de julio de 2026
+    <p><strong>Los quince dominios están verificados como libres</strong> al 13 de julio de 2026
       (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para <span class="mono">.cl</span>).
       Eso caduca: si vas a usar uno, verifícalo de nuevo antes de comprarlo.</p>
     <p><strong>Los números son estimaciones, y se muestran con su aritmética.</strong> Ninguna idea
@@ -169,6 +187,14 @@ body {
   </div>
 
   <main class="grid">
+
+  <section class="fam">
+    <header class="fam__head">
+      <h2>PYME chilena</h2>
+      <p>El comprador es la dueña que contesta el WhatsApp mientras atiende. Ticket bajo, venta rápida, y un competidor que casi siempre es Excel o un cuaderno.</p>
+      <span class="fam__n mono">10</span>
+    </header>
+    <div class="grid">
 
     <article class="idea" style="--accent:#C0362C">
       <a class="idea__hit" href="01-licitaciones/index.html" aria-labelledby="t01"></a>
@@ -192,7 +218,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#A93B22">
       <a class="idea__hit" href="02-cobranza/index.html" aria-labelledby="t02"></a>
       <div class="idea__num">02</div>
@@ -215,7 +240,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#14624A">
       <a class="idea__hit" href="03-agenda/index.html" aria-labelledby="t03"></a>
       <div class="idea__num">03</div>
@@ -238,7 +262,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#b8452b">
       <a class="idea__hit" href="04-inventario/index.html" aria-labelledby="t04"></a>
       <div class="idea__num">04</div>
@@ -261,7 +284,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#A81E12">
       <a class="idea__hit" href="05-contratos/index.html" aria-labelledby="t05"></a>
       <div class="idea__num">05</div>
@@ -284,7 +306,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#B2432A">
       <a class="idea__hit" href="06-arriendos/index.html" aria-labelledby="t06"></a>
       <div class="idea__num">06</div>
@@ -307,7 +328,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#D9F02B">
       <a class="idea__hit" href="07-terreno/index.html" aria-labelledby="t07"></a>
       <div class="idea__num">07</div>
@@ -330,7 +350,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#A8232E">
       <a class="idea__hit" href="08-laboral/index.html" aria-labelledby="t08"></a>
       <div class="idea__num">08</div>
@@ -353,7 +372,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#D8461B">
       <a class="idea__hit" href="09-despacho/index.html" aria-labelledby="t09"></a>
       <div class="idea__num">09</div>
@@ -376,7 +394,6 @@ body {
         </nav>
       </div>
     </article>
-
     <article class="idea" style="--accent:#c1391c">
       <a class="idea__hit" href="10-contabilidad/index.html" aria-labelledby="t10"></a>
       <div class="idea__num">10</div>
@@ -399,6 +416,128 @@ body {
         </nav>
       </div>
     </article>
+    </div>
+  </section>
+  <section class="fam">
+    <header class="fam__head">
+      <h2>Minería</h2>
+      <p>El comprador tiene plata y miedo, pero compra lento: piloto, homologación, procurement. Por eso cuatro de las cinco no le venden a la minera, sino a la contratista que ya está adentro.</p>
+      <span class="fam__n mono">5</span>
+    </header>
+    <div class="grid">
+
+    <article class="idea" style="--accent:#FFB000">
+      <a class="idea__hit" href="11-correas/index.html" aria-labelledby="t11"></a>
+      <div class="idea__num">11</div>
+      <div class="idea__body">
+        <h2 class="idea__brand" id="t11">Cintavia</h2>
+        <p class="idea__domain">cintavia.com<span class="idea__free">libre</span></p>
+        <p class="idea__tagline">La correa, kilómetro a kilómetro.</p>
+        <p class="idea__problem">Kilómetros de correa se inspeccionan con un tipo caminando con una linterna: se detecta tarde o se detecta cuando ya se cortó. Un polín trabado que roza la cinta un turno completo cuesta US$1,4 M de planta detenida, y es causa reconocida de incendio de correa.</p>
+        <dl class="idea__meta">
+          <div><dt>Rubro</dt><dd>Minería · confiabilidad de correas transportadoras</dd></div>
+          <div><dt>Mercado</dt><dd>Chile (laboratorio) → Perú, Brasil, Australia (el mercado de verdad)</dd></div>
+          <div><dt>Precio</dt><dd>Desde $890.000/mes (Ronda) · $3.900.000 (Faena) · desde $8.400.000 (Cinturón) · habilitación $2.250.000/estación o comodato +35%</dd></div>
+        </dl>
+        <nav class="idea__links" aria-label="Cintavia">
+          <a href="11-correas/index.html">Producto</a>
+          <a href="11-correas/demo/index.html" class="is-demo">Demo</a>
+          <a href="11-correas/negocio.html">Negocio</a>
+          <a href="11-correas/roadmap.html">Roadmap</a>
+          <a href="11-correas/stack.html">Arquitectura</a>
+        </nav>
+      </div>
+    </article>
+    <article class="idea" style="--accent:#FFD100">
+      <a class="idea__hit" href="12-seguridad/index.html" aria-labelledby="t12"></a>
+      <div class="idea__num">12</div>
+      <div class="idea__body">
+        <h2 class="idea__brand" id="t12">Cuasio</h2>
+        <p class="idea__domain">cuasio.com<span class="idea__free">libre</span></p>
+        <p class="idea__tagline">El casi-accidente es el único aviso que vas a recibir. Captúralo en 30 segundos.</p>
+        <p class="idea__problem">El casi-accidente es la señal temprana que avisa antes de la muerte, y es justo la que se pierde: reportarlo es un trámite de veinte minutos al final del turno y a nadie le pagan por hacerlo.</p>
+        <dl class="idea__meta">
+          <div><dt>Rubro</dt><dd>Seguridad y gestión de riesgos para minería</dd></div>
+          <div><dt>Mercado</dt><dd>Chile → minería de LatAm</dd></div>
+          <div><dt>Precio</dt><dd>Desde $190.000/mes</dd></div>
+        </dl>
+        <nav class="idea__links" aria-label="Cuasio">
+          <a href="12-seguridad/index.html">Producto</a>
+          <a href="12-seguridad/demo/index.html" class="is-demo">Demo</a>
+          <a href="12-seguridad/negocio.html">Negocio</a>
+          <a href="12-seguridad/roadmap.html">Roadmap</a>
+          <a href="12-seguridad/stack.html">Arquitectura</a>
+        </nav>
+      </div>
+    </article>
+    <article class="idea" style="--accent:#22C3AC">
+      <a class="idea__hit" href="13-contratistas/index.html" aria-labelledby="t13"></a>
+      <div class="idea__num">13</div>
+      <div class="idea__body">
+        <h2 class="idea__brand" id="t13">Torniqua</h2>
+        <p class="idea__domain">torniqua.com<span class="idea__free">libre</span></p>
+        <p class="idea__tagline">PASA o NO PASA en un segundo, con el motivo exacto y la ruta para arreglarlo.</p>
+        <p class="idea__problem">A las 06:12 el bus llegó a la portería y cuatro no pueden entrar: a uno se le venció el examen de altura geográfica hace tres días y nadie lo vio, porque las vigencias viven en una planilla que nadie mira.</p>
+        <dl class="idea__meta">
+          <div><dt>Rubro</dt><dd>Compliance y control de acceso · Minería</dd></div>
+          <div><dt>Mercado</dt><dd>Chile (Antofagasta / Calama) → construcción y energía → Perú</dd></div>
+          <div><dt>Precio</dt><dd>Desde $69.000/mes · plan Faena $189.000/mes · lector de portería para la minera: $0</dd></div>
+        </dl>
+        <nav class="idea__links" aria-label="Torniqua">
+          <a href="13-contratistas/index.html">Producto</a>
+          <a href="13-contratistas/demo/index.html" class="is-demo">Demo</a>
+          <a href="13-contratistas/negocio.html">Negocio</a>
+          <a href="13-contratistas/roadmap.html">Roadmap</a>
+          <a href="13-contratistas/stack.html">Arquitectura</a>
+        </nav>
+      </div>
+    </article>
+    <article class="idea" style="--accent:#56d7ef">
+      <a class="idea__hit" href="14-permisos/index.html" aria-labelledby="t14"></a>
+      <div class="idea__num">14</div>
+      <div class="idea__body">
+        <h2 class="idea__brand" id="t14">Cianota</h2>
+        <p class="idea__domain">cianota.com<span class="idea__free">libre</span></p>
+        <p class="idea__tagline">La ruta crítica de tus permisos, en un solo plano.</p>
+        <p class="idea__problem">Un permiso se atrasa un mes, arrastra a otros cuatro y la puesta en marcha se corre tres meses — y nadie tenía el grafo de dependencias para verlo venir.</p>
+        <dl class="idea__meta">
+          <div><dt>Rubro</dt><dd>RegTech industrial · permitología de proyectos</dd></div>
+          <div><dt>Mercado</dt><dd>Chile → Perú, Brasil, LatAm</dd></div>
+          <div><dt>Precio</dt><dd>Desde $890.000/mes</dd></div>
+        </dl>
+        <nav class="idea__links" aria-label="Cianota">
+          <a href="14-permisos/index.html">Producto</a>
+          <a href="14-permisos/demo/index.html" class="is-demo">Demo</a>
+          <a href="14-permisos/negocio.html">Negocio</a>
+          <a href="14-permisos/roadmap.html">Roadmap</a>
+          <a href="14-permisos/stack.html">Arquitectura</a>
+        </nav>
+      </div>
+    </article>
+    <article class="idea" style="--accent:#3F9BD6">
+      <a class="idea__hit" href="15-agua/index.html" aria-labelledby="t15"></a>
+      <div class="idea__num">15</div>
+      <div class="idea__body">
+        <h2 class="idea__brand" id="t15">Freatia</h2>
+        <p class="idea__domain">freatia.com<span class="idea__free">libre</span></p>
+        <p class="idea__tagline">El balance hídrico de la faena, cuadrado y auditable — y cuando no cuadra, te dice cuánto falta y dónde buscarlo.</p>
+        <p class="idea__problem">El balance hídrico de la faena vive en una planilla que arma una sola persona con datos de sensores, PDF y lecturas a mano. Cuando no cuadra —y casi nunca cuadra— nadie sabe si faltan 40 l/s porque un caudalímetro está descalibrado o porque el muro del tranque está filtrando. El reporte al regulador y a la comunidad se arma a última hora, sin trazabilidad, y una discrepancia que nadie miró es a la vez una multa de la SMA y el primer síntoma de una falla geotécnica.</p>
+        <dl class="idea__meta">
+          <div><dt>Rubro</dt><dd>SaaS industrial · Gestión hídrica y monitoreo de depósitos de relaves</dd></div>
+          <div><dt>Mercado</dt><dd>Chile (norte: Antofagasta, Atacama, Tarapacá) → Perú, Brasil, Australia</dd></div>
+          <div><dt>Precio</dt><dd>Cuenca $2.900.000/mes · Tranque $4.900.000/mes · Corporativo desde $9.800.000/mes · Implementación $12.000.000–$28.000.000 por única vez</dd></div>
+        </dl>
+        <nav class="idea__links" aria-label="Freatia">
+          <a href="15-agua/index.html">Producto</a>
+          <a href="15-agua/demo/index.html" class="is-demo">Demo</a>
+          <a href="15-agua/negocio.html">Negocio</a>
+          <a href="15-agua/roadmap.html">Roadmap</a>
+          <a href="15-agua/stack.html">Arquitectura</a>
+        </nav>
+      </div>
+    </article>
+    </div>
+  </section>
   </main>
 
   <footer class="colofon">

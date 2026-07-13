@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianota — demo: Proyecto Sierra Ancha</title>
+<meta name="description" content="Demo de Cianota: el grafo de permisos del proyecto, la ruta crítica, el reloj legal de cada servicio y el lector de ICSARA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* ── barra de proyecto ── */
+  .proy {
+    border-bottom: 1px solid var(--linea);
+    background: var(--hueco);
+    padding-block: var(--sp-s);
+  }
+  .proy-tit { display: flex; flex-wrap: wrap; gap: var(--sp-xs); align-items: baseline; }
+  .proy-tit h1 { font-size: var(--step-1); }
+  .kpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-s);
+    margin-top: var(--sp-s);
+  }
+  @media (min-width: 48em) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpi { border-left: 2px solid var(--linea); padding-left: 0.7rem; }
+  .kpi-et {
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-3); display: block;
+  }
+  .kpi-v {
+    font-family: var(--cond); font-weight: 700; font-size: var(--step-2);
+    color: var(--tinta); line-height: 1.1; display: block;
+  }
+  .kpi-v.malo { color: var(--critico); }
+  .kpi-v.bien { color: var(--ok); }
+  .kpi-p { font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3); display: block; }
+  .kpi.vivo { border-left-color: var(--critico); }
+
+  /* ── pestañas ── */
+  .tabs { display: flex; border-bottom: 1px solid var(--linea); margin-top: var(--sp-m); }
+  .tab {
+    flex: 1;
+    font-family: var(--mono); font-size: var(--step--1);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--tinta-3);
+    padding: 0.75rem 0.4rem;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab[aria-selected="true"] { color: var(--cian); border-bottom-color: var(--cian); background: var(--cian-op); }
+  .panel[hidden] { display: none; }
+
+  /* ── simulador ── */
+  .sim-caja { margin-block: var(--sp-m); }
+  .sim-fila { display: grid; gap: var(--sp-s); }
+  @media (min-width: 52em) { .sim-fila { grid-template-columns: 1.4fr 1.6fr auto; align-items: end; } }
+  label.et {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-3);
+    display: block; margin-bottom: 0.35rem;
+  }
+  select {
+    width: 100%;
+    background: var(--hueco);
+    border: 1px solid var(--linea);
+    color: var(--tinta);
+    padding: 0.65rem 0.6rem;
+    min-height: 46px;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 44px; background: transparent; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--linea); }
+  input[type=range]::-moz-range-track { height: 2px; background: var(--linea); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 26px; margin-top: -12px; background: var(--cian); border: 0;
+  }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 26px; background: var(--cian); border: 0; border-radius: 0; }
+  .rango-cab { display: flex; justify-content: space-between; align-items: baseline; }
+  .rango-val { font-family: var(--mono); font-size: var(--step-0); color: var(--cian); }
+
+  /* ── selector de vista ── */
+  .vistas { display: flex; gap: 1px; margin-bottom: var(--sp-s); flex-wrap: wrap; }
+  .vista {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--tinta-3); border: 1px solid var(--linea); padding: 0.5rem 0.8rem;
+    min-height: 44px;
+  }
+  .vista[aria-pressed="true"] { color: var(--plano); background: var(--cian); border-color: var(--cian); }
+
+  /* ── lienzo del grafo ── */
+  .lienzo { background: var(--hueco); border: 1px solid var(--linea-df); }
+  .lienzo svg { display: block; }
+  /* El plano no se encoge: se dibuja 1:1 y se recorre, como una lámina en la mesa.
+     Encogerlo para que "quepa" es exactamente lo que hace ilegible un plano. */
+  #vista-plano .lienzo { overflow-x: auto; }
+  #vista-plano svg { max-width: none; }
+  /* La espina vertical sí escala al ancho, pero no se agranda sin sentido. */
+  #vista-ruta svg { max-width: 560px; margin-inline: auto; }
+  .nodo { cursor: pointer; }
+  .nodo:focus { outline: none; }
+  .nodo:focus-visible rect.marco { stroke: #fff; stroke-width: 2.5; }
+  .nodo rect.marco { transition: fill 0.12s; }
+  .nodo:hover rect.marco { fill: #163653; }
+
+  /* ── detalle de nodo ── */
+  .detalle { margin-top: var(--sp-s); }
+  .detalle dl { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-xs) var(--sp-s); margin-top: var(--sp-s); }
+  @media (min-width: 48em) { .detalle dl { grid-template-columns: repeat(4, 1fr); } }
+  .detalle dt {
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--tinta-3);
+  }
+  .detalle dd { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta); }
+
+  /* ── relojes ── */
+  .barra-reloj { width: 100%; height: 8px; display: block; }
+
+  /* ── lector ── */
+  .doc {
+    display: flex; gap: var(--sp-s); align-items: flex-start;
+    border: 1px solid var(--linea-df); background: var(--panel);
+    padding: var(--sp-s); width: 100%; text-align: left; min-height: 44px;
+  }
+  .doc[aria-pressed="true"] { border-color: var(--cian); background: var(--panel-2); }
+  .doc svg { flex: none; margin-top: 2px; }
+  .consola {
+    background: #030b14; border: 1px solid var(--linea-df);
+    font-family: var(--mono); font-size: 0.78rem; color: var(--tinta-3);
+    padding: var(--sp-s); min-height: 8.5rem; line-height: 1.7;
+  }
+  .consola b { color: var(--cian); font-weight: 400; }
+  .obs { border: 1px solid var(--linea-df); background: var(--panel); padding: var(--sp-s); }
+  .obs + .obs { margin-top: var(--sp-2xs); }
+  .obs-cab { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); align-items: center; justify-content: space-between; }
+  .obs-cod { font-family: var(--mono); font-size: 0.75rem; color: var(--cian); }
+  .obs-txt { font-size: var(--step--1); margin-block: 0.45rem; }
+  .obs-ev {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3);
+    border-left: 2px solid var(--linea); padding-left: 0.6rem; line-height: 1.6;
+  }
+  .obs-ev.falta { border-left-color: var(--critico); color: #f0a9a5; }
+  .obs-ev.parcial { border-left-color: var(--alerta); }
+  .obs-ev.ok { border-left-color: var(--ok); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav-fila">
+      <a class="marca" href="../index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+          <circle cx="4" cy="4" r="2.2"/><circle cx="18" cy="4" r="2.2"/>
+          <circle cx="11" cy="11" r="2.2"/><circle cx="4" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>
+          <path d="M5.6 5.6 9.4 9.4M16.4 5.6 12.6 9.4M9.4 12.6 5.6 16.4M12.6 12.6l3.8 3.8"/>
+        </svg>
+        Cianota
+      </a>
+      <button class="nav-btn" aria-expanded="false" aria-controls="nav-menu">MENÚ</button>
+    </div>
+    <nav id="nav-menu" class="nav-menu" aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════ BARRA DE PROYECTO -->
+<div class="proy">
+  <div class="container">
+    <div class="proy-tit">
+      <h1>Sierra Ancha — Expansión Fase III</h1>
+      <span class="chip chip-curso">EIA en evaluación</span>
+    </div>
+    <p class="nota" style="margin-top:0.3rem">
+      Compañía Minera Altoandina SpA · RUT 76.543.210-K · Calama, Región de Antofagasta · 4.050 m s.n.m. · Inversión US$ 1.240 M · Hoy: 13-jul-2026
+    </p>
+
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi-et">Puesta en marcha</span>
+        <span class="kpi-v" id="k-cod">—</span>
+        <span class="kpi-p" id="k-cod-base">base 12-oct-2029</span>
+      </div>
+      <div class="kpi" id="k-desl-caja">
+        <span class="kpi-et">Deslizamiento</span>
+        <span class="kpi-v" id="k-desl">—</span>
+        <span class="kpi-p">vs. plan vigente</span>
+      </div>
+      <div class="kpi" id="k-costo-caja">
+        <span class="kpi-et">Costo de la demora</span>
+        <span class="kpi-v" id="k-costo">—</span>
+        <span class="kpi-p">a US$ 355.000/día</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-et">Permisos en el grafo</span>
+        <span class="kpi-v">26</span>
+        <span class="kpi-p" id="k-critico">11 en la ruta crítica</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+  <div class="tabs" role="tablist" aria-label="Vistas del proyecto">
+    <button class="tab" role="tab" id="tab-plano" aria-selected="true" aria-controls="p-plano">Plano</button>
+    <button class="tab" role="tab" id="tab-relojes" aria-selected="false" aria-controls="p-relojes">Relojes</button>
+    <button class="tab" role="tab" id="tab-lector" aria-selected="false" aria-controls="p-lector">Lector</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ PANEL 1 — PLANO -->
+  <section class="panel" id="p-plano" role="tabpanel" aria-labelledby="tab-plano">
+
+    <div class="caja sim-caja">
+      <p class="rotulo" style="margin-bottom:var(--sp-s)">Simulador — ¿qué pasa si esto se atrasa?</p>
+      <div class="sim-fila">
+        <div>
+          <label class="et" for="sel-nodo">Permiso o actividad</label>
+          <select id="sel-nodo"></select>
+        </div>
+        <div>
+          <div class="rango-cab">
+            <label class="et" for="sel-dias">Atraso</label>
+            <span class="rango-val"><span id="sel-dias-v">0</span> días corridos</span>
+          </div>
+          <input type="range" id="sel-dias" min="0" max="120" step="5" value="0">
+        </div>
+        <div>
+          <button class="btn btn-fantasma" id="btn-reset" style="width:100%">Volver al plan</button>
+        </div>
+      </div>
+      <p class="nota" id="sim-msg" aria-live="polite" style="margin-top:var(--sp-xs)"></p>
+    </div>
+
+    <div class="vistas" role="group" aria-label="Vista del grafo">
+      <button class="vista" id="v-plano" aria-pressed="true">Plano</button>
+      <button class="vista" id="v-ruta" aria-pressed="false">Ruta crítica</button>
+      <button class="vista" id="v-lista" aria-pressed="false">Lista</button>
+    </div>
+
+    <div id="vista-plano">
+      <p class="nota" style="margin-bottom:var(--sp-2xs)">Desliza el plano para recorrerlo. Toca un nodo para ver su ficha. La cadena en cian es la ruta crítica.</p>
+      <div class="lienzo scroll-x" id="lienzo-plano"></div>
+    </div>
+
+    <div id="vista-ruta" hidden>
+      <p class="nota" style="margin-bottom:var(--sp-2xs)">La cadena que manda la fecha de puesta en marcha, de arriba hacia abajo. Es la misma información del plano, en un ancho de teléfono.</p>
+      <div class="lienzo" id="lienzo-ruta"></div>
+    </div>
+
+    <div id="vista-lista" hidden>
+      <div class="scroll-x">
+        <table id="tabla-lista">
+          <thead>
+            <tr>
+              <th>Permiso / actividad</th>
+              <th>Servicio</th>
+              <th>Requiere</th>
+              <th class="num">Holgura</th>
+              <th>Término</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="caja detalle" id="detalle" hidden></div>
+
+    <div class="filas" style="margin-top:var(--sp-s);font-family:var(--mono);font-size:0.72rem;color:var(--tinta-3)">
+      <span><span class="chip chip-ok">Aprobado</span></span>
+      <span><span class="chip chip-curso">En trámite</span></span>
+      <span><span class="chip chip-alerta">En el titular</span></span>
+      <span><span class="chip chip-critico">Servicio en mora</span></span>
+      <span><span class="chip chip-neutro">Pendiente de ingreso</span></span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ PANEL 2 — RELOJES -->
+  <section class="panel" id="p-relojes" role="tabpanel" aria-labelledby="tab-relojes" hidden>
+    <div class="aviso aviso-critico" style="margin-block:var(--sp-m)">
+      <strong class="malo">La DGA está en mora.</strong> El traslado del punto de captación se ingresó el 12-nov-2025.
+      Con la estimación de plazo que manejamos (60 días hábiles, <span class="chip chip-validar">por validar</span>),
+      el servicio lleva <strong id="mora-dias">—</strong> días hábiles de exceso.
+      La Ley 19.880 (art. 27) fija que un procedimiento administrativo no debería exceder los 6 meses
+      <span class="chip chip-validar">verificar aplicación al caso</span>.
+      <br><br>
+      <em>Acción sugerida:</em> presentar solicitud de pronunciamiento con la certificación del cómputo que emite Cianota.
+      Este permiso hoy tiene 140 días de holgura — es decir, todavía no te está costando plata. Cuando la pierda, ya será tarde.
+    </div>
+
+    <p class="rotulo">Cómputo en días hábiles — feriados de Chile incluidos</p>
+    <div class="scroll-x">
+      <table id="tabla-relojes">
+        <thead>
+          <tr>
+            <th>Trámite</th>
+            <th>Servicio</th>
+            <th>Estado</th>
+            <th>Ingreso</th>
+            <th class="num">Plazo</th>
+            <th class="num">Transcurrido</th>
+            <th style="width:9rem">Reloj</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-s)">
+      El cómputo de días hábiles descuenta sábados, domingos y feriados legales. Las suspensiones (por ejemplo, mientras
+      la pelota está en el titular respondiendo un ICSARA) se descuentan del reloj del servicio y se suman al del titular.
+      <br>Los plazos marcados <span class="chip chip-validar">por validar</span> son estimaciones observadas, no norma citada.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ PANEL 3 — LECTOR -->
+  <section class="panel" id="p-lector" role="tabpanel" aria-labelledby="tab-lector" hidden>
+
+    <div class="rejilla rejilla-2" style="margin-block:var(--sp-m)">
+      <div class="stack">
+        <p class="rotulo">1 — Documento recibido</p>
+        <button class="doc" id="doc-1" aria-pressed="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+            <path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h4.5"/>
+          </svg>
+          <span>
+            <strong style="display:block;color:var(--tinta)">ICSARA Complementario — Res. Ex. N° 0417/2026</strong>
+            <span class="nota">SEA Región de Antofagasta · recibido 06-jul-2026 · 92 páginas · 9 observaciones</span>
+          </span>
+        </button>
+        <p class="nota">
+          Plazo para ingresar la Adenda complementaria: el titular solicitó suspensión del cómputo
+          <span class="chip chip-validar">plazo aplicable por validar</span>.
+          En el plan vigente, la Adenda se entrega el <strong class="acento">30-ago-2026</strong>.
+        </p>
+        <button class="btn btn-solido" id="btn-leer">Leer el documento →</button>
+      </div>
+
+      <div>
+        <p class="rotulo">2 — Extracción</p>
+        <div class="consola" id="consola" aria-live="polite">
+          <span class="tenue">Esperando documento…</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultado" hidden>
+      <p class="rotulo">3 — Qué te están pidiendo, y qué del expediente ya lo responde</p>
+      <div class="rejilla rejilla-4" style="margin-bottom:var(--sp-m)">
+        <div class="metrica"><span class="metrica-et">Observaciones</span><span class="metrica-valor">9</span></div>
+        <div class="metrica"><span class="metrica-et">Ya respondidas</span><span class="metrica-valor bien">4</span><span class="metrica-pie">con cita al expediente</span></div>
+        <div class="metrica"><span class="metrica-et">Parciales</span><span class="metrica-valor" style="color:var(--alerta)">2</span></div>
+        <div class="metrica"><span class="metrica-et">Sin respuesta</span><span class="metrica-valor malo">3</span></div>
+      </div>
+
+      <div id="obs-lista"></div>
+
+      <div class="caja" style="margin-top:var(--sp-m);border-color:var(--critico)">
+        <p class="rotulo" style="color:var(--critico);margin-bottom:var(--sp-xs)">Lo que esto le hace a tu fecha</p>
+        <p>La observación <strong>4.2</strong> exige dos campañas de monitoreo estacional. No están en el expediente y no se
+        pueden fabricar: hay que ir a terreno en estiaje y en época estival. Cianota estima que la Adenda complementaria
+        no se puede ingresar antes del <strong class="malo">14-oct-2026</strong>: <strong class="malo">45 días</strong> más
+        tarde que el plan.</p>
+        <p style="margin-top:var(--sp-s)">La Adenda tiene 9 días de holgura. Estos son 45.</p>
+        <button class="btn btn-solido" id="btn-aplicar" style="margin-top:var(--sp-s)">Aplicar al plano y ver el impacto →</button>
+        <p class="nota" id="aplicado" hidden style="margin-top:var(--sp-s)"></p>
+      </div>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-l)">
+      En el producto real, este panel llama a Claude Opus 4.8 con el ICSARA y con un índice del expediente; el emparejamiento
+      observación ↔ documento lo hace Claude Sonnet 5 sobre los fragmentos recuperados. En esta demo la extracción está
+      pre-computada: no hay llamada a la API. Los detalles están en <a href="../stack.html">Arquitectura</a>.
+    </p>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p>Demo con datos ficticios. Los servicios, permisos y procedimientos son reales; lo que no nos consta va marcado <span class="chip chip-validar">por validar</span> · <a href="../index.html">Volver al producto</a></p>
+  </div>
+</footer>
+
+<script src="../nav.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   MOTOR — aritmética de días hábiles, compuertas de sesión, ventanas de
+   terreno y ruta crítica. Determinista. Ningún LLM calcula una fecha aquí.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+var HOY = '2026-07-13';
+var COSTO_DIA = 355000;   // US$/día — derivación en ../index.html#costo
+
+var FERIADOS = {
+  '2025-04-18':1,'2025-05-01':1,'2025-05-21':1,'2025-06-20':1,'2025-06-29':1,'2025-07-16':1,
+  '2025-08-15':1,'2025-09-18':1,'2025-09-19':1,'2025-10-12':1,'2025-10-31':1,'2025-11-01':1,
+  '2025-12-08':1,'2025-12-25':1,
+  '2026-01-01':1,'2026-04-03':1,'2026-05-01':1,'2026-05-21':1,'2026-06-29':1,'2026-07-16':1,
+  '2026-08-15':1,'2026-09-18':1,'2026-09-19':1,'2026-10-12':1,'2026-10-31':1,'2026-11-01':1,
+  '2026-12-08':1,'2026-12-25':1,
+  '2027-01-01':1,'2027-03-26':1,'2027-05-01':1,'2027-05-21':1,'2027-06-21':1,'2027-06-28':1,
+  '2027-07-16':1,'2027-08-15':1,'2027-09-17':1,'2027-09-18':1,'2027-10-11':1,'2027-10-31':1,
+  '2027-11-01':1,'2027-12-08':1,'2027-12-25':1,
+  '2028-01-01':1,'2028-04-14':1,'2028-05-01':1,'2028-05-21':1,'2028-06-26':1,'2028-06-30':1,
+  '2028-07-16':1,'2028-08-15':1,'2028-09-18':1,'2028-09-19':1,'2028-10-09':1,'2028-10-31':1,
+  '2028-11-01':1,'2028-12-08':1,'2028-12-25':1,
+  '2029-01-01':1,'2029-03-30':1,'2029-05-01':1,'2029-05-21':1,'2029-06-25':1,'2029-06-29':1,
+  '2029-07-16':1,'2029-08-15':1,'2029-09-18':1,'2029-09-19':1,'2029-10-15':1,'2029-10-31':1,
+  '2029-11-01':1,'2029-12-08':1,'2029-12-25':1,
+  '2030-01-01':1,'2030-04-19':1,'2030-05-01':1,'2030-05-21':1
+};
+/* Calendario de feriados aproximado a las leyes vigentes. En producción lo
+   mantiene el catálogo normativo, no una constante en el código. */
+
+function iso(d) { return d.toISOString().slice(0, 10); }
+function parse(s) { var p = s.split('-'); return new Date(Date.UTC(+p[0], p[1] - 1, +p[2])); }
+function addDias(d, n) { var x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
+function esHabil(d) { var w = d.getUTCDay(); return w !== 0 && w !== 6 && !FERIADOS[iso(d)]; }
+function addHabiles(d, n) { var x = new Date(d), c = 0; while (c < n) { x = addDias(x, 1); if (esHabil(x)) c++; } return x; }
+function diffHabiles(a, b) { var x = new Date(a), c = 0; while (x < b) { x = addDias(x, 1); if (esHabil(x)) c++; } return c; }
+function diffDias(a, b) { return Math.round((b - a) / 86400000); }
+
+/* sesión mensual: n-ésimo miércoles del mes (compuerta de tabla) */
+function nthMiercoles(anio, mes, n) {
+  var d = new Date(Date.UTC(anio, mes, 1)), c = 0;
+  while (true) { if (d.getUTCDay() === 3) { c++; if (c === n) return d; } d = addDias(d, 1); }
+}
+function proximaSesion(desde, n) {
+  var anio = desde.getUTCFullYear(), mes = desde.getUTCMonth();
+  for (var i = 0; i < 30; i++) {
+    var s = nthMiercoles(anio, mes, n);
+    if (s >= desde) return s;
+    mes++; if (mes > 11) { mes = 0; anio++; }
+  }
+  return desde;
+}
+/* ventana de terreno cerrada (MM-DD → MM-DD, cruza el año) */
+function cerrada(d, v) {
+  var md = iso(d).slice(5);
+  return v.desde <= v.hasta ? (md >= v.desde && md <= v.hasta) : (md >= v.desde || md <= v.hasta);
+}
+function apertura(d, v) { var x = new Date(d); for (var i = 0; i < 800; i++) { if (!cerrada(x, v)) return x; x = addDias(x, 1); } return x; }
+
+var MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function fecha(d) { return d.getUTCDate() + '-' + MES[d.getUTCMonth()] + '-' + d.getUTCFullYear(); }
+function fechaCorta(d) { return String(d.getUTCDate()).padStart(2,'0') + '-' + MES[d.getUTCMonth()] + '-' + String(d.getUTCFullYear()).slice(2); }
+function usd(n) {
+  if (n === 0) return 'US$ 0';
+  if (n >= 1e6) return 'US$ ' + (n / 1e6).toFixed(1).replace('.', ',') + ' M';
+  return 'US$ ' + Math.round(n / 1000) + ' mil';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL EXPEDIENTE — Proyecto Sierra Ancha. Datos ficticios; servicios reales.
+   plazo.estado: 'confirmado' cuando la norma está citada; 'validar' cuando es
+   una estimación observada. NUNCA se presenta una estimación como si fuera ley.
+   ══════════════════════════════════════════════════════════════════════════ */
+var NODOS = [
+  { id:'sng-sondajes', nom:'Aprobación de sondajes de reconocimiento', srv:'SERNAGEOMIN', dur:0, u:'corridos', deps:[], inicio:'2025-04-22',
+    estado:'aprobado', norma:'DS 132 — Reglamento de Seguridad Minera', plazo:null, ingreso:'2024-11-05' },
+
+  { id:'adenda', nom:'Adenda complementaria (respuesta al ICSARA)', srv:'Titular', dur:55, u:'corridos', deps:[], inicio:'2026-07-06',
+    estado:'titular', norma:'Ley 19.300 / DS 40', plazo:{ dias:null, estado:'validar', txt:'suspensión solicitada' }, ingreso:null },
+
+  { id:'dga-traslado', nom:'Traslado del punto de captación de aguas', srv:'DGA', dur:220, u:'habiles', deps:[], inicio:'2025-11-12',
+    estado:'mora', norma:'Código de Aguas, art. 163', plazo:{ dias:60, estado:'validar' }, ingreso:'2025-11-12' },
+
+  { id:'consulta', nom:'Consulta indígena (Convenio 169 OIT)', srv:'SEA', dur:110, u:'habiles', deps:['adenda'],
+    estado:'pendiente', norma:'DS 66 / DS 40, art. 85', plazo:{ dias:110, estado:'validar' } },
+
+  { id:'pas-relaves', nom:'PAS depósito de relaves — contenido técnico', srv:'SERNAGEOMIN', dur:40, u:'habiles', deps:['adenda','sng-sondajes'],
+    estado:'pendiente', norma:'DS 40 (PAS) + DS 248', plazo:{ dias:40, estado:'validar' } },
+
+  { id:'pas-agua', nom:'PAS obras hidráulicas — contenido técnico', srv:'DGA', dur:70, u:'habiles', deps:['adenda'],
+    estado:'pendiente', norma:'DS 40 (PAS) + Código de Aguas', plazo:{ dias:70, estado:'validar' } },
+
+  { id:'pas-arqueo', nom:'PAS intervención arqueológica — contenido técnico', srv:'Consejo de Monumentos', dur:35, u:'habiles', deps:['adenda'],
+    estado:'pendiente', norma:'Ley 17.288', plazo:{ dias:35, estado:'validar' } },
+
+  { id:'pas-xero', nom:'PAS formaciones xerofíticas', srv:'CONAF', dur:30, u:'habiles', deps:['adenda'],
+    estado:'pendiente', norma:'Ley 20.283', plazo:{ dias:30, estado:'validar' } },
+
+  { id:'pas-fauna', nom:'PAS rescate y relocalización de fauna', srv:'SAG', dur:30, u:'habiles', deps:['adenda'],
+    estado:'pendiente', norma:'Ley 19.473', plazo:{ dias:30, estado:'validar' } },
+
+  { id:'ice', nom:'Informe Consolidado de Evaluación (ICE)', srv:'SEA', dur:35, u:'habiles',
+    deps:['consulta','pas-relaves','pas-agua','pas-arqueo','pas-xero','pas-fauna'],
+    estado:'pendiente', norma:'Ley 19.300, art. 9 bis', plazo:{ dias:35, estado:'validar' } },
+
+  { id:'rca', nom:'Calificación ambiental — RCA', srv:'Comisión de Evaluación', dur:5, u:'habiles', deps:['ice'], gate:2,
+    estado:'pendiente', norma:'Ley 19.300, art. 15 — EIA: 120 días hábiles',
+    plazo:{ dias:120, estado:'confirmado' },
+    compuerta:'La Comisión sesiona una vez al mes (2° miércoles). Si el ICE llega después de la tabla, esperas al mes siguiente. Cadencia por validar.' },
+
+  { id:'cmn-permiso', nom:'Permiso de intervención arqueológica (ejecución)', srv:'Consejo de Monumentos', dur:30, u:'habiles', deps:['rca','pas-arqueo'], gate:1,
+    estado:'pendiente', norma:'Ley 17.288 / DS 484', plazo:{ dias:30, estado:'validar' },
+    compuerta:'El Consejo sesiona mensualmente. Cadencia por validar.' },
+
+  { id:'sng-relaves', nom:'Aprobación del proyecto de depósito de relaves', srv:'SERNAGEOMIN', dur:60, u:'habiles', deps:['rca','pas-relaves'],
+    estado:'pendiente', norma:'DS 248/2006', plazo:{ dias:60, estado:'validar' } },
+
+  { id:'sng-metodo', nom:'Aprobación del método de explotación', srv:'SERNAGEOMIN', dur:45, u:'habiles', deps:['rca'],
+    estado:'pendiente', norma:'DS 132 — Reglamento de Seguridad Minera', plazo:{ dias:45, estado:'validar' } },
+
+  { id:'dga-obras', nom:'Obras hidráulicas mayores (art. 294 CdA)', srv:'DGA', dur:90, u:'habiles', deps:['rca','pas-agua','dga-traslado'],
+    estado:'pendiente', norma:'Código de Aguas, art. 294', plazo:{ dias:90, estado:'validar' } },
+
+  { id:'conc-maritima', nom:'Concesión marítima — captación de agua de mar', srv:'Subsecretaría para las FF.AA.', dur:380, u:'habiles', deps:['rca'],
+    estado:'tramite', norma:'DFL 340/1960 · Reglamento DS 9/2018', plazo:{ dias:null, estado:'validar', txt:'sin plazo acreditado' }, ingreso:'2026-03-03',
+    nota:'La solicitud está ingresada, pero el otorgamiento requiere la RCA. Es la segunda cadena más apretada del proyecto.' },
+
+  { id:'salud', nom:'Autorización sanitaria (faena, agua potable, RESPEL)', srv:'SEREMI de Salud Antofagasta', dur:40, u:'habiles', deps:['rca'],
+    estado:'pendiente', norma:'Código Sanitario · DS 148/2003', plazo:{ dias:40, estado:'validar' } },
+
+  { id:'arqueo-mov', nom:'Licitación y movilización del equipo arqueológico', srv:'Titular', dur:140, u:'corridos', deps:['cmn-permiso'],
+    estado:'pendiente', norma:null, plazo:null },
+
+  { id:'edificacion', nom:'Permiso de edificación', srv:'DOM Calama', dur:30, u:'habiles', deps:['salud'],
+    estado:'pendiente', norma:'LGUC / OGUC', plazo:{ dias:30, estado:'validar' } },
+
+  { id:'arqueo-terreno', nom:'Campaña de rescate arqueológico en terreno', srv:'Titular', dur:45, u:'corridos', deps:['arqueo-mov'],
+    ventana:{ desde:'12-15', hasta:'01-31' },
+    estado:'pendiente', norma:null, plazo:null,
+    nota:'Restricción de faena, no legal: a 4.050 m no se excava entre el 15-dic y el 31-ene (invierno altiplánico). Configurable por el titular.' },
+
+  { id:'sec', nom:'Declaración de instalación eléctrica TE-4', srv:'SEC', dur:20, u:'habiles', deps:['edificacion'],
+    estado:'pendiente', norma:'Ley 18.410', plazo:{ dias:20, estado:'validar' } },
+
+  { id:'cierre', nom:'Plan de cierre actualizado', srv:'SERNAGEOMIN', dur:60, u:'habiles', deps:['sng-relaves','sng-metodo'],
+    estado:'pendiente', norma:'Ley 20.551', plazo:{ dias:60, estado:'validar' } },
+
+  { id:'arqueo-informe', nom:'Aprobación del informe de rescate arqueológico', srv:'Consejo de Monumentos', dur:40, u:'habiles', deps:['arqueo-terreno'], gate:1,
+    estado:'pendiente', norma:'Ley 17.288', plazo:{ dias:40, estado:'validar' },
+    compuerta:'Sesión mensual del Consejo. Sin este informe aprobado no se libera el área: el movimiento de tierras no parte.' },
+
+  { id:'obra-tierras', nom:'Movimiento de tierras y obras civiles', srv:'Construcción', dur:300, u:'corridos', deps:['arqueo-informe','edificacion','sng-relaves'],
+    estado:'pendiente', norma:null, plazo:null },
+
+  { id:'obra-montaje', nom:'Montaje electromecánico', srv:'Construcción', dur:240, u:'corridos', deps:['obra-tierras','sec','dga-obras','conc-maritima'],
+    estado:'pendiente', norma:null, plazo:null },
+
+  { id:'pem', nom:'Puesta en marcha y autorización de operación', srv:'SERNAGEOMIN + SEREMI de Salud', dur:45, u:'corridos', deps:['obra-montaje','cierre'],
+    estado:'pendiente', norma:'DS 132 · Código Sanitario', plazo:{ dias:45, estado:'validar' } }
+];
+
+/* suspensiones del cómputo (días hábiles que no corren contra el servicio) */
+var SUSPENSIONES = { 'eia': 135 };
+
+var MAPA = {};
+NODOS.forEach(function (n) { MAPA[n.id] = n; });
+
+/* ─────────────────────────────── cálculo ─────────────────────────────── */
+function calcular(atrasos) {
+  var R = {};
+  function visitar(id) {
+    if (R[id]) return;
+    var n = MAPA[id];
+    n.deps.forEach(visitar);
+    var es = n.inicio ? parse(n.inicio) : null, driver = null;
+    for (var i = 0; i < n.deps.length; i++) {
+      var ef = R[n.deps[i]].ef;
+      if (!es || ef > es) { es = ef; driver = n.deps[i]; }
+    }
+    if (!es) es = parse(HOY);
+    var esNatural = es;                       // cuándo podría partir si no hubiera ventana
+    var extra = atrasos[id] || 0;
+    function fin(st) {
+      var e = n.u === 'habiles' ? addHabiles(st, n.dur) : addDias(st, n.dur);
+      return extra ? addDias(e, extra) : e;
+    }
+    var ef2 = fin(es);
+    if (n.ventana) {
+      var g = 0;
+      while ((cerrada(es, n.ventana) || cerrada(ef2, n.ventana)) && g < 10) {
+        es = apertura(cerrada(es, n.ventana) ? es : addDias(ef2, 1), n.ventana);
+        if (cerrada(es, n.ventana)) es = apertura(es, n.ventana);
+        ef2 = fin(es); g++;
+      }
+    }
+    var saltoVentana = !!(n.ventana && es > esNatural);
+    if (n.gate) ef2 = addHabiles(proximaSesion(ef2, n.gate), 3);
+    R[id] = { es: es, ef: ef2, driver: driver, saltoVentana: saltoVentana };
+  }
+  NODOS.forEach(function (n) { visitar(n.id); });
+  return R;
+}
+
+var BASE = calcular({});
+var COD_BASE = BASE['pem'].ef;
+
+/* holgura = días de atraso que aguanta ese nodo sin mover la puesta en marcha */
+var HOLGURA = {};
+NODOS.forEach(function (n) {
+  var h = 0, a = {};
+  for (var d = 1; d <= 150; d++) {
+    a[n.id] = d;
+    if (diffDias(COD_BASE, calcular(a)['pem'].ef) > 0) { h = d - 1; break; }
+    h = d;
+  }
+  HOLGURA[n.id] = h;
+});
+
+/* la sonda llega hasta 150 días: más allá de eso el número deja de ser útil */
+function hTxt(h) { return h >= 150 ? '>150' : String(h); }
+
+/* ruta crítica = la cadena de nodos que determina la fecha final */
+function rutaCritica(R) {
+  var c = 'pem', ch = {};
+  while (c) { ch[c] = 1; c = R[c].driver; }
+  return ch;
+}
+
+/* ─────────────────────────────── estado UI ───────────────────────────── */
+var estado = { atrasos: {}, sel: 'adenda', vista: 'plano', nodoDet: null };
+
+var COLOR = {
+  aprobado: '#3ec98f', tramite: '#56d7ef', titular: '#e0a53a',
+  mora: '#e5544e', pendiente: '#7ea9cc'
+};
+var ETIQUETA = {
+  aprobado: 'Aprobado', tramite: 'En trámite', titular: 'En el titular',
+  mora: 'Servicio en mora', pendiente: 'Pendiente de ingreso'
+};
+var CHIP = {
+  aprobado: 'chip-ok', tramite: 'chip-curso', titular: 'chip-alerta',
+  mora: 'chip-critico', pendiente: 'chip-neutro'
+};
+
+/* capas para el layout del grafo (longest path) */
+var CAPA = {};
+(function () {
+  function prof(id) {
+    if (CAPA[id] !== undefined) return CAPA[id];
+    var n = MAPA[id], p = 0;
+    n.deps.forEach(function (d) { p = Math.max(p, prof(d) + 1); });
+    CAPA[id] = p;
+    return p;
+  }
+  NODOS.forEach(function (n) { prof(n.id); });
+})();
+
+/* ══════════════════════════════ RENDER ══════════════════════════════════ */
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function pintarKPIs(R, crit) {
+  var cod = R['pem'].ef;
+  var desl = diffDias(COD_BASE, cod);
+  document.getElementById('k-cod').textContent = fecha(cod);
+  document.getElementById('k-cod').className = 'kpi-v' + (desl > 0 ? ' malo' : '');
+  var d = document.getElementById('k-desl');
+  d.textContent = desl > 0 ? '+' + desl + ' días' : 'en plan';
+  d.className = 'kpi-v ' + (desl > 0 ? 'malo' : 'bien');
+  var c = document.getElementById('k-costo');
+  c.textContent = usd(desl * COSTO_DIA);
+  c.className = 'kpi-v ' + (desl > 0 ? 'malo' : 'bien');
+  document.getElementById('k-desl-caja').className = 'kpi' + (desl > 0 ? ' vivo' : '');
+  document.getElementById('k-costo-caja').className = 'kpi' + (desl > 0 ? ' vivo' : '');
+  document.getElementById('k-critico').textContent = Object.keys(crit).length + ' en la ruta crítica';
+}
+
+/* ── el plano: grafo por capas ── */
+function pintarPlano(R, crit) {
+  var CW = 200, NW = 168, NH = 52, PITCH = 66, PAD = 16;
+  var porCapa = {};
+  NODOS.forEach(function (n) { (porCapa[CAPA[n.id]] = porCapa[CAPA[n.id]] || []).push(n.id); });
+  var capas = Object.keys(porCapa).map(Number).sort(function (a, b) { return a - b; });
+  var maxFilas = 0;
+  capas.forEach(function (c) { maxFilas = Math.max(maxFilas, porCapa[c].length); });
+
+  var POS = {};
+  capas.forEach(function (c) {
+    var col = porCapa[c];
+    var alturaCol = col.length * PITCH;
+    var y0 = PAD + (maxFilas * PITCH - alturaCol) / 2;
+    col.forEach(function (id, i) {
+      POS[id] = { x: PAD + c * CW, y: y0 + i * PITCH };
+    });
+  });
+
+  var W = PAD * 2 + (capas.length - 1) * CW + NW;
+  var H = PAD * 2 + maxFilas * PITCH + 10;
+
+  var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H +
+    '" role="img" aria-label="Grafo de dependencias de los permisos del proyecto. La ruta crítica está resaltada en cian.">';
+  s += '<defs>';
+  s += '<marker id="ar" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#56d7ef"/></marker>';
+  s += '<marker id="arg" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#456f92"/></marker>';
+  s += '</defs>';
+
+  // aristas
+  NODOS.forEach(function (n) {
+    n.deps.forEach(function (d) {
+      var a = POS[d], b = POS[n.id];
+      var x1 = a.x + NW, y1 = a.y + NH / 2, x2 = b.x, y2 = b.y + NH / 2;
+      var esCrit = crit[n.id] && R[n.id].driver === d;
+      var mx = (x1 + x2) / 2;
+      var path = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ',' + mx + ' ' + y2 + ',' + x2 + ' ' + y2;
+      s += '<path d="' + path + '" fill="none" stroke="' + (esCrit ? '#56d7ef' : '#456f92') + '" stroke-width="' + (esCrit ? 2 : 1) + '" stroke-opacity="' + (esCrit ? 1 : 0.45) + '" marker-end="url(#' + (esCrit ? 'ar' : 'arg') + ')"/>';
+    });
+  });
+
+  // nodos
+  NODOS.forEach(function (n) {
+    var p = POS[n.id], esCrit = crit[n.id], atr = estado.atrasos[n.id] || 0;
+    var borde = atr ? '#e5544e' : (esCrit ? '#56d7ef' : '#456f92');
+    var relleno = esCrit ? '#102a44' : '#0d2136';
+    var nombre = n.nom.length > 30 ? n.nom.slice(0, 29) + '…' : n.nom;
+    s += '<g class="nodo" data-id="' + n.id + '" tabindex="0" role="button" aria-label="' + esc(n.nom) + ', ' + esc(n.srv) + '">';
+    s += '<rect class="marco" x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" fill="' + relleno + '" stroke="' + borde + '" stroke-width="' + (esCrit || atr ? 1.6 : 1) + '"/>';
+    s += '<circle cx="' + (p.x + 9) + '" cy="' + (p.y + 10) + '" r="3" fill="' + COLOR[n.estado] + '"/>';
+    s += '<text x="' + (p.x + 18) + '" y="' + (p.y + 13) + '" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#7ea9cc" letter-spacing="0.05em">' + esc(n.srv.toUpperCase().slice(0, 24)) + '</text>';
+    s += '<text x="' + (p.x + 9) + '" y="' + (p.y + 28) + '" font-family="IBM Plex Sans Condensed, sans-serif" font-weight="600" font-size="10.5" fill="#e8f2fa">' + esc(nombre) + '</text>';
+    s += '<text x="' + (p.x + 9) + '" y="' + (p.y + 43) + '" font-family="IBM Plex Mono, monospace" font-size="8" fill="' + (esCrit ? '#56d7ef' : '#7ea9cc') + '">' + fechaCorta(R[n.id].ef) + '</text>';
+    var h = HOLGURA[n.id];
+    s += '<text x="' + (p.x + NW - 9) + '" y="' + (p.y + 43) + '" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="' + (h === 0 ? '#e5544e' : h < 15 ? '#e0a53a' : '#456f92') + '">h ' + hTxt(h) + 'd</text>';
+    if (atr) s += '<text x="' + (p.x + NW - 9) + '" y="' + (p.y + 13) + '" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="#e5544e">+' + atr + 'd</text>';
+    s += '</g>';
+  });
+  s += '</svg>';
+  document.getElementById('lienzo-plano').innerHTML = s;
+}
+
+/* ── la ruta crítica: espina vertical, pensada para el teléfono ── */
+function pintarRuta(R, crit) {
+  var cadena = [];
+  var c = 'pem';
+  while (c) { cadena.unshift(c); c = R[c].driver; }
+
+  var W = 340, PITCH = 92, PAD = 10;
+  var H = PAD * 2 + cadena.length * PITCH;
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Ruta crítica del proyecto, de la Adenda a la puesta en marcha.">';
+
+  cadena.forEach(function (id, i) {
+    var n = MAPA[id], y = PAD + i * PITCH, atr = estado.atrasos[id] || 0;
+    if (i < cadena.length - 1) {
+      s += '<path d="M28 ' + (y + 62) + ' L28 ' + (y + PITCH + 4) + '" stroke="#56d7ef" stroke-width="2"/>';
+      s += '<path d="M24 ' + (y + PITCH - 2) + ' L28 ' + (y + PITCH + 4) + ' L32 ' + (y + PITCH - 2) + '" fill="#56d7ef"/>';
+    }
+    s += '<circle cx="28" cy="' + (y + 22) + '" r="7" fill="#0d2136" stroke="' + (atr ? '#e5544e' : '#56d7ef') + '" stroke-width="2"/>';
+    s += '<circle cx="28" cy="' + (y + 22) + '" r="2.5" fill="' + COLOR[n.estado] + '"/>';
+
+    var bordeC = atr ? '#e5544e' : '#56d7ef';
+    s += '<g class="nodo" data-id="' + id + '" tabindex="0" role="button" aria-label="' + esc(n.nom) + '">';
+    s += '<rect class="marco" x="48" y="' + (y + 2) + '" width="' + (W - 58) + '" height="62" fill="#102a44" stroke="' + bordeC + '" stroke-width="1.2"/>';
+    s += '<text x="58" y="' + (y + 16) + '" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#7ea9cc" letter-spacing="0.06em">' + esc(n.srv.toUpperCase()) + '</text>';
+    var nom = n.nom.length > 40 ? n.nom.slice(0, 39) + '…' : n.nom;
+    s += '<text x="58" y="' + (y + 32) + '" font-family="IBM Plex Sans Condensed, sans-serif" font-weight="600" font-size="12" fill="#e8f2fa">' + esc(nom) + '</text>';
+    s += '<text x="58" y="' + (y + 50) + '" font-family="IBM Plex Mono, monospace" font-size="9" fill="#56d7ef">término ' + fechaCorta(R[id].ef) + '</text>';
+    var h = HOLGURA[id];
+    s += '<text x="' + (W - 18) + '" y="' + (y + 50) + '" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" fill="' + (h === 0 ? '#e5544e' : h < 15 ? '#e0a53a' : '#7ea9cc') + '">holgura ' + hTxt(h) + ' d</text>';
+    if (atr) s += '<text x="' + (W - 18) + '" y="' + (y + 16) + '" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" fill="#e5544e">+' + atr + ' d</text>';
+    if (R[id].saltoVentana) s += '<text x="58" y="' + (y + 61) + '" font-family="IBM Plex Mono, monospace" font-size="8" fill="#e0a53a">ventana de terreno perdida — salta de temporada</text>';
+    s += '</g>';
+  });
+  s += '</svg>';
+  document.getElementById('lienzo-ruta').innerHTML = s;
+}
+
+/* ── la lista ── */
+function pintarLista(R, crit) {
+  var tb = document.querySelector('#tabla-lista tbody');
+  var filas = NODOS.slice().sort(function (a, b) { return R[a.id].ef - R[b.id].ef; });
+  tb.innerHTML = filas.map(function (n) {
+    var h = HOLGURA[n.id];
+    var req = n.deps.length ? n.deps.map(function (d) { return MAPA[d].nom.split(' ')[0] + ' ' + (MAPA[d].nom.split(' ')[1] || ''); }).join(', ') : '—';
+    return '<tr>' +
+      '<td><button class="nodo-lista" data-id="' + n.id + '" style="text-align:left;min-height:0;min-width:0;padding:0;color:' + (crit[n.id] ? '#56d7ef' : '#e8f2fa') + '">' + esc(n.nom) + '</button>' +
+      (crit[n.id] ? ' <span class="chip chip-critico" style="font-size:0.6rem">ruta crítica</span>' : '') + '</td>' +
+      '<td class="mono" style="font-size:0.72rem">' + esc(n.srv) + '</td>' +
+      '<td class="mono tenue" style="font-size:0.7rem">' + esc(req) + '</td>' +
+      '<td class="num" style="color:' + (h === 0 ? '#e5544e' : h < 15 ? '#e0a53a' : '#7ea9cc') + '">' + hTxt(h) + ' d</td>' +
+      '<td class="num">' + fechaCorta(R[n.id].ef) + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+/* ── ficha del nodo ── */
+function pintarDetalle(R) {
+  var box = document.getElementById('detalle');
+  if (!estado.nodoDet) { box.hidden = true; return; }
+  var n = MAPA[estado.nodoDet], r = R[n.id], h = HOLGURA[n.id];
+  var arrastra = NODOS.filter(function (m) { return m.deps.indexOf(n.id) >= 0; });
+  var plazoTxt = '—';
+  if (n.plazo) {
+    if (n.plazo.dias) plazoTxt = n.plazo.dias + ' días hábiles';
+    else plazoTxt = n.plazo.txt || '—';
+    plazoTxt += ' <span class="chip ' + (n.plazo.estado === 'confirmado' ? 'chip-ok' : 'chip-validar') + '" style="font-size:0.6rem">' +
+      (n.plazo.estado === 'confirmado' ? 'confirmado' : 'por validar') + '</span>';
+  }
+  box.hidden = false;
+  box.innerHTML =
+    '<div class="obs-cab"><p class="rotulo" style="margin:0;flex:1">Ficha del permiso</p>' +
+    '<span class="chip ' + CHIP[n.estado] + '">' + ETIQUETA[n.estado] + '</span></div>' +
+    '<h3 style="margin-top:var(--sp-xs)">' + esc(n.nom) + '</h3>' +
+    '<dl>' +
+    '<div><dt>Servicio</dt><dd>' + esc(n.srv) + '</dd></div>' +
+    '<div><dt>Norma</dt><dd>' + esc(n.norma || '—') + '</dd></div>' +
+    '<div><dt>Plazo del servicio</dt><dd>' + plazoTxt + '</dd></div>' +
+    '<div><dt>Duración modelada</dt><dd>' + n.dur + ' días ' + (n.u === 'habiles' ? 'hábiles' : 'corridos') + '</dd></div>' +
+    '<div><dt>Inicio más temprano</dt><dd>' + fecha(r.es) + '</dd></div>' +
+    '<div><dt>Término estimado</dt><dd>' + fecha(r.ef) + '</dd></div>' +
+    '<div><dt>Holgura</dt><dd style="color:' + (h === 0 ? '#e5544e' : h < 15 ? '#e0a53a' : '#3ec98f') + '">' + hTxt(h) + ' días</dd></div>' +
+    '<div><dt>Bloquea a</dt><dd>' + (arrastra.length ? arrastra.length + ' trámite' + (arrastra.length > 1 ? 's' : '') : '—') + '</dd></div>' +
+    '</dl>' +
+    (arrastra.length ? '<p class="nota" style="margin-top:var(--sp-s)"><strong class="acento">Bloquea:</strong> ' +
+      arrastra.map(function (m) { return esc(m.nom); }).join(' · ') + '</p>' : '') +
+    (n.compuerta ? '<p class="aviso" style="margin-top:var(--sp-s)"><strong>Compuerta de sesión.</strong> ' + esc(n.compuerta) + '</p>' : '') +
+    (n.ventana ? '<p class="aviso" style="margin-top:var(--sp-s)"><strong>Ventana de terreno.</strong> ' + esc(n.nota) + '</p>' : '') +
+    (n.nota && !n.ventana ? '<p class="nota" style="margin-top:var(--sp-s)">' + esc(n.nota) + '</p>' : '') +
+    '<button class="btn btn-fantasma" id="btn-simular" style="margin-top:var(--sp-s)">Simular atraso de este permiso ↑</button>';
+
+  document.getElementById('btn-simular').addEventListener('click', function () {
+    estado.sel = n.id;
+    document.getElementById('sel-nodo').value = n.id;
+    document.getElementById('sel-dias').value = estado.atrasos[n.id] || 30;
+    onSim();
+    document.getElementById('sel-dias').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
+/* ── los relojes ── */
+function pintarRelojes() {
+  var hoy = parse(HOY);
+  var tb = document.querySelector('#tabla-relojes tbody');
+  var conReloj = NODOS.filter(function (n) { return n.ingreso || n.estado === 'titular'; });
+  var otros = NODOS.filter(function (n) { return !n.ingreso && n.estado !== 'titular'; });
+
+  function fila(n) {
+    var trans = n.ingreso ? diffHabiles(parse(n.ingreso), hoy) : null;
+    var plazo = n.plazo && n.plazo.dias ? n.plazo.dias : null;
+    var pct = (trans !== null && plazo) ? Math.min(trans / plazo, 1.6) : 0;
+    var color = n.estado === 'mora' ? '#e5544e' : n.estado === 'aprobado' ? '#3ec98f' : n.estado === 'titular' ? '#e0a53a' : '#56d7ef';
+    var barra = '';
+    if (trans !== null && plazo) {
+      var w = Math.min(pct, 1) * 100, ex = Math.max(pct - 1, 0) / 0.6 * 100;
+      barra = '<svg class="barra-reloj" viewBox="0 0 100 8" preserveAspectRatio="none" role="img" aria-label="' + trans + ' de ' + plazo + ' días hábiles">' +
+        '<rect x="0" y="2" width="100" height="4" fill="#16324a"/>' +
+        '<rect x="0" y="2" width="' + w + '" height="4" fill="' + color + '"/>' +
+        (ex > 0 ? '<rect x="0" y="0" width="100" height="8" fill="#e5544e" opacity="0.18"/>' : '') +
+        '<line x1="100" y1="0" x2="100" y2="8" stroke="#7ea9cc" stroke-width="1"/></svg>' +
+        '<span class="nota" style="font-size:0.65rem">' + (trans > plazo ? '<span class="malo">excedido en ' + (trans - plazo) + ' d.háb.</span>' : (plazo - trans) + ' d.háb. restantes') + '</span>';
+    } else if (n.estado === 'aprobado') {
+      barra = '<span class="nota bien" style="font-size:0.7rem">otorgado ' + fechaCorta(parse(n.inicio)) + '</span>';
+    } else if (n.estado === 'titular') {
+      barra = '<span class="nota" style="font-size:0.7rem;color:var(--alerta)">el reloj corre para nosotros</span>';
+    } else if (trans !== null) {
+      barra = '<span class="nota" style="font-size:0.7rem">' + trans + ' d.háb. sin plazo acreditado</span>';
+    } else {
+      barra = '<span class="nota tenue" style="font-size:0.7rem">no ingresado</span>';
+    }
+    var plazoCell = plazo
+      ? plazo + ' <span class="chip ' + (n.plazo.estado === 'confirmado' ? 'chip-ok' : 'chip-validar') + '" style="font-size:0.55rem">' + (n.plazo.estado === 'confirmado' ? 'ley' : 'est.') + '</span>'
+      : '<span class="tenue">—</span>';
+    return '<tr>' +
+      '<td>' + esc(n.nom) + '</td>' +
+      '<td class="mono" style="font-size:0.72rem">' + esc(n.srv) + '</td>' +
+      '<td><span class="chip ' + CHIP[n.estado] + '">' + ETIQUETA[n.estado] + '</span></td>' +
+      '<td class="num">' + (n.ingreso ? fechaCorta(parse(n.ingreso)) : '—') + '</td>' +
+      '<td class="num">' + plazoCell + '</td>' +
+      '<td class="num">' + (trans !== null ? trans + ' d' : '—') + '</td>' +
+      '<td>' + barra + '</td>' +
+      '</tr>';
+  }
+  tb.innerHTML = conReloj.map(fila).join('') + otros.slice(0, 8).map(fila).join('');
+
+  var dgaT = diffHabiles(parse('2025-11-12'), hoy);
+  document.getElementById('mora-dias').textContent = dgaT - 60;
+}
+
+/* ══════════════════════════════ CICLO ══════════════════════════════════ */
+function repintar() {
+  var R = calcular(estado.atrasos);
+  var crit = rutaCritica(R);
+  pintarKPIs(R, crit);
+  pintarPlano(R, crit);
+  pintarRuta(R, crit);
+  pintarLista(R, crit);
+  pintarDetalle(R);
+  return R;
+}
+
+/* selector de nodos */
+(function () {
+  var sel = document.getElementById('sel-nodo');
+  sel.innerHTML = NODOS.map(function (n) {
+    return '<option value="' + n.id + '">' + esc(n.nom) + ' — ' + esc(n.srv) + '</option>';
+  }).join('');
+  sel.value = 'adenda';
+})();
+
+function onSim() {
+  var id = document.getElementById('sel-nodo').value;
+  var d = parseInt(document.getElementById('sel-dias').value, 10);
+  document.getElementById('sel-dias-v').textContent = d;
+  estado.sel = id;
+  estado.atrasos = {};
+  if (d > 0) estado.atrasos[id] = d;
+  estado.nodoDet = id;
+  var R = repintar();
+
+  var desl = diffDias(COD_BASE, R['pem'].ef);
+  var h = HOLGURA[id];
+  var msg = document.getElementById('sim-msg');
+  if (d === 0) {
+    msg.innerHTML = 'Plan vigente. Puesta en marcha: <strong>' + fecha(COD_BASE) + '</strong>.';
+  } else if (desl === 0) {
+    msg.innerHTML = 'Atraso de ' + d + ' días absorbido: <strong>' + esc(MAPA[id].nom) + '</strong> tiene ' + hTxt(h) +
+      ' días de holgura. La fecha no se mueve. <span class="tenue">(Todavía. La holgura se gasta.)</span>';
+  } else {
+    var movidos = NODOS.filter(function (n) { return diffDias(BASE[n.id].ef, R[n.id].ef) > 0; }).length;
+    var salta = NODOS.some(function (n) { return R[n.id].saltoVentana && !BASE[n.id].saltoVentana; });
+    msg.innerHTML = '<strong class="malo">' + d + ' días de atraso → la puesta en marcha se corre ' + desl + ' días.</strong> ' +
+      'Arrastra a ' + movidos + ' trámites. Costo: <strong class="malo">' + usd(desl * COSTO_DIA) + '</strong>.' +
+      (salta ? ' <span style="color:var(--alerta)">La campaña de rescate arqueológico ya no cabe en la ventana de terreno: se va entera a la temporada siguiente. Ahí está el salto.</span>' : '');
+  }
+}
+
+document.getElementById('sel-nodo').addEventListener('change', onSim);
+document.getElementById('sel-dias').addEventListener('input', onSim);
+document.getElementById('btn-reset').addEventListener('click', function () {
+  document.getElementById('sel-dias').value = 0;
+  onSim();
+});
+
+/* clicks sobre nodos (delegación) */
+['lienzo-plano', 'lienzo-ruta'].forEach(function (idc) {
+  var el = document.getElementById(idc);
+  el.addEventListener('click', function (e) {
+    var g = e.target.closest('.nodo');
+    if (!g) return;
+    estado.nodoDet = g.getAttribute('data-id');
+    repintar();
+    document.getElementById('detalle').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  el.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var g = e.target.closest('.nodo');
+    if (!g) return;
+    e.preventDefault();
+    estado.nodoDet = g.getAttribute('data-id');
+    repintar();
+  });
+});
+document.querySelector('#tabla-lista tbody').addEventListener('click', function (e) {
+  var b = e.target.closest('.nodo-lista');
+  if (!b) return;
+  estado.nodoDet = b.getAttribute('data-id');
+  repintar();
+  document.getElementById('detalle').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+/* vistas */
+var vistas = { 'v-plano': 'vista-plano', 'v-ruta': 'vista-ruta', 'v-lista': 'vista-lista' };
+Object.keys(vistas).forEach(function (btn) {
+  document.getElementById(btn).addEventListener('click', function () {
+    Object.keys(vistas).forEach(function (b) {
+      document.getElementById(b).setAttribute('aria-pressed', String(b === btn));
+      document.getElementById(vistas[b]).hidden = (b !== btn);
+    });
+  });
+});
+
+/* pestañas */
+var tabs = { 'tab-plano': 'p-plano', 'tab-relojes': 'p-relojes', 'tab-lector': 'p-lector' };
+Object.keys(tabs).forEach(function (t) {
+  document.getElementById(t).addEventListener('click', function () {
+    Object.keys(tabs).forEach(function (o) {
+      document.getElementById(o).setAttribute('aria-selected', String(o === t));
+      document.getElementById(tabs[o]).hidden = (o !== t);
+    });
+  });
+});
+
+/* ══════════════════════════════ EL LECTOR ═════════════════════════════ */
+var OBS = [
+  { cod:'4.2', tit:'Hidrogeología — modelo numérico', srv:'DGA / SEA',
+    txt:'Se solicita ampliar el modelo numérico de flujo subterráneo incorporando dos campañas adicionales de monitoreo de niveles en los pozos PM-04 a PM-09, en época de estiaje y en época estival.',
+    cls:'falta', et:'SIN RESPUESTA', etc:'chip-critico',
+    ev:'El Anexo 4.2 (Adenda 1) tiene el modelo, pero <strong>no</strong> las campañas estacionales. No hay dato en el expediente que las cubra. Se requiere terreno: 2 campañas separadas por temporada. <strong class="malo">Impacto estimado: +45 días en la Adenda complementaria.</strong>' },
+  { cod:'6.1', tit:'Arqueología — plan de rescate', srv:'Consejo de Monumentos',
+    txt:'Presentar el plan de rescate y los antecedentes del Anexo 6.1, con la caracterización de los tres sitios identificados en el sector del rajo.',
+    cls:'ok', et:'RESPONDIDA', etc:'chip-ok',
+    ev:'Anexo 6.1 “Plan de rescate arqueológico” (Adenda 1, p. 118-164) + Informe de prospección arqueológica dirigida (2024). Confianza alta.' },
+  { cod:'9.2', tit:'Relaves — estabilidad física', srv:'SERNAGEOMIN',
+    txt:'Acreditar la estabilidad física del depósito de relaves espesados bajo el sismo máximo creíble, incluyendo el análisis de licuefacción de la fundación.',
+    cls:'parcial', et:'PARCIAL', etc:'chip-alerta',
+    ev:'El Anexo 9.2 trae el análisis pseudoestático (secciones 4 y 5). <strong>Falta</strong> el análisis de deformaciones post-sísmicas (Newmark). Estimación del equipo geotécnico: 4 semanas. No está en la ruta crítica.' },
+  { cod:'11.5', tit:'Consulta indígena — estado del proceso', srv:'SEA',
+    txt:'Informar el estado del proceso de participación con la comunidad indígena atacameña del sector y los acuerdos alcanzados a la fecha.',
+    cls:'falta', et:'SIN RESPUESTA', etc:'chip-critico',
+    ev:'No hay ningún documento en el expediente que responda esto. Requiere coordinación con el SEA y con la comunidad; el plazo depende del proceso, no de nosotros. <span class="chip chip-validar" style="font-size:0.55rem">plazo por validar</span>' },
+  { cod:'12.1', tit:'Vialidad — Ruta 25', srv:'Dirección de Vialidad / SEA',
+    txt:'Presentar el estudio de impacto sobre la Ruta 25 y el pronunciamiento de la Dirección de Vialidad respecto del aumento de flujo de camiones.',
+    cls:'falta', et:'SIN RESPUESTA', etc:'chip-critico',
+    ev:'No está en el expediente. Requiere estudio de impacto sobre el sistema de transporte y pronunciamiento sectorial. Estimación: 8 semanas. Corre en paralelo con la campaña hidrogeológica; no suma a la ruta crítica.' },
+  { cod:'2.1', tit:'Descripción del proyecto — caudal', srv:'SEA',
+    txt:'Aclarar la discrepancia entre el caudal de agua de mar informado en el Capítulo 1 (520 l/s) y el informado en el Capítulo 2 (480 l/s).',
+    cls:'ok', et:'RESPONDIDA', etc:'chip-ok',
+    ev:'Adenda 1, Cap. 1, tabla 1-7: el caudal corregido es 520 l/s y así quedó en el balance hídrico (Anexo 2.3). Basta con reiterar la corrección. Confianza alta.' },
+  { cod:'7.3', tit:'Formaciones xerofíticas', srv:'CONAF',
+    txt:'Presentar el plan de manejo de formaciones xerofíticas conforme a la Ley 20.283 para las 84 ha a intervenir.',
+    cls:'parcial', et:'PARCIAL', etc:'chip-alerta',
+    ev:'Anexo 7.3 tiene el plan. <strong>Falta</strong> la cartografía a escala 1:5.000 que exige CONAF. 2 semanas de gabinete. Confianza media.' },
+  { cod:'8.6', tit:'Fauna — rescate y relocalización', srv:'SAG',
+    txt:'Presentar el plan de rescate y relocalización de Liolaemus, indicando la ventana estacional de ejecución.',
+    cls:'ok', et:'RESPONDIDA', etc:'chip-ok',
+    ev:'Anexo 8.6 (Adenda 1, p. 12-47), con la ventana estacional ya declarada. Confianza alta.' },
+  { cod:'3.4', tit:'Calidad del aire — factor de emisión', srv:'SEREMI de Salud / SEA',
+    txt:'Justificar el factor de emisión utilizado para el tránsito de camiones en caminos no pavimentados.',
+    cls:'ok', et:'RESPONDIDA', etc:'chip-ok',
+    ev:'Anexo 3.4, sección 5: factor AP-42 (13.2.2) con la corrección de humedad medida en terreno. Confianza alta.' }
+];
+
+var LINEAS = [
+  'Descargando <b>ICSARA_0417_2026.pdf</b> · 92 páginas · 4,1 MB',
+  'OCR + segmentación de la resolución… <b>ok</b>',
+  'Identificando el acto administrativo: <b>Res. Ex. N° 0417/2026, SEA Antofagasta</b>',
+  'Extrayendo observaciones (Claude Opus 4.8)… <b>9 encontradas</b>',
+  'Indexando el expediente del proyecto: <b>3.184 documentos</b>, 21.406 páginas',
+  'Emparejando cada observación con la evidencia del expediente (Claude Sonnet 5)…',
+  '  → 4 observaciones ya respondidas, con cita',
+  '  → 2 respondidas parcialmente',
+  '  → <b>3 sin respuesta en el expediente</b>',
+  'Estimando impacto en la ruta crítica…',
+  '<b style="color:#e5544e">La observación 4.2 exige campañas estacionales de terreno. No se puede fabricar. → +45 días.</b>'
+];
+
+document.getElementById('btn-leer').addEventListener('click', function () {
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Leyendo…';
+  var c = document.getElementById('consola');
+  c.innerHTML = '';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var i = 0;
+  function paso() {
+    if (i >= LINEAS.length) {
+      btn.disabled = false;
+      btn.textContent = 'Volver a leer';
+      document.getElementById('resultado').hidden = false;
+      document.getElementById('obs-lista').innerHTML = OBS.map(function (o) {
+        return '<div class="obs">' +
+          '<div class="obs-cab"><span class="obs-cod">OBS ' + o.cod + ' — ' + esc(o.tit) + '</span>' +
+          '<span class="chip ' + o.etc + '">' + o.et + '</span></div>' +
+          '<p class="obs-txt">“' + esc(o.txt) + '”</p>' +
+          '<p class="obs-ev ' + o.cls + '"><strong>' + esc(o.srv) + '</strong> · ' + o.ev + '</p>' +
+          '</div>';
+      }).join('');
+      document.getElementById('resultado').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
+    c.innerHTML += '<div>' + LINEAS[i] + '</div>';
+    c.scrollTop = c.scrollHeight;
+    i++;
+    setTimeout(paso, reduce ? 0 : 320);
+  }
+  paso();
+});
+
+document.getElementById('btn-aplicar').addEventListener('click', function () {
+  document.getElementById('sel-nodo').value = 'adenda';
+  document.getElementById('sel-dias').value = 45;
+  onSim();
+  var R = calcular({ adenda: 45 });
+  var desl = diffDias(COD_BASE, R['pem'].ef);
+  var av = document.getElementById('aplicado');
+  av.hidden = false;
+  av.innerHTML = '<strong class="malo">Aplicado.</strong> La puesta en marcha pasa de ' + fecha(COD_BASE) + ' a <strong class="malo">' +
+    fecha(R['pem'].ef) + '</strong>: <strong class="malo">' + desl + ' días</strong> y <strong class="malo">' +
+    usd(desl * COSTO_DIA) + '</strong>. Anda a la pestaña <em>Plano</em> para ver la cadena que arrastró.';
+  document.getElementById('tab-plano').click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* arranque.
+   En teléfono el grafo completo no se lee: arrancamos en la vista de ruta
+   crítica, que es la misma información en un ancho de 390px. El plano queda
+   a un toque de distancia para quien lo quiera recorrer. */
+pintarRelojes();
+onSim();
+if (!window.matchMedia('(min-width: 62em)').matches) {
+  document.getElementById('v-ruta').click();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cintavia — Negocio</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, la decisión de a quién le vendemos primero, economía unitaria, canales y qué mataría esto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__in">
+      <a class="brand" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <path d="M2 14 C 6 8, 16 8, 20 14" stroke="#FFB000" stroke-width="1.6"/>
+          <circle cx="5" cy="12.2" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="11" cy="10.4" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="17" cy="12.2" r="1.9" stroke="#FF6152" stroke-width="1.2"/>
+          <path d="M2 18h18" stroke="#22323D" stroke-width="1.2"/>
+        </svg>
+        Cintavia<span class="brand__dot" aria-hidden="true"></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav">Menú</button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section style="padding-top:var(--sp-l)">
+  <div class="container">
+    <p class="eyebrow">Plan de negocio · go-to-market</p>
+    <h1 style="max-width:20ch">A quién le vendemos primero.</h1>
+    <p class="lede mt-s" style="max-width:64ch">
+      Esta es la única decisión que importa y define todo lo demás: el precio, el producto, el equipo y
+      la caja. Está resuelta con aritmética, no con optimismo, y la respuesta <strong>no</strong> es
+      «a la minera».
+    </p>
+    <div class="callout mt-m">
+      <p><strong>Nota de método.</strong> Toda cifra en esta página está <em>citada</em> o está
+      <em>etiquetada como estimación con su aritmética a la vista</em>. Cuando estimo, lo digo. Cuando no
+      sé, lo digo también. Un TAM sin derivación es exactamente el tell que estamos evitando: quien lea
+      esto va a decidir si gasta dos años de su vida acá.</p>
+      <p class="mono dim" style="font-size:0.72rem">Tipo de cambio de referencia: 1 USD = $940 CLP · julio 2026.
+      Cobre a US$4,10/lb. Los dos son supuestos, no cotizaciones.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ LA DECISIÓN ============ -->
+<section id="decision">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">01 · La decisión, con la aritmética</p>
+      <h2>Tres compradores posibles. Sólo uno te deja llegar vivo al mes 12.</h2>
+    </div>
+
+    <div class="grid g3">
+
+      <!-- A -->
+      <div class="panel stack-s" style="opacity:.82">
+        <div class="row" style="justify-content:space-between">
+          <p class="panel__title">Opción A — La minera grande</p>
+          <span class="st st--crit"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.6"/></svg>Descartada</span>
+        </div>
+        <p style="font-size:var(--step--1)">Gerencia de confiabilidad de una faena de 100+ ktpd. Presupuesto enorme, dolor enorme, cheque enorme.</p>
+        <hr class="rule" style="margin-block:var(--sp-2xs)">
+        <table style="font-size:var(--step--1)">
+          <tbody>
+            <tr><td>Ciclo de venta</td><td class="num-r crit">12–18 meses</td></tr>
+            <tr><td>Ticket anual</td><td class="num-r">US$107.000</td></tr>
+            <tr><td>Prob. de cierre</td><td class="num-r">~12 %</td></tr>
+            <tr><td>Costo de perseguir 1</td><td class="num-r">US$39.150</td></tr>
+            <tr><td><strong>CAC implícito</strong></td><td class="num-r crit"><strong>US$326.000</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout--crit" style="padding:var(--sp-2xs)">
+          <p style="font-size:0.78rem"><strong>Por qué no.</strong> 15 meses hasta el primer peso × US$28.000/mes
+          de quema (4 personas) = <strong>US$420.000 de caja quemada con cero ingresos</strong>. No es que sea
+          mal negocio. Es que no lo puedes financiar sin levantar US$3 M antes de tener un cliente. Y para
+          levantar US$3 M necesitas un cliente.</p>
+        </div>
+      </div>
+
+      <!-- B -->
+      <div class="panel stack-s" style="border-color:var(--amber)">
+        <div class="row" style="justify-content:space-between">
+          <p class="panel__title amber">Opción B — El contratista de correas</p>
+          <span class="st st--ok"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 5l3 3 5-6" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Elegida</span>
+        </div>
+        <p style="font-size:var(--step--1)">La empresa que tiene el contrato de mantención de correas <em>adentro</em> de la faena. Cuadrilla de 20–40 personas, contrato de US$3–8 M/año.</p>
+        <hr class="rule" style="margin-block:var(--sp-2xs)">
+        <table style="font-size:var(--step--1)">
+          <tbody>
+            <tr><td>Ciclo de venta</td><td class="num-r ok">8–14 semanas</td></tr>
+            <tr><td>Ticket anual</td><td class="num-r">US$49.800</td></tr>
+            <tr><td>Piloto → contrato</td><td class="num-r">~50 %</td></tr>
+            <tr><td>Costo por 2 contratos</td><td class="num-r">US$37.650</td></tr>
+            <tr><td><strong>CAC implícito</strong></td><td class="num-r amber"><strong>US$18.800</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="callout" style="padding:var(--sp-2xs)">
+          <p style="font-size:0.78rem"><strong>Por qué sí — tres razones, en orden de peso:</strong></p>
+          <p style="font-size:0.78rem"><strong>1. Ya está adentro.</strong> Homologado, con credencial, con
+          acceso físico a la correa y con sus propias ventanas de mantención. No necesitamos que la minera nos
+          apruebe a <em>nosotros</em>: instalamos bajo <em>su</em> contrato, en <em>su</em> ventana. Ese es el
+          atajo de 14 meses.</p>
+          <p style="font-size:0.78rem"><strong>2. El ahorro es suyo.</strong> Su contrato es a
+          <strong>suma alzada por disponibilidad</strong>: le pagan por que la correa esté arriba, no por hora
+          hombre. Si baja sus HH y sube su disponibilidad, la diferencia es margen suyo y bono suyo.</p>
+          <p style="font-size:0.78rem"><strong>3. Lo firma una persona.</strong> El gerente de operaciones,
+          contra su propio presupuesto operacional. No hay comité de inversión.</p>
+        </div>
+      </div>
+
+      <!-- C -->
+      <div class="panel stack-s" style="opacity:.82">
+        <div class="row" style="justify-content:space-between">
+          <p class="panel__title">Opción C — La mediana minería</p>
+          <span class="st st--warn"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1l4 8H1z" fill="currentColor"/></svg>Año 3</span>
+        </div>
+        <p style="font-size:var(--step--1)">Planta de 3–20 ktpd en Atacama o Coquimbo. Sin departamento de confiabilidad. El dueño firma.</p>
+        <hr class="rule" style="margin-block:var(--sp-2xs)">
+        <table style="font-size:var(--step--1)">
+          <tbody>
+            <tr><td>Ciclo de venta</td><td class="num-r ok">4–8 semanas</td></tr>
+            <tr><td>Ticket anual</td><td class="num-r crit">US$11.400</td></tr>
+            <tr><td>Margen planta / h</td><td class="num-r">US$19.000</td></tr>
+            <tr><td>CAC estimado</td><td class="num-r">US$6.000</td></tr>
+            <tr><td>LTV / CAC</td><td class="num-r">4,5</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout--crit" style="padding:var(--sp-2xs)">
+          <p style="font-size:0.78rem"><strong>Por qué todavía no.</strong> Su correa tiene 800 m, no 4 km, y un
+          corte le cuesta US$150.000, no US$1,4 M — el ROI existe pero es 10× más chico. Y el riesgo real:
+          <strong>cuando el cobre baja de US$3,40/lb, la mediana minería chilena para.</strong> Nuestro churn
+          quedaría correlacionado con el precio del cobre, que es exactamente el momento en que menos podemos
+          aguantarlo. Además, a US$947/mes no financias un ingeniero en terreno en Diego de Almagro.</p>
+          <p style="font-size:0.78rem"><strong>Cuándo sí:</strong> cuando la estación sea auto-instalable y el
+          soporte 100 % remoto. Mes 24 en adelante.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout--cyan mt-m">
+      <p><strong>La jugada completa, en una frase.</strong> Entramos por el contratista (mes 5), acumulamos
+      12–18 meses de datos y de detecciones validadas <em>dentro</em> de la faena, y cuando llega la
+      relicitación del contrato de correas <strong>la minera nos pone en las bases técnicas</strong> —
+      «el oferente deberá contar con monitoreo continuo de condición de correas». Ahí dejamos de venderle al
+      contratista y le vendemos a la minera, con la referencia ya adentro y sin ciclo de 18 meses.</p>
+      <p><strong>El riesgo de esa jugada:</strong> si el contratista pierde la licitación antes de eso,
+      nos vamos con él. Está tratado abajo, en churn.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ ICP ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">02 · Cliente objetivo</p>
+      <h2>El ICP es más angosto de lo que te gustaría. Bien.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Quién es exactamente</span></div>
+        <table>
+          <tbody>
+            <tr><td style="width:38%">Segmento</td><td><strong>Empresa contratista de mantención de correas transportadoras</strong> en faena de gran minería del norte.</td></tr>
+            <tr><td>Tamaño</td><td>Cuadrilla de 20–60 personas en faena. Facturación US$3–12 M/año. 1 a 3 faenas.</td></tr>
+            <tr><td>Filtro duro</td><td class="amber"><strong>Contrato a suma alzada o por disponibilidad</strong>, no a precio unitario por HH. Si le pagan por hora hombre, no es cliente: es enemigo.</td></tr>
+            <tr><td>Quién firma</td><td>Gerente de Operaciones o Gerente de Contrato. Presupuesto operacional propio, hasta ~US$120k/año sin subir a directorio.</td></tr>
+            <tr><td>Quién lo usa</td><td>El planificador de mantención (arma la ventana) y el supervisor de terreno (lo mira en el teléfono, caminando).</td></tr>
+            <tr><td>Quién lo odia</td><td>El jefe de cuadrilla al que le vas a cambiar la ronda de 20 años. Es un stakeholder real y hay que ganárselo, no ignorarlo.</td></tr>
+            <tr><td>Dónde ya está</td><td>Excel y WhatsApp. La ronda se anota en una libreta y se pasa a un Excel el viernes. Ese Excel es el verdadero titular del puesto.</td></tr>
+            <tr><td>Dónde lo encuentro</td><td>Calama, Antofagasta, Copiapó. Aprimin. Exponor. LinkedIn. Son <strong>catorce empresas</strong> en todo el norte: cabe en una servilleta.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Señales de que es el cliente correcto</span></div>
+        <ul class="list list--warn">
+          <li>Tiene un <strong>KPI de disponibilidad de correa</strong> con bono o multa asociada. Si no lo tiene, no le duele.</li>
+          <li>Su faena tiene una <strong>overland de más de 2 km</strong>. Bajo eso, el inspector alcanza a caminarla.</li>
+          <li>Tuvo <strong>un corte de correa en los últimos 18 meses</strong>. Es el mejor predictor de compra que existe y no es sutil.</li>
+          <li>Está en <strong>relicitación en 12–30 meses</strong>. Quiere algo que contar en la propuesta técnica.</li>
+          <li>Su cliente (la minera) usa <strong>SAP PM</strong> y <strong>AVEVA PI</strong>. Casi todas en Chile.</li>
+        </ul>
+        <hr class="rule" style="margin-block:var(--sp-s)">
+        <div class="panel__head"><span class="panel__title crit">Señales de que NO lo es</span></div>
+        <ul class="list list--crit">
+          <li>Contrato <strong>a precio unitario</strong>. Le pagas por cambiar polines: reducir cambios de polín le baja la factura.</li>
+          <li>La minera hace la mantención de correas <strong>con personal propio</strong>. Entonces el comprador es la minera y volvemos a la Opción A.</li>
+          <li>Correas cortas de planta solamente. El dolor está en la overland.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ MERCADO ============ -->
+<section id="mercado">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">03 · Tamaño de mercado</p>
+      <h2>La conclusión incómoda: Chile solo no aguanta esta empresa.</h2>
+      <p class="lede" style="max-width:62ch">Prefiero decírtelo en la página 3 y no en el mes 20.</p>
+    </div>
+
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Supuestos declarados</span>
+        <span class="panel__meta">todos son estimación propia, no cifra citada</span></div>
+        <table>
+          <tbody>
+            <tr><td>Faenas de gran minería del cobre en Chile con concentradora y correa &gt; 1 km</td><td class="num-r"><strong>24</strong></td></tr>
+            <tr><td>Faenas de mediana minería con correa &gt; 500 m</td><td class="num-r"><strong>14</strong></td></tr>
+            <tr><td>Sitios adyacentes con el mismo problema (cemento, cal, puertos graneleros, celulosa)</td><td class="num-r"><strong>17</strong></td></tr>
+            <tr><td>Km de correa monitoreable por faena grande (promedio; rango real 3–40)</td><td class="num-r"><strong>8 km</strong></td></tr>
+            <tr><td>Ticket anual Tramo Cinturón (faena completa)</td><td class="num-r"><strong>US$107.000</strong></td></tr>
+            <tr><td>Ticket anual Tramo Ronda (mediana minería)</td><td class="num-r"><strong>US$11.400</strong></td></tr>
+            <tr><td>Ticket anual sitio adyacente (Tramo Faena)</td><td class="num-r"><strong>US$49.800</strong></td></tr>
+          </tbody>
+        </table>
+        <p class="src">
+          <b>De dónde salen los conteos.</b> Conté las faenas a mano desde los listados públicos de operaciones
+          de Cochilco y SERNAGEOMIN, quedándome sólo con las que tienen concentradora y correa larga.
+          <b>No es un número citado de un informe de mercado — es mi conteo y puede estar ±20 % equivocado.</b>
+          Prefiero eso a inventar «el mercado global de monitoreo de correas es de US$4,2 B».
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">La aritmética</span></div>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th></th><th>Cuenta</th><th class="num-r">Sitios</th><th class="num-r">ARR</th></tr></thead>
+            <tbody>
+              <tr>
+                <td rowspan="4" style="vertical-align:top"><strong class="amber">TAM<br>Chile</strong><br><span class="dim" style="font-size:0.7rem">todo lo monitoreable</span></td>
+                <td>24 grandes × US$107k</td><td class="num-r">24</td><td class="num-r">US$2,57 M</td>
+              </tr>
+              <tr><td>14 medianas × US$11,4k</td><td class="num-r">14</td><td class="num-r">US$0,16 M</td></tr>
+              <tr><td>17 adyacentes × US$49,8k</td><td class="num-r">17</td><td class="num-r">US$0,85 M</td></tr>
+              <tr style="border-top:1px solid var(--rule)">
+                <td><strong>Total</strong></td><td class="num-r"><strong>55</strong></td>
+                <td class="num-r amber"><strong>US$3,58 M</strong></td>
+              </tr>
+              <tr>
+                <td rowspan="3" style="vertical-align:top;padding-top:var(--sp-s)"><strong class="cyan">SAM</strong><br><span class="dim" style="font-size:0.7rem">a quien de verdad podemos venderle</span></td>
+                <td style="padding-top:var(--sp-s)">De las 24 grandes, las que tienen contratista de correas externo <strong>a suma alzada</strong>: estimo 60 %</td>
+                <td class="num-r" style="padding-top:var(--sp-s)">14</td><td class="num-r" style="padding-top:var(--sp-s)">US$1,50 M</td>
+              </tr>
+              <tr><td>Adyacentes alcanzables sin equipo nuevo</td><td class="num-r">6</td><td class="num-r">US$0,30 M</td></tr>
+              <tr style="border-top:1px solid var(--rule)">
+                <td><strong>Total</strong></td><td class="num-r"><strong>20</strong></td>
+                <td class="num-r cyan"><strong>US$1,80 M</strong></td>
+              </tr>
+              <tr>
+                <td style="padding-top:var(--sp-s)"><strong>SOM<br>36 meses</strong></td>
+                <td style="padding-top:var(--sp-s)">12 sitios pagando, ticket mezclado US$70k</td>
+                <td class="num-r" style="padding-top:var(--sp-s)">12</td>
+                <td class="num-r" style="padding-top:var(--sp-s)"><strong>US$840 k</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2 mt-s">
+      <div class="callout callout--crit">
+        <p><strong>Léelo de frente: el TAM de Chile es de US$3,6 M de ARR.</strong> Eso no sostiene una empresa
+        de venture. Chile no es el mercado — <strong>Chile es el laboratorio</strong>: 24 faenas de clase
+        mundial en 800 km de desierto, en tu idioma, con tus normas y con tus contratistas. Es el mejor lugar
+        del planeta para construir esto y un lugar pésimo para venderlo solamente ahí.</p>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">La extensión: el mercado de verdad</span></div>
+        <p style="font-size:var(--step--1)">
+          Faenas de cobre, hierro y carbón con overland &gt; 2 km en el mundo (mi conteo, no una cifra citada):
+          <span class="mono">Perú 22 · Brasil 40 · Australia 85 · Sudáfrica 30 · Indonesia 12 · EE.UU. y Canadá 45 · resto 60</span>
+          → <strong>~294 faenas</strong>.
+        </p>
+        <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+          294 × US$107k = <strong class="amber">US$31 M de ARR</strong> en gran minería.
+          Con los adyacentes (cemento, puertos, generación), <strong>US$50–65 M</strong>.
+        </p>
+        <div class="callout callout--cyan mt-s">
+          <p><strong>Y la honestidad final:</strong> esto, muy bien ejecutado, es un negocio de
+          <strong>US$10 a 25 M de ARR</strong>. Es defendible, capital-eficiente y aburrido.
+          <strong>No es un unicornio y no va a serlo.</strong> Si tu tesis necesita un fondo de 100×,
+          no construyas esto. Si buscas una empresa que valga US$120 M y que sea difícil de matar,
+          esta es una candidata razonable.</p>
+        </div>
+        <p class="src">El canal internacional es el mismo canal: los grandes contratistas de correas operan
+        Chile y Perú con las mismas cuadrillas. Perú llama «faja» a la correa; el resto es idéntico.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ ROI DEL CLIENTE ============ -->
+<section id="roi">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">04 · La aritmética que le mostramos al cliente</p>
+      <h2>De dónde sale «US$140.000 por hora».</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Margen de contribución de una faena de 110 ktpd</span></div>
+        <div class="scroll-x">
+          <table>
+            <tbody>
+              <tr><td>Mineral tratado</td><td class="num-r">110.000 t/día</td><td class="dim">supuesto</td></tr>
+              <tr><td>Ley de cobre</td><td class="num-r">0,68 %</td><td class="dim">supuesto</td></tr>
+              <tr><td>Recuperación</td><td class="num-r">87 %</td><td class="dim">supuesto</td></tr>
+              <tr><td>= Cobre fino</td><td class="num-r">651 t/día</td><td class="dim">110.000 × 0,0068 × 0,87</td></tr>
+              <tr><td>= En libras</td><td class="num-r">1.435.207 lb/día</td><td class="dim">× 2.204,62</td></tr>
+              <tr><td>Precio del cobre</td><td class="num-r">US$4,10 /lb</td><td class="dim">supuesto</td></tr>
+              <tr><td>= Ingreso bruto</td><td class="num-r">US$245.181 /h</td><td class="dim">1.435.207 × 4,10 ÷ 24</td></tr>
+              <tr><td>Costo variable (energía, bolas, reactivos, TC/RC, flete)</td><td class="num-r">US$1,75 /lb</td><td class="dim">supuesto</td></tr>
+              <tr><td>= Costo variable</td><td class="num-r">US$104.650 /h</td><td class="dim">1.435.207 × 1,75 ÷ 24</td></tr>
+              <tr style="border-top:2px solid var(--amber)">
+                <td><strong>Margen de contribución perdido por hora de planta detenida</strong></td>
+                <td class="num-r amber"><strong>US$140.531</strong></td>
+                <td class="dim">245.181 − 104.650</td>
+              </tr>
+              <tr><td>En pesos</td><td class="num-r"><strong>$132,1 M CLP /h</strong></td><td class="dim">× 940</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src">Cambia cualquier supuesto y el número se mueve. A US$3,20/lb el margen de contribución cae
+        a <b>US$86.700/h</b> y todo el caso de negocio se comprime un 38 %. Por eso el precio del cobre está en
+        «qué mataría esto».</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Y ahora la parte que casi nadie te dice</span></div>
+        <p style="font-size:var(--step--1)">
+          <strong>Que la correa se corte no significa que la planta se detenga.</strong> El acopio de gruesos
+          entre el chancador y la molienda tiene autonomía. Si el acopio aguanta 10 horas y la reparación toma
+          14, la planta sólo pierde <strong>4 horas</strong>, no 14.
+        </p>
+        <hr class="rule" style="margin-block:var(--sp-s)">
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Evento</th><th class="num-r">Corr. fuera</th><th class="num-r">− buffer</th><th class="num-r">Planta det.</th><th class="num-r">Costo</th></tr></thead>
+            <tbody>
+              <tr><td>Empalme abierto</td><td class="num-r">14 h</td><td class="num-r">10 h</td><td class="num-r">4 h</td><td class="num-r amber">US$562 k</td></tr>
+              <tr><td>Polín trabado que daña la cinta</td><td class="num-r">20 h</td><td class="num-r">10 h</td><td class="num-r">10 h</td><td class="num-r amber">US$1,41 M</td></tr>
+              <tr><td>Incendio de correa (tramo corto)</td><td class="num-r">48 h</td><td class="num-r">10 h</td><td class="num-r">38 h</td><td class="num-r crit">US$5,34 M</td></tr>
+              <tr><td>Incendio de correa (tramo largo)</td><td class="num-r">96 h</td><td class="num-r">10 h</td><td class="num-r">86 h</td><td class="num-r crit">US$12,1 M</td></tr>
+              <tr style="opacity:.75"><td>Desalineamiento crónico</td><td class="num-r">0 h</td><td class="num-r">—</td><td class="num-r">0 h</td><td class="num-r">desgaste de cubierta</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src">Ninguno de estos números incluye lesionados. Un incendio de correa en un túnel de
+        transferencia es un evento de seguridad, no de producción, y ahí la conversación deja de ser sobre plata.</p>
+        <div class="callout mt-s">
+          <p><strong>El caso de negocio honesto</strong> del Tramo Faena (US$49.800/año): con evitar
+          <strong>un solo</strong> corte de empalme cada tres años (US$562 k ÷ 3 = US$187 k/año), y atribuyéndonos
+          conservadoramente sólo el <strong>40 %</strong> del mérito (el otro 60 % es la cuadrilla que sí hizo la
+          reparación), el ahorro imputable es de <strong>US$75 k/año contra un costo de US$50 k/año</strong>.
+          Es un ROI de 1,5×, no de 20×. <strong>Vender 20× es cómo pierdes al cliente en la renovación.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ UNIT ECONOMICS ============ -->
+<section id="unit">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">05 · Precio y economía unitaria</p>
+      <h2>79 % de margen bruto. No 90: esto tiene fierro.</h2>
+    </div>
+
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">Tramo Faena · 12 estaciones · 6 km</span>
+        <span class="panel__meta">el plan que compra el 70 % de los clientes</span></div>
+        <div class="scroll-x">
+          <table>
+            <tbody>
+              <tr><td><strong>Precio</strong></td><td class="num-r"><strong>$3.900.000 /mes</strong></td><td class="num-r amber">US$4.149</td></tr>
+              <tr style="border-top:1px solid var(--rule)"><td colspan="3" class="mono dim" style="font-size:0.68rem;padding-top:var(--sp-2xs)">COSTO DIRECTO MENSUAL</td></tr>
+              <tr><td>Inferencia de IA + cloud</td><td class="num-r dim">derivado en <a href="stack.html#costo">stack.html</a></td><td class="num-r">US$85</td></tr>
+              <tr><td>Conectividad LTE de respaldo (6 est. × US$25)</td><td class="num-r dim">las otras 6 van por red de faena</td><td class="num-r">US$150</td></tr>
+              <tr><td>Garantía y reposición de hardware</td><td class="num-r dim">5 %/año de US$16.800 de BOM</td><td class="num-r">US$70</td></tr>
+              <tr><td>Soporte en terreno prorrateado</td><td class="num-r dim">ing. en Calama US$4.500/mes ÷ 8 sitios</td><td class="num-r">US$563</td></tr>
+              <tr style="border-top:1px solid var(--rule)"><td><strong>COGS total</strong></td><td></td><td class="num-r"><strong>US$868</strong></td></tr>
+              <tr style="border-top:2px solid var(--amber)">
+                <td><strong>Margen bruto</strong></td>
+                <td class="num-r dim">(4.149 − 868) ÷ 4.149</td>
+                <td class="num-r amber"><strong>79,1 %</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src">
+          <b>El costo que más duele no es la IA — es el terreno.</b> US$563 de los US$868. El cómputo pesado
+          (visión, térmica, acústica) corre en la estación, no en la nube: el costo marginal por frame es
+          esencialmente cero. Los US$85 de nube e IA son sobre todo <b>Claude consolidando el turno y
+          redactando la OT</b> (US$25), más Postgres/Timescale y los workers (US$60). La derivación completa,
+          con volúmenes, tokens y precio por modelo, está en <a href="stack.html#costo">stack.html</a> —
+          y los dos números cuadran: <b>IA + cloud son el 2,0 % del precio.</b>
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title">CAC, payback y LTV</span></div>
+        <div class="scroll-x">
+          <table>
+            <tbody>
+              <tr><td colspan="2" class="mono dim" style="font-size:0.68rem">DERIVACIÓN DEL CAC (por 2 contratos cerrados)</td></tr>
+              <tr><td>10 conversaciones calificadas × 0,15 FTE × US$5.500</td><td class="num-r">US$8.250</td></tr>
+              <tr><td>4 pilotos subsidiados × US$6.000 (2 estaciones, 3 meses, ingeniería)</td><td class="num-r">US$24.000</td></tr>
+              <tr><td>Viajes: 4 × 3 visitas × US$450 (Santiago–Calama)</td><td class="num-r">US$5.400</td></tr>
+              <tr style="border-top:1px solid var(--rule)"><td>Total para cerrar 2</td><td class="num-r">US$37.650</td></tr>
+              <tr><td><strong>CAC</strong></td><td class="num-r amber"><strong>US$18.825</strong></td></tr>
+
+              <tr style="border-top:1px solid var(--rule)"><td colspan="2" class="mono dim" style="font-size:0.68rem;padding-top:var(--sp-2xs)">PAYBACK — DOS NÚMEROS DISTINTOS</td></tr>
+              <tr><td>Margen bruto mensual (4.149 × 0,791)</td><td class="num-r">US$3.282</td></tr>
+              <tr><td>Payback contable (CAC ÷ margen bruto)</td><td class="num-r">5,7 meses</td></tr>
+              <tr><td class="amber"><strong>Payback en CAJA, con habilitación pagada</strong></td><td class="num-r amber"><strong>4,2 meses</strong></td></tr>
+              <tr><td class="crit"><strong>Payback en CAJA, con comodato</strong></td><td class="num-r crit"><strong>8,9 meses</strong></td></tr>
+
+              <tr style="border-top:1px solid var(--rule)"><td colspan="2" class="mono dim" style="font-size:0.68rem;padding-top:var(--sp-2xs)">LTV</td></tr>
+              <tr><td>Churn de logo (razón declarada abajo)</td><td class="num-r">18 % / año</td></tr>
+              <tr><td>Vida usada (conservadora: 1/0,18 = 5,6 años)</td><td class="num-r">4 años</td></tr>
+              <tr><td><strong>LTV</strong> (4.149 × 12 × 0,791 × 4)</td><td class="num-r"><strong>US$157.500</strong></td></tr>
+              <tr style="border-top:2px solid var(--amber)"><td><strong>LTV / CAC</strong></td><td class="num-r amber"><strong>8,4×</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2 mt-s">
+      <div class="callout">
+        <p><strong>Por qué existen dos modalidades de hardware, y por qué importa tanto.</strong></p>
+        <p><strong>Habilitación pagada</strong> ($2.250.000/estación): el cliente compra el fierro. Nuestro costo
+        es US$2.000 por estación (BOM US$1.400 + instalación US$600); cobramos US$2.394. Ganamos 16 % —
+        <em>prácticamente nada</em>. Pero nos deja el balance limpio: <strong>payback en caja de 4,2 meses</strong>,
+        y podemos bootstrapear.</p>
+        <p><strong>Comodato</strong> (+35 % en la mensualidad, US$0 de entrada): nosotros financiamos US$24.000
+        de fierro por cliente. El payback en caja se va a <strong>8,9 meses</strong> y cada venta nueva nos come
+        caja. Es un arma comercial cara.</p>
+        <p><strong>La decisión:</strong> en el año 1 empujamos habilitación pagada, porque no tenemos caja para
+        financiar fierro. Desde el mes 15, con caja levantada, el comodato pasa a ser el default — porque elimina
+        la única objeción real que queda (el CAPEX) y sube el ARPU un 35 %.</p>
+      </div>
+
+      <div class="callout callout--crit">
+        <p><strong>El churn no depende de nuestro producto. Ese es el problema.</strong></p>
+        <p>El contratista renueva su contrato con la faena cada 3–5 años. <strong>Si pierde la licitación,
+        nosotros nos vamos con él</strong>, aunque el producto haya funcionado perfecto. Ese es el 18 % de churn
+        anual y no lo controlamos con retención ni con producto.</p>
+        <p><strong>La mitigación, y hay que pelearla en el contrato desde el día 1:</strong> una cláusula de
+        <em>novación</em>. Las estaciones ya están instaladas en la estructura de la correa, son de la faena en
+        términos prácticos, y la faena las quiere. Si el contratista sale, la suscripción se transfiere al que
+        entra. Firmar eso en el contrato inicial es la diferencia entre 18 % y 6 % de churn — y entre un LTV de
+        US$158 k y uno de US$470 k.</p>
+        <p class="mono" style="font-size:0.7rem">Si en los primeros 3 contratos no logramos meter la cláusula de
+        novación, hay que revisar toda la tesis del canal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ CANALES ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">06 · Canales de adquisición, rankeados</p>
+      <h2>Nuestro mercado son 14 empresas. No es un embudo, es una lista.</h2>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead>
+          <tr><th style="width:26px">#</th><th>Canal</th><th>Por qué</th><th class="num-r">Costo</th><th class="num-r">CPL / cierre</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono amber">1</td>
+            <td><strong>Outbound directo al gerente de operaciones</strong><br><span class="dim">LinkedIn → WhatsApp → café en Calama</span></td>
+            <td>Hay <strong>14 empresas contratistas de correas</strong> en el norte de Chile. Catorce. Se llaman una por una. El demo se muestra en el teléfono, en la faena, en 4 minutos.</td>
+            <td class="num-r">tiempo</td>
+            <td class="num-r amber">CAC US$18,8k</td>
+          </tr>
+          <tr>
+            <td class="mono amber">2</td>
+            <td><strong>Distribuidores de polines y correa</strong><br><span class="dim">canal de referencia</span></td>
+            <td>Quien le vende los polines al contratista <strong>sabe exactamente cuáles se están reventando</strong> y quién tiene el problema. Comisión del 10 % del año 1.</td>
+            <td class="num-r">10 % ARR</td>
+            <td class="num-r">≈US$5k</td>
+          </tr>
+          <tr>
+            <td class="mono">3</td>
+            <td><strong>Exponor (Antofagasta) y EXPOMIN</strong></td>
+            <td>No un stand con folletos: una <strong>charla técnica en el bloque de confiabilidad</strong> con el dato de una faena real y las curvas. Es donde está la gente que decide.</td>
+            <td class="num-r">US$9.000</td>
+            <td class="num-r">≈US$12k</td>
+          </tr>
+          <tr>
+            <td class="mono">4</td>
+            <td><strong>Aprimin y Consejo Minero</strong><br><span class="dim">gremios</span></td>
+            <td>Aprimin es literalmente el gremio de nuestros clientes (proveedores industriales de la minería). Membresía y presencia en sus mesas técnicas.</td>
+            <td class="num-r">$2 M CLP/año</td>
+            <td class="num-r">indirecto</td>
+          </tr>
+          <tr>
+            <td class="mono">5</td>
+            <td><strong>SEO long-tail en español</strong></td>
+            <td>«vida útil polín correa transportadora», «causas de incendio de correa minera», «DS 132 correas». Volumen bajo (200–800/mes) pero <strong>intención perfecta y cero competencia</strong>.</td>
+            <td class="num-r">1 artículo/mes</td>
+            <td class="num-r">≈US$2k</td>
+          </tr>
+          <tr>
+            <td class="mono">6</td>
+            <td><strong>Mercado Público y portales de compra</strong><br><span class="dim">Ariba / Coupa de las mineras</span></td>
+            <td>Codelco y ENAMI licitan ahí. <strong>Sirve desde el año 2</strong>: los pliegos piden 3 años de experiencia comprobable, así que hoy no calificamos.</td>
+            <td class="num-r">bajo</td>
+            <td class="num-r">año 2+</td>
+          </tr>
+          <tr style="opacity:.6">
+            <td class="mono crit">✕</td>
+            <td><strong>Google Ads · Meta Ads · LinkedIn Ads</strong></td>
+            <td><strong>Descartado explícitamente.</strong> Nuestro comprador son ~40 personas en todo Chile. Un CPL de US$180 en LinkedIn Ads B2B industrial no compite con tomarse un café en Calama. Pagar CPC para llegarle a alguien que puedo llamar por teléfono es una confesión de que no sé quién es mi cliente.</td>
+            <td class="num-r crit">—</td>
+            <td class="num-r crit">no</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ IA EN EL MARKETING ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">07 · Uso de IA en el marketing mismo</p>
+      <h2>«IA en todo» no es una respuesta. Acá va la mía.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title ok">Donde la IA sí sirve, y mucho</span></div>
+        <ul class="list">
+          <li><strong>El informe del piloto.</strong> 40 páginas con las curvas, los hallazgos, la validación
+          contra la termografía manual del cliente y el cálculo de ROI con <em>sus</em> supuestos. Antes: 3 días
+          de un ingeniero. Con Claude sobre nuestros propios datos: 2 horas y una revisión humana.
+          <strong>Ese informe ES la venta</strong> — es lo único que el gerente lleva a su directorio.</li>
+          <li><strong>Vigilancia de licitaciones.</strong> Un agente que revisa Mercado Público y los portales
+          de compra de las mineras todos los días y avisa cuando aparece un ítem de «mantención de correas» o
+          «monitoreo de condición». Barato, aburrido, funciona.</li>
+          <li><strong>Adaptación a Perú.</strong> El vocabulario cambia (allá la correa es «faja», el polín es
+          «polín» pero la ventana es «parada»). Traducir y adaptar 80 páginas de material técnico sin perder
+          precisión es exactamente lo que un LLM hace bien.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel__head"><span class="panel__title crit">Donde NO la usamos, y por qué</span></div>
+        <ul class="list list--crit">
+          <li><strong>Contenido de LinkedIn escrito por IA: no.</strong> Nuestro comprador es un ingeniero de
+          mantención de 48 años que lleva 20 años en el norte y detecta el texto de IA en dos frases. Lo que
+          vendemos es <em>credibilidad técnica</em>: es el único activo comercial que tenemos y es exactamente
+          lo que se quema publicando slop.
+          <strong>Todo lo que se publica con nuestro nombre lo escribe alguien que ha estado en una sala de control.</strong></li>
+          <li><strong>Prospección en frío a volumen: no.</strong> La lista de clientes tiene catorce nombres.
+          Automatizar el envío de correos a catorce personas es teatro. Se les llama.</li>
+          <li><strong>Chatbot en el sitio: no.</strong> Si alguien de una faena entra a nuestro sitio a las 2 AM,
+          quiero que le conteste el fundador, no un bot. Van a ser tres al mes.</li>
+        </ul>
+        <p class="src">La regla que uso: <b>la IA sirve donde el trabajo es real y voluminoso (el informe, la
+        vigilancia, la traducción) y estorba donde el trabajo es la relación.</b> En un mercado de 14 clientes,
+        casi todo es la relación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ 90 DÍAS ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">08 · Primeros 90 días</p>
+      <h2>Nada de esto es escribir software.</h2>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th style="width:74px">Semana</th><th>Qué</th><th>Entregable duro</th></tr></thead>
+        <tbody>
+          <tr><td class="mono amber">1–2</td>
+            <td>La lista. Las <strong>14 empresas contratistas de correas</strong> del norte, con nombre del
+            gerente de operaciones, tipo de contrato (suma alzada / precio unitario) y faena. Se llama a todas.</td>
+            <td><strong>6 reuniones agendadas.</strong> Herramienta: el demo en un teléfono.</td></tr>
+          <tr><td class="mono amber">3–4</td>
+            <td>Estación #1 con hardware comprado al detalle: Jetson Orin Nano + módulo térmico radiométrico
+            + cámara IP66 + micrófono MEMS + gabinete. Caro (US$2.200) porque es una unidad.</td>
+            <td><strong>Una estación que enciende y transmite.</strong></td></tr>
+          <tr><td class="mono amber">5–6</td>
+            <td>Instalar en el <strong>taller del contratista</strong>, no en faena. Filmar 200 horas de polines
+            reales en su banco de pruebas. Incluye trabar un polín a propósito y filmarlo calentándose.</td>
+            <td><strong>200 h de video, térmica y audio etiquetados.</strong> Este dataset no existe hoy.</td></tr>
+          <tr><td class="mono amber">7–10</td>
+            <td>Modelo v0. La meta <strong>no</strong> es la precisión — es que un mantenedor mire 20 detecciones
+            y diga «esa sí, esa no». Si no puede distinguirlas, el problema es el sensor, no el modelo.</td>
+            <td><strong>Sesión de revisión con 3 mantenedores.</strong></td></tr>
+          <tr><td class="mono amber">11–13</td>
+            <td>Primer piloto en faena real. La parte difícil <strong>no es el software</strong>: es la carta de
+            acceso, el permiso de trabajo, el bloqueo LOTO, el aviso al comité paritario y la charla de 5 minutos.</td>
+            <td><strong>Una estación instalada en una correa de verdad, con permiso escrito.</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--crit mt-s">
+      <p><strong>Criterio de salida de los 90 días — el único que importa.</strong> Una estación instalada en
+      una faena de verdad, con permiso escrito, generando detecciones. <strong>Si al día 90 no tenemos eso, el
+      problema no es el software: es que no tenemos acceso.</strong> Y sin acceso no hay negocio, por bueno que
+      sea el modelo. Ese es el momento de parar, no el mes 18.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ QUÉ MATARÍA ESTO ============ -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">09 · Qué mataría esto</p>
+      <h2>En orden de probabilidad, no de dramatismo.</h2>
+    </div>
+    <div class="grid g2">
+      <div class="stack">
+        <div class="panel" style="border-left:3px solid var(--st-crit)">
+          <p class="panel__title crit">1 · El contratista a precio unitario</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            Si su contrato le paga por hora hombre y por polín cambiado, <strong>reducir cambios de polín le
+            baja la facturación</strong>. No es que no lo compre: es que lo compra, no lo usa, y nos boicotea
+            desde adentro con una sonrisa. Nos obliga a filtrar el ICP sólo a contratos de suma alzada — y
+            <strong>eso corta el SAM a la mitad</strong>.
+          </p>
+          <p class="mono crit" style="font-size:0.72rem;margin-top:var(--sp-2xs)">
+            Probabilidad: alta. Control: ninguno. Detección temprana: preguntar por el tipo de contrato en la primera llamada.
+          </p>
+        </div>
+        <div class="panel" style="border-left:3px solid var(--st-crit)">
+          <p class="panel__title crit">2 · Un OEM regala el software</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            Continental ContiTech o Flexco meten monitoreo de condición gratis dentro de la venta de la cinta.
+            Es su jugada obvia, tienen el canal y tienen la relación de 30 años. Nuestra única defensa es ser
+            <strong>agnósticos de marca</strong> (una faena tiene 4 marcas de cinta y 6 de polín) y estar más
+            cerca del CMMS que ellos.
+          </p>
+          <p class="mono crit" style="font-size:0.72rem;margin-top:var(--sp-2xs)">
+            Probabilidad: media-alta a 3 años. Control: parcial.
+          </p>
+        </div>
+        <div class="panel" style="border-left:3px solid var(--amber)">
+          <p class="panel__title amber">3 · La precisión no llega</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            Si a un umbral útil la precisión se queda bajo <strong>0,70</strong>, el mantenedor deja de mirar el
+            sistema en tres semanas y <strong>no vuelve nunca</strong>. La confianza se pierde una sola vez.
+            Este es el riesgo técnico y por eso el hito M2 del <a href="roadmap.html">roadmap</a> lo pone
+            <em>antes</em> de escalar, no después.
+          </p>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="panel" style="border-left:3px solid var(--amber)">
+          <p class="panel__title amber">4 · El polvo</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            Suena tonto. No lo es. Si el visor se ensucia cada 4 días y hay que mandar a alguien a limpiarlo,
+            el costo de soporte en terreno (ya son <strong>US$563 de los US$868 de COGS</strong>) se dispara y
+            el producto no escala. Es el problema de ingeniería más aburrido, más caro y el que más
+            subestimamos. Purga de aire positiva, y aun así.
+          </p>
+        </div>
+        <div class="panel" style="border-left:3px solid var(--amber)">
+          <p class="panel__title amber">5 · El tamaño del mercado</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            Chile es US$3,6 M de TAM. <strong>Si tardamos más de 24 meses en poder vender en Perú, nos quedamos
+            sin mercado antes de quedarnos sin producto.</strong> Y salir a Perú no es traducir el sitio: es
+            homologarse allá, tener a alguien en Arequipa y aguantar otro ciclo de venta.
+          </p>
+        </div>
+        <div class="panel" style="border-left:3px solid var(--st-none)">
+          <p class="panel__title dim">6 · El precio del cobre</p>
+          <p style="font-size:var(--step--1);margin-top:var(--sp-2xs)">
+            A US$3,20/lb, el margen de contribución por hora cae de US$140.531 a <strong>US$86.700</strong> y
+            todo nuestro caso de negocio se comprime un 38 %. Peor: bajo US$3,00/lb las mineras congelan
+            <em>todo</em> gasto que no sea operación crítica, y «monitoreo predictivo» es lo primero que se
+            corta. <strong>No controlamos esto en absoluto.</strong> Es el riesgo de estar en minería.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout--cyan mt-m">
+      <p><strong>Lo que NO nos mata, aunque lo parezca.</strong> Que alguien copie la detección. La detección
+      es el 20 % del producto y es copiable en 18 meses por cualquiera con un buen equipo de visión.
+      El otro 80 % es el aviso de SAP con el repuesto reservado, la ventana correcta, la cláusula de novación
+      y el ingeniero que se sube a la camioneta en Calama. <strong>Eso no se copia con un paper.</strong></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <span>Cintavia · negocio</span>
+      <span>Todas las cifras: estimación con aritmética, o citada. Ninguna inventada.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var t = document.getElementById('navToggle'), n = document.getElementById('nav');
+  t.addEventListener('click', function () {
+    var open = n.getAttribute('data-open') === 'true';
+    n.setAttribute('data-open', String(!open));
+    t.setAttribute('aria-expanded', String(!open));
+  });
+})();
+</script>
+
+</body>
+</html>

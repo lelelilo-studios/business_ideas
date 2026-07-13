@@ -1,0 +1,476 @@
+/* ============================================================================
+   CIANOTA — dirección de arte: PLANO / BLUEPRINT TÉCNICO
+   ----------------------------------------------------------------------------
+   Referencia: una lámina de proyecto de ingeniería y un diagrama de
+   dependencias. Fondo azul profundo (cianotipo), retícula de dibujo en cian a
+   muy baja opacidad, filetes de 1px, esquinas rectas con marcas de escuadra,
+   anotaciones en monoespaciada, cartucho (title block) al pie. El grafo es el
+   elemento gráfico protagonista, no un adorno.
+
+   Tipografía: la familia IBM Plex se dibujó para contextos técnicos y de
+   ingeniería; por eso está aquí y no Inter.
+     - IBM Plex Sans Condensed 600/700 → títulos (rótulos de lámina)
+     - IBM Plex Sans 400/500          → prosa
+     - IBM Plex Mono 400/500          → datos, plazos, códigos, anotaciones
+
+   Paleta: un solo acento (cian #56d7ef). Los colores de estado son una escala
+   reservada (aprobado / en trámite / atrasado / vencido) y nunca se usan como
+   colores de serie. Series de gráfico validadas con el validador de la skill
+   dataviz contra la superficie #0d2136 (modo oscuro):
+     #22a6bd  #c98500  #8f83e6  #d84f68   → todas las parejas ΔE ≥ 24,7 (deutan)
+   ========================================================================== */
+
+:root {
+  /* superficies */
+  --plano:      #081726;  /* la lámina */
+  --panel:      #0d2136;  /* la caja de dibujo */
+  --panel-2:    #102a44;  /* caja elevada */
+  --hueco:      #050f1b;  /* fondo hundido */
+
+  /* trazos */
+  --linea:      rgba(86, 215, 239, 0.22);
+  --linea-df:   rgba(86, 215, 239, 0.11);
+  --reticula:   rgba(86, 215, 239, 0.055);
+  --reticula-2: rgba(86, 215, 239, 0.10);
+
+  /* tinta */
+  --tinta:      #e8f2fa;
+  --tinta-2:    #b9d2e6;
+  --tinta-3:    #7ea9cc;
+
+  /* acento único */
+  --cian:       #56d7ef;
+  --cian-op:    rgba(86, 215, 239, 0.12);
+
+  /* estados (escala reservada — nunca como color de serie) */
+  --ok:         #3ec98f;
+  --curso:      #56d7ef;
+  --alerta:     #e0a53a;
+  --grave:      #f0774f;
+  --critico:    #e5544e;
+
+  /* series de gráfico (validadas) */
+  --s1:         #22a6bd;
+  --s2:         #c98500;
+  --s3:         #8f83e6;
+  --s4:         #d84f68;
+
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+}
+
+/* --------------------------------------------------------------- la lámina */
+body {
+  background-color: var(--plano);
+  background-image:
+    linear-gradient(var(--reticula) 1px, transparent 1px),
+    linear-gradient(90deg, var(--reticula) 1px, transparent 1px),
+    linear-gradient(var(--reticula-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--reticula-2) 1px, transparent 1px);
+  background-size: 12px 12px, 12px 12px, 96px 96px, 96px 96px;
+  background-position: -1px -1px;
+  color: var(--tinta-2);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+}
+
+::selection { background: var(--cian); color: var(--plano); }
+
+:focus-visible {
+  outline: 2px solid var(--cian);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* --------------------------------------------------------------- tipografía */
+h1, h2, h3, h4 {
+  font-family: var(--cond);
+  font-weight: 700;
+  color: var(--tinta);
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); line-height: 1.05; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); }
+h4 { font-size: var(--step-0); }
+
+p { text-wrap: pretty; }
+strong { color: var(--tinta); font-weight: 600; }
+a { color: var(--cian); text-underline-offset: 3px; }
+
+.mono { font-family: var(--mono); }
+
+/* rótulo de lámina: el encabezado de sección como en un plano */
+.rotulo {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--cian);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2xs);
+  margin-bottom: var(--sp-xs);
+}
+.rotulo::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--linea);
+}
+
+.lede {
+  font-size: var(--step-1);
+  color: var(--tinta-2);
+  line-height: 1.5;
+}
+
+.nota {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--tinta-3);
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------- estructura */
+section { padding-block: var(--sp-2xl); }
+section + section { border-top: 1px solid var(--linea-df); }
+.stack > * + * { margin-top: var(--sp-s); }
+.stack-l > * + * { margin-top: var(--sp-l); }
+
+/* ------------------------------------------------------------------- cajas */
+.caja {
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  padding: var(--sp-m);
+  position: relative;
+}
+/* marcas de escuadra en las esquinas — la caja es un recorte del plano */
+.caja::before, .caja::after {
+  content: "";
+  position: absolute;
+  width: 9px; height: 9px;
+  border: 1px solid var(--cian);
+  opacity: 0.55;
+}
+.caja::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.caja::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+.caja-lisa {
+  background: var(--panel);
+  border: 1px solid var(--linea-df);
+  padding: var(--sp-m);
+}
+
+.hueco {
+  background: var(--hueco);
+  border: 1px solid var(--linea-df);
+  padding: var(--sp-s);
+}
+
+/* --------------------------------------------------------------- navegación */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(5, 15, 27, 0.94);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--linea);
+}
+.nav-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  gap: var(--sp-s);
+}
+.marca {
+  font-family: var(--cond);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  white-space: nowrap;
+}
+.marca svg { flex: none; }
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--tinta-2);
+  border: 1px solid var(--linea);
+  padding-inline: 0.6rem;
+}
+.nav-menu {
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  padding-block: var(--sp-2xs) var(--sp-s);
+}
+.nav-menu.abierto { display: flex; }
+.nav-menu a {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  text-decoration: none;
+  color: var(--tinta-2);
+  padding: 0.7rem 0.75rem;
+  border-left: 2px solid transparent;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.04em;
+}
+.nav-menu a:hover { background: var(--cian-op); color: var(--tinta); }
+.nav-menu a[aria-current="page"] {
+  color: var(--cian);
+  border-left-color: var(--cian);
+  background: var(--cian-op);
+}
+
+@media (min-width: 56em) {
+  .nav-btn { display: none; }
+  .nav-menu {
+    display: flex !important;
+    flex-direction: row;
+    gap: var(--sp-2xs);
+    padding: 0;
+  }
+  .nav-menu a {
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0.4rem 0.6rem;
+  }
+  .nav-menu a[aria-current="page"] { border-bottom-color: var(--cian); border-left-color: transparent; }
+}
+
+/* ------------------------------------------------------------------ botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85rem 1.3rem;
+  border: 1px solid var(--cian);
+  color: var(--cian);
+  background: var(--cian-op);
+  min-height: 46px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn:hover { background: var(--cian); color: var(--plano); }
+.btn-solido { background: var(--cian); color: var(--plano); font-weight: 500; }
+.btn-solido:hover { background: #8ae6f7; }
+.btn-fantasma { border-color: var(--linea); color: var(--tinta-2); background: transparent; }
+.btn-fantasma:hover { border-color: var(--cian); color: var(--cian); background: var(--cian-op); }
+
+/* ------------------------------------------------------------------- chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.5rem;
+  border: 1px solid currentColor;
+  /* Los chips "por validar" no son etiquetas de una palabra: llevan la frase
+     completa ("verificar contra la edición vigente de Cochilco"). Si no envuelven,
+     empujan el ancho del documento en un teléfono. */
+  max-width: 100%;
+  line-height: 1.35;
+}
+.chip-ok      { color: var(--ok); }
+.chip-curso   { color: var(--curso); }
+.chip-alerta  { color: var(--alerta); }
+.chip-grave   { color: var(--grave); }
+.chip-critico { color: var(--critico); }
+.chip-neutro  { color: var(--tinta-3); border-color: var(--linea); }
+
+/* el chip que más importa del producto entero */
+.chip-validar {
+  color: var(--alerta);
+  border-style: dashed;
+}
+
+/* --------------------------------------------------------------- métricas */
+.metrica { border-left: 2px solid var(--linea); padding-left: var(--sp-s); }
+.metrica-valor {
+  font-family: var(--cond);
+  font-weight: 700;
+  font-size: var(--step-3);
+  color: var(--tinta);
+  line-height: 1;
+  display: block;
+}
+.metrica-valor.acento { color: var(--cian); }
+.metrica-valor.malo   { color: var(--critico); }
+.metrica-et {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.metrica-pie { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); margin-top: 0.3rem; display: block; }
+
+/* --------------------------------------------------------------- rejillas */
+.rejilla { display: grid; gap: var(--sp-s); }
+/* Un ítem de grilla tiene min-width:auto: si adentro hay una tabla con
+   min-width:34rem, el ítem se infla a 34rem y el documento se va de lado en un
+   teléfono. Con min-width:0 el ítem obedece a la columna y la tabla se desplaza
+   dentro de su .scroll-x, que es exactamente lo que queremos. */
+.rejilla > * { min-width: 0; }
+@media (min-width: 40em) { .rejilla-2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 52em) { .rejilla-3 { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 52em) { .rejilla-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 72em) { .rejilla-4 { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 62em) { .rejilla-lado { grid-template-columns: 1fr 1fr; gap: var(--sp-l); } }
+
+/* ------------------------------------------------------------------ tablas */
+table { width: 100%; font-size: var(--step--1); }
+th, td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--linea-df);
+  vertical-align: top;
+}
+th {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  font-weight: 400;
+  border-bottom: 1px solid var(--linea);
+  white-space: nowrap;
+}
+td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+tbody tr:hover { background: rgba(86, 215, 239, 0.04); }
+.scroll-x { border: 1px solid var(--linea-df); }
+.scroll-x table { min-width: 34rem; }
+
+/* ------------------------------------------------------------------ listas */
+.lista { list-style: none; }
+.lista li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.55;
+}
+.lista li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.6em;
+  width: 8px; height: 1px;
+  background: var(--cian);
+}
+.lista-num { list-style: none; counter-reset: n; }
+.lista-num li { counter-increment: n; position: relative; padding-left: 2.2rem; margin-bottom: 0.8rem; }
+.lista-num li::before {
+  content: counter(n, decimal-leading-zero);
+  position: absolute; left: 0; top: 0.05em;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--cian);
+}
+
+/* ----------------------------------------------------------------- cartucho
+   El title block de una lámina: proyecto / escala / fecha / revisión. */
+.cartucho {
+  border: 1px solid var(--linea);
+  background: var(--panel);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+@media (min-width: 48em) { .cartucho { grid-template-columns: repeat(4, 1fr); } }
+.cartucho > div {
+  padding: 0.7rem 0.85rem;
+  border-right: 1px solid var(--linea-df);
+  border-bottom: 1px solid var(--linea-df);
+}
+.cartucho dt {
+  color: var(--tinta-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  margin-bottom: 0.25rem;
+}
+.cartucho dd { color: var(--tinta); }
+
+/* ---------------------------------------------------------------- gráficos */
+.fig { background: var(--panel); border: 1px solid var(--linea-df); padding: var(--sp-s); }
+.fig-titulo {
+  font-family: var(--cond);
+  font-weight: 600;
+  color: var(--tinta);
+  font-size: var(--step-0);
+  margin-bottom: 0.15rem;
+}
+.fig-sub { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); margin-bottom: var(--sp-s); }
+.fig svg { width: 100%; height: auto; overflow: visible; }
+.eje { stroke: var(--linea); stroke-width: 1; }
+.malla { stroke: var(--linea-df); stroke-width: 1; }
+.tick {
+  font-family: var(--mono);
+  font-size: 9px;
+  fill: var(--tinta-3);
+  font-variant-numeric: tabular-nums;
+}
+.serie-et { font-family: var(--mono); font-size: 10px; }
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-s);
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--tinta-2);
+  margin-top: var(--sp-2xs);
+}
+.leyenda span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.leyenda i { width: 12px; height: 3px; display: block; }
+
+/* ---------------------------------------------------------------- pie */
+.pie {
+  border-top: 1px solid var(--linea);
+  padding-block: var(--sp-l);
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--tinta-3);
+}
+
+/* ------------------------------------------------------------- utilitarios */
+.centro { text-align: center; }
+.acento { color: var(--cian); }
+.tenue { color: var(--tinta-3); }
+.malo { color: var(--critico); }
+.bien { color: var(--ok); }
+.filas { display: flex; flex-wrap: wrap; gap: var(--sp-xs); }
+.aviso {
+  border-left: 2px solid var(--alerta);
+  background: rgba(224, 165, 58, 0.07);
+  padding: var(--sp-s);
+  font-size: var(--step--1);
+}
+.aviso-critico {
+  border-left-color: var(--critico);
+  background: rgba(229, 84, 78, 0.07);
+}

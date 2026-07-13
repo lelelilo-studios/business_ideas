@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianota — la ruta crítica de tus permisos, en un solo plano</title>
+<meta name="description" content="Cianota mapea las dependencias de los permisos de un proyecto minero, calcula la ruta crítica y te dice, en US$, cuánto cuesta que uno se atrase.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* --- hero: la lámina de portada --- */
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); position: relative; }
+  .hero h1 { font-size: var(--step-5); margin-block: var(--sp-s); }
+  .hero h1 em { font-style: normal; color: var(--cian); }
+  .hero .lede { max-width: 46ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-top: var(--sp-l); }
+  .hero-grafo { margin-top: var(--sp-l); }
+  @media (min-width: 62em) {
+    .hero-caja { display: grid; grid-template-columns: 1.05fr 1fr; gap: var(--sp-xl); align-items: center; }
+    .hero-grafo { margin-top: 0; }
+  }
+
+  /* --- simulador en vivo --- */
+  .sim { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .sim { grid-template-columns: 1fr 1.15fr; align-items: start; } }
+  .sim-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-s); margin-top: var(--sp-m); }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 44px; background: transparent; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 2px; background: var(--linea); border: 0;
+  }
+  input[type=range]::-moz-range-track { height: 2px; background: var(--linea); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 26px; margin-top: -12px;
+    background: var(--cian); border: 0; border-radius: 0;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 26px; background: var(--cian); border: 0; border-radius: 0;
+  }
+  .sim-escala {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3);
+  }
+
+  /* --- precios --- */
+  .precio { display: flex; flex-direction: column; height: 100%; }
+  .precio-monto {
+    font-family: var(--cond); font-weight: 700; font-size: var(--step-3);
+    color: var(--tinta); line-height: 1; margin-block: 0.5rem 0.2rem;
+  }
+  .precio.destacado { border-color: var(--cian); }
+  .precio ul { margin-top: var(--sp-s); flex: 1; }
+
+  /* --- faq --- */
+  details {
+    border-bottom: 1px solid var(--linea-df);
+    padding-block: var(--sp-s);
+  }
+  summary {
+    font-family: var(--cond); font-weight: 600; font-size: var(--step-1);
+    color: var(--tinta); cursor: pointer; list-style: none;
+    display: flex; justify-content: space-between; gap: var(--sp-s);
+    min-height: 44px; align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--mono); color: var(--cian); flex: none; }
+  details[open] summary::after { content: "−"; }
+  details > p { margin-top: var(--sp-xs); max-width: var(--measure); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav-fila">
+      <a class="marca" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+          <circle cx="4" cy="4" r="2.2"/><circle cx="18" cy="4" r="2.2"/>
+          <circle cx="11" cy="11" r="2.2"/><circle cx="4" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>
+          <path d="M5.6 5.6 9.4 9.4M16.4 5.6 12.6 9.4M9.4 12.6 5.6 16.4M12.6 12.6l3.8 3.8"/>
+        </svg>
+        Cianota
+      </a>
+      <button class="nav-btn" aria-expanded="false" aria-controls="nav-menu">MENÚ</button>
+    </div>
+    <nav id="nav-menu" class="nav-menu" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-caja">
+      <div>
+        <p class="rotulo">Lámina 01 — Permitología de proyectos</p>
+        <h1>Un permiso se atrasa un mes. La puesta en marcha se corre <em>tres</em>.</h1>
+        <p class="lede">Cianota dibuja el grafo de dependencias de los permisos de tu proyecto, calcula la ruta crítica en días hábiles y te dice —en dólares— cuánto cuesta cada semana de atraso. Antes de que ocurra.</p>
+        <div class="hero-cta">
+          <a class="btn btn-solido" href="demo/index.html">Abrir el plano →</a>
+          <a class="btn btn-fantasma" href="#simulador">Ver el simulador</a>
+        </div>
+        <p class="nota" style="margin-top:var(--sp-m)">Para titulares de proyectos mineros, de energía e industriales, y para los estudios que les tramitan los permisos.</p>
+      </div>
+
+      <div class="hero-grafo">
+        <!-- Fragmento del grafo: la cadena que manda. Dibujado a mano. -->
+        <svg viewBox="0 0 420 260" role="img" aria-label="Diagrama: la Adenda alimenta la RCA, que alimenta el permiso del Consejo de Monumentos, que gatilla la campaña de rescate arqueológico y de ahí la construcción y la puesta en marcha.">
+          <defs>
+            <marker id="fx" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0 0 L7 3.5 L0 7 z" fill="#56d7ef"/>
+            </marker>
+            <marker id="fx2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0 0 L7 3.5 L0 7 z" fill="#7ea9cc" opacity=".5"/>
+            </marker>
+          </defs>
+          <!-- aristas fuera de ruta -->
+          <path d="M92 42 L150 42" stroke="#7ea9cc" stroke-opacity=".35" stroke-width="1" marker-end="url(#fx2)"/>
+          <path d="M92 42 L150 96" stroke="#7ea9cc" stroke-opacity=".35" stroke-width="1" marker-end="url(#fx2)"/>
+          <path d="M247 96 L305 42" stroke="#7ea9cc" stroke-opacity=".35" stroke-width="1" marker-end="url(#fx2)"/>
+          <path d="M247 96 L305 213" stroke="#7ea9cc" stroke-opacity=".35" stroke-width="1" marker-end="url(#fx2)"/>
+          <!-- ruta crítica -->
+          <path d="M92 96 L150 96" stroke="#56d7ef" stroke-width="2" marker-end="url(#fx)"/>
+          <path d="M247 96 L305 96" stroke="#56d7ef" stroke-width="2" marker-end="url(#fx)"/>
+          <path d="M370 113 L370 140" stroke="#56d7ef" stroke-width="2" marker-end="url(#fx)"/>
+          <path d="M340 157 L92 157 L92 174" stroke="#56d7ef" stroke-width="2" fill="none" marker-end="url(#fx)"/>
+          <path d="M92 208 L92 226 L370 226 L370 200" stroke="#56d7ef" stroke-width="2" fill="none" marker-end="url(#fx)"/>
+
+          <!-- nodos fuera de ruta -->
+          <g fill="#0d2136" stroke="#7ea9cc" stroke-opacity=".4">
+            <rect x="150" y="28" width="97" height="28"/>
+            <rect x="305" y="28" width="97" height="28"/>
+            <rect x="305" y="199" width="97" height="28"/>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#7ea9cc">
+            <text x="158" y="46">PAS DGA · agua</text>
+            <text x="313" y="46">Concesión marítima</text>
+            <text x="313" y="217">Plan de cierre</text>
+          </g>
+
+          <!-- nodos ruta crítica -->
+          <g fill="#102a44" stroke="#56d7ef" stroke-width="1.4">
+            <rect x="5" y="82" width="87" height="28"/>
+            <rect x="150" y="82" width="97" height="28"/>
+            <rect x="305" y="82" width="97" height="31"/>
+            <rect x="340" y="140" width="62" height="34"/>
+            <rect x="5" y="174" width="174" height="34"/>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#e8f2fa">
+            <text x="13" y="100">Adenda</text>
+            <text x="158" y="100">RCA · SEA</text>
+            <text x="313" y="97">CMN · permiso</text>
+            <text x="313" y="108" fill="#56d7ef">arqueológico</text>
+            <text x="348" y="156">Rescate</text>
+            <text x="348" y="168">en terreno</text>
+            <text x="13" y="190">Obras + montaje + PEM</text>
+            <text x="13" y="203" fill="#56d7ef">holgura 0 días</text>
+          </g>
+          <!-- cotas -->
+          <g font-family="IBM Plex Mono, monospace" font-size="8" fill="#56d7ef">
+            <text x="100" y="88">+30 d</text>
+            <text x="185" y="252" fill="#e5544e">→ 98 días de deslizamiento</text>
+          </g>
+          <path d="M92 76 L150 76" stroke="#56d7ef" stroke-width=".8"/>
+          <path d="M92 72 L92 80 M150 72 L150 80" stroke="#56d7ef" stroke-width=".8"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ PROBLEMA -->
+<section>
+  <div class="container">
+    <p class="rotulo">02 — El problema</p>
+    <div class="rejilla-lado">
+      <div class="stack">
+        <h2>Hoy esto vive en un Excel y una carpeta compartida</h2>
+        <p>Un proyecto minero grande no necesita “un permiso”. Necesita <strong>decenas</strong>: la RCA del SEIA, más los permisos sectoriales de SERNAGEOMIN, DGA, CONAF, el Consejo de Monumentos, el SAG, la autoridad sanitaria, la DOM, la SEC. Con dependencias entre sí: hay permisos que exigen como requisito otro permiso que todavía no existe.</p>
+        <p>Eso no es una lista. Es un <strong>grafo</strong>. Y ningún Excel dibuja un grafo.</p>
+        <p class="nota">El equipo que lo administra —abogados, un jefe de permisos, la consultora ambiental— hace lo que puede: una carta Gantt lineal, un tablero de correos y la memoria de quien lleva más tiempo. Funciona hasta que llega el primer ICSARA.</p>
+      </div>
+      <div class="caja">
+        <p class="rotulo" style="margin-bottom:var(--sp-s)">Lo que se rompe</p>
+        <ul class="lista stack">
+          <li><strong>La dependencia invisible.</strong> Nadie tenía anotado que el movimiento de tierras no parte hasta que el CMN apruebe el informe de rescate arqueológico. Se descubre en terreno.</li>
+          <li><strong>El plazo legal que no se cumple.</strong> El servicio se pasó del plazo hace 47 días hábiles y nadie lo está contando, porque contar días hábiles con feriados a mano es un trabajo en sí mismo.</li>
+          <li><strong>La observación que reabre el reloj.</strong> Llega un ICSARA de 90 páginas con 14 observaciones. Alguien tiene que leerlo, decidir qué piden exactamente y buscar en 3.000 documentos del expediente qué ya lo responde.</li>
+          <li><strong>La ventana que se cierra.</strong> Un mes de atraso te deja fuera de la temporada de terreno en altura. Ese mes se convierte en cuatro y nadie lo vio venir.</li>
+          <li><strong>El costo que nadie calcula.</strong> Con US$ 620 millones ya comprometidos, cada día de atraso tiene un número. Casi nunca está en la misma planilla que los permisos.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SIMULADOR -->
+<section id="simulador">
+  <div class="container">
+    <p class="rotulo">03 — El producto, en vivo</p>
+    <h2>Mueve el atraso. Mira la fecha.</h2>
+    <p class="lede" style="margin-bottom:var(--sp-l);max-width:60ch">Datos del proyecto de demostración: <strong>Sierra Ancha — Expansión Fase III</strong>, Compañía Minera Altoandina SpA, comuna de Calama, 4.050&nbsp;m&nbsp;s.n.m. Inversión US$&nbsp;1.240&nbsp;millones. El nodo que mueves es la <strong>Adenda complementaria</strong>, la respuesta al ICSARA que el titular debe entregar al SEA.</p>
+
+    <div class="sim">
+      <div class="caja">
+        <label for="rango" class="metrica-et" style="margin-bottom:var(--sp-xs)">Atraso en la entrega de la Adenda complementaria</label>
+        <p style="font-family:var(--cond);font-weight:700;font-size:var(--step-3);color:var(--cian);line-height:1;margin-bottom:var(--sp-2xs)">
+          <span id="v-atraso">30</span> <span style="font-size:var(--step-0);color:var(--tinta-3)">días corridos</span>
+        </p>
+        <input type="range" id="rango" min="0" max="90" step="5" value="30"
+               aria-describedby="sim-resultado">
+        <div class="sim-escala"><span>0</span><span>30</span><span>60</span><span>90</span></div>
+
+        <div class="sim-kpis">
+          <div class="metrica">
+            <span class="metrica-et">Puesta en marcha</span>
+            <span class="metrica-valor" id="v-cod">18-ene-2030</span>
+            <span class="metrica-pie">base: 12-oct-2029</span>
+          </div>
+          <div class="metrica">
+            <span class="metrica-et">Deslizamiento</span>
+            <span class="metrica-valor malo" id="v-desl">+98 d</span>
+            <span class="metrica-pie">holgura disponible: 9 d</span>
+          </div>
+        </div>
+
+        <div class="hueco" style="margin-top:var(--sp-s)">
+          <span class="metrica-et">Costo de la demora</span>
+          <span class="metrica-valor malo" id="v-costo" style="font-size:var(--step-2)">US$ 34,8 M</span>
+          <span class="metrica-pie">US$ 355.000/día × días de deslizamiento</span>
+        </div>
+
+        <p id="sim-resultado" class="nota" style="margin-top:var(--sp-s)" aria-live="polite"></p>
+      </div>
+
+      <div class="fig">
+        <p class="fig-titulo">Curva de sensibilidad</p>
+        <p class="fig-sub">Días de atraso en la Adenda → días que se corre la puesta en marcha</p>
+        <svg id="fig-curva" viewBox="0 0 420 250" role="img"
+             aria-label="Gráfico escalonado. De 0 a 9 días de atraso, la puesta en marcha no se mueve. A partir del día 10, salta de golpe a 98 días de deslizamiento y se mantiene plana hasta los 90 días.">
+          <!-- ejes y malla -->
+          <line class="eje" x1="46" y1="200" x2="404" y2="200"/>
+          <line class="eje" x1="46" y1="20" x2="46" y2="200"/>
+          <line class="malla" x1="46" y1="145" x2="404" y2="145"/>
+          <line class="malla" x1="46" y1="90"  x2="404" y2="90"/>
+          <line class="malla" x1="46" y1="35"  x2="404" y2="35"/>
+          <text class="tick" x="40" y="203" text-anchor="end">0</text>
+          <text class="tick" x="40" y="148" text-anchor="end">40</text>
+          <text class="tick" x="40" y="93"  text-anchor="end">80</text>
+          <text class="tick" x="40" y="38"  text-anchor="end">120</text>
+          <text class="tick" x="46" y="216" text-anchor="middle">0</text>
+          <text class="tick" x="165" y="216" text-anchor="middle">30</text>
+          <text class="tick" x="285" y="216" text-anchor="middle">60</text>
+          <text class="tick" x="404" y="216" text-anchor="middle">90</text>
+          <text class="tick" x="225" y="234" text-anchor="middle">días de atraso en la Adenda</text>
+          <text class="tick" x="12" y="110" text-anchor="middle" transform="rotate(-90 12 110)">deslizamiento (días)</text>
+
+          <!-- zona de holgura -->
+          <rect x="46" y="20" width="36" height="180" fill="#3ec98f" opacity="0.07"/>
+          <text class="serie-et" x="50" y="33" fill="#3ec98f">holgura</text>
+
+          <!-- escalón -->
+          <path d="M46 200 L82 200 L82 65 L404 65" fill="none" stroke="#56d7ef" stroke-width="2"/>
+          <!-- marcador móvil -->
+          <line id="cur-x" class="malla" x1="165" y1="20" x2="165" y2="200" stroke="#56d7ef" stroke-opacity=".5"/>
+          <circle id="cur-pt" cx="165" cy="65" r="5" fill="#56d7ef" stroke="#0d2136" stroke-width="2"/>
+          <text class="serie-et" x="250" y="56" fill="#56d7ef">98 días — la temporada de terreno se perdió</text>
+          <text class="serie-et" x="90" y="192" fill="#7ea9cc">9 días de margen</text>
+        </svg>
+        <p class="nota" style="margin-top:var(--sp-xs)">No es una recta. Es un escalón: pasado el día 9 de atraso, la campaña de rescate arqueológico ya no cabe en la ventana de terreno (se cierra por el invierno altiplánico) y se va entera a la temporada siguiente. <strong>Por eso un mes cuesta tres.</strong></p>
+      </div>
+    </div>
+
+    <!-- La derivación del número. Sin esto, el simulador es una animación bonita. -->
+    <div class="caja" id="costo" style="margin-top:var(--sp-l)">
+      <p class="rotulo" style="margin-bottom:var(--sp-s)">De dónde sale el US$ 355.000 por día</p>
+      <div class="rejilla rejilla-2">
+        <div>
+          <p>Un día de atraso no “pierde” un día de producción: <strong>difiere el flujo de caja completo del proyecto en un día</strong>. El costo financiero de eso es el VAN por la tasa, dividido en 365. A eso se le suma lo que el proyecto gasta mientras espera.</p>
+          <table style="margin-top:var(--sp-s)">
+            <tbody>
+              <tr>
+                <td>Diferimiento del VAN<br><span class="nota">VAN US$ 1.180 M × tasa real 8 % ÷ 365</span></td>
+                <td class="num">US$ 258.600/día</td>
+              </tr>
+              <tr>
+                <td>Equipo de proyecto + <em>standby</em> de contratos EPC<br><span class="nota">oficina técnica, EPCM, equipos long-lead en espera</span></td>
+                <td class="num">US$ 96.400/día</td>
+              </tr>
+              <tr style="border-top:1px solid var(--linea)">
+                <td><strong>Costo de la demora</strong></td>
+                <td class="num"><strong class="acento">US$ 355.000/día</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hueco">
+          <p class="nota"><strong class="acento">Es un supuesto, y lo configura el titular.</strong> Cianota no inventa este número: lo toma del modelo financiero que el proyecto ya tiene. El VAN de US$ 1.180 M y la tasa de 8 % son los del proyecto ficticio de la demo.</p>
+          <p class="nota" style="margin-top:var(--sp-s)">Lo que sí aporta Cianota es la otra mitad de la multiplicación: <strong>cuántos días</strong>. Y esa mitad, hoy, no la tiene nadie — porque nadie tiene el grafo.</p>
+          <p class="nota" style="margin-top:var(--sp-s)">98 días × US$ 355.000 = <strong class="malo">US$ 34,8 millones</strong>. Ese es el tamaño de la conversación.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:var(--sp-l)">
+      <a class="btn btn-solido" href="demo/index.html">Ver el plano completo, el reloj legal y el lector de ICSARA →</a>
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ QUÉ HACE -->
+<section>
+  <div class="container">
+    <p class="rotulo">04 — Las cuatro piezas</p>
+    <div class="rejilla rejilla-2">
+
+      <div class="caja stack">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#56d7ef" stroke-width="1.3" aria-hidden="true">
+          <circle cx="4" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="20" cy="12" r="2"/>
+          <path d="M5.7 10.7 10.3 6.3M5.7 13.3l4.6 4.4M13.7 6.3l4.6 4.4M13.7 17.7l4.6-4.4"/>
+        </svg>
+        <h3>El plano</h3>
+        <p>El grafo de dependencias de los permisos del proyecto. Qué bloquea a qué, quién resuelve, en qué estado está. La ruta crítica se dibuja sola: es la cadena que determina la fecha de puesta en marcha.</p>
+        <p class="nota">Y en el teléfono también, porque la mitad de las decisiones se toman en la camioneta.</p>
+      </div>
+
+      <div class="caja stack">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#56d7ef" stroke-width="1.3" aria-hidden="true">
+          <circle cx="12" cy="12" r="8"/><path d="M12 7v5l3.2 2"/><path d="M12 2v2M12 20v2"/>
+        </svg>
+        <h3>El reloj legal</h3>
+        <p>Cada trámite tiene un plazo y cada plazo se cuenta en días hábiles, con los feriados de Chile. Cianota lleva la cuenta y te avisa cuando <strong>el servicio</strong> se está pasando del plazo — que es cuando recién puedes hacer algo al respecto.</p>
+        <p class="nota">Si un plazo no nos consta, aparece marcado <span class="chip chip-validar">por validar</span>. No lo inventamos.</p>
+      </div>
+
+      <div class="caja stack">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#56d7ef" stroke-width="1.3" aria-hidden="true">
+          <path d="M3 20V9M9 20V4M15 20v-7M21 20v-11"/><path d="M2 20h20"/>
+        </svg>
+        <h3>El simulador</h3>
+        <p>Mueves un permiso y ves correrse la fecha de puesta en marcha, la cadena que arrastra y el costo en US$. Sirve para dos cosas: decidir dónde poner al mejor abogado, y explicarle al directorio por qué.</p>
+        <p class="nota">La ruta crítica no es donde está el permiso más lento. Es donde no hay holgura.</p>
+      </div>
+
+      <div class="caja stack">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#56d7ef" stroke-width="1.3" aria-hidden="true">
+          <path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h4.5"/>
+        </svg>
+        <h3>El lector</h3>
+        <p>Llega el ICSARA. Cianota lo lee, separa cada observación, dice qué te están pidiendo exactamente y para cuándo, y busca en el expediente qué documentos ya la responden — con la cita.</p>
+        <p class="nota">No redacta la Adenda. Eso lo firma un abogado y así debe ser. Le arma el andamiaje y le ahorra las tres semanas de búsqueda.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ CÓMO FUNCIONA -->
+<section>
+  <div class="container">
+    <p class="rotulo">05 — Cómo entra a la empresa</p>
+    <div class="rejilla rejilla-3">
+      <div class="stack">
+        <p class="metrica-et">Paso 01 · semana 1–3</p>
+        <h3>Cargamos el expediente</h3>
+        <p>Nos entregas lo que ya tienes: la carta Gantt, la carpeta del SEIA, las resoluciones. Cianota indexa los documentos y arma el grafo. Esto es trabajo y por eso se cobra aparte.</p>
+      </div>
+      <div class="stack">
+        <p class="metrica-et">Paso 02 · semana 3</p>
+        <h3>Validamos el grafo contigo</h3>
+        <p>El jefe de permisos revisa las dependencias en pantalla y corrige. Es la primera vez que alguien ve el proyecto completo en una hoja. Suele aparecer una dependencia que nadie tenía.</p>
+      </div>
+      <div class="stack">
+        <p class="metrica-et">Paso 03 · en adelante</p>
+        <h3>El plano queda vivo</h3>
+        <p>Cada resolución que llega actualiza el grafo. Cada reloj corre solo. Cada semana sale un reporte con lo que se movió, lo que está por vencer y cuánto costó lo que se atrasó.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ PRECIOS -->
+<section>
+  <div class="container">
+    <p class="rotulo">06 — Precios</p>
+    <h2>En CLP, al mes, sin IVA</h2>
+    <p class="lede" style="max-width:58ch;margin-bottom:var(--sp-l)">Un día de atraso en el proyecto de la demo cuesta US$ 355.000. El plan más caro de Cianota cuesta US$ 4.100 <em>al año</em>. La conversación de precio no es sobre el precio.</p>
+
+    <div class="rejilla rejilla-3">
+      <div class="caja precio">
+        <p class="metrica-et">Expediente</p>
+        <p class="precio-monto">$890.000</p>
+        <p class="nota">/ mes · 1 proyecto</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Hasta 40 permisos en el grafo</li>
+          <li>Ruta crítica y relojes legales</li>
+          <li>5 usuarios</li>
+          <li>25 documentos/mes al lector</li>
+        </ul>
+      </div>
+
+      <div class="caja precio destacado">
+        <p class="metrica-et acento">Cartera · el más vendido</p>
+        <p class="precio-monto">$2.400.000</p>
+        <p class="nota">/ mes · hasta 5 proyectos</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Todo lo de Expediente</li>
+          <li><strong>Simulador de escenarios</strong> y costo de la demora</li>
+          <li>Usuarios ilimitados · alertas por WhatsApp</li>
+          <li>150 documentos/mes · API</li>
+          <li>Reporte de directorio mensual</li>
+        </ul>
+      </div>
+
+      <div class="caja precio">
+        <p class="metrica-et">Estudio</p>
+        <p class="precio-monto">$3.900.000</p>
+        <p class="nota">/ mes · para consultoras y estudios</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Hasta 15 proyectos de clientes distintos</li>
+          <li>Informes con la marca del estudio</li>
+          <li>400 documentos/mes</li>
+          <li>Espacios separados por cliente</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-m)">Implementación (una vez): <strong class="acento">$2.900.000</strong> — carga del expediente histórico, construcción y validación del grafo. Contrato anual. La factura la firma el gerente de proyecto; el que lo usa todos los días es el jefe de permisos.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ LA NOTA HONESTA -->
+<section>
+  <div class="container">
+    <p class="rotulo">07 — La conversación incómoda</p>
+    <div class="rejilla-lado">
+      <div class="stack">
+        <h2>¿Y si el Estado arregla la permitología?</h2>
+        <p>Hay reforma en curso al sistema de permisos sectoriales, y hay reforma al SEIA. <strong>No damos por conocido su estado exacto de tramitación</strong>: eso mismo es parte del trabajo del producto y lo mantenemos marcado como <span class="chip chip-validar">por validar</span> hasta verificarlo.</p>
+        <p>Si el Estado entrega una ventanilla única que de verdad funcione —con el estado de cada trámite, el plazo corriendo y una API— entonces la mitad “seguimiento” de Cianota pierde valor. Eso es un riesgo real y no lo vamos a esconder.</p>
+      </div>
+      <div class="caja stack">
+        <p class="rotulo" style="margin-bottom:var(--sp-s)">Por qué igual creemos que hay negocio</p>
+        <ul class="lista">
+          <li>El Estado te va a decir <em>en qué estado está tu trámite</em>. Nunca te va a decir <em>cuánto te cuesta que se atrase</em>, ni cuál de tus permisos mueve tu fecha de puesta en marcha. Eso depende de tu proyecto, tu contrato EPC y tu VAN.</li>
+          <li>Una reforma cambia las reglas. Mantener el catálogo al día durante el cambio es exactamente el trabajo que un cliente prefiere comprar que hacer.</li>
+          <li>Si sale la ventanilla única con API, somos su primer consumidor y nos ahorra el trabajo más frágil que tenemos.</li>
+        </ul>
+        <p class="nota">Si la reforma es un éxito rotundo, esto es un negocio de cinco años, no de quince. Está dicho.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ FAQ -->
+<section>
+  <div class="container">
+    <p class="rotulo">08 — Preguntas</p>
+    <div style="max-width:var(--measure)">
+
+      <details open>
+        <summary>¿La IA responde el ICSARA?</summary>
+        <p>No, y es a propósito. La respuesta a una observación de la autoridad es un acto que compromete al titular y la firma un abogado. Lo que hace la IA es lo aburrido y lo que nadie alcanza a hacer bien: leer las 90 páginas, separar cada observación, decir qué piden y encontrar en el expediente los documentos que ya lo responden, con la cita exacta. El abogado parte del andamiaje, no de la hoja en blanco.</p>
+      </details>
+
+      <details>
+        <summary>¿De dónde salen los plazos?</summary>
+        <p>De la norma cuando nos consta y está citada (el plazo de evaluación de una DIA y de un EIA está en la Ley 19.300; el plazo general de un procedimiento administrativo está en la Ley 19.880). Cuando no nos consta —y en permisología sectorial pasa seguido— el plazo aparece marcado <span class="chip chip-validar">por validar</span> con la estimación observada, y no se presenta como si fuera ley. Un producto que inventa un plazo legal es peor que no tener producto.</p>
+      </details>
+
+      <details>
+        <summary>Ya tenemos Primavera P6 / MS Project.</summary>
+        <p>Perfecto: eso planifica la obra. Cianota planifica <em>el permiso</em>, que es lo que hoy entra a P6 como una barra estimada a ojo. Sabemos exportar hitos para que el cronograma de obra tome fechas reales y no un supuesto. No competimos con P6; le damos la mitad del cronograma que hoy no tiene dueño.</p>
+      </details>
+
+      <details>
+        <summary>Somos un estudio ambiental. ¿Esto nos reemplaza?</summary>
+        <p>No. Un estudio vende criterio, relación con el servicio y responsabilidad profesional. Nada de eso está en un software. Lo que sí les quitamos es el trabajo que no les pagan bien: llevar el Excel, contar días hábiles y buscar en la carpeta. El plan Estudio existe precisamente porque preferimos que nos vendan ustedes.</p>
+      </details>
+
+      <details>
+        <summary>¿Y la información del proyecto?</summary>
+        <p>Es la información más sensible que tiene una minera antes de anunciar. El expediente vive en una base aislada por cliente, en Chile; los documentos se cifran; nadie del equipo de Cianota accede a un expediente sin un ticket firmado por el cliente. Los detalles están en <a href="stack.html">Arquitectura</a>.</p>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ CTA + CARTUCHO -->
+<section>
+  <div class="container">
+    <div class="caja centro" style="padding-block:var(--sp-xl)">
+      <h2>La primera pregunta que respondemos es gratis</h2>
+      <p class="lede" style="margin:var(--sp-s) auto var(--sp-l);max-width:52ch">Danos tu proyecto y te devolvemos, en dos semanas, el grafo de dependencias y la ruta crítica. Si no encontramos al menos una dependencia que no tenías anotada, no hay conversación de venta.</p>
+      <div class="filas" style="justify-content:center">
+        <a class="btn btn-solido" href="demo/index.html">Abrir la demo →</a>
+        <a class="btn btn-fantasma" href="negocio.html">Cómo se vende esto</a>
+      </div>
+    </div>
+
+    <dl class="cartucho" style="margin-top:var(--sp-l)">
+      <div><dt>Proyecto</dt><dd>Cianota</dd></div>
+      <div><dt>Lámina</dt><dd>01 · Producto</dd></div>
+      <div><dt>Estado</dt><dd>Prototipo</dd></div>
+      <div><dt>Rev.</dt><dd>2026-07-13</dd></div>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p>Cianota · cianota.com — Los datos del proyecto Sierra Ancha son ficticios y sirven para demostrar el producto. Los servicios, permisos y procedimientos citados son reales; lo que no nos consta está marcado como <span class="chip chip-validar">por validar</span>.</p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+<script>
+// ── Simulador de la landing ─────────────────────────────────────────────────
+// Los valores salen del mismo motor CPM del demo (días hábiles + feriados +
+// compuertas de sesión + ventana de terreno), precalculados para esta página.
+(function () {
+  var COD_BASE = '12-oct-2029';
+  var COSTO_DIA = 355000;          // US$/día — derivación más abajo, en #costo
+  // atraso (días) → [deslizamiento del COD, nueva fecha]
+  var TABLA = {
+    0:[0,'12-oct-2029'],   5:[0,'12-oct-2029'],   10:[98,'18-ene-2030'],
+    15:[98,'18-ene-2030'], 20:[98,'18-ene-2030'], 25:[98,'18-ene-2030'],
+    30:[98,'18-ene-2030'], 35:[98,'18-ene-2030'], 40:[98,'18-ene-2030'],
+    45:[98,'18-ene-2030'], 50:[98,'18-ene-2030'], 55:[98,'18-ene-2030'],
+    60:[98,'18-ene-2030'], 65:[98,'18-ene-2030'], 70:[98,'18-ene-2030'],
+    75:[98,'18-ene-2030'], 80:[98,'18-ene-2030'], 85:[98,'18-ene-2030'],
+    90:[98,'18-ene-2030']
+  };
+
+  var rango = document.getElementById('rango');
+  var vAtraso = document.getElementById('v-atraso');
+  var vCod = document.getElementById('v-cod');
+  var vDesl = document.getElementById('v-desl');
+  var vCosto = document.getElementById('v-costo');
+  var msg = document.getElementById('sim-resultado');
+  var curX = document.getElementById('cur-x');
+  var curPt = document.getElementById('cur-pt');
+
+  function fmtUSD(n) {
+    var m = n / 1e6;
+    return 'US$ ' + m.toFixed(1).replace('.', ',') + ' M';
+  }
+
+  function pinta() {
+    var d = parseInt(rango.value, 10);
+    var r = TABLA[d];
+    var desl = r[0], cod = r[1];
+
+    vAtraso.textContent = d;
+    vCod.textContent = cod;
+    vDesl.textContent = (desl > 0 ? '+' : '') + desl + ' d';
+    vDesl.className = 'metrica-valor ' + (desl > 0 ? 'malo' : 'bien');
+    vCosto.textContent = desl > 0 ? fmtUSD(desl * COSTO_DIA) : 'US$ 0';
+    vCosto.className = 'metrica-valor ' + (desl > 0 ? 'malo' : 'bien');
+
+    if (desl === 0) {
+      msg.innerHTML = 'Dentro de la holgura. La Adenda tiene <strong>9 días</strong> de margen antes de mover nada: nadie más en la cadena depende de ella todavía.';
+    } else {
+      msg.innerHTML = 'La Adenda arrastra al ICE, a la RCA, al permiso del CMN y a la campaña de rescate — que ya no cabe en la ventana de terreno y se va a la temporada siguiente. <strong>' +
+        d + ' días de atraso = ' + desl + ' días de deslizamiento = ' + fmtUSD(desl * COSTO_DIA) + '.</strong>';
+    }
+
+    // marcador sobre la curva: x de 46 a 404 para 0..90 días
+    var x = 46 + (d / 90) * 358;
+    // y: 200 = 0 días, escala 40 días = 55px  →  y = 200 - desl * (55/40)
+    var y = 200 - desl * 1.375;
+    curX.setAttribute('x1', x); curX.setAttribute('x2', x);
+    curPt.setAttribute('cx', x); curPt.setAttribute('cy', y);
+  }
+
+  rango.addEventListener('input', pinta);
+  pinta();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+/* ============================================================================
+   CINTAVIA — DIRECCIÓN DE ARTE
+   ----------------------------------------------------------------------------
+   Registro: SALA DE CONTROL / HMI INDUSTRIAL. La referencia es un SCADA bien
+   diseñado y la señalética de una faena, no un dashboard de startup.
+
+   - Fondo grafito profundo. Nunca papel. Nunca crema.
+   - Familia de color: pizarra/grafito. Señal en ÁMBAR (#FFB000) y CIAN (#3DD6EA).
+     El rojo existe pero está RESERVADO: sólo alarma crítica. Verde = normal.
+     Convención SCADA: el color significa estado, no decoración.
+   - Tipografía: Archivo (grotesca técnica, densa, de señalética) para la voz.
+     JetBrains Mono para TODO dato: TAG, metro, temperatura, CLP, confianza.
+     Sin serif. Sin Inter. Sin Poppins.
+   - Geometría: rectángulos duros, filetes de 1px, esquinas con marca de bisel
+     (las "orejas" de un panel de instrumento). Cero radios, cero sombras suaves,
+     cero glassmorphism.
+   - Ritmo: denso. Un HMI no respira, informa.
+
+   Paleta de gráficos (validada con dataviz/validate_palette.js contra
+   surface #111A21, modo oscuro: banda de luminosidad, piso de croma,
+   separación CVD y contraste — todos PASS):
+       #C48400  #0E9EB4  #7B7FE0  #BE5A52  #3F9767
+   El ámbar de UI (#FFB000) es para texto/indicadores (contraste 9,6:1);
+   el ámbar de serie (#C48400) es para marcas de gráfico. No son el mismo token
+   y no se intercambian.
+   ============================================================================ */
+
+:root {
+  /* Superficies */
+  --bg:        #0A0F14;
+  --panel:     #111A21;
+  --raised:    #17222B;
+  --sunken:    #070B0E;
+  --rule:      #22323D;
+  --rule-soft: #1A272F;
+
+  /* Tinta */
+  --ink:    #DDE7ED;
+  --ink-2:  #93A8B6;
+  --ink-3:  #7B90A0;
+
+  /* Señal */
+  --amber:     #FFB000;
+  --amber-ink: #FFC44D;
+  --cyan:      #3DD6EA;
+  --cyan-deep: #1B8FA3;
+
+  /* Estado (reservado — sólo significa estado) */
+  --st-ok:    #43C08A;
+  --st-warn:  #FFB000;
+  --st-crit:  #FF6152;
+  --st-none:  #64798A;
+
+  /* Series de gráfico (validadas) */
+  --s1: #C48400;
+  --s2: #0E9EB4;
+  --s3: #7B7FE0;
+  --s4: #BE5A52;
+  --s5: #3F9767;
+
+  --grid: #1E2C36;
+
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ---------- base ---------- */
+
+html { background: var(--bg); }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--step-0);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  /* Trama de plano: una rejilla apenas visible, como el fondo de un P&ID. */
+  background-image:
+    linear-gradient(to right, rgba(61,214,234,0.026) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(61,214,234,0.026) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+::selection { background: var(--amber); color: #0A0F14; }
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* ---------- tipografía ---------- */
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+h1 { font-size: var(--step-4); line-height: 1.03; }
+h2 { font-size: var(--step-2); line-height: 1.1; }
+h3 { font-size: var(--step-1); line-height: 1.2; }
+
+p { color: var(--ink-2); }
+p strong, li strong { color: var(--ink); font-weight: 600; }
+
+a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(61,214,234,0.35); }
+a:hover { border-bottom-color: var(--cyan); }
+
+code, .mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.tag {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  font-weight: 500;
+  color: var(--cyan);
+  background: rgba(61,214,234,0.08);
+  border: 1px solid rgba(61,214,234,0.22);
+  padding: 0.05em 0.35em;
+  white-space: nowrap;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2xs);
+}
+.eyebrow::before {
+  content: "";
+  width: 14px; height: 1px;
+  background: var(--amber);
+  flex: none;
+}
+
+.lede { font-size: var(--step-1); color: var(--ink-2); line-height: 1.5; }
+
+/* ---------- nav ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10,15,20,0.94);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.topbar__in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-s);
+  min-height: 54px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-height: 44px;   /* blanco táctil, no sólo alto de texto */
+  gap: var(--sp-2xs);
+  border: 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  font-size: 1.02rem;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.brand:hover { border: 0; }
+.brand svg { flex: none; }
+.brand__dot {
+  width: 7px; height: 7px;
+  background: var(--st-ok);
+  box-shadow: 0 0 8px rgba(67,192,138,0.8);
+  margin-left: 2px;
+}
+
+.nav-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3xs);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  padding: 0 0.7rem;
+  min-height: 44px;
+}
+.nav-toggle[aria-expanded="true"] { color: var(--amber); border-color: var(--amber); }
+
+.nav {
+  display: none;
+  border-top: 1px solid var(--rule-soft);
+  padding: var(--sp-2xs) 0 var(--sp-s);
+}
+.nav[data-open="true"] { display: block; }
+
+.nav ul { list-style: none; display: flex; flex-direction: column; }
+
+.nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border: 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.nav a:hover { color: var(--amber); border-bottom-color: var(--rule); }
+.nav a[aria-current="page"] { color: var(--amber); }
+.nav a[aria-current="page"]::before { content: "▸ "; margin-right: 4px; }
+
+@media (min-width: 56em) {
+  .nav-toggle { display: none; }
+  .nav { display: block !important; border: 0; padding: 0; }
+  .nav ul { flex-direction: row; gap: var(--sp-m); }
+  .nav a { border: 0; min-height: 54px; }
+  .nav a:hover { border: 0; }
+  .topbar__in { flex-wrap: nowrap; }
+}
+
+/* ---------- layout ---------- */
+
+section { padding-block: var(--sp-xl); }
+@media (min-width: 56em) { section { padding-block: var(--sp-2xl); } }
+
+.rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+
+.sec-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2xs);
+  margin-bottom: var(--sp-l);
+}
+
+/* ---------- panel (la unidad visual del HMI) ---------- */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: var(--sp-s);
+  position: relative;
+}
+.panel--raised { background: var(--raised); }
+
+/* Marca de bisel: la "oreja" del panel de instrumento. */
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 7px; height: 7px;
+  border-color: var(--amber);
+  opacity: 0.55;
+}
+.panel::before { top: -1px; left: -1px; border-top: 1px solid; border-left: 1px solid; }
+.panel::after  { bottom: -1px; right: -1px; border-bottom: 1px solid; border-right: 1px solid; }
+
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2xs);
+  padding-bottom: var(--sp-2xs);
+  margin-bottom: var(--sp-s);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.panel__title {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.panel__meta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-3);
+}
+
+/* ---------- estado (icono + etiqueta, nunca sólo color) ---------- */
+
+.st {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.st svg { flex: none; }
+.st--ok   { color: var(--st-ok); }
+.st--warn { color: var(--st-warn); }
+.st--crit { color: var(--st-crit); }
+.st--none { color: var(--st-none); }
+
+/* ---------- botones ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2xs);
+  min-height: 44px;
+  padding: 0 var(--sp-s);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  background: var(--raised);
+  transition: color .12s, border-color .12s, background .12s;
+}
+.btn:hover { color: var(--ink); border-color: var(--ink-3); }
+
+.btn--primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #0A0F14;
+  font-weight: 700;
+}
+.btn--primary:hover { background: var(--amber-ink); border-color: var(--amber-ink); color: #0A0F14; }
+
+.btn--ghost { background: transparent; }
+
+.btn--cyan { border-color: var(--cyan-deep); color: var(--cyan); }
+.btn--cyan:hover { border-color: var(--cyan); color: var(--cyan); }
+
+a.btn { border-bottom: 1px solid var(--rule); }
+a.btn.btn--primary { border-bottom-color: var(--amber); }
+a.btn.btn--cyan { border-bottom-color: var(--cyan-deep); }
+a.btn:hover { border-bottom-color: currentColor; }
+
+/* ---------- tablas ---------- */
+
+table { width: 100%; font-size: var(--step--1); }
+
+th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0.5rem 0.6rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+td {
+  padding: 0.55rem 0.6rem 0.55rem 0;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--ink-2);
+  vertical-align: top;
+}
+td:last-child, th:last-child { padding-right: 0; }
+tbody tr:hover td { background: rgba(61,214,234,0.03); }
+td .num, td.num { color: var(--ink); }
+.num-r { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- listas ---------- */
+
+.list { list-style: none; display: flex; flex-direction: column; gap: var(--sp-xs); }
+.list li {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: var(--sp-2xs);
+  color: var(--ink-2);
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+.list li::before {
+  content: "";
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  margin-top: 0.5em;
+}
+.list--warn li::before { background: var(--amber); }
+.list--crit li::before { background: var(--st-crit); }
+
+/* ---------- cifra ---------- */
+
+.figure {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.figure--amber { color: var(--amber); }
+.figure--cyan { color: var(--cyan); }
+.figure__unit { font-size: 0.42em; color: var(--ink-3); font-weight: 500; margin-left: 0.15em; }
+.figure__note { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); margin-top: 4px; letter-spacing: 0.04em; }
+
+/* ---------- grillas ---------- */
+
+.grid { display: grid; gap: var(--sp-s); }
+
+/* EL BUG QUE ROMPE EL MÓVIL.
+   Un item de grid (y de flex) tiene `min-width: auto` por defecto: se niega a
+   encogerse por debajo del ancho mínimo de su contenido. Cuando adentro hay un
+   .scroll-x cuyo hijo mide 560-820px, ese mínimo se propaga hacia arriba, revienta
+   el contenedor y el <body> termina con scroll horizontal. El overflow del
+   .scroll-x nunca llega a activarse. Se corta de raíz: los items de layout pueden
+   encogerse, y el scroll queda donde tiene que quedar (dentro de la caja ancha). */
+.grid > *,
+.stack > *, .stack-s > *, .stack-l > *,
+.sec-head > *, .panel__head > *, .figure > * { min-width: 0; }
+.panel, .figure, .callout { min-width: 0; }
+
+@media (min-width: 48em) { .g2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 62em) {
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g23 { grid-template-columns: 2fr 3fr; }
+  .g32 { grid-template-columns: 3fr 2fr; }
+}
+@media (min-width: 40em) and (max-width: 61.99em) {
+  .g4 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- gráficos ---------- */
+
+.chart { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--mono); font-size: 9px; fill: var(--ink-3); }
+.chart .ax { stroke: var(--rule); stroke-width: 1; }
+.chart .gridline { stroke: var(--grid); stroke-width: 1; }
+.chart .lbl { fill: var(--ink-2); font-size: 9.5px; }
+.chart .lbl-em { fill: var(--ink); font-size: 10px; font-weight: 500; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2xs) var(--sp-s);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-2);
+  margin-top: var(--sp-2xs);
+}
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 12px; height: 3px; display: block; flex: none; }
+
+/* ---------- nota / fuente ---------- */
+
+.src {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.6;
+  color: var(--ink-3);
+  border-left: 2px solid var(--rule);
+  padding-left: var(--sp-2xs);
+  margin-top: var(--sp-xs);
+}
+.src b { color: var(--ink-2); font-weight: 500; }
+
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--amber);
+  background: rgba(255,176,0,0.04);
+  padding: var(--sp-s);
+}
+.callout--crit { border-left-color: var(--st-crit); background: rgba(255,97,82,0.05); }
+.callout--cyan { border-left-color: var(--cyan); background: rgba(61,214,234,0.04); }
+.callout p { color: var(--ink-2); font-size: var(--step--1); }
+.callout p + p { margin-top: var(--sp-2xs); }
+
+/* ---------- footer ---------- */
+
+.foot {
+  border-top: 1px solid var(--rule);
+  padding-block: var(--sp-l);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2xs) var(--sp-m);
+  justify-content: space-between;
+}
+
+/* ---------- utilidades ---------- */
+
+.stack   { display: flex; flex-direction: column; gap: var(--sp-s); }
+.stack-s { display: flex; flex-direction: column; gap: var(--sp-2xs); }
+.stack-l { display: flex; flex-direction: column; gap: var(--sp-l); }
+.row     { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); align-items: center; }
+.mt-s { margin-top: var(--sp-s); }
+.mt-m { margin-top: var(--sp-m); }
+.mt-l { margin-top: var(--sp-l); }
+.dim { color: var(--ink-3); }
+.amber { color: var(--amber); }
+.cyan { color: var(--cyan); }
+.crit { color: var(--st-crit); }
+.ok { color: var(--st-ok); }
+/* Lo ancho scrollea dentro de su propia caja, nunca el body.
+   Los gráficos necesitan más ancho mínimo que una tabla: por debajo de ~680px
+   el texto del eje (9px) se vuelve ilegible al escalar el viewBox. */
+.scroll-x > * { min-width: 560px; }
+.scroll-x > .chart { min-width: 680px; }
+.scroll-x { padding-bottom: 4px; }
+
+/* ---------- bloque de código / aviso SAP ----------
+   Lo usan el demo (el aviso generado) y stack.html (.env, SQL, prompts).
+   `pre-wrap` respeta los saltos de línea pero NO parte un token largo sin espacios
+   (una URL, un CREATE TABLE): por eso `overflow-wrap: anywhere` además del scroll.
+   Sin esto, una sola línea `SAP_ODATA_URL=https://...` empuja el ancho del <body>. */
+.sap {
+  background: var(--sunken);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--st-ok);
+  padding: var(--sp-xs);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  min-width: 0;
+}
+.sap b { color: var(--st-ok); }
+.sap i { color: var(--ink-3); font-style: normal; }
+
+/* Pista de scroll: en móvil hay que saber que la caja se arrastra. */
+@media (max-width: 47.99em) {
+  .scroll-x { scrollbar-width: thin; }
+  .scroll-x::-webkit-scrollbar { height: 6px; }
+  .scroll-x::-webkit-scrollbar-track { background: var(--sunken); }
+  .scroll-x::-webkit-scrollbar-thumb { background: var(--rule); }
+}

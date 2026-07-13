@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torniqua — negocio y go-to-market</title>
+<meta name="description" content="ICP, TAM/SAM/SOM con la aritmética a la vista, competencia real, economía unitaria y por qué le vendemos primero a la contratista y no a la minera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="torniqua.css">
+<style>
+  /* la aritmética se escribe tal cual se lee: espacios preservados, scroll propio */
+  .calc { font-family:'IBM Plex Mono',monospace; font-size: .8rem; background: var(--steel-0);
+          border: 1px solid var(--steel-4); border-left: 3px solid var(--teal); border-radius: 2px;
+          padding: var(--sp-s); color: var(--ink-2); overflow-x: auto; white-space: pre; line-height: 1.55; }
+  .calc b { color: var(--teal); font-weight: 500; }
+  .calc .out { color: var(--ink); font-weight: 600; }
+  .src { font-size: .74rem; color: var(--ink-3); font-family:'IBM Plex Mono',monospace; }
+  .src::before { content: "▸ "; color: var(--teal); }
+  .vs { display: grid; gap: var(--sp-s); }
+  @media (min-width: 48em) { .vs { grid-template-columns: 1fr 1fr; } }
+  .vs > div { border: 1px solid var(--steel-4); border-radius: var(--radius); padding: var(--sp-s); background: var(--steel-2); }
+  .vs > div.win { border-color: var(--teal); background: linear-gradient(180deg, var(--teal-tint), var(--steel-2)); }
+  .kpi { font-size: var(--step-2); font-weight: 700; letter-spacing: -.02em; }
+  .kpi--alarm { color: var(--alarm); }
+  .kpi--ok { color: var(--teal); }
+  ol.steps { list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: var(--sp-s);
+                padding-block: var(--sp-s); border-top: 1px solid var(--line); }
+  ol.steps li::before { content: counter(s); font-family:'IBM Plex Mono',monospace; color: var(--teal);
+                        border: 1px solid var(--steel-4); height: 30px; display: grid; place-items: center; font-size: .78rem; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="2" stroke="#22C3AC" stroke-width="1.5"/>
+        <path d="M6 8h7M6 12h5M6 16h7" stroke="#22C3AC" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 5v16" stroke="#22C3AC" stroke-width="1.5"/><circle cx="20.5" cy="13" r="1.6" fill="#22C3AC"/>
+      </svg>
+      <span class="brand__name">Torniqua</span><span class="brand__dot" aria-hidden="true"></span>
+    </a>
+    <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="section section--flush">
+  <span class="tag tag--teal">Negocio</span>
+  <h1 style="margin-block:var(--sp-2xs) var(--sp-s)">A quién le vendemos, con qué plata y por qué esa y no la otra.</h1>
+  <p class="lede prose">
+    La pregunta que define este negocio: ¿le vendes a la minera mandante, que tiene la plata y el miedo,
+    o a la empresa contratista, que sufre el rechazo? La respondemos con aritmética, y la respuesta
+    tiene truco: <strong>le regalamos el lector a la mandante y le cobramos a la contratista</strong>.
+  </p>
+  <p class="src" style="margin-top:var(--sp-s)">
+    Regla de esta página: toda cifra está citada o está etiquetada como estimación con su aritmética a la vista.
+    Donde no sabemos, lo decimos.
+  </p>
+</section>
+
+<!-- ================================================================== ICP -->
+<section class="section">
+  <div class="section__head"><span class="tag">01</span><h2>Cliente objetivo</h2></div>
+
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="tag tag--teal">Quien paga (día 1)</span>
+      <h3 style="margin-block:6px">Empresa contratista minera, 20–120 personas en faena</h3>
+      <ul class="rows small">
+        <li><strong>Segmento:</strong>&nbsp;mantención mecánica y eléctrica, montaje, sondaje, transporte de personal, aseo industrial, alimentación.</li>
+        <li><strong>Dónde:</strong>&nbsp;Calama, Antofagasta, Sierra Gorda, Diego de Almagro, Copiapó. Oficina chica, gente en faena.</li>
+        <li><strong>Quién firma:</strong>&nbsp;el gerente de operaciones o el dueño. Ticket bajo el umbral de comité.</li>
+        <li><strong>Quién lo usa:</strong>&nbsp;el prevencionista de riesgos y la persona de RRHH que hoy mantiene la planilla.</li>
+        <li><strong>Dónde ya está:</strong>&nbsp;Excel, Drive, correo, y el grupo de WhatsApp «Documentación Faena».</li>
+        <li><strong>Gatillo de compra:</strong>&nbsp;el último rechazo en portería. No hay mejor vendedor.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="tag">Quien manda (y no paga, todavía)</span>
+      <h3 style="margin-block:6px">Minera mandante: contract manager y jefe de portería</h3>
+      <ul class="rows small">
+        <li><strong>Su miedo:</strong>&nbsp;responsabilidad solidaria (Ley 20.123) y un accidente de un contratista no habilitado.</li>
+        <li><strong>Su dolor operativo:</strong>&nbsp;la portería es el cuello de botella del cambio de turno.</li>
+        <li><strong>Su velocidad:</strong>&nbsp;homologación de proveedor, revisión de TI, ciberseguridad, presupuesto anual. 9 a 14 meses.</li>
+        <li><strong>Nuestra jugada:</strong>&nbsp;darle el lector gratis. Sin contrato, sin integración, sin factura: un Android en la garita.</li>
+        <li><strong>Qué le vendemos en el año 2:</strong>&nbsp;el Panel Mandante, cuando el dato ya está corriendo en su portería.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== LA PREGUNTA -->
+<section class="section" id="quien">
+  <div class="section__head">
+    <span class="tag">02</span>
+    <h2>La pregunta de US$ 10 millones: ¿mandante o contratista?</h2>
+    <p class="lede prose" style="margin-top:var(--sp-2xs)">Los dos caminos, con la misma calculadora.</p>
+  </div>
+
+  <div class="vs">
+    <div>
+      <span class="tag tag--alarm">Camino A · vender a la minera</span>
+      <p class="small" style="margin-top:8px">45 faenas grandes y medianas en Chile (estimación: 8 divisiones Codelco + ~20 privadas grandes + ~17 medianas). Ticket alto, ciclo eterno.</p>
+      <div class="calc" style="margin-top:var(--sp-s)">
+2 vendedores enterprise cargados  = <b>$3.500.000</b> c/u /mes
+costo comercial                   = $7.000.000 /mes
+ciclo de venta                    = <b>11 meses</b> (homologación + TI + presupuesto)
+procesos activos posibles año 1   = 20
+tasa de cierre supuesta           = 15%
+cierres a 18 meses                = 20 × 0,15 = <b>3</b>
+ingreso mes 18                    = 3 × $2.900.000 = <span class="out">$8.700.000 /mes</span>
+costo comercial acumulado (18 m)  = <span class="out">$126.000.000</span>
+      </div>
+      <p class="small" style="margin-top:8px;color:var(--alarm)"><strong>Primer peso: mes 11.</strong>
+        Con esa curva, el equipo se muere antes del primer contrato. Y el peor escenario no es no vender:
+        es vender uno solo y quedar preso de su ciclo de compra.</p>
+    </div>
+
+    <div class="win">
+      <span class="tag tag--teal">Camino B · vender a la contratista</span>
+      <p class="small" style="margin-top:8px">4.500 empresas contratistas mineras (derivación abajo). Ticket bajo, decisión rápida, dolor semanal.</p>
+      <div class="calc" style="margin-top:var(--sp-s)">
+1 SDR + fundador vendiendo        = <b>$2.000.000</b> /mes (SDR cargado + ferias/viajes)
+ciclo de venta                    = <b>9–21 días</b> (decide el dueño)
+cierres/mes (promedio meses 4–18) = 6,5
+ARPU ponderado                    = <b>$180.000</b> /mes
+ingreso mes 18 (97 clientes, curva base) = <span class="out">$17.500.000 /mes</span>
+costo comercial acumulado (18 m)  = <span class="out">$36.000.000</span>
+      </div>
+      <p class="small" style="margin-top:8px;color:var(--teal)"><strong>Primer peso: mes 3.</strong>
+        Y cada cliente trae el dato de una faena distinta, que es lo que después le vendemos al mandante.</p>
+    </div>
+  </div>
+
+  <div class="hazard" style="margin-top:var(--sp-m)">
+    <span class="tag tag--alarm">La aritmética que decide</span>
+    <p class="small" style="margin-top:6px;color:var(--ink)">
+      El equipo del mes 16 en adelante (7 personas) cuesta <strong class="num">$15.500.000</strong> al mes
+      (<a href="roadmap.html#caja">detalle en el roadmap</a>). Para cubrirlo hay que facturar ~<strong class="num">$16.300.000</strong>/mes.
+      Eso son <strong>6 mineras mandantes</strong> — que con 2 vendedores enterprise y ciclo de 11 meses recién existirían
+      alrededor del mes 36, y sólo si cierras la mitad de lo que tocas — o <strong>91 empresas contratistas</strong>,
+      que en la curva base llegan en el <strong>mes 17</strong>. No es una preferencia estética: es la única de las dos que cierra.
+    </p>
+  </div>
+
+  <div class="card" style="margin-top:var(--sp-m)">
+    <span class="tag tag--teal">Por qué el lector va gratis: es el canal, no un regalo</span>
+    <p class="small" style="margin-top:6px">
+      Una faena grande tiene entre 150 y 600 empresas contratistas acreditadas. Poner el lector en su portería
+      no cuesta nada (corre en un Android) y no requiere que la minera compre nada — sólo que deje. A cambio,
+      cada rechazo en esa portería es una demostración del producto frente a la persona exacta que lo necesita,
+      con el motivo impreso en el ticket y una URL. <strong>El costo de adquisición de ese canal es cero y la
+      intención de compra es la más alta que va a existir jamás.</strong>
+      Ninguna campaña de LinkedIn compite con estar parado en el momento en que el camión no entra.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================== MERCADO -->
+<section class="section" id="mercado">
+  <div class="section__head">
+    <span class="tag">03</span>
+    <h2>Tamaño de mercado, con los supuestos declarados</h2>
+  </div>
+
+  <div class="grid grid--sidebar">
+    <div class="stack">
+      <div class="card">
+        <span class="tag tag--teal">Universo de empresas contratistas — derivación</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+faenas grandes/medianas con portería       = <b>45</b>   (estimación propia)
+contratistas acreditadas por faena (prom.) = <b>250</b>  (rango observado 150–600)
+solapamiento: faenas por contratista       = <b>2,3</b>
+--------------------------------------------------------
+universo único = 45 × 250 ÷ 2,3           = <span class="out">≈ 4.900 → redondeamos a 4.500</span>
+        </div>
+        <p class="src" style="margin-top:8px">Los tres números son estimaciones nuestras, no cifras publicadas.
+          El que más mueve el resultado es el solapamiento: si fuera 1,5 el universo sube a 7.500; si fuera 4, baja a 2.800.
+          Es la primera cosa que hay que medir con datos reales de una faena.</p>
+      </div>
+
+      <div class="card">
+        <span class="tag tag--teal">ARPU ponderado — derivación</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+Cuadrilla   $69.000  × 45% = $31.050
+Faena       $189.000 × 40% = $75.600
+Multifaena  $490.000 × 15% = $73.500
+--------------------------------------------
+ARPU mensual ponderado     = <span class="out">$180.150 ≈ $180.000</span>
+        </div>
+        <p class="src" style="margin-top:8px">La mezcla 45/40/15 es un supuesto: contratistas chicas hay muchas más,
+          pero las que sufren el rechazo a diario son las de 20–120 personas. Si la mezcla se corre hacia Cuadrilla,
+          el ARPU cae a $120.000 y el SOM baja un tercio.</p>
+      </div>
+
+      <div class="card">
+        <span class="tag">TAM · SAM · SOM Chile (minería)</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+TAM contratistas = 4.500 × $180.000 × 12 = <span class="out">$9.720 millones CLP/año</span>
+TAM mandantes    =    45 × $2.900.000 × 12 = <span class="out">$1.566 millones CLP/año</span>
+TAM total                                  = <span class="out">$11.286 M CLP ≈ USD 11,9 M</span>   (USD a $950)
+
+SAM = contratistas con ≥10 personas en faena (50%)
+    = 2.250 × $180.000 × 12                = $4.860 M
+    + 20 mandantes alcanzables × $2,9M × 12 = $696 M
+                                            = <span class="out">$5.556 M CLP ≈ USD 5,8 M</span>
+
+SOM 36 meses = 12% del SAM contratista
+    = 270 clientes × $180.000 × 12          = $583 M
+    + 4 mandantes × $2,9M × 12              = $139 M
+                                            = <span class="out">$722 M CLP/año ≈ USD 760 k ARR</span>
+        </div>
+      </div>
+
+      <div class="hazard">
+        <span class="tag tag--alarm">La verdad incómoda del TAM</span>
+        <p class="small" style="margin-top:6px;color:var(--ink)">
+          La minería chilena sola no da para un unicornio: el techo son ~USD 12 M al año, y eso si te llevas todo.
+          Este negocio es una PYME de software muy rentable en Chile, o es un producto que se extiende. La extensión
+          no es marketing, es el mismo producto: <strong>la Ley 20.123 aplica igual en construcción, forestal, energía,
+          puertos y salmonicultura</strong> — misma responsabilidad solidaria, mismo F30-1, misma portería.
+        </p>
+        <div class="calc" style="margin-top:var(--sp-2xs);border-left-color:var(--alarm)">
+Chile no-minero (construcción, forestal, energía, puertos):
+  ~3× el número de mandantes con portería, ticket 40% menor
+  → multiplicador ≈ <b>1,8×</b>  → +USD 21 M
+Perú minería (Ley 29245, misma lógica de subcontratación)
+  → ≈ <b>0,6×</b> Chile          → +USD 7 M
+México + Colombia (más lento, marco distinto)  → +USD 8 M
+--------------------------------------------------------
+TAM extendido (estimación gruesa) = <span class="out">≈ USD 45 M/año</span>
+        </div>
+        <p class="src" style="margin-top:8px">Estimación gruesa, sin fuente. Sirve para saber si vale la pena empezar, no para levantar una Serie A.</p>
+      </div>
+    </div>
+
+    <aside>
+      <figure class="card" style="margin:0">
+        <figcaption class="tag" style="margin-bottom:var(--sp-s)">TAM · SAM · SOM — Chile minería, CLP/año</figcaption>
+        <svg class="chart" viewBox="0 0 320 180" role="img" aria-label="Barras: TAM 11.286 millones de pesos al año, SAM 5.556 millones, SOM a 36 meses 722 millones.">
+          <!-- rampa ordinal de un solo tono, validada (ΔL ≥ 0,06 entre pasos) -->
+          <text x="0" y="14" font-size="10" fill="#A6BAC1">TAM · $11.286 M</text>
+          <path d="M0 22 h296 q4 0 4 4 v14 q0 4 -4 4 H0 Z" fill="#6FD9C9"/>
+          <text x="0" y="72" font-size="10" fill="#A6BAC1">SAM · $5.556 M</text>
+          <path d="M0 80 h142 q4 0 4 4 v14 q0 4 -4 4 H0 Z" fill="#0FA894"/>
+          <text x="0" y="130" font-size="10" fill="#A6BAC1">SOM 36 m · $722 M</text>
+          <path d="M0 138 h15 q4 0 4 4 v14 q0 4 -4 4 H0 Z" fill="#0A5E55"/>
+          <text x="26" y="152" font-size="9" fill="#718A93">6,4% del TAM</text>
+          <line x1="0" y1="172" x2="300" y2="172" stroke="#1B2A31"/>
+          <text x="0" y="180" font-size="8" fill="#718A93">escala lineal · 300 px = $11.286 M</text>
+        </svg>
+      </figure>
+      <div class="card" style="margin-top:var(--sp-s)">
+        <span class="tag">Concentración geográfica</span>
+        <p class="small" style="margin-top:6px">El grueso del SAM cabe en un radio de 300 km alrededor de Antofagasta y Calama.
+          Un vendedor puede visitar cuatro clientes en un día. Eso baja el CAC de una forma que no se puede replicar
+          en un mercado disperso — y es una de las pocas ventajas estructurales de este negocio.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ========================================================= POSICIONAMIENTO -->
+<section class="section">
+  <div class="section__head"><span class="tag">04</span><h2>Posicionamiento y cuña</h2></div>
+
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="tag tag--teal">La frase</span>
+      <p style="margin-top:8px;font-size:var(--step-1);color:var(--ink)">
+        «Achilles te acredita una vez al año para poder contratar.
+        <strong style="color:var(--teal)">Torniqua decide si tu gente entra mañana a las 6.</strong>»
+      </p>
+      <hr class="rule">
+      <span class="tag">La cuña (beachhead)</span>
+      <p class="small" style="margin-top:6px">
+        Contratistas de <strong>mantención y montaje de 20 a 80 personas</strong> en las 3 faenas donde consigamos poner
+        el lector. No "la minería chilena": tres porterías. Ganamos ahí el 60% de las contratistas de esas faenas,
+        y recién entonces vamos por la cuarta faena — llegando con la carta de que sus propias contratistas ya lo usan.
+      </p>
+    </div>
+    <div class="card">
+      <span class="tag">Por qué esa cuña y no otra</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li><span class="mono" style="color:var(--teal)">01</span>&nbsp;Bajo 20 personas, el dueño lleva la carpeta en la cabeza y no paga.</li>
+        <li><span class="mono" style="color:var(--teal)">02</span>&nbsp;Sobre 120, ya tienen un ERP y un jefe de contrato: ciclo largo, integraciones, licitación.</li>
+        <li><span class="mono" style="color:var(--teal)">03</span>&nbsp;Mantención y montaje entran y salen todos los días, con turnos rotativos: el rechazo les pasa seguido.</li>
+        <li><span class="mono" style="color:var(--teal)">04</span>&nbsp;Ya tienen prevencionista — hay quien use el producto — pero no tienen software.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== COMPETENCIA -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">05</span><h2>Competencia (con nombre y apellido)</h2>
+  </div>
+
+  <div class="scroll-x card" style="padding:0">
+    <table class="data">
+      <caption class="visually-hidden">Competidores reales y diferenciación</caption>
+      <thead><tr><th>Quién</th><th>Qué hace de verdad</th><th>Por qué gana hoy</th><th>Dónde no llega</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Excel + correo + carpeta</strong><br><span class="src">el titular real del puesto</span></td>
+          <td>Una planilla con una columna «vence», carpetas en Drive y un grupo de WhatsApp.</td>
+          <td>Es gratis, ya está instalado y nadie tiene que aprobar nada.</td>
+          <td>No avisa. Nadie mira la planilla el domingo a las 23:00 para el turno del lunes.</td>
+        </tr>
+        <tr>
+          <td><strong>Achilles / RedMinera</strong></td>
+          <td>Registro de homologación de proveedores para minería. El proveedor paga por estar acreditado.</td>
+          <td>Lo exige la mandante en el contrato. Tiene la relación con Abastecimiento.</td>
+          <td>Es acreditación anual de la <em>empresa</em>, no habilitación diaria de la <em>persona</em>. No resuelve la portería.</td>
+        </tr>
+        <tr>
+          <td><strong>Avetta · ISNetworld (ISN) · ComplyWorks</strong></td>
+          <td>Precalificación y compliance de contratistas, estándar en minería y O&amp;G global.</td>
+          <td>Marca global, ya los conocen las mineras multinacionales.</td>
+          <td>Producto pensado para el corporativo del mandante, en inglés, sin la portería chilena ni el F30-1.</td>
+        </tr>
+        <tr>
+          <td><strong>SAP Ariba / Fieldglass</strong></td>
+          <td>Gestión de proveedores y de fuerza laboral externa dentro del ERP de la minera.</td>
+          <td>Ya está comprado. Nadie se pelea con SAP.</td>
+          <td>Nadie de la contratista lo usa. La vigencia del examen de altura no vive ahí.</td>
+        </tr>
+        <tr>
+          <td><strong>BUK · Rex+ · Softland</strong></td>
+          <td>Remuneraciones y RRHH. Tienen el contrato y la nómina.</td>
+          <td>Ya están dentro de la contratista.</td>
+          <td>No saben nada de faena: ni inducción, ni altura geográfica, ni portería. <span style="color:var(--alarm)">Riesgo real: BUK podría entrar acá.</span></td>
+        </tr>
+        <tr>
+          <td><strong>Integradores de control de acceso</strong></td>
+          <td>Torniquetes, tarjetas, biometría, molinetes.</td>
+          <td>Ya están instalados en la portería. Son los dueños del fierro.</td>
+          <td>Validan <em>quién eres</em>, no <em>si estás habilitado</em>. Son el complemento natural, no el rival.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:var(--sp-m)">
+    <span class="tag tag--alarm">Diferenciación honesta</span>
+    <p class="small" style="margin-top:6px">
+      No reemplazamos a Achilles y decirlo nos ahorra seis meses de discusión: si la mandante lo exige,
+      la contratista lo va a pagar igual. Nosotros somos <strong>gasto operacional, no gasto de acreditación</strong>,
+      y competimos contra el costo de un rechazo, no contra una licencia. Nuestra debilidad estructural es clara:
+      <strong>ellos tienen la relación con Abastecimiento de la minera y nosotros no</strong>. Por eso entramos por
+      la portería, que es de Operaciones, no de Abastecimiento.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================ PRECIO -->
+<section class="section" id="unit">
+  <div class="section__head">
+    <span class="tag">06</span><h2>Precio y economía unitaria</h2>
+  </div>
+
+  <div class="grid grid--4">
+    <div class="card"><span class="tag">Cuadrilla · ≤15 pers.</span><div class="kpi num">$69.000</div><span class="small muted">/mes</span></div>
+    <div class="card"><span class="tag">Faena · ≤60 pers.</span><div class="kpi num">$189.000</div><span class="small muted">/mes · el plan ancla</span></div>
+    <div class="card"><span class="tag">Multifaena · ≤250</span><div class="kpi num">$490.000</div><span class="small muted">/mes</span></div>
+    <div class="card" style="border-color:var(--teal-3)"><span class="tag tag--teal">Lector mandante</span><div class="kpi kpi--ok num">$0</div><span class="small muted">para siempre · es el canal</span></div>
+  </div>
+
+  <div class="grid grid--2" style="margin-top:var(--sp-m)">
+    <div class="card">
+      <span class="tag tag--teal">Costo de un rechazo en portería — por qué el precio es barato</span>
+      <div class="calc" style="margin-top:var(--sp-2xs)">
+costo hora-hombre cargado = $1.100.000 × 1,4 ÷ 176 h ≈ <b>$9.000</b>
+
+persona rechazada, 1 día perdido   8 h × $9.000  = $72.000
+bus detenido 30 min (20 personas)  20 × 0,5 h    = $90.000
+cuadrilla incompleta, tarea corrida 3 × 4 h      = $108.000
+horas de prevencionista y jefe     5 h × $15.000 = $75.000
+traslado y reemplazo                             = $35.000
+------------------------------------------------------------
+costo de UN rechazo                = <span class="out">$380.000</span>
+plan Faena                         = <span class="out">$189.000/mes</span>
+      </div>
+      <p class="src" style="margin-top:8px">Estimación propia. El supuesto grande es el bus detenido: si el bus no espera, el número baja a $290.000 y el argumento sigue en pie.</p>
+    </div>
+
+    <div class="card">
+      <span class="tag tag--teal">Economía unitaria (plan mezcla, ARPU $180.000)</span>
+      <div class="calc" style="margin-top:var(--sp-2xs)">
+COGS por cliente/mes  (cuadra con Arquitectura)
+  inferencia IA (Haiku 4.5 + Sonnet 5)   = $1.150
+  WhatsApp Business API (~300 conv.)     = $2.600
+  infra prorrateada (app, Postgres, S3)  = $2.100
+  soporte L1 (1 CS cada 180 clientes)    = $9.400
+  ------------------------------------------------
+  COGS total                             = <span class="out">$15.250</span>
+margen bruto = (180.000 − 15.250) ÷ 180.000 = <span class="out">91,5%</span>
+contribución mensual por cliente            = <span class="out">$164.750</span>
+
+CAC año 1 = $2.000.000/mes ÷ 6,5 cierres    = <span class="out">$307.700</span>
+payback   = $307.700 ÷ $164.750             = <span class="out">1,9 meses</span>
+churn supuesto 3,5%/mes → vida 28,6 meses
+LTV = $164.750 × 28,6                       = <span class="out">$4.712.000</span>
+LTV / CAC                                   = <span class="out">15,3×</span>
+      </div>
+      <p class="src" style="margin-top:8px">Ojo con dos cosas. (1) El LTV/CAC se ve espectacular porque el canal
+        (la portería) todavía es gratis: cuando haya que comprar clientes fuera de las faenas con lector, el CAC
+        sube a $600–900 k y la razón cae a 5–8×. (2) El soporte L1 está costeado a régimen; en el año 1 lo hacen
+        los fundadores y no aparece en ninguna planilla — el margen del primer año se ve mejor de lo que es.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== CANALES -->
+<section class="section">
+  <div class="section__head"><span class="tag">07</span><h2>Canales, rankeados</h2></div>
+
+  <ol class="steps">
+    <li>
+      <div>
+        <strong>La portería misma.</strong> Cada rechazo imprime un ticket con el motivo exacto y una URL.
+        CAC marginal: cero. Intención de compra: máxima. Es el canal y por eso el lector va gratis.
+        <div class="src" style="margin-top:4px">Requiere: una faena que nos deje. Ese es todo el riesgo del plan.</div>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Outbound humano en Calama y Antofagasta.</strong> WhatsApp y teléfono al prevencionista y al jefe de contrato.
+        Lista construible desde los registros de proveedores, LinkedIn y las nóminas de los gremios.
+        <div class="src" style="margin-top:4px">CPL estimado: $0 en medios, ~$47.000 en tiempo de SDR (2.000.000 ÷ 42 leads calificados/mes).</div>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Gremios: AIA (Asociación de Industriales de Antofagasta) y APRIMIN.</strong> Sus socios <em>son</em> el ICP.
+        Charla de 30 min sobre responsabilidad solidaria + demo del lector. Se cierra en la sala.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Mutualidades y centros médicos ocupacionales</strong> (ACHS, IST, Mutual de Seguridad CChC).
+        Ellos emiten los exámenes de altura. Alianza natural: nosotros les mandamos agenda, ellos nos mandan clientes.
+        Es el canal que más puede escalar y el que más tiempo toma armar.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Ferias: Exponor (Antofagasta) y Expomin (Santiago).</strong> Caro por lead, pero es donde el jefe de contrato
+        de la minera te da 20 minutos. Sirve para el lector, no para vender suscripciones.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>SEO long-tail en español.</strong> «vigencia examen de altura geográfica», «cómo se saca el F30-1»,
+        «me rechazaron en portería de faena». Volumen bajo, intención altísima, costo casi cero.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Google Ads.</strong> CPC estimado $400–900 en keywords nicho, conversión 4% → CPL ≈ $15.000.
+        Volumen mensual de búsquedas: cientos, no miles. Sirve para capturar demanda, jamás para crearla.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Contadores y software PYME (Nubox, Defontana, Bsale): NO es canal.</strong>
+        Lo decimos explícitamente porque es la respuesta fácil. El contador de la contratista no sabe qué es una
+        inducción de faena y no tiene ninguna razón para hablar de esto. Meter energía ahí sería un año perdido.
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ============================================================== IA EN MKT -->
+<section class="section">
+  <div class="section__head"><span class="tag">08</span><h2>IA en el marketing: dónde sí y dónde no</h2></div>
+  <div class="grid grid--2">
+    <div class="card" style="border-color:var(--teal-3)">
+      <span class="tag tag--teal">Sí</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li><strong>Construir la lista.</strong>&nbsp;Un agente lee registros públicos de proveedores, sitios web y LinkedIn y estima dotación, faenas donde opera y quién es el prevencionista. Pasar de 4.500 nombres a 300 empresas priorizadas es trabajo de máquina.</li>
+        <li><strong>Personalizar con un dato real.</strong>&nbsp;Cuando el lector ya está en su faena, el primer mensaje puede decir «el martes rechazaron a dos personas suyas en Portería Norte». Eso no es personalización, es información. Y no se puede fingir.</li>
+        <li><strong>Redactar el resumen de auditoría</strong> que el cliente le manda a su mandante. Es el entregable que más lo enorgullece mostrar y el que más comparte.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag tag--alarm">No</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li><strong>Blog «potenciado por IA».</strong>&nbsp;Este comprador no lee blogs de software. Lee el grupo de WhatsApp de prevencionistas de Calama.</li>
+        <li><strong>SDR 100% automatizado por WhatsApp.</strong>&nbsp;El mercado son 4.500 empresas donde todos se conocen. Un bot mal calibrado quema la marca en dos semanas y no hay segunda oportunidad.</li>
+        <li><strong>Video generado.</strong>&nbsp;Vendemos confianza para decidir quién entra a una faena. Una cara sintética explicando la Ley 20.123 es exactamente el mensaje contrario.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== 90 DÍAS -->
+<section class="section">
+  <div class="section__head"><span class="tag">09</span><h2>Primeros 90 días</h2></div>
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="tag tag--teal">Días 1–15 · Escuchar y conseguir la portería</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li>12 entrevistas: 5 prevencionistas de contratista, 3 jefes de contrato de mandante, 2 guardias de portería, 2 dueños de contratista.</li>
+        <li>Objetivo duro: <strong>una faena que nos deje instalar el lector en un turno</strong>. Sin eso, no hay plan.</li>
+        <li>Salida: la lista de los 9 documentos que de verdad se revisan (no los 30 que dice el procedimiento).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag tag--teal">Días 16–45 · Construir lo mínimo que decide</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li>Motor de reglas + lectura IA de 5 tipos de documento (altura geográfica, altura física, inducción, licencia interna, F30-1).</li>
+        <li>Lector en un Android, con caché offline. Piloto en <strong>una</strong> portería, un turno, con el papel de respaldo al lado.</li>
+        <li>Métrica: % de lecturas resueltas sin intervención humana. Meta: ≥70%.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag tag--teal">Días 46–75 · Tres design partners de verdad</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li>3 contratistas cargan su dotación real (no un piloto de juguete: la gente que entra mañana).</li>
+        <li>Métrica que vale: <strong>rechazos evitados</strong>. Se cuentan uno por uno y se les pone precio con la calculadora de arriba.</li>
+        <li>Se cobra desde el día uno. Nada gratis "por ahora": un contratista que no paga no te dice la verdad.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag tag--teal">Días 76–90 · El primer contrato</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li>Primer cliente pagando a precio de lista.</li>
+        <li>Caso escrito con el número de rechazos evitados, firmado por el prevencionista con nombre y apellido.</li>
+        <li>Ese caso es la carta de presentación en la AIA, y es lo único que abre la segunda faena.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= MUERTE -->
+<section class="section">
+  <div class="section__head"><span class="tag">10</span><h2>Qué mata esto</h2></div>
+  <div class="stack">
+    <div class="hazard">
+      <span class="tag tag--alarm">1 · La mandante no deja poner el lector</span>
+      <p class="small" style="margin-top:6px;color:var(--ink)">
+        Es el riesgo número uno y no depende de nosotros. Si TI de la minera bloquea un dispositivo de un tercero
+        en la portería, se cae el canal completo y quedamos siendo un gestor de vencimientos más — bueno, pero uno
+        que compite de igual a igual con Excel. Mitigación parcial: el producto funciona sin lector (el contratista
+        igual evita el rechazo porque sabe antes), pero pierde la magia y el CAC se triplica.
+      </p>
+    </div>
+    <div class="hazard">
+      <span class="tag tag--alarm">2 · Una mandante grande mandata a Achilles/Avetta para esto mismo</span>
+      <p class="small" style="margin-top:6px;color:var(--ink)">
+        Si queda escrito en el contrato, la contratista paga eso y no tiene presupuesto para dos. No podemos
+        competir contra una cláusula contractual: sólo podemos ser el operativo y integrarnos. Habría que
+        moverse rápido a ser el proveedor de la capa de portería <em>de</em> ellos.
+      </p>
+    </div>
+    <div class="hazard">
+      <span class="tag tag--alarm">3 · Un falso positivo con consecuencias</span>
+      <p class="small" style="margin-top:6px;color:var(--ink)">
+        Alguien entra con un examen vencido porque la IA leyó mal una fecha, y tiene un accidente de altitud.
+        Eso no es un bug: es el fin de la empresa. Por eso la IA no decide nunca, el umbral de duda es alto
+        (0,90 por campo) y toda aprobación queda firmada por una persona con nombre. Es más lento y es correcto.
+      </p>
+    </div>
+    <div class="hazard">
+      <span class="tag tag--alarm">4 · El techo</span>
+      <p class="small" style="margin-top:6px;color:var(--ink)">
+        Aunque todo salga bien, la minería chilena tope ~USD 12 M de TAM. Si al mes 24 no hay una segunda vertical
+        (construcción) o un segundo país (Perú) mostrando tracción, esto es un buen negocio de dueño, no un
+        venture case — y hay que decidirlo con esa palabra, no descubrirlo tres años después.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container row row--between">
+    <span>Torniqua · negocio · prototipo</span>
+    <span class="mono small"><a href="roadmap.html">Roadmap →</a></span>
+  </div>
+</footer>
+
+<script>
+  var t = document.getElementById('navtoggle'), n = document.getElementById('nav');
+  t.addEventListener('click', function () {
+    var open = n.classList.toggle('nav--open');
+    t.setAttribute('aria-expanded', String(open));
+  });
+</script>
+</body>
+</html>

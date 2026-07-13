@@ -1,0 +1,15 @@
+{
+  "folder": "13-contratistas",
+  "brand": "Torniqua",
+  "domain": "torniqua.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/torniqua.com -> HTTP 404 (disponible), 2026-07-13. NIC Chile: torniqua.cl -> 'no existe' (disponible).",
+  "alternates": ["kredencia.com", "garitel.com", "credalza.com"],
+  "tagline": "PASA o NO PASA en un segundo, con el motivo exacto y la ruta para arreglarlo.",
+  "category": "Compliance y control de acceso · Minería",
+  "market": "Chile (Antofagasta / Calama) → construcción y energía → Perú",
+  "icp": "Empresa contratista minera, 20-120 personas en faena, con prevencionista y sin software",
+  "price_clp": "Desde $69.000/mes · plan Faena $189.000/mes · lector de portería para la minera: $0",
+  "accent": "#22C3AC",
+  "problem": "A las 06:12 el bus llegó a la portería y cuatro no pueden entrar: a uno se le venció el examen de altura geográfica hace tres días y nadie lo vio, porque las vigencias viven en una planilla que nadie mira.",
+  "status": "prototipo"
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torniqua — arquitectura: qué habría que configurar para que esto exista</title>
+<meta name="description" content="Modelo de datos, agentes de IA con sus prompts y sus límites, APIs que hay que contratar, variables de entorno, costo mensual con la aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="torniqua.css">
+<style>
+  .calc, pre.code { font-family:'IBM Plex Mono',monospace; font-size: .76rem; background: var(--steel-0);
+          border: 1px solid var(--steel-4); border-left: 3px solid var(--teal); border-radius: 2px;
+          padding: var(--sp-s); color: var(--ink-2); overflow-x: auto; line-height: 1.55; white-space: pre; }
+  pre.code b, .calc b { color: var(--teal); font-weight: 500; }
+  pre.code .c { color: var(--ink-3); }
+  pre.code .s { color: var(--alarm); }
+  .calc .out { color: var(--ink); font-weight: 600; }
+  .src { font-size: .74rem; color: var(--ink-3); font-family:'IBM Plex Mono',monospace; }
+  .src::before { content: "▸ "; color: var(--teal); }
+  .agent { border: 1px solid var(--line); border-radius: var(--radius); background: var(--steel-2); padding: var(--sp-s); }
+  .agent__hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+               padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .agent h3 { font-size: var(--step-0); }
+  .model { font-family:'IBM Plex Mono',monospace; font-size: .68rem; color: var(--teal);
+           border: 1px solid var(--teal-3); border-radius: 2px; padding: 3px 6px; white-space: nowrap; }
+  table.data td.k { font-family:'IBM Plex Mono',monospace; font-size: .76rem; color: var(--teal); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="2" stroke="#22C3AC" stroke-width="1.5"/>
+        <path d="M6 8h7M6 12h5M6 16h7" stroke="#22C3AC" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 5v16" stroke="#22C3AC" stroke-width="1.5"/><circle cx="20.5" cy="13" r="1.6" fill="#22C3AC"/>
+      </svg>
+      <span class="brand__name">Torniqua</span><span class="brand__dot" aria-hidden="true"></span>
+    </a>
+    <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="section section--flush">
+  <span class="tag tag--teal">Arquitectura</span>
+  <h1 style="margin-block:var(--sp-2xs) var(--sp-s)">Nada de esto está aprovisionado. Todo esto está decidido.</h1>
+  <p class="lede prose">
+    Qué tablas, qué modelos, qué prompts, qué APIs hay que contratar, cuánto cuesta al mes con la aritmética a la
+    vista, y —lo más importante— <strong>qué está falseado en el demo</strong>.
+  </p>
+  <div class="hazard" style="margin-top:var(--sp-m)">
+    <span class="tag tag--alarm">La regla que ordena toda la arquitectura</span>
+    <p class="small" style="margin-top:6px;color:var(--ink)">
+      <strong>Ningún modelo de lenguaje participa en la decisión de acceso.</strong> La IA lee documentos y extrae
+      campos. El veredicto PASA / NO PASA lo produce un motor de reglas en código, versionado, con tests, capaz de
+      reproducir cualquier veredicto histórico con los datos de ese día. Si algún día hay que explicarle a un juez
+      por qué entró una persona con el examen vencido, la respuesta no puede empezar con «el modelo estimó que…».
+    </p>
+  </div>
+</section>
+
+<!-- =========================================================== MODELO DATOS -->
+<section class="section">
+  <div class="section__head"><span class="tag">01</span><h2>Modelo de datos</h2></div>
+  <div class="scroll-x card" style="padding:0">
+    <table class="data">
+      <caption class="visually-hidden">Tablas principales</caption>
+      <thead><tr><th>Tabla</th><th>Campos</th><th>Nota</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">mandante</td>
+          <td class="small">id · razon_social · rut · faenas[]</td>
+          <td class="small muted">La minera. No es cliente pagador en v1.</td>
+        </tr>
+        <tr>
+          <td class="k">faena</td>
+          <td class="small">id · mandante_id · nombre · comuna · <strong>altitud_m</strong> · porterias[] · requisitos_json</td>
+          <td class="small muted"><strong>altitud_m</strong> es un campo de negocio, no un adorno: sobre 3.000 m el examen de altura geográfica pasa a ser obligatorio.</td>
+        </tr>
+        <tr>
+          <td class="k">empresa_contratista</td>
+          <td class="small">id · rut · razon_social · mutualidad · poliza_vence · f30_vence · previred_estado · bloqueo_motivo · bloqueo_desde</td>
+          <td class="small muted">El bloqueo es a nivel empresa y arrastra a toda su gente. Es el caso que más plata mueve.</td>
+        </tr>
+        <tr>
+          <td class="k">trabajador</td>
+          <td class="small">id · rut · nombres · apellidos · empresa_id · cargo · conduce · credencial_uid · estado_calc</td>
+          <td class="small muted"><code>estado_calc</code> se recalcula cada noche y en cada cambio de documento. Nunca se edita a mano.</td>
+        </tr>
+        <tr>
+          <td class="k">documento</td>
+          <td class="small">id · titular (trabajador|empresa) · tipo · archivo_url · sha256 · emitido_el · <strong>vigente_hasta</strong> · institucion · estado (pendiente|confirmado|rechazado) · confianza_json · extraido_por (modelo+versión+fecha) · aprobado_por · aprobado_el</td>
+          <td class="small muted">Guardamos <strong>quién</strong> aprobó y <strong>con qué confianza</strong>. Sin eso no hay expediente que valga.</td>
+        </tr>
+        <tr>
+          <td class="k">requisito</td>
+          <td class="small">id · faena_id · cargo · tipo_doc · obligatorio · condicion (ej. <code>faena.altitud_m &gt; 3000</code>) · bloquea_ingreso · bloquea_conduccion</td>
+          <td class="small muted">La diferencia entre <code>bloquea_ingreso</code> y <code>bloquea_conduccion</code> es la que produce el «PASA CON RESTRICCIÓN» del demo.</td>
+        </tr>
+        <tr>
+          <td class="k">evaluacion_acceso</td>
+          <td class="small">id · trabajador_id · porteria_id · ts · veredicto · motivos_json · offline · cache_id · guardia_id · regla_version</td>
+          <td class="small muted">Append-only. <code>regla_version</code> permite reproducir el veredicto exacto años después.</td>
+        </tr>
+        <tr>
+          <td class="k">alerta</td>
+          <td class="small">id · documento_id · dias_antes (30/15/5) · canal · enviada_el · leida · resuelta</td>
+          <td class="small muted">Si la alerta se envió y el documento igual venció, eso también es un dato: el problema es del cliente, no del producto.</td>
+        </tr>
+        <tr>
+          <td class="k">expediente</td>
+          <td class="small">id · empresa_id · periodo · sha256 · generado_el · documentos[] · <strong>faltantes_json</strong> · url_lectura · expira_el</td>
+          <td class="small muted">Los faltantes se guardan explícitamente. Un expediente que no declara sus huecos es una trampa.</td>
+        </tr>
+        <tr>
+          <td class="k">auditoria</td>
+          <td class="small">id · actor · accion · entidad · antes · despues · ts · ip</td>
+          <td class="small muted">Append-only, sin DELETE. Es la tabla que se le muestra a la fiscalizadora.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================ AGENTES -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">02</span><h2>Los agentes de IA</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">Cinco agentes. Ninguno decide accesos.</p>
+  </div>
+
+  <div class="stack">
+    <article class="agent">
+      <div class="agent__hd">
+        <h3>1 · Lector de documentos</h3>
+        <span class="model">claude-haiku-4-5-20251001 · visión</span>
+      </div>
+      <p class="small">Entra una imagen o PDF. Sale un JSON con los campos y <strong>una confianza por campo</strong>.
+        Es el agente que corre 48 veces al mes por cliente y el que define el margen.</p>
+      <pre class="code"><span class="c"># prompt de sistema (extracto — el que importa)</span>
+Eres un lector de documentos de habilitación de faena minera chilena.
+Devuelves SIEMPRE este JSON, sin texto alrededor:
+  { tipo, titular_rut, titular_nombre, institucion,
+    emitido_el, vigente_hasta, aptitud,
+    confianza: { campo: 0.00–1.00 },
+    ilegibles: [ { campo, motivo, lecturas_posibles[] } ] }
+
+<span class="s">REGLA INVIOLABLE:</span> si no puedes leer un carácter con certeza,
+devuelve <b>null</b> en ese campo y descríbelo en `ilegibles`.
+<span class="s">Está prohibido completar por inferencia</span> una fecha, un RUT o un
+nombre — incluso si el contexto lo hace "obvio".
+Una vigencia mal leída deja entrar a una persona no habilitada a una
+faena a 4.000 m. No es un error de formato: es una persona.
+
+Si ves dos lecturas posibles (un dígito bajo un sello, una sombra),
+devuélvelas AMBAS en `lecturas_posibles` y deja el campo en null.</pre>
+      <p class="small" style="margin-top:8px"><span class="tag">Herramientas</span><br>
+        <code>recortar(bbox)</code> para volver a mirar una zona a más resolución ·
+        <code>catalogo_documentos(tipo)</code> con los 9 tipos válidos y sus vigencias legales típicas ·
+        <code>buscar_trabajador(rut)</code> para verificar que el RUT existe en la dotación de esa empresa.</p>
+    </article>
+
+    <article class="agent" style="border-left: 3px solid var(--alarm)">
+      <div class="agent__hd">
+        <h3>2 · Árbitro de duda</h3>
+        <span class="model">claude-sonnet-5</span>
+      </div>
+      <p class="small">Se invoca <strong>sólo</strong> cuando un campo crítico (<code>vigente_hasta</code>,
+        <code>titular_rut</code>) queda bajo <code>CONF_MIN = 0,90</code> o cuando hay lecturas múltiples.
+        Vuelve a mirar la imagen con más contexto y toma una de tres salidas:</p>
+      <pre class="code">  <b>confirmar</b>   → sólo si ahora lee el campo con ≥ 0,97
+  <b>escalar</b>     → arma la ficha para el humano: recorte, lecturas
+                 posibles, y qué consecuencia tiene cada una
+  <b>rechazar</b>    → el documento no sirve (falta firma, está cortado,
+                 está vencido de origen)
+
+<span class="s">Nunca</span> devuelve una fecha "más probable". Nunca promedia.
+Nunca elige la lectura que conviene.</pre>
+      <p class="small" style="margin-top:8px;color:var(--alarm)">Éste es el agente que produce el momento del demo
+        en que la IA dice «no voy a elegir por ti». No es una carencia del producto: <strong>es el producto</strong>.</p>
+    </article>
+
+    <article class="agent">
+      <div class="agent__hd">
+        <h3>3 · Ruteador de bandeja</h3>
+        <span class="model">claude-haiku-4-5-20251001</span>
+      </div>
+      <p class="small">Los documentos llegan como llegan: un WhatsApp del prevencionista con 6 fotos, un correo con
+        un ZIP, un PDF arrastrado a la app. Este agente clasifica cada adjunto (tipo de documento), lo asocia a una
+        empresa y a un trabajador por RUT, detecta duplicados y versiones más nuevas del mismo certificado.
+        Herramientas: <code>listar_dotacion(empresa)</code>, <code>hash_documento()</code>, <code>marcar_duplicado()</code>.</p>
+    </article>
+
+    <article class="agent">
+      <div class="agent__hd">
+        <h3>4 · Redactor de alertas</h3>
+        <span class="model">claude-haiku-4-5-20251001</span>
+      </div>
+      <p class="small">Escribe el WhatsApp de los 30, 15 y 5 días antes. <strong>El modelo no calcula fechas ni
+        decide a quién avisar</strong>: recibe la lista ya computada por SQL y sólo redacta, en es-CL, con la ruta
+        concreta de arreglo (dónde se toma ese examen, qué días hay cupo). Plantilla utility aprobada por Meta,
+        con variables — el texto libre se limita a la ruta.</p>
+    </article>
+
+    <article class="agent">
+      <div class="agent__hd">
+        <h3>5 · Armador de expediente</h3>
+        <span class="model">claude-sonnet-5</span>
+      </div>
+      <p class="small">Una vez al mes por cliente (o cuando llega la DT). Recorre los documentos del periodo, arma
+        el índice, redacta el resumen ejecutivo y —el punto entero— <strong>lista lo que falta</strong>, clasificado
+        entre «en plazo legal» y «grave». Tiene prohibido, por prompt y por código, incluir en el índice un documento
+        que no exista en la tabla <code>documento</code> con su hash.</p>
+    </article>
+  </div>
+</section>
+
+<!-- =================================================================== COSTO -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">03</span><h2>Costo mensual, con la aritmética</h2>
+    <p class="small muted" style="margin-top:6px">Este es el número que <a href="negocio.html#unit">Negocio</a> descuenta del margen. Las dos páginas cuadran.</p>
+  </div>
+
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="tag tag--teal">Inferencia · un cliente de 60 trabajadores (plan Faena)</span>
+      <div class="calc" style="margin-top:var(--sp-2xs)">
+<b>Precios de lista (USD por millón de tokens)</b>
+  Haiku 4.5   in $1   · out $5
+  Sonnet 5    in $3   · out $15
+
+<b>Volumen mensual</b>
+  9 tipos de doc × 60 personas = 540 vigentes
+  vigencias mayormente anuales → 540 ÷ 12 = 45 doc/mes
+  + F30, F30-1, Previred de la empresa        = 3
+  total                                       = <b>48 doc/mes</b>
+
+<b>1 · Lector (Haiku, todos los docs)</b>
+  imagen ~1.400 tok + prompt 700 = 2.100 in
+  JSON de salida                 =   350 out
+  = 2.100×1/1e6 + 350×5/1e6      = US$0,00385 /doc
+  × 48                           = <span class="out">US$0,185</span>
+
+<b>2 · Árbitro (Sonnet, 15% de los docs)</b>
+  2.400 in + 500 out             = US$0,0147 /doc
+  × 7,2                          = <span class="out">US$0,106</span>
+
+<b>3 · Ruteador de bandeja (Haiku, ~150 llamadas)</b>  <span class="out">US$0,200</span>
+<b>4 · Redactor de alertas (Haiku, ~300 mensajes)</b>   <span class="out">US$0,360</span>
+<b>5 · Expediente (Sonnet, 1 vez: 60k in + 3k out)</b>  <span class="out">US$0,225</span>
+<b>6 · Reintentos y relectura tras foto nueva (12%)</b> <span class="out">US$0,090</span>
+<b>7 · Verificación cruzada RUT/nombre (Haiku)</b>      <span class="out">US$0,050</span>
+--------------------------------------------------------
+IA por cliente/mes = US$1,22 × $950 = <span class="out">$1.159 ≈ $1.150 CLP</span>
+      </div>
+      <p class="src" style="margin-top:8px">Precios de lista de la API de Anthropic. Con caché de prompt (el prompt
+        de sistema del lector es fijo y largo) el costo real baja; no lo descontamos para no maquillar el número.</p>
+    </div>
+
+    <div class="stack">
+      <div class="card">
+        <span class="tag tag--teal">Resto del COGS por cliente/mes</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+WhatsApp Business API (Meta, plantilla utility)
+  ~US$0,0088 por conversación × 300           = US$2,64
+                                              = <span class="out">$2.600 CLP</span>
+  <span class="c"># tarifa aproximada para Chile: verificar la lista</span>
+  <span class="c"># vigente de Meta, cambia todos los años.</span>
+
+Infra (a 100 clientes, US$220/mes en total)
+  app (2 instancias)            US$50
+  Postgres administrado         US$70
+  object storage (docs, ~60 GB) US$25
+  CDN, colas, logs, monitoreo   US$75
+  ÷ 100 clientes = US$2,20                    = <span class="out">$2.100 CLP</span>
+
+Soporte L1 (1 CS cada 180 clientes)
+  $1.700.000 ÷ 180                            = <span class="out">$9.400 CLP</span>
+--------------------------------------------------------
+COGS total por cliente/mes                    = <span class="out">$15.250 CLP</span>
+margen bruto sobre ARPU $180.000              = <span class="out">91,5%</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">Costo de la flota completa (mes 24, escenario base: 150 clientes)</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+IA        150 × $1.150   = $172.500
+WhatsApp  150 × $2.600   = $390.000
+Infra     (US$300/mes)   = $285.000
+--------------------------------------
+inferencia + infra       = <span class="out">$847.500 CLP/mes</span>
+                         = <span class="out">≈ US$890/mes</span>
+        </div>
+        <p class="src" style="margin-top:8px">La infra de este producto es barata y aburrida a propósito. El costo
+          que hay que vigilar no es el de los tokens: es el de las personas de soporte.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== APIS -->
+<section class="section">
+  <div class="section__head"><span class="tag">04</span><h2>Qué hay que contratar de verdad</h2></div>
+  <div class="scroll-x card" style="padding:0">
+    <table class="data">
+      <caption class="visually-hidden">APIs de terceros</caption>
+      <thead><tr><th>Servicio</th><th>Para qué</th><th>Estado real</th></tr></thead>
+      <tbody>
+        <tr><td class="k">API de Anthropic</td><td class="small">Los 5 agentes.</td><td class="small muted">Se contrata y funciona. Sin fricción.</td></tr>
+        <tr><td class="k">WhatsApp Business API</td><td class="small">Alertas 30/15/5 días y confirmaciones.</td><td class="small muted">Vía Meta directo o un BSP (Twilio, 360dialog, Infobip). Hay que verificar el número, registrar las plantillas <em>utility</em> y esperar aprobación. 2–3 semanas.</td></tr>
+        <tr><td class="k">Previred</td><td class="small">Estado de cotizaciones del contratista.</td><td class="small" style="color:var(--alarm)"><strong>No hay API pública para terceros.</strong> En v1 el contratista sube el comprobante y la IA lo lee. Un RPA con la clave del cliente es técnicamente posible y una mala idea: no lo haremos.</td></tr>
+        <tr><td class="k">Dirección del Trabajo (F30 / F30-1)</td><td class="small">Certificado de antecedentes laborales y previsionales.</td><td class="small" style="color:var(--alarm)"><strong>No hay API.</strong> Se saca en el portal de la DT con clave del empleador. El certificado trae folio; el sitio de la DT permite verificarlo. En v1: el cliente sube el PDF y guardamos el folio. Verificación automática del folio: revisar términos de uso antes.</td></tr>
+        <tr><td class="k">Registro Civil</td><td class="small">Validar la cédula chilena.</td><td class="small muted">La cédula trae un <strong>PDF417</strong> que se lee con la cámara, offline, sin convenio. Validar contra el Registro Civil sí requiere convenio; en v1 no hace falta.</td></tr>
+        <tr><td class="k">Transbank / Flow</td><td class="small">Cobro de las suscripciones.</td><td class="small muted">Webpay para tarjeta; la mayoría de las contratistas va a pagar por transferencia igual.</td></tr>
+        <tr><td class="k">Facturación electrónica (SII)</td><td class="small">DTE de la suscripción.</td><td class="small muted">Vía LibreDTE o la API de Nubox/Bsale. Es un trámite, no un problema.</td></tr>
+        <tr><td class="k">Hardware de portería</td><td class="small">El lector.</td><td class="small muted">Tablet Android (US$120) + impresora térmica Bluetooth para el ticket de rechazo (US$60). La cámara basta para el PDF417. Integración con el torniquete (relé seco / Wiegand): documentada, no implementada en v1 — primero el guardia mira la pantalla.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- =================================================================== ENV -->
+<section class="section">
+  <div class="section__head"><span class="tag">05</span><h2>Variables de entorno</h2></div>
+  <pre class="code"><span class="c"># --- IA ---------------------------------------------------------------</span>
+ANTHROPIC_API_KEY=sk-ant-...
+MODELO_LECTOR=claude-haiku-4-5-20251001
+MODELO_ARBITRO=claude-sonnet-5
+MODELO_EXPEDIENTE=claude-sonnet-5
+<b>CONF_MIN=0.90</b>              <span class="c"># bajo esto, no se aprueba solo. Es la variable</span>
+<b>CONF_CONFIRMA=0.97</b>         <span class="c"># más importante del sistema completo.</span>
+
+<span class="c"># --- datos ------------------------------------------------------------</span>
+DATABASE_URL=postgres://...
+S3_ENDPOINT= / S3_BUCKET=torniqua-docs / S3_KEY= / S3_SECRET=
+RETENCION_DOCS_ANIOS=5        <span class="c"># la DT puede fiscalizar hacia atrás</span>
+
+<span class="c"># --- portería ---------------------------------------------------------</span>
+<b>GATE_CACHE_TTL_HORAS=12</b>    <span class="c"># cuánto puede decidir sin señal</span>
+GATE_SIGNING_KEY=...          <span class="c"># firma Ed25519 de la caché offline</span>
+REGLA_VERSION=2026.07.1       <span class="c"># queda grabada en cada veredicto</span>
+
+<span class="c"># --- mensajería y cobro -----------------------------------------------</span>
+WHATSAPP_TOKEN= / WHATSAPP_PHONE_ID= / WABA_TEMPLATE_VENCIMIENTO=
+WEBPAY_COMMERCE_CODE= / WEBPAY_API_KEY=
+DTE_RUT_EMISOR= / DTE_CAF_PATH=
+
+<span class="c"># --- operación --------------------------------------------------------</span>
+TZ=America/Santiago           <span class="c"># los turnos y los vencimientos son locales</span>
+SENTRY_DSN=</pre>
+  <p class="src" style="margin-top:var(--sp-s)">
+    <code>CONF_MIN</code> no es una variable de tuning: es una política. Subirla cuesta plata en revisión humana;
+    bajarla cuesta que alguien entre indebidamente. Se cambia con acta, no con un deploy.
+  </p>
+</section>
+
+<!-- ================================================================ FALSEADO -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">06</span><h2>Qué está falseado en el demo</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">Sin esta sección, el demo sería una mentira bien hecha.</p>
+  </div>
+
+  <div class="grid grid--2">
+    <div class="hazard">
+      <span class="tag tag--alarm">Falseado</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li><strong>No hay backend.</strong>&nbsp;Todo el estado es un objeto JavaScript en el navegador. Si recargas, vuelve al inicio.</li>
+        <li><strong>La IA del demo no llama a ningún modelo.</strong>&nbsp;Las extracciones y las confianzas están escritas a mano para mostrar los dos casos que importan: el documento limpio que se aprueba solo, y el documento dudoso donde el sistema se detiene.</li>
+        <li><strong>El lector no lee PDF417.</strong>&nbsp;El «escaneo» es un temporizador de 700 ms. La lectura real de la cédula chilena con la cámara es un problema resuelto (hay librerías), pero no está acá.</li>
+        <li><strong>Los WhatsApp no se envían.</strong>&nbsp;Los botones «Avisar» muestran el texto exacto que se enviaría.</li>
+        <li><strong>La caché offline es un booleano.</strong>&nbsp;En producción es un bundle firmado con Ed25519, con TTL, que el lector verifica sin red.</li>
+        <li><strong>El expediente no genera PDF.</strong>&nbsp;Muestra el índice, el conteo y los faltantes, que es lo que importa mostrar.</li>
+        <li><strong>Empresas, RUT, faenas y personas son inventados.</strong>&nbsp;Los RUT están bien formados pero no corresponden a nadie.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-color:var(--teal-3)">
+      <span class="tag tag--teal">Verdadero</span>
+      <ul class="rows small" style="margin-top:6px">
+        <li><strong>El motor de reglas es real.</strong>&nbsp;La función <code>evaluar()</code> del demo es la misma lógica que iría a producción: requisitos por cargo y por altitud de faena, bloqueo a nivel empresa, y la distinción entre lo que bloquea el ingreso y lo que sólo bloquea la conducción.</li>
+        <li><strong>Los documentos son los que se exigen de verdad.</strong>&nbsp;Examen de altura geográfica (hipobaria, D.S. 28/2012 MINSAL), altura física, psicosensotécnico, Inducción Hombre Nuevo, licencia interna de conducción, ODI (art. 21 D.S. 40), registro de entrega de EPP (art. 53 D.S. 594), contrato y anexo de faena, F30 y F30-1.</li>
+        <li><strong>La responsabilidad solidaria es real.</strong>&nbsp;Ley 20.123. El derecho de información y retención (art. 183-C) es exactamente por lo que la minera pide el F30-1 todos los meses.</li>
+        <li><strong>El caso del F30-1 con deuda previsional</strong> bloqueando a toda una empresa es el mecanismo que más plata mueve en este producto, y funciona en el demo tal como funcionaría en la faena.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:var(--sp-m)">
+    <span class="tag">Para que fuera real — el trabajo, en orden</span>
+    <div class="scroll-x">
+      <table class="data" style="margin-top:var(--sp-2xs)">
+        <caption class="visually-hidden">Trabajo pendiente para producción</caption>
+        <thead><tr><th>#</th><th>Qué</th><th>Esfuerzo</th></tr></thead>
+        <tbody>
+          <tr><td class="k">1</td><td class="small">Backend (Postgres + API + colas) y el motor de reglas versionado con tests que reproduzcan veredictos históricos.</td><td class="small muted">4 semanas</td></tr>
+          <tr><td class="k">2</td><td class="small">Pipeline de documentos: subida, hash, lector Haiku, árbitro Sonnet, cola de confirmación humana con el recorte a la vista.</td><td class="small muted">3 semanas</td></tr>
+          <tr><td class="k">3</td><td class="small">App de portería Android: lectura PDF417 con la cámara, caché firmada, modo offline, impresión del ticket de rechazo.</td><td class="small muted">3 semanas</td></tr>
+          <tr><td class="k">4</td><td class="small">WhatsApp Business API: verificación del número, plantillas <em>utility</em>, aprobación de Meta.</td><td class="small muted">2–3 semanas (mayormente esperando)</td></tr>
+          <tr><td class="k">5</td><td class="small">Catálogo de requisitos por faena y por cargo, cargado con una faena real. Es trabajo de campo, no de código.</td><td class="small muted">2 semanas</td></tr>
+          <tr><td class="k">6</td><td class="small">Cobro (Webpay/transferencia) y DTE.</td><td class="small muted">1 semana</td></tr>
+          <tr><td class="k">7</td><td class="small">Seguridad: cifrado en reposo de los documentos (son datos de salud), control de acceso por empresa, retención a 5 años, y el registro de auditoría append-only.</td><td class="small muted">2 semanas</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:var(--sp-s)">
+      Total ≈ 17 semanas de 2 desarrolladores. Los exámenes ocupacionales son <strong>datos de salud</strong>: la
+      Ley 19.628 y la nueva institucionalidad de protección de datos aplican, y el diseño tiene que asumirlo desde
+      el primer día — no se parcha después.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================ DOMINIO -->
+<section class="section">
+  <div class="section__head"><span class="tag">07</span><h2>Evidencia del dominio</h2></div>
+  <pre class="code">$ ./_kit/check-domain.sh torniqua kredencia garitel credalza
+
+torniqua               .com <b>AVAILABLE</b>          (http 404)   .cl AVAILABLE
+kredencia              .com AVAILABLE          (http 404)   .cl AVAILABLE
+garitel                .com AVAILABLE          (http 404)   .cl AVAILABLE
+credalza               .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+<span class="c"># rdap.verisign.com/com/v1/domain/torniqua.com -> HTTP 404 = disponible</span>
+<span class="c"># NIC Chile: torniqua.cl -> "no existe" = disponible</span>
+<span class="c"># verificado el 13-07-2026</span></pre>
+  <p class="small" style="margin-top:var(--sp-s)">
+    <strong>Torniqua</strong>, del torniquete de la portería: el objeto donde este producto vive o muere.
+    Alternativas verificadas y libres: <span class="mono">kredencia.com</span>, <span class="mono">garitel.com</span>,
+    <span class="mono">credalza.com</span>.
+  </p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container row row--between">
+    <span>Torniqua · arquitectura · prototipo</span>
+    <span class="mono small"><a href="demo/index.html">Volver al demo →</a></span>
+  </div>
+</footer>
+
+<script>
+  var t = document.getElementById('navtoggle'), n = document.getElementById('nav');
+  t.addEventListener('click', function () {
+    var open = n.classList.toggle('nav--open');
+    t.setAttribute('aria-expanded', String(open));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianota — arquitectura</title>
+<meta name="description" content="Modelo de datos, agentes de IA, APIs a contratar, costo de inferencia con la aritmética y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  pre {
+    background: var(--hueco);
+    border: 1px solid var(--linea-df);
+    border-left: 2px solid var(--cian);
+    padding: var(--sp-s);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.65;
+    color: var(--tinta-2);
+    overflow-x: auto;
+  }
+  pre .c { color: var(--tinta-3); }
+  pre .k { color: var(--cian); }
+  pre .s { color: #3ec98f; }
+  .agente { border-top: 2px solid var(--cian); }
+  .agente + .agente { margin-top: var(--sp-l); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav-fila">
+      <a class="marca" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+          <circle cx="4" cy="4" r="2.2"/><circle cx="18" cy="4" r="2.2"/><circle cx="11" cy="11" r="2.2"/>
+          <circle cx="4" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>
+          <path d="M5.6 5.6 9.4 9.4M16.4 5.6 12.6 9.4M9.4 12.6 5.6 16.4M12.6 12.6l3.8 3.8"/>
+        </svg>
+        Cianota
+      </a>
+      <button class="nav-btn" aria-expanded="false" aria-controls="nav-menu">MENÚ</button>
+    </div>
+    <nav id="nav-menu" class="nav-menu" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="container">
+    <p class="rotulo">Lámina 05 — Arquitectura</p>
+    <h1>Qué habría que configurar para que esto fuera de verdad</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Nada de esto está aprovisionado. Está documentado, que es distinto — y es lo que corresponde en un prototipo.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ PRINCIPIO -->
+<section>
+  <div class="container">
+    <p class="rotulo">00 — El principio que ordena todo lo demás</p>
+    <div class="caja" style="border-color:var(--cian)">
+      <h2>La IA lee. La aritmética la hace el código.</h2>
+      <p style="margin-top:var(--sp-s)">Ningún modelo de lenguaje calcula una fecha en Cianota. El motor de ruta crítica —días hábiles, feriados, compuertas de sesión, ventanas de terreno— es <strong>determinista y auditable</strong>, y se puede reproducir en una planilla si un abogado lo pide.</p>
+      <p style="margin-top:var(--sp-s)">Lo que hace la IA es lo que un humano hace mal por cansancio: leer 92 páginas, encontrar las nueve cosas que te piden y buscarlas en 3.184 documentos. La IA devuelve <em>“esta observación exige dos campañas de terreno, 45 días de trabajo adicional”</em>. El motor decide qué le hace eso a la fecha de puesta en marcha.</p>
+      <p class="nota" style="margin-top:var(--sp-s)">Si un LLM te dice “tu RCA sale el 18 de enero”, igual vas a tener que revisarlo. Entonces mejor que no lo diga.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ MODELO DE DATOS -->
+<section>
+  <div class="container">
+    <p class="rotulo">01 — Modelo de datos</p>
+    <h2>PostgreSQL 16 + pgvector</h2>
+    <p class="prose">El corazón es un grafo dirigido acíclico sobre dos tablas (<code>permiso_proyecto</code> y <code>dependencia</code>) y un catálogo normativo versionado que es, de verdad, el activo de la empresa.</p>
+
+    <pre><span class="c">-- El catálogo normativo. Esto es el activo. Versionado, con fuente y vigencia.</span>
+<span class="k">catalogo_permiso</span>(
+  id, nombre, servicio_id, ambito,          <span class="c">-- 'seia' | 'sectorial' | 'municipal'</span>
+  norma, articulo, fuente_url,
+  plazo_dias_habiles     <span class="k">int null</span>,
+  plazo_estado           <span class="k">enum</span>(<span class="s">'confirmado'</span>, <span class="s">'por_validar'</span>),  <span class="c">-- ← el campo más importante</span>
+  plazo_nota             <span class="k">text</span>,               <span class="c">-- por qué no nos consta</span>
+  vigencia_desde, vigencia_hasta,           <span class="c">-- una reforma no borra: versiona</span>
+  validado_por, validado_at
+)
+
+<span class="k">servicio</span>(id, nombre, sigla, region, sesiona_regla)  <span class="c">-- SEA, SERNAGEOMIN, DGA, CMN, CONAF, SAG…</span>
+<span class="k">feriado</span>(fecha, nombre, ley)                        <span class="c">-- el calendario chileno, con su fuente legal</span>
+
+<span class="c">-- El proyecto y su grafo</span>
+<span class="k">proyecto</span>(
+  id, org_id, titular_rut, nombre, comuna, region, altitud_m,
+  inversion_usd, van_usd, tasa_descuento,   <span class="c">-- de aquí sale el costo de la demora</span>
+  costo_demora_usd_dia, cod_objetivo
+)
+<span class="k">permiso_proyecto</span>(
+  id, proyecto_id, catalogo_id, estado,     <span class="c">-- aprobado|tramite|titular|mora|pendiente</span>
+  fecha_ingreso, fecha_resolucion,
+  duracion_modelada, unidad,                <span class="c">-- 'habiles' | 'corridos'</span>
+  compuerta_id, ventana_id
+)
+<span class="k">dependencia</span>(
+  proyecto_id, origen_id, destino_id,
+  tipo   <span class="k">enum</span>(<span class="s">'requisito_legal'</span>, <span class="s">'requisito_tecnico'</span>, <span class="s">'secuencia_obra'</span>),
+  fuente, confianza, validado_por           <span class="c">-- una arista sin dueño no se dibuja</span>
+)
+<span class="k">compuerta</span>(id, servicio_id, regla)              <span class="c">-- 'sesión mensual, 2º miércoles'</span>
+<span class="k">ventana</span>(id, proyecto_id, cerrada_desde, cerrada_hasta, motivo)  <span class="c">-- invierno altiplánico</span>
+
+<span class="c">-- El expediente</span>
+<span class="k">documento</span>(id, proyecto_id, tipo, titulo, fecha, paginas, sha256, uri, ocr_estado)
+<span class="k">fragmento</span>(id, documento_id, pagina, texto, embedding <span class="k">vector</span>(1024))
+<span class="k">observacion</span>(id, documento_id, codigo, servicio_id, texto, plazo_respuesta, estado)
+<span class="k">evidencia</span>(
+  observacion_id, documento_id, fragmento_id, pagina,
+  veredicto <span class="k">enum</span>(<span class="s">'responde'</span>, <span class="s">'parcial'</span>, <span class="s">'no_responde'</span>),
+  confianza <span class="k">numeric</span>, verificado_por_usuario <span class="k">bool</span>   <span class="c">-- nada se da por bueno solo</span>
+)
+
+<span class="c">-- El reloj y el escenario</span>
+<span class="k">reloj</span>(permiso_proyecto_id, ingreso, suspensiones_dias, computo_neto, excedido_dias)
+<span class="k">escenario</span>(id, proyecto_id, nombre, atrasos <span class="k">jsonb</span>, cod_resultante, deslizamiento_dias, costo_usd)
+<span class="k">alerta</span>(id, proyecto_id, permiso_id, tipo, umbral_dias, canal, enviado_at)
+<span class="k">auditoria</span>(id, usuario_id, accion, expediente_id, at)   <span class="c">-- quién vio qué. No es opcional.</span>
+</pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ AGENTES -->
+<section>
+  <div class="container">
+    <p class="rotulo">02 — Los agentes de IA</p>
+    <h2>Tres, con límites explícitos</h2>
+
+    <div class="caja agente">
+      <div class="obs-cab">
+        <h3 style="margin:0">A1 · Lector de expedientes</h3>
+        <span class="chip chip-curso">claude-opus-4-8</span>
+      </div>
+      <p style="margin-top:var(--sp-s)">Lee el ICSARA, la RCA o el oficio que llegó, y extrae cada requerimiento: qué piden, quién lo pide, para cuándo, y qué trabajo implica.</p>
+      <dl class="hito-dl" style="display:grid;grid-template-columns:1fr;gap:var(--sp-xs);margin-top:var(--sp-s)">
+        <div class="nota"><strong class="acento">Por qué Opus:</strong> es lectura jurídica larga y de una sola pasada, donde perderse una observación cuesta meses. Aquí no se ahorra en el modelo.</div>
+        <div class="nota"><strong class="acento">Parámetros:</strong> <code>thinking: {type:"adaptive"}</code>, <code>output_config: {effort:"high"}</code>, <code>output_config.format</code> con <code>json_schema</code> estricto. Prompt caching del contexto del proyecto entre pasadas del mismo documento.</div>
+        <div class="nota"><strong class="acento">Herramientas:</strong> <code>buscar_fragmento(consulta)</code> (RAG sobre pgvector), <code>listar_documentos(filtro)</code>, <code>citar(documento_id, pagina)</code>. Sin herramientas de escritura: no toca la base.</div>
+      </dl>
+      <pre style="margin-top:var(--sp-s)"><span class="c">// system (extracto)</span>
+Eres un analista de permisos ambientales en Chile. Recibes un acto
+administrativo (ICSARA, Adenda, RCA, oficio) y devuelves cada requerimiento
+por separado.
+
+Reglas duras:
+1. NO calculas fechas. Devuelves trabajo estimado en días de esfuerzo.
+   El motor de ruta crítica hace la aritmética de calendario.
+2. NO afirmas un plazo legal salvo que esté en el catálogo con
+   plazo_estado = 'confirmado'. Si no, devuelves plazo_estado = 'por_validar'.
+3. Toda observación lleva cita: documento_id + página. Sin cita, se descarta.
+4. Si una observación es ambigua, la marcas ambigua. No la resuelves tú.
+</pre>
+    </div>
+
+    <div class="caja agente">
+      <div class="obs-cab">
+        <h3 style="margin:0">A2 · Emparejador de evidencia</h3>
+        <span class="chip chip-curso">claude-sonnet-5</span>
+      </div>
+      <p style="margin-top:var(--sp-s)">Por cada observación extraída, decide qué documentos del expediente ya la responden, cuáles la responden a medias y cuáles faltan. Devuelve veredicto, confianza y cita.</p>
+      <dl class="hito-dl" style="display:grid;grid-template-columns:1fr;gap:var(--sp-xs);margin-top:var(--sp-s)">
+        <div class="nota"><strong class="acento">Por qué Sonnet 5:</strong> es alto volumen (cientos de emparejamientos al mes por cuenta) sobre fragmentos ya recuperados. El trabajo difícil —encontrar el candidato— lo hace la búsqueda vectorial, no el modelo.</div>
+        <div class="nota"><strong class="acento">Parámetros:</strong> <code>output_config: {effort:"medium"}</code>, structured outputs. Sin herramientas: recibe los 8 fragmentos candidatos en el prompt.</div>
+        <div class="nota"><strong class="acento">Y lo que NO hace:</strong> no redacta la respuesta a la observación. Eso lo escribe y lo firma un abogado. Cianota entrega el andamiaje y las citas.</div>
+      </dl>
+    </div>
+
+    <div class="caja agente">
+      <div class="obs-cab">
+        <h3 style="margin:0">A3 · Vigía del catálogo y del e-SEIA</h3>
+        <span class="chip chip-curso">claude-haiku-4-5 · Batches API</span>
+      </div>
+      <p style="margin-top:var(--sp-s)">Todos los días revisa el Diario Oficial y el portal del e-SEIA. Clasifica: ¿esto cambia una norma del catálogo? ¿ingresó un proyecto nuevo que califica como prospecto? ¿le llegó un ICSARA a un cliente nuestro?</p>
+      <dl class="hito-dl" style="display:grid;grid-template-columns:1fr;gap:var(--sp-xs);margin-top:var(--sp-s)">
+        <div class="nota"><strong class="acento">Por qué Haiku + Batch:</strong> es clasificación de miles de ítems sin urgencia de latencia. La Batches API cuesta la mitad. Aquí sí se ahorra.</div>
+        <div class="nota"><strong class="acento">Salida:</strong> nunca escribe directo en el catálogo. Genera una <em>propuesta de cambio</em> que el analista regulatorio aprueba o rechaza. El catálogo lo firma un humano.</div>
+        <div class="nota"><strong class="acento">Doble función:</strong> este mismo agente es el motor del canal de adquisición descrito en <a href="negocio.html">Negocio</a>: detecta el proyecto que acaba de ingresar y dispara la radiografía gratis.</div>
+      </dl>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-l)">
+      <strong>Dónde deliberadamente NO hay IA.</strong>
+      <ul class="lista" style="margin-top:0.5rem;font-size:var(--step--1)">
+        <li><strong>La ruta crítica.</strong> Aritmética de días hábiles, compuertas de sesión, ventanas de terreno. Código puro, testeable, reproducible en Excel.</li>
+        <li><strong>El costo de la demora.</strong> Una multiplicación. No necesita un modelo de lenguaje.</li>
+        <li><strong>La respuesta a la autoridad.</strong> La firma un abogado, y por eso la escribe un abogado.</li>
+        <li><strong>El catálogo de plazos.</strong> Lo propone el vigía; lo aprueba una persona con RUT.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ APIS -->
+<section>
+  <div class="container">
+    <p class="rotulo">03 — APIs de terceros y qué hay que contratar</p>
+
+    <div class="scroll-x">
+      <table>
+        <thead>
+          <tr><th>Servicio</th><th>Para qué</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>e-SEIA</strong> (seia.gob.cl)</td>
+            <td>Expediente público de cada proyecto, resoluciones, ICSARA, estado de tramitación. Es la fuente de datos más importante del producto.</td>
+            <td><span class="chip chip-critico">el punto más frágil</span><br><span class="nota">No nos consta que exista una API pública documentada <span class="chip chip-validar">por validar</span>. El plan hoy es leer el portal público con un extractor. Un cambio de maquetado nos rompe. Un bloqueo nos deja ciegos. Si existe convenio o API, hay que conseguirlo antes que cualquier otra cosa.</span></td>
+          </tr>
+          <tr>
+            <td><strong>Diario Oficial</strong></td>
+            <td>Publicación de normas nuevas y modificaciones. Alimenta al vigía del catálogo.</td>
+            <td><span class="chip chip-alerta">verificar</span><br><span class="nota">Tiene edición electrónica. Revisar términos de uso y si hay acceso estructurado. <span class="chip chip-validar">por validar</span></span></td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic API</strong></td>
+            <td>Los tres agentes. Opus 4.8, Sonnet 5, Haiku 4.5 (este último por Batches API).</td>
+            <td><span class="chip chip-ok">contratable hoy</span></td>
+          </tr>
+          <tr>
+            <td><strong>Google Cloud Document AI</strong> (o AWS Textract)</td>
+            <td>OCR de los PDF escaneados del expediente, que son muchos y son malos.</td>
+            <td><span class="chip chip-ok">contratable hoy</span></td>
+          </tr>
+          <tr>
+            <td><strong>WhatsApp Business API</strong></td>
+            <td>Alertas de plazo. En terreno nadie lee correos; sí lee WhatsApp.</td>
+            <td><span class="chip chip-alerta">requiere BSP</span><br><span class="nota">Vía Meta o un proveedor local. Plantillas aprobadas, verificación de negocio.</span></td>
+          </tr>
+          <tr>
+            <td><strong>Postmark / Amazon SES</strong></td>
+            <td>Reporte semanal y el correo del disparador del e-SEIA.</td>
+            <td><span class="chip chip-ok">contratable hoy</span></td>
+          </tr>
+          <tr>
+            <td><strong>Clave Única</strong></td>
+            <td>Sólo si algún día operamos trámites en nombre del cliente.</td>
+            <td><span class="chip chip-neutro">no aplica hoy</span><br><span class="nota">Hoy Cianota <em>no</em> presenta trámites. Si eso cambia, cambia todo el perfil regulatorio y de responsabilidad. <span class="chip chip-validar">por validar</span></span></td>
+          </tr>
+          <tr>
+            <td><strong>Hetzner / Fly.io + Cloudflare R2</strong></td>
+            <td>Cómputo, Postgres 16 + pgvector, almacenamiento de expedientes.</td>
+            <td><span class="chip chip-ok">contratable hoy</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aviso aviso-critico" style="margin-top:var(--sp-m)">
+      <strong>Seguridad, y no es un párrafo de relleno.</strong> El expediente de un proyecto minero antes del anuncio es la información más sensible que tiene la compañía. Base de datos aislada por cliente (una por org, no una fila con <code>org_id</code>), cifrado en reposo, cifrado de los documentos con clave por cliente, y una tabla de auditoría que registra <strong>cada</strong> acceso a un documento — incluidos los del equipo de Cianota, que sólo entran con un ticket firmado por el cliente. Si esto se filtra, no hay empresa.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ ENV -->
+<section>
+  <div class="container">
+    <p class="rotulo">04 — Variables de entorno</p>
+    <pre><span class="c"># modelos</span>
+ANTHROPIC_API_KEY=sk-ant-...
+MODELO_LECTOR=claude-opus-4-8
+MODELO_EMPAREJADOR=claude-sonnet-5
+MODELO_VIGIA=claude-haiku-4-5
+EFFORT_LECTOR=high
+EFFORT_EMPAREJADOR=medium
+
+<span class="c"># datos</span>
+DATABASE_URL=postgres://…            <span class="c"># una base por cliente</span>
+PGVECTOR_DIM=1024
+OBJETO_BUCKET=cianota-expedientes
+OBJETO_KMS_KEY_ID=…                  <span class="c"># clave por cliente</span>
+
+<span class="c"># fuentes públicas</span>
+ESEIA_BASE_URL=https://seia.sea.gob.cl
+ESEIA_RATE_LIMIT_RPS=0.5             <span class="c"># no le pegamos fuerte al Estado</span>
+DIARIO_OFICIAL_BASE_URL=…
+DOCUMENT_AI_PROJECT=…
+DOCUMENT_AI_PROCESSOR_ID=…
+
+<span class="c"># notificaciones</span>
+WHATSAPP_BSP_TOKEN=…
+WHATSAPP_PLANTILLA_PLAZO=plazo_por_vencer_v3
+POSTMARK_TOKEN=…
+
+<span class="c"># reglas de negocio</span>
+COSTO_DEMORA_DEFECTO_USD_DIA=0       <span class="c"># nunca se asume: lo configura el titular</span>
+TIPO_CAMBIO_CLP_USD=950
+CATALOGO_VERSION=2026.07
+</pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ COSTO -->
+<section>
+  <div class="container">
+    <p class="rotulo">05 — Costo mensual estimado, por cuenta</p>
+    <h2>La aritmética entera, token por token</h2>
+    <p class="prose">Precios de lista de la API de Anthropic: <strong>Opus 4.8</strong> US$ 5 / US$ 25 por millón de tokens (entrada/salida). <strong>Sonnet 5</strong> US$ 3 / US$ 15. <strong>Haiku 4.5</strong> US$ 1 / US$ 5, y la <strong>Batches API</strong> los deja a la mitad. Lectura de caché ≈ 0,1× la entrada; escritura de caché ≈ 1,25×.</p>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table>
+        <thead>
+          <tr><th>Componente</th><th>Aritmética</th><th class="num">US$/mes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A1 · Lector</strong><br><span class="nota">Opus 4.8</span></td>
+            <td class="nota">
+              Un ICSARA de 92 págs ≈ 60k tokens. Se procesa en 3 pasadas (extracción · verificación de completitud · estructuración) sobre un contexto de proyecto de 40k tokens que se cachea.<br>
+              P1: 60k×$5/M = $0,300 · escritura de caché 40k×$6,25/M = $0,250 · salida 6k×$25/M = $0,150<br>
+              P2: caché 40k×$0,50/M = $0,020 · 8k×$5/M = $0,040 · salida 3k×$25/M = $0,075<br>
+              P3: caché $0,020 · 6k×$5/M = $0,030 · salida 4k×$25/M = $0,100<br>
+              <strong>= US$ 1,07 por documento × 12 documentos con requerimientos al mes</strong>
+            </td>
+            <td class="num">12,8</td>
+          </tr>
+          <tr>
+            <td><strong>Indexación del expediente</strong><br><span class="nota">Sonnet 5</span></td>
+            <td class="nota">
+              120 documentos nuevos al mes × 15 págs × ~700 tokens = 1,26 M tokens de entrada; 0,10 M de salida (resúmenes + metadatos).<br>
+              1,26 × $3 + 0,10 × $15 = $3,78 + $1,50
+            </td>
+            <td class="num">5,3</td>
+          </tr>
+          <tr>
+            <td><strong>A2 · Emparejador</strong><br><span class="nota">Sonnet 5</span></td>
+            <td class="nota">
+              Por observación: 12k tokens cacheados ($0,0036) + 6k de fragmentos ×$3/M ($0,018) + 1,2k de salida ×$15/M ($0,018) = <strong>$0,0396</strong>.<br>
+              12 documentos × 9 observaciones × 3 re-corridas (cada documento nuevo que entra al expediente re-evalúa las observaciones abiertas) = 324 emparejamientos.
+            </td>
+            <td class="num">12,8</td>
+          </tr>
+          <tr>
+            <td><strong>A3 · Vigía</strong><br><span class="nota">Haiku 4.5, Batches −50 %</span></td>
+            <td class="nota">
+              3.000 ítems/mes (Diario Oficial + ingresos al e-SEIA) × (2k entrada + 0,3k salida) = 6 M + 0,9 M tokens.<br>
+              6 × $0,50 + 0,9 × $2,50 = $5,25/mes <strong>para toda la plataforma</strong> ÷ 40 cuentas = $0,13.<br>
+              Más el vigía dedicado del expediente de cada cliente (revisión diaria).
+            </td>
+            <td class="num">2,0</td>
+          </tr>
+          <tr style="border-top:1px solid var(--linea)">
+            <td colspan="2"><strong>Subtotal inferencia</strong></td>
+            <td class="num"><strong class="acento">32,9</strong></td>
+          </tr>
+          <tr>
+            <td>OCR (Document AI)</td>
+            <td class="nota">1.800 págs/mes × US$ 0,0015/pág</td>
+            <td class="num">3,0</td>
+          </tr>
+          <tr>
+            <td>Almacenamiento de expedientes</td>
+            <td class="nota">250 GB × US$ 0,02/GB</td>
+            <td class="num">5,0</td>
+          </tr>
+          <tr>
+            <td>Cómputo + Postgres + pgvector</td>
+            <td class="nota">US$ 420/mes de plataforma ÷ 40 cuentas</td>
+            <td class="num">10,5</td>
+          </tr>
+          <tr>
+            <td>Alertas WhatsApp</td>
+            <td class="nota">~200 mensajes de plantilla × US$ 0,05</td>
+            <td class="num">10,0</td>
+          </tr>
+          <tr style="border-top:1px solid var(--linea)">
+            <td colspan="2"><strong>Subtotal infraestructura</strong></td>
+            <td class="num"><strong>28,5</strong></td>
+          </tr>
+          <tr style="border-top:2px solid var(--cian)">
+            <td colspan="2"><strong>TOTAL técnico por cuenta</strong></td>
+            <td class="num"><strong class="acento">US$ 61,4</strong><br><span class="nota">≈ $58.300 CLP</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rejilla rejilla-3" style="margin-top:var(--sp-m)">
+      <div class="caja">
+        <span class="metrica-et">Costo técnico</span>
+        <span class="metrica-valor">$58.300</span>
+        <span class="metrica-pie">CLP/cuenta/mes (a $950/US$)</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">+ Analista regulatorio y soporte</span>
+        <span class="metrica-valor">$59.500</span>
+        <span class="metrica-pie">$2,2 M ÷ 40 cuentas + soporte L1</span>
+      </div>
+      <div class="caja" style="border-color:var(--cian)">
+        <span class="metrica-et">COGS total por cuenta</span>
+        <span class="metrica-valor acento">$117.800</span>
+        <span class="metrica-pie">→ margen bruto 93 % sobre ARPU $1.794.500</span>
+      </div>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)">
+      Este número es exactamente el que <a href="negocio.html">Negocio</a> descuenta del margen. Las dos páginas cuadran: <strong>$1.794.500 − $117.800 = $1.676.700 → 93,4 %</strong>.
+      Con 10 cuentas, el analista regulatorio se reparte entre menos gente y el margen real baja a <strong>84 %</strong>. También está dicho allá.
+      <br>Costo fijo de plataforma independiente de las cuentas: <strong>US$ 420/mes</strong> (cómputo, base de datos, monitoreo, dominios).
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ FALSEADO -->
+<section>
+  <div class="container">
+    <p class="rotulo">06 — Qué está falseado en el demo</p>
+    <h2>La lista completa, sin trampas</h2>
+
+    <div class="rejilla rejilla-2">
+      <div class="caja stack">
+        <p class="rotulo" style="color:var(--critico);margin-bottom:var(--sp-s)">Falso</p>
+        <ul class="lista">
+          <li><strong>No hay backend.</strong> Todo corre en el navegador. Recargas y se pierde.</li>
+          <li><strong>El lector no llama a la API.</strong> Las nueve observaciones del ICSARA están escritas a mano y la “extracción” es una animación. En producción sería una llamada real a Claude Opus 4.8 con el esquema de salida de arriba.</li>
+          <li><strong>El expediente de 3.184 documentos no existe.</strong> Ni el proyecto Sierra Ancha, ni la Compañía Minera Altoandina, ni el ICSARA 0417/2026.</li>
+          <li><strong>El grafo de dependencias lo armamos nosotros.</strong> En producción lo valida un abogado del cliente antes de que nadie tome una decisión con él.</li>
+          <li><strong>No hay autenticación ni auditoría.</strong> En un producto que guarda expedientes mineros, eso sería inaceptable.</li>
+        </ul>
+      </div>
+
+      <div class="caja stack">
+        <p class="rotulo" style="color:var(--ok);margin-bottom:var(--sp-s)">Verdadero</p>
+        <ul class="lista">
+          <li><strong>El motor de ruta crítica es real.</strong> Días hábiles con feriados chilenos, compuertas de sesión mensual, ventanas de terreno, propagación por el grafo, holgura calculada por sondeo. El mismo código correría en producción.</li>
+          <li><strong>Los servicios y los permisos son reales.</strong> SEA, SERNAGEOMIN, DGA, Consejo de Monumentos, CONAF, SAG, SEREMI de Salud, DOM, SEC, Subsecretaría para las FF.AA.</li>
+          <li><strong>El comportamiento no lineal es real.</strong> Que un mes de atraso cueste tres meses porque se pierde una ventana de terreno es exactamente lo que pasa en un proyecto a 4.050 m.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-m)">
+      <strong>Y lo más importante: los plazos.</strong>
+      <ul class="lista" style="margin-top:0.5rem;font-size:var(--step--1)">
+        <li>El único plazo marcado <span class="chip chip-ok">confirmado</span> en el demo es el de evaluación de un EIA — <strong>120 días hábiles, Ley 19.300, art. 15</strong>. Y aun así, la redacción vigente habría que verificarla antes de mostrársela a un cliente.</li>
+        <li><strong>Todos los demás plazos del demo están marcados <span class="chip chip-validar">por validar</span>, y eso es literal: no los verificamos contra la norma.</strong> Son estimaciones plausibles puestas para que el modelo corra. En un producto real, cada uno de ellos es trabajo del analista regulatorio antes de salir a producción.</li>
+        <li>La ventana de terreno del rescate arqueológico (15-dic a 31-ene) <strong>no es una norma</strong>: es una restricción de faena a 4.050 m. En el producto la configura el titular.</li>
+        <li>El calendario de feriados es aproximado. En producción se mantiene con su fuente legal.</li>
+        <li>El costo de la demora (US$ 355.000/día) es un supuesto con derivación mostrada en el <a href="index.html#costo">producto</a>. En producción lo configura el titular con su propio VAN y su propia tasa.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ DOMINIO -->
+<section>
+  <div class="container">
+    <p class="rotulo">07 — Marca y dominio</p>
+    <h2>Cianota</h2>
+    <p class="prose"><strong>Cianotipo</strong> — el proceso fotográfico de las copias azules, del que salió la palabra <em>blueprint</em>. Y <strong>nota</strong> — la anotación al margen del plano, y la observación que llega del servicio. Un plano lleno de notas es, literalmente, lo que este producto es.</p>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table>
+        <thead>
+          <tr><th>Dominio</th><th>Verificación</th><th>Código</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong class="acento">cianota.com</strong> ← elegido</td>
+            <td class="mono" style="font-size:0.72rem">rdap.verisign.com/com/v1/domain/cianota.com</td>
+            <td class="num mono">HTTP 404</td>
+            <td><span class="chip chip-ok">disponible</span> <span class="nota">2026-07-13</span></td>
+          </tr>
+          <tr>
+            <td>isocrona.com</td>
+            <td class="mono" style="font-size:0.72rem">rdap.verisign.com/com/v1/domain/isocrona.com</td>
+            <td class="num mono">HTTP 404</td>
+            <td><span class="chip chip-ok">disponible</span></td>
+          </tr>
+          <tr>
+            <td>cianoplano.com</td>
+            <td class="mono" style="font-size:0.72rem">rdap.verisign.com/com/v1/domain/cianoplano.com</td>
+            <td class="num mono">HTTP 404</td>
+            <td><span class="chip chip-ok">disponible</span></td>
+          </tr>
+          <tr>
+            <td>rutaje.com</td>
+            <td class="mono" style="font-size:0.72rem">rdap.verisign.com/com/v1/domain/rutaje.com</td>
+            <td class="num mono">HTTP 404</td>
+            <td><span class="chip chip-ok">disponible</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)">HTTP 404 en el RDAP de Verisign = el dominio no está registrado. <code>cianota.cl</code> también figura disponible en NIC Chile a la misma fecha; se registran los dos.</p>
+
+    <dl class="cartucho" style="margin-top:var(--sp-xl)">
+      <div><dt>Proyecto</dt><dd>Cianota</dd></div>
+      <div><dt>Lámina</dt><dd>05 · Arquitectura</dd></div>
+      <div><dt>Catálogo</dt><dd>v2026.07</dd></div>
+      <div><dt>Rev.</dt><dd>2026-07-13</dd></div>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p>Cianota · Nada aprovisionado, todo documentado. <a href="demo/index.html">Volver al demo →</a></p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+</body>
+</html>

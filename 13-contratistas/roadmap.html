@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torniqua — roadmap, criterios de muerte y probabilidad</title>
+<meta name="description" content="Del día 1 al mes 24: seis hitos, cada uno con su criterio de muerte. Trayectoria de MRR en tres escenarios, caja, embudo y probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="torniqua.css">
+<style>
+  .calc { font-family:'IBM Plex Mono',monospace; font-size: .78rem; background: var(--steel-0);
+          border: 1px solid var(--steel-4); border-left: 3px solid var(--teal); border-radius: 2px;
+          padding: var(--sp-s); color: var(--ink-2); overflow-x: auto; white-space: pre; line-height: 1.55; }
+  .calc b { color: var(--teal); font-weight: 500; }
+  .calc .out { color: var(--ink); font-weight: 600; }
+  .calc .bad { color: var(--alarm); }
+  .src { font-size: .74rem; color: var(--ink-3); font-family:'IBM Plex Mono',monospace; }
+  .src::before { content: "▸ "; color: var(--teal); }
+
+  .mile { border: 1px solid var(--line); border-left: 3px solid var(--teal); border-radius: var(--radius);
+          background: var(--steel-2); padding: var(--sp-s); }
+  .mile__hd { display: flex; align-items: baseline; gap: var(--sp-2xs); flex-wrap: wrap; }
+  .mile__id { font-family:'IBM Plex Mono',monospace; color: var(--teal); font-weight: 600; }
+  .mile dl { display: grid; grid-template-columns: 1fr; gap: 2px; margin-top: var(--sp-s); }
+  @media (min-width: 40em) { .mile dl { grid-template-columns: 130px 1fr; } }
+  .mile dt { font-family:'IBM Plex Mono',monospace; font-size: .64rem; letter-spacing: .12em;
+             text-transform: uppercase; color: var(--ink-3); padding-top: 5px; }
+  .mile dd { font-size: .88rem; color: var(--ink-2); padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .mile dd:last-of-type { border-bottom: 0; }
+  .death { margin-top: var(--sp-s); }
+  .figure { border: 1px solid var(--line); background: var(--steel-2); border-radius: var(--radius); padding: var(--sp-s); }
+  .figure figcaption { margin-bottom: var(--sp-s); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="2" stroke="#22C3AC" stroke-width="1.5"/>
+        <path d="M6 8h7M6 12h5M6 16h7" stroke="#22C3AC" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 5v16" stroke="#22C3AC" stroke-width="1.5"/><circle cx="20.5" cy="13" r="1.6" fill="#22C3AC"/>
+      </svg>
+      <span class="brand__name">Torniqua</span><span class="brand__dot" aria-hidden="true"></span>
+    </a>
+    <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="section section--flush">
+  <span class="tag tag--teal">Roadmap · día 1 → mes 24</span>
+  <h1 style="margin-block:var(--sp-2xs) var(--sp-s)">Seis hitos y seis formas de parar a tiempo.</h1>
+  <p class="lede prose">
+    Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de acá abajo declara
+    la observación que debería hacernos parar — y la fecha en que hay que mirarla.
+  </p>
+</section>
+
+<!-- ============================================================ SUPUESTOS -->
+<section class="section">
+  <div class="section__head"><span class="tag">00</span><h2>Los supuestos que mueven todos los gráficos</h2></div>
+  <div class="grid grid--3">
+    <div class="card">
+      <span class="tag tag--alarm">Pesimista</span>
+      <div class="calc" style="margin-top:8px;border-left-color:#B8842B">
+cierres/mes    = 55% de la curva base
+ARPU           = <b>$140.000</b> (mezcla se corre a Cuadrilla)
+churn          = <b>6,0%</b> /mes
+MRR mes 24     = <span class="out">$9,9 M</span>
+ARR            = <span class="out">USD 126 k</span>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--teal-3)">
+      <span class="tag tag--teal">Base</span>
+      <div class="calc" style="margin-top:8px">
+cierres/mes    = 0,0,1,2,3,4,5,6,7,8,8,9,
+                 9,10,10,11,11,12,12,12,13,13,14,14
+ARPU           = <b>$180.000</b>
+churn          = <b>3,5%</b> /mes
+MRR mes 24     = <span class="out">$27,0 M</span> (150 clientes)
+ARR            = <span class="out">USD 341 k</span>
+      </div>
+    </div>
+    <div class="card">
+      <span class="tag">Optimista</span>
+      <div class="calc" style="margin-top:8px;border-left-color:#5A8FD8">
+cierres/mes    = 145% de la curva base
+ARPU           = <b>$210.000</b> (más Multifaena)
+churn          = <b>2,5%</b> /mes
+MRR mes 24     = <span class="out">$49,1 M</span>
+ARR            = <span class="out">USD 621 k</span>
+      </div>
+    </div>
+  </div>
+  <p class="src" style="margin-top:var(--sp-s)">
+    MRR(m) = MRR(m−1) × (1 − churn) + cierres(m) × ARPU. Dólar a $950. La curva base de cierres no es una proyección
+    optimista disfrazada: son 6,5 cierres promedio al mes entre el mes 4 y el 18, con un vendedor y medio.
+  </p>
+</section>
+
+<!-- ================================================================ MRR -->
+<section class="section">
+  <div class="section__head"><span class="tag">01</span><h2>Trayectoria de ingresos</h2></div>
+  <figure class="figure">
+    <figcaption class="row row--between">
+      <span class="tag">MRR mensual · millones de CLP · 24 meses</span>
+      <button class="btn btn--ghost" data-tbl="t-mrr" style="min-height:36px;font-size:.7rem">Ver tabla</button>
+    </figcaption>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 680 300" style="min-width:620px" role="img"
+           aria-label="Tres trayectorias de MRR a 24 meses. Base llega a 27 millones mensuales, optimista a 49,1 y pesimista a 9,9.">
+        <line class="grid-line" x1="44" y1="262" x2="584" y2="262"/>
+        <line class="grid-line" x1="44" y1="212.8" x2="584" y2="212.8"/>
+        <line class="grid-line" x1="44" y1="163.6" x2="584" y2="163.6"/>
+        <line class="grid-line" x1="44" y1="114.4" x2="584" y2="114.4"/>
+        <line class="grid-line" x1="44" y1="65.2" x2="584" y2="65.2"/>
+        <line class="grid-line" x1="44" y1="16" x2="584" y2="16"/>
+        <text x="36" y="265" text-anchor="end">0</text>
+        <text x="36" y="216" text-anchor="end">10</text>
+        <text x="36" y="167" text-anchor="end">20</text>
+        <text x="36" y="118" text-anchor="end">30</text>
+        <text x="36" y="69" text-anchor="end">40</text>
+        <text x="36" y="19" text-anchor="end">50</text>
+        <text x="44" y="284" text-anchor="middle">M1</text>
+        <text x="161.4" y="284" text-anchor="middle">M6</text>
+        <text x="302.3" y="284" text-anchor="middle">M12</text>
+        <text x="443.1" y="284" text-anchor="middle">M18</text>
+        <text x="584" y="284" text-anchor="middle">M24</text>
+
+        <!-- punto de equilibrio operacional: el ingreso neto cubre los costos -->
+        <line x1="443.1" y1="16" x2="443.1" y2="262" stroke="#718A93" stroke-width="1" stroke-dasharray="0"/>
+        <text x="447" y="28" fill="#718A93">equilibrio · M18</text>
+
+        <polyline fill="none" stroke="#B8842B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="44,262 67.5,262 91,261.5 114.4,260.5 137.9,259 161.4,258.1 184.9,255.6 208.3,254.6 231.8,252.2 255.3,250.2 278.8,248.2 302.3,245.3 325.7,242.8 349.2,239.9 372.7,237.4 396.2,234.4 419.7,231.5 443.1,229 466.6,226.1 490.1,223.6 513.6,220.7 537,218.7 560.5,215.8 584,213.3"/>
+        <polyline fill="none" stroke="#5A8FD8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="44,262 67.5,262 91,261 114.4,258.1 137.9,253.6 161.4,247.7 184.9,240.4 208.3,232 231.8,222.6 255.3,211.3 278.8,200 302.3,187.7 325.7,176.4 349.2,162.6 372.7,149.3 396.2,136 419.7,122.3 443.1,108 466.6,94.7 490.1,80.9 513.6,65.7 537,51.4 560.5,35.7 584,20.4"/>
+        <polyline fill="none" stroke="#0FA894" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="44,262 67.5,262 91,261 114.4,259.5 137.9,256.6 161.4,253.1 184.9,248.7 208.3,244.3 231.8,238.9 255.3,233 278.8,226.6 302.3,219.7 325.7,213.3 349.2,206.4 372.7,199 396.2,191.2 419.7,184.3 443.1,175.9 466.6,168 490.1,161.1 513.6,153.3 537,144.9 560.5,137 584,129.2"/>
+
+        <circle cx="584" cy="20.4" r="4" fill="#5A8FD8" stroke="#101A1E" stroke-width="2"/>
+        <circle cx="584" cy="129.2" r="4" fill="#0FA894" stroke="#101A1E" stroke-width="2"/>
+        <circle cx="584" cy="213.3" r="4" fill="#B8842B" stroke="#101A1E" stroke-width="2"/>
+        <text x="594" y="24" fill="#A6BAC1">$49,1 M</text>
+        <text x="594" y="133" fill="#E9F1F3">$27,0 M</text>
+        <text x="594" y="217" fill="#A6BAC1">$9,9 M</text>
+
+        <line class="axis" x1="44" y1="262" x2="584" y2="262"/>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><i style="background:#0FA894"></i> Base · 150 clientes</span>
+      <span><i style="background:#5A8FD8"></i> Optimista · 234 clientes</span>
+      <span><i style="background:#B8842B"></i> Pesimista · 71 clientes</span>
+    </div>
+    <div id="t-mrr" hidden class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="data" style="min-width:0">
+        <caption class="visually-hidden">MRR por escenario en millones de CLP</caption>
+        <thead><tr><th>Mes</th><th>Pesimista</th><th>Base</th><th>Optimista</th></tr></thead>
+        <tbody>
+          <tr><td>M6</td><td class="n">$0,8</td><td class="n">$1,8</td><td class="n">$2,9</td></tr>
+          <tr><td>M12</td><td class="n">$3,4</td><td class="n">$8,6</td><td class="n">$15,1</td></tr>
+          <tr><td>M18</td><td class="n">$6,7</td><td class="n">$17,5</td><td class="n">$31,3</td></tr>
+          <tr><td>M24</td><td class="n">$9,9</td><td class="n">$27,0</td><td class="n">$49,1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:var(--sp-s)">
+      Ni el escenario optimista llega a USD 1 M de ARR en el mes 24. Eso no es pesimismo: es el tamaño del mercado
+      chileno de contratistas mineros, y hay que mirarlo de frente antes de prometerle otra cosa a alguien.
+    </p>
+  </figure>
+</section>
+
+<!-- =============================================================== CAJA -->
+<section class="section" id="caja">
+  <div class="section__head">
+    <span class="tag">02</span><h2>Caja: quema, ingreso y el valle</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">
+      Dos paneles, no dos ejes: el flujo mensual y el saldo de caja son cosas distintas y no se
+      dibujan en la misma escala. Capital inicial declarado: <strong>$70 millones</strong>
+      ($45 M propios + $25 M de un instrumento tipo Corfo Semilla Inicia — el instrumento existe,
+      el monto es referencial y hay que verificar las bases vigentes).
+    </p>
+  </div>
+
+  <div class="grid grid--2">
+    <figure class="figure">
+      <figcaption><span class="tag">Flujo mensual · ingreso neto de COGS vs. costos · M$ CLP</span></figcaption>
+      <div class="scroll-x">
+        <svg class="chart" viewBox="0 0 360 210" style="min-width:320px" role="img"
+             aria-label="El ingreso neto cruza a los costos en el mes 15, vuelve a caer bajo ellos con la contratación del mes 16, y los supera definitivamente en el mes 18.">
+          <line class="grid-line" x1="34" y1="178" x2="308" y2="178"/>
+          <line class="grid-line" x1="34" y1="137" x2="308" y2="137"/>
+          <line class="grid-line" x1="34" y1="96" x2="308" y2="96"/>
+          <line class="grid-line" x1="34" y1="55" x2="308" y2="55"/>
+          <line class="grid-line" x1="34" y1="14" x2="308" y2="14"/>
+          <text x="28" y="181" text-anchor="end">0</text>
+          <text x="28" y="140" text-anchor="end">7</text>
+          <text x="28" y="99" text-anchor="end">14</text>
+          <text x="28" y="58" text-anchor="end">21</text>
+          <text x="28" y="17" text-anchor="end">28</text>
+          <text x="34" y="196" text-anchor="middle">M1</text>
+          <text x="165" y="196" text-anchor="middle">M12</text>
+          <text x="308" y="196" text-anchor="middle">M24</text>
+
+          <polyline fill="none" stroke="#B8842B" stroke-width="2" stroke-linejoin="round"
+            points="34,156.3 45.9,156.3 57.8,156.3 69.7,135.2 81.7,135.2 93.6,135.2 105.5,135.2 117.4,135.2 129.3,135.2 141.2,113.6 153.1,113.6 165,113.6 177,113.6 188.9,113.6 200.8,113.6 212.7,87.2 224.6,87.2 236.5,87.2 248.4,87.2 260.3,87.2 272.3,87.2 284.2,87.2 296.1,87.2 308,87.2"/>
+          <polyline fill="none" stroke="#0FA894" stroke-width="2" stroke-linejoin="round"
+            points="34,178 45.9,178 57.8,176.9 69.7,175.3 81.7,172.1 93.6,168.4 105.5,163.5 117.4,158.7 129.3,152.8 141.2,146.4 153.1,139.4 165,131.9 177,124.9 188.9,117.4 200.8,109.4 212.7,100.8 224.6,93.3 236.5,84.2 248.4,75.6 260.3,68.1 272.3,59.6 284.2,50.4 296.1,41.9 308,33.3"/>
+
+          <circle cx="236.5" cy="84.2" r="4.5" fill="#0FA894" stroke="#101A1E" stroke-width="2"/>
+          <text x="196" y="75" fill="#E9F1F3">equilibrio M18</text>
+          <circle cx="308" cy="33.3" r="4" fill="#0FA894" stroke="#101A1E" stroke-width="2"/>
+          <line class="axis" x1="34" y1="178" x2="308" y2="178"/>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i style="background:#0FA894"></i> Ingreso neto de COGS</span>
+        <span><i style="background:#B8842B"></i> Costos (equipo + infra)</span>
+      </div>
+      <p class="src" style="margin-top:8px">Los escalones del costo son contrataciones: mes 4 (SDR + dev),
+        mes 10 (dev + CS), mes 16 (SDR + KAM). En el mes 15 el ingreso ya cubría los costos — y la contratación
+        del mes 16 lo vuelve a romper. Es una decisión, no un accidente.</p>
+    </figure>
+
+    <figure class="figure">
+      <figcaption><span class="tag">Saldo de caja · M$ CLP · escenario base</span></figcaption>
+      <div class="scroll-x">
+        <svg class="chart" viewBox="0 0 360 210" style="min-width:320px" role="img"
+             aria-label="El saldo de caja baja desde 70 millones hasta un valle de 10,1 millones en el mes 17, y se recupera a 43,7 millones en el mes 24.">
+          <line class="grid-line" x1="34" y1="178" x2="308" y2="178"/>
+          <line class="grid-line" x1="34" y1="131.1" x2="308" y2="131.1"/>
+          <line class="grid-line" x1="34" y1="84.3" x2="308" y2="84.3"/>
+          <line class="grid-line" x1="34" y1="37.4" x2="308" y2="37.4"/>
+          <text x="28" y="181" text-anchor="end">0</text>
+          <text x="28" y="134" text-anchor="end">20</text>
+          <text x="28" y="87" text-anchor="end">40</text>
+          <text x="28" y="40" text-anchor="end">60</text>
+          <text x="34" y="196" text-anchor="middle">M1</text>
+          <text x="165" y="196" text-anchor="middle">M12</text>
+          <text x="308" y="196" text-anchor="middle">M24</text>
+
+          <polygon fill="#0FA894" fill-opacity="0.10"
+            points="34,22.7 45.9,31.3 57.8,39.6 69.7,55.6 81.7,70.4 93.6,83.6 105.5,94.9 117.4,104.3 129.3,111.3 141.2,124.4 153.1,134.8 165,142.1 177,146.7 188.9,148.2 200.8,146.5 212.7,152 224.6,154.4 236.5,153.2 248.4,148.6 260.3,141 272.3,129.9 284.2,115.2 296.1,97.1 308,75.5 308,178 34,178"/>
+          <polyline fill="none" stroke="#0FA894" stroke-width="2" stroke-linejoin="round"
+            points="34,22.7 45.9,31.3 57.8,39.6 69.7,55.6 81.7,70.4 93.6,83.6 105.5,94.9 117.4,104.3 129.3,111.3 141.2,124.4 153.1,134.8 165,142.1 177,146.7 188.9,148.2 200.8,146.5 212.7,152 224.6,154.4 236.5,153.2 248.4,148.6 260.3,141 272.3,129.9 284.2,115.2 296.1,97.1 308,75.5"/>
+
+          <!-- el valle -->
+          <line x1="224.6" y1="154.4" x2="224.6" y2="178" stroke="#FF5A2C" stroke-width="1"/>
+          <circle cx="224.6" cy="154.4" r="4.5" fill="#FF5A2C" stroke="#101A1E" stroke-width="2"/>
+          <text x="232" y="158" fill="#FF5A2C">valle M17</text>
+          <text x="232" y="170" fill="#FF5A2C">$10,1 M</text>
+          <text x="40" y="18" fill="#A6BAC1">$70 M inicial</text>
+          <line class="axis" x1="34" y1="178" x2="308" y2="178"/>
+        </svg>
+      </div>
+      <p class="src" style="margin-top:8px">
+        El valle es $10,1 M en el mes 17: <strong>tres semanas de operación</strong> del equipo de esa fecha.
+        Es demasiado justo. La decisión real que sale de este gráfico: o se posterga la contratación del mes 16,
+        o se levanta una ronda pequeña antes del mes 14 — no en el mes 17, cuando ya se nota.
+      </p>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================================================= EMBUDO -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">03</span><h2>El embudo que es la restricción real</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">
+      Nuestra restricción no es la retención ni el precio: es <strong>cuántas porterías nos dejan poner el lector</strong>.
+      Todo lo demás cuelga de ahí. Este embudo es el de los primeros 12 meses con 3 faenas.
+    </p>
+  </div>
+
+  <figure class="figure">
+    <figcaption class="row row--between">
+      <span class="tag">Embudo del canal portería · meses 1–12</span>
+      <button class="btn btn--ghost" data-tbl="t-fun" style="min-height:36px;font-size:.7rem">Ver tabla</button>
+    </figcaption>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 620 230" style="min-width:520px" role="img"
+           aria-label="Embudo: 750 contratistas expuestas al lector, 340 con al menos un rechazo propio, 155 abren la app, 78 cargan gente, 42 pagan.">
+        <!-- rampa ordinal de un solo tono (validada): más grande = más claro -->
+        <path d="M0 6 h436 q4 0 4 4 v20 q0 4 -4 4 H0 Z" fill="#6FD9C9"/>
+        <text x="450" y="25" fill="#E9F1F3">750</text>
+        <text x="500" y="25" fill="#718A93">contratistas expuestas (3 faenas × 250)</text>
+
+        <path d="M0 48 h195 q4 0 4 4 v20 q0 4 -4 4 H0 Z" fill="#39C2AE"/>
+        <text x="209" y="67" fill="#E9F1F3">340</text>
+        <text x="259" y="67" fill="#718A93">tuvieron al menos un rechazo propio · 45%</text>
+
+        <path d="M0 90 h87 q4 0 4 4 v20 q0 4 -4 4 H0 Z" fill="#0FA894"/>
+        <text x="101" y="109" fill="#E9F1F3">155</text>
+        <text x="151" y="109" fill="#718A93">escanearon el QR del ticket de rechazo · 46%</text>
+
+        <path d="M0 132 h40 q4 0 4 4 v20 q0 4 -4 4 H0 Z" fill="#0C7A6D"/>
+        <text x="58" y="151" fill="#E9F1F3">78</text>
+        <text x="101" y="151" fill="#718A93">cargaron ≥5 trabajadores (prueba real) · 50%</text>
+
+        <path d="M0 174 h18 q4 0 4 4 v20 q0 4 -4 4 H0 Z" fill="#0A5E55"/>
+        <text x="36" y="193" fill="#E9F1F3">42</text>
+        <text x="79" y="193" fill="#718A93">pagando al mes 12 · 54%</text>
+
+        <line class="axis" x1="0" y1="212" x2="600" y2="212"/>
+        <text x="0" y="226" fill="#718A93">conversión punta a punta 5,6% · los otros 6 clientes del mes 12 vienen de gremios y outbound</text>
+      </svg>
+    </div>
+    <div id="t-fun" hidden class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="data" style="min-width:0">
+        <caption class="visually-hidden">Embudo del canal portería</caption>
+        <thead><tr><th>Etapa</th><th>Empresas</th><th>Conversión</th></tr></thead>
+        <tbody>
+          <tr><td>Expuestas al lector</td><td class="n">750</td><td class="n">—</td></tr>
+          <tr><td>Con rechazo propio</td><td class="n">340</td><td class="n">45%</td></tr>
+          <tr><td>Escanean el ticket</td><td class="n">155</td><td class="n">46%</td></tr>
+          <tr><td>Prueban de verdad</td><td class="n">78</td><td class="n">50%</td></tr>
+          <tr><td>Pagan</td><td class="n">42</td><td class="n">54%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:var(--sp-s)">
+      Las cinco tasas son supuestos, no mediciones — no existe todavía un lector instalado. La primera
+      (45% con rechazo propio en 12 meses) es la que hay que medir en el piloto: si fuera 15%, el embudo entero
+      entrega 14 clientes en vez de 42 y el plan cambia de forma.
+    </p>
+  </figure>
+</section>
+
+<!-- ============================================================== HITOS -->
+<section class="section">
+  <div class="section__head"><span class="tag">04</span><h2>Los seis hitos</h2></div>
+
+  <figure class="figure" style="margin-bottom:var(--sp-l)">
+    <figcaption><span class="tag">Línea de tiempo · los rombos son criterios de muerte</span></figcaption>
+    <div class="scroll-x">
+      <svg class="chart" viewBox="0 0 640 130" style="min-width:560px" role="img"
+           aria-label="Línea de tiempo de seis hitos entre el mes 2 y el mes 24, cada uno con un criterio de muerte asociado.">
+        <line x1="20" y1="66" x2="620" y2="66" stroke="#1B2A31" stroke-width="2"/>
+        <g font-family="IBM Plex Mono" font-size="10">
+          <!-- M1 -->
+          <circle cx="45" cy="66" r="6" fill="#0FA894"/>
+          <path d="M45 40 l7 8 -7 8 -7 -8 Z" fill="#FF5A2C"/>
+          <text x="45" y="88" text-anchor="middle" fill="#E9F1F3">H1</text>
+          <text x="45" y="102" text-anchor="middle" fill="#718A93">mes 2</text>
+          <!-- M2 -->
+          <circle cx="150" cy="66" r="6" fill="#0FA894"/>
+          <path d="M150 40 l7 8 -7 8 -7 -8 Z" fill="#FF5A2C"/>
+          <text x="150" y="88" text-anchor="middle" fill="#E9F1F3">H2</text>
+          <text x="150" y="102" text-anchor="middle" fill="#718A93">mes 4</text>
+          <!-- M3 -->
+          <circle cx="270" cy="66" r="6" fill="#0FA894"/>
+          <path d="M270 40 l7 8 -7 8 -7 -8 Z" fill="#FF5A2C"/>
+          <text x="270" y="88" text-anchor="middle" fill="#E9F1F3">H3</text>
+          <text x="270" y="102" text-anchor="middle" fill="#718A93">mes 9</text>
+          <!-- M4 -->
+          <circle cx="390" cy="66" r="6" fill="#0FA894"/>
+          <path d="M390 40 l7 8 -7 8 -7 -8 Z" fill="#FF5A2C"/>
+          <text x="390" y="88" text-anchor="middle" fill="#E9F1F3">H4</text>
+          <text x="390" y="102" text-anchor="middle" fill="#718A93">mes 14</text>
+          <!-- M5 -->
+          <circle cx="500" cy="66" r="6" fill="#0FA894"/>
+          <path d="M500 40 l7 8 -7 8 -7 -8 Z" fill="#FF5A2C"/>
+          <text x="500" y="88" text-anchor="middle" fill="#E9F1F3">H5</text>
+          <text x="500" y="102" text-anchor="middle" fill="#718A93">mes 20</text>
+          <!-- M6 -->
+          <rect x="592" y="58" width="16" height="16" fill="#22C3AC"/>
+          <text x="600" y="88" text-anchor="middle" fill="#E9F1F3">H6</text>
+          <text x="600" y="102" text-anchor="middle" fill="#718A93">mes 24</text>
+          <text x="592" y="30" text-anchor="end" fill="#22C3AC">decisión</text>
+          <text x="20" y="20" fill="#FF5A2C">◆ criterio de muerte</text>
+        </g>
+      </svg>
+    </div>
+  </figure>
+
+  <div class="stack">
+
+    <article class="mile">
+      <div class="mile__hd"><span class="mile__id">H1</span><h3>La portería nos deja entrar</h3><span class="chip chip--off">mes 2</span></div>
+      <dl>
+        <dt>Qué es cierto</dt><dd>Una faena aceptó un lector nuestro en una portería, un turno, con el papel de respaldo al lado. Hay 3 contratistas cargando su dotación real.</dd>
+        <dt>Caja</dt><dd>Consumidos $7,4 M de los $70 M. Quedan $62,6 M.</dd>
+        <dt>Headcount</dt><dd>2 fundadores.</dd>
+        <dt>Métrica</dt><dd>≥70% de los documentos leídos por la IA sin intervención humana.</dd>
+      </dl>
+      <div class="hazard death">
+        <span class="tag tag--alarm">Criterio de muerte</span>
+        <p class="small" style="margin-top:4px;color:var(--ink)">
+          Si a los 60 días <strong>ninguna faena nos deja instalar el lector ni siquiera en un turno de prueba</strong>,
+          el canal no existe. No es «hay que insistir»: es que la tesis completa —lector gratis como distribución—
+          está equivocada, y hay que rehacer el negocio o parar. Ésta es la más importante de las seis.
+        </p>
+      </div>
+    </article>
+
+    <article class="mile">
+      <div class="mile__hd"><span class="mile__id">H2</span><h3>Primer cliente pagando a precio de lista</h3><span class="chip chip--off">mes 4</span></div>
+      <dl>
+        <dt>Qué es cierto</dt><dd>Una contratista paga $69.000 o $189.000 al mes con tarjeta o transferencia, sin descuento de fundador ni «piloto gratis».</dd>
+        <dt>Caja</dt><dd>Saldo $52,2 M. Quema $7,3 M/mes desde el mes 4.</dd>
+        <dt>Headcount</dt><dd>3 (2 fundadores + 1 dev).</dd>
+        <dt>Métrica</dt><dd>Rechazos evitados contados uno a uno y valorizados con la calculadora de $380.000.</dd>
+      </dl>
+      <div class="hazard death">
+        <span class="tag tag--alarm">Criterio de muerte</span>
+        <p class="small" style="margin-top:4px;color:var(--ink)">
+          Si tres design partners usaron el producto seis semanas con su gente real y <strong>ninguno acepta pagar
+          $69.000 al mes</strong>, el dolor que nos contaron no es dolor. Un contratista que no paga te miente por
+          amabilidad — y en Calama son muy amables.
+        </p>
+      </div>
+    </article>
+
+    <article class="mile">
+      <div class="mile__hd"><span class="mile__id">H3</span><h3>Diez clientes y dos porterías</h3><span class="chip chip--off">mes 9</span></div>
+      <dl>
+        <dt>Qué es cierto</dt><dd>El hito exige 10+ contratistas pagando y 2 faenas con lector. La curva base pone 26 clientes acá; si sólo hay 10, seguimos vivos pero el plan se corre 4 meses.</dd>
+        <dt>Caja</dt><dd>Saldo $28,5 M. MRR base $4,7 M.</dd>
+        <dt>Headcount</dt><dd>5 (2 fundadores + 2 devs + 1 SDR).</dd>
+        <dt>Métrica</dt><dd>≥80% de lectura IA sin intervención. Costo de soporte por cliente bajo $4.000/mes.</dd>
+      </dl>
+      <div class="hazard death">
+        <span class="tag tag--alarm">Criterio de muerte</span>
+        <p class="small" style="margin-top:4px;color:var(--ink)">
+          Si la lectura automática se queda <strong>bajo 60%</strong>, el producto es un servicio de digitación con
+          una capa de marketing: el margen se lo come el soporte y el 91,5% de margen bruto declarado en Negocio es falso.
+          Segundo criterio: si de las 250 contratistas expuestas en la primera faena <strong>menos de 15 abren la app</strong>
+          en 6 meses, el canal no convierte y el CAC real es el de outbound puro.
+        </p>
+      </div>
+    </article>
+
+    <article class="mile">
+      <div class="mile__hd"><span class="mile__id">H4</span><h3>Venta repetible</h3><span class="chip chip--off">mes 14</span></div>
+      <dl>
+        <dt>Qué es cierto</dt><dd>63 clientes (curva base), el SDR cierra sin el fundador en la llamada, y el guion de venta es el mismo tres veces seguidas.</dd>
+        <dt>Caja</dt><dd>Saldo $12,7 M — el valle está encima. MRR $11,3 M.</dd>
+        <dt>Headcount</dt><dd>6.</dd>
+        <dt>Métrica</dt><dd>CAC &lt; $400.000 · payback &lt; 3 meses · churn &lt; 4%/mes.</dd>
+      </dl>
+      <div class="hazard death">
+        <span class="tag tag--alarm">Criterio de muerte</span>
+        <p class="small" style="margin-top:4px;color:var(--ink)">
+          Si el churn de la cohorte 1 a los 6 meses <strong>supera el 8% mensual</strong>, no hay retención: entraron,
+          ordenaron la carpeta y se fueron. Eso convierte el producto en un servicio de una vez, y ningún SaaS
+          sobrevive a eso. Segundo: si el CAC supera $600.000 sostenidamente, el LTV/CAC cae bajo 8 y el modelo
+          deja de financiarse solo.
+        </p>
+      </div>
+    </article>
+
+    <article class="mile">
+      <div class="mile__hd"><span class="mile__id">H5</span><h3>Escala de canal y el primer mandante que paga</h3><span class="chip chip--off">mes 20</span></div>
+      <dl>
+        <dt>Qué es cierto</dt><dd>114 clientes, 5 faenas con lector, y <strong>una minera paga el Panel Mandante</strong> ($2,9 M/mes) después de haber tenido el lector gratis un año.</dd>
+        <dt>Caja</dt><dd>Saldo $15,8 M, ya subiendo (el valle quedó atrás en el mes 17). MRR $20,5 M.</dd>
+        <dt>Headcount</dt><dd>8.</dd>
+        <dt>Métrica</dt><dd>2 de 5 faenas en conversación formal por el panel. Un canal (AIA o mutualidad) entregando ≥15% de los leads.</dd>
+      </dl>
+      <div class="hazard death">
+        <span class="tag tag--alarm">Criterio de muerte</span>
+        <p class="small" style="margin-top:4px;color:var(--ink)">
+          Si después de un año de tener el lector gratis <strong>ninguna mandante quiere pagar por el panel</strong>,
+          el upsell no existe: el techo del negocio es sólo el TAM contratista (USD 10 M) y hay que decidir la
+          extensión a construcción ahora, no en el mes 24.
+        </p>
+      </div>
+    </article>
+
+    <article class="mile" style="border-left-color:var(--alarm)">
+      <div class="mile__hd"><span class="mile__id" style="color:var(--alarm)">H6</span><h3>Punto de decisión</h3><span class="chip chip--stop">mes 24</span></div>
+      <dl>
+        <dt>Escenario base</dt><dd>150 clientes · MRR $27,0 M · ARR USD 341 k · caja $43,7 M · equipo de 8.</dd>
+        <dt>Levantar</dt><dd>Sólo si hay <strong>tracción demostrada fuera de la minería</strong> (10+ clientes en construcción) o en un segundo país. Sin eso, el TAM no soporta la conversación con un fondo.</dd>
+        <dt>Bootstrapear</dt><dd>Con MRR $27 M y 95% de margen, esto ya es una empresa rentable de 8 personas. Es el desenlace más probable y no es un fracaso.</dd>
+        <dt>Matar / vender</dt><dd>Si el churn ≥ 6% y el canal portería no escaló más allá de 3 faenas: venderle la base de clientes a un integrador de control de acceso o a Achilles, y cerrar.</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<!-- ======================================================== PROBABILIDAD -->
+<section class="section">
+  <div class="section__head">
+    <span class="tag">05</span><h2>Probabilidad de éxito, con la derivación a la vista</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">
+      Un número único y confiado sería autoridad inventada. Acá va la clase de referencia, los ajustes y el rango.
+    </p>
+  </div>
+
+  <div class="grid grid--sidebar">
+    <div class="stack">
+      <div class="card">
+        <span class="tag tag--teal">1 · Clase de referencia</span>
+        <ul class="rows small" style="margin-top:6px">
+          <li><strong>SaaS B2B que llega a US$1 M de ARR:</strong>&nbsp;la cifra que circula en la industria (análisis de cohortes tipo Point Nine y similares) es del orden de <strong>4–6%</strong> de las fundadas, y cerca de <strong>1 de cada 3</strong> de las que levantan una seed institucional. <span class="src" style="display:block;margin-top:4px">Es una cifra de uso común en la industria, no un dato oficial. No verificamos la fuente primaria acá y hay que hacerlo antes de citarla en un directorio.</span></li>
+          <li><strong>Supervivencia de empresas nuevas en Chile a 3 años:</strong>&nbsp;del orden del <strong>50–55%</strong> según los boletines de dinámica empresarial del Ministerio de Economía. <span class="src" style="display:block;margin-top:4px">Cifra de orden; verificar la edición vigente.</span></li>
+          <li><strong>Tasa base de software B2B vendido a contratistas mineros chilenos:</strong>&nbsp;<strong>no existe públicamente</strong>. No la vamos a inventar. Usamos la de SaaS B2B general y ajustamos.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="tag tag--teal">2 · Ajustes para esta idea</span>
+        <div class="scroll-x">
+          <table class="data" style="min-width:480px">
+            <caption class="visually-hidden">Ajustes sobre la tasa base</caption>
+            <thead><tr><th>Ajuste</th><th>Dirección</th><th>Por qué</th></tr></thead>
+            <tbody>
+              <tr><td>Cuña afilada y concentrada</td><td><span class="chip chip--ok">↑</span></td><td>El SAM cabe en 300 km. Un vendedor visita 4 clientes en un día.</td></tr>
+              <tr><td>Presupuesto que ya se gasta</td><td><span class="chip chip--ok">↑</span></td><td>Ya pagan homologación y ya pagan el costo del rechazo. No hay que crear la categoría.</td></tr>
+              <tr><td>Canal que no requiere compra</td><td><span class="chip chip--ok">↑</span></td><td>El lector es gratis: la minera no tiene que aprobar un gasto, sólo dejar.</td></tr>
+              <tr><td>Dolor con fecha</td><td><span class="chip chip--ok">↑</span></td><td>Un vencimiento es un evento datable. El producto tiene un gatillo natural.</td></tr>
+              <tr><td>TAM chileno chico</td><td><span class="chip chip--stop">↓↓</span></td><td>USD 1 M de ARR exige ~26% del SAM. Ni el escenario optimista llega en 24 meses.</td></tr>
+              <tr><td>Canal en manos de un tercero</td><td><span class="chip chip--stop">↓↓</span></td><td>La mandante puede cerrar la portería con un correo, y no es cliente nuestro.</td></tr>
+              <tr><td>Riesgo asimétrico</td><td><span class="chip chip--stop">↓</span></td><td>Un falso positivo con accidente es terminal, aunque el sistema haya funcionado 99.999 veces.</td></tr>
+              <tr><td>Titular con relación instalada</td><td><span class="chip chip--stop">↓</span></td><td>Achilles/Avetta ya hablan con Abastecimiento de la minera. Nosotros no.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <aside class="stack">
+      <div class="card" style="border-color:var(--teal-3)">
+        <span class="tag tag--teal">3 · El resultado, como rango</span>
+        <div class="calc" style="margin-top:var(--sp-2xs)">
+P(ARR ≥ USD 1 M al mes 24)
+  base SaaS B2B         4–6%
+  ↓↓ techo de mercado   (ni el optimista llega)
+  → <span class="bad">2–5%</span>
+
+P(ARR ≥ USD 300 k al mes 24 = curva base)
+  condicional a lograr H3 en el mes 9
+  → <span class="out">30–40%</span>
+
+P(empresa viva y rentable al mes 24,
+  aunque sea de dueño y no de fondo)
+  → <span class="out">45–55%</span>
+
+P(matar antes del mes 12)
+  dominado por H1: el canal
+  → <span class="bad">35–45%</span>
+        </div>
+      </div>
+      <div class="hazard">
+        <span class="tag tag--alarm">Cómo leer esto</span>
+        <p class="small" style="margin-top:6px;color:var(--ink)">
+          Esto <strong>no es una idea de venture</strong> con los números chilenos sobre la mesa: es una idea con
+          40–55% de probabilidad de terminar siendo una empresa rentable de 8 personas, y 2–5% de terminar siendo
+          algo que un fondo quiera. Quien va a gastar dos años de su vida acá tiene derecho a saberlo antes,
+          no a descubrirlo en el mes 20.
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container row row--between">
+    <span>Torniqua · roadmap · prototipo</span>
+    <span class="mono small"><a href="stack.html">Arquitectura →</a></span>
+  </div>
+</footer>
+
+<script>
+  var t = document.getElementById('navtoggle'), n = document.getElementById('nav');
+  t.addEventListener('click', function () {
+    var open = n.classList.toggle('nav--open');
+    t.setAttribute('aria-expanded', String(open));
+  });
+  /* Cada gráfico tiene su gemelo en tabla: ningún valor queda encerrado en el dibujo. */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tbl]'), function (b) {
+    b.addEventListener('click', function () {
+      var el = document.getElementById(b.getAttribute('data-tbl'));
+      el.hidden = !el.hidden;
+      b.textContent = el.hidden ? 'Ver tabla' : 'Ocultar tabla';
+    });
+  });
+</script>
+</body>
+</html>

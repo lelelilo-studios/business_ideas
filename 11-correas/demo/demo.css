@@ -1,0 +1,261 @@
+/* CINTAVIA — demo. Extiende estilo.css. Sala de control: densidad, no aire. */
+
+body { background-image: none; }
+
+/* ---------- barra de estado del HMI ---------- */
+
+.hmi {
+  background: var(--sunken);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+.hmi__in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2xs) var(--sp-m);
+  padding-block: 7px;
+  color: var(--ink-3);
+}
+.hmi__in b { color: var(--ink-2); font-weight: 500; }
+.hmi__live { display: inline-flex; align-items: center; gap: 5px; color: var(--st-ok); }
+.hmi__pulse {
+  width: 7px; height: 7px; background: var(--st-ok); flex: none;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .hmi__pulse { animation: none; } }
+
+/* ---------- fila de filtros (una sola, arriba de todo lo que alcanza) ---------- */
+
+.filters {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: var(--sp-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-s);
+}
+@media (min-width: 62em) {
+  .filters { flex-direction: row; align-items: flex-end; gap: var(--sp-l); }
+}
+.f-group { display: flex; flex-direction: column; gap: 5px; flex: 1 1 auto; min-width: 0; }
+.f-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+select {
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  min-height: 44px;
+  padding: 0 var(--sp-2xs);
+  width: 100%;
+}
+select:hover { border-color: var(--ink-3); }
+
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 44px; background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; background: var(--rule);
+}
+input[type="range"]::-moz-range-track { height: 4px; background: var(--rule); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 22px; background: var(--amber);
+  margin-top: -9px; border: 0;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 22px; background: var(--amber); border: 0; border-radius: 0;
+}
+
+/* ---------- tabs ---------- */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: var(--sp-s);
+}
+.tab {
+  flex: none;
+  min-height: 46px;
+  padding: 0 var(--sp-s);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: var(--ink-2); }
+.tab[aria-selected="true"] { color: var(--amber); border-bottom-color: var(--amber); background: rgba(255,176,0,0.05); }
+.tab .badge {
+  font-size: 0.62rem;
+  background: var(--st-crit);
+  color: #0A0F14;
+  font-weight: 700;
+  padding: 1px 4px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.view { padding-top: var(--sp-m); }
+.view[hidden] { display: none; }
+
+/* ---------- KPI ---------- */
+
+.kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+@media (min-width: 48em) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 72em) { .kpis { grid-template-columns: repeat(6, 1fr); } }
+.kpi { background: var(--panel); padding: var(--sp-xs); }
+.kpi__k {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3); display: block; margin-bottom: 4px;
+}
+.kpi__v { font-weight: 700; font-size: 1.55rem; line-height: 1.05; letter-spacing: -0.02em; }
+.kpi__u { font-family: var(--mono); font-size: 0.66rem; color: var(--ink-3); margin-top: 3px; }
+
+/* ---------- fila de correa (sinóptico) ---------- */
+
+.belt {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-2xs);
+  padding: var(--sp-xs) 0;
+  border-bottom: 1px solid var(--rule-soft);
+  text-align: left;
+  width: 100%;
+  min-height: 44px;
+  cursor: pointer;
+}
+.belt:hover { background: rgba(61,214,234,0.04); }
+.belt__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2xs); flex-wrap: wrap; }
+.belt__tag { font-family: var(--mono); font-weight: 700; font-size: 0.92rem; color: var(--ink); letter-spacing: 0.02em; }
+.belt__desc { font-size: 0.8rem; color: var(--ink-3); }
+.belt__bar { display: flex; gap: 1px; height: 12px; }
+.belt__bar i { flex: 1; display: block; }
+.belt__nums { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); display: flex; gap: var(--sp-s); flex-wrap: wrap; }
+
+/* ---------- feed de eventos ---------- */
+
+.feed { list-style: none; display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
+.feed li {
+  display: grid;
+  grid-template-columns: 58px 12px 1fr;
+  gap: var(--sp-2xs);
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: 0.78rem;
+  color: var(--ink-2);
+}
+.feed time { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); }
+.feed .dot { width: 7px; height: 7px; margin-top: 5px; }
+.feed .mono { color: var(--cyan); }
+
+/* ---------- hallazgo ---------- */
+
+.evi { display: grid; grid-template-columns: 1fr; gap: var(--sp-2xs); }
+.evi__row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2xs);
+  padding: 7px 0; border-bottom: 1px solid var(--rule-soft);
+  font-size: 0.8rem;
+}
+.evi__row span:first-child { color: var(--ink-3); }
+.evi__row span:last-child { font-family: var(--mono); color: var(--ink); text-align: right; }
+
+.conf-bar { height: 22px; background: var(--sunken); border: 1px solid var(--rule); position: relative; }
+.conf-bar__band { position: absolute; top: 0; bottom: 0; background: rgba(255,176,0,0.20); }
+.conf-bar__p50 { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--amber); }
+.conf-bar__scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.62rem; color: var(--ink-3); margin-top: 3px; }
+
+/* ---------- ventana ---------- */
+
+.ot {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: var(--sp-2xs);
+  padding: var(--sp-xs) 0;
+  border-bottom: 1px solid var(--rule-soft);
+  align-items: start;
+}
+.ot input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; margin-top: 2px;
+  border: 1px solid var(--ink-3); background: var(--sunken); cursor: pointer;
+}
+.ot input[type="checkbox"]:checked { background: var(--amber); border-color: var(--amber); }
+.ot input[type="checkbox"]:checked::after {
+  content: ""; display: block; width: 6px; height: 11px;
+  border: solid #0A0F14; border-width: 0 2px 2px 0;
+  transform: rotate(45deg); margin: 1px 0 0 6px;
+}
+.ot label { cursor: pointer; }
+.ot__t { font-size: 0.86rem; color: var(--ink); font-weight: 600; }
+.ot__m { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); margin-top: 3px; line-height: 1.6; }
+
+.cap { height: 26px; display: flex; border: 1px solid var(--rule); background: var(--sunken); }
+.cap i { display: block; height: 100%; }
+.cap__lbl { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); margin-top: 4px; }
+
+/* .sap (bloque de código / aviso) vive en estilo.css: lo usan el demo y stack.html. */
+
+/* ---------- tooltip de gráfico ---------- */
+
+.tip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--sunken);
+  border: 1px solid var(--amber);
+  padding: 5px 7px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: nowrap;
+  z-index: 30;
+  opacity: 0;
+  transform: translate(-50%, -120%);
+  transition: opacity .08s;
+}
+.tip[data-on="true"] { opacity: 1; }
+.chart-wrap { position: relative; }
+
+/* El perfil km es el gráfico más denso del demo: 3 carriles + 4.240 m de correa.
+   Por debajo de 820px las etiquetas de metraje se pisan. En móvil se arrastra. */
+.scroll-x > #perfil { min-width: 820px; }
+
+.toast {
+  position: fixed;
+  left: 50%; bottom: 16px;
+  transform: translateX(-50%);
+  background: var(--amber);
+  color: #0A0F14;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+}
+.toast[data-on="true"] { opacity: 1; }

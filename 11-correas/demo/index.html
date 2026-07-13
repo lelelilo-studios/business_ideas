@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cintavia — Sala de control</title>
+<meta name="description" content="Demo del producto: mapa de salud de la correa kilómetro a kilómetro, detección de anomalías con nivel de confianza, vida remanente y la orden de trabajo para la próxima ventana de mantención.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__in">
+      <a class="brand" href="../index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <path d="M2 14 C 6 8, 16 8, 20 14" stroke="#FFB000" stroke-width="1.6"/>
+          <circle cx="5" cy="12.2" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="11" cy="10.4" r="1.9" stroke="#3DD6EA" stroke-width="1.2"/>
+          <circle cx="17" cy="12.2" r="1.9" stroke="#FF6152" stroke-width="1.2"/>
+          <path d="M2 18h18" stroke="#22323D" stroke-width="1.2"/>
+        </svg>
+        Cintavia<span class="brand__dot" aria-hidden="true"></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav">Menú</button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- barra de estado del HMI -->
+<div class="hmi">
+  <div class="container">
+    <div class="hmi__in">
+      <span class="hmi__live"><span class="hmi__pulse" aria-hidden="true"></span>EN LÍNEA</span>
+      <span>FAENA <b id="hmiFaena">—</b></span>
+      <span>ESTACIONES <b id="hmiEst">—</b></span>
+      <span>ÚLT. SINCRONÍA <b id="hmiSync">—</b></span>
+      <span>PRECISIÓN 90 DET. <b id="hmiPrec">—</b></span>
+      <span class="dim">TURNO A · 2026-07-13</span>
+    </div>
+  </div>
+</div>
+
+<main class="container" style="padding-block:var(--sp-s) var(--sp-2xl)">
+
+  <!-- ============ FILA DE FILTROS (alcanza a TODA la vista) ============ -->
+  <div class="filters">
+    <div class="f-group" style="max-width:280px">
+      <label class="f-label" for="selFaena">Faena</label>
+      <select id="selFaena">
+        <option value="QAM">Quebrada Amarga · Sierra Gorda</option>
+        <option value="LCO">Los Cóndores · Diego de Almagro</option>
+      </select>
+    </div>
+
+    <div class="f-group" style="max-width:320px">
+      <label class="f-label" for="selCorrea">Correa</label>
+      <select id="selCorrea"></select>
+    </div>
+
+    <div class="f-group">
+      <label class="f-label" for="umbral">
+        Umbral de confianza · <span class="mono amber" id="umbralV">0,60</span>
+      </label>
+      <input type="range" id="umbral" min="40" max="95" step="5" value="60"
+             aria-describedby="umbralNota">
+      <p id="umbralNota" class="mono" style="font-size:0.7rem;color:var(--ink-3);line-height:1.5;margin-top:-6px">
+        <span id="umbralTxt">—</span>
+      </p>
+    </div>
+
+    <div class="f-group" style="max-width:220px">
+      <span class="f-label">Curva precisión / recall</span>
+      <div class="chart-wrap">
+        <svg id="prCurve" class="chart" viewBox="0 0 210 62" role="img"
+             aria-label="Curva de precisión y recall del detector según el umbral de confianza. Al subir el umbral, la precisión sube y el recall baja."></svg>
+      </div>
+      <div class="legend" style="margin-top:2px">
+        <span><i style="background:#C48400"></i> precisión</span>
+        <span><i style="background:#0E9EB4"></i> recall</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TABS ============ -->
+  <div class="tabs" role="tablist" aria-label="Vistas de la sala de control">
+    <button class="tab" role="tab" id="tab-sin" aria-controls="v-sin" aria-selected="true">Sinóptico</button>
+    <button class="tab" role="tab" id="tab-per" aria-controls="v-per" aria-selected="false">Perfil km</button>
+    <button class="tab" role="tab" id="tab-hal" aria-controls="v-hal" aria-selected="false">
+      Hallazgo <span class="badge" id="tabBadge">0</span>
+    </button>
+    <button class="tab" role="tab" id="tab-ven" aria-controls="v-ven" aria-selected="false">Ventana / OT</button>
+    <button class="tab" role="tab" id="tab-bit" aria-controls="v-bit" aria-selected="false">Bitácora</button>
+  </div>
+
+  <!-- ============ VISTA: SINÓPTICO ============ -->
+  <section class="view" id="v-sin" role="tabpanel" aria-labelledby="tab-sin">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid g32 mt-s">
+      <div class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Línea de manejo de materiales</span>
+          <span class="panel__meta" id="sinMeta">—</span>
+        </div>
+        <p class="dim" style="font-size:var(--step--1);margin-bottom:var(--sp-2xs)">
+          Cada barra es una correa dividida en tramos iguales (el largo del tramo va abajo).
+          El color es el peor hallazgo abierto dentro del tramo. Toca una correa para abrir su perfil.
+        </p>
+        <div id="belts"></div>
+        <div class="legend mt-s">
+          <span><i style="background:#43C08A"></i> normal</span>
+          <span><i style="background:#FFB000"></i> atención</span>
+          <span><i style="background:#FF6152"></i> crítico</span>
+          <span><i style="background:#64798A"></i> sin dato</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Bitácora en vivo</span>
+          <button class="btn btn--ghost" id="btnPlay" style="padding:0 12px;font-size:0.68rem">Pausar</button>
+        </div>
+        <ul class="feed" id="feed"></ul>
+      </div>
+    </div>
+
+    <div class="callout mt-s">
+      <p><strong>Cómo leer esto.</strong> El sinóptico no es para mirarlo todo el día — nadie lo hace.
+      Es para que cuando suene el teléfono a las 03:14 sepas en 10 segundos qué correa, qué metro y qué
+      tan seguro está el sistema. El trabajo de verdad ocurre en la pestaña <strong>Ventana / OT</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ============ VISTA: PERFIL ============ -->
+  <section class="view" id="v-per" role="tabpanel" aria-labelledby="tab-per" hidden>
+    <div class="panel">
+      <div class="panel__head">
+        <span class="panel__title" id="perTitle">—</span>
+        <span class="panel__meta" id="perMeta">—</span>
+      </div>
+      <p class="dim" style="font-size:var(--step--1);margin-bottom:var(--sp-xs)">
+        Tres canales alineados al mismo eje de metros. Toca cualquier celda o pin para abrir el hallazgo.
+      </p>
+      <div class="chart-wrap">
+        <div class="scroll-x">
+          <svg id="perfil" class="chart" viewBox="0 0 900 278" role="img" aria-label="Perfil kilométrico de la correa"></svg>
+        </div>
+        <div class="tip" id="tipPerfil"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#2C3B45"></i> ΔT &lt;5 °C</span>
+        <span><i style="background:#8A6A1E"></i> 5–20 °C</span>
+        <span><i style="background:#C48400"></i> 20–40 °C</span>
+        <span><i style="background:#FF6152"></i> &gt;40 °C</span>
+        <span><i style="background:#0E9EB4"></i> desalineamiento</span>
+        <span><i style="background:#7B7FE0"></i> energía acústica</span>
+      </div>
+    </div>
+
+    <div class="grid g2 mt-s">
+      <div class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Hallazgos sobre el umbral</span>
+          <span class="panel__meta" id="perCount">—</span>
+        </div>
+        <div id="anomList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Salud de empalmes</span>
+          <span class="panel__meta">vida remanente estimada · días</span>
+        </div>
+        <div class="chart-wrap">
+          <svg id="empalmes" class="chart" viewBox="0 0 420 200" role="img"
+               aria-label="Vida remanente estimada de cada empalme, con su banda de incertidumbre."></svg>
+        </div>
+        <p class="src">
+          La barra es la banda P10–P90; el punto es el P50. Un empalme cuya banda cruza la línea de la
+          próxima ventana <strong>tiene que entrar en esa ventana</strong>. La tabla equivalente está en
+          la Bitácora.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA: HALLAZGO ============ -->
+  <section class="view" id="v-hal" role="tabpanel" aria-labelledby="tab-hal" hidden>
+    <div id="hallazgo"></div>
+  </section>
+
+  <!-- ============ VISTA: VENTANA / OT ============ -->
+  <section class="view" id="v-ven" role="tabpanel" aria-labelledby="tab-ven" hidden>
+    <div id="ventana"></div>
+  </section>
+
+  <!-- ============ VISTA: BITÁCORA ============ -->
+  <section class="view" id="v-bit" role="tabpanel" aria-labelledby="tab-bit" hidden>
+    <div class="panel">
+      <div class="panel__head">
+        <span class="panel__title">Registro de hallazgos — vista de tabla</span>
+        <span class="panel__meta">todo lo que muestran los gráficos, en texto</span>
+      </div>
+      <div class="scroll-x">
+        <table id="tablaBit"></table>
+      </div>
+      <p class="src">
+        <b>Por qué existe esta tabla.</b> Ningún dato de este producto vive sólo en un color. Si eres
+        daltónico, si estás mirando el teléfono con sol de mediodía en Sierra Gorda, o si necesitas
+        pegar esto en un correo: acá está todo en texto.
+      </p>
+    </div>
+  </section>
+
+  <p class="src mt-m">
+    <b>Qué es real y qué está falseado.</b> El flujo, la aritmética y la incertidumbre son reales.
+    Los datos no: las faenas son ficticias (las comunas no), las imágenes térmicas están sintetizadas
+    en SVG, no hay estaciones instaladas y no hay SAP al otro lado. El detalle completo de qué haría
+    falta para que esto fuera de verdad está en <a href="../stack.html">Arquitectura</a>.
+  </p>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <span>Cintavia · Sala de control (prototipo)</span>
+      <span>Estado en el cliente. Recarga la página para reiniciar la faena.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

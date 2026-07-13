@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Freatia — qué habría que configurar para que esto fuera real</title>
+<meta name="description" content="Modelo de datos, los cuatro agentes de IA con su modelo y su prompt, las APIs que hay que contratar, las variables de entorno, el costo mensual con su aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  pre {
+    background: var(--ink-900); border: 1px solid var(--linea); border-left: 2px solid var(--agua);
+    padding: var(--sp-xs); overflow-x: auto; font-family: var(--mono); font-size: 0.78rem;
+    line-height: 1.55; color: var(--txt-2); margin-top: var(--sp-xs);
+  }
+  pre .c { color: var(--txt-4); }
+  pre .k { color: var(--agua); }
+  pre .s { color: var(--recirc, #2E9E70); }
+  .agente { border-top: 1px solid var(--linea); padding: var(--sp-s) 0; }
+  .agente-cab { display: flex; flex-wrap: wrap; gap: var(--sp-xs); align-items: baseline; }
+  .agente h3 { flex: 1 1 auto; }
+  .tabla-mini td, .tabla-mini th { padding: 6px 8px; font-size: var(--step--1); }
+  code { font-family: var(--mono); font-size: .86em; background: var(--ink-750); padding: 1px 4px; border: 1px solid var(--linea); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" stroke-width="1.5" aria-hidden="true">
+        <path d="M1 23c4.5-6 9 2 14.5-3S25 21 31 17" stroke="#7A5C33"/>
+        <path d="M1 28c5-5 9.5 2 15-3s8.5 1 15-3" stroke="#7A5C33"/>
+        <path d="M16 2s7 8.6 7 12.6a7 7 0 1 1-14 0C9 10.6 16 2 16 2Z" stroke="#3F9BD6"/>
+      </svg>
+      <span class="marca-txt">Freatia</span>
+    </a>
+    <nav>
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btn-menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+  </div>
+  <div id="menu" class="container">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="sec">
+  <span class="rotulo rotulo-agua">Arquitectura</span>
+  <h1 style="margin-top:var(--sp-2xs);max-width:24ch">Nada de esto está aprovisionado. Todo esto está documentado.</h1>
+  <p class="prose" style="margin-top:var(--sp-s)">
+    Lo que sigue es lo que habría que configurar para que Freatia existiera de verdad: el modelo de datos, los
+    cuatro agentes con su modelo y su prompt, las APIs que hay que contratar, las variables de entorno, el costo
+    real por faena al mes — y, al final, la lista de todo lo que está falseado en el demo.
+  </p>
+</section>
+
+<!-- DIAGRAMA -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">De la faena al reporte</span>
+    <h2>El camino de un litro.</h2>
+  </div>
+  <div class="placa">
+    <div class="scroll-x svg-caja">
+      <svg viewBox="0 0 980 300" style="min-width:760px" role="img" aria-label="Diagrama: los sensores de la faena hablan con el gateway por OPC-UA; el gateway envía a la nube por MQTT sobre TLS; en la nube viven la base de series de tiempo, el motor de balance determinista y los cuatro agentes de IA; de ahí salen la aplicación web, los reportes sellados y las alertas por WhatsApp.">
+        <g class="eje-txt" font-family="JetBrains Mono">
+          <!-- Faena -->
+          <rect x="10" y="30" width="200" height="240" fill="#0F1A1F" stroke="#24404A"/>
+          <text x="20" y="22" fill="#7A5C33" font-size="11">FAENA · RED OT</text>
+          <rect x="26" y="52" width="168" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="36" y="73" fill="#C2D2D9" font-size="11">PLC / DCS · sensores</text>
+          <rect x="26" y="96" width="168" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="36" y="117" fill="#C2D2D9" font-size="11">Historiador (AVEVA PI)</text>
+          <rect x="26" y="140" width="168" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="36" y="161" fill="#C2D2D9" font-size="10">Piezómetros · dataloggers</text>
+          <rect x="26" y="184" width="168" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="36" y="205" fill="#C2D2D9" font-size="11">PDF · planillas · fotos</text>
+          <rect x="26" y="228" width="168" height="30" fill="#1A2E36" stroke="#3F9BD6"/>
+          <text x="36" y="247" fill="#3F9BD6" font-size="11">GW-01 · gateway OPC-UA</text>
+
+          <!-- flecha -->
+          <path d="M210 243 L268 243" stroke="#3F9BD6" stroke-width="1.5" fill="none"/>
+          <path d="M262 239 L269 243 L262 247 Z" fill="#3F9BD6"/>
+          <text x="216" y="224" fill="#5F7A85" font-size="8.5">MQTT/TLS</text>
+          <text x="216" y="234" fill="#5F7A85" font-size="8.5">sólo salida</text>
+
+          <!-- Nube -->
+          <rect x="276" y="30" width="380" height="240" fill="#0F1A1F" stroke="#24404A"/>
+          <text x="286" y="22" fill="#7A5C33" font-size="11">NUBE · VPC PRIVADA</text>
+          <rect x="292" y="52" width="164" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="302" y="73" fill="#C2D2D9" font-size="11">Ingesta + validación</text>
+          <rect x="292" y="96" width="164" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="302" y="117" fill="#C2D2D9" font-size="11">TimescaleDB (lecturas)</text>
+          <rect x="292" y="140" width="164" height="34" fill="#14232A" stroke="#2E9E70"/>
+          <text x="302" y="155" fill="#2E9E70" font-size="11">Motor de balance</text>
+          <text x="302" y="168" fill="#5F7A85" font-size="9">SQL determinista, testeado</text>
+          <rect x="292" y="184" width="164" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="302" y="205" fill="#C2D2D9" font-size="11">Registro sellado (WORM)</text>
+          <rect x="476" y="52" width="164" height="166" fill="#14232A" stroke="#B85499"/>
+          <text x="486" y="72" fill="#B85499" font-size="11">4 agentes (Claude)</text>
+          <text x="486" y="92" fill="#8AA3AE" font-size="10">1 · Conciliador (Haiku)</text>
+          <text x="486" y="110" fill="#8AA3AE" font-size="10">2 · Diagnóstico (Sonnet 5)</text>
+          <text x="486" y="128" fill="#8AA3AE" font-size="10">3 · Documentos (Sonnet 5)</text>
+          <text x="486" y="146" fill="#8AA3AE" font-size="10">4 · Reportes (Opus 4.8)</text>
+          <text x="486" y="172" fill="#5F7A85" font-size="9">no calculan el balance:</text>
+          <text x="486" y="185" fill="#5F7A85" font-size="9">lo leen, lo explican</text>
+          <text x="486" y="198" fill="#5F7A85" font-size="9">y lo redactan</text>
+          <rect x="292" y="228" width="348" height="30" fill="#1A2E36" stroke="#35606E"/>
+          <text x="302" y="247" fill="#C2D2D9" font-size="11">API · autenticación · auditoría de accesos</text>
+
+          <path d="M656 150 L714 150" stroke="#3F9BD6" stroke-width="1.5" fill="none"/>
+          <path d="M708 146 L715 150 L708 154 Z" fill="#3F9BD6"/>
+
+          <!-- Salidas -->
+          <rect x="722" y="30" width="248" height="240" fill="#0F1A1F" stroke="#24404A"/>
+          <text x="732" y="22" fill="#7A5C33" font-size="11">SALIDAS</text>
+          <rect x="738" y="52" width="216" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="748" y="73" fill="#C2D2D9" font-size="11">Aplicación web (el demo)</text>
+          <rect x="738" y="96" width="216" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="748" y="117" fill="#C2D2D9" font-size="11">Reportes DGA / SNGM / SMA</text>
+          <rect x="738" y="140" width="216" height="34" fill="#14232A" stroke="#35606E"/>
+          <text x="748" y="161" fill="#C2D2D9" font-size="11">Reporte público a la comunidad</text>
+          <rect x="738" y="184" width="216" height="34" fill="#14232A" stroke="#E8A33D"/>
+          <text x="748" y="205" fill="#E8A33D" font-size="11">Escalamiento: WhatsApp · voz</text>
+          <rect x="738" y="228" width="216" height="30" fill="#14232A" stroke="#35606E"/>
+          <text x="748" y="247" fill="#C2D2D9" font-size="11">Exportación al consultor</text>
+        </g>
+      </svg>
+    </div>
+    <div class="aviso aviso-ok">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg>
+      <p><strong>El gateway sólo escribe hacia afuera.</strong> No acepta conexiones entrantes, no escribe en el
+        PLC, no toca la red OT. Es la primera pregunta que hace el área de TI de la minera y de la respuesta
+        depende que exista el proyecto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MODELO DE DATOS -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Modelo de datos</span>
+    <h2>Nada se actualiza. Todo se agrega.</h2>
+    <p>Un balance auditable no puede vivir sobre un <code>UPDATE</code>. Una corrección es una fila nueva con autor,
+      hora y motivo; la fila vieja se marca como superada, nunca se borra. Es más lento de escribir y es la única
+      forma de que un fiscalizador crea lo que ve.</p>
+  </div>
+  <div class="scroll-x">
+    <table class="tabla-mini">
+      <thead><tr><th>Tabla</th><th>Campos principales</th><th>Notas</th></tr></thead>
+      <tbody>
+        <tr><td><code>faena</code></td><td>id · nombre · rut_titular · comuna · region · cuenca · cota_ref · rca_id · plan</td><td>El RUT viene formateado <code>76.412.905-3</code>.</td></tr>
+        <tr><td><code>fuente_dato</code></td><td>id · faena_id · tipo(opcua|historiador|pdf|manual|api) · config_json · ultimo_ping · estado</td><td>Si una fuente lleva 30 min sin latir, el balance lo dice.</td></tr>
+        <tr><td><code>sensor</code></td><td>id · faena_id · tag · tipo · unidad · instrumento · cota · fuente_dato_id · calib_ultima · calib_vence</td><td>El TAG es la llave del mundo real: <code>FIT-1010</code>, <code>PZ-14</code>.</td></tr>
+        <tr><td><code>lectura</code></td><td>sensor_id · ts · valor · calidad(buena|sospechosa|mala) · hash_origen</td><td><strong>Hipertabla</strong> (TimescaleDB), particionada por semana. Append-only. 200 señales × 1/min ≈ 8,6M filas/mes por faena.</td></tr>
+        <tr><td><code>partida</code></td><td>id · faena_id · nombre · clase(entrada|uso|salida|interno|acumulacion) · metodo(medido|calculado|estimado|manual) · expresion · sensores[]</td><td>La <code>expresion</code> es cómo se calcula la partida. Versionada: cambiar un coeficiente crea una versión nueva y el balance histórico no se altera retroactivamente.</td></tr>
+        <tr><td><code>flujo</code></td><td>id · faena_id · de_partida · a_partida</td><td>La topología del Sankey. Se define en la implementación, con el ingeniero de procesos en la sala.</td></tr>
+        <tr><td><code>balance</code></td><td>id · faena_id · periodo · entradas · salidas · acumulacion · sin_explicar · pct · estado(borrador|cerrado|firmado) · sello_sha256</td><td>Un balance cerrado es inmutable. Si aparece un dato nuevo, se emite un balance <em>corregido</em> que apunta al anterior.</td></tr>
+        <tr><td><code>balance_detalle</code></td><td>balance_id · partida_id · ls · m3 · cobertura · calidad · version_expresion</td><td>Guarda con qué versión de la fórmula se calculó cada partida. Esto es lo que hace auditable el número.</td></tr>
+        <tr><td><code>umbral</code></td><td>id · faena_id · sensor_id · tipo(alerta|critico) · valor · direccion · ref_manual_operacion</td><td>Cada umbral apunta al párrafo del manual de operación del depósito que lo justifica. Sin esa referencia, no se puede crear.</td></tr>
+        <tr><td><code>evento</code></td><td>id · faena_id · umbral_id · gatillo_ts · nivel · estado · cerrado_ts · cerrado_por</td><td>El escalamiento del demo.</td></tr>
+        <tr><td><code>evento_bitacora</code></td><td>evento_id · ts · actor · accion · adjuntos[]</td><td><strong>Append-only, sin excepción.</strong> Es la prueba de quién supo qué y cuándo.</td></tr>
+        <tr><td><code>hipotesis</code></td><td>id · balance_id · titulo · prob · explica_min · explica_max · evidencia_json · accion · costo_clp · resultado</td><td>El campo <code>resultado</code> se llena después: es cómo aprendemos si el modelo de diagnóstico sirve.</td></tr>
+        <tr><td><code>reporte</code></td><td>id · faena_id · organismo · periodo · balance_id · estado · firmado_por · sello_sha256 · pdf_uri</td><td>Un reporte apunta a un balance sellado. Si el balance cambia, el reporte queda marcado como obsoleto y avisa.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- AGENTES -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Agentes de IA</span>
+    <h2>Cuatro agentes, y ninguno suma los números.</h2>
+    <p>Esto es lo más importante de esta página: <strong>el balance lo calcula SQL determinista y testeado, no un
+      modelo de lenguaje.</strong> Un LLM sumando catorce caudales es una idea espantosa y no la vamos a tener.
+      Los agentes deciden qué mirar, explican lo que ven y redactan. La aritmética es de la base de datos.</p>
+  </div>
+
+  <article class="agente">
+    <div class="agente-cab">
+      <h3>1 · Conciliador</h3>
+      <span class="tag">claude-haiku-4-5</span>
+      <span class="chip chip-neutro">cada hora · 720 corridas/mes</span>
+    </div>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      Corre después de que el motor determinista cerró el balance de la hora. Su trabajo es <em>clasificar</em>:
+      qué partidas tienen datos sospechosos, qué sensores están mudos, si la discrepancia se movió de forma
+      relevante, y escribir una línea de bitácora legible. Si la discrepancia supera el umbral o cambia más de
+      2 l/s, gatilla al agente 2.
+    </p>
+    <p class="pista"><strong>Por qué Haiku:</strong> es clasificación con reglas, corre 720 veces al mes por faena
+      y no necesita razonar profundo. Gastar Opus aquí sería quemar plata para lucirse.</p>
+    <pre><span class="c"># Herramientas (todas de sólo lectura)</span>
+leer_balance(faena_id, periodo)      <span class="c"># el resultado del motor SQL, no lo recalcula</span>
+leer_estado_sensores(faena_id)       <span class="c"># latido, cobertura, calibración</span>
+leer_historial_discrepancia(faena_id, dias=30)
+
+<span class="c"># Extracto del system prompt</span>
+<span class="s">Eres un ingeniero de balance hídrico de una faena minera del norte de Chile.
+Recibes un balance YA CALCULADO. NO recalcules nada y NO ajustes ningún
+coeficiente para que el balance cierre: eso es exactamente lo que este
+producto existe para impedir. Si el balance no cierra, tu trabajo es decir
+en cuánto no cierra y qué partidas tienen la peor calidad de dato.
+Responde SIEMPRE con el esquema JSON entregado.</span>
+
+<span class="k">output_config</span>={<span class="s">"format"</span>: {<span class="s">"type"</span>: <span class="s">"json_schema"</span>, <span class="s">"schema"</span>: ESQUEMA_CONCILIACION}</pre>
+  </article>
+
+  <article class="agente">
+    <div class="agente-cab">
+      <h3>2 · Diagnóstico de la discrepancia</h3>
+      <span class="tag">claude-sonnet-5</span>
+      <span class="chip chip-neutro">por gatillo · ~25 corridas/mes</span>
+    </div>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      El agente que produce lo que el cliente compra. Con 90 días de series, el estado de calibración de cada
+      instrumento, los eventos geotécnicos y los cambios de operación, arma las hipótesis: qué explicaría la
+      discrepancia, con qué evidencia, cuánto explicaría cada una, y qué hacer primero — ordenado por lo que sea
+      barato y descarte más.
+    </p>
+    <p class="pista"><strong>Configuración:</strong> <code>thinking: {"type": "adaptive"}</code> y
+      <code>output_config: {"effort": "high"}</code>. Es un problema de razonamiento sobre evidencia parcial:
+      aquí el razonamiento se paga solo.</p>
+    <pre><span class="c"># Herramientas</span>
+serie_temporal(tag, desde, hasta)
+estado_calibracion(tag)
+correlacion(serie_a, serie_b, dias)      <span class="c"># la calcula numpy, no el modelo</span>
+eventos_geotecnicos(faena_id, dias)
+cambios_operacion(faena_id, dias)        <span class="c"># cambio de espesador, nueva pila, etc.</span>
+costo_intervencion(tipo)                 <span class="c"># catálogo de costos de campaña</span>
+
+<span class="c"># Extracto del system prompt</span>
+<span class="s">Tienes 40 l/s sin explicar. NO inventes una causa. Enumera las hipótesis
+que la evidencia sostiene, con el rango de caudal que cada una explicaría.
+Si la evidencia no alcanza para ordenarlas, dilo. Toda cifra que uses tiene
+que venir de una herramienta: si no la mediste, no la escribas. Recomienda
+primero la acción más barata que descarte una hipótesis entera.</span></pre>
+  </article>
+
+  <article class="agente">
+    <div class="agente-cab">
+      <h3>3 · Extractor de documentos</h3>
+      <span class="tag">claude-sonnet-5</span>
+      <span class="chip chip-neutro">visión · ~120 documentos/mes</span>
+    </div>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      El informe mensual de la PTAS llega en PDF. El certificado de calibración es un escaneo. La planilla de
+      aforo del canal es una foto que sacó alguien con casco. Este agente los lee, extrae los valores, y —crítico
+      para la trazabilidad— <strong>devuelve la coordenada de la página de donde salió cada número</strong>, para
+      que en el panel de trazabilidad se pueda ver el recorte original.
+    </p>
+    <p class="pista">Todo lo que extrae entra al sistema con calidad <code>estimado</code> o <code>manual</code>,
+      nunca <code>medido</code>. Un dato de tercero es un dato de tercero.</p>
+  </article>
+
+  <article class="agente">
+    <div class="agente-cab">
+      <h3>4 · Redactor de reportes</h3>
+      <span class="tag">claude-opus-4-8</span>
+      <span class="chip chip-neutro">~12 corridas/mes</span>
+    </div>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      Escribe el reporte al organismo y —el más difícil— el reporte a la comunidad: castellano simple, sin jerga,
+      sin esconder el mes malo. Es la pieza donde vale la pena el mejor modelo, porque un párrafo mal calibrado en
+      un documento público le puede costar a la faena más que la multa.
+    </p>
+    <div class="aviso aviso-critico">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg>
+      <p><strong>Guardarraíl obligatorio: el verificador de cifras.</strong> Después de generar el texto, un
+        proceso determinista extrae con expresión regular <em>todos</em> los números del documento y los coteja
+        contra el JSON del balance sellado. Si aparece un número que no está en la fuente, el reporte se rechaza y
+        se reintenta. A la tercera, se escala a una persona. Un modelo que alucina un caudal en un documento
+        firmado ante la SMA no es un bug: es el fin de la empresa.</p>
+    </div>
+  </article>
+</section>
+
+<!-- COSTO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Costo mensual</span>
+    <h2>US$504 por faena al mes. Con la aritmética.</h2>
+    <p>Este es el número que <a href="negocio.html">Negocio</a> descuenta del margen. Precios de la API de Claude
+      vigentes a julio de 2026. Tipo de cambio supuesto: US$1 = $950.</p>
+  </div>
+
+  <div class="placa">
+    <div class="placa-tit"><h3>Inferencia de IA, por faena/mes</h3><span class="rotulo">el 6% del costo de infraestructura</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Agente</th><th>Modelo</th><th class="n">Corridas/mes</th><th class="n">Tokens in</th><th class="n">Tokens out</th><th class="n">Precio (in/out por MTok)</th><th class="n">USD/mes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1 · Conciliador</td><td><span class="tag">claude-haiku-4-5</span></td>
+            <td class="n">720</td><td class="n">14.000</td><td class="n">1.200</td>
+            <td class="n">$1 / $5</td><td class="n">$8,9</td>
+          </tr>
+          <tr>
+            <td>2 · Diagnóstico</td><td><span class="tag">claude-sonnet-5</span></td>
+            <td class="n">25</td><td class="n">45.000</td><td class="n">6.000</td>
+            <td class="n">$3 / $15</td><td class="n">$5,6</td>
+          </tr>
+          <tr>
+            <td>3 · Documentos (visión)</td><td><span class="tag">claude-sonnet-5</span></td>
+            <td class="n">120</td><td class="n">12.000</td><td class="n">1.500</td>
+            <td class="n">$3 / $15</td><td class="n">$7,0</td>
+          </tr>
+          <tr>
+            <td>4 · Reportes</td><td><span class="tag">claude-opus-4-8</span></td>
+            <td class="n">12</td><td class="n">60.000</td><td class="n">15.000</td>
+            <td class="n">$5 / $25</td><td class="n">$8,1</td>
+          </tr>
+        </tbody>
+        <tfoot><tr><td colspan="6">Total inferencia</td><td class="n">US$29,6 ≈ <strong>US$30</strong></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="pista">
+      Aritmética del agente 1 (el más caro por volumen): de sus 14.000 tokens de entrada, 9.000 son el contexto
+      estable de la faena y van a caché. Entrada nueva: 720 × 5.000 = 3,60 MTok × US$1 = <span class="num">US$3,60</span>.
+      Lectura de caché: 720 × 9.000 = 6,48 MTok × US$0,10 = <span class="num">US$0,65</span>.
+      Escritura de caché (una vez al día): 30 × 9.000 = 0,27 MTok × US$1,25 = <span class="num">US$0,34</span>.
+      Salida: 720 × 1.200 = 0,864 MTok × US$5 = <span class="num">US$4,32</span>. Total
+      <span class="num">US$8,91</span>.
+    </p>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>Infraestructura, por faena/mes</h3></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Componente</th><th class="n">USD/mes</th><th>Dimensionamiento</th></tr></thead>
+        <tbody>
+          <tr><td>Base de series de tiempo (TimescaleDB gestionado)</td><td class="n">180</td><td>200 señales × 1 muestra/min = 8,6M filas/mes por faena. Retención en caliente 24 meses, luego a objetos.</td></tr>
+          <tr><td>Backend, API y frontend (contenedores)</td><td class="n">70</td><td>2 tareas + balanceador. La app es liviana; el trabajo pesado es la ingesta.</td></tr>
+          <tr><td>Gateway industrial en faena</td><td class="n">39</td><td>PC industrial de riel DIN, ~US$1.400, amortizado a 36 meses. Es un costo real y hay que decirlo.</td></tr>
+          <tr><td>Enlace de respaldo (LTE / satelital)</td><td class="n">25</td><td>Cuando se cae el enlace, el gateway sigue midiendo y guarda; cuando vuelve, sincroniza.</td></tr>
+          <tr><td>Almacenamiento de objetos (evidencia, PDF, respaldos)</td><td class="n">15</td><td>Con bloqueo WORM: escrito una vez, no se puede borrar hasta que expire la retención.</td></tr>
+          <tr><td>Observabilidad, logs y alertas de plataforma</td><td class="n">25</td><td>Si nuestro sistema se cae y el cliente no se entera, el escalamiento no existe.</td></tr>
+          <tr><td>Mensajería de escalamiento (WhatsApp + voz)</td><td class="n">22</td><td>~250 mensajes y ~15 llamadas al mes. Tarifa a verificar con el proveedor.</td></tr>
+          <tr><td>Sellado de tiempo (RFC 3161) y firma de registros</td><td class="n">6</td><td>Un sello por balance cerrado y por reporte firmado.</td></tr>
+          <tr><td>Plataforma compartida (US$1.100/mes ÷ 12 faenas)</td><td class="n">92</td><td>Entornos, CI, respaldos, monitoreo central, ambiente de auditoría.</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Subtotal infraestructura dedicada (las 8 primeras filas)</td><td class="n">US$382</td><td>Escala con cada faena nueva.</td></tr>
+          <tr><td>Plataforma compartida, prorrateada</td><td class="n">US$92</td><td>Baja a medida que entran faenas: con 24, son US$46.</td></tr>
+          <tr><td>Inferencia de IA (tabla anterior)</td><td class="n">US$30</td><td></td></tr>
+          <tr><td><strong>Total por faena/mes</strong></td><td class="n"><strong>US$504</strong></td><td><strong>$478.800 CLP</strong> · US$1 = $950</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="pista">A esto <a href="negocio.html">Negocio</a> le suma el soporte humano ($550.000) y la visita
+      trimestral de calibración ($300.000) para llegar al COGS de $1.328.800 y al margen bruto de 72,9%.</p>
+  </div>
+</section>
+
+<!-- TERCEROS -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Terceros</span>
+    <h2>Qué hay que contratar, y qué hay que ir a preguntar.</h2>
+  </div>
+  <div class="scroll-x">
+    <table class="tabla-mini">
+      <thead><tr><th>Servicio</th><th>Para qué</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>API de Claude (Anthropic)</td><td>Los cuatro agentes.</td><td><span class="chip chip-ok">se contrata y listo</span></td></tr>
+        <tr><td>OPC-UA</td><td>Hablar con los PLC. No se contrata: se configura, y se negocia con el área de TI de la minera.</td><td><span class="chip chip-ok">estándar abierto</span></td></tr>
+        <tr><td>AVEVA PI Web API</td><td>Leer del historiador cuando el cliente lo tiene.</td><td><span class="chip chip-alerta">licencia del cliente</span></td></tr>
+        <tr><td>WhatsApp Business API (vía Twilio o 360dialog)</td><td>El escalamiento. En faena, WhatsApp es el canal, no el correo.</td><td><span class="chip chip-alerta">verificar tarifa vigente en Chile</span></td></tr>
+        <tr><td>Twilio Voice</td><td>La llamada al turno cuando nadie acusa recibo a las 2 de la mañana.</td><td><span class="chip chip-ok">se contrata</span></td></tr>
+        <tr><td>Autoridad de sellado de tiempo (RFC 3161)</td><td>Que el sello del balance tenga fecha demostrable ante un tercero.</td><td><span class="chip chip-ok">proveedor acreditado</span></td></tr>
+        <tr><td>Firma electrónica avanzada (e-certchile, Acepta u otro)</td><td>Que el reporte firmado tenga valor legal.</td><td><span class="chip chip-validar">por validar: ¿el regulador exige FEA para estos reportes?</span></td></tr>
+        <tr><td>Transmisión de extracciones a la DGA (MEE)</td><td>Enviar las extracciones de los pozos en el formato y la periodicidad que la DGA exige.</td><td><span class="chip chip-validar">por validar: hay que leer la resolución vigente y hablar con la DGA. No inventamos el formato.</span></td></tr>
+        <tr><td>Datos meteorológicos (DMC / red DGA)</td><td>Evaporación y precipitación cuando la faena no tiene estación propia.</td><td><span class="chip chip-validar">por validar: cobertura y licencia de uso</span></td></tr>
+        <tr><td>Sentry · Grafana Cloud</td><td>Que sepamos que algo se rompió antes que el cliente.</td><td><span class="chip chip-ok">se contrata</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>Lo que nos consta y lo que no</h3><span class="rotulo">regulación</span></div>
+    <div class="rej rej-2">
+      <div>
+        <span class="rotulo" style="color:var(--ok)">Nos consta que existe</span>
+        <ul class="lista" style="margin-top:var(--sp-xs)">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>DGA · Código de Aguas.</strong> Derechos de aprovechamiento, y la obligación de monitorear y transmitir las extracciones efectivas. La reforma de la <strong>Ley 21.435 (2022)</strong> endureció el régimen (caducidad, patentes por no uso).</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>SERNAGEOMIN · DS 248.</strong> El reglamento de aprobación de proyectos de diseño, construcción, operación y cierre de los depósitos de relaves. También aplican el DS 132 (Reglamento de Seguridad Minera) y la Ley 20.551 de cierre de faenas.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>SMA · Ley 20.417.</strong> La Superintendencia fiscaliza el cumplimiento de la RCA y puede sancionar.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>GISTM.</strong> El estándar global de gestión de relaves que las compañías del ICMM se comprometieron a implementar tras Brumadinho. No es ley chilena; es presión de inversionistas, que a veces pesa más.</span></li>
+        </ul>
+      </div>
+      <div>
+        <span class="rotulo" style="color:var(--perdida)">Por validar antes de vender</span>
+        <ul class="lista" style="margin-top:var(--sp-xs)">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span>El <strong>formato, la periodicidad y el estándar de equipo</strong> del monitoreo de extracciones que exige la DGA según el caudal. Depende de resoluciones que hay que leer, no adivinar.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span>La <strong>periodicidad exacta</strong> de los informes de estado del depósito a SERNAGEOMIN, y qué variables exige el manual de operación aprobado en cada RCA. <strong>Varía caso a caso.</strong></span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span>Los <strong>montos y categorías de sanción</strong> de la SMA. Sabemos que existen y que son altos; no vamos a poner una cifra del susto en una propuesta comercial sin verificarla.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span>El estado de la <strong>ley marco de desalación</strong> y su efecto sobre los permisos. Hubo proyectos en trámite; no nos consta el texto vigente.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg><span>La <strong>revancha hidráulica mínima</strong> exigible por norma (el demo usa el umbral del proyecto, 4,0 m, que es lo correcto: el umbral operativo sale del manual de la faena).</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="accion">
+      Esta lista es corta a propósito. Lo primero que hay que contratar no es un servidor: es <strong>cuatro horas
+      de un abogado de aguas y cuatro de un ingeniero de relaves con experiencia en fiscalización</strong>. Cuesta
+      menos que un mes de nube y evita construir sobre una obligación imaginaria.
+    </div>
+  </div>
+</section>
+
+<!-- VARIABLES -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Variables de entorno</span>
+    <h2>Lo que habría en el <code>.env</code>.</h2>
+  </div>
+  <pre><span class="c"># --- IA ---</span>
+ANTHROPIC_API_KEY=sk-ant-...
+MODELO_CONCILIADOR=claude-haiku-4-5
+MODELO_DIAGNOSTICO=claude-sonnet-5
+MODELO_DOCUMENTOS=claude-sonnet-5
+MODELO_REPORTES=claude-opus-4-8
+
+<span class="c"># --- Datos ---</span>
+DATABASE_URL=postgres://...            <span class="c"># metadatos y modelo de dominio</span>
+TIMESCALE_URL=postgres://...           <span class="c"># hipertabla de lecturas</span>
+S3_BUCKET_EVIDENCIA=freatia-evidencia  <span class="c"># WORM: object-lock activado</span>
+RETENCION_EVIDENCIA_MESES=120          <span class="c"># 10 años. La vida de un tranque es más larga.</span>
+
+<span class="c"># --- Faena ---</span>
+OPCUA_GATEWAY_TOKEN=...                <span class="c"># uno por faena, rotación trimestral</span>
+PI_WEB_API_URL=https://pi.cliente.local/piwebapi
+PI_WEB_API_USER=freatia_ro             <span class="c"># SÓLO LECTURA. No negociable.</span>
+PI_WEB_API_PASS=...
+
+<span class="c"># --- Escalamiento ---</span>
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+WHATSAPP_PHONE_ID=...
+ESCALAMIENTO_N2_MINUTOS=120            <span class="c"># sin acuse → superintendente</span>
+ESCALAMIENTO_N3_MINUTOS=480            <span class="c"># sin acción → gerencia</span>
+
+<span class="c"># --- Evidencia ---</span>
+TSA_URL=https://tsa.proveedor.cl/rfc3161
+FEA_PROVEEDOR=...                      <span class="c"># firma electrónica avanzada</span>
+
+<span class="c"># --- Reglas del producto ---</span>
+UMBRAL_DISCREPANCIA_PCT=5              <span class="c"># sobre esto, el reporte a la SMA se bloquea</span>
+BLOQUEAR_REPORTE_CON_EVENTO_ABIERTO=true
+PERMITIR_FIRMA_CON_INCERTIDUMBRE=true  <span class="c"># con anexo obligatorio y registro de quién firmó</span></pre>
+</section>
+
+<!-- FALSEADO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Honestidad</span>
+    <h2>Qué está falseado en el demo.</h2>
+  </div>
+  <div class="rej rej-2">
+    <div class="placa">
+      <ul class="lista lista-no">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No hay ingesta.</strong> Los datos vienen de un archivo <code>demo.js</code>. La ingesta real —OPC-UA, historiador, dataloggers, PDF, teléfono— es el 60% del trabajo de ingeniería del producto y es la parte que nadie ve.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>El sello criptográfico es un string.</strong> El registro inmutable de verdad necesita almacenamiento WORM, sellado de tiempo RFC 3161 y una política de retención escrita.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Las probabilidades del diagnóstico están escritas a mano.</strong> En el producto salen del agente 2, y hasta tener 20 faenas y sus resultados reales, esas probabilidades son una opinión con decimales. Lo diremos en la interfaz.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>El escalamiento no manda nada.</strong> No hay WhatsApp, no hay llamada, no hay turno. Hay <code>alert()</code>.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Las faenas son inventadas</strong> (Quebrada Seca, Cerro Amarillo, Salar Norte) y sus RUT son ficticios. Las cuencas, los salares, las comunas, los organismos, los reglamentos y los instrumentos, no.</span></li>
+      </ul>
+    </div>
+    <div class="placa">
+      <h3>Lo que sí es real en el demo</h3>
+      <ul class="lista">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>La aritmética.</strong> El balance de las tres faenas cierra exactamente en los tres períodos: entradas = salidas + acumulación + sin explicar. El residual no está escrito a mano: se calcula. Si cambias un flujo, el residual cambia.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>Los interlocks.</strong> El reporte a la SMA se bloquea de verdad si la discrepancia supera el 5%. El informe a SERNAGEOMIN se bloquea de verdad mientras haya un evento abierto, y se desbloquea al cerrarlo. Ese comportamiento es el producto.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>El orden de magnitud de los caudales</strong>, las cotas, los TAG de instrumentos y los umbrales son verosímiles para una faena de 42.000 t/d en Sierra Gorda. Un ingeniero de faena los puede leer sin reírse.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DOMINIO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Marca y dominio</span>
+    <h2>Evidencia de disponibilidad.</h2>
+  </div>
+  <div class="placa">
+    <p style="font-size:var(--step--1)"><strong>Freatia</strong>, de <em>nivel freático</em>: la cota del agua
+      subterránea. Es el número que decide si un tranque duerme tranquilo y es, literalmente, dónde está el agua
+      que no se ve.</p>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table class="tabla-mini">
+        <thead><tr><th>Dominio</th><th>Verificación</th><th>Resultado</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>freatia.com</strong></td>
+            <td><code>rdap.verisign.com/com/v1/domain/freatia.com</code></td>
+            <td><span class="chip chip-ok">HTTP 404 · DISPONIBLE · 2026-07-13</span></td>
+          </tr>
+          <tr>
+            <td>freatia.cl</td>
+            <td>NIC Chile · <code>Whois.do?d=freatia.cl</code></td>
+            <td><span class="chip chip-ok">"no existe" · DISPONIBLE</span></td>
+          </tr>
+          <tr><td>isohipsa.com <span class="pista">(alternativa)</span></td><td>rdap.verisign.com</td><td><span class="chip chip-ok">HTTP 404 · DISPONIBLE</span></td></tr>
+          <tr><td>cuencora.com <span class="pista">(alternativa)</span></td><td>rdap.verisign.com</td><td><span class="chip chip-ok">HTTP 404 · DISPONIBLE</span></td></tr>
+          <tr><td>piezara.com <span class="pista">(alternativa)</span></td><td>rdap.verisign.com</td><td><span class="chip chip-ok">HTTP 404 · DISPONIBLE</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pista">Verificado con <code>_kit/check-domain.sh</code> el 2026-07-13. Las tres alternativas también
+      tienen el <code>.cl</code> libre.</p>
+  </div>
+</section>
+
+<footer class="pie">
+  <p>Freatia · prototipo · Ningún recurso de este sitio se carga desde un CDN: sólo Google Fonts.
+    <a href="index.html">Volver al producto</a></p>
+</footer>
+
+</main>
+
+<script>
+  (function () {
+    var b = document.getElementById("btn-menu"), m = document.getElementById("menu");
+    b.addEventListener("click", function () {
+      var a = m.classList.toggle("abierto");
+      b.setAttribute("aria-expanded", a ? "true" : "false");
+    });
+  })();
+</script>
+</body>
+</html>

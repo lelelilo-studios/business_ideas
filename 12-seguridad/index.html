@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuasio — El casi-accidente es el aviso. Captúralo en 30 segundos.</title>
+<meta name="description" content="Cuasio captura incidentes y casi-accidentes en faena minera en 30 segundos, con guantes y sin señal. Cruza los reportes que nadie cruzó, verifica los controles críticos y arma el reporte a SERNAGEOMIN.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306111C'/><path d='M16 6 L28 26 L4 26 Z' fill='none' stroke='%23FFD100' stroke-width='3'/><rect x='14.5' y='13' width='3' height='7' fill='%23FFD100'/><rect x='14.5' y='21.5' width='3' height='2.5' fill='%23FFD100'/></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav__barra">
+      <a class="marca" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+          <path d="M13 3 L24 22 L2 22 Z" fill="none" stroke="#FFD100" stroke-width="2.5" stroke-linejoin="miter"/>
+          <rect x="11.7" y="10" width="2.6" height="6" fill="#FFD100"/>
+          <rect x="11.7" y="17.4" width="2.6" height="2.4" fill="#FFD100"/>
+        </svg>
+        <span>Cuasio<span class="marca__punto">.</span></span>
+      </a>
+      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">
+        <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M0 1h16M0 6h16M0 11h16" stroke="currentColor" stroke-width="2"/></svg>
+        Menú
+      </button>
+      <nav class="nav__menu" id="navMenu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">← Ideas</a></li>
+          <li><a href="index.html" aria-current="page">Producto</a></li>
+          <li><a href="demo/index.html">Demo</a></li>
+          <li><a href="negocio.html">Negocio</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="stack.html">Arquitectura</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="rayado" role="presentation"></div>
+
+<main id="principal">
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero">
+  <div class="container">
+    <p class="hero__kicker"><span class="placa">Seguridad minera</span> <span class="placa placa--hueca">DS 132</span></p>
+    <h1>El casi-accidente es el <span class="txt-amarillo">único aviso</span> que vas a recibir.</h1>
+    <p class="hero__bajada">Y hoy nadie lo escribe: reportarlo es un trámite de veinte minutos al final del turno y a nadie le pagan por hacerlo. <strong>Cuasio</strong> lo captura en 30 segundos —con guantes, con casco, sin una barra de señal—, cruza los reportes que nadie cruzó y te dice qué control crítico está caído <strong>hoy</strong>, no en la próxima auditoría.</p>
+    <div class="hero__acciones">
+      <a class="btn" href="demo/index.html">Entrar al demo</a>
+      <a class="btn btn--linea" href="#hallazgo">Ver el hallazgo</a>
+    </div>
+
+    <ul class="tira" role="list">
+      <li>
+        <span class="dato">30 s</span>
+        <span class="tira__pie">Lo que demora un reporte completo en terreno. Cuatro toques y la voz.</span>
+      </li>
+      <li>
+        <span class="dato">0 barras</span>
+        <span class="tira__pie">Funciona sin señal. En interior mina y en el fondo del rajo, que es donde pasa.</span>
+      </li>
+      <li>
+        <span class="dato">7 → 1</span>
+        <span class="tira__pie">Siete reportes sueltos que nadie cruzó. Un patrón. Una rampa. Una media hora.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="rayado rayado--fino" role="presentation"></div>
+
+<!-- ══════════════ 01 EL PROBLEMA ══════════════ -->
+<section class="seccion" id="problema">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">01 / EL PROBLEMA</p>
+      <h2>El sistema existe. Es de papel.</h2>
+      <p>No es que falte normativa ni que falte gente preocupada. Es que la evidencia que serviría para evitar la próxima muerte se pierde en el camino entre la pala y el Excel. Esto lo dice la gente, no nosotros.</p>
+    </div>
+
+    <div class="rejilla rejilla--2">
+      <blockquote class="cita">
+        <p>“El cuasi-accidente lo tienes que escribir en un formulario de dos hojas. Al final del turno, con las manos hechas tira, tienes que ir a la oficina, buscar el talonario y llenarlo. ¿Sabes cuántos se reportan? Los que no puedes esconder.”</p>
+        <footer><span class="cita__quien">Supervisor de seguridad</span><span class="cita__donde">Contratista de movimiento de tierra · Antofagasta</span></footer>
+      </blockquote>
+      <blockquote class="cita">
+        <p>“Yo casi choco con una camioneta en la rampa. No pasó nada, seguí cargando. ¿Qué iba a reportar? ¿Que no pasó nada? Después te llaman a declarar y quedas como el que se equivocó.”</p>
+        <footer><span class="cita__quien">Operador CAEX</span><span class="cita__donde">Turno 7×7, faena a rajo abierto</span></footer>
+      </blockquote>
+      <blockquote class="cita">
+        <p>“La investigación la hago en un Word que copio del anterior. Las acciones correctivas quedan en un Excel que abro cuando viene la auditoría del mandante. Ahí me doy cuenta de que hay catorce vencidas.”</p>
+        <footer><span class="cita__quien">Jefa de prevención de riesgos</span><span class="cita__donde">Empresa contratista, 180 trabajadores</span></footer>
+      </blockquote>
+      <blockquote class="cita">
+        <p>“Si el mandante me baja el índice de seguridad, no entro más a la faena. Entonces la seguridad para mí no es un tema moral, es que me quedo sin empresa. Y la manejo con planillas.”</p>
+        <footer><span class="cita__quien">Gerente general</span><span class="cita__donde">Contratista de mantención mecánica</span></footer>
+      </blockquote>
+    </div>
+
+    <div class="caja caja--peligro mt-l">
+      <div class="caja__cinta caja__cinta--peligro">
+        <span>El dato que importa</span>
+        <svg width="20" height="18" viewBox="0 0 20 18" aria-hidden="true"><path d="M10 1 L19 17 L1 17 Z" fill="none" stroke="#06111C" stroke-width="2"/><rect x="9" y="7" width="2" height="5" fill="#06111C"/><rect x="9" y="13" width="2" height="2" fill="#06111C"/></svg>
+      </div>
+      <p class="mb-0">La lógica de la pirámide de seguridad —muchos eventos sin consecuencia por cada evento fatal— es la base de toda la gestión moderna de riesgos: <strong>el casi-accidente es la señal temprana</strong>. Y es exactamente la que el sistema de papel pierde, porque es la única que no obliga a nadie a llenar un formulario. Se reporta lo que ya dolió. Lo que avisaba, no.</p>
+      <p class="fuente mb-0">La forma exacta de esa proporción (las “pirámides” tipo Heinrich / Bird) está discutida en la literatura y no la usamos como número: la usamos como dirección. Lo que sí es operativo y no está en discusión: <strong>un evento de alto potencial sin lesión contiene la misma información causal que la fatalidad que no ocurrió</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 02 EL HALLAZGO ══════════════ -->
+<section class="seccion seccion--oscura" id="hallazgo">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">02 / EL HALLAZGO</p>
+      <h2>Siete reportes. Nadie los cruzó.</h2>
+      <p>Esto es lo que Cuasio encontró en la Faena Cerro Quemado con datos que <em>ya existían</em>: siete casi-accidentes distintos, reportados por seis personas distintas, en tres meses. Sueltos no dicen nada. Juntos dicen exactamente dónde y a qué hora va a pasar.</p>
+    </div>
+
+    <figure class="fig">
+      <figcaption>
+        <span class="fig__tit">Reportes de la faena · 18 abr – 2 jul 2026</span>
+        <span class="fig__sub">Cada punto es un reporte. Eje horizontal: fecha. Eje vertical: hora del día.</span>
+      </figcaption>
+
+      <svg viewBox="0 0 400 300" role="img" aria-labelledby="tScatter dScatter" id="scatter">
+        <title id="tScatter">Dispersión de reportes por fecha y hora del día</title>
+        <desc id="dScatter">43 reportes. Los 36 grises se reparten por todo el día. Los 7 amarillos, todos en la Rampa 7, caen todos dentro de la franja de cambio de turno, entre las 19:30 y las 20:30.</desc>
+
+        <!-- franja de cambio de turno -->
+        <rect x="46" y="207.6" width="338" height="9.4" fill="#FFD100" fill-opacity="0.16"/>
+        <line x1="46" y1="207.6" x2="384" y2="207.6" stroke="#FFD100" stroke-width="1" stroke-opacity="0.55"/>
+        <line x1="46" y1="217" x2="384" y2="217" stroke="#FFD100" stroke-width="1" stroke-opacity="0.55"/>
+
+        <!-- ejes -->
+        <line class="g-eje" x1="46" y1="24" x2="46" y2="250"/>
+        <line class="g-eje" x1="46" y1="250" x2="384" y2="250"/>
+
+        <!-- ticks Y -->
+        <text class="g-eje-txt" x="40" y="27" text-anchor="end">00:00</text>
+        <text class="g-eje-txt" x="40" y="83.5" text-anchor="end">06:00</text>
+        <text class="g-eje-txt" x="40" y="140" text-anchor="end">12:00</text>
+        <text class="g-eje-txt" x="40" y="196.5" text-anchor="end">18:00</text>
+        <text class="g-eje-txt" x="40" y="253" text-anchor="end">24:00</text>
+
+        <!-- ticks X -->
+        <text class="g-eje-txt" x="46" y="264" text-anchor="start">18 abr</text>
+        <text class="g-eje-txt" x="215" y="264" text-anchor="middle">25 may</text>
+        <text class="g-eje-txt" x="384" y="264" text-anchor="end">2 jul</text>
+
+        <!-- contexto: 36 reportes del resto de la faena -->
+        <g fill="#66809A" id="gContexto">
+          <circle cx="52" cy="60" r="4"/><circle cx="58" cy="140" r="4"/><circle cx="66" cy="196" r="4"/>
+          <circle cx="74" cy="90" r="4"/><circle cx="88" cy="168" r="4"/><circle cx="96" cy="44" r="4"/>
+          <circle cx="104" cy="120" r="4"/><circle cx="112" cy="212" r="4"/><circle cx="120" cy="72" r="4"/>
+          <circle cx="132" cy="150" r="4"/><circle cx="140" cy="104" r="4"/><circle cx="150" cy="230" r="4"/>
+          <circle cx="158" cy="56" r="4"/><circle cx="168" cy="182" r="4"/><circle cx="176" cy="128" r="4"/>
+          <circle cx="186" cy="96" r="4"/><circle cx="196" cy="64" r="4"/><circle cx="204" cy="158" r="4"/>
+          <circle cx="214" cy="204" r="4"/><circle cx="224" cy="116" r="4"/><circle cx="234" cy="80" r="4"/>
+          <circle cx="244" cy="144" r="4"/><circle cx="252" cy="190" r="4"/><circle cx="262" cy="52" r="4"/>
+          <circle cx="272" cy="166" r="4"/><circle cx="282" cy="108" r="4"/><circle cx="292" cy="224" r="4"/>
+          <circle cx="300" cy="74" r="4"/><circle cx="300" cy="212" r="4"/><circle cx="310" cy="136" r="4"/>
+          <circle cx="318" cy="92" r="4"/><circle cx="328" cy="178" r="4"/><circle cx="336" cy="120" r="4"/>
+          <circle cx="344" cy="60" r="4"/><circle cx="352" cy="152" r="4"/><circle cx="360" cy="100" r="4"/>
+        </g>
+
+        <!-- los 7 de la Rampa 7 -->
+        <g id="gRampa">
+          <circle cx="46"    cy="211.1" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="18 abr · 19:52" data-q="M. Ibáñez · Op. CAEX" data-t="Salí del cruce y venía una camioneta subiendo pegada al talud. No la vi. Alcancé a frenar."></circle>
+          <circle cx="91.4"  cy="213.1" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="29 abr · 20:05" data-q="R. Peñailillo · Mantenedor" data-t="Iba bajando en la camioneta y me encontré un CAEX cargado en la curva. No se veía nada por el polvo."></circle>
+          <circle cx="124.4" cy="210.2" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="7 may · 19:47" data-q="J. Colil · Op. CAEX" data-t="Casi me llevo una camioneta que estaba detenida sin baliza en la berma. El regador no había pasado."></circle>
+          <circle cx="182.1" cy="214.0" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="21 may · 20:11" data-q="C. Vergara · Supervisora" data-t="Subiendo al relevo tuve que meterme a la cuneta para que pasara el CAEX. Polvo total, cero visibilidad."></circle>
+          <circle cx="235.7" cy="212.0" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="3 jun · 19:58" data-q="M. Ibáñez · Op. CAEX" data-t="Otra vez lo mismo del cruce. Ya van dos veces que reporto y sigue igual."></circle>
+          <circle cx="301.7" cy="215.1" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="19 jun · 20:18" data-q="N. Quilodrán · Op. Wheel Dozer" data-t="Una camioneta se me cruzó por el lado ciego. Íbamos los dos al relevo, nadie mira."></circle>
+          <circle cx="355.3" cy="209.3" r="6" fill="#FFD100" stroke="#0B1A2B" stroke-width="2" tabindex="0" role="button"
+            data-f="2 jul · 19:41" data-q="F. Painemal · Op. CAEX" data-t="Freno de emergencia. Camioneta de supervisión adelantando por la derecha. No la vi hasta encima."></circle>
+        </g>
+
+        <!-- anotación de la franja -->
+        <text class="g-etq" x="384" y="196" text-anchor="end" fill="#FFD100">CAMBIO DE TURNO · 19:30–20:30</text>
+        <line x1="330" y1="238" x2="352" y2="219" stroke="#FFD100" stroke-width="1"/>
+        <text class="g-etq" x="330" y="248" text-anchor="end">Rampa 7 · los 7 reportes</text>
+      </svg>
+
+      <div class="fig__leyenda">
+        <span><i class="llave llave--punto" style="background:#FFD100"></i> Casi-accidente en Rampa 7 (7)</span>
+        <span><i class="llave llave--punto" style="background:#66809A"></i> Resto de reportes de la faena (36)</span>
+      </div>
+      <div class="tooltip" id="tt" hidden>
+        <p class="tooltip__f mono" id="ttF"></p>
+        <p class="tooltip__q" id="ttQ"></p>
+        <p class="tooltip__t" id="ttT"></p>
+      </div>
+      <p class="fuente">Datos simulados de la Faena Cerro Quemado. Toca o enfoca un punto amarillo para leer el reporte.</p>
+    </figure>
+
+    <div class="rejilla rejilla--2 mt-m">
+      <div class="caja">
+        <div class="caja__cinta">Lo que dice el patrón</div>
+        <ul class="lista" role="list">
+          <li>Los 7 son en la <strong>Rampa 7</strong>, tramo curva–cruce.</li>
+          <li>Los 7 caen entre las <strong>19:41 y las 20:18</strong>: el relevo del turno día.</li>
+          <li>5 de 7 mencionan <strong>polvo</strong> o <strong>“no la vi”</strong>.</li>
+          <li>El mismo operador reportó dos veces. La segunda dice: <em>“ya van dos veces que reporto y sigue igual”</em>.</li>
+        </ul>
+      </div>
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">La causa, y por qué nadie la vio</div>
+        <p>El camión regador riega la ruta de acarreo cada 40 minutos. <strong>A las 19:30 el regador también entra a relevo.</strong> Durante la media hora del cambio de turno la ruta lleva el polvo de dos ciclos sin regar — y es justo la media hora en la que las camionetas del turno entrante suben la misma rampa por la que bajan los CAEX cargados del turno saliente.</p>
+        <p class="mb-0">Ninguno de los siete reportes contiene esa conclusión. La conclusión sólo aparece <strong>cruzándolos</strong>. Y sólo se puede cruzar si existen — que es todo el punto del producto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rayado rayado--fino" role="presentation"></div>
+
+<!-- ══════════════ 03 CÓMO FUNCIONA ══════════════ -->
+<section class="seccion" id="como">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">03 / CÓMO FUNCIONA</p>
+      <h2>Cuatro piezas. Ninguna opcional.</h2>
+    </div>
+
+    <ol class="pasos" role="list">
+      <li class="paso">
+        <span class="paso__n">01</span>
+        <div class="paso__cuerpo">
+          <h3>Captura en terreno, 30 segundos</h3>
+          <p>Cuatro toques grandes (¿qué?, ¿dónde?, ¿qué tan cerca estuvo?) y la voz. Botones de 72&nbsp;px porque el operador tiene guantes de cabritilla puestos. <strong>Funciona sin señal</strong>: el reporte se guarda en el teléfono y sube solo cuando el equipo pasa por cobertura. Se puede reportar sin nombre: si el miedo al castigo es el que apaga el reporte, el anonimato es una función del producto, no una casilla.</p>
+          <a class="paso__link" href="demo/index.html">Probar la captura →</a>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso__n">02</span>
+        <div class="paso__cuerpo">
+          <h3>Triage con IA: clasifica y cruza</h3>
+          <p>Cada reporte entra clasificado: tipo de evento, energía involucrada (gravedad, vehículo en movimiento, eléctrica, presión…), potencial de severidad, control crítico asociado. Y —lo que ninguna planilla hace— <strong>cruza los reportes entre sí</strong>: mismo lugar, misma hora, mismo equipo, mismas palabras. Ahí aparece el hallazgo de arriba. La IA propone; la persona firma.</p>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso__n">03</span>
+        <div class="paso__cuerpo">
+          <h3>Controles críticos, verificados hoy</h3>
+          <p>La metodología que la industria de verdad usa: identificar el puñado de controles que impiden una fatalidad y <strong>verificar que estén operativos hoy</strong>, no que estén escritos en un manual. Cuasio le pone la verificación en el teléfono al que corresponde —jefe de turno, supervisor— y cuando un control se cae, se ve caído, con nombre y hora, en la pantalla del que puede pararlo.</p>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso__n">04</span>
+        <div class="paso__cuerpo">
+          <h3>Investigación y reporte, armados solos</h3>
+          <p>La investigación parte con un borrador que ya tiene los hechos, la línea de tiempo, los reportes previos del mismo lugar y una hipótesis causal. El equipo la corrige, la discute y la firma. Y el reporte que hay que entregar sale del mismo dato, sin volver a tipear nada. <strong>Ojo con esto:</strong> el formato y los plazos exactos ante SERNAGEOMIN los tratamos como <span class="porvalidar">por validar</span> hasta contrastarlos con el texto vigente. Ver abajo.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════════ 04 MARCO LEGAL ══════════════ -->
+<section class="seccion seccion--oscura" id="legal">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">04 / MARCO LEGAL</p>
+      <h2>Lo que nos consta y lo que hay que validar.</h2>
+      <p>En un producto de seguridad minera, <strong>inventar una obligación legal no es un error de copy: es un pasivo</strong>. Así que separamos las dos columnas y lo dejamos escrito en la landing, no en la letra chica.</p>
+    </div>
+
+    <div class="rejilla rejilla--2">
+      <div class="caja">
+        <div class="caja__cinta">Nos consta</div>
+        <ul class="lista lista--check" role="list">
+          <li><strong>DS 132</strong> (Ministerio de Minería) es el <strong>Reglamento de Seguridad Minera</strong>: es la norma marco de seguridad de la industria minera en Chile.</li>
+          <li><strong>SERNAGEOMIN</strong> es el organismo fiscalizador de la seguridad minera y el receptor de la información de accidentabilidad del sector.</li>
+          <li>La <strong>Ley 16.744</strong> establece el seguro social contra riesgos de accidentes del trabajo y enfermedades profesionales, con las mutualidades como administradoras.</li>
+          <li>La obligación de seguridad <strong>alcanza igual a la empresa contratista</strong> que al mandante: el contratista tiene su propia responsabilidad, su propio deber de prevención y su propia estadística.</li>
+          <li>La metodología de <strong>controles críticos</strong> (identificar los controles que evitan el evento fatal y verificar su operatividad) es práctica estándar de la industria, no un invento nuestro.</li>
+        </ul>
+      </div>
+      <div class="caja">
+        <div class="caja__cinta">Por validar antes de venderlo</div>
+        <ul class="lista lista--muerte" role="list">
+          <li><strong>Artículos y numerales exactos</strong> del DS 132 que obligan a reportar y a investigar. No citamos números de artículo de memoria.</li>
+          <li><strong>Plazos y vías de notificación</strong> a SERNAGEOMIN según tipo de evento (fatal, grave, otros). El plazo exacto y el canal formal se validan contra el texto vigente y las circulares.</li>
+          <li><strong>Formato oficial</strong> del reporte y de la estadística mensual. El demo arma un borrador estructurado; que ese borrador calce campo a campo con el formato de la autoridad es tarea de la fase de diseño con un experto en prevención.</li>
+          <li>Si el <strong>DS 40 sigue vigente o fue reemplazado</strong> por la normativa de gestión preventiva más reciente del Ministerio del Trabajo: hay un cambio normativo reciente en esa línea y no lo damos por sabido.</li>
+          <li>Cifras de accidentabilidad y fatalidad del sector: <strong>las publica SERNAGEOMIN</strong> y las citamos de la fuente o no las citamos. No hay estadísticas inventadas en este sitio.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="fuente mt-s">Regla de la casa: cualquier afirmación normativa que no podamos apuntar a un texto vigente sale marcada <span class="porvalidar">por validar</span> en el producto y en el sitio, hasta que un prevencionista con registro la confirme. Un software de seguridad que miente sobre la norma es peor que un Excel honesto.</p>
+  </div>
+</section>
+
+<div class="rayado rayado--fino" role="presentation"></div>
+
+<!-- ══════════════ 05 CONTRA QUÉ COMPETIMOS ══════════════ -->
+<section class="seccion" id="competencia">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">05 / CONTRA QUÉ COMPETIMOS</p>
+      <h2>Contra el Excel. Y contra el que no reporta.</h2>
+    </div>
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead>
+          <tr><th scope="col">Quién</th><th scope="col">Qué es</th><th scope="col">Por qué gana hoy</th><th scope="col">Dónde lo ganamos</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>El Excel + el talonario</strong></td>
+            <td>El titular real del puesto. En prácticamente toda contratista mediana chilena.</td>
+            <td>Cuesta $0, ya está ahí, y nadie te obliga a cambiarlo.</td>
+            <td>El Excel no captura en terreno, no cruza siete reportes y no te avisa nada. Su costo real es el evento que no viste venir.</td>
+          </tr>
+          <tr>
+            <td><strong>Intelex · Cority · VelocityEHS</strong></td>
+            <td>Suites EHS globales, serias, completas.</td>
+            <td>Ya están adentro de varias mineras grandes. Cumplen todo.</td>
+            <td>Están diseñadas para el escritorio del corporativo, no para el guante del operador. Implementación de meses, licencia en USD, y la contratista de 120 personas no las va a comprar nunca.</td>
+          </tr>
+          <tr>
+            <td><strong>El sistema propio del mandante</strong></td>
+            <td>La minera te obliga a cargar tus eventos en <em>su</em> plataforma.</td>
+            <td>Es obligatorio. No se discute.</td>
+            <td>No compite: se integra. La contratista igual necesita gestionar lo suyo, y hoy lo hace dos veces. Cuasio es la fuente y exporta hacia el mandante.</td>
+          </tr>
+          <tr>
+            <td><strong>Formularios Google / Forms</strong></td>
+            <td>La solución casera del prevencionista con iniciativa.</td>
+            <td>Gratis y en 20 minutos está andando.</td>
+            <td>No funciona sin señal, no clasifica, no gestiona el control crítico y termina siendo… otra planilla.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fuente">Diferenciación honesta: no somos más completos que Cority. Somos los únicos que el operador va a usar con el guante puesto, y los únicos que la contratista puede pagar.</p>
+  </div>
+</section>
+
+<!-- ══════════════ 06 PRECIO ══════════════ -->
+<section class="seccion seccion--oscura" id="precio">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">06 / PRECIO</p>
+      <h2>Por trabajador en faena. En pesos.</h2>
+      <p>Sin licencias por usuario: <strong>el que reporta no paga licencia</strong>. Cobrar por asiento en un producto cuyo éxito depende de que reporte todo el mundo sería sabotearse solo. El precio va por dotación en faena, en CLP, sin dólar y sin sorpresa cambiaria.</p>
+    </div>
+
+    <div class="rejilla rejilla--planes">
+      <div class="plan">
+        <p class="placa placa--tinta">Cuadrilla</p>
+        <p class="plan__precio"><span class="dato">$190.000</span><span class="plan__mes">/ mes</span></p>
+        <p class="plan__quien">Hasta 50 trabajadores en faena</p>
+        <ul class="lista" role="list">
+          <li>Captura ilimitada, offline, anónima opcional</li>
+          <li>Triage y detección de patrones</li>
+          <li>Hasta 8 controles críticos</li>
+          <li>Exportación del reporte regulatorio</li>
+        </ul>
+        <p class="plan__unit mono">≈ $3.800 por trabajador / mes</p>
+      </div>
+      <div class="plan plan--destacado">
+        <p class="placa">Faena</p>
+        <p class="plan__precio"><span class="dato">$490.000</span><span class="plan__mes">/ mes</span></p>
+        <p class="plan__quien">51 a 250 trabajadores · el corazón del mercado contratista</p>
+        <ul class="lista" role="list">
+          <li>Todo lo anterior</li>
+          <li>Investigación asistida (ICAM / 5 porqués)</li>
+          <li>Controles críticos ilimitados + verificación por turno</li>
+          <li>Panel para el mandante (lectura)</li>
+          <li>Integración con el sistema del mandante</li>
+        </ul>
+        <p class="plan__unit mono">≈ $1.960 por trabajador / mes</p>
+      </div>
+      <div class="plan">
+        <p class="placa placa--tinta">Multifaena</p>
+        <p class="plan__precio"><span class="dato">$1.290.000</span><span class="plan__mes">/ mes</span></p>
+        <p class="plan__quien">251 a 1.000 trabajadores, varias faenas o varios contratos</p>
+        <ul class="lista" role="list">
+          <li>Todo lo anterior, consolidado por faena y por contrato</li>
+          <li>Comparación entre faenas (el patrón que se repite en dos)</li>
+          <li>API y exportación programada</li>
+          <li>Soporte con SLA</li>
+        </ul>
+        <p class="plan__unit mono">≈ $1.290 por trabajador / mes</p>
+      </div>
+    </div>
+
+    <div class="caja mt-m">
+      <div class="caja__cinta">Minera mandante</div>
+      <p class="mb-0">Vista consolidada de todos tus contratistas en Cuasio, con el patrón cruzado entre empresas —que es donde de verdad está el hallazgo que nadie tiene hoy—. <strong>Desde $4.900.000 / mes</strong> + implementación. Se cotiza. Y sí: llegamos ahí por abajo, desde tus contratistas. Está explicado sin adornos en <a href="negocio.html">Negocio</a>.</p>
+    </div>
+    <p class="fuente">Valores netos, sin IVA. Facturación mensual o anual (2 meses de descuento). El costo de inferencia de IA que estos precios tienen que absorber está calculado con la aritmética a la vista en <a href="stack.html">Arquitectura</a>.</p>
+  </div>
+</section>
+
+<div class="rayado rayado--fino" role="presentation"></div>
+
+<!-- ══════════════ 07 FAQ ══════════════ -->
+<section class="seccion" id="faq">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">07 / PREGUNTAS</p>
+      <h2>Lo que nos preguntan primero.</h2>
+    </div>
+
+    <div class="faq">
+      <details>
+        <summary>¿Y si el operador no reporta igual?</summary>
+        <div class="faq__cuerpo">
+          <p>Ése es <strong>el</strong> riesgo del producto, no una objeción menor, y lo decimos igual en el <a href="roadmap.html">roadmap</a> como criterio de muerte. El software puede bajar el costo de reportar de 20 minutos a 30 segundos; no puede solo cambiar que a alguien lo hayan castigado por reportar. Por eso: reporte anónimo real, cero campos de culpa en la captura, y una métrica que la jefatura ve todas las semanas — <em>cuántos de tus trabajadores reportaron al menos una vez este mes</em>. Si esa métrica no sube en el piloto, el producto no sirve y hay que decirlo.</p>
+        </div>
+      </details>
+      <details>
+        <summary>No hay señal en el rajo ni en interior mina.</summary>
+        <div class="faq__cuerpo">
+          <p>Correcto, y por eso la app es <em>offline-first</em>: el reporte se escribe en el teléfono (IndexedDB), la voz se guarda como audio local, y todo sincroniza cuando el equipo pasa por el punto de wifi del comedor, del taller o de la garita. El operador ve “3 en cola” y no le importa. En el demo puedes cortar la señal y seguir reportando.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Esto reemplaza al prevencionista?</summary>
+        <div class="faq__cuerpo">
+          <p>No, y sería una pésima idea venderlo así. Le saca de encima las cuatro horas semanales de tipeo, transcripción y armado de planilla, para que use ese tiempo en terreno. La investigación la firma una persona con nombre y registro, siempre. La IA redacta borradores; no cierra hallazgos.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Y la ley? ¿Esto me deja cumpliendo?</summary>
+        <div class="faq__cuerpo">
+          <p>Te deja con el dato ordenado, trazable y exportable, que es la condición necesaria. Pero no te vamos a decir “cumple con el DS 132” como si fuera una casilla que se marca: el cumplimiento lo determina la autoridad y lo sostiene tu experto en prevención. Lo que sí garantizamos es que <strong>ninguna afirmación normativa del producto está inventada</strong>: lo que no nos consta aparece marcado <span class="porvalidar">por validar</span>, en el producto también.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Se integra con la plataforma que me exige el mandante?</summary>
+        <div class="faq__cuerpo">
+          <p>Es el caso normal y es parte del plan Faena. Cuasio es la fuente de verdad de tu empresa y exporta hacia el sistema del mandante (CSV/API según lo que ese sistema acepte). Hoy tu gente carga el mismo evento dos veces; la idea es que lo cargue cero veces.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Cuánto demora implementar?</summary>
+        <div class="faq__cuerpo">
+          <p>El objetivo declarado es <strong>una semana</strong> para una contratista de 120 personas: cargar dotación (Excel de RR.HH.), definir áreas de la faena, elegir los controles críticos (partimos de una plantilla de la industria y se ajusta), y una charla de 15 minutos en el cambio de turno. No hay integración obligatoria para empezar.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CTA ══════════════ -->
+<section class="cta">
+  <div class="container">
+    <h2>El próximo casi-accidente ya está por pasar.<br>La pregunta es si alguien lo va a escribir.</h2>
+    <div class="hero__acciones">
+      <a class="btn" href="demo/index.html">Entrar al demo</a>
+      <a class="btn btn--linea" href="negocio.html">Cómo se vende esto</a>
+    </div>
+    <p class="txt-chico mt-s">Buscamos 3 contratistas mineras para el piloto: 80–250 personas en faena, Antofagasta / Atacama / O'Higgins. Piloto de 90 días, sin costo, con el criterio de éxito escrito antes de partir.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="rayado" role="presentation"></div>
+
+<footer class="pie">
+  <div class="container">
+    <p class="mono txt-chico">CUASIO · Prototipo · cuasio.com verificado disponible el 13-07-2026 (RDAP Verisign → HTTP 404)</p>
+    <p class="txt-chico">Producto no lanzado. Los datos de faena de este sitio son simulados. Ninguna cita normativa de este sitio debe usarse como asesoría legal.</p>
+    <nav class="pie__links" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Menú móvil
+  (function () {
+    var t = document.getElementById('navToggle');
+    var m = document.getElementById('navMenu');
+    t.addEventListener('click', function () {
+      var abierto = m.classList.toggle('abierto');
+      t.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    });
+  })();
+
+  // Tooltip del scatter (hover + foco + toque)
+  (function () {
+    var tt = document.getElementById('tt');
+    if (!tt) return;
+    var f = document.getElementById('ttF'), q = document.getElementById('ttQ'), x = document.getElementById('ttT');
+    var puntos = document.querySelectorAll('#gRampa circle');
+    function mostrar(e) {
+      var c = e.currentTarget;
+      f.textContent = c.getAttribute('data-f');
+      q.textContent = c.getAttribute('data-q');
+      x.textContent = '“' + c.getAttribute('data-t') + '”';
+      tt.hidden = false;
+      puntos.forEach(function (p) { p.setAttribute('r', p === c ? '8' : '6'); });
+    }
+    puntos.forEach(function (c) {
+      c.addEventListener('mouseenter', mostrar);
+      c.addEventListener('focus', mostrar);
+      c.addEventListener('click', mostrar);
+    });
+  })();
+</script>
+
+<style>
+  /* Estilos propios de la landing */
+  .hero { padding-block: var(--sp-xl) var(--sp-l); }
+  .hero__kicker { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-bottom: var(--sp-m); }
+  .hero h1 { font-size: var(--step-4); font-variation-settings: 'wdth' 110; max-width: 15ch; }
+  @media (min-width: 48em) { .hero h1 { font-size: var(--step-5); font-variation-settings: 'wdth' 118; } }
+  .hero__bajada { margin-top: var(--sp-m); font-size: var(--step-1); color: var(--tinta-2); max-width: 44ch; }
+  .hero__acciones { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-top: var(--sp-m); }
+  .hero__acciones .btn { flex: 1 1 14rem; }
+
+  .tira { list-style: none; display: grid; gap: var(--sp-s); margin-top: var(--sp-xl); border-top: 2px solid var(--linea); padding-top: var(--sp-m); }
+  .tira li { display: grid; gap: var(--sp-2xs); }
+  .tira .dato { font-size: var(--step-3); }
+  .tira__pie { color: var(--tinta-3); font-size: var(--step--1); max-width: 30ch; }
+  @media (min-width: 48em) { .tira { grid-template-columns: repeat(3, 1fr); gap: var(--sp-m); } }
+
+  .seccion--oscura { background: var(--panel); border-block: 2px solid var(--linea); }
+
+  .cita { background: var(--panel); border: 2px solid var(--linea); border-left: 6px solid var(--amarillo); padding: var(--sp-m); }
+  .seccion--oscura .cita { background: var(--panel-alto); }
+  .cita p { color: var(--blanco); font-size: var(--step-0); }
+  .cita footer { display: grid; gap: 2px; margin-top: var(--sp-s); }
+  .cita__quien { color: var(--amarillo); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; }
+  .cita__donde { color: var(--tinta-3); font-size: 0.78rem; font-family: var(--mono); }
+
+  .pasos { list-style: none; display: grid; gap: 0; border-top: 2px solid var(--linea); }
+  .paso { display: grid; grid-template-columns: 3.2rem 1fr; gap: var(--sp-s); padding-block: var(--sp-m); border-bottom: 2px solid var(--linea); }
+  .paso__n { font-family: var(--mono); font-size: var(--step-1); color: var(--amarillo); font-weight: 600; }
+  .paso__cuerpo h3 { margin-bottom: var(--sp-2xs); }
+  .paso__cuerpo p { max-width: var(--measure); }
+  .paso__link { display: inline-block; margin-top: var(--sp-2xs); color: var(--amarillo); text-transform: uppercase; font-weight: 800; letter-spacing: 0.08em; font-size: 0.78rem; text-decoration: none; border-bottom: 2px solid var(--amarillo); padding-bottom: 2px; min-height: 44px; line-height: 44px; }
+  @media (min-width: 48em) { .paso { grid-template-columns: 5rem 1fr; gap: var(--sp-m); } }
+
+  .rejilla--planes { grid-template-columns: 1fr; }
+  @media (min-width: 62em) { .rejilla--planes { grid-template-columns: repeat(3, 1fr); } }
+  .plan { background: var(--panel-alto); border: 2px solid var(--linea); padding: var(--sp-m); display: grid; align-content: start; gap: var(--sp-s); }
+  .plan--destacado { border-color: var(--amarillo); background: var(--panel-alto); }
+  .plan__precio { display: flex; align-items: baseline; gap: 0.4rem; margin: 0; flex-wrap: wrap; }
+  .plan__precio .dato { font-size: var(--step-2); }
+  @media (min-width: 75em) { .plan__precio .dato { font-size: var(--step-3); } }
+  .plan__mes { color: var(--tinta-3); font-family: var(--mono); font-size: var(--step--1); }
+  .plan__quien { color: var(--tinta-2); font-size: var(--step--1); margin: 0; min-height: 3em; }
+  .plan .placa { justify-self: start; }
+  .plan__unit { color: var(--tinta-3); font-size: 0.78rem; border-top: 1px solid var(--linea); padding-top: var(--sp-2xs); margin: 0; }
+
+  .faq { border-top: 2px solid var(--linea); }
+  .faq details { border-bottom: 2px solid var(--linea); }
+  .faq summary { cursor: pointer; padding: var(--sp-s) 0; min-height: 44px; color: var(--blanco); font-weight: 800; font-variation-settings: 'wdth' 110; list-style: none; display: flex; justify-content: space-between; gap: var(--sp-s); align-items: center; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; color: var(--amarillo); font-family: var(--mono); font-size: 1.4rem; flex: none; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq summary:hover { color: var(--amarillo); }
+  .faq__cuerpo { padding-bottom: var(--sp-m); max-width: var(--measure); }
+
+  .cta { background: var(--amarillo); color: var(--noche); padding-block: var(--sp-xl); }
+  .cta h2 { color: var(--noche); font-size: var(--step-3); }
+  .cta .btn { background: var(--noche); color: var(--amarillo); border-color: var(--noche); }
+  .cta .btn:hover { background: #000; border-color: #000; color: var(--amarillo); }
+  .cta .btn--linea { background: none; color: var(--noche); border-color: var(--noche); }
+  .cta .btn--linea:hover { background: var(--noche); color: var(--amarillo); }
+  .cta .txt-chico { color: #3d3000; max-width: 52ch; }
+
+  .tooltip { margin-top: var(--sp-xs); border: 2px solid var(--amarillo); background: var(--noche); padding: var(--sp-xs) var(--sp-s); }
+  .tooltip__f { color: var(--amarillo); font-size: 0.78rem; letter-spacing: 0.06em; margin: 0; }
+  .tooltip__q { color: var(--blanco); font-weight: 700; font-size: var(--step--1); margin: 2px 0 0; }
+  .tooltip__t { color: var(--tinta-2); font-size: var(--step--1); margin: 4px 0 0; }
+</style>
+
+</body>
+</html>

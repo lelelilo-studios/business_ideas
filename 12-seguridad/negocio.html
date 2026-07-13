@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Cuasio</title>
+<meta name="description" content="Go-to-market de Cuasio: por qué le vendemos primero a la empresa contratista y no a la minera grande, con TAM, precio, CAC, LTV y la aritmética a la vista.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306111C'/><path d='M16 6 L28 26 L4 26 Z' fill='none' stroke='%23FFD100' stroke-width='3'/><rect x='14.5' y='13' width='3' height='7' fill='%23FFD100'/><rect x='14.5' y='21.5' width='3' height='2.5' fill='%23FFD100'/></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav__barra">
+      <a class="marca" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+          <path d="M13 3 L24 22 L2 22 Z" fill="none" stroke="#FFD100" stroke-width="2.5"/>
+          <rect x="11.7" y="10" width="2.6" height="6" fill="#FFD100"/>
+          <rect x="11.7" y="17.4" width="2.6" height="2.4" fill="#FFD100"/>
+        </svg>
+        <span>Cuasio<span class="marca__punto">.</span></span>
+      </a>
+      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">
+        <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M0 1h16M0 6h16M0 11h16" stroke="currentColor" stroke-width="2"/></svg>
+        Menú
+      </button>
+      <nav class="nav__menu" id="navMenu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">← Ideas</a></li>
+          <li><a href="index.html">Producto</a></li>
+          <li><a href="demo/index.html">Demo</a></li>
+          <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="stack.html">Arquitectura</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="rayado" role="presentation"></div>
+
+<main id="principal">
+
+<section class="seccion">
+  <div class="container">
+    <p class="placa">Plan de negocio</p>
+    <h1 class="mt-s" style="font-size:var(--step-4);max-width:20ch">A quién le vendemos, cuánto vale y qué lo mata.</h1>
+    <p class="mt-s prose">Toda cifra de esta página está <strong>citada</strong> o <strong>etiquetada como estimación con su aritmética a la vista</strong>. Donde no tenemos la fuente, lo decimos. Un plan con un TAM inventado es peor que no tener plan: te hace gastar dos años.</p>
+  </div>
+</section>
+
+<!-- ICP -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">01 / CLIENTE OBJETIVO</p>
+      <h2>La empresa contratista minera.</h2>
+    </div>
+
+    <div class="rejilla rejilla--2">
+      <div class="caja">
+        <div class="caja__cinta">Quién exactamente</div>
+        <dl class="ficha">
+          <div><dt>Segmento</dt><dd>Empresa contratista o subcontratista que trabaja dentro de una faena minera: movimiento de tierra, mantención mecánica y eléctrica, perforación y tronadura, servicios de planta, transporte interno.</dd></div>
+          <div><dt>Tamaño</dt><dd>80 a 250 personas en faena. Es la banda donde ya hay estructura (existe un experto en prevención) pero todavía no hay software (todo vive en Excel).</dd></div>
+          <div><dt>Dónde</dt><dd>Antofagasta, Calama, Copiapó, El Salvador, Los Andes, Rancagua. La venta es presencial y el norte es el norte.</dd></div>
+          <div><dt>Quién firma</dt><dd>El <strong>gerente general</strong> o el <strong>gerente de operaciones</strong>. No firma por moral: firma porque si el mandante le baja el índice de seguridad, pierde el contrato y pierde la empresa.</dd></div>
+          <div><dt>Quién lo usa a diario</dt><dd>La <strong>experta en prevención de riesgos</strong> (la campeona interna, 80% del uso de oficina) y los <strong>jefes de turno</strong>. En terreno lo usa todo el mundo: operador CAEX, mantenedor, supervisor.</dd></div>
+          <div><dt>Dónde está hoy</dt><dd>Talonario de papel + Excel + Word + una carpeta compartida. El mandante lo audita dos veces al año y ahí se descubre lo que faltaba.</dd></div>
+        </dl>
+      </div>
+
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">La decisión: contratista, no minera</div>
+        <p>Es <em>la</em> decisión de esta empresa, así que va con sus razones y con su costo.</p>
+        <ul class="lista" role="list">
+          <li><strong>El ciclo.</strong> Vender a minera grande es piloto + procurement + homologación de proveedor: <strong>12 a 18 meses</strong> y un equipo de venta enterprise que no tenemos el año 1. A una contratista le vendes en <strong>4 a 8 semanas</strong>, en dos reuniones, y firma una sola persona.</li>
+          <li><strong>El volumen.</strong> Mineras grandes en Chile: unas pocas decenas. Contratistas con gente adentro de faena: <strong>miles</strong>. Un mercado de miles se ataca con venta repetible; uno de treinta, con relaciones.</li>
+          <li><strong>La obligación es la misma.</strong> La ley no le pide menos al contratista. Tiene el mismo deber de prevención, la misma estadística y el mismo riesgo de que alguien no vuelva.</li>
+          <li><strong>Y tiene un miedo que la minera no tiene:</strong> se juega el contrato. Es el único comprador de este mercado cuyo dolor es <strong>comercial y es hoy</strong>.</li>
+        </ul>
+        <p class="mt-s mb-0"><strong>El costo de esta decisión, dicho sin adorno:</strong> el contratista es un comprador con menos plata, ticket más chico y más mortalidad — si pierde el contrato con la minera, se acaba la empresa y se acaba tu suscripción. Ese churn estructural está modelado abajo y es el que puede matar la economía unitaria.</p>
+      </div>
+    </div>
+
+    <div class="caja mt-m">
+      <div class="caja__cinta">La jugada larga (por qué esta cuña llega igual a la minera)</div>
+      <p class="mb-0">Cada contratista que entra deja su dato de seguridad adentro de Cuasio. A los 18 meses tenemos <strong>25 o 30 contratistas de la misma faena</strong>. Ahí le vendemos a la minera algo que hoy no puede comprarle a nadie: <strong>la vista cruzada de todos sus contratistas</strong> — el patrón que se repite entre dos empresas distintas que trabajan en la misma rampa y que ninguna de las dos puede ver sola. No entramos por la puerta del procurement: entramos porque el dato ya está adentro. Eso es <em>land-and-expand</em> de abajo hacia arriba, y es la única forma en que una empresa chica le vende a una minera grande sin morir esperando.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MERCADO -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">02 / TAMAÑO DE MERCADO</p>
+      <h2>Un mercado chico. Y decirlo es parte del trabajo.</h2>
+      <p>No vamos a escribir “US$4,2 mil millones”. Vamos a hacer la cuenta con supuestos declarados, y el número que sale es incómodo y honesto.</p>
+    </div>
+
+    <div class="caja">
+      <div class="caja__cinta">Los supuestos (cada uno con su etiqueta)</div>
+      <div class="scroll-x tabla-caja">
+        <table>
+          <thead><tr><th>#</th><th>Supuesto</th><th>Valor usado</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td class="num">S1</td><td>Empleo en la minería chilena (directo, propio + contratistas)</td><td class="num">~250.000 personas</td><td><span class="porvalidar">orden de magnitud · por validar</span> contra la publicación vigente de SERNAGEOMIN / Consejo Minero</td></tr>
+            <tr><td class="num">S2</td><td>Fracción del empleo que está en empresas contratistas</td><td class="num">~60%  →  150.000</td><td><span class="porvalidar">estimación propia · por validar</span></td></tr>
+            <tr><td class="num">S3</td><td>Dotación media de una contratista con gente en faena</td><td class="num">70 personas</td><td>Estimación propia. Es el supuesto más frágil de todos.</td></tr>
+            <tr><td class="num">S4</td><td>Universo de contratistas activas = S2 ÷ S3</td><td class="num">≈ 2.100 empresas</td><td>Derivado. Redondeamos a <strong>2.100</strong> y trabajamos con un rango de 1.500–3.000.</td></tr>
+            <tr><td class="num">S5</td><td>Faenas de mineras (grandes y medianas) que comprarían la vista consolidada</td><td class="num">60 faenas</td><td>Estimación propia, conservadora.</td></tr>
+            <tr><td class="num">S6</td><td>ARPU mensual mezclado (mix 40% Cuadrilla / 48% Faena / 12% Multifaena)</td><td class="num">$466.000</td><td>Derivado del pricing. Aritmética abajo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fuente">S1 y S2 son las dos cifras que un inversionista debería exigirnos citadas antes de poner un peso. Están publicadas; no las citamos de memoria.</p>
+    </div>
+
+    <div class="aritmetica mt-m">
+ARPU mezclado (S6)
+  0,40 × $190.000  =  $ 76.000
+  0,48 × $490.000  =  $235.200
+  0,12 × $1.290.000 = $154.800
+  <b>ARPU = $466.000 / mes</b>
+
+TAM Chile (todo el gasto potencial en gestión digital de seguridad minera, por año)
+  Contratistas: 2.100 × $466.000 × 12  =  <b>$11.743 millones CLP</b>
+  Mineras:         60 × $4.900.000 × 12 =  <b>$ 3.528 millones CLP</b>
+  ────────────────────────────────────────────────────────
+  <b>TAM ≈ $15.271 millones CLP / año  ≈  US$ 16,1 millones</b>   (a $950 por USD)
+
+SAM (lo alcanzable con este producto y este equipo, 3 años)
+  Contratistas ≥ 30 personas en faena, en regiones mineras: 2.100 × 65%  =  1.365
+  1.365 × $466.000 × 12  =  <b>$ 7.633 millones CLP / año  ≈  US$ 8,0 millones</b>
+
+SOM (lo que creemos que tomamos al mes 36)
+  120 contratistas  × $466.000   × 12  =  $  671 millones
+    4 mineras       × $4.900.000 × 12  =  $  235 millones
+  ────────────────────────────────────────────────────────
+  <b>SOM ≈ $906 millones CLP de ARR  ≈  US$ 954 mil</b>   (11,9% del SAM)
+    </div>
+
+    <div class="caja mt-m caja--peligro">
+      <div class="caja__cinta caja__cinta--peligro">Lo que ese número significa de verdad</div>
+      <p><strong>Un TAM de US$16M no sostiene una empresa de riesgo.</strong> Sostiene un negocio bueno, rentable y chico. Cualquiera que te diga que la seguridad minera chilena es un mercado gigante te está vendiendo humo, y probablemente también te vendió el TAM.</p>
+      <p class="mb-0">La tesis de crecimiento no es Chile: son las <strong>dos extensiones</strong>, y hay que elegir una en el mes 24 (está en el <a href="roadmap.html">roadmap</a> como punto de decisión):</p>
+      <ul class="lista mt-s" role="list">
+        <li><strong>Geográfica — minería de LatAm.</strong> Perú (Perumin, minería grande y un ecosistema de contratistas idéntico), México, Brasil, Colombia. Regla de dedo: 4× a 5× Chile → <strong>US$65–80M de TAM regional</strong>. <span class="porvalidar">por validar</span> con el empleo minero de cada país. El producto es casi el mismo; el marco regulatorio, no.</li>
+        <li><strong>Sectorial — el resto de lo que mata gente en Chile.</strong> Construcción (canal: CChC), forestal, portuario, energía. El motor —captura de eventos de alto potencial y verificación de controles críticos— es el mismo; cambia la taxonomía y cambia la norma. Multiplica el TAM chileno por ~4, pero te obliga a validar un marco legal nuevo por sector, y ese es exactamente el trabajo que no se puede hacer con IA.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETENCIA -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">03 / COMPETENCIA</p>
+      <h2>El titular del puesto es una planilla.</h2>
+    </div>
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Competidor</th><th>Qué cobra</th><th>Su fuerza</th><th>Nuestra diferencia honesta</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Excel + talonario</strong><br><span class="txt-mini txt-tenue">Cuota de mercado real: la mayoría</span></td>
+            <td class="num">$0</td>
+            <td>Gratis, instalado, nadie te obliga a cambiarlo, y el prevencionista ya lo domina.</td>
+            <td>No captura en terreno, no cruza siete reportes y no avisa nada. Contra el Excel no ganamos por funciones: ganamos porque el operador <strong>sí</strong> usa Cuasio y <strong>no</strong> usa el Excel.</td>
+          </tr>
+          <tr>
+            <td><strong>Intelex</strong> · <strong>Cority</strong> · <strong>VelocityEHS</strong></td>
+            <td class="num">Licencia en USD, típicamente 5 o 6 cifras anuales <span class="porvalidar">precio exacto: por validar</span></td>
+            <td>Suites EHS completas y serias. Ya están dentro de varias mineras grandes de Chile. Cumplen todo lo que un corporativo pide.</td>
+            <td>No compiten por este cliente. Están construidas para el escritorio del corporativo, no para el guante del operador, y ninguna contratista de 120 personas las va a comprar. <strong>No decimos que somos mejores: decimos que no juegan en esta cancha.</strong></td>
+          </tr>
+          <tr>
+            <td><strong>La plataforma del mandante</strong></td>
+            <td class="num">Gratis (obligatoria)</td>
+            <td>Es obligatoria. No se discute con el que te paga.</td>
+            <td>No competimos: <strong>exportamos hacia ella</strong>. La contratista igual tiene que gestionar lo propio y hoy carga el mismo evento dos veces. <strong>Y es también nuestro riesgo de muerte n.º 2</strong> (abajo).</td>
+          </tr>
+          <tr>
+            <td><strong>Software chileno de prevención</strong><br><span class="txt-mini txt-tenue">(varios actores locales de checklist y capacitación)</span></td>
+            <td class="num">$50.000 – $300.000 / mes</td>
+            <td>Precio local, factura en pesos, hablan el idioma.</td>
+            <td>Son gestores de cumplimiento: listas de chequeo, charlas, documentos. Ninguno resuelve <strong>el cruce</strong> —el patrón que aparece entre reportes que nadie juntó— que es toda la razón de ser de Cuasio.</td>
+          </tr>
+          <tr>
+            <td><strong>Google Forms + WhatsApp</strong></td>
+            <td class="num">$0</td>
+            <td>El prevencionista con iniciativa lo arma en 20 minutos.</td>
+            <td>No funciona sin señal, no clasifica, no gestiona controles críticos y termina siendo otra planilla, pero con más pasos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIO Y ECONOMÍA -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">04 / PRECIO Y ECONOMÍA UNITARIA</p>
+      <h2>La cuenta, entera.</h2>
+      <p>El costo de inferencia que se descuenta acá es exactamente el que se deriva en <a href="stack.html">Arquitectura</a>. Las dos páginas cuadran o alguna miente.</p>
+    </div>
+
+    <div class="rejilla rejilla--3">
+      <div class="caja caja--alto">
+        <p class="txt-mini txt-tenue">Cuadrilla · hasta 50</p>
+        <p class="dato" style="font-size:var(--step-2)">$190.000</p>
+        <p class="txt-mini txt-tenue mb-0">≈ $3.800 por trabajador / mes</p>
+      </div>
+      <div class="caja caja--alto" style="border-color:var(--amarillo)">
+        <p class="txt-mini txt-amarillo">Faena · 51 a 250 · el corazón</p>
+        <p class="dato" style="font-size:var(--step-2)">$490.000</p>
+        <p class="txt-mini txt-tenue mb-0">≈ $1.960 por trabajador / mes</p>
+      </div>
+      <div class="caja caja--alto">
+        <p class="txt-mini txt-tenue">Multifaena · 251 a 1.000</p>
+        <p class="dato" style="font-size:var(--step-2)">$1.290.000</p>
+        <p class="txt-mini txt-tenue mb-0">≈ $1.290 por trabajador / mes</p>
+      </div>
+    </div>
+    <p class="fuente">Valores netos mensuales en CLP. Minera mandante: desde $4.900.000/mes, se cotiza. <strong>No cobramos por usuario</strong>: el éxito del producto depende de que reporte todo el mundo, y cobrar por asiento sería pagarnos por sabotearnos.</p>
+
+    <h3 class="mt-l">Margen bruto por cliente promedio (ARPU $466.000)</h3>
+    <div class="aritmetica mt-s">
+Ingreso mensual por cliente                                 $ 466.000
+
+COSTO DIRECTO (todo derivado en stack.html)
+  Inferencia de IA (triage + patrones + investigación)      $   5.200
+  Transcripción de voz (ASR, ~120 reportes/mes)             $   2.100
+  Infraestructura asignada (hosting, DB, storage, push)     $  11.400
+  Soporte y éxito de cliente (6% del ARPU)                  $  27.960
+  Onboarding amortizado (8 h × $25.000, sobre 30 meses)     $   6.667
+  ────────────────────────────────────────────────────────
+  <b>Costo directo total                                       $  53.327</b>
+
+  <b>Margen bruto = (466.000 − 53.327) / 466.000  =  88,6%</b>
+    </div>
+    <p class="fuente">La IA cuesta el <strong>1,1% del ingreso</strong>. En este producto la IA no es el costo: el costo es la persona que acompaña al cliente para que la gente reporte. Ese es el negocio real y por eso el CSM está dentro del margen y no en gastos.</p>
+
+    <h3 class="mt-l">CAC, LTV y payback</h3>
+    <div class="aritmetica mt-s">
+CAC — costo de adquirir una contratista (venta directa, régimen)
+  Ejecutivo de ventas (bruto + cargas)                      $ 2.860.000 / mes
+  SDR (bruto + cargas)                                      $ 1.430.000 / mes
+  Viajes al norte, herramientas, CRM                        $ 1.200.000 / mes
+  Marketing (contenido, SEO, feria amortizada)              $ 1.500.000 / mes
+  ────────────────────────────────────────────────────────
+  Costo comercial total                                     $ 6.990.000 / mes
+  Cierres por mes en régimen (supuesto declarado)                     5
+  <b>CAC = 6.990.000 / 5  =  $ 1.398.000</b>
+
+PAYBACK
+  Margen bruto mensual por cliente = 466.000 × 0,886  =  $ 412.876
+  <b>Payback = 1.398.000 / 412.876  =  3,4 meses</b>
+
+LTV — y aquí está el supuesto que decide si esto existe: EL CHURN
+  Churn 1,5%/mes (adopción lograda) → vida 67 meses, la capamos a 48
+    LTV = 412.876 × 48  =  <b>$ 19.818.000</b>      LTV/CAC = <b>14,2×</b>
+  Churn 5%/mes (adopción mediocre)  → vida 20 meses
+    LTV = 412.876 × 20  =  <b>$  8.258.000</b>      LTV/CAC = <b>5,9×</b>
+  Churn 12%/mes (nadie reporta)     → vida 8,3 meses
+    LTV = 412.876 × 8,3 =  <b>$  3.427.000</b>      LTV/CAC = <b>2,5×</b>
+    </div>
+
+    <div class="caja caja--peligro mt-m">
+      <div class="caja__cinta caja__cinta--peligro">Lee bien la tabla de arriba</div>
+      <p class="mb-0">Un LTV/CAC de 14× no es una buena noticia: es <strong>una señal de que uno de los supuestos está mintiendo</strong>. El sospechoso es el churn de 1,5%. En el escenario del medio —churn 5%, que es lo que pasa cuando el producto se instala pero la gente reporta a medias— el negocio todavía funciona. En el de abajo —churn 12%, nadie reporta, la contratista cancela al medio año— los <em>unit economics</em> aguantan (payback 3,4 meses, no pierdes plata por cliente), pero el negocio <strong>muere de otra cosa</strong>: cada mes reemplazas lo que perdiste y nunca creces. Por eso la métrica que gobierna esta empresa no es el MRR: es la <strong>cobertura de reporte</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CANALES -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">05 / CANALES</p>
+      <h2>Rankeados, con su costo por lead.</h2>
+    </div>
+
+    <ol class="pasos-num" role="list">
+      <li>
+        <span class="paso__n">01</span>
+        <div>
+          <h3>Outbound directo a Calama y Antofagasta</h3>
+          <p>LinkedIn + WhatsApp al gerente general y a la experta en prevención, y después el avión. Este mercado se cierra <strong>en persona</strong>: el norte compra mirando a los ojos, y el gremio es tan chico que una mala reunión te quema con cinco empresas.</p>
+          <p class="aritmetica">1 SDR ($1.430.000 cargado) genera ~32 reuniones calificadas/mes → <b>costo por reunión ≈ $45.000</b>.
+Tasa de cierre supuesta: 15% → 4,8 clientes/mes. Ciclo: <b>4 a 8 semanas</b>.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">02</span>
+        <div>
+          <h3>El mandante como canal (no como cliente)</h3>
+          <p>La gerencia de seguridad de la minera <strong>recomienda</strong> Cuasio a sus contratistas. No lo impone —imponerlo lo convierte en un trámite más y mata la adopción—, lo recomienda. Una faena con 60 contratistas es <strong>60 leads calientes de golpe</strong>, con la referencia más potente que existe en este mercado: la del que paga.</p>
+          <p class="aritmetica">Se consigue regalando el panel consolidado a la gerencia de seguridad de la minera durante 6 meses.
+Costo: ~$0 en marketing, 3 meses de trabajo de un fundador.
+<b>Es el canal de mayor apalancamiento y el más lento. Se siembra en el mes 1 y se cosecha en el 12.</b></p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">03</span>
+        <div>
+          <h3>El prevencionista consultor como distribuidor</h3>
+          <p>El equivalente exacto del contador para la PYME: hay expertos en prevención independientes que asesoran a 5 u 8 contratistas a la vez. Si le resuelves el trabajo aburrido (armar la planilla, escribir la investigación), <strong>te instala en toda su cartera</strong>. Comisión recurrente del 15%.</p>
+          <p class="aritmetica">10 consultores activos × 3 clientes cada uno = <b>30 clientes</b> sin equipo de venta.
+Costo: 15% de comisión recurrente → baja el margen bruto de 88,6% a <b>73,6%</b> en ese subconjunto. Vale la pena igual.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">04</span>
+        <div>
+          <h3>Mutualidades y gremios</h3>
+          <p><strong>ACHS</strong>, <strong>Mutual de Seguridad CChC</strong> e <strong>IST</strong> tienen equipos de prevención que <em>ya visitan</em> a estas empresas: es una fuerza de venta con la puerta abierta y la credibilidad puesta. <strong>APRIMIN</strong> (proveedores de la minería) y <strong>SONAMI</strong> son el gremio donde está el comprador.</p>
+          <p class="fuente">Sin humo: un convenio con una mutualidad es lento y político, y no depende de que el producto sea bueno. Se trabaja desde el mes 6, no se cuenta en el plan del año 1.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">05</span>
+        <div>
+          <h3>SEO long-tail: el Excel como carnada</h3>
+          <p>El prevencionista googlea, de noche y con angustia: <em>“formato investigación de incidente minería”</em>, <em>“matriz de controles críticos ejemplo”</em>, <em>“cómo investigar un cuasi accidente”</em>. La jugada elegante: <strong>regalamos la planilla que venimos a reemplazar</strong>. Descarga la matriz de controles críticos en Excel, entrega su correo, y a los tres meses está harto de la planilla — que es exactamente el argumento de venta.</p>
+          <p class="aritmetica">Volumen chileno: bajo (cientos de búsquedas/mes, no miles). Costo marginal ≈ 0.
+<b>Compone lento y es el único canal que no se apaga cuando dejas de pagar.</b> Empieza el mes 1.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">06</span>
+        <div>
+          <h3>Ferias: EXPONOR y EXPOMIN</h3>
+          <p>Donde está todo el mundo. Un stand chico cuesta del orden de <strong>$4 a $8 millones</strong> <span class="porvalidar">precio exacto: por validar</span>.</p>
+          <p class="aritmetica">Supuesto: 40 leads calificados por feria → <b>CPL ≈ $150.000</b>.
+Caro contra el outbound ($45.000). <b>Sólo se va el año 2</b>, y con casos de clientes reales en la mano.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso__n">07</span>
+        <div>
+          <h3>Google Ads (el último, y chico)</h3>
+          <p class="aritmetica">CPC estimado “software prevención de riesgos”: $900 – $1.800.
+Conversión a lead: 2% → <b>CPL $45.000 – $90.000</b>, pero con volumen mínimo.
+<b>Presupuesto tope: $300.000/mes.</b> Sirve para capturar al que ya te está buscando, nada más.</p>
+          <p class="fuente">Meta Ads: no. Este comprador no compra software B2B en Instagram. Mercado Público: no. Esto no se licita.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- IA EN MARKETING -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">06 / IA EN EL MARKETING</p>
+      <h2>Dónde ayuda y dónde nos quema.</h2>
+      <p>“IA en todo” no es una respuesta. En un mercado de 2.000 empresas donde todos se conocen, el spam automatizado no es ineficiente: es <strong>terminal</strong>.</p>
+    </div>
+
+    <div class="rejilla rejilla--2">
+      <div class="caja">
+        <div class="caja__cinta">Sí, y mucho</div>
+        <ul class="lista lista--check" role="list">
+          <li><strong>Investigación de cuentas.</strong> Quién es el experto en prevención de cada contratista, en qué faena está, con qué mandante trabaja, si tuvo un accidente reportado. Ahorra 20 minutos por cuenta y las cuentas son 2.000.</li>
+          <li><strong>Producción del SEO long-tail.</strong> Doscientas páginas útiles de verdad —una por control crítico, una por tipo de evento— que un humano no alcanza a escribir. <strong>Con una condición dura: cada página que toque la norma la revisa un prevencionista con registro antes de publicarse.</strong> Publicar una obligación legal inventada nos mata la marca en una semana.</li>
+          <li><strong>Resumir la llamada de descubrimiento</strong> y sacar de ahí el lenguaje real del cliente. Nuestro copy sale de esas transcripciones, no de la cabeza de un fundador.</li>
+        </ul>
+      </div>
+      <div class="caja">
+        <div class="caja__cinta">No, y es una decisión</div>
+        <ul class="lista lista--muerte" role="list">
+          <li><strong>El mensaje de contacto no se automatiza.</strong> Lo escribe una persona, mirando la empresa. Calama es un pueblo: si te ganas fama de spam, la perdiste con todos, y no hay presupuesto que lo compre de vuelta.</li>
+          <li><strong>No hay contenido de autoridad firmado por una IA.</strong> En seguridad, la firma <em>es</em> el producto. Si un artículo nuestro sobre investigación de accidentes no lo firma alguien que estuvo en una faena, no vale nada y se nota.</li>
+          <li><strong>No hay chatbot de ventas.</strong> El comprador tiene una pregunta y es: <em>“¿esto me deja cumpliendo o no?”</em>. Un bot que conteste eso mal es un pasivo legal. Contesta un humano, o no se contesta.</li>
+          <li><strong>Nada de estadísticas generadas.</strong> Ni una cifra de accidentabilidad en nuestro marketing que no salga de una publicación citable.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 90 DÍAS -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">07 / PRIMEROS 90 DÍAS</p>
+      <h2>La secuencia, sin épica.</h2>
+    </div>
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Días</th><th>Qué se hace</th><th>Qué tiene que ser cierto al final</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="num">1–15</td>
+            <td>Veinte entrevistas con expertos en prevención de contratistas. No se vende: se entiende. Y se recluta <strong>al asesor</strong>: un prevencionista con registro y 15 años de faena, con equity. Sin él no hay producto.</td>
+            <td>Sabemos si el problema que creemos que existe, existe. Y tenemos al asesor firmado.</td>
+          </tr>
+          <tr>
+            <td class="num">15–30</td>
+            <td>Se define la plantilla de <strong>8 controles críticos</strong> con el asesor. Y se paga a un abogado con experiencia en minería para levantar el marco legal real: qué obliga el DS 132, con qué plazos, en qué formato. <strong>Costo: ~$1.500.000. No es opcional.</strong></td>
+            <td>Tenemos escrito, en un documento firmado por alguien, qué es cierto y qué no. Ahí muere la columna “por validar”.</td>
+          </tr>
+          <tr>
+            <td class="num">30–45</td>
+            <td>Se construye <strong>sólo la captura</strong> (offline-first, 30 segundos) y el triage. Nada más. Ni investigación, ni reporte, ni panel bonito.</td>
+            <td>Un operador con guantes reporta en menos de 40 segundos, sin señal, sin ayuda.</td>
+          </tr>
+          <tr>
+            <td class="num">45–75</td>
+            <td>Tres <strong>pilotos gratis de 90 días</strong> en contratistas de 80–250 personas. El criterio de éxito se escribe y se firma <em>antes</em> de partir: <strong>≥50% de la dotación reporta al menos una vez en el mes 2</strong>.</td>
+            <td>Sabemos si la gente reporta o no. Es la única pregunta que importa y no se puede responder con una encuesta.</td>
+          </tr>
+          <tr>
+            <td class="num">75–90</td>
+            <td>Primer contrato pagado (uno de los tres pilotos). Y la primera reunión con una gerencia de seguridad de mandante, llevando el dato de los tres pilotos — no un pitch.</td>
+            <td>Hay una factura emitida. Y hay un mandante que quiere ver el panel consolidado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- QUÉ LO MATA -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">08 / QUÉ MATARÍA ESTO</p>
+      <h2>Los cuatro, en orden de probabilidad.</h2>
+    </div>
+
+    <div class="rejilla rejilla--2">
+      <div class="caja caja--peligro">
+        <div class="caja__cinta caja__cinta--peligro">01 · El riesgo real</div>
+        <h3>Que la gente no reporte.</h3>
+        <p>No es un problema de software y no se arregla con una app bonita. Si en esa faena el que reporta queda marcado, o si el jefe de turno tiene una meta de “cero incidentes” que en la práctica premia el silencio, <strong>Cuasio no sirve para nada</strong>. Bajamos el costo de reportar de veinte minutos a treinta segundos; no bajamos el miedo.</p>
+        <p class="mb-0"><strong>Señal de muerte:</strong> cobertura de reporte bajo 25% al mes 3 en dos de los tres pilotos. Si pasa, no se pivotea el producto: se para.</p>
+      </div>
+      <div class="caja">
+        <div class="caja__cinta">02</div>
+        <h3>Que el mandante lo regale.</h3>
+        <p>Si una minera grande le exige a sus 60 contratistas usar <em>su</em> plataforma —o si Cority saca un módulo de contratistas y lo incluye en la licencia que la minera ya paga— el canal se cierra de un portazo y no hay nada que hacer. Es el riesgo estructural de vender al eslabón débil de la cadena.</p>
+        <p class="mb-0"><strong>Mitigación parcial:</strong> ser la fuente del dato y exportar hacia el mandante, no pelearle la pantalla. Pero si el mandante decide gestionar también el mundo interno del contratista, perdimos y hay que aceptarlo rápido.</p>
+      </div>
+      <div class="caja">
+        <div class="caja__cinta">03</div>
+        <h3>Que esté caro.</h3>
+        <p>Una contratista que vive de un contrato a suma alzada no tiene holgura. Si el 60% del SAM dice “$490.000 al mes no los tengo”, el ARPU se cae a $250.000 y la venta directa deja de pagarse sola: con CAC de $1,4M el payback se va a 6,4 meses y hay que rearmar todo el canal en torno al consultor y al mandante.</p>
+        <p class="mb-0"><strong>Señal:</strong> más de la mitad de las oportunidades perdidas por precio en las primeras 30 reuniones.</p>
+      </div>
+      <div class="caja">
+        <div class="caja__cinta">04</div>
+        <h3>Que nos equivoquemos en la norma.</h3>
+        <p>Si Cuasio afirma un plazo legal que no es, y una empresa incumple confiando en nosotros, no hay marca que sobreviva ni seguro que alcance. Es el riesgo más chico en probabilidad y el más grande en consecuencia.</p>
+        <p class="mb-0"><strong>Mitigación:</strong> la columna <span class="porvalidar">por validar</span> vive dentro del producto, no en el pie de página. Y el marco legal lo firma un abogado antes del primer peso cobrado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="container">
+    <p class="txt-chico mb-0">Sigue en <a href="roadmap.html">Roadmap</a>: los seis hitos, los criterios de muerte y la probabilidad de éxito como rango derivado — no como un número inventado.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="rayado" role="presentation"></div>
+
+<footer class="pie">
+  <div class="container">
+    <p class="mono txt-chico">CUASIO · Prototipo · Ninguna cifra de esta página está citada sin fuente ni estimada sin aritmética</p>
+    <nav class="pie__links" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var t = document.getElementById('navToggle');
+    var m = document.getElementById('navMenu');
+    t.addEventListener('click', function () {
+      var a = m.classList.toggle('abierto');
+      t.setAttribute('aria-expanded', a ? 'true' : 'false');
+    });
+  })();
+</script>
+
+<style>
+  .seccion--oscura { background: var(--panel); border-block: 2px solid var(--linea); }
+  .ficha { display: grid; gap: var(--sp-s); }
+  .ficha > div { display: grid; gap: 2px; }
+  .ficha dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--amarillo); font-weight: 800; }
+  .ficha dd { color: var(--tinta-2); font-size: var(--step--1); }
+  .pasos-num { list-style: none; display: grid; gap: 0; border-top: 2px solid var(--linea); }
+  .pasos-num > li { display: grid; grid-template-columns: 3rem 1fr; gap: var(--sp-s); padding-block: var(--sp-m); border-bottom: 2px solid var(--linea); }
+  .pasos-num > li > div { min-width: 0; }
+  .paso__n { font-family: var(--mono); font-size: var(--step-1); color: var(--amarillo); font-weight: 600; }
+  .pasos-num h3 { margin-bottom: var(--sp-2xs); }
+  .pasos-num p { max-width: var(--measure); }
+  @media (min-width: 48em) { .pasos-num > li { grid-template-columns: 5rem 1fr; gap: var(--sp-m); } }
+  .cta-final { border-top: 2px solid var(--linea); padding-block: var(--sp-l); }
+  h3 { margin-top: var(--sp-2xs); }
+</style>
+
+</body>
+</html>

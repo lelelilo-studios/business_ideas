@@ -1,0 +1,20 @@
+{
+  "folder": "11-correas",
+  "brand": "Cintavia",
+  "domain": "cintavia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/cintavia.com -> HTTP 404 (disponible), verificado con _kit/check-domain.sh el 2026-07-13. cintavia.cl también disponible (NIC Chile Whois: 'no existe').",
+  "alternates": ["rodalto.com", "kilocinta.com", "tramovia.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE. También libres y verificadas ese día: termalta.com, rondavia.com.",
+  "tagline": "La correa, kilómetro a kilómetro.",
+  "category": "Minería · confiabilidad de correas transportadoras",
+  "market": "Chile (laboratorio) → Perú, Brasil, Australia (el mercado de verdad)",
+  "icp": "Empresa contratista de mantención de correas en faena de gran minería del norte. 20-60 personas en faena, contrato a SUMA ALZADA por disponibilidad (no a precio unitario), 1-3 faenas. Firma el gerente de operaciones contra su propio presupuesto operacional.",
+  "price_clp": "Desde $890.000/mes (Ronda) · $3.900.000 (Faena) · desde $8.400.000 (Cinturón) · habilitación $2.250.000/estación o comodato +35%",
+  "accent": "#FFB000",
+  "problem": "Kilómetros de correa se inspeccionan con un tipo caminando con una linterna: se detecta tarde o se detecta cuando ya se cortó. Un polín trabado que roza la cinta un turno completo cuesta US$1,4 M de planta detenida, y es causa reconocida de incendio de correa.",
+  "solution": "Estaciones fijas con visión, térmica y acústica cada 400-600 m que procesan en el borde; un mapa de salud de la correa kilómetro a kilómetro; vida remanente del polín y del empalme CON su banda de incertidumbre; y —lo que lo convierte en plata— la orden de trabajo emitida como aviso de SAP PM para la próxima ventana de mantención programada, no una alarma más en un tablero que nadie mira.",
+  "wedge": "No le vendemos a la minera (18 meses de ciclo, CAC de US$326k, te mueres antes de cobrar). Le vendemos al CONTRATISTA de correas, que ya está homologado adentro de la faena, tiene sus propias ventanas de mantención y cobra a suma alzada — así que cada hora de cuadrilla que le ahorramos es margen suyo. Ciclo: 8-14 semanas.",
+  "art_direction": "Sala de control / HMI industrial. Fondo grafito profundo (#0A0F14), señal en ámbar (#FFB000) y cian (#3DD6EA), rojo reservado sólo para alarma crítica. Archivo (grotesca técnica de señalética) + JetBrains Mono para todo dato. Filetes de 1px, esquinas con marca de bisel, cero radios. La referencia es un SCADA bien diseñado, no un dashboard de startup.",
+  "honesty": "TAM de Chile: US$3,6 M de ARR. Bien ejecutado esto es un negocio de US$10-25 M de ARR, no un unicornio. Probabilidad de llegar a US$1M ARR al mes 30: 6-12 % incondicional, 18-28 % condicional a validar la precisión del detector (M2) antes del mes 12, <3 % si M2 falla.",
+  "status": "prototipo"
+}

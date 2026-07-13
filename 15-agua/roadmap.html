@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · Freatia — del día 1 al mes 24, con criterios de muerte</title>
+<meta name="description" content="Seis hitos, tres escenarios de ingresos con supuestos declarados, la curva de caja con su valle, el embudo real de venta minera y la probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hito { display: grid; gap: var(--sp-s); padding: var(--sp-s) 0; border-top: 1px solid var(--linea); }
+  .hito-cab { display: flex; align-items: baseline; gap: var(--sp-s); flex-wrap: wrap; }
+  .hito-n { font-family: var(--mono); color: var(--agua); font-size: var(--step-1); }
+  .hito-datos { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-xs); }
+  .hito-datos > div { border-left: 2px solid var(--linea); padding-left: var(--sp-xs); }
+  .muerte { border-left: 3px solid var(--critico); background: color-mix(in srgb, var(--critico) 7%, transparent); padding: var(--sp-xs); }
+  .muerte .rotulo { color: var(--critico); }
+  .muerte p { font-size: var(--step--1); margin-top: 4px; }
+  @media (min-width: 62em) {
+    .hito { grid-template-columns: 1fr 380px; align-items: start; }
+    .hito-cab { grid-column: 1 / -1; }
+    .hito-datos { grid-template-columns: repeat(4, 1fr); grid-column: 1 / -1; }
+  }
+  .deriv { display: grid; gap: 2px; font-size: var(--step--1); }
+  .deriv > div { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-s); padding: 7px 0; border-bottom: 1px solid var(--ink-750); }
+  .deriv .num { color: var(--txt); }
+  .rango {
+    display: flex; align-items: baseline; gap: 10px; padding: var(--sp-s);
+    border: 1px solid var(--agua); background: color-mix(in srgb, var(--agua) 8%, transparent);
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" stroke-width="1.5" aria-hidden="true">
+        <path d="M1 23c4.5-6 9 2 14.5-3S25 21 31 17" stroke="#7A5C33"/>
+        <path d="M1 28c5-5 9.5 2 15-3s8.5 1 15-3" stroke="#7A5C33"/>
+        <path d="M16 2s7 8.6 7 12.6a7 7 0 1 1-14 0C9 10.6 16 2 16 2Z" stroke="#3F9BD6"/>
+      </svg>
+      <span class="marca-txt">Freatia</span>
+    </a>
+    <nav>
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btn-menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+  </div>
+  <div id="menu" class="container">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="sec">
+  <span class="rotulo rotulo-agua">Roadmap · día 1 → mes 24</span>
+  <h1 style="margin-top:var(--sp-2xs);max-width:22ch">Seis hitos, y la observación que debería hacernos parar en cada uno.</h1>
+  <p class="prose" style="margin-top:var(--sp-s)">
+    Todas las cifras de esta página o están citadas, o son estimaciones con la aritmética a la vista.
+    El tipo de cambio supuesto es <span class="num">US$1 = $950</span>. Un roadmap sin criterios de muerte es
+    una carta al Viejito Pascuero, así que cada hito trae el suyo, y están dibujados en la línea de tiempo.
+  </p>
+</section>
+
+<!-- TRAYECTORIA -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Ingresos</span>
+    <h2>Trayectoria de MRR a 24 meses, tres escenarios.</h2>
+    <p>Los escenarios no son optimismo y pesimismo: son tres juegos de supuestos declarados sobre tasa de cierre,
+      ciclo de venta, ticket y churn. Si no te crees los supuestos, no te creas la curva.</p>
+  </div>
+
+  <div class="placa">
+    <div class="placa-tit"><h3>MRR (millones de CLP/mes)</h3><span class="rotulo">plan Tranque $4,9M/mes</span></div>
+    <div class="svg-caja"><svg id="g-mrr"></svg></div>
+    <div class="leyenda">
+      <span><span class="pt" style="background:#A5D5F0"></span>Optimista</span>
+      <span><span class="pt" style="background:#3F9BD6"></span>Base</span>
+      <span><span class="pt" style="background:#1F5C80"></span>Pesimista</span>
+    </div>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table>
+        <thead><tr><th>Escenario</th><th class="n">Cierre del pipeline</th><th class="n">Ciclo de venta</th><th class="n">Ticket medio</th><th class="n">Churn anual</th><th class="n">Faenas al mes 24</th><th class="n">ARR mes 24</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pt" style="background:#A5D5F0"></span>Optimista</td><td class="n">25%</td><td class="n">6 meses</td><td class="n">$5.600.000</td><td class="n">5%</td><td class="n">19</td><td class="n">$1.277M · US$1,34M</td></tr>
+          <tr><td><span class="pt" style="background:#3F9BD6"></span>Base</td><td class="n">15%</td><td class="n">9 meses</td><td class="n">$4.900.000</td><td class="n">8%</td><td class="n">12</td><td class="n">$706M · US$743k</td></tr>
+          <tr><td><span class="pt" style="background:#1F5C80"></span>Pesimista</td><td class="n">8%</td><td class="n">14 meses</td><td class="n">$4.900.000</td><td class="n">15%</td><td class="n">4</td><td class="n">$235M · US$248k</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pista">Aritmética: ARR = faenas × ticket × 12. En base, 12 × $4.900.000 × 12 = $705.600.000.
+      El churn anual en los tres casos es menor a un cliente al año, porque a esta escala perder un cliente es
+      perder el 8% del negocio: no es una tasa, es un evento.</p>
+  </div>
+</section>
+
+<!-- CAJA -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Caja</span>
+    <h2>El valle de runway está antes de la semilla, no después.</h2>
+    <p>Dos gráficos y no uno, porque los ingresos mensuales y el saldo de caja son magnitudes distintas y meterlas
+      en el mismo eje sería mentir con la escala.</p>
+  </div>
+
+  <div class="rej rej-2">
+    <div class="placa">
+      <div class="placa-tit"><h3>Ingresos vs. gastos (millones de CLP/mes)</h3></div>
+      <div class="svg-caja"><svg id="g-flujo"></svg></div>
+      <div class="leyenda">
+        <span><span class="pt" style="background:#2E9E70"></span>Ingresos (suscripción + implementación)</span>
+        <span><span class="pt" style="background:#B3762F"></span>Gastos</span>
+      </div>
+    </div>
+    <div class="placa">
+      <div class="placa-tit"><h3>Saldo de caja (millones de CLP)</h3></div>
+      <div class="svg-caja"><svg id="g-caja"></svg></div>
+      <div class="aviso aviso-critico">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2 15 14H1L8 2Z"/><path d="M8 6.5v3.5"/></svg>
+        <p><strong>Mes 7: $15,8 millones en caja.</strong> Menos de un mes de operación. Si el mes 6 no hay un
+          cliente pagando la implementación, el mes 7 no hay empresa. Todo el riesgo de este negocio está
+          concentrado en esa casilla, y ninguna ronda posterior lo arregla.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="placa">
+    <div class="placa-tit"><h3>De dónde sale la caja</h3><span class="rotulo">supuestos declarados</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Fuente / uso</th><th>Cuándo</th><th class="n">Monto</th><th>Supuesto</th></tr></thead>
+        <tbody>
+          <tr><td>Capital de los fundadores</td><td>Mes 0</td><td class="n">$60.000.000</td><td>Dos fundadores, ahorros. No hay heroísmo aquí: alcanza para 4 meses.</td></tr>
+          <tr><td>CORFO (Semilla Expande o equivalente)</td><td>Mes 3</td><td class="n">$50.000.000</td><td>Orden de magnitud de los instrumentos de capital semilla de CORFO. <strong>Monto y bases: por validar</strong> contra la convocatoria vigente.</td></tr>
+          <tr><td>Ronda semilla</td><td>Mes 8</td><td class="n">$430.000.000</td><td>≈ US$450k. Fondos locales que sí miran verticales industriales. No es una valorización de moda; es la caja mínima para llegar al mes 24.</td></tr>
+          <tr><td>Gastos mes 1–6</td><td></td><td class="n">$16.000.000/mes</td><td>3 personas, sueldos de fundador.</td></tr>
+          <tr><td>Gastos mes 7–12</td><td></td><td class="n">$26.000.000/mes</td><td>5 personas.</td></tr>
+          <tr><td>Gastos mes 13–18</td><td></td><td class="n">$48.000.000/mes</td><td>8 personas + el costo de servir 8 faenas.</td></tr>
+          <tr><td>Gastos mes 19–24</td><td></td><td class="n">$66.000.000/mes</td><td>12 personas ($50M) + COGS de 12 faenas ($16M, ver <a href="stack.html">Arquitectura</a>).</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="2">Caja al mes 24 (escenario base)</td><td class="n">$339.400.000</td><td>El negocio llega a equilibrio de caja alrededor del mes 22–24.</td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- EMBUDO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">La restricción real</span>
+    <h2>El embudo no se muere en el interés. Se muere en el comité.</h2>
+    <p>Para un SaaS PYME la restricción es la retención. Para esto, no: la retención es alta porque el sistema
+      queda escrito en los procedimientos. La restricción es <strong>la homologación de proveedor y el comité de
+      inversión</strong> — el tramo donde una minera decide si le compra software a una empresa de cuatro personas.</p>
+  </div>
+
+  <div class="rej rej-12-7">
+    <div class="placa">
+      <div class="placa-tit"><h3>Embudo anual, escenario base</h3></div>
+      <div class="svg-caja"><svg id="g-embudo"></svg></div>
+      <p class="pista">Universo: ~200 faenas y plantas contactables en Chile (ver el TAM en <a href="negocio.html">Negocio</a>).
+        Conversión total: 4 de 200 = <span class="num">2,0%</span> al año, con un vendedor y medio.</p>
+    </div>
+    <div class="placa placa-alta">
+      <span class="rotulo">Lo que dice este embudo</span>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        <strong>El diagnóstico gratuito convierte bien</strong> (45 de 120 conversaciones lo aceptan): la cuña
+        funciona porque no pide presupuesto, pide un archivo.
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        <strong>En 22 de 45 casos hay un hallazgo relevante.</strong> En los otros 23 el balance cuadra y se lo
+        decimos. Perder la mitad de los prospectos por honestidad es caro y es la única forma de que el diagnóstico
+        signifique algo cuando decimos que sí hay un problema.
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        <strong>De 14 propuestas, 5 llegan a comité y 4 cierran.</strong> Ese tramo dura entre 3 y 7 meses y no lo
+        controlamos. Es la razón de que el ciclo de venta sea el criterio de muerte del hito M2.
+      </p>
+      <div class="accion">
+        La única palanca que tenemos sobre el comité es <strong>llegar con un caso de otra faena parecida</strong>.
+        Por eso el hito M2 no es "10 clientes": es "3 clientes y un caso público".
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LÍNEA DE TIEMPO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Hitos</span>
+    <h2>Los seis hitos y sus criterios de muerte.</h2>
+  </div>
+
+  <div class="placa">
+    <div class="placa-tit"><h3>Línea de tiempo</h3><span class="rotulo">▲ criterio de muerte</span></div>
+    <div class="scroll-x svg-caja"><svg id="g-hitos" style="min-width:760px"></svg></div>
+  </div>
+
+  <div style="margin-top:var(--sp-l)">
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M0</span><h3>Día 1–90 · Dos design partners y el primer levantamiento</h3></div>
+      <div>
+        <p>Dos faenas medianas (Antofagasta y Atacama) entregan sus datos y cuatro horas semanales de su ingeniero
+          de procesos. Nosotros hacemos el levantamiento a mano: el mapa de flujos, las 12–18 partidas, la
+          incertidumbre de cada una, y el primer balance conciliado. Sin software todavía.</p>
+        <p class="pista" style="margin-top:var(--sp-2xs)"><strong>Es cierto si:</strong> en al menos una de las dos
+          faenas aparece una discrepancia que ellos no conocían, y el ingeniero de procesos pide seguir mirándola.</p>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>Los dos design partners miran el hallazgo y dicen “ya lo sabíamos, y no importa”. Si la discrepancia es
+          un hecho conocido, aceptado y sin consecuencias, la tesis del producto está muerta y hay que parar antes
+          de escribir una línea de código de producción.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja requerida</span><div class="num">$45M</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">2</div></div>
+        <div><span class="rotulo">MRR</span><div class="num">$0</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 3</div></div>
+      </div>
+    </article>
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M1</span><h3>Mes 6 · Primer cliente pagando</h3></div>
+      <div>
+        <p>Una de las dos faenas firma contrato anual del plan Tranque y paga la implementación. La ingesta real
+          (OPC-UA o historiador) está corriendo, el balance se recalcula solo, y el primer reporte salió del dato
+          y no de una planilla.</p>
+        <p class="pista" style="margin-top:var(--sp-2xs)"><strong>Es cierto si:</strong> hay una orden de compra
+          firmada y una factura pagada. No “una carta de intención”, no “un piloto extendido”.</p>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>Mes 8 sin orden de compra. Si quien usó el producto gratis durante seis meses, con nosotros sentados en
+          su faena, no firma, entonces nadie que no nos conozca va a firmar. Parar y devolver lo que quede.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja requerida</span><div class="num">$180M acum.</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">4</div></div>
+        <div><span class="rotulo">MRR</span><div class="num">$4,9M</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 6</div></div>
+      </div>
+    </article>
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M2</span><h3>Mes 12 · Tres faenas pagando y un caso público</h3></div>
+      <div>
+        <p>Tres contratos, MRR de $14,7M, y —lo más importante— <strong>un caso documentado y autorizado por el
+          cliente</strong>: un hallazgo con nombre, número y consecuencia. Sin ese caso no se pasa el comité de la
+          cuarta minera.</p>
+        <p class="pista" style="margin-top:var(--sp-2xs)"><strong>Es cierto si:</strong> el tercer cliente llegó por
+          referencia o por el caso, y no porque un fundador conocía a alguien.</p>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>El ciclo de venta medio supera los 12 meses. Con ese ciclo, la caja no alcanza y el negocio no es
+          financiable: la ronda que se necesitaría no existe para un mercado de US$8M en Chile. Si eso pasa, la
+          salida honesta es convertirse en consultora con software propio, y decirlo.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja requerida</span><div class="num">$420M acum.</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">6</div></div>
+        <div><span class="rotulo">MRR</span><div class="num">$14,7M</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 12</div></div>
+      </div>
+    </article>
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M3</span><h3>Mes 18 · Ocho faenas y venta repetible</h3></div>
+      <div>
+        <p>Ocho contratos, MRR de $39,2M. El 60% de las ventas las cierra alguien que no es fundador. La
+          implementación bajó de 16 a 8 semanas y la ejecuta el equipo de delivery sin un fundador adentro.</p>
+        <p class="pista" style="margin-top:var(--sp-2xs)"><strong>Es cierto si:</strong> se puede describir el
+          proceso de venta en una página y un vendedor nuevo cierra su primer trato en menos de 9 meses.</p>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>La implementación sigue tomando más de 12 semanas y sigue requiriendo a un fundador. Si el producto no se
+          puede instalar sin nosotros, no es un producto: es una consultora disfrazada. Hay que decidir serlo a
+          propósito —lo que es un negocio perfectamente digno— o matarlo.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja requerida</span><div class="num">$700M acum.</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">10</div></div>
+        <div><span class="rotulo">MRR</span><div class="num">$39,2M</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 18</div></div>
+      </div>
+    </article>
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M4</span><h3>Mes 21 · El canal empieza a traer clientes</h3></div>
+      <div>
+        <p>Dos consultoras (del tipo Amphos 21, JRI, Poch, Arcadis) firman acuerdo de referencia: ellas hacen el
+          estudio de balance hídrico, nosotros somos la capa viva que lo mantiene. Un piloto pagado en Perú, que es
+          el mismo problema con otro regulador (ANA en vez de DGA).</p>
+        <p class="pista" style="margin-top:var(--sp-2xs)"><strong>Es cierto si:</strong> al menos 2 de los 10
+          clientes llegaron por el canal y no por outbound.</p>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>Las consultoras nos ven como competencia y no como capa complementaria — y tienen razón, porque les
+          quitamos el estudio anual. Si a los 6 meses ninguna refirió a nadie, el canal no existe y hay que
+          asumir que este negocio se vende de a uno, para siempre, con el techo que eso implica.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja requerida</span><div class="num">$780M acum.</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">12</div></div>
+        <div><span class="rotulo">MRR</span><div class="num">$49,0M</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 21</div></div>
+      </div>
+    </article>
+
+    <article class="hito">
+      <div class="hito-cab"><span class="hito-n">M5</span><h3>Mes 24 · El punto de decisión</h3></div>
+      <div>
+        <p>12 faenas, ARR de $706M (US$743k), margen bruto de 73%, caja en equilibrio. Tres caminos, y hay que
+          elegir uno a la vista de los números:</p>
+        <ul class="lista" style="margin-top:var(--sp-xs)">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 8h10M9 4l4 4-4 4"/></svg><span><strong>Levantar Serie A (US$4M)</strong> para atacar Perú, Brasil y la gran minería. Sólo si el canal funcionó y el ciclo de venta bajó de 9 meses. Si no, es plata cara para un techo bajo.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 8h10M9 4l4 4-4 4"/></svg><span><strong>Bootstrapear.</strong> Con 12 clientes, 73% de margen y caja positiva, el negocio crece solo, más lento, y los fundadores se quedan con todo. Es el resultado más probable si esto funciona, y no es un fracaso.</span></li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 8h10M9 4l4 4-4 4"/></svg><span><strong>Vender.</strong> A AVEVA, Hexagon, Bentley/Seequent, Trimble o a un fabricante de instrumentación que necesita la capa de software. Con 12 faenas y tres años de registros sellados, hay algo que comprar.</span></li>
+        </ul>
+      </div>
+      <div class="muerte">
+        <span class="rotulo">Criterio de muerte</span>
+        <p>ARR bajo US$250k al mes 24 con el 100% del pipeline recorrido. No hay una segunda vuelta: el universo son
+          200 cuentas y ya las visitamos todas. Vender el equipo y el producto, pagar lo que se pueda, y contar
+          honestamente qué pasó.</p>
+      </div>
+      <div class="hito-datos">
+        <div><span class="rotulo">Caja al cierre</span><div class="num">$339M</div></div>
+        <div><span class="rotulo">Headcount</span><div class="num">12</div></div>
+        <div><span class="rotulo">ARR</span><div class="num">US$743k</div></div>
+        <div><span class="rotulo">Fecha objetivo</span><div class="num">Mes 24</div></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- PROBABILIDAD -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Probabilidad de éxito</span>
+    <h2>Un rango, con la derivación a la vista.</h2>
+    <p>Un número único y confiado sería autoridad inventada. Esto es lo que hay.</p>
+  </div>
+
+  <div class="rej rej-2">
+    <div class="placa">
+      <h3>1 · Clase de referencia</h3>
+      <ul class="lista" style="margin-top:var(--sp-s)">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 12h12M2 9l3.5-4L9 8l5-6"/></svg><span><strong>Fracción de SaaS B2B que llega a US$1M de ARR: se cita habitualmente en torno al 4–5%.</strong> Viene de análisis de la industria (benchmarking de fondos), no de una estadística oficial. Es un orden de magnitud, no un dato: trátalo así.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 12h12M2 9l3.5-4L9 8l5-6"/></svg><span><strong>Supervivencia de empresas nuevas en Chile a 3 años: del orden de 50–60%</strong> según los datos del Ministerio de Economía. <strong>Verificar la edición vigente</strong> antes de citarlo en una presentación.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>No conocemos una tasa base publicada para “software vertical vendido a la minería chilena”.</strong> Si existe, no la encontramos. Lo decimos en vez de inventarla, porque inventarla sería exactamente el tipo de cifra que hace inútil este documento.</span></li>
+      </ul>
+    </div>
+
+    <div class="placa">
+      <h3>2 · Ajustes para esta idea</h3>
+      <div class="deriv" style="margin-top:var(--sp-s)">
+        <div><span>Tasa base (SaaS B2B → US$1M ARR)</span><span class="num">~5%</span></div>
+        <div><span style="color:var(--ok)">↑ El presupuesto ya existe: la faena hoy paga un estudio de balance hídrico y contratos de instrumentación geotécnica. No hay que crear la línea.</span><span class="num">×1,6</span></div>
+        <div><span style="color:var(--ok)">↑ Cuña verificable en una semana: el diagnóstico gratuito produce un hallazgo o no lo produce. Se sabe rápido y barato.</span><span class="num">×1,5</span></div>
+        <div><span style="color:var(--ok)">↑ Viento a favor fechado: post-Brumadinho, GISTM y la fiscalización de la SMA empujan en la misma dirección.</span><span class="num">×1,3</span></div>
+        <div><span style="color:var(--critico)">↓ Ciclo de venta de 9–14 meses con homologación de proveedor y comité. Mata más startups que la falta de producto.</span><span class="num">×0,6</span></div>
+        <div><span style="color:var(--critico)">↓ Mercado chico: TAM Chile US$8M. El techo limita el financiamiento y por lo tanto la velocidad.</span><span class="num">×0,8</span></div>
+        <div><span style="color:var(--critico)">↓ Riesgo de que el cliente lo haga en casa sobre el PI System que ya paga.</span><span class="num">×0,85</span></div>
+        <div><span><strong>Resultado de la derivación</strong></span><span class="num"><strong>≈ 4,0%</strong></span></div>
+      </div>
+      <p class="pista" style="margin-top:var(--sp-s)">
+        5% × 1,6 × 1,5 × 1,3 × 0,6 × 0,8 × 0,85 = 4,0%. Pero esa multiplicación finge una precisión que no
+        tenemos: cada factor es un juicio. Lo honesto es un rango ancho alrededor de ese punto, condicionado al
+        hito que de verdad discrimina.
+      </p>
+    </div>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <h3>3 · El resultado, condicional</h3>
+    <div class="rej rej-3" style="margin-top:var(--sp-s)">
+      <div class="rango">
+        <div>
+          <span class="rotulo">Llegar a US$1M ARR al mes 30</span>
+          <div class="cifra num" style="color:var(--agua);font-size:var(--step-2)">3 – 8%</div>
+          <p class="pista">Incondicional, hoy, antes de saber nada.</p>
+        </div>
+      </div>
+      <div class="rango" style="border-color:var(--ok);background:color-mix(in srgb, var(--ok) 8%, transparent)">
+        <div>
+          <span class="rotulo">…condicional a lograr M2</span>
+          <div class="cifra num" style="color:var(--ok);font-size:var(--step-2)">20 – 30%</div>
+          <p class="pista">Si al mes 12 hay 3 faenas pagando y un caso público, el ciclo de venta quedó demostrado
+            y lo que resta es repetirlo. Ese es el único hito que mueve de verdad la aguja.</p>
+        </div>
+      </div>
+      <div class="rango" style="border-color:var(--critico);background:color-mix(in srgb, var(--critico) 8%, transparent)">
+        <div>
+          <span class="rotulo">…si al mes 12 hay 0–1 cliente</span>
+          <div class="cifra num" style="color:var(--critico);font-size:var(--step-2)">&lt; 3%</div>
+          <p class="pista">Cerrar o convertirse en consultora. No hay una tercera opción honesta.</p>
+        </div>
+      </div>
+    </div>
+    <div class="accion" style="margin-top:var(--sp-s)">
+      <strong>Y el desenlace que en realidad es más probable si esto funciona:</strong> no llegar a US$1M de ARR,
+      sino quedarse en US$400–700k con 12 clientes, margen de 73% y caja positiva, y que a los 4 años alguien lo
+      compre. Eso lo estimamos en <span class="num">25–35%</span>, y sería un buen resultado para casi todos los
+      involucrados — sólo no para un fondo que necesita un fondo entero de retorno en cada apuesta. Vale la pena
+      saberlo antes de tomar su plata.
+    </div>
+  </div>
+</section>
+
+<footer class="pie">
+  <p>Freatia · prototipo · Todas las cifras de esta página son estimaciones con su aritmética a la vista, salvo
+    donde se cita una fuente. Donde no nos consta un dato, lo decimos.
+    <a href="negocio.html">Ver el plan de negocio</a></p>
+</footer>
+
+</main>
+
+<script src="graficos.js"></script>
+<script>
+(function () {
+  var b = document.getElementById("btn-menu"), m = document.getElementById("menu");
+  b.addEventListener("click", function () {
+    var a = m.classList.toggle("abierto");
+    b.setAttribute("aria-expanded", a ? "true" : "false");
+  });
+
+  var G = window.FreatiaGraficos, el = G.el, fmt = G.fmt;
+  var TXT3 = "#8AA3AE", TXT4 = "#5F7A85", SURF = "#0F1A1F";
+
+  /* ---- 1 · MRR, tres escenarios (rampa ordinal de un solo tono azul) ---- */
+  // faenas pagando por mes (índice 0 = mes 0)
+  var base = [0,0,0,0,0,0,1,1,1,2,2,2,3,3,4,5,6,7,8,8,9,10,11,11,12];
+  var pes  = [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4];
+  var opt  = [0,0,0,0,0,1,1,1,2,2,3,4,5,6,7,9,11,12,13,15,16,17,18,18,19];
+  var TICKET = 4.9, TICKET_OPT = 5.6;
+  var esc = [
+    { id: "Optimista", color: "#A5D5F0", datos: opt.map(function (f) { return f * TICKET_OPT; }) },
+    { id: "Base",      color: "#3F9BD6", datos: base.map(function (f) { return f * TICKET; }) },
+    { id: "Pesimista", color: "#1F5C80", datos: pes.map(function (f) { return f * TICKET; }) }
+  ];
+
+  (function () {
+    var svg = document.getElementById("g-mrr");
+    var W = 760, H = 340, ML = 44, MR = 86, MT = 18, MB = 34;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "MRR mensual en tres escenarios. Al mes 24: optimista 106 millones, base 59 millones, pesimista 20 millones de pesos al mes.");
+    var max = 110;
+    function X(i) { return ML + i / 24 * (W - ML - MR); }
+    function Y(v) { return MT + (1 - v / max) * (H - MT - MB); }
+
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      svg.appendChild(el("line", { x1: ML, y1: Y(v), x2: W - MR, y2: Y(v), class: "eje" }));
+      var t = el("text", { x: ML - 8, y: Y(v) + 3.5, class: "eje-txt", "text-anchor": "end" });
+      t.textContent = v; svg.appendChild(t);
+    });
+    [0, 6, 12, 18, 24].forEach(function (i) {
+      var t = el("text", { x: X(i), y: H - 12, class: "eje-txt", "text-anchor": "middle" });
+      t.textContent = "m" + i; svg.appendChild(t);
+    });
+    // hitos M1 (mes 6) y M2 (mes 12)
+    [{ i: 6, l: "M1" }, { i: 12, l: "M2" }, { i: 18, l: "M3" }].forEach(function (h) {
+      svg.appendChild(el("line", { x1: X(h.i), y1: MT, x2: X(h.i), y2: H - MB, stroke: "#24404A", "stroke-width": 1 }));
+      var t = el("text", { x: X(h.i) + 4, y: MT + 10, class: "eje-txt" });
+      t.textContent = h.l; svg.appendChild(t);
+    });
+
+    esc.forEach(function (s) {
+      var d = s.datos.map(function (v, i) { return (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ");
+      svg.appendChild(el("path", { d: d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+      var xf = X(24), yf = Y(s.datos[24]);
+      svg.appendChild(el("circle", { cx: xf, cy: yf, r: 4.5, fill: s.color, stroke: SURF, "stroke-width": 2 }));
+      var t = el("text", { x: xf + 9, y: yf + 4, class: "eje-txt" });
+      t.setAttribute("fill", "#C2D2D9");
+      t.textContent = "$" + s.datos[24].toFixed(0) + "M";
+      svg.appendChild(t);
+    });
+    var yl = el("text", { x: 0, y: 11, class: "eje-txt" });
+    yl.textContent = "MRR, millones CLP/mes"; svg.appendChild(yl);
+  })();
+
+  /* ---- 2 · Ingresos vs gastos (columnas, 2 series) ---- */
+  // ingresos = MRR del escenario base + $18M de implementación el mes de cada firma
+  var ingresos = [], gastos = [];
+  for (var i = 0; i <= 24; i++) {
+    var nuevos = i > 0 ? base[i] - base[i - 1] : 0;
+    ingresos.push(base[i] * TICKET + nuevos * 18);
+    gastos.push(i === 0 ? 0 : i <= 6 ? 16 : i <= 12 ? 26 : i <= 18 ? 48 : 66);
+  }
+
+  (function () {
+    var svg = document.getElementById("g-flujo");
+    var W = 700, H = 320, ML = 40, MR = 12, MT = 18, MB = 34;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Ingresos y gastos mensuales. Los ingresos alcanzan a los gastos alrededor del mes 22.");
+    var max = 80;
+    var bw = (W - ML - MR) / 25;
+    function Y(v) { return MT + (1 - v / max) * (H - MT - MB); }
+    [0, 20, 40, 60, 80].forEach(function (v) {
+      svg.appendChild(el("line", { x1: ML, y1: Y(v), x2: W - MR, y2: Y(v), class: "eje" }));
+      var t = el("text", { x: ML - 8, y: Y(v) + 3.5, class: "eje-txt", "text-anchor": "end" });
+      t.textContent = v; svg.appendChild(t);
+    });
+    for (var j = 0; j <= 24; j++) {
+      var x = ML + j * bw;
+      // gasto: barra completa; ingreso: barra angosta encima. 2px de aire entre ellas.
+      var hg = Y(0) - Y(gastos[j]), hi = Y(0) - Y(ingresos[j]);
+      if (hg > 0) svg.appendChild(el("rect", { x: x + 1, y: Y(gastos[j]), width: bw / 2 - 2, height: hg, fill: "#B3762F", rx: 2 }));
+      if (hi > 0) svg.appendChild(el("rect", { x: x + bw / 2 + 1, y: Y(ingresos[j]), width: bw / 2 - 2, height: hi, fill: "#2E9E70", rx: 2 }));
+      if (j % 6 === 0) {
+        var t2 = el("text", { x: x + bw / 2, y: H - 12, class: "eje-txt", "text-anchor": "middle" });
+        t2.textContent = "m" + j; svg.appendChild(t2);
+      }
+    }
+    var yl = el("text", { x: 0, y: 11, class: "eje-txt" });
+    yl.textContent = "millones CLP/mes"; svg.appendChild(yl);
+    var lbl = el("text", { x: W - MR, y: Y(78), class: "eje-txt", "text-anchor": "end" });
+    lbl.setAttribute("fill", "#3FC08A");
+    lbl.textContent = "los ingresos alcanzan a los gastos ≈ m21";
+    svg.appendChild(lbl);
+  })();
+
+  /* ---- 3 · Saldo de caja ---- */
+  (function () {
+    var saldo = [], c = 60;
+    for (var i = 0; i <= 24; i++) {
+      if (i === 3) c += 50;          // CORFO
+      if (i === 8) c += 430;         // semilla
+      c += ingresos[i] - gastos[i];
+      saldo.push(Math.round(c * 10) / 10);
+    }
+    var svg = document.getElementById("g-caja");
+    var W = 700, H = 320, ML = 48, MR = 16, MT = 18, MB = 34;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Saldo de caja mensual. El valle es el mes 7 con 15,8 millones de pesos, antes de la ronda semilla del mes 8.");
+    var max = 700;
+    function X(i) { return ML + i / 24 * (W - ML - MR); }
+    function Y(v) { return MT + (1 - v / max) * (H - MT - MB); }
+    [0, 200, 400, 600].forEach(function (v) {
+      svg.appendChild(el("line", { x1: ML, y1: Y(v), x2: W - MR, y2: Y(v), class: "eje" }));
+      var t = el("text", { x: ML - 8, y: Y(v) + 3.5, class: "eje-txt", "text-anchor": "end" });
+      t.textContent = v; svg.appendChild(t);
+    });
+    [0, 6, 12, 18, 24].forEach(function (i) {
+      var t = el("text", { x: X(i), y: H - 12, class: "eje-txt", "text-anchor": "middle" });
+      t.textContent = "m" + i; svg.appendChild(t);
+    });
+    var d = saldo.map(function (v, i) { return (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ");
+    svg.appendChild(el("path", { d: d + " L" + X(24) + "," + Y(0) + " L" + X(0) + "," + Y(0) + " Z", fill: "#3F9BD6", opacity: ".10" }));
+    svg.appendChild(el("path", { d: d, fill: "none", stroke: "#3F9BD6", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+    // El valle: mes 7
+    var vx = X(7), vy = Y(saldo[7]);
+    svg.appendChild(el("line", { x1: vx, y1: vy, x2: vx, y2: Y(0), stroke: "#E8574E", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+    svg.appendChild(el("circle", { cx: vx, cy: vy, r: 5, fill: "#E8574E", stroke: SURF, "stroke-width": 2 }));
+    var t3 = el("text", { x: vx + 8, y: vy - 8, class: "eje-txt" });
+    t3.setAttribute("fill", "#E8574E");
+    t3.textContent = "valle m7: $" + saldo[7].toFixed(1) + "M";
+    svg.appendChild(t3);
+
+    // semilla
+    var sx = X(8);
+    svg.appendChild(el("line", { x1: sx, y1: MT, x2: sx, y2: Y(0), stroke: "#24404A", "stroke-width": 1 }));
+    var t4 = el("text", { x: sx + 5, y: MT + 10, class: "eje-txt" });
+    t4.textContent = "semilla $430M";
+    svg.appendChild(t4);
+    var yl = el("text", { x: 0, y: 11, class: "eje-txt" });
+    yl.textContent = "millones CLP"; svg.appendChild(yl);
+  })();
+
+  /* ---- 4 · Embudo (rampa ordinal) ---- */
+  (function () {
+    var pasos = [
+      { l: "Universo contactable", v: 200, c: "#26688C" },
+      { l: "Conversación inicial", v: 120, c: "#317FA8" },
+      { l: "Acepta el diagnóstico gratis", v: 45, c: "#3F9BD6" },
+      { l: "Hallazgo relevante", v: 22, c: "#63B4E3" },
+      { l: "Propuesta formal", v: 14, c: "#8CCBEC" },
+      { l: "Homologación + comité", v: 5, c: "#B4DFF5" },
+      { l: "Orden de compra", v: 4, c: "#B4DFF5" }
+    ];
+    var svg = document.getElementById("g-embudo");
+    var W = 620, H = 330, ML = 8, MR = 8, MT = 10, MB = 10;
+    var alto = (H - MT - MB) / pasos.length;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Embudo de adquisición: de 200 faenas contactables, 120 conversan, 45 aceptan el diagnóstico, 22 tienen hallazgo, 14 reciben propuesta, 5 llegan a comité y 4 firman.");
+    pasos.forEach(function (p, i) {
+      var w = (p.v / 200) * (W - ML - MR - 200);
+      var y = MT + i * alto;
+      svg.appendChild(el("rect", { x: ML, y: y + 3, width: Math.max(w, 3), height: alto - 8, fill: p.c, rx: 2 }));
+      var t = el("text", { x: ML + Math.max(w, 3) + 10, y: y + alto / 2 + 1, class: "marca-txt-svg" });
+      t.textContent = p.l; svg.appendChild(t);
+      var n = el("text", { x: ML + Math.max(w, 3) + 10, y: y + alto / 2 + 15, class: "eje-txt" });
+      n.textContent = p.v + (i ? "  ·  " + Math.round(p.v / pasos[i - 1].v * 100) + "% del paso anterior" : "");
+      svg.appendChild(n);
+      if (i === 5) {
+        var cuello = el("text", { x: W - 8, y: y + alto / 2 + 1, class: "eje-txt", "text-anchor": "end" });
+        cuello.setAttribute("fill", "#E8574E");
+        cuello.textContent = "◀ la restricción";
+        svg.appendChild(cuello);
+      }
+    });
+  })();
+
+  /* ---- 5 · Línea de tiempo de hitos con criterios de muerte ---- */
+  (function () {
+    var hitos = [
+      { m: 3,  id: "M0", t: "Design partners", d: "“Ya lo sabíamos y no importa”" },
+      { m: 6,  id: "M1", t: "Primer cliente", d: "Mes 8 sin orden de compra" },
+      { m: 12, id: "M2", t: "3 faenas + caso", d: "Ciclo de venta > 12 meses" },
+      { m: 18, id: "M3", t: "8 faenas, venta repetible", d: "Implementación > 12 semanas" },
+      { m: 21, id: "M4", t: "El canal trae clientes", d: "Cero referencias en 6 meses" },
+      { m: 24, id: "M5", t: "Decisión", d: "ARR < US$250k → matar" }
+    ];
+    var svg = document.getElementById("g-hitos");
+    var W = 900, H = 260, ML = 30, MR = 30;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Línea de tiempo de los seis hitos entre el mes 3 y el mes 24, cada uno con su criterio de muerte.");
+    var yl = 96;
+    function X(m) { return ML + m / 24 * (W - ML - MR); }
+    svg.appendChild(el("line", { x1: ML, y1: yl, x2: W - MR, y2: yl, stroke: "#35606E", "stroke-width": 1 }));
+    [0, 6, 12, 18, 24].forEach(function (m) {
+      var t = el("text", { x: X(m), y: yl + 20, class: "eje-txt", "text-anchor": "middle" });
+      t.textContent = "mes " + m; svg.appendChild(t);
+    });
+    hitos.forEach(function (h, i) {
+      var x = X(h.m);
+      var arriba = i % 2 === 0;
+      var y = arriba ? yl - 14 : yl + 34;
+      svg.appendChild(el("rect", { x: x - 5, y: yl - 5, width: 10, height: 10, fill: "#3F9BD6" }));
+      svg.appendChild(el("line", { x1: x, y1: yl, x2: x, y2: arriba ? yl - 60 : yl + 62, stroke: "#24404A", "stroke-width": 1 }));
+
+      var by = arriba ? yl - 88 : yl + 62;
+      var g = el("g", {});
+      var id = el("text", { x: x - 62, y: by + 12, class: "eje-txt" });
+      id.setAttribute("fill", "#3F9BD6");
+      id.textContent = h.id; g.appendChild(id);
+      var t2 = el("text", { x: x - 62, y: by + 28, class: "marca-txt-svg" });
+      t2.textContent = h.t; g.appendChild(t2);
+      var d1 = el("text", { x: x - 62, y: by + 46, class: "eje-txt" });
+      d1.setAttribute("fill", "#E8574E");
+      d1.textContent = "▲ " + h.d; g.appendChild(d1);
+      svg.appendChild(g);
+    });
+    var lg = el("text", { x: ML, y: H - 6, class: "eje-txt" });
+    lg.setAttribute("fill", "#E8574E");
+    lg.textContent = "▲ criterio de muerte: la observación que debería hacernos parar";
+    svg.appendChild(lg);
+  })();
+})();
+</script>
+</body>
+</html>

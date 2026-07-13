@@ -1,0 +1,484 @@
+/* =============================================================================
+   CUASIO — hoja de estilo del sitio
+   -----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: SEÑALÉTICA INDUSTRIAL.
+   La referencia no es un libro ni un cuaderno: es el cartel de peligro atornillado
+   a la reja de la faena y la credencial que cuelga del pecho. De ahí sale todo:
+
+   · Fondo azul noche profundo (#06111C). No es "dark mode": es la noche del turno
+     B, la sala de control, el rajo a las 20:00.
+   · UN acento: amarillo de seguridad #FFD100. El color con el que la industria
+     dice "aquí te puedes morir". No se usa para decorar; se usa para señalar.
+   · Blanco puro reservado al DATO. El texto de servicio es azul agrisado.
+   · Geometría dura: border-radius 0 en todo. Bordes de 2px. Rayado de peligro a
+     45° como separador. Esquinas cortadas tipo placa metálica.
+   · Tipografía grotesca ANCHA: Archivo variable con eje de ancho (wdth 125 en
+     títulos, uppercase, tracking abierto = cartel). IBM Plex Mono para el dato
+     duro (RUT, folio, hora, coordenada) porque un folio es una matrícula, no prosa.
+     No es Inter ni Poppins: Archivo es una grotesca diseñada para impresión de
+     alto impacto y tiene eje de ancho real, que es lo que hace la señalética.
+
+   PALETA DE DATOS (validada con scripts/validate_palette.js de la skill dataviz,
+   modo dark, superficie #0B1A2B):
+   · No hay paleta categórica: los datos de este producto son "destacado + contexto"
+     y rampas ordinales. Es una decisión, no un olvido.
+   · Destacado (la serie que cuenta la historia): #FFD100  — 12.0:1 sobre panel.
+   · Contexto (todo lo demás):                    #66809A  — 4.28:1  (≥3:1 OK).
+   · Rampa ordinal (cohortes, embudo): #B57C00 → #E0A500 → #FFD100 → #FFF3B8
+     → validador --ordinal: ALL CHECKS PASS (monótona, ΔL≥0.06, un solo tono).
+   · Estado (reservado, SIEMPRE con icono + etiqueta, nunca color solo):
+     crítico #FF5C4D · alto #FF9A3C · operativo #3FCB8E · pendiente #8FA6BC.
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Superficies */
+  --noche:        #06111C;
+  --panel:        #0B1A2B;
+  --panel-alto:   #12283D;
+  --linea:        #23405C;
+  --linea-fuerte: #35597C;
+
+  /* Tinta */
+  --blanco:  #FFFFFF;
+  --tinta-2: #9DB2C6;
+  --tinta-3: #6E869C;
+
+  /* El acento. Uno. */
+  --amarillo:      #FFD100;
+  --amarillo-alto: #FFDE45;
+  --amarillo-bajo: #C9A400;
+
+  /* Estado — reservado, nunca es "serie 4" */
+  --critico:   #FF5C4D;
+  --alto:      #FF9A3C;
+  --operativo: #3FCB8E;
+  --pendiente: #8FA6BC;
+
+  /* Datos */
+  --dato-destacado: #FFD100;
+  --dato-contexto:  #66809A;
+  --ord-1: #B57C00;
+  --ord-2: #E0A500;
+  --ord-3: #FFD100;
+  --ord-4: #FFF3B8;
+
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ---------- Base (móvil primero) ---------- */
+
+body {
+  background: var(--noche);
+  color: var(--tinta-2);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  font-variation-settings: 'wdth' 100;
+}
+
+h1, h2, h3, h4 {
+  color: var(--blanco);
+  font-family: var(--sans);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 118;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  /* Una grotesca ancha en mayúsculas hace tokens larguísimos. Que nunca
+     empujen el ancho de la página: eso es scroll horizontal y está prohibido. */
+  overflow-wrap: break-word;
+}
+
+h1 { font-size: var(--step-4); line-height: 1.02; }
+h2 { font-size: var(--step-3); line-height: 1.06; }
+h3 { font-size: var(--step-1); line-height: 1.12; }
+h4 { font-size: var(--step-0); letter-spacing: 0.06em; }
+
+p { margin-block: 0 var(--sp-s); }
+p:last-child { margin-bottom: 0; }
+
+strong { color: var(--blanco); font-weight: 700; }
+em { font-style: normal; color: var(--amarillo); }
+
+a { color: var(--blanco); text-decoration-color: var(--amarillo); text-underline-offset: 3px; }
+a:hover { color: var(--amarillo); }
+
+:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+
+/* ---------- Piezas de señalética ---------- */
+
+/* Rayado de peligro. El separador de la casa. */
+.rayado {
+  height: 10px;
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--amarillo) 0 10px,
+    var(--noche) 10px 20px
+  );
+  border-block: 1px solid var(--noche);
+}
+.rayado--fino { height: 6px; }
+
+/* Etiqueta tipo placa: fondo amarillo, texto negro, mayúsculas. */
+.placa {
+  display: inline-block;
+  background: var(--amarillo);
+  color: var(--noche);
+  font-weight: 800;
+  font-size: var(--step--1);
+  font-variation-settings: 'wdth' 112;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.3em 0.7em;
+}
+.placa--hueca {
+  background: none;
+  color: var(--amarillo);
+  border: 2px solid var(--amarillo);
+}
+.placa--tinta {
+  background: none;
+  color: var(--tinta-3);
+  border: 2px solid var(--linea);
+}
+
+/* Numeración de sección, como en un plano. */
+.seccion__num {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--amarillo);
+  letter-spacing: 0.14em;
+}
+
+.caja {
+  background: var(--panel);
+  border: 2px solid var(--linea);
+  padding: var(--sp-m);
+}
+.caja--alto { background: var(--panel-alto); }
+.caja--peligro { border-color: var(--amarillo); }
+
+/* Encabezado de caja tipo cartel: barra superior. */
+.caja__cinta {
+  margin: calc(-1 * var(--sp-m)) calc(-1 * var(--sp-m)) var(--sp-m);
+  background: var(--linea);
+  color: var(--blanco);
+  padding: 0.5em var(--sp-m);
+  font-weight: 800;
+  font-size: var(--step--1);
+  font-variation-settings: 'wdth' 112;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  gap: var(--sp-2xs);
+  align-items: center;
+  justify-content: space-between;
+}
+.caja__cinta--peligro { background: var(--amarillo); color: var(--noche); }
+
+.dato {
+  font-family: var(--sans);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 118;
+  color: var(--blanco);
+  line-height: 1;
+}
+
+/* ---------- Navegación ---------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--noche);
+  border-bottom: 2px solid var(--linea);
+}
+.nav__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-s);
+  min-height: 60px;
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 120;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--blanco);
+  text-decoration: none;
+}
+.marca:hover { color: var(--blanco); }
+.marca svg { flex: none; }
+.marca__punto { color: var(--amarillo); }
+
+.nav__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid var(--linea);
+  color: var(--blanco);
+  padding-inline: 0.7rem;
+  font-weight: 700;
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.nav__toggle:hover { border-color: var(--amarillo); }
+
+.nav__menu {
+  order: 3;
+  flex-basis: 100%;
+  display: none;
+  border-top: 2px solid var(--linea);
+  padding-block: var(--sp-2xs) var(--sp-s);
+}
+.nav__menu.abierto { display: block; }
+.nav__menu ul { list-style: none; display: grid; }
+.nav__menu a {
+  display: block;
+  padding: 0.85rem 0;
+  min-height: 44px;
+  color: var(--tinta-2);
+  text-decoration: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--step--1);
+  border-bottom: 1px solid var(--linea);
+}
+.nav__menu a:hover, .nav__menu a[aria-current="page"] { color: var(--amarillo); }
+.nav__menu a[aria-current="page"] { border-bottom-color: var(--amarillo); }
+
+@media (min-width: 56em) {
+  .nav__toggle { display: none; }
+  .nav__menu {
+    display: block;
+    order: 2;
+    flex-basis: auto;
+    margin-left: auto;
+    border-top: 0;
+    padding: 0;
+  }
+  .nav__menu ul { grid-auto-flow: column; gap: var(--sp-m); align-items: center; }
+  .nav__menu a { border-bottom: 0; padding: 0; }
+  .nav__menu a[aria-current="page"] {
+    color: var(--noche);
+    background: var(--amarillo);
+    padding-inline: 0.5em;
+  }
+  .nav__barra { min-height: 68px; }
+}
+
+/* ---------- Botones ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding: 0.75rem 1.25rem;
+  background: var(--amarillo);
+  color: var(--noche);
+  border: 2px solid var(--amarillo);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 112;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--step--1);
+  text-decoration: none;
+  text-align: center;
+}
+.btn:hover { background: var(--amarillo-alto); border-color: var(--amarillo-alto); color: var(--noche); }
+.btn:active { background: var(--amarillo-bajo); }
+.btn--linea {
+  background: none;
+  color: var(--blanco);
+  border-color: var(--linea-fuerte);
+}
+.btn--linea:hover { background: none; border-color: var(--amarillo); color: var(--amarillo); }
+
+/* ---------- Layout ---------- */
+
+.seccion { padding-block: var(--sp-xl); }
+.seccion--apretada { padding-block: var(--sp-l); }
+
+.seccion__cab { margin-bottom: var(--sp-l); }
+.seccion__cab h2 { margin-top: var(--sp-2xs); }
+.seccion__cab p { margin-top: var(--sp-xs); max-width: var(--measure); }
+
+.rejilla { display: grid; gap: var(--sp-s); }
+/* Sin esto, una cifra grande e inquebrantable empuja la columna y rompe el ancho. */
+.rejilla > * { min-width: 0; }
+@media (min-width: 48em) {
+  .rejilla--2 { grid-template-columns: 1fr 1fr; }
+  .rejilla--3 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 64em) {
+  .rejilla--4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---------- Tablas ---------- */
+
+table { width: 100%; font-size: var(--step--1); }
+th, td {
+  text-align: left;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--linea);
+  vertical-align: top;
+}
+thead th {
+  background: var(--panel-alto);
+  color: var(--blanco);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--linea-fuerte);
+}
+td .num, td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--blanco); }
+.tabla-caja { border: 2px solid var(--linea); background: var(--panel); }
+.scroll-x { border: 0; }
+.scroll-x table { min-width: 34rem; }
+
+/* ---------- Utilidades ---------- */
+
+.txt-amarillo { color: var(--amarillo); }
+.txt-blanco { color: var(--blanco); }
+.txt-tenue { color: var(--tinta-3); }
+.txt-mono { font-family: var(--mono); }
+.txt-chico { font-size: var(--step--1); }
+.txt-mini { font-size: 0.78rem; letter-spacing: 0.04em; }
+.mb-0 { margin-bottom: 0; }
+.mt-s { margin-top: var(--sp-s); }
+.mt-m { margin-top: var(--sp-m); }
+.mt-l { margin-top: var(--sp-l); }
+
+.lista { list-style: none; display: grid; gap: var(--sp-xs); }
+/* OJO: el <li> NO puede ser grid ni flex. Si lo es, cada <strong> de adentro se
+   convierte en un ítem de grilla y se va a su propia línea. La viñeta va absoluta. */
+.lista li {
+  position: relative;
+  padding-left: 1.35rem;
+}
+.lista li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 10px;
+  height: 10px;
+  background: var(--amarillo);
+}
+.lista--check li::before { background: var(--operativo); }
+.lista--muerte li::before { background: var(--critico); }
+
+/* Nota "por validar" — el sello legal honesto. */
+.porvalidar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  background: rgba(255, 154, 60, 0.14);
+  border: 1px dashed var(--alto);
+  color: var(--alto);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15em 0.45em;
+  white-space: normal;
+}
+.consta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  background: rgba(63, 203, 142, 0.12);
+  border: 1px solid var(--operativo);
+  color: var(--operativo);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15em 0.45em;
+  white-space: normal;
+}
+
+/* Cifra con su aritmética a la vista. Es un bloque preformateado: las columnas
+   se alinean o la cuenta no se lee. Scrollea dentro de su caja, nunca la página. */
+.aritmetica {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--tinta-2);
+  background: var(--noche);
+  border-left: 3px solid var(--amarillo);
+  padding: var(--sp-xs) var(--sp-s);
+  white-space: pre;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 48em) { .aritmetica { font-size: var(--step--1); } }
+.aritmetica b { color: var(--blanco); font-weight: 600; }
+.fuente {
+  font-size: 0.78rem;
+  color: var(--tinta-3);
+  font-family: var(--mono);
+  margin-top: var(--sp-2xs);
+}
+
+/* ---------- Gráficos ---------- */
+
+.fig { background: var(--panel); border: 2px solid var(--linea); padding: var(--sp-s); }
+.fig__tit {
+  color: var(--blanco);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 112;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: var(--step--1);
+}
+.fig__sub { color: var(--tinta-3); font-size: 0.82rem; margin-top: 0.25rem; }
+/* El viewBox mide 400 unidades: si lo dejas crecer hasta 1200px el texto del eje
+   se escala ×3 y el gráfico se ve como un póster. Se topa en 680px y se centra. */
+.fig svg {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  display: block;
+  margin: var(--sp-s) auto 0;
+}
+.fig__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-s);
+  margin-top: var(--sp-xs);
+  font-size: 0.78rem;
+  color: var(--tinta-2);
+}
+.fig__leyenda span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.llave { width: 14px; height: 4px; flex: none; }
+.llave--punto { width: 10px; height: 10px; border-radius: 50%; }
+.g-eje { stroke: var(--linea); stroke-width: 1; }
+.g-eje-txt { fill: var(--tinta-3); font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
+.g-etq { fill: var(--blanco); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; }
+
+/* ---------- Pie ---------- */
+
+.pie {
+  border-top: 2px solid var(--linea);
+  padding-block: var(--sp-l);
+  color: var(--tinta-3);
+  font-size: var(--step--1);
+}
+.pie__links { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-s); }
+.pie__links a { text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-size: 0.78rem; }

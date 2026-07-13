@@ -1,0 +1,20 @@
+{
+  "folder": "15-agua",
+  "brand": "Freatia",
+  "domain": "freatia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/freatia.com -> HTTP 404 (disponible), verificado con _kit/check-domain.sh el 2026-07-13. freatia.cl también disponible (NIC Chile).",
+  "alternates": ["isohipsa.com", "cuencora.com", "piezara.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE.",
+  "tagline": "El balance hídrico de la faena, cuadrado y auditable — y cuando no cuadra, te dice cuánto falta y dónde buscarlo.",
+  "category": "SaaS industrial · Gestión hídrica y monitoreo de depósitos de relaves",
+  "market": "Chile (norte: Antofagasta, Atacama, Tarapacá) → Perú, Brasil, Australia",
+  "icp": "Faena minera de cobre o litio en el norte de Chile, 5.000 a 60.000 t/d, con derechos DGA vigentes y al menos un depósito de relaves activo. Compra el Superintendente de Medio Ambiente o de Recursos Hídricos; firma el Gerente de Operaciones. Hoy el balance lo arma una persona en una planilla.",
+  "price_clp": "Cuenca $2.900.000/mes · Tranque $4.900.000/mes · Corporativo desde $9.800.000/mes · Implementación $12.000.000–$28.000.000 por única vez",
+  "accent": "#3F9BD6",
+  "problem": "El balance hídrico de la faena vive en una planilla que arma una sola persona con datos de sensores, PDF y lecturas a mano. Cuando no cuadra —y casi nunca cuadra— nadie sabe si faltan 40 l/s porque un caudalímetro está descalibrado o porque el muro del tranque está filtrando. El reporte al regulador y a la comunidad se arma a última hora, sin trazabilidad, y una discrepancia que nadie miró es a la vez una multa de la SMA y el primer síntoma de una falla geotécnica.",
+  "solution": "El balance hídrico en tiempo real y trazable hasta el sensor (Sankey de entradas, usos, recirculación y pérdidas), el monitoreo del depósito de relaves con umbrales y escalamiento que no se puede ignorar, y el reporte a la DGA, a SERNAGEOMIN, a la SMA y a la comunidad generado desde los mismos datos sellados. La discrepancia no se esconde: se publica, se diagnostica con hipótesis rankeadas y evidencia, y bloquea la firma del reporte hasta que alguien la explique.",
+  "wedge": "Todos los demás cierran el balance forzando un coeficiente. Freatia se niega: deja el hueco a la vista, lo cuantifica, y lo convierte en la pregunta que vale plata. El residual sin explicar es el producto.",
+  "art_direction": "Carta topográfica nocturna: fondo de tinta oscura con retícula de mapa, curvas de nivel en ocre árido, agua en azul y recirculación en verde sobre terreno seco. Barlow y Barlow Condensed para los rótulos de plancheta, JetBrains Mono para cotas y caudales. Sin papel crema, sin serif editorial, sin acento rojo óxido.",
+  "honesty": "Un dashboard no compra licencia social. Freatia no predice la falla del muro, no mide lo que no está instrumentado y no evita una multa por sí solo: sólo hace que la faena sepa antes, y pueda probar lo que sabía.",
+  "status": "prototipo"
+}

@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torniqua — consola de faena (demo)</title>
+<meta name="description" content="Demo navegable: portería, lectura IA de documentos, cartera de contratistas, vencimientos y expediente para la Dirección del Trabajo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../torniqua.css">
+<style>
+  /* ---- consola: la barra de estado de la faena ---- */
+  .console {
+    background: var(--steel-2); border-bottom: 1px solid var(--steel-4);
+  }
+  .console__in { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap; padding-block: 8px; }
+  .sel {
+    background: var(--steel-3); border: 1px solid var(--steel-4); color: var(--ink);
+    border-radius: 2px; min-height: 38px; padding: 0 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem;
+  }
+  .lnk-off {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 10px;
+    border: 1px solid var(--steel-4); border-radius: 2px; background: var(--steel-3);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-2);
+  }
+  .lnk-off[aria-pressed="true"] { border-color: var(--alarm); color: var(--alarm); background: var(--alarm-tint); }
+
+  /* ---- pestañas ---- */
+  .tabs { position: sticky; top: 56px; z-index: 29; background: var(--steel-1); border-bottom: 1px solid var(--line); }
+  .tabs__in { display: flex; gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs__in::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: none; min-height: 48px; padding: 0 12px; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--ink-3); font-size: 0.78rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+  }
+  .tab:hover { color: var(--ink-2); }
+  .tab[aria-selected="true"] { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab .badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0;
+    background: var(--alarm); color: #170703; border-radius: 8px; padding: 1px 6px; font-weight: 600;
+  }
+  .panel { padding-block: var(--sp-m) var(--sp-2xl); }
+  .panel[hidden] { display: none; }
+
+  /* ---- portería ---- */
+  @media (min-width: 64em) { .gate { display: grid; grid-template-columns: 1fr 1.05fr; gap: var(--sp-l); align-items: start; } }
+  .queue { list-style: none; display: grid; gap: 6px; }
+  .qitem {
+    width: 100%; text-align: left; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px;
+    align-items: center; padding: 10px; min-height: 56px;
+    background: var(--steel-2); border: 1px solid var(--line); border-radius: var(--radius);
+    color: var(--ink);
+  }
+  .qitem:hover, .qitem:focus-visible { border-color: var(--steel-4); background: var(--steel-3); }
+  .qitem[data-done="1"] { opacity: .58; }
+  .qitem__n { font-family:'IBM Plex Mono',monospace; font-size:.7rem; color: var(--ink-3); }
+  .qitem__nom { font-weight: 600; font-size: .92rem; line-height: 1.2; }
+  .qitem__emp { font-family:'IBM Plex Mono',monospace; font-size: .68rem; color: var(--ink-3); }
+
+  .scanner {
+    border: 1px solid var(--steel-4); border-radius: var(--radius);
+    background: var(--steel-2); overflow: hidden; box-shadow: var(--shadow);
+  }
+  .scanner__hd { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+                 padding: 10px var(--sp-s); background: var(--steel-3); border-bottom: 1px solid var(--steel-4); }
+  .scanner__body { padding: var(--sp-s); min-height: 340px; }
+  .scanline {
+    height: 3px; background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    animation: sweep 1.1s linear infinite;
+  }
+  @keyframes sweep { 0% { opacity:.25 } 50% { opacity:1 } 100% { opacity:.25 } }
+  @media (prefers-reduced-motion: reduce) { .scanline { animation: none; } }
+
+  .big { font-size: clamp(2.2rem, 1.2rem + 5vw, 3.4rem); font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .big--ok { color: var(--teal); }
+  .big--stop { color: var(--alarm); }
+  .big--warn { color: var(--teal); }
+
+  .checks { list-style: none; display: grid; gap: 4px; margin-top: var(--sp-s); }
+  .checks li { display: grid; grid-template-columns: 16px 1fr auto; gap: 8px; align-items: center;
+               padding: 7px 8px; border: 1px solid var(--line); border-radius: 2px; background: var(--steel-1); font-size: .8rem; }
+  .checks li[data-s="stop"] { border-color: rgba(255,90,44,.5); background: var(--alarm-tint); }
+  .checks li[data-s="warn"] { border-color: rgba(255,90,44,.35); }
+  .checks .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+  .checks li[data-s="stop"] .dot { background: var(--alarm); }
+  .checks li[data-s="warn"] .dot { background: transparent; border: 2px solid var(--alarm); width: 10px; height: 10px; }
+  .checks .venc { font-family:'IBM Plex Mono',monospace; font-size: .7rem; color: var(--ink-3); white-space: nowrap; }
+
+  .log { list-style: none; font-family: 'IBM Plex Mono', monospace; font-size: .72rem; }
+  .log li { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+  .log b { color: var(--teal); font-weight: 500; }
+  .log b.no { color: var(--alarm); }
+
+  /* ---- documentos / IA ---- */
+  .doc { border: 1px solid var(--line); border-radius: var(--radius); background: var(--steel-2); overflow: hidden; }
+  .doc__hd { display: flex; gap: 10px; align-items: center; padding: 10px var(--sp-s); border-bottom: 1px solid var(--line); background: var(--steel-3); }
+  .doc__bd { padding: var(--sp-s); }
+  .fields { list-style: none; display: grid; gap: 6px; }
+  .fields li { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; padding: 7px 8px;
+               background: var(--steel-1); border: 1px solid var(--line); border-radius: 2px; }
+  .fields .k { font-family:'IBM Plex Mono',monospace; font-size:.64rem; letter-spacing:.12em; text-transform:uppercase; color: var(--ink-3); }
+  .fields .v { font-size: .88rem; font-weight: 500; }
+  .conf { display: flex; align-items: center; gap: 6px; }
+  .conf__bar { width: 46px; height: 4px; background: var(--steel-4); border-radius: 2px; overflow: hidden; }
+  .conf__fill { height: 100%; background: var(--teal); display: block; }
+  .conf__n { font-family:'IBM Plex Mono',monospace; font-size:.66rem; color: var(--ink-3); }
+  .fields li[data-duda="1"] { border-color: rgba(255,90,44,.5); background: var(--alarm-tint); }
+  .fields li[data-duda="1"] .conf__fill { background: var(--alarm); }
+
+  .crop { background: var(--steel-0); border: 1px solid var(--steel-4); border-radius: 2px; padding: 8px; }
+  .thumb { width: 64px; height: 80px; flex: none; border: 1px solid var(--steel-4); background: var(--steel-0);
+           display: grid; place-items: center; overflow: hidden; }
+
+  /* ---- tablas y detalle ---- */
+  .detail { background: var(--steel-1); border: 1px solid var(--steel-4); border-top: 0; padding: var(--sp-s); }
+  .bar { height: 6px; background: var(--steel-4); border-radius: 3px; overflow: hidden; width: 84px; }
+  .bar i { display: block; height: 100%; background: var(--teal); }
+  .bar i.low { background: var(--alarm); }
+
+  /* ---- gráfico ---- */
+  .figure { border: 1px solid var(--line); background: var(--steel-2); border-radius: var(--radius); padding: var(--sp-s); }
+  .tip {
+    position: fixed; pointer-events: none; z-index: 60; opacity: 0;
+    background: var(--steel-0); border: 1px solid var(--steel-4); border-radius: 2px;
+    padding: 6px 8px; font-family:'IBM Plex Mono',monospace; font-size: .7rem; color: var(--ink);
+    transition: opacity .1s;
+  }
+
+  /* ---- toast ---- */
+  .toast {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    z-index: 70; max-width: min(92vw, 460px);
+    background: var(--steel-3); border: 1px solid var(--teal); border-left: 3px solid var(--teal);
+    border-radius: 2px; padding: 10px 12px; font-size: .82rem; color: var(--ink);
+    box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
+  }
+  .toast[data-on="1"] { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .toast[data-kind="alarm"] { border-color: var(--alarm); border-left-color: var(--alarm); }
+
+  .hint { font-size: .78rem; color: var(--teal); font-family:'IBM Plex Mono',monospace; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="../index.html">
+      <svg class="brand__mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="2" stroke="#22C3AC" stroke-width="1.5"/>
+        <path d="M6 8h7M6 12h5M6 16h7" stroke="#22C3AC" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 5v16" stroke="#22C3AC" stroke-width="1.5"/>
+        <circle cx="20.5" cy="13" r="1.6" fill="#22C3AC"/>
+      </svg>
+      <span class="brand__name">Torniqua</span>
+      <span class="brand__dot" aria-hidden="true"></span>
+    </a>
+    <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<div class="console">
+  <div class="container console__in">
+    <label class="visually-hidden" for="faena">Faena</label>
+    <select class="sel" id="faena">
+      <option value="igneo">FAENA CERRO ÍGNEO · 4.120 m · Calama</option>
+      <option value="zafiro">FAENA LOMA ZAFIRO · 3.780 m · Sierra Gorda</option>
+    </select>
+    <span class="tag" id="hoy">LUN 13-07-2026 · TURNO A</span>
+    <button class="lnk-off" id="offbtn" aria-pressed="false">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0" stroke-linecap="round"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg>
+      <span id="offtxt">Enlace OK</span>
+    </button>
+    <span class="chip chip--stop" id="alertchip" style="margin-left:auto">1 empresa bloqueada</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="container">
+    <div class="tabs__in" role="tablist" aria-label="Secciones de la consola">
+      <button class="tab" role="tab" id="t-porteria" aria-controls="p-porteria" aria-selected="true">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V6l8-2v16M4 20h16M12 20V9l6-2v13"/></svg>Portería</button>
+      <button class="tab" role="tab" id="t-docs" aria-controls="p-docs" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h4"/></svg>Documentos <span class="badge" id="docbadge">3</span></button>
+      <button class="tab" role="tab" id="t-cartera" aria-controls="p-cartera" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v13H3z"/><path d="M9 7V4h6v3"/></svg>Cartera</button>
+      <button class="tab" role="tab" id="t-venc" aria-controls="p-venc" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Vencimientos</button>
+      <button class="tab" role="tab" id="t-exp" aria-controls="p-exp" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7l2 2h7v12H4z"/><path d="M8 13h8"/></svg>Expediente</button>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+<!-- ============================================================ PORTERÍA -->
+<section class="panel" id="p-porteria" role="tabpanel" aria-labelledby="t-porteria">
+  <div id="offbanner" hidden style="margin-bottom:var(--sp-s)" class="hazard">
+    <span class="tag tag--alarm">Sin señal</span>
+    <p class="small" style="margin-top:4px;color:var(--ink)">La portería sigue resolviendo con la caché firmada del último sync
+      (<span class="mono">05:58</span>, válida hasta las <span class="mono">17:58</span>). Cada lectura queda marcada
+      <span class="mono">[OFFLINE]</span> en el log y se sincroniza al recuperar enlace.</p>
+  </div>
+
+  <div class="gate">
+    <div class="stack">
+      <div class="card">
+        <div class="card__hd">
+          <span class="tag">Bus 4 · llegó 06:08 · 6 en fila</span>
+          <span class="tag tag--teal" id="clock">06:12:04</span>
+        </div>
+        <ul class="queue" id="queue"></ul>
+        <button class="btn btn--primary btn--block" id="scanNext" style="margin-top:var(--sp-s)">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M3 12h18" stroke-linecap="round"/></svg>
+          Escanear siguiente
+        </button>
+        <p class="small muted" style="margin-top:8px">O toca a cualquiera de la fila para leer su credencial.</p>
+      </div>
+
+      <div class="card">
+        <div class="card__hd"><span class="tag">Log de accesos · Portería Norte</span><span class="tag" id="logcount">0</span></div>
+        <ul class="log" id="log"><li><span class="muted">Sin lecturas todavía en este turno.</span></li></ul>
+      </div>
+    </div>
+
+    <div class="scanner">
+      <div class="scanner__hd">
+        <span class="tag">Lector PDF417 · cédula o credencial de faena</span>
+        <span class="tag" id="scanstate">EN ESPERA</span>
+      </div>
+      <div class="scanline" id="scanline" style="opacity:.3"></div>
+      <div class="scanner__body" id="scanout" aria-live="polite">
+        <div style="display:grid;place-items:center;min-height:300px;text-align:center;gap:10px">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#22C3AC" stroke-width="1" opacity=".5" aria-hidden="true">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><rect x="5" y="8" width="5" height="6"/><path d="M13 9h6M13 12h6M13 15h4"/>
+          </svg>
+          <p class="tag">Acerque la credencial al lector</p>
+          <p class="small muted" style="max-width:34ch">La decisión la toma un motor de reglas, no un modelo de lenguaje.
+            8 requisitos por persona + 4 requisitos por empresa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== DOCUMENTOS -->
+<section class="panel" id="p-docs" role="tabpanel" aria-labelledby="t-docs" hidden>
+  <div class="section__head">
+    <span class="tag">Bandeja de documentos · llegan por WhatsApp, correo o app</span>
+    <h2 style="font-size:var(--step-2)">La IA lee. Cuando no ve bien, pregunta.</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">
+      El modelo extrae campos con un nivel de confianza por campo. Bajo <span class="mono">0,90</span> el documento
+      no se aprueba solo: queda esperando a un humano, con el recorte de la imagen a la vista.
+      Nunca completa una fecha que no leyó.
+    </p>
+  </div>
+  <div class="grid grid--2" id="docs"></div>
+  <div id="docs-empty" hidden class="card" style="text-align:center;padding:var(--sp-xl)">
+    <span class="tag tag--teal">Bandeja vacía</span>
+    <p class="small muted" style="margin-top:8px">Los tres documentos fueron resueltos. Vuelve a
+      <button class="btn btn--ghost" style="min-height:36px;margin-top:10px" data-goto="porteria">Portería</button>
+      y escanea de nuevo a quien no pasó.</p>
+  </div>
+</section>
+
+<!-- ============================================================== CARTERA -->
+<section class="panel" id="p-cartera" role="tabpanel" aria-labelledby="t-cartera" hidden>
+  <div class="section__head">
+    <span class="tag">Cartera de contratistas · Faena Cerro Ígneo</span>
+    <h2 style="font-size:var(--step-2)">7 empresas · <span id="dotTotal" class="num">210</span> personas habilitables</h2>
+  </div>
+  <div class="scroll-x card" style="padding:0">
+    <table class="data">
+      <caption class="visually-hidden">Estado de habilitación de las empresas contratistas</caption>
+      <thead>
+        <tr>
+          <th>Empresa contratista</th><th>RUT</th><th>Dotación</th><th>Habilitados</th>
+          <th>Vencidos</th><th>F30-1</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="carteraBody"></tbody>
+    </table>
+  </div>
+  <div id="carteraDetail"></div>
+</section>
+
+<!-- ========================================================= VENCIMIENTOS -->
+<section class="panel" id="p-venc" role="tabpanel" aria-labelledby="t-venc" hidden>
+  <div class="section__head">
+    <span class="tag">Horizonte de vencimientos · 210 personas · 9 tipos de documento</span>
+    <h2 style="font-size:var(--step-2)">Lo que se va a caer, antes de que se caiga.</h2>
+  </div>
+
+  <div class="grid grid--sidebar">
+    <figure class="figure" style="margin:0">
+      <figcaption class="row row--between" style="margin-bottom:var(--sp-s)">
+        <span class="tag">Documentos por vencer — próximos 90 días</span>
+        <button class="btn btn--ghost" id="tblToggle" style="min-height:36px;font-size:.7rem">Ver tabla</button>
+      </figcaption>
+      <div id="chartWrap">
+        <div class="scroll-x">
+          <svg class="chart" id="chart" viewBox="0 0 640 260" style="min-width:560px" role="img" aria-label="Histograma: 12 documentos ya vencidos, y luego 8, 14, 21, 17, 26 y 11 documentos venciendo en tramos de 15 días hasta los 90 días.">
+          </svg>
+        </div>
+        <p class="small muted" style="margin-top:8px">Cada barra es un tramo de 15 días. La primera barra son documentos
+          <strong style="color:var(--alarm)">ya vencidos</strong>: gente que hoy no puede entrar.</p>
+      </div>
+      <div id="tblWrap" hidden class="scroll-x">
+        <table class="data" style="min-width:0">
+          <caption class="visually-hidden">Tabla equivalente al gráfico de vencimientos</caption>
+          <thead><tr><th>Tramo</th><th>Documentos</th><th>Personas afectadas</th></tr></thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+    </figure>
+
+    <div class="card">
+      <div class="card__hd"><span class="tag">Próximos avisos</span><span class="tag tag--teal">WhatsApp</span></div>
+      <ul class="rows" id="avisos"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== EXPEDIENTE -->
+<section class="panel" id="p-exp" role="tabpanel" aria-labelledby="t-exp" hidden>
+  <div class="section__head">
+    <span class="tag">Expediente · Dirección del Trabajo / auditoría interna</span>
+    <h2 style="font-size:var(--step-2)">Llegó la fiscalizadora. Tienes 48 horas.</h2>
+    <p class="small muted" style="margin-top:6px;max-width:64ch">
+      El expediente se arma con lo que hay. Lo que falta se marca como faltante: un expediente que
+      miente es peor que uno incompleto.
+    </p>
+  </div>
+
+  <div class="grid grid--sidebar">
+    <div class="card">
+      <div class="row" style="gap:var(--sp-2xs)">
+        <label class="visually-hidden" for="expEmp">Empresa</label>
+        <select class="sel" id="expEmp" style="flex:1;min-width:200px"></select>
+        <label class="visually-hidden" for="expPer">Periodo</label>
+        <select class="sel" id="expPer">
+          <option>ABR–JUN 2026</option>
+          <option>ENE–MAR 2026</option>
+          <option>2025 completo</option>
+        </select>
+      </div>
+      <button class="btn btn--primary btn--block" id="expGo" style="margin-top:var(--sp-s)">Armar expediente</button>
+      <ul class="log" id="expLog" style="margin-top:var(--sp-s)"><li><span class="muted">Sin expediente armado.</span></li></ul>
+    </div>
+
+    <div id="expOut"></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container">
+    <p class="small">
+      Demo con datos ficticios. Empresas, RUT, faenas y personas son inventados; los documentos, cursos y
+      exámenes son los que se exigen de verdad en faenas mineras chilenas.
+      Qué está falseado y qué haría falta para que fuera real: <a href="../stack.html">Arquitectura</a>.
+    </p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* =============================================================================
+   TORNIQUA — consola de faena (demo)
+   Estado en el cliente. La decisión de acceso es un motor de reglas
+   determinístico (evaluar()). La "IA" sólo aparece en la bandeja de documentos:
+   extrae campos con confianza, y cuando no ve, se detiene.
+   ============================================================================= */
+(function () {
+'use strict';
+
+/* ---------------------------------------------------------------- utilidades */
+var HOY = new Date(2026, 6, 13);              // lunes 13-07-2026
+var DIA = 86400000;
+var $  = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function dias(iso) { var p = iso.split('-'); return Math.round((new Date(+p[0], p[1]-1, +p[2]) - HOY) / DIA); }
+function fmt(iso) { var p = iso.split('-'); return p[2] + '-' + p[1] + '-' + p[0]; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function toast(msg, kind) {
+  var t = $('#toast');
+  t.textContent = msg;
+  t.setAttribute('data-kind', kind || 'ok');
+  t.setAttribute('data-on', '1');
+  clearTimeout(t._h);
+  t._h = setTimeout(function () { t.removeAttribute('data-on'); }, 4200);
+}
+
+/* ------------------------------------------------------------------- catálogo
+   Documentos que de verdad se exigen para entrar a una faena minera chilena. */
+var DOCS = {
+  alt_geo: { l: 'Examen de altura geográfica', n: 'Hipobaria intermitente crónica — obligatorio sobre 3.000 m (D.S. 28/2012 MINSAL)', ruta: 'Cupo mañana 14-07 a las 07:30, Centro Médico Ocupacional Calama. Dura 40 min, resultado el mismo día.' },
+  alt_fis: { l: 'Examen de altura física', n: 'Trabajo sobre 1,8 m', ruta: 'Se toma junto con el de altura geográfica, sin cita aparte.' },
+  psico:   { l: 'Examen psicosensotécnico', n: 'Sólo cargos que operan equipo', ruta: 'Agendar en mutualidad (ACHS / IST / Mutual CChC), 3 días de espera.' },
+  ihn:     { l: 'Inducción Hombre Nuevo (faena)', n: 'Anual, la dicta la mandante', ruta: 'Reinducción jueves 16-07, 08:00, sala Portería Norte. Dura 3 h.' },
+  def:     { l: 'Curso conducción a la defensiva', n: 'Bienal, cargos que conducen', ruta: 'Curso e-learning + práctica; 2 fechas al mes en Calama.' },
+  lic:     { l: 'Licencia interna de conducción', n: 'La emite la faena, no el municipio', ruta: 'Reevaluación práctica con instructor de faena, martes y jueves 15:00.' },
+  odi:     { l: 'ODI — Obligación de informar', n: 'Art. 21 D.S. 40', ruta: 'La contratista carga el acta firmada; la IA la lee en 20 s.' },
+  epp:     { l: 'Registro de entrega de EPP', n: 'Art. 53 D.S. 594', ruta: 'Cargar el registro firmado por el trabajador desde la app.' },
+  ctr:     { l: 'Contrato + anexo de faena', n: 'Art. 9 Código del Trabajo', ruta: 'Cargar contrato y anexo vigentes.' }
+};
+var REQ_BASE = ['alt_geo', 'alt_fis', 'ihn', 'odi', 'epp', 'ctr'];
+var REQ_COND = ['psico', 'def', 'lic'];
+
+/* ------------------------------------------------------------------- empresas */
+var EMP = {
+  ceibo:   { nom: 'Mantención Industrial Ceibo Ltda.',      rut: '76.331.205-8', dot: 42, f30: '2026-08-31', previred: 'al día',  poliza: '2027-01-31', bloq: null },
+  quilcan: { nom: 'Sondajes Quilcán SpA',                   rut: '76.998.113-5', dot: 18, f30: '2026-07-31', previred: 'al día',  poliza: '2026-12-15', bloq: null },
+  aguilar: { nom: 'Transportes Aguilar Hnos. SpA',          rut: '77.210.664-3', dot: 14, f30: '2026-06-30', previred: 'deuda',   poliza: '2026-11-30',
+             bloq: { motivo: 'F30-1 de junio con DEUDA PREVISIONAL declarada ante la Dirección del Trabajo. Cotizaciones de mayo y junio impagas: 14 trabajadores.',
+                     ruta: 'Transportes Aguilar debe pagar las cotizaciones y cargar un F30-1 limpio. Mientras no lo haga, la mandante retiene el estado de pago — y al retener, deja de responder solidariamente y pasa a responder de forma subsidiaria (Ley 20.123, art. 183-C). El F30-1 de julio ya está en la bandeja de documentos.' } },
+  puelche: { nom: 'Eléctrica Puelche Servicios SpA',        rut: '77.804.339-K', dot: 26, f30: '2026-08-31', previred: 'al día',  poliza: '2027-03-31', bloq: null },
+  vega:    { nom: 'Alimentación y Casino Vega Norte SpA',   rut: '76.115.882-6', dot: 31, f30: '2026-08-31', previred: 'al día',  poliza: '2026-10-31', bloq: null },
+  coiron:  { nom: 'Aseo Industrial Coirón Ltda.',           rut: '76.543.210-K', dot: 22, f30: '2026-07-20', previred: 'al día',  poliza: '2026-09-30', bloq: null },
+  riosv:   { nom: 'Montajes Ríos y Vergara Ltda.',          rut: '78.432.907-1', dot: 57, f30: '2026-08-31', previred: 'al día',  poliza: '2027-02-28', bloq: null }
+};
+
+/* --------------------------------------------------------------- trabajadores */
+var TRAB = [
+  { id:'w1', ini:'MC', nom:'Miguel Ángel Cortés Fuentes', rut:'15.482.907-3', emp:'ceibo', cargo:'Operador multipropósito', conduce:true,
+    docs:{ alt_geo:'2026-11-14', alt_fis:'2026-11-14', psico:'2027-04-02', ihn:'2027-02-02', def:'2027-08-19', lic:'2026-09-30', odi:'2027-01-15', epp:'2026-12-01', ctr:'indefinido' } },
+
+  { id:'w2', ini:'JQ', nom:'Jonathan Quilodrán Vera', rut:'18.204.663-1', emp:'quilcan', cargo:'Ayudante de sondaje', conduce:false,
+    docs:{ alt_geo:'2026-07-10', alt_fis:'2027-03-12', ihn:'2026-10-04', odi:'2026-11-20', epp:'2027-01-08', ctr:'indefinido' } },
+
+  { id:'w3', ini:'NP', nom:'Nelson Painemal Loyola', rut:'13.905.118-K', emp:'puelche', cargo:'Eléctrico de alta tensión', conduce:false,
+    docs:{ alt_geo:'2027-01-22', alt_fis:'2027-01-22', ihn:'2026-07-19', odi:'2026-09-30', epp:'2026-11-11', ctr:'indefinido' } },
+
+  { id:'w4', ini:'YP', nom:'Yasna Paredes Millán', rut:'16.740.552-9', emp:'aguilar', cargo:'Conductora bus de acercamiento', conduce:true,
+    docs:{ alt_geo:'2027-05-08', alt_fis:'2027-05-08', psico:'2027-05-08', ihn:'2027-04-01', def:'2028-01-20', lic:'2027-06-30', odi:'2026-12-05', epp:'2027-02-14', ctr:'indefinido' } },
+
+  { id:'w5', ini:'MA', nom:'Marisol Antileo Cárdenas', rut:'17.331.086-4', emp:'vega', cargo:'Manipuladora de alimentos', conduce:false,
+    docs:{ alt_geo:'2026-12-30', alt_fis:'2026-12-30', ihn:'2027-03-18', odi:'2027-03-18', epp:'2026-10-22', ctr:'indefinido' } },
+
+  { id:'w6', ini:'CB', nom:'Cristián Bustos Ojeda', rut:'12.660.941-7', emp:'riosv', cargo:'Supervisor de montaje', conduce:true,
+    docs:{ alt_geo:'2027-02-11', alt_fis:'2027-02-11', psico:'2026-10-09', ihn:'2027-05-27', def:'2027-11-03', lic:'2026-06-28', odi:'2026-12-19', epp:'2027-04-30', ctr:'indefinido' } },
+
+  { id:'w7', ini:'KR', nom:'Katherine Riquelme Soto', rut:'19.442.870-2', emp:'coiron', cargo:'Operadora de aseo industrial', conduce:false,
+    docs:{ alt_geo:'2027-06-04', alt_fis:'2027-06-04', ihn:'2026-12-12', odi:'2027-02-20', epp:null, ctr:'indefinido' } },
+
+  { id:'w8', ini:'HV', nom:'Hugo Valdés Zúñiga', rut:'14.008.775-6', emp:'aguilar', cargo:'Conductor camión aljibe', conduce:true,
+    docs:{ alt_geo:'2027-01-30', alt_fis:'2027-01-30', psico:'2026-11-25', ihn:'2027-01-05', def:'2027-07-14', lic:'2027-03-08', odi:'2026-10-16', epp:'2026-12-28', ctr:'indefinido' } }
+];
+var byId = {};
+TRAB.forEach(function (w) { byId[w.id] = w; });
+
+/* La fila del bus 4 de esta mañana. */
+var FILA = ['w1', 'w2', 'w3', 'w4', 'w5', 'w6'];
+var scanned = {};
+
+/* ============================================================ MOTOR DE REGLAS
+   Determinístico. Sin modelo, sin probabilidad, sin "creo que". Si la fecha es
+   anterior a hoy, no pasa: eso es todo, y por eso se puede auditar. */
+function requisitos(w) {
+  return REQ_BASE.concat(w.conduce ? REQ_COND : []);
+}
+function evaluar(w) {
+  var e = EMP[w.emp];
+  var r = { fallas: [], avisos: [], restric: [], checks: [] };
+
+  if (e.bloq) {
+    r.fallas.push({ k: 'EMPRESA', t: e.bloq.motivo, ruta: e.bloq.ruta });
+    r.checks.push({ s: 'stop', l: 'Empresa habilitada (F30-1 / Previred)', v: 'BLOQUEADA' });
+  } else {
+    r.checks.push({ s: 'ok', l: 'Empresa habilitada (F30-1 / Previred)', v: 'F30-1 al ' + fmt(e.f30) });
+  }
+
+  requisitos(w).forEach(function (k) {
+    var d = DOCS[k], v = w.docs[k];
+    if (v === null || v === undefined) {
+      r.fallas.push({ k: k, t: 'Falta el documento: ' + d.l + '. Nunca se cargó.', ruta: d.ruta });
+      r.checks.push({ s: 'stop', l: d.l, v: 'NO CARGADO' });
+      return;
+    }
+    if (v === 'indefinido') { r.checks.push({ s: 'ok', l: d.l, v: 'vigente' }); return; }
+    var n = dias(v);
+    if (n < 0) {
+      var msg = d.l + ' VENCIDO hace ' + Math.abs(n) + ' días (venció el ' + fmt(v) + ').';
+      if (k === 'lic') {          // no bloquea el ingreso: bloquea la conducción
+        r.restric.push({ k: k, t: msg + ' Puede entrar como pasajero; no puede operar vehículo ni equipo en faena.', ruta: d.ruta });
+        r.checks.push({ s: 'warn', l: d.l, v: 'vencido ' + fmt(v) });
+      } else {
+        r.fallas.push({ k: k, t: msg, ruta: d.ruta });
+        r.checks.push({ s: 'stop', l: d.l, v: 'vencido ' + fmt(v) });
+      }
+    } else if (n <= 10) {
+      r.avisos.push({ k: k, t: d.l + ' vence en ' + n + ' días (' + fmt(v) + ').', ruta: d.ruta });
+      r.checks.push({ s: 'warn', l: d.l, v: 'vence en ' + n + ' d' });
+    } else {
+      r.checks.push({ s: 'ok', l: d.l, v: fmt(v) });
+    }
+  });
+
+  r.veredicto = r.fallas.length ? 'NO PASA' : (r.restric.length ? 'PASA CON RESTRICCIÓN' : 'PASA');
+  return r;
+}
+
+/* =================================================================== PORTERÍA */
+var offline = false;
+var clockT = new Date(2026, 6, 13, 6, 12, 4);
+function hhmmss(d) { return [d.getHours(), d.getMinutes(), d.getSeconds()].map(function (n) { return String(n).padStart(2, '0'); }).join(':'); }
+setInterval(function () { clockT = new Date(clockT.getTime() + 1000); $('#clock').textContent = hhmmss(clockT); }, 1000);
+
+function pintarFila() {
+  var ul = $('#queue');
+  ul.innerHTML = '';
+  FILA.forEach(function (id, i) {
+    var w = byId[id], ev = evaluar(w);
+    var li = document.createElement('li');
+    var b = document.createElement('button');
+    b.className = 'qitem';
+    b.type = 'button';
+    b.setAttribute('data-done', scanned[id] ? '1' : '0');
+    var chip = ev.veredicto === 'PASA' ? '<span class="chip chip--ok">Pasa</span>'
+             : ev.veredicto === 'NO PASA' ? '<span class="chip chip--stop">No pasa</span>'
+             : '<span class="chip chip--warn">Restringido</span>';
+    b.innerHTML =
+      '<span class="qitem__n">' + String(i + 1).padStart(2, '0') + '</span>' +
+      '<span><span class="qitem__nom">' + esc(w.nom) + '</span><br><span class="qitem__emp">' + esc(w.rut) + ' · ' + esc(EMP[w.emp].nom) + '</span></span>' +
+      (scanned[id] ? chip : '<span class="chip chip--off">Sin leer</span>');
+    b.addEventListener('click', function () { escanear(id); });
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+}
+
+function escanear(id) {
+  var w = byId[id];
+  $('#scanstate').textContent = 'LEYENDO';
+  $('#scanline').style.opacity = '1';
+  $('#scanout').innerHTML =
+    '<div style="display:grid;place-items:center;min-height:300px;gap:10px;text-align:center">' +
+      '<p class="tag tag--teal">Leyendo PDF417…</p>' +
+      '<p class="mono small muted">' + esc(w.rut) + '</p>' +
+      '<p class="mono small muted">validando ' + (requisitos(w).length + 1) + ' requisitos' + (offline ? ' · CACHÉ LOCAL' : ' · en línea') + '</p>' +
+    '</div>';
+  setTimeout(function () { veredicto(id); }, REDUCE ? 0 : 700);
+}
+
+function veredicto(id) {
+  var w = byId[id], e = EMP[w.emp], ev = evaluar(w);
+  var pasa = ev.veredicto !== 'NO PASA';
+  scanned[id] = ev.veredicto;
+  $('#scanstate').textContent = pasa ? 'LIBERADO' : 'BLOQUEADO';
+  $('#scanline').style.opacity = '.3';
+
+  var cls = ev.veredicto === 'NO PASA' ? 'big--stop' : 'big--ok';
+  var motivos = ev.fallas.length ? ev.fallas : (ev.restric.length ? ev.restric : ev.avisos);
+
+  var html =
+    '<div class="row row--between">' +
+      '<span class="big ' + cls + '">' + ev.veredicto + '</span>' +
+      '<span class="chip ' + (ev.veredicto === 'PASA' ? 'chip--ok' : ev.veredicto === 'NO PASA' ? 'chip--stop' : 'chip--warn') + '">' +
+        (ev.veredicto === 'NO PASA' ? 'Torniquete bloqueado' : 'Torniquete liberado') + '</span>' +
+    '</div>' +
+    '<div class="row" style="margin-top:var(--sp-s);align-items:flex-start">' +
+      '<div class="photo ' + (pasa ? '' : 'photo--alarm') + '">' + w.ini + '</div>' +
+      '<div style="min-width:0">' +
+        '<div style="font-weight:600;font-size:1.02rem">' + esc(w.nom) + '</div>' +
+        '<div class="mono small muted">' + esc(w.rut) + ' · ' + esc(w.cargo) + '</div>' +
+        '<div class="small" style="margin-top:4px">' + esc(e.nom) + '</div>' +
+        '<div class="mono small muted">' + esc(e.rut) + '</div>' +
+      '</div>' +
+    '</div>';
+
+  if (motivos.length) {
+    html += '<div style="margin-top:var(--sp-s)" class="' + (ev.fallas.length ? 'hazard' : 'card') + '">' +
+      '<span class="tag ' + (ev.fallas.length ? 'tag--alarm' : 'tag--teal') + '">' +
+        (ev.fallas.length ? 'Motivo exacto del rechazo' : (ev.restric.length ? 'Restricción' : 'Aviso — igual pasa')) + '</span>' +
+      motivos.map(function (m) { return '<p class="small" style="margin-top:6px;color:var(--ink)">' + esc(m.t) + '</p>'; }).join('') +
+      '<p class="small" style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--ink-2)">' +
+        '<span class="tag">Ruta para arreglarlo</span><br>' + esc(motivos[0].ruta) + '</p>' +
+    '</div>';
+  }
+
+  if (offline) {
+    html += '<p class="mono small" style="margin-top:8px;color:var(--alarm)">[OFFLINE] resuelto con caché firmada del sync 05:58</p>';
+  }
+
+  html += '<ul class="checks">' + ev.checks.map(function (c) {
+    return '<li data-s="' + c.s + '"><span class="dot"></span><span>' + esc(c.l) + '</span><span class="venc">' + esc(c.v) + '</span></li>';
+  }).join('') + '</ul>';
+
+  if (ev.fallas.length) {
+    html += '<div class="row" style="margin-top:var(--sp-s)">' +
+      '<button class="btn btn--alarm" id="avisarFix">Avisar al prevencionista</button>' +
+      (w.id === 'w2' ? '<button class="btn btn--ghost" data-goto="docs">Ver su examen en la bandeja</button>' : '') +
+      (w.emp === 'aguilar' ? '<button class="btn btn--ghost" data-goto="docs">Ver el F30-1 de la empresa</button>' : '') +
+    '</div>';
+  }
+
+  html += '<div class="mrz">TQ&lt;CHL' + w.rut.replace(/[.\-]/g, '') + '&lt;&lt;' + w.nom.split(' ').pop().toUpperCase() +
+          '&lt;&lt;' + e.rut.replace(/[.\-]/g, '') + '&lt;&lt;' + (pasa ? 'OK' : 'STOP') + '&lt;' + hhmmss(clockT) + '</div>';
+
+  $('#scanout').innerHTML = html;
+
+  var av = $('#avisarFix');
+  if (av) av.addEventListener('click', function () {
+    av.disabled = true; av.textContent = 'Aviso enviado';
+    toast('WhatsApp enviado al prevencionista de ' + e.nom + ' con el motivo y la ruta de arreglo.', 'alarm');
+  });
+
+  logAdd(w, ev.veredicto);
+  pintarFila();
+}
+
+var logN = 0;
+function logAdd(w, ver) {
+  var ul = $('#log');
+  if (logN === 0) ul.innerHTML = '';
+  logN++;
+  var li = document.createElement('li');
+  var cls = ver === 'NO PASA' ? 'no' : '';
+  li.innerHTML = '<span class="muted">' + hhmmss(clockT) + '</span>' +
+                 '<b class="' + cls + '">' + ver + '</b>' +
+                 '<span>' + esc(w.rut) + '</span>' +
+                 '<span class="muted" style="margin-left:auto">' + (offline ? 'OFFLINE' : 'P-NORTE') + '</span>';
+  ul.insertBefore(li, ul.firstChild);
+  $('#logcount').textContent = logN + ' lecturas';
+}
+
+$('#scanNext').addEventListener('click', function () {
+  var next = FILA.find(function (id) { return !scanned[id]; });
+  if (!next) { toast('La fila del bus 4 está completa: 6 lecturas. Revisa el log.'); return; }
+  escanear(next);
+});
+
+$('#offbtn').addEventListener('click', function () {
+  offline = !offline;
+  this.setAttribute('aria-pressed', String(offline));
+  $('#offtxt').textContent = offline ? 'Sin señal' : 'Enlace OK';
+  $('#offbanner').hidden = !offline;
+  toast(offline
+    ? 'Enlace caído. La portería sigue decidiendo con la caché firmada (válida 12 h).'
+    : 'Enlace recuperado. Se sincronizaron las lecturas hechas offline.', offline ? 'alarm' : 'ok');
+});
+
+/* ================================================================ DOCUMENTOS
+   Tres documentos en la bandeja. Uno limpio, uno ilegible, uno incompleto.
+   El del medio es el que importa: la IA no adivina. */
+var BANDEJA = [
+  {
+    id: 'd1', origen: 'WhatsApp +56 9 5512 4408 · prevencionista Sondajes Quilcán',
+    archivo: 'IMG-20260713-WA0007.jpg', peso: '1,8 MB · foto, 12° de inclinación, sombra sobre el sello',
+    titulo: 'Examen ocupacional de altura geográfica — Quilodrán Vera',
+    duda: true,
+    campos: [
+      { k: 'Trabajador', v: 'Jonathan Quilodrán Vera', c: 0.97 },
+      { k: 'RUT', v: '18.204.663-1', c: 0.96 },
+      { k: 'Tipo de examen', v: 'Altura geográfica (hipobaria intermitente crónica)', c: 0.94 },
+      { k: 'Institución', v: 'Centro Médico Ocupacional Calama', c: 0.91 },
+      { k: 'Fecha de emisión', v: '11-07-2026', c: 0.93 },
+      { k: 'Aptitud', v: 'APTO para trabajo sobre 3.000 m', c: 0.95 },
+      { k: 'Vigencia hasta', v: '11-07-202?', c: 0.41, duda: true }
+    ],
+    porque: 'El último dígito del año cae justo bajo el sello húmedo y la sombra del pulgar. Leo «11-07-202?»: puede ser 2026 o 2027. Si fuera 2026, el examen ya estaría vencido y esta persona NO debería entrar. No voy a elegir por ti.',
+    acciones: [
+      { txt: 'Es 11-07-2027 (vigente)', kind: 'primary', do: 'fix_w2_2027' },
+      { txt: 'Es 11-07-2026 (vencido)', kind: 'alarm', do: 'fix_w2_2026' },
+      { txt: 'Pedir foto nueva', kind: 'ghost', do: 'refoto' }
+    ]
+  },
+  {
+    id: 'd2', origen: 'Correo · contabilidad@transportesaguilar.cl',
+    archivo: 'F30-1_JUL2026_77210664.pdf', peso: '96 KB · PDF nativo, generado por la DT',
+    titulo: 'Certificado de antecedentes laborales y previsionales (F30-1) — julio 2026',
+    duda: false,
+    campos: [
+      { k: 'Empresa', v: 'Transportes Aguilar Hnos. SpA', c: 0.99 },
+      { k: 'RUT', v: '77.210.664-3', c: 0.99 },
+      { k: 'Periodo', v: 'Julio 2026', c: 0.98 },
+      { k: 'Trabajadores informados', v: '14', c: 0.97 },
+      { k: 'Deuda previsional', v: 'NO REGISTRA', c: 0.96 },
+      { k: 'Multas laborales', v: 'NO REGISTRA', c: 0.96 }
+    ],
+    porque: 'PDF nativo, texto seleccionable, folio verificable. Todos los campos sobre 0,90: se aprueba solo y se anota quién lo aprobó (el sistema) y con qué confianza.',
+    acciones: [
+      { txt: 'Aprobar y levantar bloqueo', kind: 'primary', do: 'unblock' },
+      { txt: 'Revisar a mano', kind: 'ghost', do: 'manual' }
+    ]
+  },
+  {
+    id: 'd3', origen: 'App · Aseo Industrial Coirón Ltda.',
+    archivo: 'registro_epp_riquelme.jpg', peso: '740 KB · foto de formulario en papel',
+    titulo: 'Registro de entrega de EPP (art. 53 D.S. 594) — Riquelme Soto',
+    duda: true,
+    campos: [
+      { k: 'Trabajadora', v: 'Katherine Riquelme Soto', c: 0.95 },
+      { k: 'RUT', v: '19.442.870-2', c: 0.94 },
+      { k: 'Elementos', v: 'Casco, lentes, guantes, calzado, protector auditivo', c: 0.92 },
+      { k: 'Fecha de entrega', v: '09-07-2026', c: 0.93 },
+      { k: 'Firma del trabajador', v: 'CASILLA VACÍA', c: 0.88, duda: true }
+    ],
+    porque: 'El documento se lee bien, pero la casilla de firma está en blanco. Sin firma, este registro no sirve como respaldo ante la Dirección del Trabajo: la entrega no queda acreditada. No es un problema de lectura, es un problema del documento — y por eso no lo apruebo.',
+    acciones: [
+      { txt: 'Rechazar y pedir firmado', kind: 'alarm', do: 'reject_epp' },
+      { txt: 'Aceptar igual (queda anotado)', kind: 'ghost', do: 'accept_epp' }
+    ]
+  }
+];
+
+function svgScan(borroso) {
+  /* Recorte del documento, dibujado a mano en SVG. Cuando la foto es mala,
+     el desenfoque es literal: es lo que el modelo ve. */
+  return '<svg viewBox="0 0 300 92" class="chart" role="img" aria-label="Recorte del documento escaneado">' +
+    '<defs><filter id="bl' + (borroso ? '1' : '0') + '"><feGaussianBlur stdDeviation="' + (borroso ? '1.4' : '0') + '"/></filter></defs>' +
+    '<rect width="300" height="92" fill="#0d1417"/>' +
+    '<g filter="url(#bl' + (borroso ? '1' : '0') + ')" font-family="IBM Plex Mono" fill="#cfe0e4">' +
+      '<text x="12" y="24" font-size="9" fill="#7d949b">VIGENCIA DEL PRESENTE CERTIFICADO</text>' +
+      '<text x="12" y="52" font-size="22" letter-spacing="2">11-07-202' + (borroso ? '' : '7') + '</text>' +
+      (borroso ? '<text x="128" y="52" font-size="22" letter-spacing="2" opacity=".35">7</text>' : '') +
+      '<text x="12" y="76" font-size="8" fill="#7d949b">CENTRO MEDICO OCUPACIONAL CALAMA</text>' +
+    '</g>' +
+    (borroso
+      ? '<g><circle cx="140" cy="46" r="30" fill="none" stroke="#FF5A2C" stroke-width="1.5" opacity=".9"/>' +
+        '<ellipse cx="150" cy="50" rx="46" ry="26" fill="#22C3AC" opacity=".10"/>' +
+        '<ellipse cx="150" cy="50" rx="46" ry="26" fill="none" stroke="#22C3AC" stroke-width="1" opacity=".25"/>' +
+        '<text x="176" y="20" font-family="IBM Plex Mono" font-size="8" fill="#FF5A2C">SELLO SOBRE EL DÍGITO</text></g>'
+      : '<rect x="1" y="1" width="298" height="90" fill="none" stroke="#0FA894" stroke-width="1" opacity=".4"/>') +
+  '</svg>';
+}
+
+function pintarDocs() {
+  var wrap = $('#docs');
+  wrap.innerHTML = '';
+  if (!BANDEJA.length) {
+    $('#docs-empty').hidden = false;
+    $('#docbadge').style.display = 'none';
+    return;
+  }
+  $('#docbadge').textContent = BANDEJA.length;
+
+  BANDEJA.forEach(function (d) {
+    var el = document.createElement('article');
+    el.className = 'doc';
+    el.innerHTML =
+      '<div class="doc__hd">' +
+        '<div class="thumb">' + svgScan(d.duda && d.id === 'd1') + '</div>' +
+        '<div style="min-width:0">' +
+          '<div style="font-weight:600;font-size:.9rem;line-height:1.25">' + esc(d.titulo) + '</div>' +
+          '<div class="mono small muted" style="margin-top:2px">' + esc(d.archivo) + '</div>' +
+          '<div class="mono small muted">' + esc(d.peso) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="doc__bd stack-s">' +
+        '<div class="row row--between">' +
+          '<span class="tag">' + esc(d.origen) + '</span>' +
+          (d.duda ? '<span class="chip chip--warn">Requiere confirmación</span>' : '<span class="chip chip--ok">Confianza alta</span>') +
+        '</div>' +
+        '<ul class="fields">' + d.campos.map(function (f) {
+          return '<li' + (f.duda ? ' data-duda="1"' : '') + '>' +
+            '<span><span class="k">' + esc(f.k) + '</span><br><span class="v">' + esc(f.v) + '</span></span>' +
+            '<span class="conf"><span class="conf__bar"><i class="conf__fill" style="width:' + Math.round(f.c * 100) + '%"></i></span>' +
+            '<span class="conf__n">' + f.c.toFixed(2) + '</span></span></li>';
+        }).join('') + '</ul>' +
+        (d.id === 'd1' ? '<div class="crop"><span class="tag tag--alarm">Lo que el modelo ve</span>' + svgScan(true) + '</div>' : '') +
+        '<div class="' + (d.duda ? 'hazard' : 'card') + '">' +
+          '<span class="tag ' + (d.duda ? 'tag--alarm' : 'tag--teal') + '">' + (d.duda ? 'Por qué no lo apruebo solo' : 'Por qué lo apruebo solo') + '</span>' +
+          '<p class="small" style="margin-top:6px;color:var(--ink)">' + esc(d.porque) + '</p>' +
+        '</div>' +
+        '<div class="row" data-acts="' + d.id + '"></div>' +
+      '</div>';
+    wrap.appendChild(el);
+
+    var row = $('[data-acts="' + d.id + '"]', el);
+    d.acciones.forEach(function (a) {
+      var b = document.createElement('button');
+      b.className = 'btn btn--' + a.kind;
+      b.type = 'button';
+      b.textContent = a.txt;
+      b.addEventListener('click', function () { accionDoc(d, a.do); });
+      row.appendChild(b);
+    });
+  });
+}
+
+function cerrarDoc(id) {
+  BANDEJA = BANDEJA.filter(function (d) { return d.id !== id; });
+  pintarDocs();
+  pintarCartera();
+  pintarAvisos();
+}
+
+function accionDoc(d, act) {
+  if (act === 'fix_w2_2027') {
+    byId.w2.docs.alt_geo = '2027-07-11';
+    scanned.w2 = null;
+    cerrarDoc(d.id); pintarFila();
+    toast('Vigencia confirmada por Camila Ortiz (prevención, Sondajes Quilcán). Quilodrán queda habilitado — vuelve a Portería y escanéalo.');
+  } else if (act === 'fix_w2_2026') {
+    byId.w2.docs.alt_geo = '2026-07-11';
+    scanned.w2 = null;
+    cerrarDoc(d.id); pintarFila();
+    toast('Registrado como vencido. Quilodrán sigue sin poder entrar y se le agendó examen para mañana 07:30.', 'alarm');
+  } else if (act === 'refoto') {
+    toast('WhatsApp enviado: «Necesito otra foto del certificado, sin sombra sobre el sello. La fecha de vigencia no se lee».', 'alarm');
+    cerrarDoc(d.id);
+  } else if (act === 'unblock') {
+    EMP.aguilar.bloq = null;
+    EMP.aguilar.f30 = '2026-07-31';
+    EMP.aguilar.previred = 'al día';
+    scanned.w4 = null;
+    cerrarDoc(d.id); pintarFila();
+    $('#alertchip').className = 'chip chip--ok';
+    $('#alertchip').textContent = '0 empresas bloqueadas';
+    $('#alertchip').style.marginLeft = 'auto';
+    toast('Bloqueo levantado: Transportes Aguilar sin deuda previsional. 14 trabajadores vuelven a estar habilitados.');
+  } else if (act === 'manual') {
+    toast('Enviado a revisión humana. Queda en la cola de Ana Belén Fuentes (contract manager).');
+    cerrarDoc(d.id);
+  } else if (act === 'reject_epp') {
+    toast('Rechazado. Se pidió el registro con la firma del trabajador. Riquelme Soto sigue sin poder entrar.', 'alarm');
+    cerrarDoc(d.id);
+  } else if (act === 'accept_epp') {
+    byId.w7.docs.epp = '2027-07-09';
+    cerrarDoc(d.id);
+    toast('Aceptado con observación. Queda anotado en el expediente: «EPP sin firma del trabajador, aceptado por Ana Belén Fuentes el 13-07-2026». Ante la DT, esa anotación te salva o te hunde.', 'alarm');
+  }
+}
+
+/* =================================================================== CARTERA */
+function estadoEmpresa(k) {
+  var e = EMP[k];
+  if (e.bloq) return { s: 'stop', t: 'Bloqueada' };
+  var vencidos = TRAB.filter(function (w) { return w.emp === k; }).reduce(function (a, w) { return a + contarVencidos(w); }, 0);
+  if (vencidos > 0) return { s: 'warn', t: 'Con observación' };
+  return { s: 'ok', t: 'Habilitada' };
+}
+function contarVencidos(w) {
+  var n = 0;
+  requisitos(w).forEach(function (k) {
+    var v = w.docs[k];
+    if (v === null || v === undefined) { n++; return; }
+    if (v !== 'indefinido' && dias(v) < 0) n++;
+  });
+  return n;
+}
+/* Los trabajadores del demo son una muestra: cada empresa tiene más gente que la que
+   modelamos uno por uno. VENC_EXTRA son los vencidos del resto de la dotación. */
+var VENC_EXTRA = { ceibo: 1, quilcan: 3, aguilar: 2, puelche: 0, vega: 4, coiron: 1, riosv: 6 };
+
+function pintarCartera() {
+  var tb = $('#carteraBody');
+  tb.innerHTML = '';
+  Object.keys(EMP).forEach(function (k) {
+    var e = EMP[k], st = estadoEmpresa(k);
+    var propios = TRAB.filter(function (w) { return w.emp === k; });
+    var vencidos = propios.reduce(function (a, w) { return a + contarVencidos(w); }, 0) + VENC_EXTRA[k];
+    var hab = e.bloq ? 0 : Math.max(0, e.dot - vencidos);
+    var pct = Math.round(hab / e.dot * 100);
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><button class="qitem" data-emp="' + k + '" style="border:0;background:none;min-height:44px;padding:0;text-align:left;display:block">' +
+        '<span style="font-weight:600;font-size:.86rem">' + esc(e.nom) + '</span></button></td>' +
+      '<td class="n small">' + esc(e.rut) + '</td>' +
+      '<td class="n">' + e.dot + '</td>' +
+      '<td><div class="row" style="gap:6px"><span class="bar"><i class="' + (pct < 90 ? 'low' : '') + '" style="width:' + pct + '%"></i></span>' +
+        '<span class="n small">' + hab + '</span></div></td>' +
+      '<td class="n" style="color:' + (vencidos ? 'var(--alarm)' : 'var(--ink-3)') + '">' + vencidos + '</td>' +
+      '<td class="n small">' + (e.previred === 'deuda' ? '<span style="color:var(--alarm)">DEUDA</span>' : fmt(e.f30)) + '</td>' +
+      '<td><span class="chip chip--' + st.s + '">' + st.t + '</span></td>';
+    tb.appendChild(tr);
+  });
+  $$('#carteraBody [data-emp]').forEach(function (b) {
+    b.addEventListener('click', function () { detalleEmpresa(b.getAttribute('data-emp')); });
+  });
+  $('#dotTotal').textContent = Object.keys(EMP).reduce(function (a, k) { return a + EMP[k].dot; }, 0);
+}
+
+function detalleEmpresa(k) {
+  var e = EMP[k];
+  var propios = TRAB.filter(function (w) { return w.emp === k; });
+  var html = '<div class="detail"><div class="row row--between" style="margin-bottom:var(--sp-s)">' +
+    '<div><span class="tag tag--teal">Detalle</span><h3 style="margin-top:4px">' + esc(e.nom) + '</h3>' +
+    '<span class="mono small muted">' + esc(e.rut) + ' · dotación ' + e.dot + ' · póliza al ' + fmt(e.poliza) + '</span></div>' +
+    '<button class="btn btn--ghost" id="closeDet" style="min-height:38px">Cerrar</button></div>';
+
+  if (e.bloq) {
+    html += '<div class="hazard" style="margin-bottom:var(--sp-s)"><span class="tag tag--alarm">Empresa bloqueada</span>' +
+      '<p class="small" style="margin-top:6px;color:var(--ink)">' + esc(e.bloq.motivo) + '</p>' +
+      '<p class="small" style="margin-top:6px;color:var(--ink-2)">' + esc(e.bloq.ruta) + '</p></div>';
+  }
+
+  html += '<p class="small muted" style="margin-bottom:8px">Trabajadores modelados en el demo (' + propios.length + ' de ' + e.dot + '):</p>';
+  html += propios.map(function (w) {
+    var ev = evaluar(w);
+    return '<div class="card" style="margin-bottom:8px">' +
+      '<div class="row row--between"><div><strong>' + esc(w.nom) + '</strong><br>' +
+      '<span class="mono small muted">' + esc(w.rut) + ' · ' + esc(w.cargo) + '</span></div>' +
+      '<span class="chip chip--' + (ev.veredicto === 'PASA' ? 'ok' : ev.veredicto === 'NO PASA' ? 'stop' : 'warn') + '">' + ev.veredicto + '</span></div>' +
+      '<ul class="checks">' + ev.checks.map(function (c) {
+        return '<li data-s="' + c.s + '"><span class="dot"></span><span>' + esc(c.l) + '</span><span class="venc">' + esc(c.v) + '</span></li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+
+  html += '</div>';
+  $('#carteraDetail').innerHTML = html;
+  $('#closeDet').addEventListener('click', function () { $('#carteraDetail').innerHTML = ''; });
+  $('#carteraDetail').scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'nearest' });
+}
+
+/* ============================================================== VENCIMIENTOS
+   Gráfico SVG a mano. Una sola serie (documentos por vencer) => sin leyenda:
+   el título dice qué es. El primer tramo es estado, no serie: usa el color de
+   alarma porque significa "ya vencido", y va etiquetado. Twin en tabla. */
+var TRAMOS = [
+  { l: 'Vencidos',  n: 12, p: 12, alarma: true },
+  { l: '0–15 d',    n: 8,  p: 8 },
+  { l: '16–30 d',   n: 14, p: 13 },
+  { l: '31–45 d',   n: 21, p: 19 },
+  { l: '46–60 d',   n: 17, p: 16 },
+  { l: '61–75 d',   n: 26, p: 24 },
+  { l: '76–90 d',   n: 11, p: 11 }
+];
+
+function dibujarChart() {
+  var W = 640, H = 260, ML = 34, MR = 12, MT = 16, MB = 42;
+  var pw = W - ML - MR, ph = H - MT - MB;
+  var max = 30;                                   // eje a número redondo
+  var band = pw / TRAMOS.length;
+  var bw = Math.min(24, band - 14);               // marca fina: nunca llena la banda
+  var s = '';
+
+  [0, 10, 20, 30].forEach(function (t) {
+    var y = MT + ph - (t / max) * ph;
+    s += '<line class="grid-line" x1="' + ML + '" y1="' + y + '" x2="' + (W - MR) + '" y2="' + y + '"/>' +
+         '<text x="' + (ML - 8) + '" y="' + (y + 3) + '" text-anchor="end">' + t + '</text>';
+  });
+
+  TRAMOS.forEach(function (t, i) {
+    var x = ML + i * band + (band - bw) / 2;
+    var h = (t.n / max) * ph;
+    var y = MT + ph - h;
+    var col = t.alarma ? '#FF5A2C' : '#0FA894';
+    /* extremo del dato redondeado 4px, cuadrado en la línea base */
+    s += '<path d="M' + x + ' ' + (y + h) + ' V' + (y + 4) + ' q0 -4 4 -4 h' + (bw - 8) + ' q4 0 4 4 V' + (y + h) + ' Z" fill="' + col + '" ' +
+         'data-l="' + t.l + '" data-n="' + t.n + '" data-p="' + t.p + '" tabindex="0" role="graphics-symbol" aria-label="' + t.l + ': ' + t.n + ' documentos"/>';
+    s += '<text x="' + (x + bw / 2) + '" y="' + (y - 6) + '" text-anchor="middle" fill="' + (t.alarma ? '#FF5A2C' : '#A6BAC1') + '">' + t.n + '</text>';
+    s += '<text x="' + (x + bw / 2) + '" y="' + (MT + ph + 16) + '" text-anchor="middle">' + t.l + '</text>';
+  });
+
+  s += '<line class="axis" x1="' + ML + '" y1="' + (MT + ph) + '" x2="' + (W - MR) + '" y2="' + (MT + ph) + '"/>';
+  s += '<text x="' + ML + '" y="' + (H - 8) + '" fill="#718A93">documentos · tramos de 15 días desde el 13-07-2026</text>';
+  $('#chart').innerHTML = s;
+
+  var tip = $('#tip');
+  $$('#chart path').forEach(function (p) {
+    function show(ev) {
+      tip.innerHTML = p.getAttribute('data-l') + ' · ' + p.getAttribute('data-n') + ' documentos · ' + p.getAttribute('data-p') + ' personas';
+      tip.style.opacity = '1';
+      var r = p.getBoundingClientRect();
+      tip.style.left = Math.min(window.innerWidth - 200, Math.max(8, r.left)) + 'px';
+      tip.style.top = (r.top - 34) + 'px';
+    }
+    function hide() { tip.style.opacity = '0'; }
+    p.addEventListener('mouseenter', show);
+    p.addEventListener('mousemove', show);
+    p.addEventListener('mouseleave', hide);
+    p.addEventListener('focus', show);
+    p.addEventListener('blur', hide);
+  });
+
+  $('#tblBody').innerHTML = TRAMOS.map(function (t) {
+    return '<tr><td>' + t.l + '</td><td class="n">' + t.n + '</td><td class="n">' + t.p + '</td></tr>';
+  }).join('');
+}
+
+$('#tblToggle').addEventListener('click', function () {
+  var tbl = $('#tblWrap').hidden;
+  $('#tblWrap').hidden = !tbl;
+  $('#chartWrap').hidden = tbl;
+  this.textContent = tbl ? 'Ver gráfico' : 'Ver tabla';
+});
+
+var AVISOS = [
+  { w: 'Nelson Painemal Loyola', e: 'Eléctrica Puelche', d: 'Inducción Hombre Nuevo', n: 6 },
+  { w: 'Cristián Bustos Ojeda', e: 'Montajes Ríos y Vergara', d: 'Licencia interna de conducción', n: -15 },
+  { w: 'Jonathan Quilodrán Vera', e: 'Sondajes Quilcán', d: 'Examen de altura geográfica', n: -3 },
+  { w: 'Katherine Riquelme Soto', e: 'Aseo Industrial Coirón', d: 'Registro de entrega de EPP', n: null },
+  { w: 'Marisol Antileo Cárdenas', e: 'Casino Vega Norte', d: 'Registro de entrega de EPP', n: 101 },
+  { w: 'Hugo Valdés Zúñiga', e: 'Transportes Aguilar', d: 'ODI (art. 21 D.S. 40)', n: 95 }
+];
+function pintarAvisos() {
+  var ul = $('#avisos');
+  ul.innerHTML = '';
+  AVISOS.forEach(function (a, i) {
+    var venc = a.n === null ? 'NO CARGADO' : (a.n < 0 ? 'vencido hace ' + Math.abs(a.n) + ' d' : 'vence en ' + a.n + ' d');
+    var urgente = a.n === null || a.n <= 10;
+    var li = document.createElement('li');
+    li.innerHTML =
+      '<span style="min-width:0;flex:1">' +
+        '<span style="font-size:.86rem;font-weight:600">' + esc(a.w) + '</span><br>' +
+        '<span class="mono small muted">' + esc(a.d) + ' · ' + esc(a.e) + '</span></span>' +
+      '<span class="chip ' + (urgente ? 'chip--warn' : 'chip--off') + '">' + venc + '</span>';
+    var b = document.createElement('button');
+    b.className = 'btn btn--ghost';
+    b.style.minHeight = '38px';
+    b.style.fontSize = '.7rem';
+    b.textContent = 'Avisar';
+    b.addEventListener('click', function () {
+      b.disabled = true; b.textContent = 'Avisado';
+      toast('WhatsApp a prevención de ' + a.e + ': «' + a.w + ' — ' + a.d + ' ' + venc + '. Ruta de arreglo adjunta».');
+    });
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+}
+
+/* ================================================================ EXPEDIENTE */
+Object.keys(EMP).forEach(function (k) {
+  var o = document.createElement('option');
+  o.value = k; o.textContent = EMP[k].nom;
+  $('#expEmp').appendChild(o);
+});
+$('#expEmp').value = 'aguilar';
+
+$('#expGo').addEventListener('click', function () {
+  var k = $('#expEmp').value, per = $('#expPer').value, e = EMP[k];
+  var pasos = [
+    'Reuniendo contratos y anexos de faena… ' + e.dot + ' contratos, ' + e.dot + ' anexos',
+    'Certificados F30 y F30-1 del periodo… 3 de 3',
+    'Comprobantes Previred… 3 de 3 (may, jun, jul 2026)',
+    'Exámenes ocupacionales vigentes… ' + (e.dot * 2 - 3) + ' de ' + (e.dot * 2),
+    'Registros de entrega de EPP (art. 53 D.S. 594)… ' + (e.dot - 1) + ' de ' + e.dot,
+    'Actas ODI (art. 21 D.S. 40)… ' + e.dot + ' de ' + e.dot,
+    'Traza de accesos a portería… 1.284 lecturas del periodo',
+    'Sellando con hash SHA-256 y marca de tiempo…'
+  ];
+  var log = $('#expLog');
+  log.innerHTML = '';
+  $('#expOut').innerHTML = '';
+  this.disabled = true;
+  var i = 0;
+  var iv = setInterval(function () {
+    if (i >= pasos.length) {
+      clearInterval(iv);
+      $('#expGo').disabled = false;
+      resultadoExp(k, per, e);
+      return;
+    }
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="muted">' + String(i + 1).padStart(2, '0') + '</span><span>' + esc(pasos[i]) + '</span>';
+    log.appendChild(li);
+    i++;
+  }, REDUCE ? 1 : 320);
+});
+
+function resultadoExp(k, per, e) {
+  var faltan = [
+    { t: 'Anexo de faena de 1 trabajador (ingreso 08-07-2026, aún en plazo legal de 15 días)', grave: false },
+    { t: '3 exámenes de altura geográfica vencidos y no renovados', grave: true },
+    { t: '1 registro de entrega de EPP sin firma del trabajador', grave: true }
+  ];
+  $('#expOut').innerHTML =
+    '<div class="cred">' +
+      '<div class="cred__punch"></div>' +
+      '<span class="tag tag--teal">Expediente sellado</span>' +
+      '<h3 style="margin-block:6px">' + esc(e.nom) + '</h3>' +
+      '<p class="mono small muted">' + esc(e.rut) + ' · ' + esc(per) + ' · Faena Cerro Ígneo</p>' +
+      '<div class="grid grid--2" style="margin-top:var(--sp-s)">' +
+        '<div class="card"><span class="tag">Documentos incluidos</span><div class="num" style="font-size:var(--step-2);font-weight:700">' + (e.dot * 5 + 6) + '</div></div>' +
+        '<div class="card"><span class="tag">Accesos trazados</span><div class="num" style="font-size:var(--step-2);font-weight:700">1.284</div></div>' +
+      '</div>' +
+      '<div class="hazard" style="margin-top:var(--sp-s)">' +
+        '<span class="tag tag--alarm">Lo que falta — marcado, no rellenado</span>' +
+        '<ul class="rows small" style="margin-top:4px">' + faltan.map(function (f) {
+          return '<li><span class="chip ' + (f.grave ? 'chip--stop' : 'chip--warn') + '">' + (f.grave ? 'Grave' : 'En plazo') + '</span><span>' + esc(f.t) + '</span></li>';
+        }).join('') + '</ul>' +
+      '</div>' +
+      '<div class="row" style="margin-top:var(--sp-s)">' +
+        '<button class="btn btn--primary" id="expDl">Descargar PDF + índice</button>' +
+        '<button class="btn btn--ghost" id="expLink">Link para la fiscalizadora</button>' +
+      '</div>' +
+      '<div class="mrz">SHA256 4f8c1b9e77a2d0c5e13b8a6f92d4e0176c3ab5f8e29d41c07b6a5d3f8e1c2b90 · 13-07-2026 06:19</div>' +
+    '</div>';
+  $('#expDl').addEventListener('click', function () {
+    toast('En el demo no se genera el PDF. En producción son ' + (e.dot * 5 + 6) + ' archivos con índice y hash por documento.', 'alarm');
+  });
+  $('#expLink').addEventListener('click', function () {
+    toast('Link de sólo lectura creado, válido 72 h, con registro de quién lo abre.');
+  });
+}
+
+/* ===================================================================== TABS */
+var TABS = ['porteria', 'docs', 'cartera', 'venc', 'exp'];
+function irA(name) {
+  TABS.forEach(function (t) {
+    var on = t === name;
+    $('#t-' + t).setAttribute('aria-selected', String(on));
+    $('#p-' + t).hidden = !on;
+  });
+  window.scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' });
+}
+TABS.forEach(function (t) { $('#t-' + t).addEventListener('click', function () { irA(t); }); });
+document.addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-goto]');
+  if (b) irA(b.getAttribute('data-goto'));
+});
+
+/* ---------------------------------------------------------------- nav móvil */
+var toggle = $('#navtoggle'), nav = $('#nav');
+toggle.addEventListener('click', function () {
+  var open = nav.classList.toggle('nav--open');
+  toggle.setAttribute('aria-expanded', String(open));
+});
+
+/* ---------------------------------------------------------------- arranque */
+pintarFila();
+pintarDocs();
+pintarCartera();
+pintarAvisos();
+dibujarChart();
+
+$('#faena').addEventListener('change', function () {
+  toast(this.value === 'zafiro'
+    ? 'Faena Loma Zafiro (3.780 m): otras 4 contratistas, mismos requisitos. En el demo sólo está cargada Cerro Ígneo.'
+    : 'Faena Cerro Ígneo (4.120 m).');
+  this.value = 'igneo';
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Freatia — a quién le vendemos, a qué precio y por qué</title>
+<meta name="description" content="ICP, TAM/SAM/SOM con la aritmética a la vista, competencia con nombre y apellido, economía unitaria en CLP, canales de adquisición en Chile y el riesgo que mata el negocio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .mercado { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .mercado > div { background: var(--ink-800); padding: var(--sp-s); }
+  .mercado .cifra { font-size: var(--step-2); }
+  .barra-tam { height: 10px; background: var(--ink-700); margin-top: var(--sp-2xs); }
+  .barra-tam span { display: block; height: 100%; background: var(--agua); }
+  .comp td:first-child { font-weight: 600; color: var(--txt); }
+  .canal { display: grid; grid-template-columns: 34px 1fr; gap: var(--sp-s); padding: var(--sp-s) 0; border-top: 1px solid var(--linea); }
+  .canal-n { font-family: var(--mono); color: var(--agua); }
+  .canal h4 { margin-bottom: 4px; }
+  .canal p { font-size: var(--step--1); }
+  .dias { display: grid; gap: var(--sp-xs); }
+  .dias > div { display: grid; grid-template-columns: 110px 1fr; gap: var(--sp-s); padding-bottom: var(--sp-xs); border-bottom: 1px solid var(--ink-750); }
+  .dias .rotulo { color: var(--agua); }
+  .dias p { font-size: var(--step--1); }
+  @media (min-width: 48em) { .mercado { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" stroke-width="1.5" aria-hidden="true">
+        <path d="M1 23c4.5-6 9 2 14.5-3S25 21 31 17" stroke="#7A5C33"/>
+        <path d="M1 28c5-5 9.5 2 15-3s8.5 1 15-3" stroke="#7A5C33"/>
+        <path d="M16 2s7 8.6 7 12.6a7 7 0 1 1-14 0C9 10.6 16 2 16 2Z" stroke="#3F9BD6"/>
+      </svg>
+      <span class="marca-txt">Freatia</span>
+    </a>
+    <nav>
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btn-menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+  </div>
+  <div id="menu" class="container">
+    <ul role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+
+<section class="sec">
+  <span class="rotulo rotulo-agua">Negocio</span>
+  <h1 style="margin-top:var(--sp-2xs);max-width:24ch">Un mercado chico, con contratos grandes y un comprador con miedo.</h1>
+  <p class="prose" style="margin-top:var(--sp-s)">
+    Toda cifra de esta página está citada o es una estimación con su aritmética a la vista y sus supuestos
+    declarados. El tipo de cambio supuesto es <span class="num">US$1 = $950</span>. Cuando un dato no nos consta,
+    lo decimos: preferimos un documento con huecos a uno con relleno.
+  </p>
+</section>
+
+<!-- ICP -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Cliente objetivo</span>
+    <h2>La minera mediana del norte que tiene un tranque y no tiene un equipo de datos.</h2>
+  </div>
+  <div class="rej rej-2">
+    <div class="placa">
+      <h3>Quién es</h3>
+      <div class="dl" style="margin-top:var(--sp-s)">
+        <div><dt>Segmento</dt><dd>Minería del cobre (y litio, oro, hierro) de tamaño mediano: 5.000 a 50.000 t/d. Filiales de grandes compañías con autonomía de compra. Excluimos —por ahora— a las cinco o seis megafaenas: compran por licitación corporativa global y ese ciclo dura años.</dd></div>
+        <div><dt>Dónde está</dt><dd>Antofagasta, Atacama, Tarapacá, Coquimbo. Sierra Gorda, Diego de Almagro, María Elena, Tierra Amarilla, Salamanca. Es un mapa de 200 puntos y se puede recorrer.</dd></div>
+        <div><dt>Quién firma</dt><dd>El <strong>Gerente de Medio Ambiente y Sustentabilidad</strong> o el <strong>Gerente de Operaciones</strong>. La orden de compra sobre $50 millones anuales suele pasar por comité, y ahí hay que llevar un caso de otra faena parecida.</dd></div>
+        <div><dt>Quién lo usa todos los días</dt><dd>El <strong>ingeniero de procesos o de recursos hídricos</strong> que hoy arma el balance en Excel, y el <strong>Jefe de Geotecnia</strong> que revisa los piezómetros. Son dos personas y hay que enamorar a las dos, porque son las que dicen “esto sirve” o “esto es otro dashboard”.</dd></div>
+        <div><dt>Quién lo sabotea</dt><dd>El área de TI de la minera, que ve un proveedor nuevo tocando la red OT. Se resuelve con arquitectura (el gateway es de sólo lectura y sale por la red corporativa, nunca al revés) y con paciencia.</dd></div>
+        <div><dt>Qué ya paga</dt><dd>Un estudio de balance hídrico a una consultora (US$40.000–80.000 al año, estimación de orden de magnitud), instrumentación geotécnica y su mantención, y horas-persona de un ingeniero que se van en armar planillas. <strong>El presupuesto existe: no hay que crearlo, hay que redirigirlo.</strong></dd></div>
+      </div>
+    </div>
+    <div class="placa placa-alta">
+      <h3>El verdadero comprador y el verdadero miedo</h3>
+      <p style="margin-top:var(--sp-xs)">
+        La multa de la SMA es real y la caducidad de derechos de agua también. Pero no son lo que quita el sueño.
+      </p>
+      <p style="margin-top:var(--sp-xs)">
+        Lo que quita el sueño es <strong>la licencia social</strong>: que una comunidad bloquee el camino, que un
+        recurso de protección pare la faena, que el conflicto por el agua termine en una portada. Y eso
+        <strong>no se compra con software</strong>. Ninguna cantidad de dashboards arregla una relación rota con un
+        vecino. Si te vendemos lo contrario, te estamos mintiendo.
+      </p>
+      <p style="margin-top:var(--sp-xs)">
+        Lo que sí podemos ofrecer es más modesto y es verdad: que el número que publicas sea el mismo que le
+        entregas al regulador; que se pueda revisar hasta el sensor; que no cambie cuando incomoda; y que lo
+        publiques todos los meses sin que te lo pidan. Eso no genera confianza. A lo más, deja de destruirla — y
+        te deja parado en un lugar desde donde la conversación difícil se puede tener.
+      </p>
+      <div class="accion">
+        <strong>Nuestro pitch de una línea:</strong> el balance hídrico de tu faena, auditable hasta el sensor, y el
+        tranque vigilado con el mismo dato — para que cuando te pregunten cómo lo sabes, tengas una respuesta.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MERCADO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Tamaño de mercado</span>
+    <h2>TAM de US$8 millones en Chile. Sí, es chico. Está a la vista.</h2>
+    <p>Preferimos un TAM pequeño y derivado a uno grande e inventado. Si esta cifra te desanima, mejor ahora que
+      en el mes 20.</p>
+  </div>
+
+  <div class="placa">
+    <h3>Supuestos (todos discutibles, todos declarados)</h3>
+    <ul class="lista" style="margin-top:var(--sp-s)">
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 12h12M2 9l3.5-4L9 8l5-6"/></svg><span><strong>~100 faenas con depósito de relaves activo en Chile.</strong> SERNAGEOMIN mantiene un catastro público de depósitos de relaves; la mayoría de los cientos catastrados están inactivos o abandonados. La cifra de <em>activos</em> es del orden de 100. <strong>Estimación — verificar contra la edición vigente del catastro antes de usarla en una presentación a inversionistas.</strong></span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 12h12M2 9l3.5-4L9 8l5-6"/></svg><span><strong>+40 operaciones sin relaves pero con obligación de monitoreo de extracciones y RCA vigente</strong>: litio del Salar de Atacama, hierro, plantas de procesamiento, sales. Estimación propia.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 12h12M2 9l3.5-4L9 8l5-6"/></svg><span><strong>Universo = 140 operaciones.</strong> A eso le sumamos ~60 plantas y faenas menores contactables, que es de donde sale el "universo de 200" del embudo del <a href="roadmap.html">roadmap</a>.</span></li>
+    </ul>
+  </div>
+
+  <div class="mercado" style="margin-top:var(--sp-s)">
+    <div>
+      <span class="rotulo">TAM Chile</span>
+      <div class="cifra num" style="color:var(--agua)">US$8,0M<span class="cifra-u">/año</span></div>
+      <div class="barra-tam"><span style="width:100%"></span></div>
+      <p class="pista" style="margin-top:var(--sp-2xs)">$7.608 millones de CLP al año, si <em>todas</em> las
+        operaciones del universo compraran el plan que les corresponde. No va a pasar. Es el techo.</p>
+    </div>
+    <div>
+      <span class="rotulo">SAM (3 años)</span>
+      <div class="cifra num" style="color:var(--agua)">US$3,7M<span class="cifra-u">/año</span></div>
+      <div class="barra-tam"><span style="width:46%"></span></div>
+      <p class="pista" style="margin-top:var(--sp-2xs)">70 operaciones alcanzables: las 45 medianas y 25 pequeñas
+        con tranque. Fuera quedan las 20 grandes (licitación corporativa, ciclo de años) y 50 pequeñas que no
+        pagan software.</p>
+    </div>
+    <div>
+      <span class="rotulo">SOM (36 meses)</span>
+      <div class="cifra num" style="color:var(--ok)">US$774k<span class="cifra-u">ARR</span></div>
+      <div class="barra-tam"><span style="width:10%;background:#3FC08A"></span></div>
+      <p class="pista" style="margin-top:var(--sp-2xs)">14 faenas: el 20% del SAM en número de cuentas.
+        $735 millones de CLP al año. Es el escenario base del roadmap, un poco estirado.</p>
+    </div>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>La aritmética del TAM</h3><span class="rotulo">a la vista</span></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Segmento</th><th class="n">Operaciones</th><th>Plan</th><th class="n">$/mes</th><th class="n">$/año por cuenta</th><th class="n">Subtotal anual</th></tr></thead>
+        <tbody>
+          <tr><td>Grandes (&gt;50 kt/d)</td><td class="n">20</td><td>Corporativo</td><td class="n">$9.800.000</td><td class="n">$117.600.000</td><td class="n">$2.352.000.000</td></tr>
+          <tr><td>Medianas (5–50 kt/d)</td><td class="n">45</td><td>Tranque</td><td class="n">$4.900.000</td><td class="n">$58.800.000</td><td class="n">$2.646.000.000</td></tr>
+          <tr><td>Pequeñas y sin tranque</td><td class="n">75</td><td>Cuenca</td><td class="n">$2.900.000</td><td class="n">$34.800.000</td><td class="n">$2.610.000.000</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>TAM Chile</td><td class="n">140</td><td></td><td class="n"></td><td class="n"></td><td class="n">$7.608.000.000 · US$8,0M</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>La extensión global, y por qué esto igual no es un unicornio</h3></div>
+    <p style="font-size:var(--step--1)">
+      El <strong>Global Tailings Portal</strong> —la base de datos que las mineras empezaron a publicar después de
+      Brumadinho, empujadas por los inversionistas— tiene del orden de <strong>1.800 depósitos declarados</strong>
+      en el mundo. Es un piso, no un censo: sólo están los de las compañías que adhirieron.
+      <strong>Cifra aproximada — verificar la edición vigente.</strong>
+    </p>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      A un ticket medio de <span class="num">US$50.000/año</span> por depósito monitoreado, eso son
+      <span class="num">US$90 millones</span> de TAM global sólo por el lado de relaves, sin contar el balance
+      hídrico de faenas sin tranque. Perú (~50 operaciones), México, Brasil (donde el marco post-Brumadinho es
+      mucho más duro), Australia y Canadá son los mercados naturales, y en todos existe el
+      <strong>GISTM</strong> —el estándar global de gestión de relaves que las compañías del ICMM se
+      comprometieron a cumplir— empujando presupuesto en la misma dirección.
+    </p>
+    <div class="accion">
+      <strong>Y ahora la parte incómoda.</strong> Un TAM global de US$90–150M no sostiene un unicornio. Sostiene un
+      buen negocio: US$10–20M de ARR en siete años, márgenes de 70%+, churn bajísimo, y una venta a AVEVA,
+      Hexagon, Bentley o Trimble. Si tu tesis de inversión necesita un fondo entero de retorno por apuesta, esta
+      no es tu apuesta, y es mejor que lo sepas antes de la primera reunión que después de la última.
+    </div>
+  </div>
+</section>
+
+<!-- POSICIONAMIENTO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Posicionamiento y cuña</span>
+    <h2>La cuña es la discrepancia. Todo lo demás viene después.</h2>
+  </div>
+  <div class="rej rej-2">
+    <div class="placa">
+      <h3>La cabeza de playa</h3>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        <strong>Minera mediana de cobre, 5.000–50.000 t/d, con depósito de relaves activo, en Antofagasta o
+        Atacama.</strong> Son unas 45 operaciones y ese es el mercado que hay que ganar primero.
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        ¿Por qué ésas? Porque tienen la misma obligación regulatoria que una megafaena pero no tienen el equipo
+        para cumplirla: no tienen 15 ingenieros de datos ni un PI System con tres administradores. Tienen a una
+        persona con Excel. El dolor es idéntico y la capacidad de resolverlo internamente es mucho menor. Y porque
+        compran en tres meses, no en tres años.
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        Después de eso: las grandes (con el caso de las medianas en la mano) y Perú (mismo problema, otro
+        regulador: la ANA en vez de la DGA).
+      </p>
+    </div>
+    <div class="placa placa-alta">
+      <h3>La cuña operativa: el diagnóstico gratis</h3>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        “Mándanos tu balance hídrico del mes pasado. En una semana te decimos en cuánto no cuadra y de dónde
+        viene la incertidumbre. Si cuadra dentro del 3%, te lo decimos también y no te vendemos nada.”
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        No pide presupuesto, pide un archivo. No pide una decisión, pide curiosidad. Y produce, en una semana, un
+        número específico de <em>su</em> faena que ellos no tenían. Es lo único que hemos encontrado que convierte
+        una reunión fría en un proyecto.
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        <strong>Cuesta caro:</strong> ~20 horas de un ingeniero senior por diagnóstico, y en la mitad de los casos
+        el balance cuadra y perdemos el prospecto. Aceptamos ese costo porque es exactamente lo que hace creíble
+        el “sí” cuando decimos que hay un problema.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETENCIA -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Competencia</span>
+    <h2>El titular del puesto es Excel, y es muy bueno en su trabajo.</h2>
+  </div>
+  <div class="scroll-x">
+    <table class="comp">
+      <thead><tr><th>Quién</th><th>Qué hace</th><th>Por qué gana hoy</th><th>Dónde perdemos o ganamos</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Excel + la planilla del ingeniero</td>
+          <td>El balance hídrico de casi todas las faenas de Chile.</td>
+          <td>Gratis, flexible, y vive en la cabeza de alguien que lleva 12 años en la faena. Nadie lo cuestiona.</td>
+          <td><strong>Es el rival real.</strong> Pierde sólo cuando llega una fiscalización y hay que explicar de dónde salió un número. Nuestra venta entera es esa escena.</td>
+        </tr>
+        <tr>
+          <td>AVEVA PI System (ex-OSIsoft)</td>
+          <td>El historiador de planta. Guarda millones de señales.</td>
+          <td>Está instalado en casi toda la gran minería y en buena parte de la mediana. Es infraestructura.</td>
+          <td><strong>No es competidor: es nuestra fuente de datos.</strong> Nos conectamos y no tocamos nada. El riesgo es el argumento “ya pago PI, que me lo haga el equipo interno” — y a veces tendrán razón.</td>
+        </tr>
+        <tr>
+          <td>Vista Data Vision, Geokon, Worldsensing, RST Instruments, Trimble 4D</td>
+          <td>Software de monitoreo geotécnico, generalmente atado a la instrumentación que venden.</td>
+          <td>Fuertes en el tranque, con años de relación con el jefe de geotecnia.</td>
+          <td>Son buenos en piezometría y ciegos al balance hídrico. Nosotros somos el cruce. Coexistimos: podemos leer de sus sistemas.</td>
+        </tr>
+        <tr>
+          <td>Maptek Sentry, IDS GeoRadar (Hexagon)</td>
+          <td>Radar y monitoreo de deformación de taludes y muros.</td>
+          <td>Es el estándar para deformación. Caro y muy bueno.</td>
+          <td>Complementarios. Su dato entra a Freatia como una señal más.</td>
+        </tr>
+        <tr>
+          <td>Consultoras: Amphos 21, SRK, WSP, Arcadis, Poch, JRI</td>
+          <td>El estudio de balance hídrico y el modelo hidrogeológico. 200 páginas, una vez al año.</td>
+          <td>Tienen la credibilidad técnica y la firma profesional que el regulador reconoce.</td>
+          <td><strong>Competidor por presupuesto y canal a la vez.</strong> Les quitamos el estudio anual, pero les damos la capa viva que ellos no quieren mantener. La conversación es delicada y hay que tenerla.</td>
+        </tr>
+        <tr>
+          <td>Sphera, Cority, Enablon, Intelex</td>
+          <td>Software EHS corporativo: cumplimiento como formularios, tareas y auditorías.</td>
+          <td>Ya están comprados a nivel corporativo en las grandes.</td>
+          <td>No tocan el dato del sensor. Gestionan la tarea de reportar, no el número que se reporta. Podemos alimentarlos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>Nuestra diferenciación, dicha honestamente</h3></div>
+    <p style="font-size:var(--step--1)">
+      Nadie cruza el balance hídrico con la piezometría del tranque, porque viven en dos gerencias distintas.
+      Y nadie muestra la discrepancia: la esconden ajustando un coeficiente, porque eso es lo que la planilla
+      permite hacer. Eso es todo lo que tenemos.
+    </p>
+    <p style="font-size:var(--step--1);margin-top:var(--sp-xs)">
+      <strong>Es defendible por producto entre 18 y 24 meses. Después es copiable</strong> — no hay magia
+      algorítmica aquí, hay criterio de ingeniería y una decisión editorial (mostrar el número feo). Lo que no es
+      copiable en dos años es la relación con el ingeniero que arma el balance, y tres años de registros sellados
+      que un auditor ya aceptó. Esa es la única muralla que vamos a tener, y hay que construirla rápido.
+    </p>
+  </div>
+</section>
+
+<!-- PRECIO Y ECONOMÍA UNITARIA -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Precio y economía unitaria</span>
+    <h2>73% de margen bruto, descontando la IA que declaramos en Arquitectura.</h2>
+  </div>
+
+  <div class="rej rej-2">
+    <div class="placa">
+      <div class="placa-tit"><h3>Costo de servir una faena</h3><span class="rotulo">CLP/mes</span></div>
+      <div class="scroll-x">
+        <table>
+          <thead><tr><th>Componente</th><th class="n">USD/mes</th><th class="n">CLP/mes</th><th>De dónde sale</th></tr></thead>
+          <tbody>
+            <tr><td>Inferencia de IA (4 agentes)</td><td class="n">30</td><td class="n">$28.500</td><td><a href="stack.html">Arquitectura</a>: Haiku 4.5, Sonnet 5 y Opus 4.8, con la aritmética por agente.</td></tr>
+            <tr><td>Infraestructura por faena</td><td class="n">382</td><td class="n">$362.900</td><td>Serie de tiempo, backend, gateway, enlace, evidencia, observabilidad, mensajería.</td></tr>
+            <tr><td>Plataforma compartida (÷12 faenas)</td><td class="n">92</td><td class="n">$87.400</td><td>US$1.100/mes de entornos, CI y monitoreo central, repartidos.</td></tr>
+            <tr><td>Soporte y éxito del cliente</td><td class="n">579</td><td class="n">$550.000</td><td>1 ingeniero hídrico cada 8 faenas ($4.400.000/mes cargado).</td></tr>
+            <tr><td>Visita de calibración trimestral</td><td class="n">316</td><td class="n">$300.000</td><td>$900.000 cada 3 meses, incluida en el plan Tranque.</td></tr>
+          </tbody>
+          <tfoot><tr><td>COGS total por faena</td><td class="n">1.399</td><td class="n">$1.328.800</td><td></td></tr></tfoot>
+        </table>
+      </div>
+      <p class="pista">Precio del plan Tranque: $4.900.000. Margen bruto = (4.900.000 − 1.328.800) / 4.900.000 =
+        <strong>72,9%</strong>. La IA es el <span class="num">2,1%</span> del COGS: en este negocio el costo no es
+        el modelo, es la ingeniería de ingesta y el ingeniero que atiende al cliente.</p>
+    </div>
+
+    <div class="placa">
+      <div class="placa-tit"><h3>CAC, LTV y payback</h3></div>
+      <div class="deriv" style="margin-top:var(--sp-xs);display:grid;gap:2px">
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span>Equipo comercial en régimen (2 AE + 1 preventa, costo cargado)</span><span class="num">$275.000.000/año</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span>Marketing, ferias (Exponor) y diagnósticos gratuitos</span><span class="num">$40.000.000/año</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span>Cierres al año en régimen (del embudo del roadmap)</span><span class="num">9</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--linea-2)"><span><strong>CAC</strong> = $315.000.000 / 9</span><span class="num"><strong>$35.000.000</strong></span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span>Margen bruto anual por cliente (72,9% de $58.800.000)</span><span class="num">$42.900.000</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span>Contribución de la implementación ($18M al 40% de margen)</span><span class="num">$7.200.000</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span><strong>Payback</strong> = ($35.000.000 − $7.200.000) / $42.900.000 × 12</span><span class="num"><strong>7,8 meses</strong></span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0;border-bottom:1px solid var(--ink-750)"><span><strong>LTV</strong> (5 años, churn 8%/año) = $42.900.000 × 5</span><span class="num"><strong>$214.500.000</strong></span></div>
+        <div style="display:grid;grid-template-columns:1fr auto;padding:7px 0"><span><strong>LTV / CAC</strong></span><span class="num"><strong>6,1×</strong></span></div>
+      </div>
+      <p class="pista" style="margin-top:var(--sp-s)">
+        Usamos 5 años de vida en vez de los 12,5 que implica un churn de 8%, porque nadie sabe si esta empresa
+        existe en 12 años y un LTV calculado a 12 años es una forma elegante de mentirse.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CANALES -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Canales de adquisición</span>
+    <h2>Rankeados, y con los que descartamos explicados.</h2>
+  </div>
+
+  <div class="canal">
+    <div class="canal-n">01</div>
+    <div>
+      <h4>Outbound directo, uno por uno</h4>
+      <p>El universo son ~200 personas en Chile: superintendentes de recursos hídricos, jefes de geotecnia, gerentes
+        de medio ambiente. Se pueden listar en una planilla y recorrer en un año. LinkedIn y teléfono; en minería
+        el WhatsApp funciona <em>después</em> de la primera reunión, no antes. Costo: el sueldo del vendedor. CPL
+        real: no existe el concepto, existe la agenda.</p>
+    </div>
+  </div>
+  <div class="canal">
+    <div class="canal-n">02</div>
+    <div>
+      <h4>El diagnóstico gratuito (nuestra máquina de leads)</h4>
+      <p>Es el canal y es la cuña al mismo tiempo. Cada diagnóstico cuesta ~20 horas de ingeniero senior
+        (≈$800.000 de costo interno) y convierte a propuesta en un 31% de los casos (14 de 45, ver el embudo del
+        <a href="roadmap.html">roadmap</a>). Costo por oportunidad calificada: ≈$2.600.000. Caro, y es lo más
+        barato que tenemos.</p>
+    </div>
+  </div>
+  <div class="canal">
+    <div class="canal-n">03</div>
+    <div>
+      <h4>Consultoras e ingenierías como canal de distribución</h4>
+      <p>Amphos 21, JRI, Poch, Arcadis, WSP. Ellas hacen el estudio y firman con su credibilidad técnica; nosotros
+        somos la capa viva que lo mantiene entre estudio y estudio. Comisión de referencia: 10% del primer año.
+        Es el equivalente minero de vender a través del contador: llegar al cliente por quien ya tiene su confianza
+        técnica. <strong>Es el canal con más potencial y el más difícil de abrir</strong>, porque también les
+        estamos comiendo un pedazo del plato.</p>
+    </div>
+  </div>
+  <div class="canal">
+    <div class="canal-n">04</div>
+    <div>
+      <h4>Proveedores de instrumentación</h4>
+      <p>Los que venden e instalan los piezómetros, caudalímetros y estaciones. Tienen la relación técnica, entran
+        a la faena, y no tienen software que ofrecer. Referencia natural y sin conflicto: ellos venden fierro,
+        nosotros vendemos el sentido de ese fierro.</p>
+    </div>
+  </div>
+  <div class="canal">
+    <div class="canal-n">05</div>
+    <div>
+      <h4>Gremios, ferias y programas</h4>
+      <p>SONAMI, Consejo Minero, Aprimin, el Instituto de Ingenieros de Minas. <strong>Exponor</strong> (Antofagasta)
+        y los congresos de relaves e hidrogeología. Un stand en Exponor cuesta del orden de $18.000.000 con viajes
+        — <strong>no vale la pena hasta tener tres casos que mostrar</strong>; antes de eso es una carpa donde
+        nadie te cree. <strong>Expande</strong> (Fundación Chile) y los programas de proveedores de CORFO abren
+        pilotos financiados y dan credibilidad ante el comité de compras.</p>
+    </div>
+  </div>
+  <div class="canal">
+    <div class="canal-n">06</div>
+    <div>
+      <h4>SEO long-tail en español</h4>
+      <p>“balance hídrico minero”, “DS 248 depósitos de relaves”, “monitoreo de extracciones efectivas DGA”,
+        “revancha hidráulica mínima”. Volumen bajísimo —decenas de búsquedas al mes— e intención altísima: quien
+        busca eso está resolviendo el problema hoy. 20 visitas al mes que valen más que 20.000 de cualquier otra
+        cosa. Costo: escribir bien, y eso lo tiene que hacer un ingeniero, no una IA.</p>
+    </div>
+  </div>
+
+  <div class="placa" style="margin-top:var(--sp-s)">
+    <div class="placa-tit"><h3>Lo que descartamos, y por qué</h3></div>
+    <ul class="lista lista-no" style="margin-top:var(--sp-xs)">
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Google Ads y Meta Ads.</strong> No hay volumen de búsqueda que pagar y el público objetivo son 200 personas. Un CPL calculado sobre esa base sería una ficción. Cero pesos.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Mercado Público.</strong> La minería privada no licita ahí. Codelco licita por su propio portal y ese es otro juego —con otro ciclo, otro equipo y otro balance— al que no entramos en 24 meses.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Canal de software PYME (Defontana, Nubox, Bsale).</strong> No tiene nada que ver con este cliente. Lo mencionamos sólo para dejar claro que lo pensamos y lo descartamos.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- IA EN EL MARKETING -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">IA en el marketing mismo</span>
+    <h2>Dónde ayuda de verdad, y dónde nos quemaría.</h2>
+  </div>
+  <div class="rej rej-2">
+    <div class="placa">
+      <h3 style="color:var(--ok)">Sí, y mucho</h3>
+      <ul class="lista" style="margin-top:var(--sp-s)">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>Investigación de cuentas.</strong> Antes de escribirle a alguien, un agente arma la ficha de su faena: qué depósito tiene y de qué tipo, qué dice su RCA, qué proyectos declaró al SEA, si tiene planta desaladora o pozos, quién es el superintendente. Es trabajo de 3 horas por cuenta que se hace en 5 minutos. <strong>Multiplica por diez la cantidad de primeros correos que no son genéricos</strong>, y en este mercado un correo genérico es un correo muerto.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>Traducir el hallazgo técnico a lenguaje de gerente.</strong> El diagnóstico produce 6 páginas de ingeniería. El gerente lee dos párrafos. Ese resumen lo escribe bien un modelo, sobre un dato que es real.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.4"/><path d="M5 8.3l2 2 4-4.4"/></svg><span><strong>Vigilar el SEA, el SNIFA y los boletines.</strong> Cuando una faena ingresa un proyecto de desalación, cambia su plan de depositación o recibe un cargo de la SMA, hay una razón para llamar esa semana. Un agente que revisa esas fuentes a diario es un generador de motivos de contacto.</span></li>
+      </ul>
+    </div>
+    <div class="placa">
+      <h3 style="color:var(--critico)">No, y sería un error caro</h3>
+      <ul class="lista lista-no" style="margin-top:var(--sp-s)">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Contenido de blog generado en masa.</strong> Nuestros lectores son 200 personas que saben más de relaves y de hidrogeología que cualquier modelo de lenguaje. Un artículo con un error técnico no nos hace perder un lead: nos quema con toda la industria de una vez, porque todos se conocen y hablan. El contenido lo escribe un ingeniero o no se escribe.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>Secuencias automatizadas de outbound.</strong> El comprador recibe seis correos de proveedores al día y los reconoce a un kilómetro. La única forma de destacar es mandarle un hallazgo concreto de <em>su</em> faena, y eso exige haber mirado sus datos.</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span><strong>“Potencia tu gestión hídrica con IA” en la portada.</strong> En este mercado, decir IA en el titular baja la credibilidad. Lo que sube la credibilidad es decir un número: 40 l/s.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 90 DÍAS -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">Primeros 90 días</span>
+    <h2>La secuencia concreta.</h2>
+  </div>
+  <div class="placa">
+    <div class="dias">
+      <div>
+        <span class="rotulo">Día 1–15</span>
+        <p><strong>Cerrar dos design partners.</strong> Faenas medianas, una en Antofagasta y una en Atacama, a
+          través de la red de los fundadores (sin esa red, esto no arranca y hay que decirlo). El trato: acceso a
+          los datos y cuatro horas semanales de su ingeniero de procesos, a cambio de cero cobro por seis meses y
+          el compromiso de que el hallazgo es de ellos. No hay software todavía; hay dos personas y un cuaderno.</p>
+      </div>
+      <div>
+        <span class="rotulo">Día 15–45</span>
+        <p><strong>El levantamiento de la faena #1.</strong> Recorrer la faena. Listar las 12–18 partidas del
+          balance. Para cada una: quién la mide, con qué, cuándo se calibró, y qué pasa cuando el instrumento
+          falla. Armar el mapa de flujos. Hacer el primer balance conciliado a mano, con ellos en la sala. Aquí se
+          descubre si la tesis es cierta.</p>
+      </div>
+      <div>
+        <span class="rotulo">Día 45–75</span>
+        <p><strong>Ingesta real y balance vivo.</strong> Gateway OPC-UA o conexión al historiador. El balance se
+          recalcula solo cada hora. Los umbrales del tranque, cargados desde el manual de operación del depósito
+          (que hay que leer entero, y es aburridísimo, y es donde está todo). Primer reporte generado desde el
+          dato.</p>
+      </div>
+      <div>
+        <span class="rotulo">Día 75–90</span>
+        <p><strong>El hallazgo, y la conversación de precio.</strong> Un número que ellos no sabían, presentado a
+          su gerente. Y la pregunta directa: ¿esto vale $4.900.000 al mes? Si la respuesta es “tendría que
+          pensarlo”, la respuesta es no, y hay que entender por qué.</p>
+      </div>
+      <div>
+        <span class="rotulo">El criterio</span>
+        <p><strong>Si al día 90 el design partner no dice “esto no lo teníamos”, no hay producto.</strong> No hay
+          que pivotar el diseño ni mejorar el onboarding: hay que aceptar que la discrepancia no le importaba a
+          nadie y que nos equivocamos. Es el criterio de muerte del hito M0 en el
+          <a href="roadmap.html">roadmap</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUÉ MATA ESTO -->
+<section class="sec sec-borde">
+  <div class="sec-cab">
+    <span class="rotulo">El riesgo honesto</span>
+    <h2>Qué mataría esto.</h2>
+  </div>
+  <div class="rej rej-2">
+    <div class="placa" style="border-color:color-mix(in srgb, var(--critico) 40%, var(--linea))">
+      <span class="rotulo" style="color:var(--critico)">El que más miedo debería darte</span>
+      <h3 style="margin-top:6px">Que a nadie le convenga mirar la discrepancia.</h3>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        Nuestro producto obliga al cliente a dejar por escrito que tiene 40 litros por segundo que no puede
+        explicar. Ese registro queda, es auditable, y un fiscalizador lo puede leer. <strong>Es perfectamente
+        posible que un producto cuyo principal aporte es hacer visible un problema incómodo sea un producto que
+        nadie quiera comprar.</strong>
+      </p>
+      <p style="margin-top:var(--sp-xs);font-size:var(--step--1)">
+        La contra-tesis es que el mundo se mueve en la dirección contraria: el GISTM, los inversionistas, la SMA y
+        las comunidades empujan hacia la transparencia, y en algún momento no publicar es más caro que publicar.
+        Estamos apostando a eso. Pero es una apuesta, no un hecho, y se resuelve en los primeros 90 días con los
+        design partners: si miran el hallazgo y prefieren no saberlo, aprendimos algo caro y verdadero.
+      </p>
+    </div>
+    <div>
+      <div class="placa" style="margin-bottom:var(--sp-s)">
+        <h4>El ciclo de venta</h4>
+        <p class="pista" style="margin-top:6px">Homologación de proveedor, evaluación de riesgo TI, comité de
+          inversión. De 9 a 14 meses desde el primer contacto hasta la orden de compra. Con un ciclo de 14 meses y
+          18 de caja, no se llega. Mata más startups B2B que la falta de producto.</p>
+      </div>
+      <div class="placa" style="margin-bottom:var(--sp-s)">
+        <h4>Que lo hagan en casa</h4>
+        <p class="pista" style="margin-top:6px">Tienen PI System, tienen un ingeniero motivado, y un Power BI hace
+          el 60% de esto en tres meses. Queda peor, pero es gratis y ya está adentro. Nuestra respuesta es la
+          trazabilidad y el sello —que nadie construye por gusto— pero es una respuesta que hay que ganar cada vez.</p>
+      </div>
+      <div class="placa">
+        <h4>La responsabilidad</h4>
+        <p class="pista" style="margin-top:6px">El día que un muro falle en una faena que usa Freatia, vamos a estar
+          en el juicio. Tenemos que ser inequívocos —en el contrato, en la interfaz y en cada reunión— en que no
+          somos el sistema de seguridad del depósito: somos el sistema de información. Y aun así un abogado hábil
+          nos va a hacer pasar un mal rato. Seguro de responsabilidad profesional desde el primer contrato, y
+          nunca, jamás, prometer que prevenimos una falla.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="pie">
+  <p>Freatia · prototipo · Las cifras son estimaciones con su aritmética a la vista. Lo que no nos consta está
+    marcado <strong>por validar</strong>.
+    <a href="roadmap.html">Ver el roadmap y los criterios de muerte</a></p>
+</footer>
+
+</main>
+
+<script>
+  (function () {
+    var b = document.getElementById("btn-menu"), m = document.getElementById("menu");
+    b.addEventListener("click", function () {
+      var a = m.classList.toggle("abierto");
+      b.setAttribute("aria-expanded", a ? "true" : "false");
+    });
+  })();
+</script>
+</body>
+</html>

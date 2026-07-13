@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · Cuasio</title>
+<meta name="description" content="Del día 1 al mes 24: seis hitos, cada uno con su criterio de muerte, la trayectoria de ingresos en tres escenarios, el valle de caja y la probabilidad de éxito como rango derivado.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2306111C'/><path d='M16 6 L28 26 L4 26 Z' fill='none' stroke='%23FFD100' stroke-width='3'/><rect x='14.5' y='13' width='3' height='7' fill='%23FFD100'/><rect x='14.5' y='21.5' width='3' height='2.5' fill='%23FFD100'/></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav__barra">
+      <a class="marca" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+          <path d="M13 3 L24 22 L2 22 Z" fill="none" stroke="#FFD100" stroke-width="2.5"/>
+          <rect x="11.7" y="10" width="2.6" height="6" fill="#FFD100"/>
+          <rect x="11.7" y="17.4" width="2.6" height="2.4" fill="#FFD100"/>
+        </svg>
+        <span>Cuasio<span class="marca__punto">.</span></span>
+      </a>
+      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">
+        <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M0 1h16M0 6h16M0 11h16" stroke="currentColor" stroke-width="2"/></svg>
+        Menú
+      </button>
+      <nav class="nav__menu" id="navMenu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">← Ideas</a></li>
+          <li><a href="index.html">Producto</a></li>
+          <li><a href="demo/index.html">Demo</a></li>
+          <li><a href="negocio.html">Negocio</a></li>
+          <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+          <li><a href="stack.html">Arquitectura</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="rayado" role="presentation"></div>
+
+<main id="principal">
+
+<section class="seccion">
+  <div class="container">
+    <p class="placa">Día 1 → mes 24</p>
+    <h1 class="mt-s" style="font-size:var(--step-4);max-width:22ch">Seis hitos. Y seis formas de darse cuenta a tiempo.</h1>
+    <p class="mt-s prose">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de acá abajo trae la observación concreta que <strong>debería hacernos parar</strong> — no “reevaluar”, no “pivotear”: parar.</p>
+  </div>
+</section>
+
+<!-- LÍNEA DE TIEMPO -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">01 / LOS HITOS</p>
+      <h2>La línea de tiempo y dónde está el hacha.</h2>
+    </div>
+
+    <figure class="fig">
+      <figcaption>
+        <span class="fig__tit">Seis hitos, mes 0 a 24</span>
+        <span class="fig__sub">La barra es el trabajo. El triángulo es el punto donde se evalúa el criterio de muerte.</span>
+      </figcaption>
+      <svg viewBox="0 0 400 265" role="img" aria-labelledby="tG dG">
+        <title id="tG">Línea de tiempo de los seis hitos con sus criterios de muerte</title>
+        <desc id="dG">H1 design partners meses 0 a 3, se evalúa el mes 4. H2 primer cliente pagando meses 3 a 6, se evalúa el mes 8. H3 primeros diez meses 6 a 11, se evalúa el mes 12. H4 venta repetible meses 11 a 16, se evalúa el mes 17. H5 escala de canal meses 16 a 22, se evalúa el mes 22. H6 punto de decisión en el mes 24.</desc>
+
+        <line class="g-eje" x1="20" y1="20" x2="20" y2="248"/>
+        <line class="g-eje" x1="112" y1="20" x2="112" y2="248"/>
+        <line class="g-eje" x1="204" y1="20" x2="204" y2="248"/>
+        <line class="g-eje" x1="296" y1="20" x2="296" y2="248"/>
+        <line class="g-eje" x1="388" y1="20" x2="388" y2="248"/>
+        <text class="g-eje-txt" x="20" y="260" text-anchor="start">mes 0</text>
+        <text class="g-eje-txt" x="112" y="260" text-anchor="middle">6</text>
+        <text class="g-eje-txt" x="204" y="260" text-anchor="middle">12</text>
+        <text class="g-eje-txt" x="296" y="260" text-anchor="middle">18</text>
+        <text class="g-eje-txt" x="388" y="260" text-anchor="end">24</text>
+
+        <text class="g-etq" x="20" y="34">H1 · Design partners</text>
+        <rect x="20" y="40" width="46" height="10" fill="#FFD100"/>
+        <path d="M81.3 36 L86.3 46 H76.3 Z" fill="#FF5C4D"/>
+
+        <text class="g-etq" x="66" y="72">H2 · Primer cliente pagando</text>
+        <rect x="66" y="78" width="46" height="10" fill="#FFD100"/>
+        <path d="M142.7 74 L147.7 84 H137.7 Z" fill="#FF5C4D"/>
+
+        <text class="g-etq" x="112" y="110">H3 · Primeros 10</text>
+        <rect x="112" y="116" width="77" height="10" fill="#FFD100"/>
+        <path d="M204 112 L209 122 H199 Z" fill="#FF5C4D"/>
+
+        <text class="g-etq" x="112" y="148">H4 · Venta repetible</text>
+        <rect x="188.7" y="154" width="77" height="10" fill="#FFD100"/>
+        <path d="M280.7 150 L285.7 160 H275.7 Z" fill="#FF5C4D"/>
+
+        <text class="g-etq" x="188" y="186">H5 · Escala de canal</text>
+        <rect x="265.3" y="192" width="92" height="10" fill="#FFD100"/>
+        <path d="M357.3 188 L362.3 198 H352.3 Z" fill="#FF5C4D"/>
+
+        <text class="g-etq" x="290" y="224" text-anchor="end">H6 · Decisión mes 24</text>
+        <path d="M388 224 L396 232 L388 240 L380 232 Z" fill="#FFD100" stroke="#0B1A2B" stroke-width="2"/>
+      </svg>
+      <div class="fig__leyenda">
+        <span><i class="llave" style="background:#FFD100"></i> Ventana de trabajo del hito</span>
+        <span><i class="llave" style="background:#FF5C4D;height:8px;width:8px"></i> Se evalúa el criterio de muerte</span>
+      </div>
+    </figure>
+
+    <div class="scroll-x tabla-caja mt-m">
+      <table>
+        <thead>
+          <tr><th>Hito</th><th>Mes</th><th>Qué es cierto si lo lograste</th><th>Caja</th><th>Equipo</th><th>Criterio de muerte</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>H1</strong><br>Design partners</td>
+            <td class="num">3</td>
+            <td>Tres contratistas firmaron carta de piloto. El asesor prevencionista (registro + 15 años de faena) está adentro con equity. El marco legal está levantado por un abogado y escrito.</td>
+            <td class="num">$14M<br><span class="txt-mini txt-tenue">gastados</span></td>
+            <td class="num">2 + asesor</td>
+            <td class="muerte">Si al mes 3 no hay <strong>tres cartas firmadas para un piloto GRATIS</strong>. Si nadie quiere probarlo regalado, nadie lo va a comprar. Se para.</td>
+          </tr>
+          <tr>
+            <td><strong>H2</strong><br>Primer cliente pagando</td>
+            <td class="num">6</td>
+            <td>Uno de los pilotos firma y paga. La cobertura de reporte llegó a ≥50% en el mes 2 del piloto. Un operador con guantes reporta en menos de 40 segundos, sin ayuda y sin señal.</td>
+            <td class="num">$35M</td>
+            <td class="num">3</td>
+            <td class="muerte">Cobertura de reporte <strong>bajo 25% al mes 3 en dos de los tres pilotos</strong>. Ahí el problema no es el producto: es que la gente no reporta y el software no lo arregla. <strong>Se para. No se pivotea.</strong></td>
+          </tr>
+          <tr>
+            <td><strong>H3</strong><br>Primeros 10</td>
+            <td class="num">12</td>
+            <td>Diez contratistas pagando. Churn bajo 5% mensual. Y —la prueba de fuego— <strong>al menos tres clientes pueden nombrar un hallazgo concreto</strong> que el cruce de reportes les entregó y que ellos accionaron.</td>
+            <td class="num">Valle: $17M<br><span class="txt-mini txt-tenue">mes 12</span></td>
+            <td class="num">6</td>
+            <td class="muerte">Menos de 10 clientes al mes 12, <strong>o</strong> ningún cliente capaz de nombrar un hallazgo que le haya servido. Si el producto no encontró nada, es un formulario caro y hay competencia gratis.</td>
+          </tr>
+          <tr>
+            <td><strong>H4</strong><br>Venta repetible</td>
+            <td class="num">17</td>
+            <td>CAC bajo $1,6M. Payback bajo 5 meses. Cinco cierres al mes hechos por <strong>un ejecutivo que no es fundador</strong>.</td>
+            <td class="num">$195M<br><span class="txt-mini txt-tenue">post-ronda</span></td>
+            <td class="num">9</td>
+            <td class="muerte">CAC sobre <strong>$2,5M sostenido tres meses</strong>, o ciclo de venta sobre 4 meses. Significa que el producto sólo lo vende el fundador, y eso no es una empresa: es una consultora.</td>
+          </tr>
+          <tr>
+            <td><strong>H5</strong><br>Escala de canal</td>
+            <td class="num">22</td>
+            <td>Dos mandantes recomendando Cuasio a sus contratistas. Diez consultores de prevención activos. <strong>El 40% de los clientes nuevos llega por canal</strong>, no por outbound.</td>
+            <td class="num">$229M</td>
+            <td class="num">12</td>
+            <td class="muerte">Si al mes 22 el <strong>90% de los clientes sigue viniendo de outbound</strong>. Con un SAM de US$8M, un negocio que sólo crece contratando vendedores no llega a ninguna parte.</td>
+          </tr>
+          <tr>
+            <td><strong>H6</strong><br>Decisión</td>
+            <td class="num">24</td>
+            <td>ARR base proyectado: <strong>$505M CLP</strong> (≈ US$532 mil). Aquí se elige uno de tres caminos y no hay cuarto.</td>
+            <td class="num">$285M</td>
+            <td class="num">12</td>
+            <td class="muerte">Matar o vender si ARR &lt; $200M, <strong>o</strong> si la cobertura de reporte promedio de la base está bajo 40%. Un producto de seguridad que la gente no usa no merece seguir existiendo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="caja mt-m">
+      <div class="caja__cinta">Mes 24 · las tres puertas</div>
+      <div class="rejilla rejilla--3 mt-s">
+        <div>
+          <h4 class="txt-amarillo">Levantar</h4>
+          <p class="txt-chico mb-0">Serie A para atacar Perú. <strong>Sólo si</strong> ARR &gt; $700M y churn &lt; 3%. Si vas a pedirle plata a alguien para un TAM chileno de US$16M, más te vale tener el pasaporte listo.</p>
+        </div>
+        <div>
+          <h4 class="txt-amarillo">Bootstrapear</h4>
+          <p class="txt-chico mb-0">Negocio rentable de nicho, 12 personas, ARR $300–600M, 88% de margen. <strong>Es el desenlace más probable y no es un fracaso</strong>: es una empresa buena que salva gente y paga sueldos.</p>
+        </div>
+        <div>
+          <h4 class="txt-amarillo">Matar</h4>
+          <p class="txt-chico mb-0">ARR &lt; $200M o cobertura &lt; 40%. Se devuelve lo que quede, se publica lo aprendido y se cierra. Es una opción real y está escrita acá para que no se pueda negociar después.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INGRESOS -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">02 / INGRESOS</p>
+      <h2>Tres escenarios, y qué supuesto mueve cada uno.</h2>
+      <p>La diferencia entre el escenario de arriba y el de abajo no es optimismo: son <strong>tres supuestos declarados</strong> — cuánto cierras al mes, a qué precio, y cuánto se te arranca.</p>
+    </div>
+
+    <div class="scroll-x tabla-caja">
+      <table>
+        <thead><tr><th>Escenario</th><th>Cierres/mes en régimen</th><th>ARPU</th><th>Churn mensual</th><th>Mineras mandantes</th><th>MRR mes 24</th><th>ARR mes 24</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pesimista</strong></td><td class="num">2</td><td class="num">$330.000</td><td class="num">8%</td><td class="num">0</td><td class="num">$6,5M</td><td class="num">$78M</td></tr>
+          <tr><td><strong>Base</strong></td><td class="num">5</td><td class="num">$466.000</td><td class="num">3%</td><td class="num">2</td><td class="num">$42,1M</td><td class="num">$505M</td></tr>
+          <tr><td><strong>Optimista</strong></td><td class="num">8</td><td class="num">$520.000</td><td class="num">2%</td><td class="num">4</td><td class="num">$84,6M</td><td class="num">$1.016M</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fuente">El pesimista no es “nos va mal”: es <strong>el mundo donde la contratista es un comprador pobre</strong> — se corre el mix a los planes chicos, el churn sube porque las empresas pierden contratos, y ningún mandante se sube. Es un escenario perfectamente posible.</p>
+
+    <figure class="fig mt-m">
+      <figcaption>
+        <span class="fig__tit">MRR proyectado, mes 0 a 24</span>
+        <span class="fig__sub">En millones de pesos por mes. La banda es el rango entre pesimista y optimista.</span>
+      </figcaption>
+      <svg viewBox="0 0 400 240" role="img" aria-labelledby="tM dM">
+        <title id="tM">Trayectoria de MRR en tres escenarios</title>
+        <desc id="dM">El escenario base llega a 42,1 millones de MRR en el mes 24. El pesimista a 6,5 millones. El optimista a 84,6 millones.</desc>
+
+        <line class="g-eje" x1="44" y1="24" x2="44" y2="210"/>
+        <line class="g-eje" x1="44" y1="210" x2="392" y2="210"/>
+        <text class="g-eje-txt" x="38" y="213" text-anchor="end">0</text>
+        <text class="g-eje-txt" x="38" y="151" text-anchor="end">30</text>
+        <text class="g-eje-txt" x="38" y="89" text-anchor="end">60</text>
+        <text class="g-eje-txt" x="38" y="27" text-anchor="end">90</text>
+        <text class="g-eje-txt" x="44" y="226" text-anchor="start">mes 0</text>
+        <text class="g-eje-txt" x="218" y="226" text-anchor="middle">12</text>
+        <text class="g-eje-txt" x="392" y="226" text-anchor="end">24</text>
+        <text class="g-eje-txt" x="10" y="120" text-anchor="middle" transform="rotate(-90 10 120)">MM$ / mes</text>
+
+        <polygon points="44,210 58.5,210 73,208.9 87.5,207.9 102,205.8 116.5,202.6 131,198.5 145.5,193.3 160,187.2 174.5,180.2 189,172.2 203.5,164.3 218,156.6 232.5,149.1 247,131.6 261.5,124.4 276,117.3 290.5,110.3 305,83.3 319.5,76.6 334,70.1 348.5,63.7 363,47.2 377.5,41.1 392,35.1 392,196.5 377.5,196.8 363,197.1 348.5,197.5 334,197.9 319.5,198.3 305,198.8 290.5,199.3 276,199.9 261.5,200.5 247,201.1 232.5,201.8 218,202.6 203.5,203.4 189,204.3 174.5,205.3 160,206.4 145.5,207.6 131,208.1 116.5,208.7 102,209.3 87.5,210 73,210 58.5,210 44,210" fill="#FFD100" fill-opacity="0.10"/>
+
+        <polyline points="44,210 58.5,210 73,208.9 87.5,207.9 102,205.8 116.5,202.6 131,198.5 145.5,193.3 160,187.2 174.5,180.2 189,172.2 203.5,164.3 218,156.6 232.5,149.1 247,131.6 261.5,124.4 276,117.3 290.5,110.3 305,83.3 319.5,76.6 334,70.1 348.5,63.7 363,47.2 377.5,41.1 392,35.1" fill="none" stroke="#66809A" stroke-width="1.5" stroke-dasharray="5 3" stroke-linejoin="round"/>
+
+        <polyline points="44,210 58.5,210 73,210 87.5,210 102,209.3 116.5,208.7 131,208.1 145.5,207.6 160,206.4 174.5,205.3 189,204.3 203.5,203.4 218,202.6 232.5,201.8 247,201.1 261.5,200.5 276,199.9 290.5,199.3 305,198.8 319.5,198.3 334,197.9 348.5,197.5 363,197.1 377.5,196.8 392,196.5" fill="none" stroke="#66809A" stroke-width="1.5" stroke-dasharray="5 3" stroke-linejoin="round"/>
+
+        <polyline points="44,210 58.5,210 73,210 87.5,209 102,208.1 116.5,206.2 131,204.4 145.5,201.7 160,199.1 174.5,195.5 189,192.1 203.5,188.8 218,184.6 232.5,180.6 247,176.6 261.5,172.8 276,169.1 290.5,165.5 305,151.9 319.5,148.5 334,145.3 348.5,142.1 363,128.9 377.5,125.9 392,123" fill="none" stroke="#FFD100" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="392" cy="123" r="4.5" fill="#FFD100" stroke="#0B1A2B" stroke-width="2"/>
+
+        <text class="g-etq" x="386" y="30" text-anchor="end">84,6</text>
+        <text class="g-etq" x="386" y="115" text-anchor="end" fill="#FFD100">42,1</text>
+        <text class="g-etq" x="386" y="192" text-anchor="end">6,5</text>
+      </svg>
+      <div class="fig__leyenda">
+        <span><i class="llave" style="background:#FFD100"></i> Base</span>
+        <span><i class="llave" style="background:#66809A"></i> Optimista y pesimista (los bordes de la banda)</span>
+      </div>
+      <p class="fuente">Los tres escenarios usan la misma aritmética: clientes(m) = clientes(m−1) × (1 − churn) + cierres, por el ARPU del mix. Sin trucos.</p>
+    </figure>
+  </div>
+</section>
+
+<!-- CAJA -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">03 / CAJA</p>
+      <h2>El valle está en el mes 12. Y no es negociable.</h2>
+      <p>Escenario base. Caja inicial $80M (aporte de fundadores + instrumento público tipo CORFO / Start-Up Chile <span class="porvalidar">montos vigentes: por validar</span>). Ronda ángel de $180M en el mes 13.</p>
+    </div>
+
+    <figure class="fig">
+      <figcaption>
+        <span class="fig__tit">Caja en banco, mes 0 a 24</span>
+        <span class="fig__sub">En millones de pesos. El punto rojo es el fondo del valle: $17,4M, mes 12.</span>
+      </figcaption>
+      <svg viewBox="0 0 400 180" role="img" aria-labelledby="tC dC">
+        <title id="tC">Caja en banco a lo largo de 24 meses</title>
+        <desc id="dC">La caja baja de 80 a 17,4 millones en el mes 12, se recupera con una ronda de 180 millones en el mes 13, y termina en 285 millones en el mes 24.</desc>
+        <line class="g-eje" x1="40" y1="24" x2="40" y2="150"/>
+        <line class="g-eje" x1="40" y1="150" x2="392" y2="150"/>
+        <text class="g-eje-txt" x="34" y="153" text-anchor="end">0</text>
+        <text class="g-eje-txt" x="34" y="111" text-anchor="end">100</text>
+        <text class="g-eje-txt" x="34" y="69" text-anchor="end">200</text>
+        <text class="g-eje-txt" x="34" y="27" text-anchor="end">300</text>
+        <text class="g-eje-txt" x="40" y="166" text-anchor="start">mes 0</text>
+        <text class="g-eje-txt" x="216" y="166" text-anchor="middle">12</text>
+        <text class="g-eje-txt" x="392" y="166" text-anchor="end">24</text>
+
+        <path d="M40,150 L40,117.7 L54.7,119.3 L69.3,120.6 L84,122.3 L98.7,125.6 L113.3,128.6 L128,131.1 L142.7,133.2 L157.3,134.9 L172,135.7 L186.7,138.7 L201.3,141.2 L216,142.9 L230.7,67.7 L245.3,67.7 L260,66.8 L274.7,67.7 L289.3,68.1 L304,65.6 L318.7,62.2 L333.3,58.4 L348,53.8 L362.7,46.7 L377.3,38.7 L392,30.3 L392,150 Z" fill="#FFD100" fill-opacity="0.10"/>
+        <polyline points="40,117.7 54.7,119.3 69.3,120.6 84,122.3 98.7,125.6 113.3,128.6 128,131.1 142.7,133.2 157.3,134.9 172,135.7 186.7,138.7 201.3,141.2 216,142.9 230.7,67.7 245.3,67.7 260,66.8 274.7,67.7 289.3,68.1 304,65.6 318.7,62.2 333.3,58.4 348,53.8 362.7,46.7 377.3,38.7 392,30.3" fill="none" stroke="#FFD100" stroke-width="2" stroke-linejoin="round"/>
+
+        <circle cx="216" cy="142.9" r="5" fill="#FF5C4D" stroke="#0B1A2B" stroke-width="2"/>
+        <line x1="216" y1="136" x2="216" y2="112" stroke="#FF5C4D" stroke-width="1"/>
+        <text class="g-etq" x="212" y="108" text-anchor="end" fill="#FF5C4D">valle $17,4M</text>
+
+        <line x1="230.7" y1="24" x2="230.7" y2="67.7" stroke="#66809A" stroke-width="1"/>
+        <text class="g-eje-txt" x="234" y="32" text-anchor="start" fill="#9DB2C6">ronda ángel $180M</text>
+        <text class="g-etq" x="386" y="26" text-anchor="end">$285M</text>
+      </svg>
+      <p class="fuente">Aritmética: caja(m) = caja(m−1) + ingresos(m) − costos(m), con la ronda inyectada en el mes 13. Los costos son la nómina escalonada de la tabla de hitos.</p>
+    </figure>
+
+    <figure class="fig mt-m">
+      <figcaption>
+        <span class="fig__tit">Ingresos vs. quema mensual</span>
+        <span class="fig__sub">En millones de pesos por mes. El punto de equilibrio operacional cae en el mes 14.</span>
+      </figcaption>
+      <svg viewBox="0 0 400 180" role="img" aria-labelledby="tQ dQ">
+        <title id="tQ">Ingresos mensuales contra quema mensual</title>
+        <desc id="dQ">Las columnas son los ingresos, que crecen de cero a 42 millones. La línea escalonada es la quema mensual, que sube de 4 a 22 millones al contratar. Se cruzan en el mes 14.</desc>
+        <line class="g-eje" x1="40" y1="24" x2="40" y2="150"/>
+        <line class="g-eje" x1="40" y1="150" x2="392" y2="150"/>
+        <text class="g-eje-txt" x="34" y="153" text-anchor="end">0</text>
+        <text class="g-eje-txt" x="34" y="111" text-anchor="end">15</text>
+        <text class="g-eje-txt" x="34" y="69" text-anchor="end">30</text>
+        <text class="g-eje-txt" x="34" y="27" text-anchor="end">45</text>
+        <text class="g-eje-txt" x="40" y="166" text-anchor="start">mes 0</text>
+        <text class="g-eje-txt" x="216" y="166" text-anchor="middle">12</text>
+        <text class="g-eje-txt" x="392" y="166" text-anchor="end">24</text>
+
+        <g id="barrasIng"><path d="M84.7 150 L84.7 148.6 Q84.7 148.6 86.1 148.6 L92.3 148.6 Q93.7 148.6 93.7 150 Z" fill="#FFD100"><title>Mes 3: $0,5MM</title></path><path d="M98.8 150 L98.8 147.5 Q98.8 147.5 101.3 147.5 L105.3 147.5 Q107.8 147.5 107.8 150 Z" fill="#FFD100"><title>Mes 4: $0,9MM</title></path><path d="M112.9 150 L112.9 149 Q112.9 145 116.9 145 L117.9 145 Q121.9 145 121.9 149 L121.9 150 Z" fill="#FFD100"><title>Mes 5: $1,8MM</title></path><path d="M127 150 L127 146.4 Q127 142.4 131 142.4 L132 142.4 Q136 142.4 136 146.4 L136 150 Z" fill="#FFD100"><title>Mes 6: $2,7MM</title></path><path d="M141.1 150 L141.1 142.8 Q141.1 138.8 145.1 138.8 L146.1 138.8 Q150.1 138.8 150.1 142.8 L150.1 150 Z" fill="#FFD100"><title>Mes 7: $4,0MM</title></path><path d="M155.1 150 L155.1 139.2 Q155.1 135.2 159.1 135.2 L160.1 135.2 Q164.1 135.2 164.1 139.2 L164.1 150 Z" fill="#FFD100"><title>Mes 8: $5,3MM</title></path><path d="M169.2 150 L169.2 134.4 Q169.2 130.4 173.2 130.4 L174.2 130.4 Q178.2 130.4 178.2 134.4 L178.2 150 Z" fill="#FFD100"><title>Mes 9: $7,0MM</title></path><path d="M183.3 150 L183.3 129.6 Q183.3 125.6 187.3 125.6 L188.3 125.6 Q192.3 125.6 192.3 129.6 L192.3 150 Z" fill="#FFD100"><title>Mes 10: $8,7MM</title></path><path d="M197.4 150 L197.4 125.2 Q197.4 121.2 201.4 121.2 L202.4 121.2 Q206.4 121.2 206.4 125.2 L206.4 150 Z" fill="#FFD100"><title>Mes 11: $10,3MM</title></path><path d="M211.5 150 L211.5 119.6 Q211.5 115.6 215.5 115.6 L216.5 115.6 Q220.5 115.6 220.5 119.6 L220.5 150 Z" fill="#FFD100"><title>Mes 12: $12,3MM</title></path><path d="M225.5 150 L225.5 114.2 Q225.5 110.2 229.5 110.2 L230.5 110.2 Q234.5 110.2 234.5 114.2 L234.5 150 Z" fill="#FFD100"><title>Mes 13: $14,2MM</title></path><path d="M239.6 150 L239.6 108.9 Q239.6 104.9 243.6 104.9 L244.6 104.9 Q248.6 104.9 248.6 108.9 L248.6 150 Z" fill="#FFD100"><title>Mes 14: $16,1MM</title></path><path d="M253.7 150 L253.7 103.6 Q253.7 99.6 257.7 99.6 L258.7 99.6 Q262.7 99.6 262.7 103.6 L262.7 150 Z" fill="#FFD100"><title>Mes 15: $18,0MM</title></path><path d="M267.8 150 L267.8 98.6 Q267.8 94.6 271.8 94.6 L272.8 94.6 Q276.8 94.6 276.8 98.6 L276.8 150 Z" fill="#FFD100"><title>Mes 16: $19,8MM</title></path><path d="M281.9 150 L281.9 93.8 Q281.9 89.8 285.9 89.8 L286.9 89.8 Q290.9 89.8 290.9 93.8 L290.9 150 Z" fill="#FFD100"><title>Mes 17: $21,5MM</title></path><path d="M295.9 150 L295.9 75.3 Q295.9 71.3 299.9 71.3 L300.9 71.3 Q304.9 71.3 304.9 75.3 L304.9 150 Z" fill="#FFD100"><title>Mes 18: $28,1MM</title></path><path d="M310 150 L310 70.8 Q310 66.8 314 66.8 L315 66.8 Q319 66.8 319 70.8 L319 150 Z" fill="#FFD100"><title>Mes 19: $29,7MM</title></path><path d="M324.1 150 L324.1 66.4 Q324.1 62.4 328.1 62.4 L329.1 62.4 Q333.1 62.4 333.1 66.4 L333.1 150 Z" fill="#FFD100"><title>Mes 20: $31,3MM</title></path><path d="M338.2 150 L338.2 61.9 Q338.2 57.9 342.2 57.9 L343.2 57.9 Q347.2 57.9 347.2 61.9 L347.2 150 Z" fill="#FFD100"><title>Mes 21: $32,9MM</title></path><path d="M352.3 150 L352.3 44.2 Q352.3 40.2 356.3 40.2 L357.3 40.2 Q361.3 40.2 361.3 44.2 L361.3 150 Z" fill="#FFD100"><title>Mes 22: $39,2MM</title></path><path d="M366.3 150 L366.3 40 Q366.3 36 370.3 36 L371.3 36 Q375.3 36 375.3 40 L375.3 150 Z" fill="#FFD100"><title>Mes 23: $40,7MM</title></path><path d="M380.4 150 L380.4 36.1 Q380.4 32.1 384.4 32.1 L385.4 32.1 Q389.4 32.1 389.4 36.1 L389.4 150 Z" fill="#FFD100"><title>Mes 24: $42,1MM</title></path></g>
+
+        <path d="M40 138.8 L96.3 138.8 L96.3 124.8 L180.8 124.8 L180.8 105.2 L265.3 105.2 L265.3 88.4 L392 88.4" fill="none" stroke="#66809A" stroke-width="2" stroke-linejoin="round"/>
+
+        <line x1="237.1" y1="150" x2="237.1" y2="98" stroke="#FF5C4D" stroke-width="1" stroke-dasharray="3 3"/>
+        <text class="g-etq" x="237.1" y="94" text-anchor="middle" fill="#FF5C4D">equilibrio · mes 14</text>
+      </svg>
+      <div class="fig__leyenda">
+        <span><i class="llave" style="background:#FFD100"></i> Ingresos del mes</span>
+        <span><i class="llave" style="background:#66809A"></i> Quema del mes (nómina + infra)</span>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- LA RESTRICCIÓN -->
+<section class="seccion">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">04 / LA RESTRICCIÓN REAL</p>
+      <h2>No es el embudo. Es si la gente reporta.</h2>
+      <p>En casi todo SaaS la restricción es el embudo de adquisición. Acá no. Acá <strong>el cliente puede firmar y el producto puede morir igual</strong>, porque la única métrica que hace que Cuasio valga algo es la <strong>cobertura de reporte</strong>: qué porcentaje de la dotación reportó al menos una vez este mes. Por eso el gráfico que gobierna esta empresa es éste, por cohorte de cliente.</p>
+    </div>
+
+    <figure class="fig">
+      <figcaption>
+        <span class="fig__tit">Cobertura de reporte por cohorte de cliente</span>
+        <span class="fig__sub">% de la dotación en faena que reportó al menos una vez en el mes, según meses desde el arranque.</span>
+      </figcaption>
+      <svg viewBox="0 0 400 220" role="img" aria-labelledby="tR dR">
+        <title id="tR">Cobertura de reporte por cohorte</title>
+        <desc id="dR">La cohorte 1 se estanca en 42%. La cohorte 2, con charla en el cambio de turno, llega a 60%. La cohorte 3, con reporte anónimo por defecto, llega a 73%. La cohorte 4, a la que se le devuelve el hallazgo que produjo su reporte, llega a 84%.</desc>
+
+        <line class="g-eje" x1="44" y1="30" x2="44" y2="180"/>
+        <line class="g-eje" x1="44" y1="180" x2="380" y2="180"/>
+        <text class="g-eje-txt" x="38" y="183" text-anchor="end">0%</text>
+        <text class="g-eje-txt" x="38" y="145.5" text-anchor="end">25%</text>
+        <text class="g-eje-txt" x="38" y="108" text-anchor="end">50%</text>
+        <text class="g-eje-txt" x="38" y="70.5" text-anchor="end">75%</text>
+        <text class="g-eje-txt" x="38" y="33" text-anchor="end">100%</text>
+        <text class="g-eje-txt" x="44" y="196" text-anchor="start">mes 0</text>
+        <text class="g-eje-txt" x="209" y="196" text-anchor="middle">3</text>
+        <text class="g-eje-txt" x="374" y="196" text-anchor="end">6</text>
+        <text class="g-eje-txt" x="209" y="212" text-anchor="middle">meses desde el arranque del cliente</text>
+
+        <line x1="44" y1="90" x2="380" y2="90" stroke="#66809A" stroke-width="1"/>
+        <text class="g-eje-txt" x="48" y="86" text-anchor="start" fill="#9DB2C6">meta: 60%</text>
+
+        <polyline points="44,162 99,138 154,118.5 209,111 264,114 319,115.5 374,117" fill="none" stroke="#B57C00" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="44,153 99,123 154,102 209,93 264,88.5 319,90 374,90" fill="none" stroke="#E0A500" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="44,147 99,112.5 154,88.5 209,78 264,72 319,70.5 374,70.5" fill="none" stroke="#FFD100" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="44,141 99,102 154,78 209,66 264,58.5 319,55.5 374,54" fill="none" stroke="#FFF3B8" stroke-width="2" stroke-linejoin="round"/>
+
+        <circle cx="374" cy="117" r="4" fill="#B57C00" stroke="#0B1A2B" stroke-width="2"/>
+        <circle cx="374" cy="90" r="4" fill="#E0A500" stroke="#0B1A2B" stroke-width="2"/>
+        <circle cx="374" cy="70.5" r="4" fill="#FFD100" stroke="#0B1A2B" stroke-width="2"/>
+        <circle cx="374" cy="54" r="4" fill="#FFF3B8" stroke="#0B1A2B" stroke-width="2"/>
+
+        <text class="g-etq" x="382" y="120" text-anchor="start" font-size="9">42%</text>
+        <text class="g-etq" x="382" y="93" text-anchor="start" font-size="9">60%</text>
+        <text class="g-etq" x="382" y="73" text-anchor="start" font-size="9">73%</text>
+        <text class="g-etq" x="382" y="57" text-anchor="start" font-size="9">84%</text>
+      </svg>
+      <div class="fig__leyenda">
+        <span><i class="llave" style="background:#B57C00"></i> C1 · pilotos, sin más</span>
+        <span><i class="llave" style="background:#E0A500"></i> C2 · + charla de 15 min en el relevo</span>
+        <span><i class="llave" style="background:#FFD100"></i> C3 · + reporte anónimo por defecto</span>
+        <span><i class="llave" style="background:#FFF3B8"></i> C4 · + se le devuelve al que reportó el hallazgo que su reporte produjo</span>
+      </div>
+      <p class="fuente">Proyección, no medición: son las cuatro palancas que creemos que mueven la aguja, en el orden en que las vamos a probar. La cohorte 4 es la apuesta central del producto — <strong>la gente reporta cuando ve que reportar sirvió para algo</strong>. Si la curva C1 es la que se repite en todas las cohortes, el negocio no existe (criterio de muerte de H2).</p>
+    </figure>
+  </div>
+</section>
+
+<!-- PROBABILIDAD -->
+<section class="seccion seccion--oscura">
+  <div class="container">
+    <div class="seccion__cab">
+      <p class="seccion__num">05 / PROBABILIDAD DE ÉXITO</p>
+      <h2>Un rango, con la derivación a la vista.</h2>
+      <p>Un número único y confiado (“68% de éxito”) es autoridad inventada. Acá va el método completo, incluida la parte donde admitimos que no sabemos.</p>
+    </div>
+
+    <div class="caja">
+      <div class="caja__cinta">Paso 1 · La clase de referencia</div>
+      <p><strong>Definición de éxito:</strong> llegar a <strong>US$1M de ARR sostenible al mes 36</strong> (≈ $950M CLP — más o menos nuestro SOM).</p>
+      <ul class="lista" role="list">
+        <li>Clase A — <strong>fracción de SaaS B2B que llega a US$1M de ARR</strong>. Los benchmarks de la industria lo ponen consistentemente en una minoría de un dígito a dígito bajo. <span class="porvalidar">cifra exacta: por validar</span> con la fuente que se cite; no la inventamos.</li>
+        <li>Clase B — <strong>supervivencia de empresas nuevas en Chile</strong>. Los datos del Ministerio de Economía / INE muestran que una fracción grande no llega al quinto año. <span class="porvalidar">cifra exacta: por validar</span>.</li>
+        <li><strong>Y la parte honesta:</strong> la clase de referencia que de verdad importaría —SaaS vertical B2B para minería en LatAm— <strong>no tiene una tasa base conocida</strong>. No hay suficientes casos. Decirlo es más útil que fabricar un número.</li>
+      </ul>
+      <p class="mb-0">Tomamos como <strong>base de trabajo un 8%</strong>, en el rango bajo de la Clase A, y de ahí ajustamos. Ese 8% es un supuesto, está declarado, y quien lea esto puede cambiarlo y rehacer la cuenta.</p>
+    </div>
+
+    <div class="caja mt-m">
+      <div class="caja__cinta">Paso 2 · Los ajustes, cada uno con su razón</div>
+      <div class="scroll-x tabla-caja">
+        <table>
+          <thead><tr><th>Ajuste</th><th>Factor</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Cuña afilada, presupuesto que ya existe</td><td class="num">× 1,4</td><td>El cliente ya gasta en prevención: tiene un experto contratado, paga mutualidad, financia auditorías. No hay que crear el presupuesto, hay que capturarlo.</td></tr>
+            <tr><td>Canal de distribución preexistente</td><td class="num">× 1,3</td><td>El mandante recomienda; el consultor de prevención instala. Dos canales que ya tocan al cliente y no hay que construir.</td></tr>
+            <tr><td>Ciclo de venta corto en el segmento elegido</td><td class="num">× 1,2</td><td>4 a 8 semanas, firma una persona. Es la razón entera de haber elegido al contratista.</td></tr>
+            <tr><td class="txt-amarillo">La adopción depende de un cambio cultural</td><td class="num">× 0,55</td><td><strong>El ajuste más brutal y el más honesto.</strong> El software baja el costo de reportar; no baja el miedo a reportar. Y eso no lo controlamos nosotros.</td></tr>
+            <tr><td>Dependencia regulatoria</td><td class="num">× 0,85</td><td>Un error normativo es fatal. Y la norma hay que validarla antes de vender, lo que agrega costo y tiempo antes del primer peso.</td></tr>
+            <tr><td>Techo de mercado chileno</td><td class="num">× 0,8</td><td>TAM de US$16M. Llegar a US$1M de ARR obliga a una expansión (a Perú o a otro sector) que no está probada y que empieza recién el mes 24.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="aritmetica mt-s">
+8% × 1,4 × 1,3 × 1,2 × 0,55 × 0,85 × 0,8  =  <b>6,5%</b>
+      </div>
+    </div>
+
+    <div class="caja caja--peligro mt-m">
+      <div class="caja__cinta caja__cinta--peligro">Paso 3 · El resultado, como rango y condicional a los hitos</div>
+      <div class="rejilla rejilla--3 mt-s">
+        <div>
+          <p class="txt-mini txt-tenue">Hoy, sin condicionar</p>
+          <p class="dato" style="font-size:var(--step-2)">5 – 9%</p>
+          <p class="txt-chico mb-0">De llegar a US$1M de ARR al mes 36. El rango sale de mover la base entre 6% y 11%.</p>
+        </div>
+        <div>
+          <p class="txt-mini txt-tenue">Condicional a superar H3 (mes 12)</p>
+          <p class="dato txt-amarillo" style="font-size:var(--step-2)">10 – 18%</p>
+          <p class="txt-chico mb-0">Si hay 10 clientes y la gente <strong>sí</strong> reporta, el factor 0,55 desaparece: la incertidumbre grande se resolvió. 6,5% ÷ 0,55 ≈ 11,8%, con rango.</p>
+        </div>
+        <div>
+          <p class="txt-mini txt-tenue">Condicional a superar H4 (mes 17)</p>
+          <p class="dato txt-amarillo" style="font-size:var(--step-2)">30 – 45%</p>
+          <p class="txt-chico mb-0">Venta repetible, CAC bajo $1,6M, churn bajo 4%. A esa altura ya no es una apuesta: es ejecución y expansión.</p>
+        </div>
+      </div>
+      <p class="mt-m mb-0"><strong>Y una cosa más, que probablemente es la más importante de esta página.</strong> Si redefines el éxito como <em>“un negocio rentable de $400M de ARR, doce personas, 88% de margen, que hace que menos gente se muera en una faena”</em> —en vez de un unicornio— la probabilidad sube a <strong>25–35%</strong>, y ése es, casi con seguridad, el negocio real. Vale la pena decidir cuál de los dos estás construyendo <strong>antes</strong> de empezar, y no en el mes 20.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="rayado" role="presentation"></div>
+
+<footer class="pie">
+  <div class="container">
+    <p class="mono txt-chico">CUASIO · Prototipo · Todas las proyecciones de esta página son estimaciones con su aritmética declarada</p>
+    <nav class="pie__links" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var t = document.getElementById('navToggle');
+    var m = document.getElementById('navMenu');
+    t.addEventListener('click', function () {
+      var a = m.classList.toggle('abierto');
+      t.setAttribute('aria-expanded', a ? 'true' : 'false');
+    });
+  })();
+</script>
+
+<style>
+  .seccion--oscura { background: var(--panel); border-block: 2px solid var(--linea); }
+  .muerte { color: var(--tinta-2); }
+  .muerte strong { color: var(--critico); }
+  td.num { white-space: nowrap; }
+  h4 { margin-bottom: var(--sp-2xs); }
+</style>
+
+</body>
+</html>

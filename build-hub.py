@@ -4,7 +4,13 @@ Correr desde la raíz del repo:  python3 build-hub.py"""
 import json, glob, html
 
 ideas = [json.load(open(f)) for f in sorted(glob.glob("*/meta.json"))]
-assert len(ideas) == 10, f"esperaba 10 ideas, encontré {len(ideas)}"
+assert len(ideas) == 15, f"esperaba 15 ideas, encontré {len(ideas)}"
+
+# Dos familias: las 10 de PYME y las 5 de minería. Se separan porque el comprador
+# es otro (una dueña que contesta el WhatsApp vs. un gerente de operaciones), el
+# ticket es otro y el ciclo de venta es otro.
+pyme   = [d for d in ideas if int(d["folder"][:2]) <= 10]
+minera = [d for d in ideas if int(d["folder"][:2]) >= 11]
 
 def e(s):
     return html.escape(str(s))
@@ -36,15 +42,37 @@ def card(d):
       </div>
     </article>'''
 
-cards = "\n".join(card(d) for d in ideas)
+def section(titulo, bajada, items):
+    return f'''
+  <section class="fam">
+    <header class="fam__head">
+      <h2>{titulo}</h2>
+      <p>{bajada}</p>
+      <span class="fam__n mono">{len(items)}</span>
+    </header>
+    <div class="grid">
+{"".join(card(d) for d in items)}
+    </div>
+  </section>'''
+
+cards = (
+    section("PYME chilena",
+            "El comprador es la dueña que contesta el WhatsApp mientras atiende. "
+            "Ticket bajo, venta rápida, y un competidor que casi siempre es Excel o un cuaderno.",
+            pyme)
+    + section("Minería",
+              "El comprador tiene plata y miedo, pero compra lento: piloto, homologación, procurement. "
+              "Por eso cuatro de las cinco no le venden a la minera, sino a la contratista que ya está adentro.",
+              minera)
+)
 
 doc = f'''<!doctype html>
 <html lang="es-CL">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10 ideas de negocio — lelelilo studios</title>
-<meta name="description" content="Diez productos para PYMEs chilenas, cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
+<title>15 ideas de negocio — lelelilo studios</title>
+<meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -92,11 +120,29 @@ body {{
 .note p + p {{ margin-top:var(--sp-s); }}
 .note strong {{ color:var(--paper); font-weight:500; }}
 
+/* -- familia (PYME / Minería) -- */
+.fam {{ margin-block:var(--sp-2xl); }}
+.fam__head {{
+  display:grid; grid-template-columns:1fr auto; align-items:baseline;
+  gap:var(--sp-s); padding-bottom:var(--sp-s);
+  border-bottom:2px solid var(--paper);
+}}
+.fam__head h2 {{
+  font-size:var(--step-3); font-weight:700; letter-spacing:-.02em;
+  grid-column:1;
+}}
+.fam__head p {{
+  grid-column:1; grid-row:2; color:var(--mute); max-width:62ch;
+  font-size:var(--step--1); line-height:1.6; margin-top:var(--sp-2xs);
+}}
+.fam__n {{
+  grid-column:2; grid-row:1; color:var(--mute-2); font-size:var(--step-2);
+}}
+
 /* -- grilla: móvil primero, una columna -- */
 .grid {{
   list-style:none; display:grid; gap:1px;
-  background:var(--line); border-block:1px solid var(--line);
-  margin-block:var(--sp-l) var(--sp-2xl);
+  background:var(--line); border-bottom:1px solid var(--line);
 }}
 .idea {{
   position:relative; background:var(--ink);
@@ -187,11 +233,11 @@ body {{
 <div class="container">
 
   <header class="masthead">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>2026</span></p>
-    <h1>Diez negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Cada idea es un problema real de una PYME chilena, con un producto que funciona
-      en el navegador, un plan de marketing, un roadmap a 24 meses y la arquitectura que habría
-      que configurar para que dejara de ser una maqueta.</p>
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>15 ideas</span><span>·</span><span>2026</span></p>
+    <h1>Quince negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería— con
+      un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
+      arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
   </header>
 
   <div class="note">
@@ -199,7 +245,7 @@ body {{
       corriendo, ni APIs contratadas. Los demos funcionan con datos falsos —creíbles, pero falsos— y
       cada idea documenta en su página de <em>Arquitectura</em> exactamente qué habría que configurar,
       cuánto costaría al mes y qué parte está fingida.</p>
-    <p><strong>Los diez dominios están verificados como libres</strong> al 13 de julio de 2026
+    <p><strong>Los quince dominios están verificados como libres</strong> al 13 de julio de 2026
       (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para <span class="mono">.cl</span>).
       Eso caduca: si vas a usar uno, verifícalo de nuevo antes de comprarlo.</p>
     <p><strong>Los números son estimaciones, y se muestran con su aritmética.</strong> Ninguna idea

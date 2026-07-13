@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo · Freatia — balance hídrico auditable y monitoreo de relaves</title>
+<meta name="description" content="El balance hídrico de una faena del norte que cuadra hasta el último litro, la trazabilidad del dato hasta el sensor, y el piezómetro que se está saliendo de rango.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 32 32" fill="none" stroke-width="1.5" aria-hidden="true">
+        <path d="M1 23c4.5-6 9 2 14.5-3S25 21 31 17" stroke="#7A5C33"/>
+        <path d="M1 28c5-5 9.5 2 15-3s8.5 1 15-3" stroke="#7A5C33"/>
+        <path d="M16 2s7 8.6 7 12.6a7 7 0 1 1-14 0C9 10.6 16 2 16 2Z" stroke="#3F9BD6"/>
+      </svg>
+      <span class="marca-txt">Freatia</span>
+    </a>
+    <nav>
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btn-menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Menú
+    </button>
+  </div>
+  <div id="menu" class="container">
+    <ul role="list">
+      <li><a href="../../index.html">← Ideas</a></li>
+      <li><a href="../index.html">Producto</a></li>
+      <li><a href="index.html" aria-current="page">Demo</a></li>
+      <li><a href="../negocio.html">Negocio</a></li>
+      <li><a href="../roadmap.html">Roadmap</a></li>
+      <li><a href="../stack.html">Arquitectura</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="faena-cab">
+    <div>
+      <span class="rotulo rotulo-agua">Balance hídrico y depósito de relaves</span>
+      <h1 id="f-nombre">—</h1>
+      <p id="f-meta" class="pista"></p>
+      <p class="pista"><span id="f-ficha"></span> · <span class="cota" id="f-cota"></span></p>
+    </div>
+    <div class="ctrl">
+      <label class="visually-hidden" for="sel-faena">Faena</label>
+      <select id="sel-faena"></select>
+      <div class="seg" id="periodos" role="group" aria-label="Período del balance">
+        <button data-p="hoy">24 h</button>
+        <button data-p="7d">7 días</button>
+        <button data-p="30d">Mes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs" role="tablist">
+    <button data-tab="balance" role="tab">Balance hídrico</button>
+    <button data-tab="traza" role="tab">Trazabilidad del dato</button>
+    <button data-tab="tranque" id="tab-tranque" role="tab">Depósito de relaves</button>
+    <button data-tab="reportes" role="tab">Reportes</button>
+  </div>
+
+  <!-- 1 · BALANCE ------------------------------------------------------- -->
+  <section class="panel" data-tab="balance" role="tabpanel" aria-label="Balance hídrico">
+    <div class="placa" id="hallazgo"></div>
+
+    <div class="placa">
+      <div class="placa-tit">
+        <h3>La ecuación</h3>
+        <span class="rotulo">todo en l/s</span>
+      </div>
+      <div id="ecuacion"></div>
+    </div>
+
+    <div class="placa">
+      <div class="placa-tit">
+        <h3>De dónde viene cada litro y dónde termina</h3>
+        <span class="rotulo">toca un nodo</span>
+      </div>
+      <div class="scroll-x svg-caja">
+        <svg id="sankey" style="min-width:900px"></svg>
+      </div>
+      <div class="leyenda">
+        <span><span class="pt" style="background:#3F9BD6"></span>Agua nueva que entra</span>
+        <span><span class="pt" style="background:#2E9E70"></span>Agua recirculada</span>
+        <span><span class="pt" style="background:#B3762F"></span>Pérdidas (evaporación, ocluida, infiltración)</span>
+        <span><span class="pt" style="background:#7FC0E6"></span>Se acumula</span>
+        <span><span class="pt" style="background:#B85499"></span>Sin explicar</span>
+      </div>
+      <p class="pista">El diagrama cuadra porque incluye el nodo <em>sin explicar</em>. Sin ese nodo, no cuadraría —
+        y esa es exactamente la planilla que hoy tiene el cliente. La tabla con la procedencia de cada partida está
+        en <strong>Trazabilidad del dato</strong>.</p>
+    </div>
+
+    <section class="placa" id="diag" hidden>
+      <div class="placa-tit">
+        <h3>Diagnóstico de la discrepancia</h3>
+        <span class="rotulo">hipótesis ordenadas por evidencia</span>
+      </div>
+      <p class="pista" style="margin-bottom:var(--sp-s)">
+        Freatia no dice "hay una fuga". Dice qué es lo más probable, con qué evidencia, cuánto explicaría cada
+        hipótesis y qué hacer primero — ordenado por lo que sea barato y descarte más. Las probabilidades son del
+        modelo, no de la física: sirven para priorizar, no para firmar.
+      </p>
+      <div id="diag-lista"></div>
+    </section>
+  </section>
+
+  <!-- 2 · TRAZABILIDAD -------------------------------------------------- -->
+  <section class="panel" data-tab="traza" role="tabpanel" aria-label="Trazabilidad del dato" hidden>
+    <div class="placa">
+      <div class="placa-tit"><h3>El libro mayor del agua</h3></div>
+      <div id="traza-resumen"></div>
+    </div>
+
+    <div class="placa">
+      <div class="placa-tit">
+        <h3>Partidas del balance</h3>
+        <div class="seg" id="filtros" role="group" aria-label="Filtrar por calidad del dato">
+          <button data-q="todos">Todas</button>
+          <button data-q="no-medido">No medidas</button>
+          <button data-q="manual">A mano</button>
+          <button data-q="estimado">Estimadas</button>
+        </div>
+      </div>
+      <div class="scroll-x">
+        <table id="tbl-libro">
+          <thead>
+            <tr>
+              <th>Partida</th><th>Tipo</th><th class="n">l/s</th><th class="n">m³/día</th>
+              <th>TAG</th><th>Calidad del dato</th><th class="n">Cobertura</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="pista">Toca una fila para ver la cadena de custodia completa.</p>
+    </div>
+
+    <div id="traza-detalle"></div>
+  </section>
+
+  <!-- 3 · TRANQUE ------------------------------------------------------- -->
+  <section class="panel" data-tab="tranque" id="panel-tranque" role="tabpanel" aria-label="Depósito de relaves" hidden></section>
+
+  <!-- 4 · REPORTES ------------------------------------------------------ -->
+  <section class="panel" data-tab="reportes" id="panel-reportes" role="tabpanel" aria-label="Reportes" hidden></section>
+
+  <div class="placa" style="margin-top:var(--sp-l)">
+    <div class="placa-tit"><h3>Qué está falseado en este demo</h3><span class="rotulo">honestidad</span></div>
+    <ul class="lista lista-no">
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span>Las faenas son inventadas. Las cuencas, los salares, las comunas, los organismos y los instrumentos, no.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span>No hay conexión OPC-UA, ni PLC, ni gateway. Los datos vienen de un archivo JavaScript. La ingesta real es el 60% del trabajo de ingeniería y está descrita en <a href="../stack.html">Arquitectura</a>.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span>Las probabilidades del diagnóstico están escritas a mano. En el producto salen de un modelo que hay que calibrar con datos reales, y hasta tener 20 faenas eso es una opinión con decimales.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span>El sello criptográfico es un string. El registro inmutable de verdad necesita un servicio de <em>timestamping</em> y una política de retención; también está en Arquitectura.</span></li>
+      <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l10 10M13 3L3 13"/></svg><span>Las periodicidades y formatos regulatorios están marcados <strong>por validar</strong> donde no nos consta. No los inventamos para que el demo se vea más completo.</span></li>
+    </ul>
+  </div>
+
+  <footer class="pie">
+    <p>Freatia · prototipo · datos ficticios sobre geografía y regulación reales.
+      <a href="../index.html">Volver al producto</a></p>
+  </footer>
+</main>
+
+<script src="../graficos.js"></script>
+<script src="demo.js"></script>
+<script>
+  (function () {
+    var b = document.getElementById("btn-menu"), m = document.getElementById("menu");
+    b.addEventListener("click", function () {
+      var abierto = m.classList.toggle("abierto");
+      b.setAttribute("aria-expanded", abierto ? "true" : "false");
+    });
+  })();
+</script>
+</body>
+</html>

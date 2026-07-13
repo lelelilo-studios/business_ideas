@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torniqua — habilitación de contratistas para faenas mineras</title>
+<meta name="description" content="Torniqua mantiene vigente la carpeta de cada trabajador contratista y resuelve el PASA / NO PASA en la portería en un segundo, con el motivo exacto y la ruta para arreglarlo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="torniqua.css">
+<style>
+  /* --- hero: la credencial y el veredicto, nada más --- */
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); }
+  .hero h1 { max-width: 16ch; }
+  .hero__kicker { margin-bottom: var(--sp-s); }
+  .hero__sub { margin-top: var(--sp-m); max-width: 46ch; }
+  .hero__cta { margin-top: var(--sp-l); display: flex; flex-wrap: wrap; gap: var(--sp-2xs); }
+  .hero__card { margin-top: var(--sp-xl); }
+  @media (min-width: 64em) {
+    .hero__in { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-2xl); align-items: center; }
+    .hero__card { margin-top: 0; }
+  }
+
+  /* --- la escena de las 6 de la mañana: una línea de tiempo vertical --- */
+  .scene { list-style: none; position: relative; padding-left: 26px; }
+  .scene::before { content:""; position:absolute; left: 5px; top: 6px; bottom: 6px; width: 1px; background: var(--line); }
+  .scene li { position: relative; padding-bottom: var(--sp-m); }
+  .scene li:last-child { padding-bottom: 0; }
+  .scene li::before {
+    content:""; position:absolute; left: -26px; top: 6px; width: 11px; height: 11px;
+    border-radius: 50%; background: var(--steel-1); border: 2px solid var(--steel-4);
+  }
+  .scene li.hit::before { border-color: var(--alarm); background: var(--alarm); }
+  .scene time { display:block; margin-bottom: 2px; }
+
+  /* --- zonas de la credencial: así presentamos el producto, no en cuadraditos --- */
+  .zones { counter-reset: z; }
+  .zone { display: grid; grid-template-columns: 44px 1fr; gap: var(--sp-s); padding-block: var(--sp-m); border-top: 1px solid var(--line); }
+  .zone__n {
+    counter-increment: z; font-family:'IBM Plex Mono',monospace; font-size: 0.72rem; font-weight: 600;
+    color: var(--teal); border: 1px solid var(--steel-4); background: var(--steel-2);
+    height: 44px; display: grid; place-items: center;
+  }
+  .zone__n::before { content: "Z" counter(z, decimal-leading-zero); }
+  .zone h3 { margin-bottom: 6px; }
+
+  /* --- lector en vivo --- */
+  .reader { border: 1px solid var(--steel-4); background: var(--steel-2); border-radius: var(--radius); overflow: hidden; }
+  .reader__hd { display:flex; align-items:center; justify-content:space-between; gap: var(--sp-2xs);
+                padding: 10px var(--sp-s); background: var(--steel-3); border-bottom: 1px solid var(--steel-4); }
+  .reader__body { padding: var(--sp-s); }
+  .picks { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pick {
+    border: 1px solid var(--steel-4); background: var(--steel-3); color: var(--ink-2);
+    border-radius: 2px; padding: 8px 10px; min-height: 44px;
+    font-family:'IBM Plex Mono',monospace; font-size: 0.72rem; text-align: left; line-height: 1.3;
+  }
+  .pick:hover, .pick:focus-visible { border-color: var(--teal); color: var(--ink); }
+  .pick b { display:block; font-family:'Archivo',sans-serif; font-size: 0.8rem; color: var(--ink); font-weight: 600; }
+  .verdict { margin-top: var(--sp-s); border: 1px solid var(--steel-4); border-radius: var(--radius); padding: var(--sp-s); background: var(--steel-1); }
+  .verdict__big { font-size: var(--step-3); font-weight: 700; letter-spacing: 0.06em; line-height: 1; }
+  .verdict--ok    { border-color: rgba(34,195,172,.45); }
+  .verdict--ok    .verdict__big { color: var(--teal); }
+  .verdict--stop  { border-color: rgba(255,90,44,.55); }
+  .verdict--stop  .verdict__big { color: var(--alarm); }
+  .verdict__why { margin-top: 8px; font-size: 0.9rem; color: var(--ink); }
+  .verdict__fix { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 0.85rem; color: var(--ink-2); }
+
+  /* --- precios --- */
+  .price { display: flex; flex-direction: column; height: 100%; }
+  .price__amt { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.02em; margin-block: 6px 2px; }
+  .price ul { list-style: none; margin-top: var(--sp-s); display: grid; gap: 8px; font-size: 0.88rem; color: var(--ink-2); }
+  .price li { display: flex; gap: 8px; align-items: flex-start; }
+  .price li svg { margin-top: 3px; color: var(--teal); }
+  .price--free { border-color: rgba(34,195,172,.4); background: linear-gradient(180deg, var(--teal-tint), var(--steel-2)); }
+  .price footer { margin-top: auto; padding-top: var(--sp-s); }
+
+  /* --- faq --- */
+  details.faq { border-bottom: 1px solid var(--line); padding-block: var(--sp-s); }
+  details.faq summary { cursor: pointer; font-weight: 600; display: flex; gap: var(--sp-2xs); align-items: center; min-height: 32px; list-style: none; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::before { content: "+"; font-family:'IBM Plex Mono',monospace; color: var(--teal); width: 14px; }
+  details.faq[open] summary::before { content: "−"; }
+  details.faq p { margin-top: var(--sp-2xs); padding-left: 22px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="2" stroke="#22C3AC" stroke-width="1.5"/>
+        <path d="M6 8h7M6 12h5M6 16h7" stroke="#22C3AC" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 5v16" stroke="#22C3AC" stroke-width="1.5"/>
+        <circle cx="20.5" cy="13" r="1.6" fill="#22C3AC"/>
+      </svg>
+      <span class="brand__name">Torniqua</span>
+      <span class="brand__dot" aria-hidden="true"></span>
+    </a>
+    <button class="navtoggle" id="navtoggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ================================================================ HERO -->
+<section class="container hero">
+  <div class="hero__in">
+    <div>
+      <p class="tag tag--teal hero__kicker">Habilitación de contratistas · Ley 20.123</p>
+      <h1>A las 06:12 el bus está en la portería. Cuatro no pueden entrar.</h1>
+      <p class="lede hero__sub">
+        Torniqua mantiene vigente la carpeta de cada trabajador y de cada empresa
+        contratista, avisa <strong>antes</strong> de que algo venza, y resuelve el
+        PASA / NO PASA en la portería en un segundo — con el motivo exacto y la ruta
+        para arreglarlo.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="demo/index.html">Entrar a la portería</a>
+        <a class="btn btn--ghost" href="#precios">Ver precios</a>
+      </div>
+      <p class="small muted" style="margin-top:var(--sp-m)">
+        El lector de portería es gratis para la minera mandante. Paga la empresa contratista.
+        <a href="negocio.html">La aritmética está acá.</a>
+      </p>
+    </div>
+
+    <!-- La credencial. Es el objeto de la marca; aparece de verdad, no de adorno. -->
+    <div class="hero__card">
+      <div class="cred" style="max-width:380px;margin-inline:auto">
+        <div class="cred__punch"></div>
+        <div class="row row--between">
+          <span class="tag">Faena Cerro Ígneo · 4.120 m</span>
+          <span class="chip chip--ok">Habilitado</span>
+        </div>
+        <div class="row" style="margin-top:var(--sp-s);align-items:flex-start">
+          <div class="photo">MC</div>
+          <div style="min-width:0">
+            <div style="font-weight:600;font-size:1.05rem">Miguel Ángel Cortés Fuentes</div>
+            <div class="mono small muted">RUT 15.482.907-3</div>
+            <div class="small" style="margin-top:6px;color:var(--ink-2)">Mantención Industrial Ceibo Ltda.</div>
+            <div class="mono small muted">76.331.205-8 · Operador multipropósito</div>
+          </div>
+        </div>
+        <div style="margin-top:var(--sp-s);display:grid;gap:6px">
+          <div class="row row--between"><span class="tag">Altura geográfica</span><span class="mono small" style="color:var(--teal)">vence 14-11-2026</span></div>
+          <div class="row row--between"><span class="tag">Inducción faena</span><span class="mono small" style="color:var(--teal)">vence 02-02-2027</span></div>
+          <div class="row row--between"><span class="tag">Lic. interna cond.</span><span class="mono small" style="color:var(--teal)">vence 30-09-2026</span></div>
+        </div>
+        <div class="mrz">TQ&lt;CHL154829073&lt;&lt;CORTES&lt;&lt;MIGUEL&lt;ANGEL&lt;&lt;76331205-8&lt;&lt;OK&lt;20260713T0612</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== LA ESCENA -->
+<section class="section" id="problema">
+  <div class="container">
+    <div class="section__head">
+      <span class="tag">01 · El problema, en la portería</span>
+      <h2>El riesgo es la multa. El costo es el camión parado.</h2>
+    </div>
+
+    <div class="grid grid--sidebar">
+      <div>
+        <ol class="scene">
+          <li>
+            <time class="tag">05:40</time>
+            <p>Sale el bus desde Calama con 32 personas de tres empresas contratistas distintas. Dos horas de camino.</p>
+          </li>
+          <li class="hit">
+            <time class="tag tag--alarm">06:12 · Portería Norte</time>
+            <p><strong>El guardia revisa carpetas.</strong> A Jonathan Quilodrán se le venció el examen de altura geográfica <strong>hace tres días</strong>. Nadie lo vio: el papel decía "vigente hasta 10-07-2026" y los papeles no avisan solos.</p>
+          </li>
+          <li class="hit">
+            <time class="tag tag--alarm">06:31</time>
+            <p>Llaman al prevencionista de la contratista. No contesta: está en el turno anterior. El bus no se mueve, porque el bus no vuelve vacío.</p>
+          </li>
+          <li>
+            <time class="tag">07:05</time>
+            <p>Entran 28. Cuatro se devuelven. La cuadrilla de mantención queda incompleta y la detención programada de la correa se corre un día.</p>
+          </li>
+          <li class="hit">
+            <time class="tag tag--alarm">Tres meses después</time>
+            <p>Llega la Dirección del Trabajo. Piden el F30-1 de los 14 contratistas del último semestre. Están en cuatro correos, dos carpetas compartidas y un notebook que se llevó alguien que renunció.</p>
+          </li>
+        </ol>
+      </div>
+
+      <aside class="stack">
+        <div class="card">
+          <span class="tag">Lo que hoy sostiene esto</span>
+          <ul class="rows" style="margin-top:var(--sp-2xs)">
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 9h16M9 9v10"/></svg><span>Una planilla Excel con una columna "vence" que nadie ordena</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg><span>Correos con PDF escaneados y fotos de WhatsApp</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h6l2 2h8v10H4z"/></svg><span>Una carpeta física por trabajador en la garita</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Un guardia con seis minutos por bus y ningún poder de decisión</span></li>
+          </ul>
+        </div>
+        <div class="hazard">
+          <span class="tag tag--alarm">Ley 20.123 · Subcontratación</span>
+          <p class="small" style="margin-top:6px;color:var(--ink)">
+            La empresa mandante responde <strong>solidariamente</strong> por las obligaciones
+            laborales y previsionales de sus contratistas. Si ejerce el derecho de información
+            y retención, la responsabilidad baja a <strong>subsidiaria</strong>. La diferencia entre
+            una y otra es literalmente quién paga: por eso el mandante pide el F30-1 todos los meses
+            — y por eso el dinero está ahí.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EL PRODUCTO -->
+<section class="section" id="producto">
+  <div class="container">
+    <div class="section__head">
+      <span class="tag">02 · Cómo funciona</span>
+      <h2>Cuatro zonas, como una credencial.</h2>
+      <p class="lede prose" style="margin-top:var(--sp-2xs)">
+        No es un repositorio de documentos. Es la decisión de acceso, y todo lo que hay que
+        hacer para que esa decisión sea "pasa".
+      </p>
+    </div>
+
+    <div class="zones">
+      <article class="zone">
+        <div class="zone__n" aria-hidden="true"></div>
+        <div>
+          <h3>El documento entra como llega: escaneado, fotografiado, torcido.</h3>
+          <p>La contratista sube el certificado del examen ocupacional desde el teléfono. La IA lo lee,
+             reconoce el tipo (altura geográfica, altura física, psicosensotécnico, inducción,
+             licencia interna) y le extrae la fecha de vigencia. Nadie tipea nada.</p>
+          <p class="small" style="margin-top:8px;color:var(--teal)">
+            Y cuando la foto está mala, <strong>duda y pregunta</strong>. Nunca inventa una fecha:
+            una vigencia mal leída es una persona entrando indebidamente.</p>
+        </div>
+      </article>
+
+      <article class="zone">
+        <div class="zone__n" aria-hidden="true"></div>
+        <div>
+          <h3>El aviso llega antes, no después.</h3>
+          <p>30, 15 y 5 días antes del vencimiento sale un WhatsApp al prevencionista de la contratista
+             con la lista exacta de quién, qué documento y dónde renovarlo. El aviso no dice "revisa tu
+             carpeta": dice "Quilodrán, altura geográfica, agenda en Calama, cupo el jueves 07:30".</p>
+        </div>
+      </article>
+
+      <article class="zone">
+        <div class="zone__n" aria-hidden="true"></div>
+        <div>
+          <h3>La portería resuelve en un segundo, y dice por qué.</h3>
+          <p>Se escanea la cédula (código PDF417) o la credencial de faena. El lector responde
+             <strong style="color:var(--teal)">PASA</strong> o <strong style="color:var(--alarm)">NO PASA</strong>
+             con el motivo exacto, en la pantalla y en el ticket. El guardia deja de ser el que decide y
+             pasa a ser el que ejecuta. Funciona sin señal: la decisión viaja firmada y con caché de 12 horas.</p>
+        </div>
+      </article>
+
+      <article class="zone">
+        <div class="zone__n" aria-hidden="true"></div>
+        <div>
+          <h3>El expediente ya está armado cuando toca la puerta la DT.</h3>
+          <p>Contratos, anexos, F30 y F30-1, comprobantes Previred, exámenes, registros de entrega de EPP
+             y la traza de cada acceso: por empresa, por periodo, sellado con hash y fecha.
+             Lo que falta aparece marcado como faltante — no rellenado.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EN VIVO -->
+<section class="section" id="lector">
+  <div class="container">
+    <div class="section__head">
+      <span class="tag">03 · El producto, no una foto del producto</span>
+      <h2>Escanea una credencial. Acá mismo.</h2>
+    </div>
+
+    <div class="grid grid--sidebar">
+      <div class="reader">
+        <div class="reader__hd">
+          <span class="tag">Portería Norte · Faena Cerro Ígneo</span>
+          <span class="tag tag--teal" id="clock">06:12:04</span>
+        </div>
+        <div class="reader__body">
+          <p class="tag" style="margin-bottom:8px">Toca una credencial de la fila</p>
+          <div class="picks" id="picks"></div>
+          <div id="verdict" class="verdict" aria-live="polite">
+            <span class="tag">Esperando lectura</span>
+            <p class="small muted" style="margin-top:6px">El lector resuelve contra la última vigencia conocida de la persona <em>y</em> de su empresa.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="stack">
+        <div class="card">
+          <span class="tag">Qué evalúa el lector</span>
+          <ul class="rows small" style="margin-top:var(--sp-2xs)">
+            <li><span class="mono" style="color:var(--teal);width:18px">01</span> Exámenes ocupacionales vigentes (altura geográfica, altura física, psicosensotécnico)</li>
+            <li><span class="mono" style="color:var(--teal);width:18px">02</span> Inducción de faena y cursos obligatorios del cargo</li>
+            <li><span class="mono" style="color:var(--teal);width:18px">03</span> Licencia interna de conducción, si la tarea la exige</li>
+            <li><span class="mono" style="color:var(--teal);width:18px">04</span> Contrato, anexo de faena y entrega de EPP registrada</li>
+            <li><span class="mono" style="color:var(--teal);width:18px">05</span> Estado de la <strong>empresa</strong>: F30-1, cotizaciones Previred, póliza vigente</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="tag tag--alarm">El caso que importa</span>
+          <p class="small" style="margin-top:6px">
+            Si la contratista tiene deuda previsional, no es un trabajador el que no pasa:
+            <strong>no pasa nadie de esa empresa</strong>. Ese es el momento en que el mandante
+            deja de ser solidariamente responsable, porque retuvo. Escanea a Yasna Paredes y míralo.
+          </p>
+        </div>
+        <a class="btn btn--primary btn--block" href="demo/index.html">Ver el flujo completo en el demo</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== PRECIOS -->
+<section class="section" id="precios">
+  <div class="container">
+    <div class="section__head">
+      <span class="tag">04 · Precio</span>
+      <h2>Paga quien sufre el rechazo. La minera no paga nada.</h2>
+      <p class="lede prose" style="margin-top:var(--sp-2xs)">
+        El lector de portería es gratis para la empresa mandante, para siempre. Suscriben las
+        empresas contratistas, por trabajador habilitado. Sin costo de implementación, sin licencia
+        de hardware: corre en un Android con cámara.
+      </p>
+    </div>
+
+    <div class="grid grid--4">
+      <div class="card price price--free">
+        <span class="tag tag--teal">Minera mandante</span>
+        <div class="price__amt">$0</div>
+        <span class="small muted">Lector de portería + tablero de cartera</span>
+        <ul>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Decisión PASA / NO PASA en portería</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Estado de todas sus contratistas</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Traza de accesos exportable</li>
+        </ul>
+        <footer><span class="small muted">Sí, gratis. Es nuestro canal de distribución.</span></footer>
+      </div>
+
+      <div class="card price">
+        <span class="tag">Contratista · Cuadrilla</span>
+        <div class="price__amt">$69.000<span class="small muted"> /mes</span></div>
+        <span class="small muted">Hasta 15 trabajadores habilitados</span>
+        <ul>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Lectura IA de documentos ilimitada</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Alertas 30/15/5 días por WhatsApp</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> 1 faena</li>
+        </ul>
+        <footer><a class="btn btn--ghost btn--block" href="demo/index.html">Probar</a></footer>
+      </div>
+
+      <div class="card price" style="border-color:var(--teal-3)">
+        <span class="tag tag--teal">Contratista · Faena</span>
+        <div class="price__amt">$189.000<span class="small muted"> /mes</span></div>
+        <span class="small muted">Hasta 60 trabajadores habilitados</span>
+        <ul>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Todo lo de Cuadrilla</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Expediente DT armado por periodo</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Hasta 3 faenas · usuarios ilimitados</li>
+        </ul>
+        <footer><a class="btn btn--primary btn--block" href="demo/index.html">Probar</a></footer>
+      </div>
+
+      <div class="card price">
+        <span class="tag">Contratista · Multifaena</span>
+        <div class="price__amt">$490.000<span class="small muted"> /mes</span></div>
+        <span class="small muted">Hasta 250 trabajadores habilitados</span>
+        <ul>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Faenas ilimitadas · API</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Integración con su ERP de RRHH</li>
+          <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Sobre 250: $1.290.000/mes</li>
+        </ul>
+        <footer><a class="btn btn--ghost btn--block" href="negocio.html">Hablar</a></footer>
+      </div>
+    </div>
+
+    <p class="small muted" style="margin-top:var(--sp-m);max-width:70ch">
+      Precios en CLP, mensuales, sin IVA. Un rechazo en portería le cuesta a una contratista de
+      60 personas del orden de <span class="num">$380.000</span> en el día
+      (bus, horas hombre pagadas y no trabajadas, y la tarea que se corre) — la
+      <a href="negocio.html#unit">aritmética de ese número está en Negocio</a>.
+      El plan Faena cuesta menos que medio rechazo al mes.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section__head">
+      <span class="tag">05 · Preguntas que nos hacen</span>
+      <h2>Lo que preguntan en Calama.</h2>
+    </div>
+    <div class="prose">
+      <details class="faq">
+        <summary>¿La IA decide quién entra?</summary>
+        <p>No. La IA lee documentos y extrae fechas; eso es todo. La decisión de acceso la toma un
+           motor de reglas determinístico: si la vigencia es anterior a hoy, no pasa. Es auditable,
+           es reproducible y no depende de un modelo. Un LLM decidiendo accesos a una faena es
+           exactamente lo que no vamos a construir.</p>
+      </details>
+      <details class="faq">
+        <summary>¿Y si la IA lee mal una fecha?</summary>
+        <p>Por eso la lectura viene con nivel de confianza por campo. Bajo el umbral, el documento
+           queda en "requiere confirmación" y una persona lo aprueba viendo el recorte de la imagen.
+           El modelo tiene prohibido rellenar un campo que no ve: si no lo ve, dice que no lo ve.
+           En el <a href="demo/index.html">demo</a> hay un caso así, y no está de adorno.</p>
+      </details>
+      <details class="faq">
+        <summary>Nuestra minera ya nos exige Achilles / RedMinera. ¿Esto lo reemplaza?</summary>
+        <p>No, y no queremos. Achilles y sus pares son registros de homologación de proveedores:
+           te acreditan una vez al año para poder <em>contratar</em>. Torniqua es operación diaria:
+           quién entra mañana a las 6. Convivimos, y exportamos hacia allá lo que pidan.</p>
+      </details>
+      <details class="faq">
+        <summary>La portería no tiene señal.</summary>
+        <p>Sabemos. El lector guarda una copia firmada de las habilitaciones válidas y opera sin
+           conexión hasta 12 horas, registrando cada lectura para sincronizar después. Si una
+           habilitación se revoca durante ese tramo, el trabajador no pasa el turno siguiente y
+           queda registrado que entró bajo caché.</p>
+      </details>
+      <details class="faq">
+        <summary>¿Quién carga los documentos, la minera o nosotros?</summary>
+        <p>La contratista, que es la que los tiene. La minera sólo mira el resultado. Ese reparto no
+           es casual: la información nace donde nace el papel, y el mandante no quiere transcribir
+           carpetas ajenas — quiere no ser responsable solidario de ellas.</p>
+      </details>
+      <details class="faq">
+        <summary>¿Se conecta con Previred y la Dirección del Trabajo?</summary>
+        <p>Hoy no hay API pública de Previred ni de la DT para terceros. Lo que hacemos es leer los
+           certificados que la propia contratista descarga (F30, F30-1, nómina Previred) y vigilar su
+           vigencia — que es exactamente el trámite que hoy hacen a mano. Lo decimos claro en
+           <a href="stack.html">Arquitectura</a>, incluido lo que está falseado en el demo.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== CTA -->
+<section class="section">
+  <div class="container">
+    <div class="cred" style="max-width:720px">
+      <span class="tag tag--teal">Siguiente turno</span>
+      <h2 style="margin-block:8px var(--sp-2xs)">Mañana a las 06:12 vas a saber quién no pasa. Hoy también podrías.</h2>
+      <p class="prose">Anda al demo y escanea el bus completo. Vas a ver el rechazo, vas a arreglar el
+         documento con la IA, y vas a volver a escanear a la misma persona.</p>
+      <div class="row" style="margin-top:var(--sp-m)">
+        <a class="btn btn--primary" href="demo/index.html">Entrar a la portería</a>
+        <a class="btn btn--ghost" href="roadmap.html">Ver el roadmap</a>
+      </div>
+      <div class="mrz">TQ&lt;CHL&lt;&lt;TORNIQUA&lt;&lt;PROTOTIPO&lt;&lt;2026&lt;&lt;DEMO&lt;NO&lt;PRODUCTIVO</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container row row--between">
+    <span>Torniqua · prototipo · Antofagasta / Calama</span>
+    <span class="mono small">torniqua.com — dominio verificado libre 13-07-2026</span>
+  </div>
+</footer>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Lector en vivo del landing. Mismo motor de reglas que el demo (versión corta):
+   la decisión es determinística, la IA no participa acá.
+   --------------------------------------------------------------------------- */
+(function () {
+  var toggle = document.getElementById('navtoggle');
+  var nav = document.getElementById('nav');
+  toggle.addEventListener('click', function () {
+    var open = nav.classList.toggle('nav--open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  /* Reloj de portería: parte 06:12:04 y corre. Es una faena de turno A. */
+  var t = new Date(2026, 6, 13, 6, 12, 4);
+  var clock = document.getElementById('clock');
+  setInterval(function () {
+    t = new Date(t.getTime() + 1000);
+    clock.textContent = [t.getHours(), t.getMinutes(), t.getSeconds()]
+      .map(function (n) { return String(n).padStart(2, '0'); }).join(':');
+  }, 1000);
+
+  var FILA = [
+    {
+      ini: 'MC', nom: 'Miguel Ángel Cortés Fuentes', rut: '15.482.907-3',
+      emp: 'Mantención Industrial Ceibo Ltda.', empRut: '76.331.205-8', cargo: 'Operador multipropósito',
+      pasa: true,
+      motivo: 'Todas las habilitaciones vigentes. Próximo vencimiento: licencia interna de conducción, en 79 días.',
+      fix: 'Sin acción. Se avisará el 01-09-2026, 30 días antes.'
+    },
+    {
+      ini: 'JQ', nom: 'Jonathan Quilodrán Vera', rut: '18.204.663-1',
+      emp: 'Sondajes Quilcán SpA', empRut: '76.998.113-5', cargo: 'Ayudante de sondaje',
+      pasa: false,
+      motivo: 'Examen de altura geográfica VENCIDO hace 3 días (venció el 10-07-2026). La faena está a 4.120 m: es obligatorio y no admite excepción.',
+      fix: 'Cupo disponible mañana 07:30, Centro Médico Ocupacional Calama. Se avisó al prevencionista de Sondajes Quilcán el 10-06, el 25-06 y el 05-07. Nadie renovó.'
+    },
+    {
+      ini: 'YP', nom: 'Yasna Paredes Millán', rut: '16.740.552-9',
+      emp: 'Transportes Aguilar Hnos. SpA', empRut: '77.210.664-3', cargo: 'Conductora bus de acercamiento',
+      pasa: false,
+      motivo: 'La EMPRESA está bloqueada: F30-1 de junio con deuda previsional declarada (14 trabajadores afectados). No es un problema de ella.',
+      fix: 'Transportes Aguilar debe regularizar cotizaciones y cargar el F30-1 limpio. Mientras tanto, el mandante retiene el estado de pago — y con eso deja de ser solidariamente responsable (Ley 20.123, art. 183-C).'
+    },
+    {
+      ini: 'NP', nom: 'Nelson Painemal Loyola', rut: '13.905.118-K',
+      emp: 'Eléctrica Puelche Servicios SpA', empRut: '77.804.339-K', cargo: 'Eléctrico de alta tensión',
+      pasa: true,
+      motivo: 'Habilitado. AVISO: la inducción de faena vence en 6 días (19-07-2026).',
+      fix: 'Pasa hoy. Se agendó reinducción para el 16-07, 08:00, sala de capacitación Portería Norte.'
+    }
+  ];
+
+  var picks = document.getElementById('picks');
+  var box = document.getElementById('verdict');
+
+  FILA.forEach(function (p, i) {
+    var b = document.createElement('button');
+    b.className = 'pick';
+    b.type = 'button';
+    b.innerHTML = '<b>' + p.nom.split(' ').slice(0, 1) + ' ' + p.nom.split(' ').slice(-2).join(' ') + '</b>' + p.rut;
+    b.addEventListener('click', function () { leer(p); });
+    picks.appendChild(b);
+  });
+
+  function leer(p) {
+    box.className = 'verdict';
+    box.innerHTML = '<span class="tag tag--teal">Leyendo credencial…</span>' +
+                    '<p class="mono small muted" style="margin-top:6px">' + p.rut + ' · validando 8 requisitos</p>';
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function () { veredicto(p); }, reduce ? 0 : 620);
+  }
+
+  function veredicto(p) {
+    box.className = 'verdict ' + (p.pasa ? 'verdict--ok' : 'verdict--stop');
+    box.innerHTML =
+      '<div class="row row--between">' +
+        '<span class="verdict__big">' + (p.pasa ? 'PASA' : 'NO PASA') + '</span>' +
+        '<span class="chip ' + (p.pasa ? 'chip--ok' : 'chip--stop') + '">' + (p.pasa ? 'Torniquete liberado' : 'Torniquete bloqueado') + '</span>' +
+      '</div>' +
+      '<div class="row" style="margin-top:10px;align-items:flex-start">' +
+        '<div class="photo ' + (p.pasa ? '' : 'photo--alarm') + '">' + p.ini + '</div>' +
+        '<div style="min-width:0">' +
+          '<div style="font-weight:600">' + p.nom + '</div>' +
+          '<div class="mono small muted">' + p.rut + '</div>' +
+          '<div class="small" style="margin-top:4px;color:var(--ink-2)">' + p.emp + '</div>' +
+          '<div class="mono small muted">' + p.empRut + ' · ' + p.cargo + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<p class="verdict__why"><span class="tag ' + (p.pasa ? '' : 'tag--alarm') + '">Motivo</span><br>' + p.motivo + '</p>' +
+      '<p class="verdict__fix"><span class="tag">Ruta para arreglarlo</span><br>' + p.fix + '</p>';
+  }
+})();
+</script>
+</body>
+</html>

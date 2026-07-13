@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianota — negocio y go-to-market</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, competencia, precio, economía unitaria y canales de Cianota.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  h2 { margin-bottom: var(--sp-s); }
+  section > .container > .prose { margin-bottom: var(--sp-m); }
+  .fuente {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3);
+    border-top: 1px solid var(--linea-df); padding-top: 0.5rem; margin-top: var(--sp-s);
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container">
+    <div class="nav-fila">
+      <a class="marca" href="index.html">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#56d7ef" stroke-width="1.2" aria-hidden="true">
+          <circle cx="4" cy="4" r="2.2"/><circle cx="18" cy="4" r="2.2"/><circle cx="11" cy="11" r="2.2"/>
+          <circle cx="4" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>
+          <path d="M5.6 5.6 9.4 9.4M16.4 5.6 12.6 9.4M9.4 12.6 5.6 16.4M12.6 12.6l3.8 3.8"/>
+        </svg>
+        Cianota
+      </a>
+      <button class="nav-btn" aria-expanded="false" aria-controls="nav-menu">MENÚ</button>
+    </div>
+    <nav id="nav-menu" class="nav-menu" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="container">
+    <p class="rotulo">Lámina 03 — Negocio</p>
+    <h1>A quién le vendemos, cuánto vale y por dónde entramos</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Toda cifra de esta página está citada o es una <strong>estimación con la aritmética a la vista</strong>. Cuando no tenemos el dato, lo decimos.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ ICP -->
+<section>
+  <div class="container">
+    <p class="rotulo">01 — Cliente objetivo</p>
+    <h2>Dos compradores, un mismo dolor</h2>
+
+    <div class="rejilla rejilla-2">
+      <div class="caja stack">
+        <span class="chip chip-curso">Comprador A</span>
+        <h3>El titular del proyecto</h3>
+        <p><strong>Segmento:</strong> minera, generadora eléctrica o industria con un proyecto de inversión sobre US$ 100 millones en tramitación ambiental o sectorial en Chile.</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li><strong>Quién firma:</strong> el gerente de proyecto o el VP de desarrollo. Es quien tiene el número del costo de la demora en su presentación al directorio.</li>
+          <li><strong>Quién lo usa:</strong> el jefe de permisos o el abogado in-house de medio ambiente. Dos a cinco personas.</li>
+          <li><strong>Dónde ya está:</strong> en un Excel con una carta Gantt, un SharePoint con el expediente y una cadena de correos con la consultora.</li>
+          <li><strong>Qué gatilla la compra:</strong> el primer ICSARA, o un directorio que preguntó por qué la fecha se corrió y nadie supo explicarlo bien.</li>
+        </ul>
+      </div>
+
+      <div class="caja stack">
+        <span class="chip chip-alerta">Comprador B — y canal</span>
+        <h3>El estudio o la consultora</h3>
+        <p><strong>Segmento:</strong> consultora ambiental o estudio de abogados que gestiona permisos para varios titulares a la vez.</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li><strong>Quién firma:</strong> el socio o el gerente de la línea de permisos.</li>
+          <li><strong>Quién lo usa:</strong> el equipo de proyectos, entre 5 y 20 personas repartidas en varias cuentas.</li>
+          <li><strong>Qué le vendemos:</strong> margen. Hoy tiene gente cara contando días hábiles y buscando en carpetas. Con Cianota entrega el mismo servicio con menos horas y con un reporte que impresiona al cliente.</li>
+          <li><strong>Y de paso:</strong> nos abre la puerta a sus titulares. Ver <em>canales</em> más abajo.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-m)">Descartado explícitamente: proyectos bajo US$ 10 millones (una DIA de baja complejidad no tiene grafo que valga la pena) y el sector público (ciclo de venta incompatible con nuestra caja).</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ MERCADO -->
+<section>
+  <div class="container">
+    <p class="rotulo">02 — Tamaño de mercado</p>
+    <h2>El TAM chileno es chico. Lo decimos de entrada.</h2>
+    <p class="prose">Esto no es un mercado de cien mil PYMEs. Son unos pocos cientos de cuentas, cada una capaz de pagar bien. Cualquier tesis que dependa de un TAM chileno grande es falsa, y el crecimiento viene de la expansión regional.</p>
+
+    <div class="rejilla-lado" style="margin-top:var(--sp-m)">
+      <div class="fig">
+        <p class="fig-titulo">TAM · SAM · SOM — Chile</p>
+        <p class="fig-sub">CLP por año, potencial de suscripción</p>
+        <svg viewBox="0 0 420 190" role="img" aria-label="TAM 10.335 millones de pesos al año, SAM 7.196 millones, SOM al mes 24 de 517 millones.">
+          <line class="eje" x1="8" y1="170" x2="412" y2="170"/>
+          <!-- TAM -->
+          <rect x="8" y="20" width="404" height="34" fill="#66cde2"/>
+          <text class="serie-et" x="18" y="41" fill="#081726" font-weight="600">TAM $10.335 M/año</text>
+          <!-- SAM -->
+          <rect x="8" y="66" width="281" height="34" fill="#33b2ca"/>
+          <text class="serie-et" x="18" y="87" fill="#081726" font-weight="600">SAM $7.196 M/año</text>
+          <!-- SOM -->
+          <rect x="8" y="112" width="20" height="34" fill="#1d8fa6"/>
+          <text class="serie-et" x="36" y="133" fill="#e8f2fa">SOM (mes 24) $517 M/año</text>
+          <text class="tick" x="8" y="185">0</text>
+          <text class="tick" x="412" y="185" text-anchor="end">$10.335 M</text>
+        </svg>
+        <p class="nota" style="margin-top:var(--sp-2xs)">El SOM del mes 24 es el <strong>5,0 %</strong> del TAM chileno. Si el plan sale perfecto, seguimos siendo un actor chico en un mercado chico. Ese es el punto.</p>
+      </div>
+
+      <div>
+        <h3>La aritmética, entera</h3>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead>
+              <tr><th>Segmento</th><th class="num">Cuentas</th><th class="num">Precio/mes</th><th class="num">CLP/año</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>A · Titulares &gt; US$ 100 M en tramitación<br><span class="nota">plan Cartera</span></td>
+                <td class="num">130</td><td class="num">$2.400.000</td><td class="num">$3.744 M</td>
+              </tr>
+              <tr>
+                <td>B · Estudios y consultoras relevantes<br><span class="nota">plan Estudio</span></td>
+                <td class="num">45</td><td class="num">$3.900.000</td><td class="num">$2.106 M</td>
+              </tr>
+              <tr>
+                <td>C · Proyectos medianos US$ 10–100 M<br><span class="nota">plan Expediente</span></td>
+                <td class="num">420</td><td class="num">$890.000</td><td class="num">$4.485 M</td>
+              </tr>
+              <tr style="border-top:1px solid var(--linea)">
+                <td><strong>TAM Chile</strong></td><td class="num">595</td><td class="num">—</td>
+                <td class="num"><strong class="acento">$10.335 M</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="nota" style="margin-top:var(--sp-s)">
+          <strong>SAM</strong> = A + B + el 30 % de C (los medianos que tienen un equipo de permisos formal) =
+          3.744 + 2.106 + 0,30 × 4.485 = <strong class="acento">$7.196 M/año</strong>.<br>
+          <strong>SOM (mes 24)</strong> = 24 cuentas × ARPU $1.795.000 × 12 = <strong class="acento">$517 M/año</strong> ≈ US$ 545 mil de ARR.
+        </p>
+
+        <div class="aviso" style="margin-top:var(--sp-s)">
+          <strong>Los supuestos, declarados uno por uno:</strong>
+          <ul class="lista" style="margin-top:0.5rem;font-size:var(--step--1)">
+            <li><strong>130 titulares grandes</strong> — es nuestra estimación de proyectos sobre US$ 100 M activos en tramitación en cualquier momento (minería, energía, industria, infraestructura). Cochilco publica una cartera de proyectos mineros a diez años del orden de decenas de miles de millones de dólares en ~50 proyectos; sumamos energía e industria. <span class="chip chip-validar">verificar contra la edición vigente de Cochilco y las estadísticas del SEA</span></li>
+            <li><strong>45 estudios</strong> — conteo propio de consultoras ambientales y estudios de abogados con práctica regulatoria activa en Chile. Estimación.</li>
+            <li><strong>420 proyectos medianos</strong> — orden de magnitud a partir del volumen anual de ingresos al SEIA (DIA + EIA), del que sólo una fracción tiene inversión sobre US$ 10 M. <span class="chip chip-validar">verificar en las estadísticas públicas del SEA</span></li>
+            <li>Precios: los de la <a href="index.html#simulador">página de producto</a>, sin descuento por volumen.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="caja" style="margin-top:var(--sp-l)">
+      <h3>La extensión global</h3>
+      <p style="margin-top:var(--sp-xs)">El mismo producto sirve donde hay permitología pesada y proyectos de capital intensivo: <strong>Perú</strong> (SENACE, MINEM — cartera minera comparable a la chilena), <strong>Brasil</strong> (IBAMA), <strong>México</strong>, <strong>Colombia</strong>, y en el mundo desarrollado <strong>Australia</strong> y <strong>Canadá</strong>. El catálogo normativo hay que rehacerlo por país; el motor, no.</p>
+      <p class="nota" style="margin-top:var(--sp-s)">Estimación gruesa, y la marcamos como tal: si Chile son ~600 cuentas, el conjunto Perú + Brasil + México + Colombia + Australia + Canadá es del orden de <strong>8×</strong> ese universo. TAM ampliado ≈ US$ 85 M/año. Es un múltiplo asumido, no un dato: para venderlo habría que hacer el mismo conteo país por país. No lo hemos hecho.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ CUÑA -->
+<section>
+  <div class="container">
+    <p class="rotulo">03 — Posicionamiento y cuña</p>
+    <h2>La cabeza de playa: minería en el norte, EIA en curso, con ICSARA sobre la mesa</h2>
+
+    <div class="rejilla rejilla-2">
+      <div class="stack">
+        <p>No entramos por “gestión de permisos”. Entramos por <strong>un momento específico</strong>: el titular acaba de recibir un ICSARA y tiene que decidir cuánto le va a costar responderlo.</p>
+        <p>Ese momento tiene tres propiedades que lo hacen ideal:</p>
+        <ul class="lista">
+          <li><strong>Es urgente.</strong> Hay un plazo corriendo, y no hay tiempo de armar un comité de compras.</li>
+          <li><strong>Es medible.</strong> Se puede demostrar valor en dos semanas, con el expediente que ya tienen.</li>
+          <li><strong>Es caro.</strong> Un ICSARA mal respondido genera otro ICSARA, y ahí se van los meses.</li>
+        </ul>
+        <p>Por eso el primer producto que se toca es el <strong>lector</strong>, no el grafo. El grafo es lo que retiene; el lector es lo que hace entrar.</p>
+      </div>
+
+      <div class="caja stack">
+        <p class="rotulo" style="margin-bottom:var(--sp-s)">Por qué minería, y por qué el norte</p>
+        <ul class="lista">
+          <li><strong>El costo de la demora es enorme y ya está calculado.</strong> En una minera existe un modelo de VAN y una tasa de descuento. No tenemos que enseñarles el concepto: sólo conectarlo con los permisos.</li>
+          <li><strong>La complejidad es máxima.</strong> Agua, relaves, arqueología, altura, comunidades. Si funciona aquí, funciona en un parque solar.</li>
+          <li><strong>El mercado es denso.</strong> Son pocas empresas y todas se conocen. Un caso de éxito circula solo.</li>
+          <li><strong>Hay presupuesto asignado.</strong> Ya le están pagando a consultores por este trabajo. No pedimos plata nueva; pedimos una parte de una plata que ya se gasta.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ COMPETENCIA -->
+<section>
+  <div class="container">
+    <p class="rotulo">04 — Competencia</p>
+    <h2>El titular del puesto es un Excel, y hay que decirlo</h2>
+
+    <div class="scroll-x">
+      <table>
+        <thead>
+          <tr><th>Quién</th><th>Qué hace hoy</th><th>Nuestra diferencia — honesta</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Excel + carta Gantt + carpeta compartida</strong><br><span class="nota">el competidor real, en el 90 % de los casos</span></td>
+            <td>Una lista de permisos con fechas puestas a mano. Nadie modela dependencias porque un Excel no dibuja un grafo.</td>
+            <td>Es gratis, ya está instalado y nadie lo va a defender en una reunión. Nuestra única defensa es que en la primera sesión les mostramos una dependencia que no tenían. Si no aparece, perdimos.</td>
+          </tr>
+          <tr>
+            <td><strong>Primavera P6 · MS Project</strong></td>
+            <td>Planifican la construcción con CPM de verdad. Los permisos entran como una barra estimada a ojo.</td>
+            <td>No competimos: exportamos hitos hacia ellos. Pero un cliente puede decir “ya tenemos P6, métanlo ahí” — y tiene parte de razón. Nuestra respuesta es el catálogo normativo, los relojes y el lector, que P6 nunca va a tener.</td>
+          </tr>
+          <tr>
+            <td><strong>Enablon · Cority · Intelex · Sphera</strong><br><span class="nota">software EHS / compliance internacional</span></td>
+            <td>Seguimiento de <em>compromisos</em> ambientales <strong>después</strong> de la RCA. Software serio, caro y global.</td>
+            <td>Ellos viven post-RCA. Nosotros vivimos pre-RCA, que es donde se pierden los años. Riesgo real: cualquiera de ellos puede bajar un módulo de permitología chilena si el mercado se ve grande. No se va a ver grande.</td>
+          </tr>
+          <tr>
+            <td><strong>Consultoras: SGA, Gestión Ambiental Consultores, Arcadis, WSP, Poch, ERM, Ramboll</strong></td>
+            <td>Venden horas de profesionales y criterio. Son excelentes en lo suyo.</td>
+            <td>No las reemplazamos: las armamos. Son nuestro canal más importante y también el que nos puede cerrar la puerta si nos leen como amenaza. Todo el plan Estudio existe para que la lectura sea la contraria.</td>
+          </tr>
+          <tr>
+            <td><strong>El e-SEIA del propio SEA</strong></td>
+            <td>Portal público con el expediente y el estado del proyecto. Gratis y oficial.</td>
+            <td>Es nuestra fuente de datos, no nuestro competidor — <em>hasta que el Estado le agregue seguimiento de plazos y una API</em>. Ver “qué mataría esto”.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ ECONOMÍA -->
+<section>
+  <div class="container">
+    <p class="rotulo">05 — Precio y economía unitaria</p>
+    <h2>Los números, con la resta hecha</h2>
+
+    <div class="rejilla rejilla-2">
+      <div>
+        <h3>ARPU</h3>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead><tr><th>Plan</th><th class="num">Precio/mes</th><th class="num">Mezcla</th><th class="num">Aporte</th></tr></thead>
+            <tbody>
+              <tr><td>Expediente</td><td class="num">$890.000</td><td class="num">55 %</td><td class="num">$489.500</td></tr>
+              <tr><td>Cartera</td><td class="num">$2.400.000</td><td class="num">30 %</td><td class="num">$720.000</td></tr>
+              <tr><td>Estudio</td><td class="num">$3.900.000</td><td class="num">15 %</td><td class="num">$585.000</td></tr>
+              <tr style="border-top:1px solid var(--linea)"><td><strong>ARPU</strong></td><td class="num">—</td><td class="num">100 %</td><td class="num"><strong class="acento">$1.794.500</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota" style="margin-top:var(--sp-xs)">Mezcla supuesta a partir del embudo del año 1. Además: implementación de $2.900.000 por cuenta nueva, cobrada una vez (cubre el costo real de cargar y validar el expediente; no la contamos como ingreso recurrente).</p>
+      </div>
+
+      <div>
+        <h3>Costo de servir una cuenta (COGS)</h3>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead><tr><th>Componente</th><th class="num">US$/mes</th><th class="num">CLP/mes</th></tr></thead>
+            <tbody>
+              <tr><td>Lector de expedientes — Claude Opus 4.8</td><td class="num">12,8</td><td class="num">$12.200</td></tr>
+              <tr><td>Indexación del expediente — Claude Sonnet 5</td><td class="num">5,3</td><td class="num">$5.000</td></tr>
+              <tr><td>Emparejador de evidencia — Claude Sonnet 5</td><td class="num">12,8</td><td class="num">$12.200</td></tr>
+              <tr><td>Vigía del catálogo — Claude Haiku 4.5 (batch)</td><td class="num">2,0</td><td class="num">$1.900</td></tr>
+              <tr><td>OCR, almacenamiento, cómputo y WhatsApp</td><td class="num">28,5</td><td class="num">$27.100</td></tr>
+              <tr><td>Analista regulatorio (catálogo al día) ÷ 40 cuentas</td><td class="num">58</td><td class="num">$55.000</td></tr>
+              <tr><td>Soporte L1</td><td class="num">4,7</td><td class="num">$4.500</td></tr>
+              <tr style="border-top:1px solid var(--linea)"><td><strong>COGS por cuenta</strong></td><td class="num">124</td><td class="num"><strong class="malo">$117.800</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota" style="margin-top:var(--sp-xs)">Tipo de cambio supuesto: <strong>$950/US$</strong>. El desglose del costo de inferencia, token por token, está en <a href="stack.html">Arquitectura</a> — y cuadra con esta tabla.</p>
+      </div>
+    </div>
+
+    <div class="rejilla rejilla-4" style="margin-top:var(--sp-l)">
+      <div class="caja">
+        <span class="metrica-et">Margen bruto</span>
+        <span class="metrica-valor acento">93 %</span>
+        <span class="metrica-pie">(1.794.500 − 117.800) ÷ 1.794.500</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">CAC</span>
+        <span class="metrica-valor">$8.200.000</span>
+        <span class="metrica-pie">go-to-market $8,2 M/mes ÷ 1,0 cierre/mes</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">LTV</span>
+        <span class="metrica-valor">$64,6 M</span>
+        <span class="metrica-pie">$1.615.500 × 40 meses de vida</span>
+      </div>
+      <div class="caja">
+        <span class="metrica-et">Payback / LTV:CAC</span>
+        <span class="metrica-valor">5,1 m · 7,9×</span>
+        <span class="metrica-pie">8.200.000 ÷ 1.615.500</span>
+      </div>
+    </div>
+
+    <div class="aviso" style="margin-top:var(--sp-m)">
+      <strong>Las tres letras chicas que no vamos a esconder.</strong>
+      <ul class="lista" style="margin-top:0.5rem;font-size:var(--step--1)">
+        <li><strong>El margen de 93 % es a escala.</strong> El analista regulatorio cuesta $2.200.000 al mes tenga 5 clientes o 40. Con 10 cuentas se reparte entre menos gente y el COGS sube a $282.800: el margen bruto real es <strong>84 %</strong>. El 93 % llega recién pasadas las 40 cuentas.</li>
+        <li><strong>El LTV usa un margen de 90 %, no de 93 %</strong>, a propósito: es el promedio ponderado de los años en que todavía no hay escala.</li>
+        <li><strong>La vida de 40 meses supone que el 40 % de las cuentas renueva con su siguiente proyecto.</strong> Si no renuevan, la vida real es la del proyecto y el churn es estructural, no un problema de producto. Es el supuesto más frágil de esta página.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ CANALES -->
+<section>
+  <div class="container">
+    <p class="rotulo">06 — Canales, en orden</p>
+    <h2>Son 600 cuentas en total. Esto es ABM, no marketing de embudo.</h2>
+
+    <ol class="lista-num" style="margin-top:var(--sp-m)">
+      <li>
+        <h3>El disparador del e-SEIA (canal propio, el mejor que tenemos)</h3>
+        <p>Todo proyecto que ingresa al SEIA aparece en el portal público. Un proyecto que ingresa un EIA es un cliente con el dolor a punto de empezar. Cianota vigila los ingresos y, dentro de la semana, le manda al titular <strong>el grafo de dependencias de su propio proyecto, hecho con datos públicos</strong>. No es un correo de venta: es el producto.</p>
+        <p class="nota">Costo marginal: casi cero. Tasa de respuesta esperada: alta, porque el correo trae trabajo hecho. Esta es la jugada central del go-to-market.</p>
+      </li>
+      <li>
+        <h3>Estudios y consultoras ambientales como distribuidores</h3>
+        <p>SGA, GAC, Poch, Arcadis, WSP, ERM y una docena de estudios de abogados tramitan, entre todos, la mayoría de los proyectos grandes de Chile. Oferta concreta: <strong>el plan Estudio gratis por 6 meses para el primer proyecto de un cliente suyo</strong>, y una comisión de referidos del 15 % del primer año cuando el titular contrata directo.</p>
+        <p class="nota">Es el canal que baja el CAC de $8,2 M a algo del orden de $3 M. Y es el canal que puede no existir: si ningún estudio trae un cliente en 6 meses, hay que mirar el modelo de nuevo (ver el criterio de muerte de M4 en el <a href="roadmap.html">roadmap</a>).</p>
+      </li>
+      <li>
+        <h3>Gremios y la semana del cobre</h3>
+        <p><strong>Consejo Minero</strong> (las grandes), <strong>SONAMI</strong> (la mediana), <strong>Aprimin</strong> (proveedores), <strong>Voces Mineras</strong>, y el <strong>Colegio de Ingenieros</strong>. El evento que importa es <strong>Cesco Week</strong> en abril, en Santiago: ahí está, en tres días, todo el universo de compradores. Segundo: <strong>Exponor</strong> en Antofagasta.</p>
+        <p class="nota">No compramos stand. Presentamos un caso: “un mes de atraso en la Adenda, tres meses de puesta en marcha, US$ 34,8 millones”. Con datos públicos de un proyecto real. Ese es el contenido.</p>
+      </li>
+      <li>
+        <h3>Outbound nominal por LinkedIn</h3>
+        <p>Hay menos de 400 personas en Chile con el cargo “gerente de permisos”, “jefe de medio ambiente” o “VP de desarrollo de proyectos” en una empresa que califica. Se pueden listar una por una. No hay volumen que optimizar: hay 400 mensajes que escribir bien.</p>
+      </li>
+      <li>
+        <h3>SEO long-tail en español</h3>
+        <p>Nadie busca “software de permitología”. Sí buscan <em>“plazo adenda SEIA días hábiles”</em>, <em>“PAS 138 qué es”</em>, <em>“cuánto demora una RCA”</em>, <em>“silencio administrativo ley 19.880 permisos”</em>. Publicamos la respuesta bien hecha, citada, y con el catálogo de plazos abierto. Es lento y compone.</p>
+      </li>
+      <li>
+        <h3 class="tenue">Google Ads / Meta — descartado</h3>
+        <p class="tenue">Con un universo de 600 cuentas, un CPL de $30.000 comprando clics de gente que no es el comprador es tirar la plata. Si algún día hay un producto autoservicio para proyectos chicos, se revisa.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ IA MARKETING -->
+<section>
+  <div class="container">
+    <p class="rotulo">07 — IA en el marketing mismo</p>
+    <h2>Dónde ayuda de verdad, y dónde es puro ruido</h2>
+
+    <div class="rejilla rejilla-2">
+      <div class="caja stack">
+        <p class="rotulo" style="color:var(--ok);margin-bottom:var(--sp-s)">Sí — y es decisivo</p>
+        <ul class="lista">
+          <li><strong>La radiografía gratis.</strong> Cuando un proyecto ingresa al SEIA, la IA lee el expediente público y arma el grafo de permisos. Eso es un lead magnet que <strong>no se puede fabricar sin IA</strong>: hacerlo a mano cuesta dos semanas de un abogado por proyecto. Con IA cuesta unos dólares. Es la única razón por la que este canal existe.</li>
+          <li><strong>Detección de la señal de compra.</strong> Clasificar, todos los días, los ICSARA y las resoluciones que publica el SEA para saber <em>hoy</em> a quién le acaba de llegar una observación. Ese es el momento de escribirle.</li>
+          <li><strong>Investigación de cuenta.</strong> Antes de una reunión, un resumen del expediente público del proyecto: en qué está, qué servicios lo tienen trabado, qué se les vence. Llegar sabiendo es lo que compra el respeto de un gerente de permisos.</li>
+        </ul>
+      </div>
+
+      <div class="caja stack">
+        <p class="rotulo" style="color:var(--critico);margin-bottom:var(--sp-s)">No — y no vamos a fingir que sí</p>
+        <ul class="lista">
+          <li><strong>Correos “personalizados” generados.</strong> El comprador es un abogado que lee contratos todo el día. Detecta un correo escrito por una máquina en la primera línea, y ahí perdimos la cuenta para siempre. Los 400 mensajes se escriben a mano.</li>
+          <li><strong>Contenido de volumen para SEO.</strong> Nuestra credibilidad entera es la precisión. Publicar veinte artículos generados sobre plazos legales —con un plazo mal— destruye exactamente el activo que vendemos.</li>
+          <li><strong>Chatbot en el sitio.</strong> Con 600 cuentas, la conversación la tiene un humano. Siempre.</li>
+        </ul>
+        <p class="nota">Regla de la casa: la IA se usa donde el output lo verifica un humano antes de salir, o donde el error no cuesta nada. En marketing, casi nunca se cumple lo segundo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ 90 DÍAS -->
+<section>
+  <div class="container">
+    <p class="rotulo">08 — Primeros 90 días</p>
+    <h2>La secuencia, sin adornos</h2>
+
+    <div class="rejilla rejilla-3">
+      <div class="caja stack">
+        <p class="metrica-et">Días 1–30 · Construir la verdad</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Cargar <strong>tres expedientes reales</strong> del e-SEIA (públicos, sin pedirle permiso a nadie) y construir el grafo a mano, con un abogado.</li>
+          <li>Levantar el catálogo v0: 40 permisos sectoriales, servicio, norma, plazo — y marcar honestamente cuáles no nos constan.</li>
+          <li>Conseguir dos horas con un ex-jefe de permisos de una minera grande. Pagarlas si hace falta.</li>
+          <li>Meta: el grafo de los tres proyectos revisado por alguien que sabe, y una lista de los errores que cometimos.</li>
+        </ul>
+      </div>
+      <div class="caja stack">
+        <p class="metrica-et">Días 31–60 · Enseñar el plano</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Mandarle a cada uno de los tres titulares <strong>su</strong> grafo, con la ruta crítica y una dependencia que probablemente no tenían anotada. Sin pedir nada a cambio.</li>
+          <li>Doce reuniones con jefes de permisos, de una lista nominal de 60.</li>
+          <li>Tres reuniones con socios de consultoras: no para venderles, para preguntarles qué odian de su semana.</li>
+          <li>Meta: tres <em>design partners</em> que acepten cargar un expediente vivo.</li>
+        </ul>
+      </div>
+      <div class="caja stack">
+        <p class="metrica-et">Días 61–90 · Cobrar</p>
+        <ul class="lista" style="font-size:var(--step--1)">
+          <li>Lector de ICSARA funcionando sobre el expediente de un <em>design partner</em>, con precisión medida contra la respuesta que ellos ya escribieron.</li>
+          <li>Primera propuesta comercial con precio. Piloto pagado de 3 meses ($2.900.000 de implementación + 3 meses de plan).</li>
+          <li>Presentar el caso “un mes = tres meses” en un evento del Consejo Minero o de SONAMI.</li>
+          <li>Meta: <strong>una factura emitida</strong>. Una sola. Si a los 90 días nadie pagó, el problema no es la venta.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ QUÉ LO MATA -->
+<section>
+  <div class="container">
+    <p class="rotulo">09 — Qué mataría esto</p>
+    <h2>Tres formas de morir, ordenadas por probabilidad</h2>
+
+    <div class="stack-l" style="margin-top:var(--sp-m)">
+      <div class="caja">
+        <div class="obs-cab">
+          <h3 style="margin:0">1. La reforma funciona</h3>
+          <span class="chip chip-critico">riesgo alto</span>
+        </div>
+        <p style="margin-top:var(--sp-s)">Hay reforma en curso al sistema de autorizaciones sectoriales y hay reforma al SEIA. <strong>No damos por conocido su estado exacto de tramitación</strong> <span class="chip chip-validar">por validar</span>. Si el resultado es una ventanilla única digital que muestra el estado real de cada trámite, con el plazo corriendo y una API pública, entonces la mitad “seguimiento” de Cianota se vuelve gratis.</p>
+        <p style="margin-top:var(--sp-s)"><strong>Qué queda si eso pasa:</strong> el grafo de dependencias, la ruta crítica y el costo de la demora — que dependen del <em>proyecto</em>, no del Estado, y que ninguna ventanilla única va a calcular jamás. Y queda el lector, que trabaja sobre documentos, no sobre trámites.</p>
+        <p style="margin-top:var(--sp-s)"><strong>Y la oportunidad:</strong> una reforma es un cambio masivo de reglas. Durante el cambio, nadie sabe qué permiso aplica. Ese es exactamente el año en que un catálogo mantenido vale más que nunca. Si sale la API, somos su primer cliente y nos ahorramos lo más frágil que tenemos.</p>
+        <p class="nota" style="margin-top:var(--sp-s)">Veredicto honesto: la reforma no nos mata. Nos <em>recorta</em>. Y si es muy buena, esto es un negocio de cinco años.</p>
+      </div>
+
+      <div class="caja">
+        <div class="obs-cab">
+          <h3 style="margin:0">2. El churn es estructural</h3>
+          <span class="chip chip-alerta">riesgo medio-alto</span>
+        </div>
+        <p style="margin-top:var(--sp-s)">Un proyecto termina de tramitar y la cuenta se acaba. Si el titular no trae su siguiente proyecto, el churn no se arregla con producto: está en la naturaleza del cliente. Nuestro supuesto de 40 meses de vida depende de que el 40 % renueve.</p>
+        <p style="margin-top:var(--sp-s)"><strong>Mitigación:</strong> extender el producto a la fase de operación (seguimiento de compromisos de la RCA, permisos de operación, plan de cierre), que es donde el cliente sigue existiendo. Pero eso ya es otro producto, y ahí sí están Enablon y Cority esperándonos.</p>
+      </div>
+
+      <div class="caja">
+        <div class="obs-cab">
+          <h3 style="margin:0">3. Un plazo mal</h3>
+          <span class="chip chip-alerta">riesgo medio, consecuencia total</span>
+        </div>
+        <p style="margin-top:var(--sp-s)">Este producto vive de la precisión. Si Cianota dice “te quedan 12 días hábiles” y en realidad eran 6, y un cliente pierde un plazo por eso, no perdemos un cliente: perdemos el mercado entero, porque son 600 cuentas y todas se conocen.</p>
+        <p style="margin-top:var(--sp-s)"><strong>Mitigación, y es cara:</strong> ningún plazo se muestra como norma si no está citado. Todo lo demás va marcado <span class="chip chip-validar">por validar</span> con su estimación observada. El analista regulatorio de la planilla de COGS no es un lujo: es el producto. Y las decisiones legales las sigue tomando el abogado del cliente — nosotros contamos días, no damos asesoría.</p>
+      </div>
+    </div>
+
+    <dl class="cartucho" style="margin-top:var(--sp-xl)">
+      <div><dt>Proyecto</dt><dd>Cianota</dd></div>
+      <div><dt>Lámina</dt><dd>03 · Negocio</dd></div>
+      <div><dt>Moneda</dt><dd>CLP · $950/US$</dd></div>
+      <div><dt>Rev.</dt><dd>2026-07-13</dd></div>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p>Cianota · Toda cifra está citada o es una estimación con la aritmética a la vista. <a href="roadmap.html">Roadmap →</a></p>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+</body>
+</html>
