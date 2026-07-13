@@ -318,7 +318,7 @@
       h += '<div class="tec">' +
         '<div class="tec__h"><i class="tec__sw" style="background:' + t.col + '"></i>' +
         '<span class="tec__n">' + t.corto + '</span>' +
-        '<span class="tec__k">' + km.toFixed(1) + ' km · vuelve ' + hhmm(fin) + '</span></div>';
+        '<span class="tec__k">' + km.toFixed(1).replace(".", ",") + ' km · vuelve ' + hhmm(fin) + '</span></div>';
       if (!ids.length) h += '<p class="src" style="border:0;padding:8px 10px">Sin visitas asignadas.</p>';
       ids.forEach(function (id, i) {
         var v = S.vis[id], a = ag[i];
@@ -369,11 +369,11 @@
       }
     });
     g += '<line x1="' + px(18) + '" y1="' + (Y0 - 8) + '" x2="' + px(18) + '" y2="' + (Y0 + ROW * 5 + 2) + '" stroke="#C0332E" stroke-width="1.5" stroke-dasharray="4 3"/>';
-    g += '<text x="' + (px(18) + 4) + '" y="' + (Y0 + ROW * 5 + 14) + '" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#C0332E">fin de jornada 18:00</text>';
-    g += '<rect x="' + (X1 - 190) + '" y="' + (Y0 + ROW * 5 + 4) + '" width="12" height="10" fill="url(#hatch)" stroke="#C3BBA7"/>' +
-      '<text x="' + (X1 - 172) + '" y="' + (Y0 + ROW * 5 + 13) + '" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#6E6A61">viaje</text>' +
-      '<rect x="' + (X1 - 120) + '" y="' + (Y0 + ROW * 5 + 4) + '" width="12" height="10" fill="#2a78d6" stroke="#14161A"/>' +
-      '<text x="' + (X1 - 102) + '" y="' + (Y0 + ROW * 5 + 13) + '" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#6E6A61">trabajo</text>';
+    g += '<text x="' + (px(18) - 5) + '" y="' + (Y0 + ROW * 5 + 14) + '" text-anchor="end" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#C0332E">fin de jornada 18:00</text>';
+    g += '<rect x="' + X0 + '" y="' + (Y0 + ROW * 5 + 4) + '" width="12" height="10" fill="url(#hatch)" stroke="#C3BBA7"/>' +
+      '<text x="' + (X0 + 18) + '" y="' + (Y0 + ROW * 5 + 13) + '" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#6E6A61">viaje</text>' +
+      '<rect x="' + (X0 + 56) + '" y="' + (Y0 + ROW * 5 + 4) + '" width="12" height="10" fill="#2a78d6" stroke="#14161A"/>' +
+      '<text x="' + (X0 + 74) + '" y="' + (Y0 + ROW * 5 + 13) + '" font-family="\'IBM Plex Mono\',monospace" font-size="9" fill="#6E6A61">trabajo (el color es del técnico)</text>';
     $("#gantt").innerHTML = g;
   }
 
@@ -384,7 +384,7 @@
     if (kmInicial === null) kmInicial = km;
     $("#kVisitas").textContent = n;
     $("#kSin").textContent = S.sin.length;
-    $("#kKm").textContent = km.toFixed(1);
+    $("#kKm").textContent = km.toFixed(1).replace(".", ",");
     $("#kHoras").textContent = (km / VEL).toFixed(1).replace(".", ",");
     $("#kCobrado").textContent = clp(S.cobrado);
   }
@@ -757,10 +757,10 @@
     var plata = ahorroKm * COSTO_KM + (min / 60) * COSTO_H;
     var f = $("#saveflag");
     if (ahorroKm > 0.05) {
-      f.innerHTML = "<b>−" + ahorroKm.toFixed(1) + " km</b><br>−" + Math.round(min) + " min de tráfico<br><b>" + clp(plata) + "</b> que no se queman hoy";
+      f.innerHTML = "<b>−" + ahorroKm.toFixed(1).replace(".", ",") + " km</b><br>−" + Math.round(min) + " min de tráfico<br><b>" + clp(plata) + "</b> que no se queman hoy";
       f.style.display = "block";
       setTimeout(function () { f.style.display = "none"; }, 6000);
-      toast("Rutas optimizadas: <b>" + antes.toFixed(1) + " km → " + despues.toFixed(1) + " km</b>. " +
+      toast("Rutas optimizadas: <b>" + antes.toFixed(1).replace(".", ",") + " km → " + despues.toFixed(1).replace(".", ",") + " km</b>. " +
         Math.round(min) + " minutos menos de Vespucio, " + clp(plata) + " que no se queman.");
     } else {
       toast("Las rutas ya estaban en su mejor orden. No hay nada que ganar.");

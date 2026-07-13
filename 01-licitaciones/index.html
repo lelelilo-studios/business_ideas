@@ -433,6 +433,11 @@
     var cont = document.getElementById('reqs');
     var estado = document.getElementById('estado');
 
+    /* Si el usuario pidió menos movimiento, no lo hacemos esperar:
+       el escalonado es JS y el bloque CSS del kit no lo alcanza. */
+    var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var d0 = RM ? 0 : 420, dk = RM ? 0 : 380;
+
     L.reqs.forEach(function (r, k) {
       timers.push(setTimeout(function () {
         var d = document.createElement('div');
@@ -441,7 +446,7 @@
           '<div><p class="req-t">' + r.t + ' <span class="pill ' + r.e + '" style="margin-left:.3rem">' + TXT[r.e] + '</span></p>' +
           '<p class="req-f">' + r.f + '</p></div>';
         cont.appendChild(d);
-      }, 420 + k * 380));
+      }, d0 + k * dk));
     });
 
     timers.push(setTimeout(function () {
@@ -458,7 +463,7 @@
           '<p style="flex:1 1 240px;color:var(--ink-2);font-size:.92rem">' + L.veredicto.txt + '</p>' +
         '</div>';
       cont.appendChild(v);
-    }, 420 + L.reqs.length * 380 + 280));
+    }, d0 + L.reqs.length * dk + (RM ? 0 : 280)));
   }
 
   chips.forEach(function (c) {

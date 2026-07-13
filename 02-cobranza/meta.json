@@ -1,0 +1,19 @@
+{
+  "folder": "02-cobranza",
+  "brand": "Tinoria",
+  "domain": "tinoria.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/tinoria.com -> HTTP 404 (disponible), verificado 2026-07-12 y 2026-07-13. tinoria.cl también disponible (NIC Chile: 'no existe').",
+  "alternates": ["cobralto.com", "talantar.com", "saldaru.com"],
+  "alternates_evidence": "Las tres verificadas con _kit/check-domain.sh el 2026-07-13: .com AVAILABLE (HTTP 404) y .cl AVAILABLE.",
+  "tagline": "Cobrar con tino.",
+  "category": "Fintech PYME · cuentas por cobrar",
+  "market": "Chile → LatAm (donde la factura electrónica es obligatoria)",
+  "icp": "PYME B2B chilena que vende a crédito: metalmecánica, ingeniería, proveedores de construcción. 10-60 trabajadores, 30-200 facturas abiertas, una sola persona en administración.",
+  "price_clp": "Desde $49.000/mes (Libro) · $99.000 (Cartera) · $229.000 (Cobranza)",
+  "accent": "#A93B22",
+  "problem": "La dueña se sienta cada viernes a perseguir facturas vencidas por correo y WhatsApp; lo posterga porque es incómodo, y la caja se muere esperando.",
+  "solution": "Un tablero de cuentas por cobrar que se arma solo desde el SII, más un agente de IA que ejecuta la secuencia de cobranza —recordatorio, insistencia, plan de pago, escalamiento— por WhatsApp y correo, con el tono calibrado para cobrar sin romper la relación comercial.",
+  "wedge": "El tono es el producto. Todos los demás sólo mandan el recordatorio.",
+  "art_direction": "Libro de caja: papel crema, filetes de un pelo, cifras tabulares y un timbre rojo óxido. Newsreader (serif editorial) para la voz, IBM Plex Sans/Mono para las cifras.",
+  "status": "prototipo"
+}

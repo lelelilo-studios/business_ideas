@@ -179,9 +179,10 @@
         Penetración del SAM = 700 / 95.000 = <span class="res">0,74%</span>
       </div>
       <p class="fuente">
-        <span class="tag tag--est">Estimación</span> 700 clientes al mes 36 supone continuar la
-        rampa del <a href="roadmap.html">roadmap</a> (168 clientes al mes 24, escenario base) con
-        crecimiento decreciente. Menos del 1% de penetración es deliberadamente conservador:
+        <span class="tag tag--est">Estimación</span> 700 clientes al mes 36 supone sostener la
+        rampa del <a href="roadmap.html">roadmap</a> (192 clientes al mes 24, escenario base) doce
+        meses más, sumando ~42 clientes netos al mes. Menos del 1% de penetración es
+        deliberadamente conservador:
         <b>este es un producto de venta lenta a un cliente disperso</b>, y prometer 5% de penetración
         en 3 años sería exactamente el tipo de número inventado que esta página evita.
       </p>
@@ -398,7 +399,7 @@
       <div class="rotulo">05 · Precio y economía unitaria</div>
       <h2>El margen ya viene descontado del costo de IA.</h2>
       <p>
-        El costo de inferencia sale de <a href="stack.html">arquitectura</a>: <b>$624 CLP por
+        El costo de inferencia sale de <a href="stack.html">arquitectura</a>: <b>$650 CLP por
         contrato analizado</b>. Las dos páginas cuadran; si no cuadraran, una de las dos estaría
         mintiendo.
       </p>
@@ -462,13 +463,14 @@
 
       <h3 style="font-size:var(--step-0);margin:var(--sp-l) 0 var(--sp-xs)">Costo por cliente / mes (COGS)</h3>
       <div class="calculo">
-        Análisis de contratos: 1,8 contratos/mes × $624 ······················ $1.123<br>
-        Preguntas al contrato (Q&amp;A, caché de prompt) ························ &nbsp;&nbsp;$800<br>
-        Infraestructura prorrateada (base de datos, storage, hosting) ········ $2.100<br>
+        Análisis de contratos — 1,8 contratos/mes × $650 ····················· $1.170<br>
+        Preguntas al contrato — 6 al mes, con caché de prompt ················ &nbsp;&nbsp;$150<br>
+        Almacenamiento cifrado del expediente (S3 + KMS) ····················· &nbsp;&nbsp;$340<br>
+        Infraestructura prorrateada (Postgres, colas, hosting, monitoreo) ···· $2.363<br>
         WhatsApp Business API — 6 avisos/mes × $80 ··························· &nbsp;&nbsp;$480<br>
         Correo transaccional ················································ &nbsp;&nbsp;&nbsp;$60<br>
         Pasarela de pago — 3,5% de $58.000 ··································· $2.030<br>
-        <b>COGS total</b> ≈ <span class="res">$6.593/cliente/mes</span> &nbsp;→&nbsp; margen bruto = 1 − 6.593/58.000 = <span class="res">88,7%</span>
+        <b>COGS total</b> = <span class="res">$6.593/cliente/mes</span> &nbsp;→&nbsp; margen bruto = 1 − 6.593/58.000 = <span class="res">88,7%</span>
       </div>
       <p class="fuente">
         La vigilancia diaria de fechas <b>no cuesta inferencia</b>: es un cron comparando fechas contra

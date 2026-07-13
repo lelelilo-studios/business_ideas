@@ -606,26 +606,34 @@ TOTAL IA por cuenta/mes                                  <b>US$5,00</b>
   <!-- ================================================= DOMINIO -->
   <h2>Dominio</h2>
   <div class="card" style="max-width:none">
-    <p class="tag">Verificado con <span class="mono">./_kit/check-domain.sh</span> el 2026-07-12</p>
+    <p class="tag">Verificado con <span class="mono">./_kit/check-domain.sh</span> el 2026-07-13</p>
     <div class="math">
-$ ./_kit/check-domain.sh rutamo.com
-rutamo.com                     404  DISPONIBLE
+$ ./_kit/check-domain.sh rutamo faenko rutovia vueltek
+rutamo         .com AVAILABLE   (http 404)   .cl AVAILABLE
+faenko         .com AVAILABLE   (http 404)   .cl AVAILABLE
+rutovia        .com AVAILABLE   (http 404)   .cl AVAILABLE
+vueltek        .com AVAILABLE   (http 404)   .cl AVAILABLE
 
-<i>(consulta a rdap.verisign.com/com/v1/domain/rutamo.com;
- HTTP 404 = no existe registro = dominio libre)</i>
+<i>El script consulta rdap.verisign.com/com/v1/domain/&lt;nombre&gt;.com,
+ que es la fuente autoritativa del .com:
+   HTTP 404 = no existe registro = dominio libre
+   HTTP 200 = ya está tomado</i>
 
-Alternativas verificadas el mismo día, por si rutamo.com cae:
-faenko.com                     404  DISPONIBLE
-rutovia.com                    404  DISPONIBLE
-vueltek.com                    404  DISPONIBLE
+$ ./_kit/check-domain.sh google        <i># control, para probar que el test sirve</i>
+google         .com TAKEN       (http 200)   .cl TAKEN
 
-<i>Descartados (HTTP 200 = ya registrados): altiro.com, vaneo.com, rutik.com,
- cuadrilla.com, rutero.com, ruteo.com, terreno.com, y ~30 más.</i>
+<b>ELEGIDO: rutamo.com</b>  (+ rutamo.cl, que también está libre)
+<b>SUPLENTES VERIFICADOS: faenko.com · rutovia.com · vueltek.com</b>
+
+<i>Descartados por estar tomados (http 200): altiro, vaneo, rutik, cuadrilla,
+ rutero, ruteo, terreno, faena, y ~30 más. Buscar un .com libre y decible
+ tomó cuatro rondas; ese es el costo real de nombrar algo en 2026.</i>
     </div>
     <p style="margin-top:var(--sp-s)"><strong>Rutamo</strong> = «ruta» + el <em>-mo</em> de <em>vamo'</em>.
     Se dice en chileno, se escribe fácil por teléfono, y no significa nada en inglés — que para un producto que
-    sólo se vende en Chile y después en la región, es exactamente lo que se necesita. También hay que tomar
-    <span class="mono">rutamo.cl</span>: en Chile la gente escribe <span class="mono">.cl</span> por reflejo.</p>
+    sólo se vende en Chile y después en la región, es exactamente lo que se necesita. Hay que tomar los dos:
+    <span class="mono">rutamo.com</span> para la marca y <span class="mono">rutamo.cl</span> porque en Chile la
+    gente escribe <span class="mono">.cl</span> por reflejo.</p>
   </div>
 
   <h2>Lo primero que rompería esto en producción</h2>

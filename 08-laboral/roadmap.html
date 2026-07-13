@@ -33,8 +33,22 @@
   .fig__cab { margin-bottom: var(--sp-s); }
   .fig__t { font-family: var(--serif); font-size: var(--step-1); font-weight: 600; line-height: 1.25; }
   .fig__s { font-size: 0.88rem; color: var(--tinta-2); margin-top: 0.3rem; max-width: 68ch; line-height: 1.55; }
-  .fig__caja { border: 1px solid var(--linea); background: var(--plot); padding: var(--sp-xs); position: relative; }
-  .fig svg { width: 100%; height: auto; display: block; }
+  /* El envoltorio no scrollea: es el bloque contenedor del tooltip. */
+  .fig__wrap { position: relative; }
+  /* La caja sí scrollea. A 390px un viewBox de 720 se escalaría a 0,5× y las
+     etiquetas de 10px quedarían en 5px: ilegibles. En vez de achicar el gráfico
+     hasta que no se lea, lo dejamos a un ancho mínimo legible y que scrollee
+     dentro de su propia caja — nunca el body. */
+  .fig__caja {
+    border: 1px solid var(--linea); background: var(--plot); padding: var(--sp-xs);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .fig svg { width: 100%; height: auto; display: block; min-width: 620px; }
+  .fig__scrollnota {
+    font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--tinta-3); margin-top: 0.4rem;
+  }
+  @media (min-width: 48em) { .fig__scrollnota { display: none; } }
   .fig__pie {
     font-size: 0.78rem; color: var(--tinta-2); margin-top: 0.6rem; line-height: 1.5;
     border-top: 1px solid var(--linea); padding-top: 0.6rem;
@@ -191,7 +205,8 @@
           <span><i style="background:#1665AD"></i> Optimista</span>
         </div>
 
-        <div class="fig__caja" id="caja-mrr">
+        <div class="fig__wrap" id="wrap-mrr">
+        <div class="fig__caja">
           <svg viewBox="0 0 720 285" role="img" aria-labelledby="t-mrr d-mrr" id="svg-mrr">
             <title id="t-mrr">MRR proyectado a 24 meses en tres escenarios</title>
             <desc id="d-mrr">En el mes 24 el escenario pesimista llega a 6,3 millones de pesos de MRR, el base a 14,5 millones y el optimista a 27,0 millones. Los datos exactos están en la tabla bajo el gráfico.</desc>
@@ -249,8 +264,10 @@
             <rect id="hit-mrr" x="56" y="24" width="644" height="226" fill="transparent" style="cursor:crosshair"/>
             <line id="cross-mrr" x1="0" y1="24" x2="0" y2="250" stroke="#17181C" stroke-width="1" opacity="0"/>
           </svg>
-          <div class="tt" id="tt-mrr" hidden></div>
         </div>
+        <div class="tt" id="tt-mrr" hidden></div>
+        </div>
+        <p class="fig__scrollnota">← desliza el gráfico para verlo completo</p>
 
         <p class="fig__pie">
           <strong>Lectura.</strong> Ni el mejor escenario llega a US$1M de ARR en 24 meses: el optimista termina en
@@ -820,55 +837,25 @@ baja (techo de mercado):
   });
 })();
 
-/* Capa de interacción del gráfico de MRR: crosshair + tooltip, con soporte táctil. */
+/* Capa de interacción del gráfico de MRR: crosshair + tooltip, con soporte táctil.
+   Los valores son los mismos del modelo publicados en la tabla "Ver los datos como
+   tabla" — una sola fuente de verdad, en miles de pesos. */
 (function () {
-  var DATOS = [
-    [0,0,0],[0,0,0],[40,46,104],[85,98,222],[136,159,368],[194,229,533],[258,308,720],[329,396,930],
-    [423,513,1213],[527,644,1533],[640,789,1892],[765,948,2292],[943,1177,2879],[1136,1424,3524],
-    [1345,1690,4231],[1570,1976,5002],[1848,2320,5940],[2145,2688,6952],[2461,3080,8042],[2837,3543,9330],
-    [3232,4029,10704],[3647,4539,12170],[4149,5148,13897],[4670,5782,15723]
-  ];
-  /* Los valores exactos vienen del modelo; acá van en miles de pesos, escala del gráfico. */
-  var MRR = [
-    [0,0,0],[0,0,0],[40,46,104],[80,92,208],[120,140,317],[168,196,442],[225,264,596],[281,331,748],
-    [359,425,962],[456,542,1229],[571,684,1554],[705,850,1919],[858,1041,2340],[1024,1249,2801],
-    [1207,1479,3313],[1401,1725,3859],[1615,1998,4463],[1841,2288,5104],[2081,2599,5793],[2333,2927,6522],
-    [2598,3273,7292],[2873,3633,8095],[3160,4009,8931],[3454,4396,9793]
-  ];
-  /* Reemplazado por los valores reales del modelo (MRR en miles de CLP): */
-  var PES = [0,0,40,80,124,172,225,281,359,456,571,705,858,1024,1207,1401,1615,1841,2081,2333,2598,2873,3160,3454];
-  var SERIES = {
-    pes:  [0,0,40,80,124,172,225,281,359,456,571,705,858,1024,1207,1401,1615,1841,2081,2333,2598,2873,3160,3454],
-    base: [0,0,46,92,143,199,262,329,444,586,752,948,1177,1424,1690,1976,2320,2688,3080,3543,4029,4539,5148,5782],
-    opt:  [0,0,104,208,325,451,596,748,962,1229,1554,1919,2340,2801,3313,3859,4463,5104,5793,6522,7292,8095,8931,9793]
-  };
-  /* Nota: la fuente de verdad es la tabla "Ver los datos como tabla" — los hitos
-     de meses 3/6/9/12/15/18/21/24 coinciden exactamente con el modelo. */
-  var real = {
-    pes:  [0,0,40,84,131,182,239,300,377,467,571,687,816,957,1110,1274,1450,1636,1833,2040,2257,2483,2719,2964],
-    base: [0,0,46,97,153,213,278,348,444,558,690,840,1009,1197,1405,1633,1882,2151,2442,2755,3090,3448,3829,4234]
+  var MRR = {
+    pes:  [0, 4, 40, 84, 131, 225, 290, 380, 571, 780, 1010, 1280,
+           1590, 1900, 2220, 2560, 2950, 3354, 3790, 4250, 4728, 5220, 5740, 6265],
+    base: [0, 5, 46, 110, 230, 444, 700, 950, 1248, 1650, 2150, 2726,
+           3390, 4100, 4854, 5680, 6600, 7566, 8600, 9680, 10802, 11960, 13210, 14510],
+    opt:  [0, 10, 104, 250, 480, 810, 1230, 1690, 2227, 2900, 3860, 4962,
+           6300, 7550, 8867, 10300, 12030, 13855, 15800, 17870, 19950, 22200, 24550, 27018]
   };
 
-  var svg = document.getElementById('svg-mrr');
-  var hit = document.getElementById('hit-mrr');
+  var svg   = document.getElementById('svg-mrr');
+  var hit   = document.getElementById('hit-mrr');
   var cross = document.getElementById('cross-mrr');
-  var tt = document.getElementById('tt-mrr');
-  var caja = document.getElementById('caja-mrr');
-  if (!svg || !hit) return;
-
-  /* Valores exactos del modelo, en pesos, mes a mes (los mismos de la tabla). */
-  var V = {
-    pes:  [0,0,40174,84005,131370,182085,236078,293285,377425,470096,571169,680545,797896,922952,1055441,1195095,1341648,1494836,1654396,1820066,1991588,2168703,2351154,2538685],
-    base: [0,0,46000,97110,152661,212684,277208,346263,444143,551948,669492,796589,933053,1078698,1233337,1396782,1568845,1749338,1938072,2134857,2339502,2551815,2771603,2998672],
-    opt:  [0,0,104000,219960,347149,485583,635274,796230,1027554,1281114,1557052,1855504,2176600,2520465,2887216,3276966,3689821,4125882,4585243,5067995,5574221,6104001,6657407,7234507]
-  };
-  /* Los de arriba son por-cliente-acumulado ×ARPU; para la lectura del tooltip usamos
-     los valores del modelo publicados en la tabla, interpolados por mes. */
-  var TABLA = {
-    pes:  [0,4,40,84,131,225,290,380,571,780,1010,1280,1590,1900,2220,2560,2950,3354,3790,4250,4728,5220,5740,6265],
-    base: [0,5,46,110,230,444,700,950,1248,1650,2150,2726,3390,4100,4854,5680,6600,7566,8600,9680,10802,11960,13210,14510],
-    opt:  [0,10,104,250,480,810,1230,1690,2227,2900,3860,4962,6300,7550,8867,10300,12030,13855,15800,17870,19950,22200,24550,27018]
-  };
+  var tt    = document.getElementById('tt-mrr');
+  var wrap  = document.getElementById('wrap-mrr');
+  if (!svg || !hit || !wrap) return;
 
   function clp(k) {
     if (k >= 1000) return '$' + (k / 1000).toFixed(1).replace('.', ',') + 'M';
@@ -876,30 +863,41 @@ baja (techo de mercado):
   }
 
   function mover(clientX) {
-    var r = hit.getBoundingClientRect();
-    var f = (clientX - r.left) / r.width;
-    var mes = Math.round(f * 23) + 1;
-    mes = Math.max(1, Math.min(24, mes));
-    var x = 56 + (mes - 1) * (644 / 23);
+    var hr = hit.getBoundingClientRect();
+    if (!hr.width) return;
+    var f = (clientX - hr.left) / hr.width;
+    var mes = Math.max(1, Math.min(24, Math.round(f * 23) + 1));
+
+    var x = 56 + (mes - 1) * (644 / 23);           /* coordenada en el viewBox */
     cross.setAttribute('x1', x);
     cross.setAttribute('x2', x);
     cross.setAttribute('opacity', '0.35');
+
     tt.hidden = false;
     tt.innerHTML = '<b>Mes ' + mes + '</b><br>' +
-      '<span style="color:#1665AD">Optimista</span> ' + clp(TABLA.opt[mes - 1]) + '<br>' +
-      '<span style="color:#E8737D">Base</span> ' + clp(TABLA.base[mes - 1]) + '<br>' +
-      '<span style="color:#C9922B">Pesimista</span> ' + clp(TABLA.pes[mes - 1]);
-    var cr = caja.getBoundingClientRect();
-    var px = (x / 720) * cr.width;
-    tt.style.left = Math.max(70, Math.min(cr.width - 70, px)) + 'px';
-    tt.style.top = '46%';
+      '<span style="color:#7FB2E0">Optimista</span> ' + clp(MRR.opt[mes - 1]) + '<br>' +
+      '<span style="color:#E8737D">Base</span> ' + clp(MRR.base[mes - 1]) + '<br>' +
+      '<span style="color:#D6A54B">Pesimista</span> ' + clp(MRR.pes[mes - 1]);
+
+    /* getBoundingClientRect ya considera el scroll de la caja, así que esto
+       posiciona bien incluso con el gráfico desplazado en móvil. */
+    var sr = svg.getBoundingClientRect();
+    var wr = wrap.getBoundingClientRect();
+    var px = (sr.left - wr.left) + (x / 720) * sr.width;
+    tt.style.left = Math.max(72, Math.min(wr.width - 72, px)) + 'px';
+    tt.style.top = '48%';
+  }
+
+  function ocultar() {
+    tt.hidden = true;
+    cross.setAttribute('opacity', '0');
   }
 
   hit.addEventListener('mousemove', function (e) { mover(e.clientX); });
-  hit.addEventListener('mouseleave', function () { tt.hidden = true; cross.setAttribute('opacity', '0'); });
+  hit.addEventListener('mouseleave', ocultar);
   hit.addEventListener('touchstart', function (e) { mover(e.touches[0].clientX); }, { passive: true });
-  hit.addEventListener('touchmove', function (e) { mover(e.touches[0].clientX); }, { passive: true });
-  hit.addEventListener('touchend', function () { setTimeout(function () { tt.hidden = true; cross.setAttribute('opacity', '0'); }, 1800); });
+  hit.addEventListener('touchmove',  function (e) { mover(e.touches[0].clientX); }, { passive: true });
+  hit.addEventListener('touchend', function () { setTimeout(ocultar, 2000); });
 })();
 </script>
 </body>

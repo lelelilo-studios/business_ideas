@@ -132,6 +132,7 @@ a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
   display: inline-flex;
   align-items: center;
   gap: .5rem;
+  min-height: 44px;
   font-family: var(--display);
   font-weight: 900;
   font-stretch: 78%;
@@ -282,6 +283,22 @@ section { padding-block: var(--sp-xl); }
 @media (min-width: 64em) {
   .grid--4 { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* Guardia mobile-first, y no es opcional:
+   un item de grid tiene min-width:auto, así que NO se encoge bajo el ancho
+   mínimo de su contenido. Un SVG con viewBox de 760, una tabla con min-width,
+   o un bloque de aritmética en monoespaciado empujan la columna entera y
+   aparece scroll horizontal del body a 390px. Con min-width:0 el item sí se
+   encoge y lo ancho scrollea dentro de su propia caja (.scroll-x), que es
+   exactamente lo que pide el contrato. */
+.grid > *,
+.doc > *,
+.layout > *,
+.cards-h > *,
+.quote-grid > *,
+.assump-grid > *,
+.days > *,
+.yes-no > * { min-width: 0; }
 
 /* --------------------------------------------------------------- botón --- */
 .btn {

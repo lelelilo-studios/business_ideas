@@ -967,7 +967,7 @@ function dibujarMape() {
     var sel = d.id === E.sku;
     g.push('<text class="etiq-f" x="' + (m.l - 8) + '" y="' + (y + bh / 2 + 4) + '" text-anchor="end" ' + (sel ? 'font-weight="600" fill="#17150f"' : '') + '>' + esc(d.n) + '</text>');
     // extremo del dato redondeado 4px, escuadra en la línea base
-    g.push('<path d="M' + m.l + ' ' + y + ' H' + (m.l + w - 4).toFixed(1) + ' a4 4 0 0 1 4 4 v' + (bh - 8) + ' a4 4 0 0 1 -4 4 H' + m.l + ' Z" fill="' + C.s1 + '" opacity="' + (sel ? 1 : 0.72) + '" data-k="' + k + '"/>');
+    g.push('<path d="M' + m.l + ' ' + y + ' H' + (m.l + w - 4).toFixed(1) + ' a4 4 0 0 1 4 4 v' + (bh - 8) + ' a4 4 0 0 1 -4 4 H' + m.l + ' Z" fill="' + C.s1 + '" opacity="' + (sel ? 1 : 0.72) + '"/>');
     g.push('<text class="etiq" x="' + (m.l + w + 7).toFixed(1) + '" y="' + (y + bh / 2 + 4) + '">' + pct(d.v) + '</text>');
   });
   g.push('<line class="base" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (H - m.b) + '"/>');

@@ -1,0 +1,15 @@
+{
+  "folder": "08-laboral",
+  "brand": "Contralta",
+  "domain": "contralta.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/contralta.com -> HTTP 404 (disponible), 2026-07-13. contralta.cl también libre (NIC Chile).",
+  "alternates": ["finiquita.com", "reglaria.com", "cauteo.com"],
+  "tagline": "El contador te lleva la contabilidad. Nadie te lleva el Código del Trabajo.",
+  "category": "Regtech / Cumplimiento laboral PYME",
+  "market": "Chile → LatAm (el motor se exporta; el contenido legal no)",
+  "icp": "PYME chilena de 10 a 49 trabajadores, sin RRHH, que contrata y despide gente y le pregunta al contador",
+  "price_clp": "Desde $34.000/mes · plan Empresa $69.000/mes · auditoría de un finiquito $19.000",
+  "accent": "#A8232E",
+  "problem": "Un finiquito mal hecho es una demanda en la Dirección del Trabajo, y el dueño de la PYME no sabe que las cotizaciones impagas hacen nulo el despido.",
+  "status": "prototipo"
+}

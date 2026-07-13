@@ -131,9 +131,11 @@ body {
   font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--tinta-3); margin-right: auto;
 }
+/* 44px es el piso táctil, no una sugerencia. El reset se lo da a todo <button>;
+   acá hay que repetirlo porque la clase gana por especificidad. */
 .chip {
   font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em;
-  padding: 0 0.6rem; min-height: 36px; display: inline-flex; align-items: center;
+  padding: 0 0.75rem; min-height: 44px; display: inline-flex; align-items: center;
   border: 1px solid var(--linea-2); background: #FBFAF7; color: var(--tinta-2);
 }
 .chip[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }

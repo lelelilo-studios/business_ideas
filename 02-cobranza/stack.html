@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinoria — arquitectura</title>
+<meta name="description" content="Modelo de datos, los tres agentes de IA, las APIs que hay que contratar, las variables de entorno, el costo mensual con la aritmética, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc { padding-block: var(--sp-xl); }
+  .bloque { padding-block: var(--sp-xl); border-top: 1px solid var(--filete); }
+  .bloque:first-of-type { border-top: 0; }
+
+  /* diagrama de flujo */
+  .flujo { display: grid; gap: 1px; background: var(--filete-2); border: 1px solid var(--filete-2); margin-top: var(--sp-m); }
+  @media (min-width: 62em) { .flujo { grid-template-columns: repeat(4, 1fr); } }
+  .capa { background: var(--papel); padding: var(--sp-m); }
+  .capa > .etiqueta { display: block; margin-bottom: var(--sp-s); color: var(--rojo); }
+  .capa ul { list-style: none; display: grid; gap: 8px; }
+  .capa li {
+    font-family: var(--mono); font-size: 0.75rem; line-height: 1.45;
+    padding: 8px 10px; border: 1px solid var(--filete); background: var(--papel-2);
+    border-radius: var(--radio);
+  }
+  .capa li b { display: block; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+
+  /* tablas del modelo de datos */
+  .tabla-dat { margin-top: var(--sp-m); border: 1px solid var(--filete-2); }
+  .tabla-dat__cab {
+    padding: 10px var(--sp-m); background: var(--papel-2); border-bottom: 1px solid var(--filete-2);
+    display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-s); flex-wrap: wrap;
+  }
+  .tabla-dat__cab b { font-family: var(--mono); font-size: 0.85rem; }
+  .tabla-dat__cab span { font-size: 0.8rem; color: var(--tinta-3); }
+  .campos { width: 100%; min-width: 520px; font-size: 0.82rem; }
+  .campos td { padding: 8px var(--sp-m); border-bottom: 1px solid var(--filete); vertical-align: top; }
+  .campos tr:last-child td { border-bottom: 0; }
+  .campos .c { font-family: var(--mono); white-space: nowrap; font-weight: 500; }
+  .campos .t { font-family: var(--mono); color: var(--rojo); white-space: nowrap; font-size: 0.75rem; }
+  .campos .d { color: var(--tinta-2); line-height: 1.5; }
+
+  /* agentes */
+  .agente { border: 1px solid var(--filete-2); margin-top: var(--sp-m); }
+  .agente__cab {
+    padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--filete-2); background: var(--papel-2);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-2xs) var(--sp-s); align-items: baseline;
+  }
+  .agente__cab h3 { font-size: var(--step-1); }
+  .agente__modelo { font-family: var(--mono); font-size: 0.72rem; color: var(--rojo); }
+  .agente__cuerpo { padding: var(--sp-m); }
+  .agente__cuerpo > p { font-size: 0.93rem; color: var(--tinta-2); line-height: 1.65; }
+  .prompt {
+    margin-top: var(--sp-m); font-family: var(--mono); font-size: 0.78rem; line-height: 1.65;
+    background: var(--papel-2); border-left: 2px solid var(--rojo); padding: var(--sp-s) var(--sp-m);
+    white-space: pre-wrap; color: var(--tinta-2); overflow-x: auto;
+  }
+  .prompt b { color: var(--tinta); }
+  .herr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-m); }
+  .herr span {
+    font-family: var(--mono); font-size: 0.7rem; padding: 4px 8px;
+    border: 1px solid var(--filete-2); background: var(--papel-2); border-radius: var(--radio);
+  }
+  .herr span b { color: var(--rojo); font-weight: 500; }
+
+  .api { width: 100%; min-width: 720px; font-size: 0.86rem; }
+  .api th { text-align: left; font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); padding: 10px 12px; border-bottom: 1px solid var(--tinta); }
+  .api td { padding: 12px; border-bottom: 1px solid var(--filete); vertical-align: top; line-height: 1.5; }
+  .api tr:nth-child(even) td { background: rgba(237,229,212,.35); }
+  .api b { display: block; }
+  .api small { font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-3); }
+
+  .falso { border-left: 3px solid var(--rojo); background: var(--rojo-tenue); padding: var(--sp-m); margin-top: var(--sp-s); }
+  .falso b { display: block; margin-bottom: 4px; }
+  .falso p { font-size: 0.9rem; line-height: 1.6; color: var(--tinta-2); }
+
+  .env {
+    font-family: var(--mono); font-size: 0.78rem; line-height: 1.9;
+    background: var(--papel-2); border: 1px solid var(--filete-2);
+    padding: var(--sp-m); overflow-x: auto; white-space: pre; margin-top: var(--sp-m);
+    color: var(--tinta-2);
+  }
+  .env .k { color: var(--tinta); font-weight: 500; }
+  .env .cm { color: var(--tinta-3); }
+
+  .evidencia { border: 1px solid var(--tinta); margin-top: var(--sp-m); }
+  .evidencia__cab { padding: 10px var(--sp-m); background: var(--tinta); color: var(--papel); font-family: var(--mono); font-size: 0.75rem; }
+  .evidencia__cuerpo { padding: var(--sp-m); font-family: var(--mono); font-size: 0.8rem; line-height: 1.9; }
+  .ok { color: var(--verde); font-weight: 500; }
+  .no { color: var(--rojo); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container">
+    <div class="barra__fila">
+      <a class="marca" href="index.html"><span class="marca__timbre" aria-hidden="true">T</span>Tinoria</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">
+        Menú
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container doc">
+
+  <p class="epigrafe epigrafe--rojo">Arquitectura</p>
+  <h1 style="margin-bottom: var(--sp-m);">Qué habría que configurar para que esto fuera real.</h1>
+  <p class="bajada prose" style="margin-bottom: var(--sp-l);">
+    Nada de esto está aprovisionado: es un demo en HTML. Lo que sigue es la lista concreta de lo que hay
+    que contratar, escribir y pagar — con el costo mensual calculado, porque ese número es el que
+    <a href="negocio.html">Negocio</a> descuenta del margen. Las dos páginas cuadran.
+  </p>
+
+  <!-- ══════════ FLUJO ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">01 — El sistema, de un vistazo</p>
+    <h2>Cuatro capas</h2>
+
+    <div class="flujo">
+      <div class="capa">
+        <span class="etiqueta">1 · Entrada de datos</span>
+        <ul>
+          <li><b>SII / DTE</b>Registro de Compras y Ventas. Certificado digital o CSV.</li>
+          <li><b>ERP</b>Nubox · Bsale · Defontana · Softland · Chipax (webhooks + polling 30 min).</li>
+          <li><b>Banco</b>Conciliación de pagos vía Fintoc (cartola en línea).</li>
+        </ul>
+      </div>
+      <div class="capa">
+        <span class="etiqueta">2 · Núcleo</span>
+        <ul>
+          <li><b>Postgres</b>Deudores, facturas, hilos, cadencias, planes de pago.</li>
+          <li><b>Motor de cadencia</b>Un cron cada hora: qué deudor toca hoy, en qué paso.</li>
+          <li><b>Cola</b>Redis + worker. Nada se manda desde el request web.</li>
+        </ul>
+      </div>
+      <div class="capa">
+        <span class="etiqueta">3 · Agentes</span>
+        <ul>
+          <li><b>El Redactor</b>Sonnet 5. Escribe el mensaje con el contexto completo.</li>
+          <li><b>El Oyente</b>Haiku 4.5. Clasifica la respuesta del deudor.</li>
+          <li><b>El Escribano</b>Opus 4.8. Sólo la carta formal y el escalamiento.</li>
+        </ul>
+      </div>
+      <div class="capa">
+        <span class="etiqueta">4 · Salida</span>
+        <ul>
+          <li><b>WhatsApp</b>Cloud API de Meta vía 360dialog. Número del cliente, no nuestro.</li>
+          <li><b>Correo</b>Postmark, con dominio del cliente (DKIM/SPF delegados).</li>
+          <li><b>Tablero</b>La bandeja de aprobación de la administradora.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="destacado prose" style="margin-top: var(--sp-l)">
+      La pieza que decide si el producto es bueno no es ninguna de las cuatro: es <b>el contexto que se le
+      pasa al Redactor</b>. Ese ensamblado —el hilo completo, las promesas rotas, cuánto vale el cliente,
+      el resultado de la última vez que se usó cada tono— es el producto. El modelo es un commodity.
+    </p>
+  </section>
+
+  <!-- ══════════ MODELO DE DATOS ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">02 — Modelo de datos</p>
+    <h2>Las siete tablas que importan</h2>
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-s)">
+      Postgres. Todo con <code class="mono">empresa_id</code> y row-level security: una PYME jamás puede
+      leer la cartera de otra, ni por un bug de un <code class="mono">WHERE</code> olvidado.
+    </p>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>empresa</b><span>el cliente de Tinoria</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">id</td><td class="t">uuid</td><td class="d">—</td></tr>
+            <tr><td class="c">rut</td><td class="t">text</td><td class="d">76.129.884-5 — normalizado sin puntos, con DV</td></tr>
+            <tr><td class="c">razon_social</td><td class="t">text</td><td class="d">Metalmecánica Vergara SpA</td></tr>
+            <tr><td class="c">plan</td><td class="t">enum</td><td class="d">libro · cartera · cobranza · resultado</td></tr>
+            <tr><td class="c">dso_inicial</td><td class="t">int</td><td class="d">Se calcula en el onboarding y no se toca más. Es la línea base contra la que se mide todo.</td></tr>
+            <tr><td class="c">sii_cert</td><td class="t">bytea</td><td class="d">Certificado digital cifrado con KMS. Nunca la clave tributaria.</td></tr>
+            <tr><td class="c">wa_phone_id</td><td class="t">text</td><td class="d">ID del número de WhatsApp Business del cliente</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>deudor</b><span>a quién hay que cobrarle</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">id · empresa_id</td><td class="t">uuid</td><td class="d">—</td></tr>
+            <tr><td class="c">rut · razon_social · comuna</td><td class="t">text</td><td class="d">Del DTE. Viene gratis.</td></tr>
+            <tr><td class="c">contacto_nombre · cargo · fono · email</td><td class="t">text</td><td class="d"><b>Esto NO viene del SII</b> y es el mayor punto de fricción del onboarding. Se saca del ERP, de los correos enviados, o se pide.</td></tr>
+            <tr><td class="c">venta_anual</td><td class="t">int</td><td class="d">Cuánto te compra al año. Define si es "sensible": el agente calcula el costo de romper la relación.</td></tr>
+            <tr><td class="c">sensible</td><td class="t">bool</td><td class="d">Si es true, ningún mensaje sale sin aprobación humana. Ni el recordatorio.</td></tr>
+            <tr><td class="c">relacion</td><td class="t">enum</td><td class="d">buena · tensa · riesgo. La baja el sistema cuando se rompe una promesa o cuando se usa un tono duro.</td></tr>
+            <tr><td class="c">promesas_rotas</td><td class="t">int</td><td class="d">Dos → crédito suspendido y escalamiento propuesto. Es una regla, no una sugerencia.</td></tr>
+            <tr><td class="c">calendario_pago</td><td class="t">jsonb</td><td class="d">Aprendido de las respuestas: "pagamos los 15 y los 30". Mueve la cadencia de ese deudor.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>factura</b><span>espejo del DTE</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">id · empresa_id · deudor_id</td><td class="t">uuid</td><td class="d">—</td></tr>
+            <tr><td class="c">folio</td><td class="t">int</td><td class="d">El folio del DTE. Único por empresa y tipo de documento.</td></tr>
+            <tr><td class="c">tipo_dte</td><td class="t">int</td><td class="d">33 (factura electrónica), 34 (exenta), 61 (nota de crédito)</td></tr>
+            <tr><td class="c">monto_total</td><td class="t">bigint</td><td class="d">En pesos, entero. Nunca float con dinero.</td></tr>
+            <tr><td class="c">emision · vence</td><td class="t">date</td><td class="d">El vencimiento se deriva: emisión + plazo pactado (30 por defecto, Ley 21.131).</td></tr>
+            <tr><td class="c">acuse_recibo</td><td class="t">date</td><td class="d"><b>Clave legal.</b> El plazo de 30 días de la Ley 21.131 corre desde acá, no desde la emisión. Sin acuse, no hay mora exigible.</td></tr>
+            <tr><td class="c">estado</td><td class="t">enum</td><td class="d">abierta · pagada · en_plan · en_disputa · castigada</td></tr>
+            <tr><td class="c">interes_devengado</td><td class="t">bigint</td><td class="d">Calculado, no guardado a mano: interés corriente desde el día 31.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>mensaje</b><span>el hilo — la tabla más valiosa de la empresa</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">id · deudor_id</td><td class="t">uuid</td><td class="d">—</td></tr>
+            <tr><td class="c">direccion</td><td class="t">enum</td><td class="d">saliente · entrante · sistema</td></tr>
+            <tr><td class="c">canal</td><td class="t">enum</td><td class="d">whatsapp · email · llamada</td></tr>
+            <tr><td class="c">tono</td><td class="t">enum</td><td class="d">cordial · firme · formal</td></tr>
+            <tr><td class="c">paso_cadencia</td><td class="t">text</td><td class="d">recordatorio_previo · primer_aviso · … · escalamiento</td></tr>
+            <tr><td class="c">cuerpo</td><td class="t">text</td><td class="d">El texto exacto que salió o entró.</td></tr>
+            <tr><td class="c">aprobado_por</td><td class="t">uuid</td><td class="d">Null si salió automático. <b>Auditoría: siempre se sabe quién autorizó qué.</b></td></tr>
+            <tr><td class="c">clasificacion</td><td class="t">enum</td><td class="d">Sólo entrantes: promesa · disputa · falta_documento · problema_caja · evasiva · silencio</td></tr>
+            <tr><td class="c">resultado_7d</td><td class="t">bool</td><td class="d"><b>El foso.</b> ¿Pagó dentro de 7 días de este mensaje? Es la etiqueta con la que se aprende qué tono funciona con qué deudor.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>cadencia · paso_cadencia</b><span>la secuencia configurable</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">dia_offset</td><td class="t">int</td><td class="d">Negativo = antes del vencimiento. −3, +1, +7, +15, +30, +45.</td></tr>
+            <tr><td class="c">canal · tono</td><td class="t">enum</td><td class="d">—</td></tr>
+            <tr><td class="c">requiere_aprobacion</td><td class="t">bool</td><td class="d">Insistencia, plan de pago y escalamiento: siempre true.</td></tr>
+            <tr><td class="c">segmento</td><td class="t">jsonb</td><td class="d">A quién aplica: por monto, por relación, por rubro. A los clientes grandes se les habla distinto.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tabla-dat">
+      <div class="tabla-dat__cab"><b>plan_pago · cuota</b><span>convenios</span></div>
+      <div class="scroll-x" style="border:0">
+        <table class="campos">
+          <tbody>
+            <tr><td class="c">deudor_id · n_cuotas · total</td><td class="t">—</td><td class="d">—</td></tr>
+            <tr><td class="c">aceptado_en</td><td class="t">timestamptz</td><td class="d">Con el mensaje del deudor como respaldo. Vale como convenio.</td></tr>
+            <tr><td class="c">cuota.vence · monto · pagada</td><td class="t">—</td><td class="d">El agente recuerda cada cuota 3 días antes. Si una se cae, el saldo total se hace exigible.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ AGENTES ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">03 — Los agentes de IA</p>
+    <h2>Tres agentes, tres modelos, tres trabajos distintos</h2>
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-s)">
+      Usar el modelo más caro para todo es la forma más rápida de destruir el margen. Cada trabajo tiene
+      el modelo que le corresponde, y la razón está escrita.
+    </p>
+
+    <!-- redactor -->
+    <article class="agente">
+      <div class="agente__cab">
+        <h3>El Redactor</h3>
+        <span class="agente__modelo">claude-sonnet-5</span>
+      </div>
+      <div class="agente__cuerpo">
+        <p>
+          Escribe el mensaje de cobranza. Es el 72% del gasto de inferencia y el 100% del producto.
+          <b>Por qué Sonnet 5 y no Haiku:</b> el tono es la diferencia entre cobrar y perder un cliente, y
+          Haiku escribe un español correcto pero plano — suena a plantilla, y una plantilla no cobra.
+          <b>Por qué no Opus:</b> a 180 mensajes al mes por cuenta, Opus cuadruplicaría el costo de
+          inferencia sin una mejora que el deudor pueda notar.
+        </p>
+
+        <div class="prompt"><b>SISTEMA</b> (cacheado — es idéntico en todas las llamadas)
+Eres quien escribe la cobranza de {razon_social}, una PYME chilena.
+No eres un bot de cobranza: eres la persona de administración que
+tiene que pedir una plata que le deben, sin perder al cliente.
+
+REGLAS DE TONO
+· Escribe en español de Chile, natural, como escribe una persona.
+  Nada de "estimado cliente", "su documento se encuentra impago",
+  "atentamente le saluda". Eso es un formulario, no un mensaje.
+· No amenaces salvo que el paso sea "escalamiento", y ahí sé
+  preciso, no dramático: hechos, fechas, montos, plazo.
+· Nunca inventes un monto, un folio, una fecha ni una promesa.
+  Si no está en el contexto, no existe.
+· El deudor es un cliente, no un moroso. Va a seguir siéndolo
+  después de que te pague.
+
+CALIBRACIÓN DEL TONO (esto es el producto)
+· cordial → hay una explicación inocente probable. Asume buena fe.
+· firme   → ya hubo un mensaje cordial sin resultado, o una promesa
+            rota. Pide UNA fecha concreta. Sin rodeos, sin rabia.
+· formal  → sólo en escalamiento. Registra hechos y plazos.
+            Cita la Ley 21.131 sólo si hay más de 30 días desde el
+            acuse de recibo. Antes de eso no hay interés devengado
+            y citarla te deja mal parado.
+
+<b>CONTEXTO</b> (ensamblado por nosotros — acá está el foso)
+· Deudor, RUT, contacto, cargo, comuna
+· Cuánto te compra al año, desde cuándo, si es "sensible"
+· Facturas impagas: folio, monto, emisión, vencimiento, días de mora,
+  acuse de recibo, interés devengado
+· <b>El hilo completo</b>: qué se le dijo, cuándo, con qué tono,
+  qué contestó, qué prometió, si cumplió
+· Promesas rotas y sus fechas
+· <b>Qué tono funcionó antes con ESTE deudor</b> (resultado_7d)
+· Paso de la cadencia y canal de salida
+
+<b>SALIDA</b>
+JSON: { asunto?, cuerpo, riesgo_relacion, advertencia? }
+"advertencia" se llena cuando el tono pedido es peor idea que el
+sugerido — y se le muestra a la dueña ANTES de que apriete enviar.</div>
+
+        <div class="herr">
+          <span><b>tool:</b> get_hilo(deudor_id)</span>
+          <span><b>tool:</b> get_facturas_impagas(deudor_id)</span>
+          <span><b>tool:</b> calcular_interes_ley_21131(factura_id)</span>
+          <span><b>tool:</b> proponer_cuotas(total, n)</span>
+          <span><b>tool:</b> tono_que_funciono(deudor_id)</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- oyente -->
+    <article class="agente">
+      <div class="agente__cab">
+        <h3>El Oyente</h3>
+        <span class="agente__modelo">claude-haiku-4-5-20251001</span>
+      </div>
+      <div class="agente__cuerpo">
+        <p>
+          Lee lo que contesta el deudor y decide qué pasa. Es una tarea de clasificación con extracción de
+          fechas: <b>Haiku 4.5 la hace igual de bien que un modelo cinco veces más caro</b>, y corre en
+          cada mensaje entrante, así que el costo importa. Si la clasificación es <code class="mono">disputa</code>,
+          detiene la cadencia y escala a un humano — una IA no arregla una orden de compra mal emitida.
+        </p>
+        <div class="prompt"><b>SISTEMA</b>
+Clasifica la respuesta de un deudor a una cobranza. Devuelve JSON.
+
+  promesa         → hay una fecha comprometida. Extrae la fecha exacta.
+  disputa         → objeta la factura (monto, OC, recepción, calidad).
+                    DETIENE la cadencia. Escala a humano SIEMPRE.
+  falta_documento → falta OC, respaldo, o el DTE no le llegó.
+  problema_caja   → dice que no puede pagar. Candidato a plan de pago.
+  evasiva         → responde sin comprometer nada ("lo estamos viendo").
+  pagado          → dice que ya pagó. Verificar contra la cartola.
+  silencio        → no aplica (no hubo respuesta).
+
+Extrae también: fecha_prometida, monto_prometido, tono_del_deudor
+(colaborativo | neutro | molesto), y si menciona un tercero que
+debe autorizar el pago (nombre y cargo — es oro: es con quien
+hay que hablar).
+
+Ante la duda entre disputa y evasiva, elige disputa. Es más caro
+insistirle a alguien que tiene razón que detenerse de más.</div>
+        <div class="herr">
+          <span><b>tool:</b> agendar_verificacion(fecha)</span>
+          <span><b>tool:</b> escalar_a_humano(motivo)</span>
+          <span><b>tool:</b> registrar_promesa(deudor_id, fecha, monto)</span>
+          <span><b>tool:</b> buscar_pago_en_cartola(rut, monto)</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- escribano -->
+    <article class="agente">
+      <div class="agente__cab">
+        <h3>El Escribano</h3>
+        <span class="agente__modelo">claude-opus-4-8</span>
+      </div>
+      <div class="agente__cuerpo">
+        <p>
+          Sólo la carta de cobro formal y el escalamiento. Son <b>tres llamadas al mes por cuenta</b>, y son
+          las tres que pueden terminar en un tribunal o en la pérdida del cliente. <b>Por qué Opus 4.8:</b> es
+          el único caso donde un error de redacción tiene consecuencias legales, y donde el costo por llamada
+          (≈$64) es irrelevante frente al daño de equivocarse. Genera además el detalle de facturas, el
+          interés devengado y el plazo, todo verificado contra la base — el modelo <em class="italica">no</em>
+          calcula el interés, lo recibe calculado.
+        </p>
+        <div class="prompt"><b>SISTEMA</b>
+Redactas cartas de cobro formal bajo derecho chileno.
+
+· Todo dato (folio, monto, fecha, días de mora, interés) viene
+  del contexto. Si calculas algo tú, es un bug.
+· Cita la Ley N° 21.131 sólo si han pasado más de 30 días desde
+  el ACUSE DE RECIBO (no desde la emisión). Si no, omite.
+· El interés corriente se recibe calculado. No lo estimes.
+· Siempre incluye una salida: ofrecimiento de convenio en cuotas.
+  La carta que no deja salida sólo consigue que el deudor
+  desaparezca.
+· Tono: formal, exacto, sin adjetivos. Una carta de cobranza
+  agresiva es una mala carta de cobranza.
+
+NO ES ASESORÍA LEGAL. La plantilla base la revisó un abogado; el
+modelo la completa. Antes de derivar a cobranza judicial, hay un
+humano en el medio, siempre.</div>
+        <div class="herr">
+          <span><b>tool:</b> calcular_interes_ley_21131(factura_ids)</span>
+          <span><b>tool:</b> detalle_facturas_impagas(deudor_id)</span>
+          <span><b>tool:</b> requiere_confirmacion_dueño()</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="falso" style="background: var(--papel-2); border-left-color: var(--filete-2)">
+      <b>Lo que NO hace ningún agente</b>
+      <p>
+        No decide solo escalar. No manda la carta formal sin que un humano apriete el botón. No le escribe a
+        un cliente marcado como sensible sin aprobación. No calcula intereses. No promete descuentos ni
+        condona deuda. Y no habla por teléfono: una llamada de cobranza hecha por una voz sintética es
+        exactamente la forma de convertir este producto en algo que la gente odia.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ APIs ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">04 — APIs y proveedores</p>
+    <h2>Qué hay que contratar, y qué duele de cada uno</h2>
+
+    <div class="scroll-x" style="margin-top: var(--sp-m)">
+      <table class="api">
+        <thead>
+          <tr>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Para qué</th>
+            <th scope="col">Costo</th>
+            <th scope="col">La fricción real</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Anthropic API</b><small>claude-sonnet-5 · haiku-4-5 · opus-4-8</small></td>
+            <td>Los tres agentes.</td>
+            <td><small>Sonnet US$3/US$15 por MTok<br>Haiku US$1/US$5<br>Opus US$5/US$25<br>(entrada/salida)</small></td>
+            <td>Ninguna técnica. La comercial: hay que activar el <b>prompt caching</b> desde el día uno o el costo de inferencia se duplica. Ver el cálculo abajo.</td>
+          </tr>
+          <tr>
+            <td><b>Meta WhatsApp Cloud API</b><small>vía 360dialog o Twilio</small></td>
+            <td>El canal principal. Sale del número del cliente.</td>
+            <td><small>≈US$0,04 por mensaje de utilidad en Chile<br>+ ~US$50/mes de BSP</small></td>
+            <td><b>El cuello de botella del onboarding.</b> Verificación de negocio de Meta (Business Manager, documentos de la empresa), plantillas pre-aprobadas para iniciar conversación, y un número que no se puede usar en la app normal de WhatsApp. Toma entre 3 días y 3 semanas. Es la parte que hay que hacer <em>por</em> el cliente, no <em>con</em> el cliente.</td>
+          </tr>
+          <tr>
+            <td><b>SII — DTE</b><small>Registro de Compras y Ventas</small></td>
+            <td>La cartera. El activo que hace posible el onboarding de 11 minutos.</td>
+            <td class="num">$0</td>
+            <td>No hay una API REST moderna y estable: se trabaja con el certificado digital del contribuyente y servicios que cambian sin aviso. <b>Hay que asumir mantención permanente</b>, y tener siempre el camino del CSV como respaldo. Nunca pedir la clave tributaria.</td>
+          </tr>
+          <tr>
+            <td><b>Fintoc</b><small>Chile</small></td>
+            <td>Cartola bancaria en línea → conciliar qué factura se pagó.</td>
+            <td><small>≈US$0,50 por cuenta/mes</small></td>
+            <td>Sin conciliación, el agente le sigue cobrando a alguien que ya pagó — el peor error posible del producto, y el que más rápido te hace perder al cliente. <b>Esto no es opcional.</b></td>
+          </tr>
+          <tr>
+            <td><b>Postmark</b></td>
+            <td>Correo transaccional con el dominio del cliente.</td>
+            <td><small>US$15/mes por 10k correos</small></td>
+            <td>Hay que delegar DKIM/SPF en el dominio del cliente, o los correos caen en spam y la cobranza no existe. Otro paso que hay que hacer por el cliente.</td>
+          </tr>
+          <tr>
+            <td><b>ERP: Nubox · Bsale · Defontana · Chipax</b></td>
+            <td>Cartera + contactos (que el SII no trae).</td>
+            <td class="num">$0 – variable</td>
+            <td>Cada uno tiene su propia API, su propia calidad y su propio humor. Es trabajo de integración puro y aburrido, y es <b>exactamente el foso que un competidor extranjero no va a construir.</b></td>
+          </tr>
+          <tr>
+            <td><b>AWS</b><small>región Santiago si está en GA; si no, São Paulo</small></td>
+            <td>RDS Postgres, ECS Fargate, Redis, S3, KMS.</td>
+            <td><small>≈US$360/mes a 150 cuentas</small></td>
+            <td>Verificar la disponibilidad real de la región de Chile antes de prometer "tus datos están en Chile". Si no está, es São Paulo con cifrado en reposo y un DPA — y hay que decirlo así, no maquillarlo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════ COSTO ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">05 — Costo mensual</p>
+    <h2>La aritmética que Negocio descuenta del margen</h2>
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-s)">
+      Calculado para una cuenta del plan <b>Cartera</b> ($99.000/mes): 250 facturas abiertas, ~180 mensajes
+      salientes y ~90 respuestas entrantes al mes. Dólar a $950.
+    </p>
+
+    <div class="calculo">
+<b>A · INFERENCIA — sin caché de prompt</b>
+
+  El Redactor · claude-sonnet-5 · 180 mensajes/mes
+    entrada  180 × 4.000 tok = 720.000 = 0,720 MTok × US$3   = US$ 2,160
+    salida   180 ×   600 tok = 108.000 = 0,108 MTok × US$15  = US$ 1,620
+  El Oyente · claude-haiku-4-5 · 90 respuestas/mes
+    entrada   90 × 1.500 tok = 135.000 = 0,135 MTok × US$1   = US$ 0,135
+    salida    90 ×   200 tok =  18.000 = 0,018 MTok × US$5   = US$ 0,090
+  Priorización diaria de cartera · claude-sonnet-5 · 30/mes
+    entrada   30 × 8.000 tok = 240.000 = 0,240 MTok × US$3   = US$ 0,720
+    salida    30 ×   800 tok =  24.000 = 0,024 MTok × US$15  = US$ 0,360
+  El Escribano · claude-opus-4-8 · 3 cartas/mes
+    entrada    3 × 6.000 tok =  18.000 = 0,018 MTok × US$5   = US$ 0,090
+    salida     3 × 1.500 tok =   4.500 = 0,0045 MTok × US$25 = US$ 0,113
+  ──────────────────────────────────────────────────────────────────
+  <b>Sin caché:  US$ 5,29 / cuenta / mes   =  $5.023 CLP</b>
+
+<b>B · INFERENCIA — con prompt caching (lo que de verdad hacemos)</b>
+
+  El bloque de sistema (reglas de tono, calibración, plantillas) son
+  ~2.500 de los 4.000 tokens de entrada del Redactor, y ~5.000 de los
+  8.000 de la priorización. Es idéntico en cada llamada → se cachea.
+  Lectura de caché ≈ 10% del precio de entrada.
+
+    Redactor:     180 × 2.500 = 450.000 tok cacheados
+    Priorización:  30 × 5.000 = 150.000 tok cacheados
+    ─────────────────────────────────────────────
+    600.000 tok que costaban 0,600 × US$3 = US$1,80
+    ahora cuestan          0,600 × US$0,30 = US$0,18
+    + escrituras de caché (~4% de las veces, a 1,25×) ≈ US$0,03
+
+  <b>Con caché:  US$ 3,76 / cuenta / mes  =  $3.570 CLP</b>
+  + 6% de holgura por reintentos y fallos  →  <b>$3.800 CLP</b>
+
+<b>C · EL RESTO</b>
+
+  WhatsApp   110 mensajes × US$0,04 = US$4,40      =  <b>$4.200</b>
+  AWS        US$360/mes ÷ 150 cuentas = US$2,40    =  <b>$2.500</b>
+  Correo     Postmark, ~600 correos                =  <b>$  570</b>
+  Fintoc     conciliación bancaria, US$0,50        =  <b>$  475</b>
+  Soporte L1 prorrateado                           =  <b>$  455</b>
+  ──────────────────────────────────────────────────────────
+  <b>COGS plan Cartera = 3.800 + 4.200 + 2.500 + 1.500 = $12.000</b>
+
+  Margen bruto Cartera = (99.000 − 12.000) / 99.000 = <b>88%</b>
+
+<b>D · LOS TRES PLANES, Y EL MEZCLADO</b>
+
+  Libro     $49.000 → COGS $ 4.500  (sin WhatsApp)  → margen <b>91%</b>
+  Cartera   $99.000 → COGS $12.000                  → margen <b>88%</b>
+  Cobranza $229.000 → COGS $32.000  (450 msg/mes)   → margen <b>86%</b>
+
+  Mezcla 25% / 60% / 15%:
+    COGS mezclado = 0,25×4.500 + 0,60×12.000 + 0,15×32.000 = <b>$13.125</b>
+    ARPU de trabajo                                          = <b>$95.000</b>
+    Contribución  = 95.000 − 13.125                          = <b>$81.875</b>
+    <b>MARGEN BRUTO MEZCLADO = 86%</b>
+
+  ↑ Éste es el 86% con el que el <a href="roadmap.html">roadmap</a> dibuja la curva de caja,
+    y el $81.875 con el que <a href="negocio.html">negocio</a> calcula el LTV. Los tres números
+    son el mismo número.
+
+<b>E · COSTO FIJO DE LA PLATAFORMA (no por cuenta)</b>
+
+  AWS base                                    US$ 360/mes
+  Monitoreo (Sentry, Better Stack)            US$  60/mes
+  BSP de WhatsApp (360dialog)                 US$  50/mes
+  Anthropic — evaluaciones y regresiones      US$ 120/mes
+  ──────────────────────────────────────────────────────
+  <b>≈ US$ 590/mes  =  $560.000 CLP</b>  (independiente de cuántos clientes haya)
+    </div>
+  </section>
+
+  <!-- ══════════ ENV ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">06 — Variables de entorno</p>
+    <h2>El <code class="mono">.env</code> que habría que llenar</h2>
+
+    <div class="env"><span class="cm"># ─── IA ───────────────────────────────────────────────</span>
+<span class="k">ANTHROPIC_API_KEY</span>=sk-ant-...
+<span class="k">MODELO_REDACTOR</span>=claude-sonnet-5
+<span class="k">MODELO_OYENTE</span>=claude-haiku-4-5-20251001
+<span class="k">MODELO_ESCRIBANO</span>=claude-opus-4-8
+<span class="k">PROMPT_CACHE</span>=on                    <span class="cm"># no negociable: duplica el COGS si se apaga</span>
+<span class="k">MAX_TOKENS_REDACTOR</span>=900
+
+<span class="cm"># ─── WhatsApp (Meta Cloud API vía BSP) ────────────────</span>
+<span class="k">WA_BSP</span>=360dialog
+<span class="k">WA_API_KEY</span>=...
+<span class="k">WA_WEBHOOK_VERIFY_TOKEN</span>=...
+<span class="k">WA_PLANTILLA_RECORDATORIO</span>=tinoria_recordatorio_v3   <span class="cm"># aprobada por Meta</span>
+<span class="k">WA_PLANTILLA_AVISO_MORA</span>=tinoria_aviso_mora_v2
+
+<span class="cm"># ─── SII ──────────────────────────────────────────────</span>
+<span class="k">SII_AMBIENTE</span>=produccion            <span class="cm"># certificacion | produccion</span>
+<span class="k">SII_CERT_KMS_KEY_ID</span>=arn:aws:kms:...  <span class="cm"># los certificados NUNCA en claro</span>
+<span class="k">SII_RCV_POLL_CRON</span>=0 */6 * * *      <span class="cm"># cada 6 h</span>
+
+<span class="cm"># ─── Bancos y correo ──────────────────────────────────</span>
+<span class="k">FINTOC_SECRET_KEY</span>=sk_live_...
+<span class="k">POSTMARK_SERVER_TOKEN</span>=...
+<span class="k">POSTMARK_DOMINIO_POR_CLIENTE</span>=true  <span class="cm"># DKIM/SPF delegados</span>
+
+<span class="cm"># ─── Núcleo ───────────────────────────────────────────</span>
+<span class="k">DATABASE_URL</span>=postgres://...
+<span class="k">REDIS_URL</span>=redis://...
+<span class="k">CADENCIA_CRON</span>=0 * * * *            <span class="cm"># cada hora: a quién le toca hoy</span>
+<span class="k">HORA_MIN_ENVIO</span>=09:00               <span class="cm"># nadie cobra a las 7 de la mañana</span>
+<span class="k">HORA_MAX_ENVIO</span>=19:00
+<span class="k">ENVIAR_FIN_DE_SEMANA</span>=false         <span class="cm"># cobrar un domingo es una falta de respeto</span>
+<span class="k">TZ</span>=America/Santiago
+
+<span class="cm"># ─── Frenos de mano ───────────────────────────────────</span>
+<span class="k">MAX_MENSAJES_DIA_POR_DEUDOR</span>=1       <span class="cm"># jamás dos mensajes el mismo día</span>
+<span class="k">ESCALAMIENTO_DIA_MINIMO</span>=45          <span class="cm"># la carta formal no existe antes del día 45</span>
+<span class="k">REQUIERE_APROBACION_SI_SENSIBLE</span>=true
+<span class="k">INTERES_CORRIENTE_MENSUAL</span>=0.0105    <span class="cm"># se actualiza con la tasa vigente de la CMF</span>
+</div>
+
+    <p class="fuente" style="margin-top: var(--sp-s); max-width: var(--measure)">
+      Los cuatro últimos son frenos de mano y no son decoración: <b>son lo que separa un producto de
+      cobranza de un producto de acoso.</b> Un bug que mande tres WhatsApp seguidos a las 23:00 no es un
+      bug, es el fin de la empresa.
+    </p>
+  </section>
+
+  <!-- ══════════ QUÉ ESTÁ FALSEADO ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">07 — Qué está falseado en el demo</p>
+    <h2>Todo lo que no es cierto, dicho de frente</h2>
+
+    <div class="falso">
+      <b>No hay conexión al SII.</b>
+      <p>
+        Los tres botones de importación reproducen una secuencia escrita a mano. Los 218 DTE, los 11 deudores
+        y las 18 facturas son datos inventados de una empresa que no existe. <b>Para que fuera real:</b> el
+        flujo del certificado digital, el scraping/consulta del RCV, y el mapeo de cada DTE a un deudor con
+        contacto — que es la parte que el SII no te da.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>Ningún mensaje sale a ninguna parte.</b>
+      <p>
+        No hay WhatsApp ni correo: los mensajes se agregan a un array en memoria. <b>Para que fuera real:</b>
+        WhatsApp Cloud API con verificación de negocio y plantillas aprobadas por Meta, y Postmark con DKIM
+        delegado en el dominio de cada cliente.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>Los textos los escribí yo, no un modelo.</b>
+      <p>
+        Los mensajes del demo —tres tonos × dos canales × siete pasos de cadencia— están escritos a mano y
+        rellenados con sustitución de variables. <b>Esto es deliberado:</b> quería que el tono se pudiera
+        juzgar sin que un modelo tuviera un buen día. En producción, el Redactor los genera con el prompt de
+        arriba y el contexto real. <b>Lo que el demo demuestra no es que el modelo escriba bien: es qué
+        debería escribir.</b> Ese es el spec.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>Las respuestas de los deudores están guionadas.</b>
+      <p>
+        Cada deudor tiene tres desenlaces escritos, uno por tono, y el demo elige según el botón que aprietes.
+        Que la carta formal a Servicios Austral haga que Ignacio te deje de comprar no es una predicción del
+        modelo: es una <b>tesis de producto</b> que escribí a propósito, porque es exactamente lo que creo que
+        pasa en la vida real. En producción no hay guion, y esa tesis hay que validarla con datos —
+        es el hito H3 del <a href="roadmap.html">roadmap</a>.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>Las probabilidades de pago son inventadas.</b>
+      <p>
+        El "41% de probabilidad de pago en 7 días" de la landing es ilustrativo. Ese modelo no existe hasta
+        tener ~200 interacciones etiquetadas con <code class="mono">resultado_7d</code> por cliente. Antes de
+        eso, el producto real debe usar una heurística conservadora <b>y decir que es una heurística</b>.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>El DSO baja demasiado rápido.</b>
+      <p>
+        En el demo, marcar una factura como pagada mueve el DSO al tiro. En la realidad el DSO es una media
+        móvil sobre ventas a crédito de un período y se mueve con la lentitud de un glaciar — que es
+        precisamente por lo que el cliente se impacienta en el mes 3, que es donde se juega la retención.
+      </p>
+    </div>
+
+    <div class="falso">
+      <b>No hay autenticación, ni multi-tenancy, ni persistencia.</b>
+      <p>
+        Recargas la página y vuelve todo al inicio. No hay usuarios, no hay RLS, no hay auditoría. Todo eso
+        es trabajo conocido y aburrido, y no es donde está el riesgo de esta idea.
+      </p>
+    </div>
+
+    <div class="falso" style="background: var(--papel-2); border-left-color: var(--verde)">
+      <b>Y lo que NO está falseado</b>
+      <p>
+        El estado del demo es real y todo se deriva de él: los $100.180.000 por cobrar, el 65% vencido, los
+        18 folios, los días de mora, el envejecimiento por tramos, el interés de la Ley 21.131 factura por
+        factura, las cuotas de un plan de pago y la agenda que resulta de la cadencia. Nada de eso está
+        escrito a mano en el HTML: se calcula. Si marcas una factura pagada, los cinco números se mueven
+        juntos. <b>Esa parte es el producto de verdad.</b>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ DOMINIO ══════════ -->
+  <section class="bloque">
+    <p class="epigrafe">08 — El dominio</p>
+    <h2>Evidencia de disponibilidad</h2>
+
+    <div class="evidencia">
+      <div class="evidencia__cab">$ ./_kit/check-domain.sh tinoria cobralto talantar saldaru</div>
+      <div class="evidencia__cuerpo">
+tinoria&nbsp;&nbsp;&nbsp;&nbsp;.com <span class="ok">AVAILABLE</span> (http 404)&nbsp;&nbsp; .cl <span class="ok">AVAILABLE</span>&nbsp; <span style="color:var(--rojo)">← la marca</span><br>
+cobralto&nbsp;&nbsp;&nbsp;.com <span class="ok">AVAILABLE</span> (http 404)&nbsp;&nbsp; .cl <span class="ok">AVAILABLE</span><br>
+talantar&nbsp;&nbsp;&nbsp;.com <span class="ok">AVAILABLE</span> (http 404)&nbsp;&nbsp; .cl <span class="ok">AVAILABLE</span><br>
+saldaru&nbsp;&nbsp;&nbsp;&nbsp;.com <span class="ok">AVAILABLE</span> (http 404)&nbsp;&nbsp; .cl <span class="ok">AVAILABLE</span><br><br>
+<span style="color:var(--tinta-3)"># verificación directa contra el RDAP autoritativo de Verisign:</span><br>
+$ curl -s -o /dev/null -w '%{http_code}' \<br>
+&nbsp;&nbsp;&nbsp;&nbsp;https://rdap.verisign.com/com/v1/domain/tinoria.com<br>
+<span class="ok">404</span>&nbsp;&nbsp;<span style="color:var(--tinta-3)"># 404 = no registrado = disponible. (200 sería "tomado".)</span><br><br>
+<span style="color:var(--tinta-3)"># Verificado dos veces, 2026-07-12 y 2026-07-13.</span>
+      </div>
+    </div>
+
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-m)">
+      <b>Tinoria</b>, de <em class="italica">tino</em>: tacto, buen juicio, la puntería de dar en el punto
+      exacto. Es la palabra que un chileno usa sin pensarla —<em class="italica">"cóbrale, pero con
+      tino"</em>— y es, literalmente, la tesis del producto: el tono no es un detalle de la cobranza,
+      el tono <b>es</b> la cobranza.
+    </p>
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-s)">
+      Alternativas verificadas, por si el orquestador necesita resolver un choque de marca:
+      <b>cobralto.com</b>, <b>talantar.com</b>, <b>saldaru.com</b> — las tres con <code class="mono">.com</code>
+      y <code class="mono">.cl</code> libres a la misma fecha.
+    </p>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <div style="display:flex; flex-wrap:wrap; gap: var(--sp-s) var(--sp-l); justify-content:space-between;">
+      <p><b>Tinoria</b> — cobrar con tino. Prototipo, julio 2026.</p>
+      <p class="mono" style="font-size:0.78rem;">tinoria.com · RDAP → HTTP 404</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('menuBtn'), n = document.getElementById('nav');
+  b.addEventListener('click', function () {
+    var a = n.classList.toggle('abierta');
+    b.setAttribute('aria-expanded', a ? 'true' : 'false');
+  });
+})();
+</script>
+</body>
+</html>

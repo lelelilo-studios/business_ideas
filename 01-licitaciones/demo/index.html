@@ -1171,6 +1171,19 @@ function generar(L, k) {
   var i = 0;
   var vel = d.tipo === 'ia' ? 22 : 6;
 
+  /* El bloque CSS de prefers-reduced-motion del kit no alcanza a esto:
+     el tipeo es JS, no una animación CSS. Si el usuario pidió menos
+     movimiento, le entregamos el texto de una vez. */
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    st[k].texto = texto;
+    st[k].estado = 'listo';
+    if (ta) ta.value = texto;
+    renderDocs(L); barraAccion();
+    if (docsListos() === DOCS_BASE.length) { toast('Expediente completo. Ya puedes pasar al chequeo de formalismos.'); habilitar('chequeo'); }
+    else { toast(d.tipo === 'ia' ? 'Redactado. Revísalo y edítalo — es tu firma la que va.' : 'Documento generado.'); }
+    return;
+  }
+
   (function paso() {
     if (i >= palabras.length) {
       st[k].estado = 'listo';
@@ -1184,9 +1197,14 @@ function generar(L, k) {
       }
       return;
     }
-    st[k].texto += (i ? ' ' : '') + palabras[i];
+    /* Emite 1 o 2 palabras por tick — pero SIEMPRE las emite todas.
+       (Avanzar el índice sin escribir la palabra intermedia se comía
+        el 40% del texto: "ANEXO N°1 — DEL OFERENTE".) */
+    var chunk = Math.random() < 0.4 ? 2 : 1;
+    for (var j = 0; j < chunk && i < palabras.length; j++, i++) {
+      st[k].texto += (i ? ' ' : '') + palabras[i];
+    }
     if (ta) { ta.value = st[k].texto; ta.scrollTop = ta.scrollHeight; }
-    i += Math.random() < 0.4 ? 2 : 1;
     setTimeout(paso, vel);
   })();
 }

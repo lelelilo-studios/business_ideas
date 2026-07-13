@@ -18,7 +18,10 @@
   .hero h1 mark {
     background: linear-gradient(180deg, transparent 62%, var(--accent-soft) 62%);
     color: inherit;
-    padding-inline: .1em;
+    /* sin padding: si no, queda un espacio fantasma antes del punto final.
+       clone = el subrayado se repite en cada línea cuando el mark se parte. */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
   .hero__quote {
     border-left: 3px solid var(--accent);

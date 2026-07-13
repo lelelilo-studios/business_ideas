@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Antefirma</title>
+<meta name="description" content="Modelo de datos, los cinco agentes con sus model IDs, APIs de terceros, variables de entorno, el costo real de inferencia por contrato, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/antefirma.css">
+<link rel="stylesheet" href="assets/paginas.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><text y='16' font-size='16'>📄</text></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+<nav class="nav" data-nav data-raiz="" data-actual="stack.html" aria-label="Principal"></nav>
+
+<main id="principal">
+
+<section class="hero" style="padding-bottom:var(--sp-l)">
+  <div class="container">
+    <div class="rotulo">Arquitectura</div>
+    <h1 style="font-size:var(--step-4);max-width:22ch;line-height:1.05;margin-bottom:var(--sp-m)">
+      Cómo se construye, qué cuesta, y qué está falseado.
+    </h1>
+    <p class="gris ancho" style="font-size:var(--step-1)">
+      Nada de esto está aprovisionado: está documentado. El número que importa —
+      <b>$650 CLP por contrato analizado</b> — es el que <a href="negocio.html">negocio</a>
+      descuenta del margen. Las dos páginas cuadran.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ EL PIPELINE ══ -->
+<section class="seccion" style="border-top:1px solid var(--regla)">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">01 · El pipeline</div>
+      <h2>De un PDF a un calendario, en seis pasos.</h2>
+      <p>
+        La decisión de diseño que ordena todo: <b>el contrato se cachea una vez y se lee muchas
+        veces</b>. Sin caché de prompt, este producto costaría cuatro veces más.
+      </p>
+    </div>
+
+    <ol class="pasos" role="list">
+      <li class="paso">
+        <div>
+          <h3>Extracción del texto</h3>
+          <p>
+            <code>pdfplumber</code> si el PDF tiene capa de texto (60% de los casos).
+            <b>Google Document AI</b> si viene escaneado o fotografiado con el teléfono, que es lo
+            que pasa cuando el mall te pasa el contrato impreso. Se guarda el SHA-256 del archivo:
+            si el mismo contrato vuelve a subirse, no se vuelve a pagar la inferencia.
+          </p>
+        </div>
+      </li>
+      <li class="paso">
+        <div>
+          <h3>Segmentación en cláusulas</h3>
+          <p>
+            Un modelo barato parte el documento en cláusulas numeradas con sus offsets exactos en
+            el texto original. Los offsets son la razón de que el visor pueda subrayar la palabra
+            exacta: <b>nunca reescribimos el contrato, sólo lo anotamos</b>.
+          </p>
+        </div>
+      </li>
+      <li class="paso">
+        <div>
+          <h3>Análisis de riesgo — tres pasadas en paralelo</h3>
+          <p>
+            El contrato completo se escribe una vez al caché de prompt. Después, tres pasadas
+            especializadas lo leen desde el caché a un décimo del precio: <b>plata</b> (precio,
+            multas, reajustes), <b>plazos</b> (renovación, avisos, vencimientos) y
+            <b>responsabilidad</b> (garantías, indemnidad, cesión, salida). Separarlas sube la
+            detección: un solo prompt que busque «riesgos» encuentra menos que tres que busquen
+            cosas concretas.
+          </p>
+        </div>
+      </li>
+      <li class="paso">
+        <div>
+          <h3>Verificación adversarial</h3>
+          <p>
+            Un cuarto agente recibe el contrato (del caché) y el informe, y trabaja con un prompt
+            hostil: <b>«Eres el abogado de la contraparte. ¿Qué cláusula que te favorece se le pasó
+            al analista?»</b> Es la mitigación técnica del riesgo 2 de
+            <a href="negocio.html">negocio</a>: el falso negativo. No lo elimina — lo reduce.
+          </p>
+        </div>
+      </li>
+      <li class="paso">
+        <div>
+          <h3>Redacción de las modificaciones</h3>
+          <p>
+            El modelo más caro se usa <b>sólo acá y sólo para las cláusulas críticas y ámbar</b>,
+            porque redactar texto jurídico que un abogado de la contraparte va a leer es la única
+            tarea del pipeline donde la calidad se nota de verdad. Las cláusulas estándar no pasan
+            por aquí.
+          </p>
+        </div>
+      </li>
+      <li class="paso">
+        <div>
+          <h3>Extracción de obligaciones y vigilancia</h3>
+          <p>
+            Las fechas salen del análisis de plazos y se materializan en filas de una tabla. Desde
+            ahí, <b>la vigilancia no usa IA</b>: es un cron que compara fechas contra hoy y dispara
+            correos y WhatsApp. Nuestro producto más valioso es el más barato de operar, y esa es
+            una ventaja de negocio, no un detalle técnico.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ LOS AGENTES ══ -->
+<section class="seccion" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">02 · Los agentes</div>
+      <h2>Cinco agentes. Cada modelo elegido por lo que cuesta y por lo que se juega.</h2>
+    </div>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <caption class="visually-hidden">Agentes de IA, modelos, herramientas y por qué ese modelo</caption>
+        <thead>
+          <tr><th>Agente</th><th>Modelo</th><th>Herramientas</th><th>Por qué ese modelo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Segmentador</b></td>
+            <td class="mono" style="font-size:.7rem">claude-haiku-4-5-20251001</td>
+            <td>Ninguna. Salida estructurada (<code>output_config.format</code>) → arreglo de cláusulas con offsets.</td>
+            <td>Es partir texto por numerales. No requiere razonar. Pagar Sonnet acá sería quemar plata.</td>
+          </tr>
+          <tr>
+            <td><b>Analista de riesgo</b><br><span class="mono" style="font-size:.68rem;color:var(--tinta-3)">×3 en paralelo</span></td>
+            <td class="mono" style="font-size:.7rem">claude-sonnet-5</td>
+            <td>
+              <code>valor_uf(fecha)</code> · <code>buscar_corpus(consulta)</code> (RAG sobre
+              nuestro corpus de cláusulas chilenas anotadas). Salida estructurada.
+              <code>thinking: {type:"adaptive"}</code>.
+            </td>
+            <td>
+              El caballo de batalla. El contrato va en caché de prompt: las tres pasadas lo leen a
+              <b>0,1×</b> del precio de entrada. Opus acá multiplicaría el costo por 1,7 sin mejorar
+              la detección lo suficiente.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Verificador adversarial</b></td>
+            <td class="mono" style="font-size:.7rem">claude-sonnet-5</td>
+            <td>Ninguna. Lee el contrato desde el mismo caché y el informe del analista.</td>
+            <td>Prompt hostil, no modelo más caro. La ganancia viene del <b>encuadre</b>, no de la potencia.</td>
+          </tr>
+          <tr style="background:var(--rojo-tenue)">
+            <td><b>Redactor de redlines</b></td>
+            <td class="mono" style="font-size:.7rem">claude-opus-4-8</td>
+            <td><code>output_config: {effort:"high"}</code>. Sólo cláusulas críticas y ámbar (≈9 de 24).</td>
+            <td>
+              <b>El único lugar donde se justifica el modelo caro.</b> Este texto lo va a leer el
+              abogado de la contraparte. Si suena a IA, perdimos al cliente y la credibilidad.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Q&amp;A del contrato</b></td>
+            <td class="mono" style="font-size:.7rem">claude-sonnet-5</td>
+            <td>
+              <code>leer_clausula(n)</code> · <code>leer_obligaciones()</code> ·
+              <code>valor_uf()</code>. <b>No se manda el contrato entero</b>: se manda el índice de
+              cláusulas y el agente pide las que necesita.
+            </td>
+            <td>
+              Decisión de costo: mandar 8.000 tokens de contrato en cada pregunta suelta —
+              sin acertar el caché de 5 minutos — costaría 8× más que mandar el índice y dejar que
+              el modelo pida tres cláusulas.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aviso mt-l">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M7 4v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="7" cy="9.6" r=".75" fill="currentColor"/>
+      </svg>
+      <div>
+        <strong>Cada riesgo detectado guarda el modelo y la versión del prompt que lo produjo</strong>
+        (columnas <code>modelo</code> y <code>version_prompt</code> en la tabla <code>riesgos</code>).
+        No es telemetría: es la única forma de saber, cuando un cliente reclame que se nos pasó una
+        cláusula, <b>qué exactamente estaba corriendo ese día</b>. En un producto con riesgo de
+        responsabilidad, la trazabilidad es una función, no un lujo.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ COSTO DE INFERENCIA -->
+<section class="seccion">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">03 · Costo de inferencia</div>
+      <h2>$650 por contrato. Toda la aritmética, línea por línea.</h2>
+      <p>
+        Supuestos declarados: contrato promedio de <b>14 páginas ≈ 8.000 tokens</b> de entrada.
+        Tipo de cambio <b>$950 CLP/USD</b>. Precios por millón de tokens (MTok), entrada/salida.
+      </p>
+    </div>
+
+    <div class="hoja" style="padding:var(--sp-m)">
+      <div class="rotulo">Precios usados</div>
+      <div class="calculo mb-m">
+        <b>Opus 4.8</b> &nbsp;&nbsp;<code>claude-opus-4-8</code> ······· US$5 / US$25 por MTok<br>
+        <b>Sonnet 5</b> &nbsp;<code>claude-sonnet-5</code> ····· US$3 / US$15 por MTok<br>
+        <b>Haiku 4.5</b> <code>claude-haiku-4-5-20251001</code> · US$1 / US$5 &nbsp;por MTok<br>
+        <b>Caché de prompt:</b> escritura 1,25× · <span class="res">lectura 0,1×</span> (TTL 5 min)
+      </div>
+
+      <div class="rotulo">Por contrato analizado</div>
+      <div class="calculo">
+<b>1. OCR</b> — Google Document AI, US$1,50 / 1.000 páginas<br>
+&nbsp;&nbsp;&nbsp;Sólo el 40% de los contratos llega escaneado: 14 pág × 0,40 = 5,6 pág<br>
+&nbsp;&nbsp;&nbsp;5,6 ÷ 1.000 × 1,50 ································ <b>US$0,0084</b><br><br>
+
+<b>2. Segmentación</b> — Haiku 4.5<br>
+&nbsp;&nbsp;&nbsp;entrada 8.000 tok × $1/MTok = $0,008<br>
+&nbsp;&nbsp;&nbsp;salida &nbsp;3.000 tok × $5/MTok = $0,015 ············ <b>US$0,0230</b><br><br>
+
+<b>3. Análisis de riesgo</b> — Sonnet 5, 3 pasadas paralelas sobre el mismo caché<br>
+&nbsp;&nbsp;&nbsp;escritura de caché: 8.000 × $3 × <b>1,25</b> ÷ 1e6 ····· $0,0300<br>
+&nbsp;&nbsp;&nbsp;3 lecturas de caché: 3 × 8.000 × $3 × <b>0,1</b> ÷ 1e6 ·· $0,0072 &nbsp;<span style="color:var(--tinta-3)">← acá está el ahorro</span><br>
+&nbsp;&nbsp;&nbsp;prompts propios: 3 × 1.500 × $3 ÷ 1e6 ·············· $0,0135<br>
+&nbsp;&nbsp;&nbsp;salida: 3 × 4.000 × $15 ÷ 1e6 ······················ $0,1800 ··· <b>US$0,2307</b><br>
+&nbsp;&nbsp;&nbsp;<span style="color:var(--tinta-3)">Sin caché, las 3 lecturas costarían $0,072 en vez de $0,0072.</span><br><br>
+
+<b>4. Verificación adversarial</b> — Sonnet 5<br>
+&nbsp;&nbsp;&nbsp;lectura de caché $0,0024 + informe 5.000×$3 ÷1e6 = $0,0150<br>
+&nbsp;&nbsp;&nbsp;salida 1.200 × $15 ÷ 1e6 = $0,0180 ················· <b>US$0,0354</b><br><br>
+
+<b>5. Redlines</b> — Opus 4.8, sólo las ≈9 cláusulas críticas y ámbar<br>
+&nbsp;&nbsp;&nbsp;entrada 6.000 × $5 ÷ 1e6 = $0,0300<br>
+&nbsp;&nbsp;&nbsp;salida &nbsp;8.000 × $25 ÷ 1e6 = $0,2000 ············· <b>US$0,2300</b><br><br>
+
+&nbsp;&nbsp;&nbsp;<b>TOTAL POR CONTRATO</b> = 0,0084 + 0,0230 + 0,2307 + 0,0354 + 0,2300<br>
+&nbsp;&nbsp;&nbsp;= <span class="res">US$0,5275</span> × $950 = <span class="res">$501 CLP</span><br><br>
+&nbsp;&nbsp;&nbsp;<b>Redondeamos a $650 CLP</b> para tener 30% de holgura: los contratos largos
+existen,<br>&nbsp;&nbsp;&nbsp;los reintentos existen, y prefiero que el margen sorprenda para arriba.
+      </div>
+
+      <p class="fuente">
+        <span class="tag tag--fnt">Precios de lista</span> Los precios por MTok y los multiplicadores
+        de caché son los publicados por Anthropic. <span class="tag tag--est">Estimación</span> Los
+        conteos de tokens (8.000 de entrada, 4.000 de salida por pasada) salen del contrato de
+        arriendo del <a href="demo/index.html">demo</a>, que tiene 6.840 palabras — es un contrato
+        real de 14 páginas, no un supuesto de aire.
+      </p>
+    </div>
+
+    <div class="hoja" style="padding:var(--sp-m);margin-top:var(--sp-m)">
+      <div class="rotulo">Costo mensual total — el número que negocio descuenta del margen</div>
+      <div class="calculo">
+<b>Por cliente, al mes</b> (el cliente promedio sube 1,8 contratos/mes):<br>
+&nbsp;&nbsp;Análisis de contratos ······ 1,8 × $650 ····················· $1.170<br>
+&nbsp;&nbsp;Q&amp;A sobre contratos ······· 6 preguntas × Sonnet 5 ········· &nbsp;&nbsp;$150<br>
+&nbsp;&nbsp;Almacenamiento cifrado ····· S3 + KMS, expediente completo ··· &nbsp;&nbsp;$340<br>
+&nbsp;&nbsp;Infra prorrateada ········· Postgres, colas, hosting, Sentry · $2.363<br>
+&nbsp;&nbsp;WhatsApp Business API ····· 6 avisos × $80 ··················· &nbsp;&nbsp;$480<br>
+&nbsp;&nbsp;Correo transaccional ······ Resend ··························· &nbsp;&nbsp;&nbsp;$60<br>
+&nbsp;&nbsp;Pasarela de pago ·········· 3,5% de $58.000 ·················· $2.030<br>
+&nbsp;&nbsp;<b>COGS por cliente/mes</b> = <span class="res">$6.593</span><br><br>
+&nbsp;&nbsp;<b>Margen bruto</b> = 1 − 6.593 ÷ 58.000 = <span class="res">88,7%</span> ← el número que usa el modelo del roadmap<br><br>
+
+<b>Costo mensual absoluto, escenario base:</b><br>
+&nbsp;&nbsp;Mes 12 — 26 clientes × $6.593 ······ <span class="res">$171.418/mes</span> (11,3% del MRR de $1.511.182)<br>
+&nbsp;&nbsp;Mes 24 — 192 clientes × $6.593 ····· <span class="res">$1.265.856/mes</span> (11,3% del MRR de $11.144.783)<br><br>
+&nbsp;&nbsp;<span style="color:var(--tinta-3)">Piso fijo de infra mientras hay pocos clientes: ≈$180.000/mes, incluido<br>
+&nbsp;&nbsp;en los $800.000 de gastos fijos del modelo del roadmap.</span>
+      </div>
+      <p class="fuente">
+        <b>La vigilancia — que es el producto — cuesta cero en inferencia.</b> El cron que compara
+        fechas contra hoy no llama a ningún modelo. Es la mejor noticia de esta página: lo que nos
+        defiende de la comoditización es también lo que no nos cuesta plata.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ MODELO DE DATOS ═══ -->
+<section class="seccion" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">04 · Modelo de datos</div>
+      <h2>Postgres. Diez tablas. Nada exótico.</h2>
+    </div>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <caption class="visually-hidden">Tablas y campos principales</caption>
+        <thead><tr><th>Tabla</th><th>Campos</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td class="mono"><b>empresas</b></td>
+              <td class="mono" style="font-size:.72rem">id · rut · razon_social · giro · comuna · plan · creada_en</td>
+              <td>El RUT es la llave natural del cliente chileno.</td></tr>
+          <tr><td class="mono"><b>usuarios</b></td>
+              <td class="mono" style="font-size:.72rem">id · empresa_id · nombre · email · telefono_wa · rol</td>
+              <td><code>telefono_wa</code> no es opcional: WhatsApp es el canal que sí se lee.</td></tr>
+          <tr><td class="mono"><b>contratos</b></td>
+              <td class="mono" style="font-size:.72rem">id · empresa_id · tipo · contraparte · contraparte_rut · archivo_url · hash_sha256 · paginas · palabras · estado · vigencia_inicio · vigencia_fin · <b>vigilado</b></td>
+              <td><code>vigilado</code> es el booleano del que depende todo el negocio. <code>hash_sha256</code> evita pagar dos veces el mismo análisis.</td></tr>
+          <tr><td class="mono"><b>clausulas</b></td>
+              <td class="mono" style="font-size:.72rem">id · contrato_id · numero · ordinal · titulo · texto · offset_inicio · offset_fin</td>
+              <td>Los offsets permiten subrayar la palabra exacta en el documento original.</td></tr>
+          <tr style="background:var(--rojo-tenue)"><td class="mono"><b>riesgos</b></td>
+              <td class="mono" style="font-size:.72rem">id · clausula_id · nivel · categoria · titulo · llano · duele · exposicion_clp · exposicion_detalle · <b>modelo</b> · <b>version_prompt</b> · confianza</td>
+              <td><b>La tabla del producto.</b> <code>modelo</code> y <code>version_prompt</code> existen por el riesgo de responsabilidad.</td></tr>
+          <tr><td class="mono"><b>redlines</b></td>
+              <td class="mono" style="font-size:.72rem">id · riesgo_id · texto_original · texto_propuesto · justificacion</td>
+              <td>Uno a uno con riesgo, y sólo para críticos y ámbar.</td></tr>
+          <tr style="background:var(--rojo-tenue)"><td class="mono"><b>obligaciones</b></td>
+              <td class="mono" style="font-size:.72rem">id · contrato_id · clausula_id · fecha · titulo · detalle · accion · nivel · recurrencia · responsable_id · alerta_activa</td>
+              <td><b>La tabla del foso.</b> Es la que el cron mira todos los días a las 8 de la mañana.</td></tr>
+          <tr><td class="mono"><b>alertas_enviadas</b></td>
+              <td class="mono" style="font-size:.72rem">id · obligacion_id · canal · enviada_en · abierta_en</td>
+              <td>Sin <code>abierta_en</code> no sabemos si la vigilancia se siente — y si no se siente, el churn sube.</td></tr>
+          <tr><td class="mono"><b>indicadores</b></td>
+              <td class="mono" style="font-size:.72rem">fecha · uf_clp</td>
+              <td>Caché diario de la UF. Una fila por día, para siempre.</td></tr>
+          <tr><td class="mono"><b>auditoria</b></td>
+              <td class="mono" style="font-size:.72rem">id · contrato_id · evento · actor · payload · creado_en</td>
+              <td>Append-only. Quién vio qué, cuándo, y qué le mostramos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ APIS Y ENTORNO ════════ -->
+<section class="seccion">
+  <div class="container">
+    <div class="rej rej--2">
+
+      <div>
+        <div class="rotulo">05 · APIs de terceros</div>
+        <h2 style="font-size:var(--step-2);margin-bottom:var(--sp-m)">Lo que hay que contratar</h2>
+        <dl class="lista-def">
+          <div><dt>Anthropic</dt>
+            <dd>Los cinco agentes. Cuenta con facturación y límites de tasa acordes al mes 12.</dd></div>
+          <div><dt>Google Document AI</dt>
+            <dd>OCR de contratos escaneados. Alternativa: AWS Textract. <b>Hay que probar los dos con contratos chilenos escaneados de verdad</b> — la calidad varía y no se puede suponer.</dd></div>
+          <div><dt>WhatsApp Business API</dt>
+            <dd>Meta Cloud API. <b>Requiere verificación de empresa y plantillas de mensaje aprobadas</b>, y eso demora semanas. Es el trámite que hay que empezar el día 1, no el mes 6.</dd></div>
+          <div><dt>mindicador.cl</dt>
+            <dd>Valor diario de la UF. Gratis, sin llave. Respaldo: la API del Banco Central.</dd></div>
+          <div><dt>Transbank / Flow</dt>
+            <dd>Suscripciones recurrentes en CLP. Flow es más simple para SaaS; Transbank tiene más confianza de marca.</dd></div>
+          <div><dt>Resend</dt>
+            <dd>Correo transaccional. Los avisos de fecha también van por acá.</dd></div>
+          <div><dt>Google Calendar API</dt>
+            <dd>OAuth para sincronizar obligaciones. El <code>.ics</code> es el respaldo y funciona sin permisos.</dd></div>
+          <div><dt>E-Sign / Acepta <span style="color:var(--tinta-3)">(fase 2)</span></dt>
+            <dd>Firma electrónica avanzada. No es una API: es una conversación de partnership. Ver <a href="negocio.html">canales</a>.</dd></div>
+        </dl>
+      </div>
+
+      <div>
+        <div class="rotulo">06 · Variables de entorno</div>
+        <h2 style="font-size:var(--step-2);margin-bottom:var(--sp-m)">El <code>.env</code></h2>
+        <div class="calculo" style="line-height:2">
+ANTHROPIC_API_KEY=<br>
+GOOGLE_APPLICATION_CREDENTIALS=<br>
+DOCUMENT_AI_PROCESSOR_ID=<br>
+<br>
+DATABASE_URL=<span style="color:var(--tinta-3)">postgres://…</span><br>
+REDIS_URL=<span style="color:var(--tinta-3)">colas del pipeline</span><br>
+<br>
+S3_BUCKET=<br>
+S3_ACCESS_KEY=<br>
+S3_SECRET_KEY=<br>
+KMS_KEY_ID=<span style="color:var(--tinta-3)">cifrado en reposo</span><br>
+<br>
+WHATSAPP_PHONE_ID=<br>
+WHATSAPP_TOKEN=<br>
+RESEND_API_KEY=<br>
+<br>
+FLOW_API_KEY=<br>
+FLOW_SECRET_KEY=<br>
+<br>
+GOOGLE_OAUTH_CLIENT_ID=<br>
+GOOGLE_OAUTH_SECRET=<br>
+<br>
+SENTRY_DSN=<br>
+UF_API_URL=<span style="color:var(--tinta-3)">https://mindicador.cl/api/uf</span><br>
+<br>
+<b style="color:var(--rojo)">PROMPT_VERSION=</b><span style="color:var(--tinta-3)">se escribe en cada fila<br>
+de la tabla riesgos. No es cosmético.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════ QUÉ ESTÁ FALSEADO EN EL DEMO ═ -->
+<section class="seccion" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">07 · Qué está falseado en el demo</div>
+      <h2>Somos un producto sobre leer la letra chica. Sería raro que tuviéramos letra chica.</h2>
+    </div>
+
+    <div class="rej rej--2">
+
+      <div class="riesgo">
+        <h3 style="font-size:var(--step-1);margin-bottom:var(--sp-s)">Falseado</h3>
+        <ul class="plan__l" role="list">
+          <li>
+            <b>No hay servidor y no hay modelo.</b> El demo corre entero en tu navegador. Los dos
+            contratos y sus 24 anotaciones están precomputados y viven en
+            <code>demo/contratos.js</code>.
+          </li>
+          <li>
+            <b>El archivo que arrastras no se lee.</b> Y te lo decimos en pantalla, en vez de fingir
+            un análisis. Fingirlo sería exactamente la clase de cosa contra la que existe este
+            producto.
+          </li>
+          <li>
+            <b>La barra de progreso es teatro sincronizado.</b> Los nombres de las etapas y de los
+            modelos son los reales del pipeline de arriba, pero en producción esto demora entre
+            <b>60 y 180 segundos</b> y llega por correo cuando está listo. En el demo dura 2,6
+            segundos y se puede saltar.
+          </li>
+          <li>
+            <b>La UF está fija en $40.150.</b> En producción viene de mindicador.cl todos los días.
+          </li>
+          <li>
+            <b>Las alertas no se envían.</b> El interruptor cambia de estado y te dice qué pasaría;
+            no hay WhatsApp detrás.
+          </li>
+        </ul>
+      </div>
+
+      <div class="riesgo" style="border-left-color:var(--estandar)">
+        <h3 style="font-size:var(--step-1);margin-bottom:var(--sp-s);color:var(--estandar)">
+          No falseado — funciona de verdad
+        </h3>
+        <ul class="plan__l" role="list">
+          <li class="si">
+            <b>El <code>.ics</code> se genera y se descarga de verdad.</b> Se arma en el navegador
+            con VEVENT y dos VALARM (30 y 7 días antes), y se baja como archivo. Ábrelo en Google
+            Calendar: las fechas quedan puestas.
+          </li>
+          <li class="si">
+            <b>El simulador de renta efectiva recalcula de verdad.</b> Mueve el control y verás el
+            escalón exacto donde se gatilla el 8% de renta variable: las 900 UF.
+          </li>
+          <li class="si">
+            <b>Las cuentas regresivas se calculan contra la fecha real de tu computador.</b> Si
+            dice «faltan 3 días» para renovar la boleta, es porque faltan 3 días.
+          </li>
+          <li class="si">
+            <b>El portapapeles copia de verdad</b>, y el correo cambia de verdad cuando cambias el
+            tono.
+          </li>
+          <li class="si">
+            <b>Los dos contratos están redactados, no resumidos.</b> 15 y 10 cláusulas en lenguaje
+            jurídico chileno, con las trampas adentro. Ese es el trabajo real de esta idea.
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="hoja mt-l" style="padding:var(--sp-m)">
+      <div class="rotulo">Qué haría falta para que fuera real</div>
+      <ol class="pasos" role="list">
+        <li class="paso">
+          <div>
+            <h3>El corpus de cláusulas chilenas anotadas</h3>
+            <p>
+              Es lo único que no se compra: <b>500 a 800 contratos reales, leídos por un abogado, con
+              cada cláusula problemática etiquetada.</b> Es el activo, es lo que alimenta el RAG del
+              analista, y es lo que hace que el modelo sepa que «tácita reconducción» no es lo
+              mismo que un <em>auto-renewal</em> gringo. Sin esto tenemos un ChatGPT con marca.
+            </p>
+          </div>
+        </li>
+        <li class="paso">
+          <div>
+            <h3>El proceso de evaluación</h3>
+            <p>
+              Un <em>golden set</em> de 100 contratos con las cláusulas de riesgo marcadas a mano,
+              y una métrica que se mira todos los días: <b>recall de cláusulas críticas</b>. No
+              precisión — <b>recall</b>. Una falsa alarma molesta; un falso negativo nos demanda.
+              Ningún cambio de prompt sale a producción sin pasar el golden set.
+            </p>
+          </div>
+        </li>
+        <li class="paso">
+          <div>
+            <h3>WhatsApp Business API verificado</h3>
+            <p>
+              Verificación de empresa ante Meta y plantillas de mensaje aprobadas. Demora semanas y
+              no depende de nosotros. <b>Es el trámite del día 1</b>, porque sin WhatsApp la alerta
+              llega por correo y el correo no se lee.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ DOMINIO ══ -->
+<section class="seccion">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">08 · El dominio</div>
+      <h2>La evidencia, con el código HTTP.</h2>
+    </div>
+
+    <div class="hoja" style="padding:var(--sp-m)">
+      <div class="calculo">
+$ curl -o /dev/null -w "%{http_code}" \<br>
+&nbsp;&nbsp;&nbsp;&nbsp;https://rdap.verisign.com/com/v1/domain/<b>antefirma.com</b><br>
+<span class="res">404</span> &nbsp;<span style="color:var(--tinta-3)">← 404 en RDAP significa «no hay registro» = DISPONIBLE</span><br><br>
+Verificado el <b>12-jul-2026</b> contra el RDAP de Verisign, el registro
+autoritativo de <code>.com</code>.<br>
+Un dominio tomado devuelve 200 con el JSON del registro. Éste devuelve 404.
+      </div>
+
+      <div class="scroll-x mt-m">
+        <table class="tabla">
+          <caption class="visually-hidden">Dominio elegido y alternativas verificadas</caption>
+          <thead><tr><th>Dominio</th><th class="num">HTTP</th><th>Estado</th><th>Qué significa el nombre</th></tr></thead>
+          <tbody>
+            <tr style="background:var(--rojo-tenue)">
+              <td class="mono"><b>antefirma.com</b></td><td class="num mono"><b>404</b></td>
+              <td><b>Elegido</b></td>
+              <td>
+                <b>La antefirma es una palabra jurídica real</b>: es el bloque de texto que va
+                <em>sobre</em> la firma en un documento. Y se lee también como <b>ante-firma</b>:
+                antes de firmar. Es el producto entero en una palabra que ya existe en castellano.
+              </td>
+            </tr>
+            <tr><td class="mono">prefirma.com</td><td class="num mono">404</td><td>Alternativa 1</td>
+                <td>Más literal, menos memorable. No tiene la doble lectura.</td></tr>
+            <tr><td class="mono">fojaroja.com</td><td class="num mono">404</td><td>Alternativa 2</td>
+                <td>«Foja» es la hoja del expediente judicial. Bonito, pero más críptico para una PYME.</td></tr>
+            <tr><td class="mono">clausara.com</td><td class="num mono">404</td><td>Alternativa 3</td>
+                <td>Acuñado sobre «cláusula». Disponible y corto, pero no dice nada por sí solo.</td></tr>
+            <tr><td class="mono">antefirma.cl</td><td class="num mono">—</td><td>Libre</td>
+                <td>NIC Chile: «no existe». Se registra también, por marca.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="container">
+    <div class="llamada">
+      <h2>Lo mejor de esta idea es el demo.</h2>
+      <p>
+        Dos contratos chilenos redactados de verdad, con trampas reales adentro, anotados en
+        castellano. Ándate a mirar el de arriendo.
+      </p>
+      <a class="btn" href="demo/index.html">Abrir el demo →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__fila">
+    <span>Antefirma · Santiago de Chile · antefirma.com</span>
+    <span>No constituye asesoría legal.</span>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

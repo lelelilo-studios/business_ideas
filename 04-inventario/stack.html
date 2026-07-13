@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermata — Arquitectura</title>
+<meta name="description" content="Modelo de datos, agentes de IA, APIs de terceros, variables de entorno, costo mensual con aritmética, qué está fingido en el demo y evidencia del dominio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="mermata.css">
+<style>
+  pre.cod {
+    font-family: var(--mono); font-size: .78rem; line-height: 1.6;
+    background: var(--papel-2); border: 1px solid var(--regla-2); border-radius: var(--radio);
+    padding: var(--sp-s); overflow-x: auto; color: var(--tinta-2);
+    -webkit-overflow-scrolling: touch;
+  }
+  pre.cod b { color: var(--tinta); font-weight: 500; }
+  pre.cod i { color: var(--tinta-3); font-style: normal; }
+  pre.cod u { color: var(--acento-osc); text-decoration: none; }
+  code { font-family: var(--mono); font-size: .88em; background: var(--papel-3); padding: 1px 4px; border-radius: 2px; }
+  .agente { border-top: 2px solid var(--tinta); padding-top: var(--sp-s); }
+  .agente-cab { display: flex; gap: var(--sp-xs); align-items: baseline; flex-wrap: wrap; margin-bottom: var(--sp-xs); }
+  .agente h3 { font-size: var(--step-1); margin: 0; }
+  .modelo {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .04em;
+    background: var(--tinta); color: var(--papel-2); padding: 3px 8px; border-radius: var(--radio);
+  }
+  .modelo-h { background: var(--s3); }
+  .modelo-s { background: var(--s1); }
+  .modelo-o { background: var(--acento); }
+  .prompt {
+    font-family: var(--mono); font-size: .76rem; line-height: 1.65;
+    border-left: 3px solid var(--regla-2); padding: var(--sp-xs) 0 var(--sp-xs) var(--sp-s);
+    color: var(--tinta-2); margin: var(--sp-xs) 0;
+    white-space: pre-wrap;
+  }
+  .herr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-xs); }
+  .herr span {
+    font-family: var(--mono); font-size: .74rem; color: var(--tinta-2);
+    border: 1px solid var(--regla-2); border-radius: var(--radio); padding: 2px 7px; background: var(--papel-2);
+  }
+  h2 { scroll-margin-top: 90px; }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="19" height="19" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 15.5L8.5 9.5L12 13L17 5.5" stroke="#b8452b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="5.5" r="1.9" fill="#b8452b"/>
+      </svg>
+      Merma<span class="marca-pt">ta</span>
+    </a>
+    <nav class="nav-lista" aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="navpanel">
+      <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M0 1h14M0 6h14M0 11h14" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-nav-txt>Menú</span>
+    </button>
+  </div>
+</header>
+<div class="nav-panel" id="navpanel" data-nav-panel>
+  <div class="container">
+    <nav class="nav-lista" aria-label="Principal móvil">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+<section class="seccion container">
+  <span class="sello sello-acento">Arquitectura</span>
+  <h1 style="margin: var(--sp-2xs) 0 var(--sp-s); max-width: 22ch;">Lo que habría que construir, y lo que cuesta correrlo.</h1>
+  <p class="prose" style="font-size: var(--step-1); color: var(--tinta-2);">Con una advertencia que va primero porque cambia todo lo demás: <b>el pronóstico no es un LLM.</b> Es estadística clásica corriendo en una CPU, y su costo marginal es prácticamente cero. Los modelos de lenguaje hacen otra cosa —leen facturas, ordenan nombres, hablan con el proveedor— y ahí sí valen lo que cuestan.</p>
+</section>
+
+<!-- ============ EL MOTOR NO ES IA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>El motor de pronóstico</h2>
+    <p>Si en 2026 alguien te dice que le pide a un LLM que pronostique la venta de marraqueta, sal corriendo. Es caro, es lento, es no determinista y pierde contra un modelo estadístico de los años 60.</p>
+  </div>
+
+  <div class="rejilla rejilla-2">
+    <div class="ficha">
+      <div class="ficha-titulo">Qué corre de verdad</div>
+      <table class="tabla">
+        <tbody>
+          <tr><th scope="row">Base</th><td>Suavizamiento exponencial (<b>ETS</b>) con estacionalidad semanal, por SKU. Es rápido, robusto y sobrevive con 8 semanas de historia.</td></tr>
+          <tr><th scope="row">Regresores</th><td><b>Gradient boosting</b> (LightGBM) sobre los residuos, con: día de la semana, día del mes, proximidad al día de pago, feriado (y víspera de feriado), temperatura y precipitación, quiebre de stock conocido, tendencia.</td></tr>
+          <tr><th scope="row">SKU lentos</th><td><b>Croston / TSB</b> para productos de venta intermitente (los que se venden 2 de cada 7 días). ETS los destroza; Croston existe exactamente para eso.</td></tr>
+          <tr><th scope="row">Incertidumbre</th><td>Cuantiles empíricos de los residuos del backtest, no una normal supuesta. La banda P10–P90 sale de <b>cómo se equivocó el modelo antes</b>, no de una fórmula bonita.</td></tr>
+          <tr><th scope="row">Validación</th><td>Backtest con corte temporal deslizante. Métrica principal <b>MAPE</b>; secundaria, y más importante, <b>MAPE en días especiales</b> (pago y feriado), porque el día que más vendes es el día en que más te equivocas.</td></tr>
+          <tr><th scope="row">Cómputo</th><td>Un cron nocturno. ~120 SKU × 14 días de horizonte ≈ <b>90 segundos de CPU por local</b>. Un worker barato reentrena 400 locales en una noche.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="apilar">
+      <div class="ficha nota" style="border-left-color: var(--acento);">
+        <b style="color: var(--tinta)">La consecuencia económica de esto</b>
+        <p style="margin: 6px 0 0; font-size: var(--step--1);">El corazón del producto tiene costo marginal cercano a <b>cero</b>. Eso es lo que permite cobrar $99.000 al mes y tener 85% de margen bruto. Si el pronóstico dependiera de llamadas a un LLM por SKU y por día, el costo variable por cuenta sería del orden de US$40 al mes y el negocio, sencillamente, no existiría a este precio.</p>
+      </div>
+      <div class="ficha">
+        <div class="ficha-titulo">Del pronóstico a la orden de compra</div>
+        <div class="calculo">
+          <div><b>1.</b> Consumo teórico del insumo <i>i</i> = Σ<sub>sku</sub> pronóstico(sku) × receta(sku, <i>i</i>)</div>
+          <div><b>2.</b> Necesidad = Σ consumo teórico sobre los días de cobertura</div>
+          <div><b>3.</b> Colchón = <b>z</b> × σ<sub>consumo</sub> × √cobertura &nbsp;<i>(z: 1,28 / 1,65 / 2,05 para 90 / 95 / 98%)</i></div>
+          <div><b>4.</b> Bruto = necesidad + colchón − stock actual</div>
+          <div><b>5.</b> Unidades = <b>⌈</b> bruto ÷ contenido del formato <b>⌉</b> &nbsp;<i>(nadie te vende 3,4 sacos de harina)</i></div>
+          <hr>
+          <div>Ese paso 5 —el redondeo al formato real del proveedor— es la diferencia entre un número y una orden de compra.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELO DE DATOS ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Modelo de datos</h2>
+    <p>Postgres. Sin nada exótico. Las tres tablas que cargan el peso son <code>dte_linea</code> (todo lo que entró y salió, según el Estado), <code>receta</code> (lo que une la venta con el insumo) y <code>orden_linea</code> (donde vive la métrica que decide la empresa).</p>
+  </div>
+
+  <div class="scroll-x">
+<pre class="cod"><i>-- IDENTIDAD ------------------------------------------------------------</i>
+<b>empresa</b>        (id, rut, razon_social, giro, plan, creada_en)
+<b>local</b>          (id, empresa_id→empresa, nombre, direccion, comuna, lat, lon, pos_tipo)
+<b>usuario</b>        (id, empresa_id→empresa, nombre, fono, rol{dueño,jefe_local}, wa_id)
+
+<i>-- LA FUENTE DE LA VERDAD: lo que el SII ya sabe ------------------------</i>
+<b>credencial_sii</b> (empresa_id→empresa, cert_p12 <u>cifrado</u>, clave <u>cifrada</u>, token, expira_en)
+<b>dte</b>            (id, empresa_id→empresa, tipo{33 factura,34,39 boleta,41,61 NC},
+                folio, rut_emisor, rut_receptor, fecha, neto, iva, total,
+                xml_crudo, sha256, ingerido_en)
+<b>dte_linea</b>      (id, dte_id→dte, nro, <u>desc_cruda</u>, cantidad, unidad,
+                precio_unit, monto, <u>alias_id</u>→alias)     <i>← el LLM llena alias_id</i>
+
+<i>-- CATÁLOGO Y RECETA: la única parte con humano -------------------------</i>
+<b>sku_venta</b>      (id, local_id→local, codigo_pos, nombre, categoria, precio_venta, activo)
+<b>proveedor</b>      (id, empresa_id→empresa, rut, nombre, contacto, fono, dias_entrega[])
+<b>insumo</b>         (id, empresa_id→empresa, nombre, unidad_base, proveedor_id→proveedor,
+                formato_compra, contenido, precio_ultimo, stock_actual)
+<b>alias</b>          (id, texto_crudo, destino{sku_venta,insumo}, entidad_id,
+                confianza, origen{llm,humano})   <i>← "HARINA PAN.25K" ⇒ insumo 41</i>
+<b>receta</b>         (sku_venta_id→sku_venta, insumo_id→insumo, coef, unidad,
+                origen{humano,inferido}, confianza)
+
+<i>-- SERIES Y PRONÓSTICO --------------------------------------------------</i>
+<b>venta_diaria</b>   (local_id, sku_venta_id, fecha, unidades, monto)   <i>← materializada de dte tipo 39</i>
+<b>clima_diario</b>   (comuna, fecha, t_max, t_min, precip_mm, es_pronostico)
+<b>feriado</b>        (fecha, nombre, alcance{nacional,regional}, region)
+<b>pronostico</b>     (local_id, sku_venta_id, fecha_objetivo, fecha_corte,
+                p10, p50, p90, modelo_ver, drivers <u>jsonb</u>)
+<b>backtest</b>       (local_id, sku_venta_id, ventana, mape, mape_dias_especiales, sesgo)
+
+<i>-- COMPRA: donde el producto se gana o se pierde ------------------------</i>
+<b>orden_compra</b>   (id, local_id→local, proveedor_id→proveedor, creada_en,
+                cobertura_dias, nivel_servicio, estado{borrador,enviada,confirmada,recibida}, total)
+<b>orden_linea</b>    (orden_id→orden_compra, insumo_id→insumo, <u>q_sugerida</u>, <u>q_enviada</u>,
+                q_recibida, formato, precio_unit, monto)
+<b>conversacion_wa</b>(orden_id→orden_compra, proveedor_id, wa_id, estado, transcripcion <u>jsonb</u>)
+
+<i>-- LA MEDICIÓN QUE NOS COMPRAN ------------------------------------------</i>
+<b>conteo_inventario</b> (local_id, insumo_id, fecha, cantidad, origen{humano,estimado})
+<b>merma_mes</b>     (local_id, mes, compras_clp, consumo_teorico_clp,
+                delta_inventario_clp, merma_clp, merma_pct)
+</pre>
+  </div>
+
+  <div class="rejilla rejilla-2" style="margin-top: var(--sp-s);">
+    <div class="ficha" style="border-left: 3px solid var(--acento);">
+      <div class="ficha-titulo">La única fórmula que el cliente nos paga por calcular</div>
+      <div class="calculo">
+        <div><b>merma</b> = compras − consumo teórico − Δ inventario</div>
+        <hr>
+        <div>compras: de <code>dte_linea</code> tipo 33 <i>(el SII ya lo sabe)</i></div>
+        <div>consumo teórico: de <code>venta_diaria × receta</code></div>
+        <div>Δ inventario: de <code>conteo_inventario</code>, un conteo al mes</div>
+        <hr>
+        <div>Todo en CLP. Todo auditable línea por línea.</div>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">El único dato que le pedimos al cliente es <b>un conteo de inventario al mes</b>. Es la fricción mínima irreducible: sin él, la merma y el error de la receta son indistinguibles.</p>
+    </div>
+    <div class="ficha" style="border-left: 3px solid var(--s1);">
+      <div class="ficha-titulo">La métrica de producto, derivada de dos columnas</div>
+      <div class="calculo">
+        <div><b>tasa_edicion</b> = Σ | q_enviada − q_sugerida | ÷ Σ q_sugerida</div>
+        <hr>
+        <div>Por orden. Se calcula sola. Sin encuestas.</div>
+        <div>&lt; 20% durante 4 semanas ⇒ cuenta <b>activada</b></div>
+        <div>&gt; 40% sostenido ⇒ el dueño no nos cree ⇒ va a churnear</div>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Es la métrica del <a href="roadmap.html">embudo de activación</a> y es la razón por la que <code>q_sugerida</code> y <code>q_enviada</code> son <b>dos columnas separadas</b> y no una. Una decisión de esquema que vale toda la empresa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AGENTES DE IA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Agentes de IA</h2>
+    <p>Cinco. Cada uno con su modelo elegido por la tarea, no por la moda: Haiku donde es clasificación y extracción, Sonnet donde hay ambigüedad y tono, Opus una sola vez, en el onboarding, donde vale la pena pensar bien.</p>
+  </div>
+
+  <div class="apilar" style="gap: var(--sp-l);">
+
+    <!-- 1 -->
+    <article class="agente">
+      <div class="agente-cab">
+        <span class="modelo modelo-h">claude-haiku-4-5</span>
+        <h3>1 · Extractor de líneas de factura</h3>
+        <span class="hito-fecha" style="margin-left:auto; font-family:var(--mono); font-size:var(--step--1); color:var(--tinta-3);">~10 llamadas/mes por local</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);">El DTE tipo 33 ya viene en XML estructurado, así que el 75% de las facturas se parsean sin tocar un modelo. El LLM entra solo cuando el proveedor manda un PDF, una foto del papel, o un XML con el detalle metido a la fuerza en el campo de glosa —que en Chile pasa todo el tiempo.</p>
+      <div class="prompt">Eres un extractor de líneas de factura chilena. Recibes el texto de un DTE
+(XML, PDF o foto transcrita). Devuelve JSON con una línea por producto:
+{ desc_cruda, cantidad, unidad, precio_unit, monto }.
+
+Reglas duras:
+- NO normalices el nombre. Copia la glosa TAL CUAL aparece. Otro agente normaliza.
+- Unidades chilenas: "SC"=saco, "CJ"=caja, "UN"=unidad, "KG", "LT", "BD"=bandeja.
+- Si un campo no está, devuelve null. NO lo estimes. NO lo inventes.
+- Si el total de las líneas no cuadra con el neto del documento, devuelve
+  ademas { "descuadre": true, "diferencia": N } y NO ajustes ninguna línea.</div>
+      <div class="herr">
+        <span>obtener_dte_xml(dte_id)</span>
+        <span>ocr_pdf(url)</span>
+        <span>escribir_dte_linea(dte_id, lineas[])</span>
+        <span>marcar_para_revision(dte_id, motivo)</span>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);"><b>Por qué Haiku:</b> es extracción estructurada con esquema fijo. Sonnet no lo hace mejor y cuesta 3 veces más. El descuadre no lo resuelve el modelo: lo levanta y lo manda a un humano.</p>
+    </article>
+
+    <!-- 2 -->
+    <article class="agente">
+      <div class="agente-cab">
+        <span class="modelo modelo-h">claude-haiku-4-5</span>
+        <h3>2 · Normalizador de catálogo</h3>
+        <span class="hito-fecha" style="margin-left:auto; font-family:var(--mono); font-size:var(--step--1); color:var(--tinta-3);">~4 corridas/mes en régimen</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);">El problema más subestimado de todo el producto. Un mismo insumo aparece como <code>HARINA PAN. 25K</code>, <code>Harina panadera saco 25 kilos</code>, <code>harina p/pan sc25</code> y <code>HAR.PAN.25</code>, según quién emitió la factura ese día. Sin resolver esto, no hay serie de precios, no hay consumo teórico y no hay merma. Es un problema de <em>entity resolution</em> y los LLM son buenísimos en eso.</p>
+      <div class="prompt">Recibes: (a) el catálogo canónico de insumos de esta empresa, con su unidad
+base y su formato de compra; (b) una lista de glosas crudas nuevas, sacadas
+de facturas de proveedor.
+
+Para cada glosa, decide a qué insumo canónico corresponde y devuelve:
+{ texto_crudo, insumo_id | null, confianza 0..1, razon }
+
+Reglas duras:
+- Si la confianza es &lt; 0,85, devuelve insumo_id: null. Un alias errado
+  contamina la serie de precios y la merma de meses enteros. Ante la duda,
+  NO adivines: manda a revisión humana.
+- "Harina 25 kg" y "Harina integral 25 kg" son insumos DISTINTOS.
+- El formato (saco/caja/bandeja) y el contenido son parte de la identidad.
+- Nunca crees un insumo nuevo. Solo mapeas contra el catálogo que recibes.</div>
+      <div class="herr">
+        <span>leer_catalogo(empresa_id)</span>
+        <span>glosas_sin_alias(empresa_id, limite)</span>
+        <span>escribir_alias(texto_crudo, insumo_id, confianza)</span>
+        <span>encolar_revision_humana(glosas[])</span>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Caché de prompt sobre el catálogo canónico: se repite en cada llamada y no cambia. Sin caché, este agente costaría 4 veces más.</p>
+    </article>
+
+    <!-- 3 -->
+    <article class="agente">
+      <div class="agente-cab">
+        <span class="modelo modelo-s">claude-sonnet-5</span>
+        <h3>3 · Agente de WhatsApp con proveedores</h3>
+        <span class="hito-fecha" style="margin-left:auto; font-family:var(--mono); font-size:var(--step--1); color:var(--tinta-3);">~144 turnos/mes por local · <b>el 71% del costo de IA</b></span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);">Redacta el pedido, lo manda, y —lo difícil— <b>lee lo que contesta el proveedor</b>. «no hay palta, el jueves te mando», «se me acabó el 25, te puedo mandar 2 de 10», «ya po, mañana 6am», «👍». Ambigüedad, chilenismos, respuestas parciales, audios. Acá Haiku se equivoca y la equivocación le cuesta plata al cliente.</p>
+      <div class="prompt">Eres el asistente de compras de {local}. Le escribes a {proveedor.contacto}
+de {proveedor.nombre}, por WhatsApp, en español de Chile.
+
+Tienes: la orden vigente, el historial de esta relación comercial, los precios
+de las últimas 3 facturas de este proveedor, y los días en que entrega.
+
+Tu trabajo:
+1. Redactar el pedido. Corto, claro, con cantidades y formato de compra.
+   Como escribe una persona, no como escribe un sistema. Sin emojis de más.
+2. Leer la respuesta y clasificarla:
+   confirmada | parcial | rechazada | cambio_precio | cambio_fecha | ambigua
+3. Si es "parcial" o "rechazada": actualizar la orden y AVISAR AL DUEÑO con
+   la consecuencia concreta en su negocio ("sin palta el jueves te quedas
+   sin 40 sándwiches, que son $180.000 de venta").
+4. Si es "cambio_precio": comparar contra las últimas 3 facturas y avisar
+   SIEMPRE, aunque el alza sea chica.
+
+Reglas duras:
+- NUNCA confirmas una orden en nombre del dueño. NUNCA negocias el precio.
+  Informas y esperas. El que compra es él.
+- Si la respuesta es ambigua, NO adivines: pregunta al proveedor una sola
+  cosa, concreta.
+- Este es el WhatsApp personal de una persona que trabaja. No lo satures.</div>
+      <div class="herr">
+        <span>enviar_wa(wa_id, plantilla, vars)</span>
+        <span>leer_orden(orden_id)</span>
+        <span>actualizar_linea(orden_id, insumo_id, estado, q)</span>
+        <span>precios_historicos(proveedor_id, insumo_id, n=3)</span>
+        <span>impacto_quiebre(local_id, insumo_id, fecha)</span>
+        <span>avisar_dueño(usuario_id, mensaje, urgencia)</span>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);"><b>Por qué Sonnet y no Haiku:</b> lo probamos mentalmente contra los casos reales y la ambigüedad chilena («te mando la mitad no más, compadre») rompe a un modelo pequeño. Y una orden mal leída cuesta un quiebre de stock, que en pesos es mucho más que la diferencia de precio del token. <b>Por qué no Opus:</b> no hay razonamiento profundo acá; hay comprensión de lenguaje y una máquina de estados chica. Opus sería pagar 5× por nada.</p>
+    </article>
+
+    <!-- 4 -->
+    <article class="agente">
+      <div class="agente-cab">
+        <span class="modelo modelo-s">claude-sonnet-5</span>
+        <h3>4 · El resumen del lunes</h3>
+        <span class="hito-fecha" style="margin-left:auto; font-family:var(--mono); font-size:var(--step--1); color:var(--tinta-3);">4 llamadas/mes por local</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);">Un WhatsApp, cada lunes a las 6:30. La pieza que hace que el producto exista en la cabeza del dueño. Y la que, según el <a href="roadmap.html">embudo</a>, decide si la cuenta se activa o se muere en silencio.</p>
+      <div class="prompt">Escribe el resumen semanal para {dueño}, dueño de {local}. Un WhatsApp.
+Máximo 6 líneas. Español de Chile, directo, sin jerga de consultor.
+
+Datos que recibes: pronóstico vs. venta real de la semana pasada por SKU,
+merma calculada del mes, órdenes enviadas y su tasa de edición, alertas de
+precio, y el calendario de la semana que viene (feriados, clima, día de pago).
+
+Estructura obligatoria:
+1. Empieza SIEMPRE por dónde nos equivocamos. Con el número.
+   "El berlín se nos fue por 18%: llovió el jueves y no lo vimos venir."
+2. Después la plata: cuánta merma evitó este mes, en pesos.
+3. Cierra con lo único que tiene que hacer esta semana.
+
+Reglas duras:
+- NUNCA felicites. NUNCA uses "¡Excelente!" ni "¡Sigue así!".
+- Si el modelo lo hizo mal, dilo primero y sin adornos. La confianza se
+  construye admitiendo el error, no escondiéndolo. Este es el punto entero.
+- Nada de porcentajes sin el peso al lado. "3,1%" no significa nada;
+  "3,1%, o sea $370.000 este mes" sí.</div>
+      <div class="herr">
+        <span>backtest_semana(local_id)</span>
+        <span>merma_mes(local_id)</span>
+        <span>tasa_edicion(local_id, semanas=4)</span>
+        <span>calendario(comuna, dias=7)</span>
+        <span>enviar_wa(wa_id, plantilla, vars)</span>
+      </div>
+    </article>
+
+    <!-- 5 -->
+    <article class="agente">
+      <div class="agente-cab">
+        <span class="modelo modelo-o">claude-opus-4-8</span>
+        <h3>5 · Diagnóstico de merma e inferencia de recetas</h3>
+        <span class="hito-fecha" style="margin-left:auto; font-family:var(--mono); font-size:var(--step--1); color:var(--tinta-3);"><b>Una sola vez</b>, en el onboarding</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);">Toma 12 meses de DTE de un prospecto y produce el informe que es, en la práctica, <b>todo nuestro material de venta</b>. Después infiere las recetas que el local no tiene escritas, comparando compras contra ventas mes a mes. Es el único trabajo donde vale la pena pagar Opus: se hace una vez, decide la venta, y un error acá contamina el modelo entero.</p>
+      <div class="prompt">Recibes 12 meses de DTE de compra (tipo 33) y de venta (tipo 39) de un local
+gastronómico chileno, ya normalizados a SKU e insumos canónicos.
+
+Produce:
+A. Un informe de merma: por mes, por insumo, en pesos.
+   merma = compras − consumo_teorico − Δinventario
+B. Recetas inferidas: para cada SKU de venta, los coeficientes de insumo que
+   mejor explican 12 meses de compras dado 12 meses de ventas.
+
+Reglas duras:
+- Para CADA coeficiente inferido, entrega tu confianza y la evidencia
+  (R², meses usados, qué otros SKU compiten por ese insumo).
+- Si un insumo entra en varios SKU, dilo explícitamente y NO repartas el
+  coeficiente a ojo: entrega el rango y márcalo para revisión humana.
+- Si el Δinventario no está (y casi nunca está el primer mes), dilo. NO lo
+  supongas cero: eso infla la merma y nos hace ver mejores de lo que somos.
+- La cifra final del informe se le va a mostrar a un dueño que va a decidir
+  si nos paga. Prefiere SIEMPRE subestimar la merma antes que inflarla.</div>
+      <div class="herr">
+        <span>dte_rango(empresa_id, desde, hasta)</span>
+        <span>ventas_diarias(local_id, desde, hasta)</span>
+        <span>regresion_recetas(ventas[], compras[])</span>
+        <span>escribir_receta(sku_id, insumo_id, coef, confianza, origen)</span>
+        <span>generar_informe_pdf(local_id)</span>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">La regla «prefiere subestimar antes que inflar» no es modestia: es el activo. Si el informe promete $9M y la realidad son $4M, perdimos al cliente en el mes 3. Si promete $4M y aparecen $9M, tenemos un cliente para siempre.</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ COSTOS ============ -->
+<section class="seccion seccion-borde container" id="costos">
+  <div class="cabeza-seccion">
+    <h2>Costo mensual, con la aritmética a la vista</h2>
+    <p>Precios de la API de Anthropic, por millón de tokens: <b>Haiku 4.5</b> US$1 entrada / US$5 salida · <b>Sonnet 5</b> US$3 / US$15 · <b>Opus 4.8</b> US$5 / US$25. Lectura de caché: 0,1× la entrada. Escritura de caché: 1,25×. Tipo de cambio <b>$960 CLP / US$1</b>.</p>
+  </div>
+
+  <div class="scroll-x">
+    <table class="tabla tabla-caja" style="min-width: 800px;">
+      <caption class="visually-hidden">Costo de inferencia por cuenta y por mes, desglosado por agente</caption>
+      <thead>
+        <tr>
+          <th scope="col">Agente</th>
+          <th scope="col">Modelo</th>
+          <th scope="col" style="text-align:right">Llamadas/mes</th>
+          <th scope="col">Aritmética</th>
+          <th scope="col" style="text-align:right">US$/mes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1 · Extractor de facturas</th>
+          <td><code>haiku-4-5</code></td>
+          <td class="num">10</td>
+          <td style="font-size:var(--step--1)">in 10×4.000 = 40k × $1/M = $0,040<br>out 10×800 = 8k × $5/M = $0,040</td>
+          <td class="num">$0,08</td>
+        </tr>
+        <tr>
+          <th scope="row">2 · Normalizador de catálogo</th>
+          <td><code>haiku-4-5</code></td>
+          <td class="num">4</td>
+          <td style="font-size:var(--step--1)">in fresco 4×1.000 = 4k × $1/M = $0,004<br>caché leída 4×5.000 = 20k × $0,10/M = $0,002<br>out 4×900 = 3,6k × $5/M = $0,018</td>
+          <td class="num">$0,03</td>
+        </tr>
+        <tr style="background: var(--papel-3);">
+          <th scope="row">3 · Agente de WhatsApp <span class="chip chip-aten" style="margin-left:4px"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v6M6 9.5v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> el que manda</span></th>
+          <td><code>sonnet-5</code></td>
+          <td class="num">144</td>
+          <td style="font-size:var(--step--1)">in fresco 144×700 = 101k × $3/M = $0,302<br>caché leída 144×2.800 = 403k × $0,30/M = $0,121<br>caché escrita 24×2.800 = 67k × $3,75/M = $0,252<br>out 144×250 = 36k × $15/M = $0,540</td>
+          <td class="num"><b>$1,22</b></td>
+        </tr>
+        <tr>
+          <th scope="row">4 · Resumen del lunes</th>
+          <td><code>sonnet-5</code></td>
+          <td class="num">4</td>
+          <td style="font-size:var(--step--1)">in 4×12.000 = 48k × $3/M = $0,144<br>out 4×700 = 2,8k × $15/M = $0,042</td>
+          <td class="num">$0,19</td>
+        </tr>
+        <tr>
+          <th scope="row">Clasificador de alertas de precio</th>
+          <td><code>haiku-4-5</code></td>
+          <td class="num">30</td>
+          <td style="font-size:var(--step--1)">in 30×5.000 = 150k × $1/M = $0,150<br>out 30×300 = 9k × $5/M = $0,045</td>
+          <td class="num">$0,20</td>
+        </tr>
+        <tr>
+          <th scope="row" class="tenue">Motor de pronóstico (ETS + LightGBM)</th>
+          <td class="tenue">— CPU —</td>
+          <td class="num tenue">0</td>
+          <td style="font-size:var(--step--1)" class="tenue">No es un LLM. Va en la línea de infraestructura.</td>
+          <td class="num tenue">$0,00</td>
+        </tr>
+        <tr style="border-top: 2px solid var(--tinta);">
+          <th scope="row">Subtotal de inferencia</th>
+          <td></td><td></td>
+          <td style="font-size:var(--step--1)">0,08 + 0,03 + 1,22 + 0,19 + 0,20</td>
+          <td class="num"><b>$1,72</b></td>
+        </tr>
+        <tr>
+          <th scope="row">× 1,25 — reintentos, evaluaciones, corridas fallidas</th>
+          <td></td><td></td>
+          <td style="font-size:var(--step--1)">$1,72 × 1,25 &nbsp;<i>(nadie acierta el consumo real a la primera)</i></td>
+          <td class="num"><b>$2,15</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rejilla rejilla-2" style="margin-top: var(--sp-s); align-items: start;">
+    <div class="ficha" style="border-left: 3px solid var(--acento);">
+      <div class="ficha-titulo">Costo variable total por cuenta, por mes</div>
+      <div class="calculo">
+        <div>Inferencia Claude &nbsp;US$2,15 × 960 = <b>$2.064</b> → <b>$2.100</b></div>
+        <hr>
+        <div>Infraestructura:</div>
+        <div class="tenue" style="padding-left:1em;">plataforma fija US$400/mes ÷ 359 cuentas = US$1,11</div>
+        <div class="tenue" style="padding-left:1em;">+ marginal por cuenta (Postgres, S3, worker) = US$0,24</div>
+        <div>US$1,35 × 960 = <b>$1.296</b> → <b>$1.300</b></div>
+        <hr>
+        <div>WhatsApp BSP: 60 conversaciones de utilidad × US$0,0122</div>
+        <div>US$0,73 × 960 = <b>$701</b> → <b>$700</b></div>
+        <hr>
+        <div>Subtotal técnico = <span class="res">$4.100 CLP / cuenta / mes</span></div>
+        <div>+ soporte prorrateado <span class="tenue">(1 CSM cada 120 cuentas)</span> <b>$8.500</b></div>
+        <hr>
+        <div>COGS total = <span class="res">$12.600</span> · sobre ARPU $85.000</div>
+        <div>Margen bruto = <span class="res">85,2%</span></div>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Este <b>$12.600</b> es exactamente el que <a href="negocio.html#precio">negocio.html</a> resta del ARPU para calcular el LTV, y el que <a href="roadmap.html">roadmap.html</a> mete en la línea de COGS del modelo de caja. Un solo número, tres páginas.</p>
+    </div>
+
+    <div class="apilar">
+      <div class="ficha">
+        <div class="ficha-titulo">Costo único de puesta en marcha (no recurrente)</div>
+        <div class="calculo">
+          <div>Diagnóstico de 12 meses, Opus 4.8:</div>
+          <div class="tenue" style="padding-left:1em;">in 600k × $5/M = $3,00 &nbsp;·&nbsp; out 15k × $25/M = $0,38</div>
+          <div>Inferencia de recetas, Opus 4.8, ~20 pasadas:</div>
+          <div class="tenue" style="padding-left:1em;">in 800k × $5/M = $4,00 &nbsp;·&nbsp; out 60k × $25/M = $1,50</div>
+          <div>Normalización del catálogo completo, Haiku: <b>$0,37</b></div>
+          <hr>
+          <div>Subtotal $9,25 × <b>1,58</b> (reprocesos y QA) = <span class="res">US$14,60</span></div>
+          <div>≈ <span class="res">$14.000 CLP</span> por cliente nuevo</div>
+        </div>
+        <p class="fuente" style="margin-top: var(--sp-xs);">Va dentro de la puesta en marcha de <b>$190.000</b>, junto a las ~6 horas de trabajo humano ($140.000 cargado). Sobra poco, y es a propósito: no es un centro de utilidad.</p>
+      </div>
+      <div class="ficha nota nota-b">
+        <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">Dónde se dispara este costo si nos equivocamos.</b> El agente 3 es el 71% de la factura de IA. Si el proveedor contesta con audios en vez de texto —cosa que pasa, y mucho— hay que transcribir, y el costo por conversación se dobla. El plan es simple: transcribir con un modelo de voz barato antes de que el texto llegue a Sonnet, nunca mandar audio al agente principal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APIS ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>APIs de terceros que hay que contratar</h2>
+    <p>Ordenadas por cuánto tiempo toma conseguirlas, que no es lo mismo que por cuánto cuestan. Las dos primeras son las que pueden atrasar el lanzamiento tres meses.</p>
+  </div>
+
+  <div class="scroll-x">
+    <table class="tabla tabla-caja" style="min-width: 780px;">
+      <thead>
+        <tr><th scope="col">Servicio</th><th scope="col">Para qué</th><th scope="col">Cómo se consigue de verdad</th><th scope="col">Costo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">SII · DTE y RCV<br><span class="chip chip-riesgo" style="margin-top:4px"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1v5M5 8v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> el camino crítico</span></th>
+          <td>Ventas por producto (boleta tipo 39) y compras (factura tipo 33). Es toda la señal del producto.</td>
+          <td>El SII <b>no tiene una API REST moderna</b>. Son servicios SOAP autenticados con certificado digital: se pide una semilla, se firma, se obtiene un token, y se descarga el Registro de Compras y Ventas. La ruta rápida es apoyarse en un proveedor autorizado (LibreDTE, Nubox, Facturación.cl) mientras se construye el conector propio. <b>Solo lectura, siempre.</b> Nunca emitimos un DTE en nombre del cliente.</td>
+          <td class="num">$0–$25k/mes por empresa según proveedor</td>
+        </tr>
+        <tr>
+          <th scope="row">WhatsApp Business Platform<br><span class="chip chip-aten" style="margin-top:4px"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v6M6 9.5v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 4–8 semanas</span></td>
+          <td>Mandar la orden al proveedor y leer su respuesta. Sin esto el producto es una planilla bonita.</td>
+          <td>Vía BSP (360dialog, Twilio, Infobip). Hay que verificar el negocio en Meta Business Manager, registrar plantillas de <em>utility</em> y esperar su aprobación una por una. La aprobación de plantillas es el cuello de botella y no se puede apurar con plata.</td>
+          <td class="num">~US$0,0122 por conversación de utilidad</td>
+        </tr>
+        <tr>
+          <th scope="row">APIs de POS</th>
+          <td>Venta por producto en tiempo real, para los locales cuya boleta no trae detalle. Y el canal de distribución.</td>
+          <td>Bsale (REST + token por cliente), Toteat, Fudo, Relbase. Técnicamente triviales; comercialmente es una negociación. La API viene con el acuerdo, no antes.</td>
+          <td class="num">$0 técnico · 20% de rev share</td>
+        </tr>
+        <tr>
+          <th scope="row">Anthropic API</th>
+          <td>Los cinco agentes.</td>
+          <td>Una clave. Ese es todo el trámite. Es la única dependencia crítica que se consigue en 5 minutos.</td>
+          <td class="num">US$2,15 / cuenta / mes</td>
+        </tr>
+        <tr>
+          <th scope="row">Open-Meteo</th>
+          <td>Histórico y pronóstico de temperatura y lluvia por comuna. Uno de los cinco regresores.</td>
+          <td>API pública, sin clave, gratis para uso no comercial y barata para el comercial. Coordenadas por comuna, cacheadas.</td>
+          <td class="num">~US$0</td>
+        </tr>
+        <tr>
+          <th scope="row">Calendario de feriados</th>
+          <td>Feriados nacionales y regionales de Chile. El regresor de mayor efecto individual.</td>
+          <td>No hay API oficial confiable. Se mantiene a mano, una vez al año, contra el Diario Oficial. Son 15 fechas. Automatizar esto sería el peor uso posible de una semana de ingeniería.</td>
+          <td class="num">$0 · 2 horas al año</td>
+        </tr>
+        <tr>
+          <th scope="row">Transbank / Flow</th>
+          <td>Cobrar la suscripción en pesos, con tarjeta chilena.</td>
+          <td>Flow o Khipu para partir (integración en días). Transbank Webpay directo cuando el volumen lo justifique.</td>
+          <td class="num">2,9% + IVA por transacción</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ ENV VARS ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Variables de entorno</h2>
+  </div>
+  <div class="scroll-x">
+<pre class="cod"><i># --- Claude ---------------------------------------------------------------</i>
+<b>ANTHROPIC_API_KEY</b>=sk-ant-...
+<b>MODELO_EXTRACCION</b>=claude-haiku-4-5        <i># agentes 1 y 2, y alertas</i>
+<b>MODELO_CONVERSACION</b>=claude-sonnet-5       <i># agentes 3 y 4</i>
+<b>MODELO_DIAGNOSTICO</b>=claude-opus-4-8        <i># agente 5, solo onboarding</i>
+<b>LLM_CACHE_TTL</b>=3600
+<b>LLM_MAX_REINTENTOS</b>=3
+
+<i># --- SII ------------------------------------------------------------------</i>
+<b>SII_AMBIENTE</b>=produccion                   <i># certificacion | produccion</i>
+<b>SII_ENDPOINT_SEMILLA</b>=https://palena.sii.cl/DTEWS/CrSeed.jws
+<b>SII_ENDPOINT_TOKEN</b>=https://palena.sii.cl/DTEWS/GetTokenFromSeed.jws
+<b>SII_ENDPOINT_RCV</b>=https://www4.sii.cl/consdcvinternetui/services/data/facadeService
+<b>SII_PROVEEDOR_FALLBACK</b>=libredte           <i># mientras el conector propio madura</i>
+<b>SII_PROVEEDOR_TOKEN</b>=...
+<u>CERT_KMS_KEY_ID</u>=arn:aws:kms:...            <i># los .p12 se cifran con KMS, jamás en claro</i>
+<u>CERT_BUCKET</u>=mermata-certs-prod            <i># cifrado en reposo + acceso auditado</i>
+
+<i># --- WhatsApp -------------------------------------------------------------</i>
+<b>WA_BSP</b>=360dialog
+<b>WA_API_KEY</b>=...
+<b>WA_NUMERO_ID</b>=...
+<b>WA_PLANTILLA_PEDIDO</b>=pedido_proveedor_v3   <i># aprobada por Meta</i>
+<b>WA_PLANTILLA_RESUMEN</b>=resumen_lunes_v2
+<b>WA_WEBHOOK_SECRET</b>=...
+
+<i># --- POS (por integración) ------------------------------------------------</i>
+<b>BSALE_TOKEN</b>=...
+<b>TOTEAT_CLIENT_ID</b>=...   <b>TOTEAT_CLIENT_SECRET</b>=...
+<b>FUDO_API_KEY</b>=...
+<b>RELBASE_TOKEN</b>=...
+
+<i># --- Datos externos -------------------------------------------------------</i>
+<b>OPENMETEO_BASE</b>=https://api.open-meteo.com/v1
+<b>FERIADOS_JSON</b>=./data/feriados_cl_2026_2028.json
+
+<i># --- Infraestructura ------------------------------------------------------</i>
+<b>DATABASE_URL</b>=postgres://...
+<b>REDIS_URL</b>=redis://...                     <i># colas de ingesta y de pronóstico</i>
+<b>S3_BUCKET_DTE</b>=mermata-dte-prod
+<b>CRON_PRONOSTICO</b>="0 3 * * *"               <i># 03:00, para que a las 6 AM esté listo</i>
+<b>CRON_RESUMEN_LUNES</b>="30 6 * * 1"
+
+<i># --- Pagos ----------------------------------------------------------------</i>
+<b>FLOW_API_KEY</b>=...   <b>FLOW_SECRET</b>=...
+
+<i># --- Operación ------------------------------------------------------------</i>
+<b>SENTRY_DSN</b>=...
+<b>UMBRAL_CONFIANZA_ALIAS</b>=0.85               <i># bajo esto, va a revisión humana</i>
+<b>UMBRAL_TASA_EDICION_ALERTA</b>=0.40           <i># sobre esto, llamamos al cliente</i>
+</pre>
+  </div>
+</section>
+
+<!-- ============ QUÉ ESTÁ FINGIDO ============ -->
+<section class="seccion seccion-tinta">
+  <div class="container">
+    <span class="sello" style="color:#8f8877">Honestidad</span>
+    <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Qué está fingido en el demo</h2>
+    <p style="color: #cfc7b4; max-width: 62ch; margin-bottom: var(--sp-l);">El <a href="demo/index.html" style="color:#e8a892">demo</a> corre entero en tu navegador. No hay servidor, no hay base de datos, no hay una sola llamada a la red. Esto es lo que es real y lo que no.</p>
+
+    <div class="rejilla rejilla-2" style="gap: var(--sp-l);">
+      <div>
+        <h3 style="color: var(--bien); font-size: var(--step-1); display:flex; align-items:center; gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Real, y calculado en vivo
+        </h3>
+        <ul style="list-style:none; padding:0; color:#cfc7b4; font-size: var(--step--1);">
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">La matemática del pronóstico.</b> Los factores multiplicativos, la banda P10–P90 que se ensancha con √(1+0,22h), el MAPE, el MAPE de días especiales. Cada toggle recalcula de verdad. Apaga «feriados» y el error de los días especiales se dispara — porque el cálculo se rehace, no porque haya un número guardado.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">La orden de compra.</b> Consumo teórico vía receta, colchón de seguridad z×σ×√cobertura, redondeo al formato del proveedor, agrupación por proveedor, totales en CLP. Es la fórmula que iría a producción.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">Los feriados.</b> El 29 de junio (San Pedro y San Pablo) y el 16 de julio (Virgen del Carmen) de 2026 son feriados chilenos reales. El demo no los inventó para que la historia calzara.</li>
+          <li style="padding:7px 0;"><b style="color:var(--papel)">Los formatos de compra.</b> Saco de 25 kg, bandeja de 30 huevos, caja de 12. Así se compra de verdad, y por eso el redondeo importa.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1); display:flex; align-items:center; gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Fingido, y aquí está cómo
+        </h3>
+        <ul style="list-style:none; padding:0; color:#cfc7b4; font-size: var(--step--1);">
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">El histórico de ventas.</b> Las 21 jornadas son sintéticas: el mismo modelo multiplicativo más ruido gaussiano con semilla determinista. En producción vendrían de los DTE tipo 39. <b class="acento" style="color:#e8a892">Consecuencia honesta:</b> el MAPE del demo (7–11%) es artificialmente bueno, porque los «datos reales» los generó el mismo modelo que los pronostica. Un local de verdad tiene más ruido, más quiebres y más días raros.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">El modelo mismo.</b> El del demo es de juguete: factores multiplicativos. El de producción es ETS + Croston + gradient boosting con validación temporal.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">Los proveedores.</b> Molinera Curicó, Lo Valledor puesto 214, Los Maitenes, El Rodeo. Los nombres, RUT y teléfonos son inventados. Sus <em>formas de operar</em> (días de entrega, formatos, que reciben pedidos por WhatsApp) no lo son.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">El WhatsApp.</b> El mensaje se redacta y se muestra. No se envía. No hay BSP conectado, ni podría haberlo sin Meta aprobando la plantilla.</li>
+          <li style="padding:7px 0; border-bottom:1px solid #3a352a;"><b style="color:var(--papel)">Las recetas.</b> Coeficientes escritos a mano por nosotros. En producción los infiere el agente 5 y los corrige un humano.</li>
+          <li style="padding:7px 0;"><b style="color:var(--papel)">El clima.</b> Serie pre-generada. En producción, Open-Meteo por comuna.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOMINIO ============ -->
+<section class="seccion seccion-borde container" id="dominio">
+  <div class="cabeza-seccion">
+    <h2>Evidencia del dominio</h2>
+    <p>Verificado contra el RDAP de Verisign, que es el registro autoritativo de <code>.com</code>. Un <b>HTTP 404</b> significa que el dominio no está registrado.</p>
+  </div>
+  <div class="scroll-x">
+    <table class="tabla tabla-caja" style="min-width: 640px;">
+      <thead><tr><th scope="col">Dominio</th><th scope="col">Consulta RDAP</th><th scope="col">Respuesta</th><th scope="col">Estado</th><th scope="col">Nota</th></tr></thead>
+      <tbody>
+        <tr style="background: var(--papel-3);">
+          <th scope="row"><b>mermata.com</b></th>
+          <td><code>rdap.verisign.com/com/v1/domain/mermata.com</code></td>
+          <td class="num">HTTP 404</td>
+          <td><span class="chip chip-bien"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Libre</span></td>
+          <td><b>La marca.</b> <code>mermata.cl</code> también libre.</td>
+        </tr>
+        <tr>
+          <th scope="row">abastero.com</th>
+          <td><code>rdap.verisign.com/com/v1/domain/abastero.com</code></td>
+          <td class="num">HTTP 404</td>
+          <td><span class="chip chip-bien"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Libre</span></td>
+          <td>Alternativa 1 — «abasto», más literal, menos memorable.</td>
+        </tr>
+        <tr>
+          <th scope="row">cuanteo.com</th>
+          <td><code>rdap.verisign.com/com/v1/domain/cuanteo.com</code></td>
+          <td class="num">HTTP 404</td>
+          <td><span class="chip chip-bien"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Libre</span></td>
+          <td>Alternativa 2 — «cuánto», acuñada, pero no dice merma.</td>
+        </tr>
+        <tr>
+          <th scope="row">pronosta.com</th>
+          <td><code>rdap.verisign.com/com/v1/domain/pronosta.com</code></td>
+          <td class="num">HTTP 404</td>
+          <td><span class="chip chip-bien"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Libre</span></td>
+          <td>Alternativa 3 — describe el método, no el resultado. Peor.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="fuente" style="margin-top: var(--sp-s);">Verificado el <b>13 de julio de 2026</b> con <code>_kit/check-domain.sh</code>. <b>Por qué Mermata:</b> es <em>merma</em> + <em>mata</em> — «mata la merma». Dice el problema y la promesa en siete letras, se pronuncia igual en todo el español, y el KPI que el producto pone al centro es literalmente el nombre de la empresa.</p>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <div class="marca" style="margin-bottom: 6px;">Merma<span class="marca-pt">ta</span></div>
+      <p class="tenue" style="font-size: var(--step--1); max-width: 40ch;">Compra lo que vas a vender. Prototipo — Santiago de Chile, 2026.</p>
+    </div>
+    <nav class="nav-lista" style="display:flex; flex-wrap:wrap; gap: var(--sp-s);" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="mermata.js"></script>
+</body>
+</html>

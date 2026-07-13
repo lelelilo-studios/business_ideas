@@ -1,0 +1,15 @@
+{
+  "folder": "07-terreno",
+  "brand": "Rutamo",
+  "domain": "rutamo.com",
+  "domain_evidence": "rdap.verisign.com -> HTTP 404 (disponible), 2026-07-13. Control: google.com -> HTTP 200 (tomado). rutamo.cl también disponible en NIC Chile.",
+  "alternates": ["faenko.com", "rutovia.com", "vueltek.com"],
+  "tagline": "El despacho, la ruta y el cobro de tu cuadrilla en terreno, en un solo lugar.",
+  "category": "Software de terreno (field service) para PYME",
+  "market": "Chile → LatAm",
+  "icp": "Empresa chilena de oficio en terreno (climatización, refrigeración, gasfitería, electricidad, ascensores) con 3 a 20 técnicos, que hoy coordina con cuaderno, WhatsApp y llamadas",
+  "price_clp": "Desde $59.000/mes",
+  "accent": "#D9F02B",
+  "problem": "El despachador arma las rutas de memoria en un cuaderno, el técnico anota la visita en un papel que se moja, y la cotización se cobra tres semanas después — si es que se cobra.",
+  "status": "prototipo"
+}

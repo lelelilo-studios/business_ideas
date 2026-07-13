@@ -491,7 +491,11 @@ JWT_SECRET=<span class="s">...</span></pre>
         <small>Corrida semanal del set dorado (200 documentos etiquetados por humanos), prorrateada</small></span>
       <span>US$0,135</span>
     </div>
-    <div class="calc-r"><b>IA por RUT / mes · US$1,161 × $960</b><span class="cifra">$1.114 CLP</span></div>
+    <div class="calc-r"><b>IA por RUT / mes · US$1,1606 × $960</b><span class="cifra">$1.114 CLP</span></div>
+    <p class="nota" style="margin-top:10px;border-top:1px solid var(--linea);padding-top:8px">
+      Las cinco líneas de arriba están redondeadas a la milésima de dólar para que se lean; el total
+      (<strong>US$1,1606</strong>) es la suma sin redondear. Tipo de cambio $960/USD.
+    </p>
   </div>
 
   <h3 class="sub">El costo total de servir, a dos escalas</h3>
@@ -668,17 +672,19 @@ $ curl -s -o /dev/null -w '%{http_code}' \
       <code>talonio.cl</code>. Verificado el <strong>12 de julio de 2026</strong>.
     </p>
 
-    <table>
-      <caption class="visually-hidden">Alternativas de marca verificadas</caption>
-      <thead>
-        <tr><th scope="col">Alternativa</th><th scope="col">.com</th><th scope="col">.cl</th><th scope="col">De dónde sale</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>cuadraje.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "cuadrar" — que los números den.</td></tr>
-        <tr><td>foliario.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "folio" — el número del documento.</td></tr>
-        <tr><td>cerofuga.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>Cero fuga de IVA. Descriptivo, menos marca.</td></tr>
-      </tbody>
-    </table>
+    <div class="scroll-x" style="background:transparent;border-color:rgba(255,255,255,.18)">
+      <table style="min-width:560px">
+        <caption class="visually-hidden">Alternativas de marca verificadas</caption>
+        <thead>
+          <tr><th scope="col">Alternativa</th><th scope="col">.com</th><th scope="col">.cl</th><th scope="col">De dónde sale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>cuadraje.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "cuadrar" — que los números den.</td></tr>
+          <tr><td>foliario.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "folio" — el número del documento.</td></tr>
+          <tr><td>cerofuga.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>Cero fuga de IVA. Descriptivo, menos marca.</td></tr>
+        </tbody>
+      </table>
+    </div>
     <p style="margin-top:var(--sp-s);font-size:.82rem">
       Las tres verificadas con el mismo script y la misma fecha. <code>tirilio.com</code> también está libre
       (404) y quedó de reserva.

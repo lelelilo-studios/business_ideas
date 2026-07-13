@@ -172,7 +172,7 @@ body { background: var(--paper); }
 .visit__t { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
 .visit__n { font-size: 1.18rem; font-weight: 700; letter-spacing: -.02em; }
 .visit__h { font-family: var(--mono); font-size: 1.05rem; color: var(--hi); font-weight: 600; }
-.visit__d { color: #A9AFA4; font-size: .95rem; margin-top: 4px; }
+.visit__d { display: block; color: #A9AFA4; font-size: .95rem; margin-top: 4px; }
 .visit__s { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: .68rem;
   letter-spacing: .1em; text-transform: uppercase; border: 1px solid #565C50; padding: 2px 7px; color: #C9CFC4; }
 .visit__s--ok { border-color: var(--hi); color: var(--hi); }

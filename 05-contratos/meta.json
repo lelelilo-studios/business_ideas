@@ -1,0 +1,15 @@
+{
+  "folder": "05-contratos",
+  "brand": "Antefirma",
+  "domain": "antefirma.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/antefirma.com -> HTTP 404 (disponible), 2026-07-12. NIC Chile: antefirma.cl -> 'no existe' (disponible).",
+  "alternates": ["prefirma.com", "fojaroja.com", "clausara.com"],
+  "tagline": "Lee el contrato antes de firmarlo. Y después te vigila las fechas que muerden.",
+  "category": "Legaltech PYME",
+  "market": "Chile → LatAm hispanohablante",
+  "icp": "PYME de retail, gastronomía y servicios, 3-60 empleados, que arrienda local comercial o le vende a una empresa grande",
+  "price_clp": "Desde $29.000 por contrato · $39.000/mes el plan Vigía",
+  "accent": "#A81E12",
+  "problem": "El contrato lo firmó porque había que firmarlo, y nadie lo leyó: el daño no llega el día que firmas, llega dos años después, cuando se renueva solo por 36 meses más.",
+  "status": "prototipo"
+}

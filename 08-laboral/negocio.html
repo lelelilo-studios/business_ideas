@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Contralta · ICP, mercado, precio y canales</title>
+<meta name="description" content="Plan de negocio de Contralta: cliente objetivo, TAM/SAM/SOM con la aritmética a la vista, competencia real, economía unitaria y los canales de adquisición en Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .calc {
+    font-family: var(--mono); font-size: 0.8rem; line-height: 1.9;
+    background: var(--papel-2); border: 1px solid var(--linea);
+    border-left: 3px solid var(--lacre);
+    padding: var(--sp-s); overflow-x: auto; white-space: pre;
+  }
+  .calc b { color: var(--lacre); font-weight: 500; }
+  .calc i { color: var(--tinta-3); font-style: normal; }
+
+  .capas { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); margin-top: var(--sp-s); }
+  .capa { background: #FBFAF7; padding: var(--sp-s); display: grid; gap: 0.3rem; }
+  .capa__n {
+    font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--tinta-3);
+  }
+  .capa__v { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; }
+  .capa--tam .capa__v { color: var(--tinta-2); }
+  .capa--sam .capa__v { color: var(--tinta); }
+  .capa--som .capa__v { color: var(--lacre); }
+  .capa__d { font-size: 0.85rem; color: var(--tinta-2); line-height: 1.5; }
+  .capa__barra { height: 6px; background: var(--papel-3); margin-top: 0.4rem; }
+  .capa__barra i { display: block; height: 100%; background: var(--lacre); }
+
+  .comp { width: 100%; font-size: 0.88rem; }
+  .comp th {
+    text-align: left; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-3); padding: 0.5rem 0.7rem; font-weight: 500;
+    border-bottom: 1px solid var(--linea-2); background: var(--papel-2); white-space: nowrap;
+  }
+  .comp td { padding: 0.8rem 0.7rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+  .comp td:first-child { font-weight: 600; white-space: nowrap; }
+  .comp .titular { background: var(--st-riesgo-bg); }
+
+  .canal {
+    display: grid; grid-template-columns: 2rem 1fr; gap: var(--sp-s);
+    padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea);
+  }
+  .canal__n { font-family: var(--mono); font-size: 1.1rem; color: var(--lacre); font-weight: 500; }
+  .canal h3 { font-size: 1.05rem; }
+  .canal p { font-size: 0.92rem; color: var(--tinta-2); line-height: 1.6; margin-top: 0.35rem; max-width: 70ch; }
+  .canal__m {
+    display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.55rem;
+  }
+
+  .dias { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .dia { background: #FBFAF7; padding: var(--sp-s); display: grid; gap: 0.4rem; }
+  @media (min-width: 48em) { .dia { grid-template-columns: 8rem 1fr; gap: var(--sp-s); } }
+  .dia__s {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em;
+    color: var(--lacre); text-transform: uppercase;
+  }
+  .dia__c { font-size: 0.93rem; line-height: 1.6; color: var(--tinta-2); }
+  .dia__c strong { color: var(--tinta); }
+
+  .mata {
+    border: 1px solid var(--linea-2); border-left: 3px solid var(--st-vencido);
+    background: #FBFAF7; padding: var(--sp-s); margin-bottom: var(--sp-2xs);
+  }
+  .mata h3 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+  .mata p { font-size: 0.92rem; color: var(--tinta-2); line-height: 1.6; max-width: 70ch; }
+  .mata__p {
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--st-vencido); margin-bottom: 0.3rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra__fila">
+    <a class="marca" href="index.html">
+      <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+        <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+      </svg>
+      Contralta <span class="marca__sub">Cumplimiento laboral</span>
+    </a>
+    <button class="hamb" id="hamb" aria-expanded="false" aria-controls="menu">Menú</button>
+  </div>
+  <nav class="container menu" id="menu" aria-label="Principal">
+    <ul>
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">Negocio · go-to-market</div>
+      <h1 style="max-width: 20ch;">A quién le vendemos, por cuánto, y por qué nos compraría.</h1>
+      <p class="lede prose" style="margin-top: var(--sp-s);">
+        Toda cifra de esta página está citada o es una estimación con su aritmética a la vista. Donde no tengo el dato,
+        lo digo en vez de inventarlo. Es una página para discutir, no para creer.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================================================================= ICP -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">01 · Cliente objetivo</div>
+      <h2 style="max-width: 24ch; margin-bottom: var(--sp-m);">El dueño que ya despidió mal una vez.</h2>
+
+      <div class="rejilla rejilla--2" style="align-items:start; gap:var(--sp-l)">
+        <div class="apilar">
+          <div class="ficha ficha--lacre">
+            <div class="rotulo" style="margin-bottom:0.5rem">Perfil exacto</div>
+            <dl style="display:grid; gap:0.8rem;">
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">Segmento</dt>
+                <dd>PYME de servicios, comercio, manufactura liviana, gastronomía o construcción liviana.
+                Con local o faena, no una startup de software.</dd></div>
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">Tamaño</dt>
+                <dd><strong>10 a 49 trabajadores.</strong> Bajo 10 no hay reglamento interno obligatorio y el dolor es
+                esporádico. Sobre 50 ya hay alguien de RRHH y el comprador es otro.</dd></div>
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">Quién firma</dt>
+                <dd><strong>El dueño o el socio administrador.</strong> Decide solo, en una reunión, y paga con la
+                tarjeta de la empresa. No hay comité de compras. Ciclo de venta: 1 a 3 semanas.</dd></div>
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">Quién lo usa</dt>
+                <dd>La <strong>administrativa que ve remuneraciones</strong> —a menudo la misma que ve facturas— y el
+                contador externo. El dueño entra sólo cuando hay que despedir a alguien.</dd></div>
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">Dónde ya está</dt>
+                <dd>En Previred todos los meses. En un Excel de trabajadores. En una carpeta de AZ con los contratos
+                firmados. En WhatsApp con su contador. Y, si tuvo mala suerte, en una audiencia de la Inspección
+                del Trabajo.</dd></div>
+              <div><dt class="mono chico tenue" style="text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.15rem">El disparador</dt>
+                <dd><strong>La primera demanda.</strong> El evento que convierte esto de "algún día lo ordeno" a
+                "necesito esto ahora" es un reclamo en la DT o el susto de haber estado cerca de uno.</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="apilar">
+          <div class="ficha">
+            <div class="rotulo" style="margin-bottom:0.5rem">Cuánto le cuesta hoy no tener esto</div>
+            <div class="calc">Empresa de 15 trabajadores, planilla $10.500.000/mes
+<i>(el caso del demo: Panificadora San Bernardo SpA)</i>
+
+Un despido mal hecho, una sola vez:
+  Indemnización mal calculada (8 años en vez de 9) ...  <b>$850.000</b>
+  Nulidad del despido por cotizaciones impagas
+    (3 meses de remuneración hasta convalidar) .......  <b>$2.550.000</b>
+  Recargo del 80% si la causal se cae en tribunales ..  <b>$6.120.000</b>
+  Multas administrativas acumuladas (5 infracciones,
+    pequeña empresa, 1 a 10 UTM c/u) .................  <b>$350.000 a $3.500.000</b>
+                                                        ─────────────
+  Exposición de un solo mal término ..................  <b>hasta $13.000.000</b>
+
+Contralta cuesta $69.000/mes = <b>$828.000 al año</b>.
+El producto se paga solo si evita <i>un</i> error, <i>una</i> vez, en <i>quince</i> años.</div>
+            <p class="chico tenue" style="margin-top:0.7rem">
+              Los montos salen del motor de cálculo del <a href="demo/index.html">demo</a>, con los supuestos declarados
+              adentro de cada hallazgo. Los rangos de multa son estimaciones dentro del rango legal.
+              <span class="cita cita--norma">Arts. 162, 163, 168, 506 CT</span>
+            </p>
+          </div>
+
+          <div class="ficha" style="border-left:3px solid var(--st-riesgo)">
+            <div class="rotulo" style="margin-bottom:0.5rem">Y el contra-argumento honesto</div>
+            <p class="chico tenue" style="line-height:1.65">
+              Una empresa que <strong>nunca despide a nadie</strong> y paga sus cotizaciones puntualmente tiene una
+              exposición esperada baja, y para ella $828.000 al año es caro. Ese cliente existe y no es nuestro.
+              La pregunta de calificación en la primera llamada es una sola: <em>"¿cuánta gente entró y salió el año
+              pasado?"</em> Si la respuesta es "ninguna", colgamos amablemente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= MERCADO -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">02 · Tamaño de mercado</div>
+      <h2 style="max-width: 24ch; margin-bottom: var(--sp-2xs);">TAM, SAM y SOM con la aritmética afuera.</h2>
+      <p class="prose tenue" style="margin-bottom: var(--sp-m);">
+        Cada supuesto está numerado y declarado. Si cambias uno, el resultado cambia — y eso es exactamente lo que
+        debería poder hacer quien lea esto.
+      </p>
+
+      <div class="calc" style="margin-bottom:var(--sp-m)">SUPUESTOS DECLARADOS
+
+S1  Empresas formales en Chile (contribuyentes con ventas) ......  1.300.000
+    <i>Orden de magnitud de las estadísticas del SII. CIFRA A VERIFICAR
+    en la fuente oficial antes de usar esto para decidir algo.</i>
+
+S2  De ellas, con al menos 1 trabajador dependiente contratado ...  25%
+    <i>SUPUESTO NUESTRO. La enorme mayoría de las microempresas chilenas
+    no tiene trabajadores contratados: es el dueño y nadie más. No
+    encontré una cifra oficial limpia de este corte. No la invento:
+    la declaro como supuesto y la marco como el eslabón más débil
+    de todo este cálculo.</i>
+
+S3  De las que tienen trabajadores, con 5 a 199 .................  37%
+    <i>SUPUESTO NUESTRO, mismo problema. Es nuestro rango atendible:
+    con menos de 5 el dolor es esporádico; con más de 200 hay RRHH
+    interno y otro comprador.</i>
+
+S4  ARPU mensual mezclado ......................................  $46.000
+    <i>Derivado de la mezcla de planes, más abajo. Éste sí es nuestro.</i></div>
+
+      <div class="capas">
+        <div class="capa capa--tam">
+          <span class="capa__n">TAM · Chile · todas las empresas con trabajadores</span>
+          <span class="capa__v">$179.400M CLP / año</span>
+          <div class="capa__barra"><i style="width:100%"></i></div>
+          <p class="capa__d">
+            <span class="mono">1.300.000 × 25% = 325.000 empresas × $46.000 × 12 = $179.400.000.000 CLP/año ≈ US$189M</span><br>
+            Es el techo teórico si absolutamente toda empresa chilena con un trabajador pagara Contralta. No significa
+            nada operativamente; sirve para saber que el juego cabe en un país.
+          </p>
+        </div>
+        <div class="capa capa--sam">
+          <span class="capa__n">SAM · las que podemos atender de verdad (5 a 199 trabajadores)</span>
+          <span class="capa__v">$66.240M CLP / año</span>
+          <div class="capa__barra"><i style="width:37%"></i></div>
+          <p class="capa__d">
+            <span class="mono">325.000 × 37% = 120.250 empresas × $46.000 × 12 = $66.378.000.000 ≈ US$70M/año</span><br>
+            Éste es el número que importa. Un mercado servible de US$70M al año en Chile es chico para un fondo de
+            riesgo y grande para un equipo de siete personas. Las dos cosas son ciertas al mismo tiempo y hay que
+            decidir con eso a la vista.
+          </p>
+        </div>
+        <div class="capa capa--som">
+          <span class="capa__n">SOM · lo que creemos alcanzable en 36 meses</span>
+          <span class="capa__v">$938M CLP / año</span>
+          <div class="capa__barra"><i style="width:1.4%"></i></div>
+          <p class="capa__d">
+            <span class="mono">1,4% del SAM = 1.700 clientes × $46.000 × 12 = $938.400.000 ≈ US$988k de ARR</span><br>
+            Que es, exactamente, el umbral de "US$1M de ARR" con el que el <a href="roadmap.html">roadmap</a> define el
+            éxito. No es coincidencia: <strong>llegar a US$1M de ARR en Chile significa capturar el 1,4% de nuestro
+            mercado servible</strong>. Al mes 24, el escenario base tiene 315 clientes: el 0,26% del SAM.
+          </p>
+        </div>
+      </div>
+
+      <div class="ficha" style="margin-top:var(--sp-m); max-width:var(--measure)">
+        <div class="rotulo" style="margin-bottom:0.5rem">La extensión global, sin humo</div>
+        <p class="chico tenue" style="line-height:1.7">
+          El <strong>motor</strong> es portable: un calendario de días hábiles con feriados locales, una máquina de
+          reglas con plazos, un generador de documentos y un tablero. El <strong>contenido legal no lo es</strong>: el
+          Código del Trabajo chileno no se parece al peruano ni al colombiano en los plazos, las causales ni los topes.
+          Portar un país cuesta, estimado, <strong>4 a 6 meses de un abogado laboral local más 3 meses de ingeniería</strong>
+          — y eso es un supuesto nuestro, no un dato.
+        </p>
+        <p class="chico tenue" style="line-height:1.7; margin-top:0.7rem">
+          <strong>No voy a publicar un TAM de LatAm.</strong> Sé que Perú, Colombia y México tienen más empresas
+          formales que Chile y estructuras laborales igual de trampeadas, pero no tengo las cifras verificadas y un
+          "TAM LatAm de US$800M" inventado en esta página sería precisamente el tipo de número que hace que nadie
+          confíe en las otras cifras del documento. La expansión es una hipótesis del mes 24, y su primera prueba es
+          barata: 10 clientes pagando en Perú antes de mover un peso más.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== POSICIÓN -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">03 · Posicionamiento y cuña</div>
+      <h2 style="max-width: 26ch; margin-bottom: var(--sp-m);">La cabeza de playa: el que está a punto de despedir.</h2>
+
+      <div class="rejilla rejilla--2" style="gap:var(--sp-l); align-items:start">
+        <div class="apilar">
+          <div class="ficha ficha--lacre">
+            <div class="rotulo" style="margin-bottom:0.5rem">La cuña</div>
+            <p style="font-family:var(--serif); font-size:1.15rem; line-height:1.55">
+              No entramos vendiendo "cumplimiento laboral". Entramos por el <strong>finiquito</strong>: el momento en
+              que el dueño tiene miedo, tiene una fecha encima y está dispuesto a pagar hoy.
+            </p>
+            <p class="chico tenue" style="margin-top:0.8rem; line-height:1.65">
+              <strong>La auditoría de finiquito a $19.000, sin suscripción</strong>, es el producto de entrada. Es
+              barato, es urgente, y el resultado es inmediatamente verificable: le mostramos las cotizaciones impagas
+              que su contador no vio y le decimos cuánto le habría costado firmarlo así.
+            </p>
+            <p class="chico tenue" style="margin-top:0.7rem; line-height:1.65">
+              Del susto sale la suscripción. El 100% de las empresas a las que les auditamos un finiquito descubren que
+              tienen <em>otras</em> cosas mal. Ese es el momento de vender el tablero.
+            </p>
+          </div>
+
+          <div class="ficha">
+            <div class="rotulo" style="margin-bottom:0.5rem">Por qué ese segmento y no otro</div>
+            <ul style="list-style:none; display:grid; gap:0.6rem; font-size:0.92rem; line-height:1.55" class="tenue">
+              <li>— <strong>Es el único momento con fecha de vencimiento.</strong> El resto del cumplimiento laboral se
+                puede postergar para siempre. Un finiquito no: tiene 10 días hábiles.</li>
+              <li>— <strong>El error es caro y es demostrable.</strong> Podemos mostrar el número exacto, no una promesa
+                de "tranquilidad".</li>
+              <li>— <strong>El contador no lo cubre y lo admite.</strong> Cuando le preguntas a un contador si el
+                finiquito está bien, la respuesta honesta es "yo te calculo los montos, lo legal míralo con un abogado".
+                Ahí hay un hueco, y está declarado por el propio titular del puesto.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="ficha" style="background:var(--tinta); color:var(--papel); border-color:var(--tinta)">
+            <div class="rotulo" style="margin-bottom:0.6rem; color:#8E9198">La frase de posicionamiento</div>
+            <p style="font-family:var(--serif); font-size:1.35rem; line-height:1.45; color:var(--papel)">
+              Entre el contador que te calcula la liquidación y el abogado que te defiende en el juicio, no hay nadie.
+              <span style="color:#E8737D">Contralta es lo que va en el medio: la vigilancia, antes.</span>
+            </p>
+            <p class="chico" style="margin-top:1rem; color:#9A9DA6; line-height:1.6">
+              No competimos con el contador (es nuestro canal). No competimos con el abogado (lo necesitamos y lo
+              pagamos). Competimos contra <strong style="color:#D7D4CD">la carpeta de AZ y la esperanza</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= COMPETENCIA -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">04 · Competencia</div>
+      <h2 style="max-width: 26ch; margin-bottom: var(--sp-m);">Con nombre y apellido, incluido el que va ganando.</h2>
+
+      <div class="scroll-x">
+        <table class="comp">
+          <thead>
+            <tr>
+              <th>Quién</th>
+              <th>Qué hace de verdad</th>
+              <th>Precio aprox.</th>
+              <th>Por qué le ganamos (o no)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="titular">
+              <td>La carpeta de AZ<br><span class="mono chico tenue">y el Excel</span></td>
+              <td>Guarda los contratos firmados. No avisa nada. No calcula nada. Es el titular real del puesto en la
+                mayoría de las PYMEs de 15 personas.</td>
+              <td class="mono">$0</td>
+              <td>Le ganamos sólo cuando duele. Mientras no haya un susto, el Excel es gratis y "ha funcionado siempre".
+                <strong>Éste es nuestro competidor más difícil</strong>, y la razón de que la cuña sea el finiquito.</td>
+            </tr>
+            <tr class="titular">
+              <td>El contador externo</td>
+              <td>Calcula remuneraciones, paga en Previred, hace el F29. Le preguntan cosas laborales todo el tiempo y
+                responde como puede, porque no es abogado laboral y no le pagan por serlo.</td>
+              <td class="mono">$150.000 –<br>$350.000/mes</td>
+              <td><strong>No le ganamos: lo reclutamos.</strong> Es nuestro canal principal. Le sacamos de encima las
+                consultas laborales que no le corresponden y le damos una comisión.</td>
+            </tr>
+            <tr>
+              <td>Buk</td>
+              <td>Suite de RRHH chilena, seria y bien hecha: remuneraciones, gente, evaluaciones, cultura. Apunta de
+                50 trabajadores para arriba.</td>
+              <td class="mono">por trabajador,<br>mes a mes</td>
+              <td>No le ganamos en nada de lo que Buk hace. Buk es un sistema de RRHH; nosotros somos un vigilante de
+                cumplimiento. Buk no te frena un finiquito con cotizaciones impagas antes de firmarlo, y para 15
+                personas es pesado y caro. <strong>Si Buk baja a este segmento con esta función, es un problema real.</strong></td>
+            </tr>
+            <tr>
+              <td>Talana · Rankmi</td>
+              <td>Mismo espacio que Buk: HR tech para empresas medianas y grandes.</td>
+              <td class="mono">por trabajador</td>
+              <td>Mismo argumento. El segmento de 10 a 49 con dueño que decide solo no es donde ellos cazan.</td>
+            </tr>
+            <tr>
+              <td>Nubox · Defontana<br>Softland</td>
+              <td>Contabilidad y ERP con módulo de remuneraciones. Calculan la liquidación y generan el archivo para
+                Previred.</td>
+              <td class="mono">desde<br>~$30.000/mes</td>
+              <td>Calculan; no vigilan. Nadie te dice ahí que el contrato de la Fernanda vence el jueves.
+                <strong>Son competidores potenciales y canal potencial a la vez</strong>, y esa ambigüedad hay que
+                jugarla con cuidado.</td>
+            </tr>
+            <tr>
+              <td>Mi DT<br><span class="mono chico tenue">Dirección del Trabajo</span></td>
+              <td>Portal oficial y gratis: registro de contratos, finiquito electrónico, consulta de multas. Real,
+                funciona, y hay que usarlo.</td>
+              <td class="mono">gratis</td>
+              <td>Mi DT es el archivador oficial: guarda lo que le entregas. <strong>No te revisa antes de que
+                entregues.</strong> Nos integramos, no competimos. Pero si algún día la DT agrega alertas de plazos,
+                nos borra media propuesta de valor gratis — es el <a href="#mata">riesgo que más nos mata</a>.</td>
+            </tr>
+            <tr>
+              <td>Estudio de abogados<br>laboral</td>
+              <td>Te defiende cuando ya te demandaron. Excelente en eso. Caro, por hora, y reactivo.</td>
+              <td class="mono">$80.000 –<br>$200.000/hora</td>
+              <td>Llegan tarde por diseño: cobran cuando el daño ya está hecho. Nosotros vendemos lo contrario.
+                <strong>Los contratamos</strong> — hay uno con retainer en nuestro costo de servir.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="descargo" style="margin-top:var(--sp-m); max-width:var(--measure)">
+        <strong>Diferenciación honesta.</strong> No tenemos ninguna ventaja tecnológica defendible: cualquiera puede
+        programar un calendario de días hábiles. Lo que tenemos es <strong>una posición que hoy nadie ocupa</strong> y
+        un corpus legal curado que cuesta trabajo mantener correcto. Si Buk decide ocupar esa posición, nuestra única
+        defensa real es haber llegado primero al canal contable y ser mucho más barato en el segmento chico. Eso es
+        una ventaja de tiempo, no de foso.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== PRECIO -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">05 · Precio y economía unitaria</div>
+      <h2 style="max-width: 24ch; margin-bottom: var(--sp-m);">Los números tienen que cuadrar con Arquitectura.</h2>
+
+      <div class="scroll-x" style="margin-bottom:var(--sp-m)">
+        <table class="tabla">
+          <thead>
+            <tr><th>Plan</th><th>Para quién</th><th class="num">Precio/mes</th><th class="num">Mezcla supuesta</th><th class="num">Aporte al ARPU</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Taller</strong></td><td>Hasta 10 trabajadores</td><td class="num">$34.000</td><td class="num">45%</td><td class="num">$15.300</td></tr>
+            <tr><td><strong>Empresa</strong></td><td>11 a 49 trabajadores</td><td class="num">$69.000</td><td class="num">40%</td><td class="num">$27.600</td></tr>
+            <tr><td><strong>Cartera</strong></td><td>Contadores, por empresa, desde 5</td><td class="num">$22.000</td><td class="num">15%</td><td class="num">$3.300</td></tr>
+            <tr style="background:var(--papel-2)"><td colspan="4"><strong>ARPU mezclado</strong></td><td class="num"><strong>$46.200</strong></td></tr>
+            <tr><td><strong>Auditoría suelta</strong></td><td>Un finiquito, sin suscripción</td><td class="num">$19.000</td><td class="num" colspan="2"><span class="tenue chico">producto de entrada, no recurrente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rejilla rejilla--2" style="gap:var(--sp-m); align-items:start">
+        <div class="calc">ECONOMÍA UNITARIA · por cuenta, al mes
+
+Precio (ARPU mezclado) .....................  <b>$46.000</b>
+
+Costo de servir <i>(detalle en Arquitectura)</i>
+  Inferencia de IA .........................    $1.400
+  Infraestructura ..........................      $600
+  Pasarela de pago (3,5%) ..................    $1.610
+  Retainer del abogado laboral, prorrateado.    $2.000
+                                              ─────────
+  COGS en régimen (750+ cuentas) ...........    <b>$5.610</b>
+
+Margen bruto .............................  <b>87,8%</b>
+Contribución mensual .....................  <b>$40.390</b>
+
+CAC (mezclado, ver canales) ..............  <b>$180.000</b>
+Payback del CAC ..........................  <b>4,5 meses</b>
+
+Churn mensual (supuesto base) ............     3,5%
+Vida media = 1 / 0,035 ...................  28,6 meses
+LTV = $40.390 × 28,6 .....................  <b>$1.154.000</b>
+LTV / CAC ................................  <b>6,4×</b></div>
+
+        <div class="apilar">
+          <div class="ficha" style="border-left:3px solid var(--st-riesgo)">
+            <div class="rotulo" style="margin-bottom:0.5rem">La trampa que no escondemos</div>
+            <p class="chico tenue" style="line-height:1.7">
+              El COGS de <strong>$5.610 es de régimen</strong>: supone 750 cuentas repartiéndose el retainer del
+              abogado ($1.500.000/mes ÷ 750 = $2.000).
+            </p>
+            <p class="chico tenue" style="line-height:1.7; margin-top:0.6rem">
+              <strong>Al mes 24 tenemos 315 cuentas, no 750.</strong> Ahí el retainer se prorratea a $4.762 por cuenta
+              y el COGS real es <strong>$8.372</strong> → margen bruto <strong>81,8%</strong>, no 87,8%. El modelo de
+              caja del <a href="roadmap.html">roadmap</a> usa el número de régimen, así que la caja del mes 24 está
+              sobreestimada en unos <strong>$870.000 al mes</strong>. No cambia la forma de la curva; sí la empeora.
+            </p>
+            <p class="chico tenue" style="line-height:1.7; margin-top:0.6rem">
+              Lo dejo escrito acá en vez de esconderlo en una nota al pie, porque es exactamente el tipo de cosa que
+              después aparece en una due diligence y quema la credibilidad de todo lo demás.
+            </p>
+          </div>
+          <div class="ficha">
+            <div class="rotulo" style="margin-bottom:0.5rem">Por qué $69.000 y no $29.000</div>
+            <p class="chico tenue" style="line-height:1.7">
+              Porque el producto tiene un costo humano irreducible: un abogado laboral revisando plantillas y
+              criterios. Un precio de $29.000 obliga a sacar al abogado, y sin abogado esto es un generador de
+              documentos con opiniones inventadas — o sea, exactamente el producto que no queremos construir.
+              <strong>El precio protege la calidad legal.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= CANALES -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">06 · Canales de adquisición, rankeados</div>
+      <h2 style="max-width: 26ch; margin-bottom: var(--sp-m);">Ordenados por lo que de verdad creemos que funciona.</h2>
+
+      <div>
+        <article class="canal">
+          <span class="canal__n">1</span>
+          <div>
+            <h3>Contadores y estudios contables</h3>
+            <p>
+              El canal que decide la empresa. Un estudio contable chico atiende entre 20 y 80 PYMEs y ya recibe todas
+              las preguntas laborales de sus clientes sin que le paguen por responderlas. Contralta se las contesta y
+              le paga <strong>20% de comisión recurrente por 12 meses</strong>. Un solo estudio que active 10 empresas
+              vale más que 200 clics de Google.
+            </p>
+            <div class="canal__m">
+              <span class="cita">CAC estimado $45.000</span>
+              <span class="cita">ciclo 4–8 semanas</span>
+              <span class="cita cita--verificar">meta M5: 40% de las altas</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="canal">
+          <span class="canal__n">2</span>
+          <div>
+            <h3>SEO long-tail en español, con una calculadora gratis de imán</h3>
+            <p>
+              El dueño que va a despedir busca en Google, siempre. "Cómo se calcula un finiquito", "plazo para firmar
+              contrato de trabajo", "qué pasa si no pago las cotizaciones", "anexo de contrato 42 horas". Publicamos
+              <strong>una calculadora de finiquito gratis</strong> —el mismo motor del demo— y cientos de páginas
+              long-tail, cada una con la norma citada. Es un canal lento y compuesto: a los 12 meses es el más barato
+              que tenemos.
+            </p>
+            <div class="canal__m">
+              <span class="cita">CAC marginal ≈ $0</span>
+              <span class="cita">madura al mes 9–12</span>
+              <span class="cita cita--verificar">volumen de búsqueda por estimar</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="canal">
+          <span class="canal__n">3</span>
+          <div>
+            <h3>Google Ads sobre intención de alta urgencia</h3>
+            <p>
+              Sólo palabras de pánico: "finiquito", "despido necesidades de la empresa", "multa dirección del trabajo".
+              No compramos "software de RRHH": ahí compiten Buk y Talana con bolsillos más hondos y la palabra cuesta
+              cara. <strong>Estimación:</strong> CPC $600–$1.200, conversión a lead 12%, de lead a cliente 8% →
+              CPL ≈ $7.500 y <strong>CAC ≈ $95.000</strong>. Es una estimación, no un dato: hay que probarla con
+              $500.000 antes de creerle.
+            </p>
+            <div class="canal__m">
+              <span class="cita cita--verificar">CAC $95.000 estimado</span>
+              <span class="cita">prueba: $500.000</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="canal">
+          <span class="canal__n">4</span>
+          <div>
+            <h3>Gremios: ASECH, Cámara de Comercio de Santiago, CChC</h3>
+            <p>
+              Charlas de 40 minutos: <em>"Los cinco errores que te van a costar un juicio laboral"</em>, con casos
+              reales y el cálculo en pantalla. No es una charla comercial, es una charla útil que termina con una
+              auditoría gratis. La <strong>CChC (construcción)</strong> es la de mayor valor: contratos por obra o
+              faena significan finiquitos constantes, y el plazo de escrituración baja a 5 días.
+            </p>
+            <div class="canal__m">
+              <span class="cita">CAC estimado $120.000</span>
+              <span class="cita">alto valor de confianza</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="canal">
+          <span class="canal__n">5</span>
+          <div>
+            <h3>Outbound por WhatsApp y LinkedIn al dueño</h3>
+            <p>
+              Funciona en Chile y funciona en esta venta, pero es caro y no escala. Se usa <strong>sólo para los
+              primeros 30 clientes</strong>, donde el objetivo no es el volumen sino aprender qué frase hace que
+              alguien conteste. La frase que ganó en las pruebas mentales: <em>"¿Sabías que si despides con las
+              cotizaciones impagas, el despido es nulo y tienes que seguir pagando sueldo?"</em>
+            </p>
+            <div class="canal__m">
+              <span class="cita">CAC estimado $260.000</span>
+              <span class="cita">no escala</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="canal">
+          <span class="canal__n">6</span>
+          <div>
+            <h3>Mutuales: Mutual de Seguridad, ACHS, IST</h3>
+            <p>
+              Ya tienen relación con estas mismas PYMEs por prevención de riesgos y ya las visitan. Co-marketing, no
+              reventa. Es un canal de segundo año: requiere una relación institucional que no tenemos el día 1.
+            </p>
+            <div class="canal__m"><span class="cita">año 2</span></div>
+          </div>
+        </article>
+
+        <article class="canal" style="border-bottom:0">
+          <span class="canal__n">7</span>
+          <div>
+            <h3>Software PYME (Nubox, Defontana, Bsale) — con cuidado</h3>
+            <p>
+              Integrarse a su marketplace nos da distribución instantánea y les enseña exactamente cómo construir lo
+              que hacemos. <strong>Es el canal con el mejor retorno de corto plazo y el peor de largo.</strong> No lo
+              tocamos antes del mes 18, y cuando lo toquemos será desde una posición donde ya tengamos el canal
+              contable amarrado.
+            </p>
+            <div class="canal__m"><span class="cita cita--verificar">riesgo estratégico alto</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="calc" style="margin-top:var(--sp-m)">CAC MEZCLADO · el que usa el modelo del roadmap
+
+  Contadores        40% × $45.000  =  $18.000
+  SEO               20% ×      $0  =       $0
+  Google Ads        15% × $95.000  =  $14.250
+  Gremios           15% × $120.000 =  $18.000
+  Outbound          10% × $260.000 =  $26.000
+                                     ─────────
+  CAC mezclado teórico ...........    $76.250
+
+  Pero el CAC del modelo es <b>$180.000</b>, no $76.250.
+  <i>Porque los primeros 18 meses la mezcla NO es ésa: el canal contable
+  todavía no existe y el SEO no ha madurado, así que la adquisición real
+  se apoya en outbound y ads. $180.000 es el CAC de la fase en que
+  vivimos, no el de régimen. Usar el número bonito acá sería hacer
+  trampa con nuestra propia caja.</i></div>
+    </div>
+  </section>
+
+  <!-- ================================================== IA EN EL MARKETING -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">07 · La IA en el marketing mismo</div>
+      <h2 style="max-width: 26ch; margin-bottom: var(--sp-m);">Dos usos que valen, y una línea que no cruzamos.</h2>
+
+      <div class="rejilla rejilla--2" style="gap:var(--sp-m); align-items:start">
+        <div class="ficha" style="border-left:3px solid var(--st-ok)">
+          <div class="rotulo" style="margin-bottom:0.6rem">Donde sí sirve</div>
+          <ul style="list-style:none; display:grid; gap:0.8rem; font-size:0.93rem; line-height:1.6" class="tenue">
+            <li><strong style="color:var(--tinta)">Fabricar el long-tail de SEO a escala.</strong> Hay literalmente
+              cientos de preguntas laborales concretas ("¿el sábado cuenta como día hábil para el finiquito?", "¿tengo
+              que firmar anexo por las 42 horas?"). Cada una es una página. La IA escribe el borrador sobre el corpus
+              legal curado; el abogado firma antes de publicar. Sin IA esto cuesta un año de un redactor; con IA cuesta
+              tres semanas y la revisión legal.</li>
+            <li><strong style="color:var(--tinta)">Personalizar el outbound con datos públicos.</strong> Rubro y tamaño
+              de la empresa determinan el riesgo típico: a una constructora le hablas de contratos por obra y del plazo
+              de 5 días; a un restaurante, de turnos y horas extra. Eso se automatiza bien y sube la tasa de respuesta.</li>
+          </ul>
+        </div>
+
+        <div class="ficha" style="border-left:3px solid var(--st-vencido)">
+          <div class="rotulo" style="margin-bottom:0.6rem">Donde no, y por qué</div>
+          <ul style="list-style:none; display:grid; gap:0.8rem; font-size:0.93rem; line-height:1.6" class="tenue">
+            <li><strong style="color:var(--tinta)">Nada de chatbot de ventas que responda dudas laborales.</strong> Es
+              la tentación obvia y sería un suicidio: vendemos precisión legal. Un bot que se equivoca en un plazo, una
+              sola vez, en un chat que queda por escrito, destruye la única cosa que estamos vendiendo. La consulta
+              legal la contesta una persona.</li>
+            <li><strong style="color:var(--tinta)">Nada de contenido de marca genérico.</strong> "Potencia tu PYME con
+              IA" no le vende nada a un dueño de panadería asustado. El copy que funciona es un número: <em>"el despido
+              es nulo y sigues pagando sueldo"</em>.</li>
+            <li><strong style="color:var(--tinta)">Regla dura, escrita:</strong> ningún contenido con una afirmación
+              legal se publica sin la revisión del abogado con retainer. Cuesta plata y hace más lento el marketing.
+              Es el precio de ser el producto en el que se confía.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= 90 DÍAS ---- -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">08 · Los primeros 90 días</div>
+      <h2 style="max-width: 24ch; margin-bottom: var(--sp-m);">Del día 1 a los tres primeros pesos.</h2>
+
+      <div class="dias">
+        <div class="dia">
+          <span class="dia__s">Semanas 1–2</span>
+          <p class="dia__c">
+            <strong>Ocho design partners, conseguidos a mano.</strong> Red personal, ASECH y una charla en la Cámara de
+            Comercio. La oferta es cruda y clara: <em>"te audito la carpeta laboral completa gratis, y si no encuentro
+            nada, te invito un café"</em>. Nadie dice que no a eso. Nada de producto todavía.
+          </p>
+        </div>
+        <div class="dia">
+          <span class="dia__s">Semanas 3–6</span>
+          <p class="dia__c">
+            <strong>Auditar a mano, con planilla y abogado.</strong> Ocho carpetas, una por una. Se documenta cada
+            hallazgo, su norma y su costo en pesos. Este es el trabajo que define el producto: <strong>las reglas del
+            motor salen de acá, no de mi cabeza</strong>. Entregable: ocho informes que duelen.
+          </p>
+        </div>
+        <div class="dia">
+          <span class="dia__s">Semanas 5–10</span>
+          <p class="dia__c">
+            <strong>Construir lo que está en el demo.</strong> Tablero de cumplimiento, motor de plazos con el
+            calendario de días hábiles, auditoría de finiquito y generador de contratos. En ese orden, porque ese es el
+            orden en que duele. Todo lo demás espera.
+          </p>
+        </div>
+        <div class="dia">
+          <span class="dia__s">Semanas 8–12</span>
+          <p class="dia__c">
+            <strong>La calculadora de finiquito gratis, en público.</strong> Más 40 páginas de SEO long-tail revisadas
+            por el abogado. Es el motor de adquisición del año 1 y hay que plantarlo temprano porque tarda en crecer.
+          </p>
+        </div>
+        <div class="dia">
+          <span class="dia__s">Semana 12</span>
+          <p class="dia__c">
+            <strong>Las tres primeras ventas y el primer estudio contable.</strong> Tres empresas pagando $69.000 sin
+            ser amigas de nadie (hito M2), y una conversación seria con un estudio contable para el plan Cartera. Si a
+            la semana 14 seguimos en cero pesos con 25 auditorías gratis hechas, se activa el criterio de muerte de M2.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== QUÉ MATA -->
+  <section class="seccion" id="mata">
+    <div class="container">
+      <div class="rotulo">09 · Qué mataría esto</div>
+      <h2 style="max-width: 24ch; margin-bottom: var(--sp-m);">Los riesgos, ordenados por lo que de verdad nos asusta.</h2>
+
+      <article class="mata">
+        <div class="mata__p">Riesgo 1 · el que no controlamos</div>
+        <h3>Que la Dirección del Trabajo agregue alertas de plazos a Mi DT.</h3>
+        <p>
+          Mi DT ya tiene los contratos, ya tiene los finiquitos electrónicos y ya sabe cuándo entró cada trabajador.
+          Agregar "te quedan 4 días para escriturar el contrato de Fernanda" es, técnicamente, un correo automático.
+          Si el Estado lo hace, es gratis, es oficial y nos borra la mitad avisadora del producto de un día para otro.
+          <strong>Nos quedaría el cálculo, la auditoría de finiquito y la explicación</strong> —que no es poco— pero el
+          precio se cae a la mitad. No hay cobertura contra esto: sólo llegar antes y estar tan metidos en el flujo
+          del contador que cambiar duela.
+        </p>
+      </article>
+
+      <article class="mata">
+        <div class="mata__p">Riesgo 2 · el más probable</div>
+        <h3>Que el dolor no sea presupuesto.</h3>
+        <p>
+          El cálculo racional de un dueño que despide a una persona cada tres años es brutal para nosotros: su
+          exposición esperada anual puede ser menor que los $828.000 que le cobramos. <strong>Va a preferir
+          arriesgarse</strong>, y estadísticamente no le va tan mal. Nuestro producto se vende por miedo, y el miedo
+          se pasa. Si el churn a los 6 meses se dispara —"no pasó nada, lo doy de baja"— el negocio no existe.
+          <em>La mitigación real es dejar de ser un seguro y volverse el registro</em>: si la carpeta laboral vive
+          adentro de Contralta, darse de baja es perder los papeles, y eso no se hace.
+        </p>
+      </article>
+
+      <article class="mata">
+        <div class="mata__p">Riesgo 3 · el que nos merecemos</div>
+        <h3>Que nos equivoquemos en un dato legal.</h3>
+        <p>
+          Un cliente pierde un juicio porque le dijimos que el plazo vencía el martes y vencía el sábado. Un solo caso
+          así, bien contado en LinkedIn, y el producto se muere: no vendemos software, vendemos que se puede confiar
+          en el número. Por eso el abogado está en el costo de servir, por eso cada dato está marcado como
+          <span class="cita cita--norma">norma citada</span> o
+          <span class="cita cita--verificar">por validar</span>, y por eso el producto muestra las dos lecturas cuando
+          el cómputo de un plazo no es pacífico. Es un producto que tiene que ser cobarde a propósito.
+        </p>
+      </article>
+
+      <article class="mata">
+        <div class="mata__p">Riesgo 4 · el estructural</div>
+        <h3>Que Chile sea muy chico y el contenido legal no se exporte.</h3>
+        <p>
+          Con un SAM de US$70M al año, capturar el 1,4% —1.700 clientes— es un negocio bueno, no uno grande. Y el
+          activo que construimos (el corpus del Código del Trabajo chileno curado) <strong>vale exactamente cero en
+          Lima</strong>. La expansión no es "abrir un mercado nuevo", es "construir el producto de nuevo". Quien
+          invierta acá tiene que aceptar que el caso base es un negocio rentable de siete personas, y que el caso de
+          riesgo depende de una hipótesis de portabilidad que todavía no está probada.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div>
+      <a class="marca" href="index.html" style="margin-bottom:0.6rem">
+        <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+          <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+        Contralta
+      </a>
+      <p style="max-width:34ch">Cumplimiento laboral para PYMEs chilenas.</p>
+      <p class="mono chico" style="margin-top:0.8rem; color:#71757E">contralta.com · prototipo 2026</p>
+    </div>
+    <div>
+      <h4>Sitio</h4>
+      <ul>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Cifras clave</h4>
+      <ul>
+        <li>SAM Chile: US$70M/año</li>
+        <li>ARPU $46.000/mes</li>
+        <li>CAC $180.000</li>
+        <li>LTV/CAC 6,4×</li>
+        <li>Margen bruto 87,8%</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('hamb'), m = document.getElementById('menu');
+  b.addEventListener('click', function () {
+    var ab = b.getAttribute('aria-expanded') === 'true';
+    b.setAttribute('aria-expanded', String(!ab));
+    m.setAttribute('data-abierto', String(!ab));
+  });
+})();
+</script>
+</body>
+</html>

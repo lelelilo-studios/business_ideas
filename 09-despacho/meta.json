@@ -1,0 +1,15 @@
+{
+  "folder": "09-despacho",
+  "brand": "Kilonauta",
+  "domain": "kilonauta.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/kilonauta.com -> HTTP 404 (disponible), 2026-07-12. NIC Chile: kilonauta.cl AVAILABLE el mismo día.",
+  "alternates": ["kilonave.com", "zarpea.com", "despachea.com"],
+  "tagline": "El mismo paquete a Puerto Montt cuesta $9.930 o $5.320. Depende de a quién le preguntes.",
+  "category": "Logística / E-commerce PYME",
+  "market": "Chile → Perú y Colombia",
+  "icp": "Tienda online de 100–900 envíos/mes, dueña-operadora, con más del 30% de sus despachos fuera de la Región Metropolitana",
+  "price_clp": "Gratis (pagas la etiqueta) · Bodega $34.900/mes · Cordillera $99.900/mes",
+  "accent": "#D8461B",
+  "problem": "Cuatro couriers, cuatro portales, cuatro etiquetas: la dueña copia direcciones a mano, paga de más en cada envío a regiones y cuando un paquete se pierde prefiere regalar el producto antes que meterse al reclamo.",
+  "status": "prototipo"
+}

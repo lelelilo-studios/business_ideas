@@ -1,0 +1,15 @@
+{
+  "folder": "04-inventario",
+  "brand": "Mermata",
+  "domain": "mermata.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/mermata.com -> HTTP 404 (disponible), 2026-07-13. mermata.cl tambien disponible.",
+  "alternates": ["abastero.com", "cuanteo.com", "pronosta.com"],
+  "tagline": "Compra lo que vas a vender.",
+  "category": "SaaS vertical para gastronomía · pronóstico de demanda y compras",
+  "market": "Chile → LatAm (México, Perú, Colombia: mismo mandato de factura electrónica)",
+  "icp": "Panaderías, cafeterías, restaurantes y minimarkets con 1-3 locales, que gastan más de $4.000.000 al mes en insumos y cuyo POS emite boleta electrónica con detalle por producto",
+  "price_clp": "Desde $49.000/mes · plan Local $99.000/mes · plan Cadena $79.000/mes por local · puesta en marcha $190.000",
+  "accent": "#b8452b",
+  "problem": "El dueño compra a ojo por WhatsApp un martes en la mañana: bota lo que sobró (merma) y pierde la venta de lo que faltó (quiebre de stock), y como nadie mide la merma, nadie sabe que esas dos pérdidas juntas se comen la mitad de la utilidad del año.",
+  "status": "prototipo"
+}

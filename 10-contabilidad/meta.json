@@ -1,0 +1,16 @@
+{
+  "folder": "10-contabilidad",
+  "brand": "Talonio",
+  "domain": "talonio.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/talonio.com -> HTTP 404 (disponible), 2026-07-13; talonio.cl -> NIC Chile sin titular (disponible)",
+  "alternates": ["cuadraje.com", "foliario.com", "cerofuga.com"],
+  "alternates_evidence": "las tres verificadas con _kit/check-domain.sh el 2026-07-13: RDAP Verisign HTTP 404 (.com disponible) y NIC Chile sin titular (.cl disponible). tirilio.com tambien libre (404), de reserva.",
+  "tagline": "La boleta que botaste era plata.",
+  "category": "Contabilidad PYME / Fintech tributaria",
+  "market": "Chile → LatAm hispanohablante (México, Colombia, Perú, España)",
+  "icp": "Contador o estudio contable con 15-80 RUT en cartera. El usuario diario es el dueño de la PYME con operación física (maestranza, construcción chica, transporte, taller), 5-50 empleados, régimen Pro Pyme 14 D N°3.",
+  "price_clp": "Estudio (contador): desde $7.900/RUT/mes · Empresa (PYME): $34.900/mes",
+  "accent": "#c1391c",
+  "problem": "El gasto que no se documentó es IVA crédito fiscal perdido: la PYME chilena bota ~$2,6 millones al año en boletas de papel y compras con tarjeta personal que nunca llegan al contador.",
+  "status": "prototipo"
+}

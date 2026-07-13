@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Contralta · qué habría que configurar de verdad</title>
+<meta name="description" content="Modelo de datos, agentes de IA, APIs por contratar, costo mensual con la aritmética, y qué está falseado en el demo de Contralta.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .calc {
+    font-family: var(--mono); font-size: 0.78rem; line-height: 1.85;
+    background: var(--papel-2); border: 1px solid var(--linea);
+    border-left: 3px solid var(--lacre);
+    padding: var(--sp-s); overflow-x: auto; white-space: pre;
+  }
+  .calc b { color: var(--lacre); font-weight: 500; }
+  .calc i { color: var(--tinta-3); font-style: normal; }
+
+  .tabla-dd { width: 100%; font-size: 0.85rem; }
+  .tabla-dd th {
+    text-align: left; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-3); padding: 0.5rem 0.6rem; font-weight: 500;
+    background: var(--papel-2); border-bottom: 1px solid var(--linea-2); white-space: nowrap;
+  }
+  .tabla-dd td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+  .tabla-dd td:first-child { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+  .tabla-dd .campos { font-family: var(--mono); font-size: 0.76rem; color: var(--tinta-2); line-height: 1.7; }
+  .tabla-dd .campos em { color: var(--lacre); font-style: normal; }
+  .tabla-dd tr.clave { background: var(--st-riesgo-bg); }
+
+  .agente {
+    border: 1px solid var(--linea); background: #FBFAF7;
+    border-left: 3px solid var(--lacre); padding: var(--sp-s); margin-bottom: var(--sp-2xs);
+  }
+  .agente__cab { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; justify-content: space-between; }
+  .agente h3 { font-size: 1.05rem; }
+  .agente__m { font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-2); }
+  .agente__g { display: grid; gap: 0.7rem; margin-top: var(--sp-s); }
+  .agente__g dt {
+    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--tinta-3); margin-bottom: 0.2rem;
+  }
+  .agente__g dd { font-size: 0.9rem; line-height: 1.6; color: var(--tinta-2); }
+  .agente__g dd code {
+    font-family: var(--mono); font-size: 0.82rem; background: var(--papel-2);
+    padding: 0.05rem 0.3rem; border: 1px solid var(--linea);
+  }
+  .prompt {
+    font-family: var(--mono); font-size: 0.76rem; line-height: 1.7;
+    background: var(--tinta); color: #C7C9CE; padding: var(--sp-xs);
+    white-space: pre-wrap; overflow-x: auto; margin-top: 0.4rem;
+  }
+  .prompt b { color: #E8737D; font-weight: 400; }
+
+  .agente--no { border-left-color: var(--st-vencido); background: var(--st-vencido-bg); }
+
+  .api { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .api__f {
+    background: #FBFAF7; padding: var(--sp-s);
+    display: grid; gap: 0.4rem;
+  }
+  @media (min-width: 56em) { .api__f { grid-template-columns: 11rem 1fr 9rem; gap: var(--sp-s); align-items: start; } }
+  .api__n { font-family: var(--mono); font-weight: 500; font-size: 0.88rem; }
+  .api__d { font-size: 0.88rem; color: var(--tinta-2); line-height: 1.6; }
+  .api__e { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  .env {
+    font-family: var(--mono); font-size: 0.78rem; line-height: 1.9;
+    background: var(--tinta); color: #C7C9CE; padding: var(--sp-s);
+    overflow-x: auto; white-space: pre;
+  }
+  .env i { color: #71757E; font-style: normal; }
+  .env b { color: #E8737D; font-weight: 400; }
+
+  .falso { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .falso__f {
+    background: #FBFAF7; padding: var(--sp-s);
+    display: grid; grid-template-columns: 20px 1fr; gap: 0.7rem; align-items: start;
+  }
+  .falso__f p { font-size: 0.9rem; line-height: 1.6; color: var(--tinta-2); }
+  .falso__f strong { color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra__fila">
+    <a class="marca" href="index.html">
+      <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+        <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+      </svg>
+      Contralta <span class="marca__sub">Cumplimiento laboral</span>
+    </a>
+    <button class="hamb" id="hamb" aria-expanded="false" aria-controls="menu">Menú</button>
+  </div>
+  <nav class="container menu" id="menu" aria-label="Principal">
+    <ul>
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">Arquitectura</div>
+      <h1 style="max-width: 22ch;">Nada de esto está aprovisionado. Acá está lo que habría que configurar.</h1>
+      <p class="lede prose" style="margin-top: var(--sp-s);">
+        Con una decisión de diseño que manda sobre todas las demás:
+        <strong>la IA no calcula plazos ni montos.</strong> Los calcula código determinista. Un modelo de lenguaje que
+        estima una indemnización es un pasivo legal con cara de feature.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================================================= LA DECISIÓN --- -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">01 · La decisión que ordena todo</div>
+
+      <div class="rejilla rejilla--2" style="gap:var(--sp-m); align-items:start">
+        <div class="ficha" style="border-left:3px solid var(--st-ok)">
+          <div class="rotulo" style="margin-bottom:0.6rem">Código determinista · la parte que no puede fallar</div>
+          <ul style="list-style:none; display:grid; gap:0.5rem; font-size:0.92rem; line-height:1.55" class="tenue">
+            <li>— Calendario de días hábiles con la tabla de feriados de Chile.</li>
+            <li>— Aritmética del finiquito: años de servicio, fracción sobre 6 meses, topes, gratificación, feriado
+              proporcional.</li>
+            <li>— Cotizaciones: AFP, salud, AFC, SIS, mutual, topes imponibles.</li>
+            <li>— Valor de la hora extra según la jornada vigente.</li>
+            <li>— Motor de reglas: qué obligación nace, cuándo vence, qué la satisface.</li>
+            <li>— Validación de RUT (módulo 11).</li>
+          </ul>
+          <p class="chico" style="margin-top:0.8rem; color:var(--st-ok); font-weight:600">
+            El mismo caso da el mismo número las mil veces. Auditable, testeable, sin temperatura.
+          </p>
+        </div>
+
+        <div class="ficha" style="border-left:3px solid var(--lacre)">
+          <div class="rotulo" style="margin-bottom:0.6rem">IA · la parte que trata con el desorden del mundo</div>
+          <ul style="list-style:none; display:grid; gap:0.5rem; font-size:0.92rem; line-height:1.55" class="tenue">
+            <li>— Leer un contrato escaneado, torcido, en PDF, y sacar los datos.</li>
+            <li>— Redactar el anexo o la carta con la plantilla que revisó el abogado.</li>
+            <li>— Explicar en castellano por qué una obligación importa.</li>
+            <li>— Detectar que lo que dice el contrato no es lo que pasa en la práctica.</li>
+            <li>— Vigilar las fuentes oficiales y avisar que cambió un parámetro.</li>
+          </ul>
+          <p class="chico" style="margin-top:0.8rem; color:var(--lacre); font-weight:600">
+            Ninguno de estos agentes emite un monto ni una fecha de vencimiento. Se los pasamos ya calculados.
+          </p>
+        </div>
+      </div>
+
+      <div class="calc" style="margin-top:var(--sp-m)">EL GUARDARRAÍL, EN CONCRETO
+
+Cuando el Redactor genera un finiquito, el motor le pasa los montos ya
+calculados en el input. Después de generar, un validador post-hoc recorre
+la salida y extrae <b>todo número que parezca dinero o fecha</b>.
+
+  si (número emitido) ∉ (números del input):
+      → se rechaza la generación
+      → se reintenta una vez
+      → si vuelve a fallar, escala a revisión humana
+
+<i>Es decir: al modelo se le prohíbe físicamente inventar una cifra. Si el
+finiquito dice $8.995.833 es porque calculo.js lo calculó, no porque un
+modelo lo haya "estimado". Este validador es unas 40 líneas y es
+probablemente la pieza más importante del producto entero.</i></div>
+    </div>
+  </section>
+
+  <!-- ====================================================== MODELO DE DATOS -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">02 · Modelo de datos</div>
+      <h2 style="margin-bottom: var(--sp-2xs);">Postgres. Diez tablas y una que salva el producto.</h2>
+      <p class="prose tenue" style="margin-bottom: var(--sp-m);">
+        Las filas en amarillo son las que hacen que esto sea un producto de cumplimiento y no un CRUD de empleados.
+      </p>
+
+      <div class="scroll-x">
+        <table class="tabla-dd">
+          <thead>
+            <tr><th>Tabla</th><th>Campos</th><th>Para qué</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>empresa</td>
+              <td class="campos">id · rut · razon_social · giro · direccion · comuna · rep_legal_nombre · rep_legal_rut ·
+                mutual · <em>tramo_505bis</em> · plan · created_at</td>
+              <td>El tramo (micro/pequeña/mediana/grande) se deriva del número de trabajadores y determina el rango de
+                multa aplicable. <span class="cita cita--norma">Art. 505 bis</span></td>
+            </tr>
+            <tr>
+              <td>trabajador</td>
+              <td class="campos">id · empresa_id · rut · nombre · cargo · fecha_ingreso · fecha_termino ·
+                tipo_contrato · <em>renovaciones</em> · jornada_semanal · sueldo_base · afp · salud · comuna ·
+                <em>fuero_tipo</em> · <em>fuero_hasta</em> · estado</td>
+              <td><code>renovaciones</code> es el campo que detecta el plazo fijo que ya pasó a indefinido.
+                <code>fuero_*</code> es el que bloquea el término.</td>
+            </tr>
+            <tr>
+              <td>documento</td>
+              <td class="campos">id · trabajador_id · empresa_id · tipo · estado · archivo_url · sha256 ·
+                fecha_generado · fecha_firmado · <em>ministro_fe</em> · extraido_por_ia · revisado_por_humano</td>
+              <td>tipo ∈ {contrato, anexo, finiquito, carta_aviso, riohs, protocolo_karin, pacto_hhee, liquidacion,
+                certificado_cotizaciones}. El hash prueba que el PDF no cambió después de firmado.</td>
+            </tr>
+            <tr class="clave">
+              <td>obligacion</td>
+              <td class="campos">id · empresa_id · trabajador_id · tipo · <em>norma_ref</em> · fecha_origen ·
+                plazo_dias · <em>plazo_tipo</em> · <em>fecha_vence_a</em> · <em>fecha_vence_b</em> ·
+                <em>criterio_computo</em> · estado · confianza</td>
+              <td><strong>El corazón.</strong> <code>plazo_tipo</code> ∈ {corridos, habiles}. Y hay <strong>dos</strong>
+                fechas de vencimiento porque el cómputo de días hábiles no es pacífico: guardamos las dos lecturas y
+                mostramos la conservadora. Un producto legal honesto necesita esta columna.</td>
+            </tr>
+            <tr class="clave">
+              <td>parametro</td>
+              <td class="campos">id · clave · valor · unidad · <em>vigente_desde</em> · vigente_hasta · <em>fuente</em> ·
+                <em>confianza</em> · cargado_at · cargado_por</td>
+              <td><strong>La tabla que salva el producto.</strong> UF, UTM, ingreso mínimo, topes imponibles,
+                comisiones AFP, tasas de AFC/SIS/mutual. Cada valor tiene fecha de vigencia, fuente y nivel de
+                confianza. <code>confianza</code> ∈ {norma, verificar}. Un parámetro sin fecha de vigencia es una
+                demanda esperando.</td>
+            </tr>
+            <tr class="clave">
+              <td>regla</td>
+              <td class="campos">id · codigo · <em>norma_ref</em> · descripcion · condicion_json · plazo_dias ·
+                plazo_tipo · severidad · costo_formula · confianza · <em>revisado_por_abogado_at</em></td>
+              <td>Las reglas son <strong>datos, no código</strong>: se pueden auditar, versionar y —sobre todo— hacer
+                que un abogado las lea sin saber programar. <code>revisado_por_abogado_at</code> es una columna que
+                bloquea el despliegue si está vacía.</td>
+            </tr>
+            <tr>
+              <td>hallazgo</td>
+              <td class="campos">id · empresa_id · obligacion_id · severidad · titulo · explicacion ·
+                costo_estimado_min · costo_estimado_max · norma_citada · confianza · resuelto_at · resuelto_por</td>
+              <td>Lo que el tablero muestra. El costo es un <strong>rango</strong>, no un número: las multas las fija
+                un fiscalizador dentro de un rango legal.</td>
+            </tr>
+            <tr>
+              <td>cotizacion</td>
+              <td class="campos">id · empresa_id · trabajador_id · periodo · monto_afp · monto_salud · monto_afc ·
+                monto_sis · monto_mutual · <em>estado</em> · fecha_pago · folio_previred</td>
+              <td>estado ∈ {declarada, pagada, rechazada, impaga}. <strong>El estado "rechazada" es el que arma la Ley
+                Bustos</strong>: se declaró pero no se pagó, y nadie revisó el archivo de rechazos.</td>
+            </tr>
+            <tr>
+              <td>feriado</td>
+              <td class="campos">fecha · nombre · tipo · region · fuente</td>
+              <td>Tabla cargada de fuente oficial, no calculada. Los feriados trasladables y los regionales no se
+                adivinan con un algoritmo.</td>
+            </tr>
+            <tr>
+              <td>acceso_log</td>
+              <td class="campos">id · usuario_id · entidad · entidad_id · accion · ip · at</td>
+              <td>Sueldos y RUT de trabajadores es lo más sensible que tiene una empresa. Quién vio qué, siempre.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= AGENTES -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">03 · Los agentes de IA</div>
+      <h2 style="margin-bottom: var(--sp-m);">Cuatro en producción, uno fuera, y uno que no existe a propósito.</h2>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>1 · Extractor documental</h3>
+          <span class="agente__m">claude-haiku-4-5-20251001</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué hace</dt><dd>Recibe el PDF o la foto de un contrato, una liquidación de sueldo o un certificado
+            de Previred —escaneados, torcidos, a veces fotografiados con el celular— y devuelve JSON estructurado.
+            Es el 80% del volumen de tokens y por eso va en Haiku.</dd></div>
+          <div><dt>Herramientas</dt><dd>Ninguna. Visión + salida estructurada con schema estricto.</dd></div>
+          <div><dt>Guardarraíl</dt><dd>Cada campo sale con un nivel de confianza. Si baja del umbral,
+            <strong>no se escribe en la tabla</strong>: se encola para que una persona lo confirme. Un sueldo base mal
+            leído se propaga a la indemnización, y eso no se puede permitir.</dd></div>
+          <div><dt>Prompt (extracto)</dt><dd>
+            <div class="prompt">Extrae los datos de este contrato de trabajo chileno.
+Devuelve SOLO el JSON del schema.
+
+<b>Si un campo no está explícito en el documento, devuelve null.
+NO lo infieras. NO lo completes con lo que sería razonable.</b>
+Para cada campo, entrega confianza 0–1.
+
+Ojo con: la jornada semanal (puede decir 45 y estar
+desactualizada), la fecha de ingreso real (que puede ser
+distinta de la fecha del contrato), y las renovaciones.</div>
+          </dd></div>
+        </dl>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>2 · Redactor de documentos</h3>
+          <span class="agente__m">claude-sonnet-5</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué hace</dt><dd>Genera contratos, anexos, cartas de aviso, finiquitos, borrador de RIOHS y el
+            protocolo de la Ley Karin, a partir de plantillas que revisó el abogado más los datos de la base.</dd></div>
+          <div><dt>Herramientas</dt><dd><code>get_trabajador</code> · <code>get_empresa</code> ·
+            <code>get_plantilla(tipo)</code> · <code>get_montos_calculados</code></dd></div>
+          <div><dt>Guardarraíl</dt><dd><strong>Los montos llegan calculados en el input.</strong> El validador post-hoc
+            rechaza cualquier cifra o fecha que el modelo emita y que no venga del input. Ver la sección 01.</dd></div>
+          <div><dt>Prompt (extracto)</dt><dd>
+            <div class="prompt">Redacta el finiquito con la plantilla adjunta.
+
+<b>PROHIBIDO calcular. PROHIBIDO estimar. PROHIBIDO redondear.</b>
+Todos los montos y fechas están en &lt;datos_calculados&gt;.
+Úsalos textualmente. Si falta uno, di que falta; no lo inventes.
+
+Si detectas que una declaración de la plantilla sería FALSA con
+estos datos (ej.: "las cotizaciones están íntegramente pagadas"
+cuando cotizaciones_al_dia = false), <b>insértala igual pero
+márcala con &lt;advertencia&gt;</b> explicando el riesgo. No la
+corrijas silenciosamente: el usuario tiene que verla.</div>
+          </dd></div>
+        </dl>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>3 · Explicador legal (RAG)</h3>
+          <span class="agente__m">claude-sonnet-5</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué hace</dt><dd>Responde el "¿y esto por qué importa?" de cada hallazgo, y las dudas laborales del
+            usuario. Recupera sobre un corpus acotado y curado: Código del Trabajo, leyes 21.561, 21.361, 21.643,
+            21.220, y dictámenes de la Dirección del Trabajo.</dd></div>
+          <div><dt>Herramientas</dt><dd><code>buscar_norma(query)</code> · <code>get_hallazgo(id)</code> ·
+            <code>escalar_a_abogado(pregunta)</code></dd></div>
+          <div><dt>Guardarraíl</dt><dd>Toda respuesta tiene que citar el artículo o la ley. <strong>Si la recuperación
+            no trae una norma que sostenga la respuesta, el agente tiene prohibido responder</strong>: dice que no sabe
+            y ofrece la consulta con el abogado (que va incluida en el plan Empresa). Es el comportamiento correcto y
+            además es el que convierte a plan pagado.</dd></div>
+          <div><dt>Prompt (extracto)</dt><dd>
+            <div class="prompt">Explica en castellano de Chile, a un dueño de PYME sin
+formación legal, por qué esta obligación importa.
+
+Reglas:
+· <b>Cita SIEMPRE el artículo o la ley.</b>
+· Si los fragmentos recuperados no contienen norma que
+  sostenga la respuesta, <b>responde exactamente: "No tengo
+  la norma que respalde esto. Te lo derivo al abogado."</b>
+  y llama a escalar_a_abogado.
+· Si el criterio es interpretativo (no está literal en la
+  ley), dilo y márcalo como POR VALIDAR.
+· No uses "podría", "en general", "normalmente" para tapar
+  que no sabes. Si no sabes, dilo.</div>
+          </dd></div>
+        </dl>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>4 · Vigía de parámetros</h3>
+          <span class="agente__m">claude-haiku-4-5-20251001 · cron diario</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué hace</dt><dd>Revisa a diario las fuentes oficiales (SII para UF y UTM, Superintendencia de
+            Pensiones para topes y comisiones, la ley de reajuste para el ingreso mínimo) y detecta si cambió algo
+            respecto de la tabla <code>parametro</code>.</dd></div>
+          <div><dt>Herramientas</dt><dd><code>fetch_fuente(url)</code> · <code>get_parametro(clave)</code> ·
+            <code>abrir_ticket(cambio)</code></dd></div>
+          <div><dt>Guardarraíl</dt><dd><strong>No tiene permiso de escritura sobre <code>parametro</code>.</strong>
+            Sólo abre un ticket. Un humano confirma contra la fuente y recién ahí se actualiza, con fecha de vigencia.
+            Que un agente autónomo pueda cambiar el valor de la UTM en un sistema que calcula multas es exactamente el
+            tipo de automatización que suena eficiente y termina en juicio.</dd></div>
+        </dl>
+      </article>
+
+      <article class="agente">
+        <div class="agente__cab">
+          <h3>5 · Curador del corpus legal <span class="pill pill--nulo">fuera de producción</span></h3>
+          <span class="agente__m">claude-opus-4-8</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué hace</dt><dd>Corre en el pipeline interno, no en la aplicación. Cuando cambia una ley o sale un
+            dictamen relevante, propone los cambios al corpus de <code>regla</code>: qué plazos cambian, qué reglas
+            nuevas nacen, qué costos se recalculan.</dd></div>
+          <div><dt>Por qué Opus acá</dt><dd>Es el único lugar donde el costo por token no importa y el costo del error
+            es enorme. Corre unas pocas veces al mes sobre textos legales largos. <strong>Su salida nunca se despliega
+            sola:</strong> genera un pull request que el abogado con retainer revisa y firma. La columna
+            <code>revisado_por_abogado_at</code> bloquea el merge.</dd></div>
+        </dl>
+      </article>
+
+      <article class="agente agente--no">
+        <div class="agente__cab">
+          <h3>6 · El agente que no existe</h3>
+          <span class="agente__m">— deliberadamente ausente —</span>
+        </div>
+        <dl class="agente__g">
+          <div><dt>Qué haría</dt><dd>«Agente calculador de finiquitos». Le pasas el caso y te devuelve el monto y los
+            plazos. Es la primera cosa que cualquiera propondría en una reunión de producto, y es la razón por la que
+            este producto sería un pasivo en vez de un negocio.</dd></div>
+          <div><dt>Por qué no</dt><dd>Porque no es reproducible, no es auditable, no se puede testear con casos de
+            regresión y no se le puede pedir cuentas. <strong>Una indemnización por años de servicio es una
+            multiplicación, no una opinión.</strong> Si el día que nos demandan tenemos que explicar que el número
+            "lo dio el modelo", el juicio está perdido antes de empezar — y con razón.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================================================================ APIS -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">04 · APIs y servicios por contratar</div>
+      <h2 style="margin-bottom: var(--sp-2xs);">Y las dos incógnitas que hay que resolver antes de escribir código.</h2>
+      <p class="prose tenue" style="margin-bottom: var(--sp-m);">
+        Marco explícitamente lo que <strong>no sé</strong>. Estas dos primeras filas son riesgo técnico real, no un
+        detalle de implementación.
+      </p>
+
+      <div class="api">
+        <div class="api__f" style="background:var(--st-riesgo-bg)">
+          <span class="api__n">Previred</span>
+          <p class="api__d">
+            <strong>Incógnita técnica n.º 1.</strong> Necesitamos saber qué cotizaciones se declararon, cuáles se
+            pagaron y —sobre todo— <strong>cuáles fueron rechazadas</strong>, porque de ahí sale la Ley Bustos.
+            No me consta que Previred exponga una API pública para terceros. El camino realista probablemente sea que
+            el cliente suba el archivo de pago o el de rechazos, o una integración a través de su plataforma de
+            empresas. <strong>Hay que verificarlo con Previred antes de prometer la función estrella del producto.</strong>
+          </p>
+          <span class="api__e"><span class="cita cita--verificar">por verificar</span></span>
+        </div>
+
+        <div class="api__f" style="background:var(--st-riesgo-bg)">
+          <span class="api__n">Dirección del Trabajo · Mi DT</span>
+          <p class="api__d">
+            <strong>Incógnita técnica n.º 2.</strong> Mi DT permite registrar contratos y ratificar finiquitos
+            electrónicamente. Si tiene integración para terceros, el producto cierra el ciclo completo. Si no la tiene,
+            el flujo termina en "descarga el PDF y súbelo tú a Mi DT" — que sigue siendo útil, pero es un producto
+            peor. <strong>Verificar antes de diseñar el flujo de término.</strong>
+          </p>
+          <span class="api__e"><span class="cita cita--verificar">por verificar</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">SII · mindicador</span>
+          <p class="api__d">UF y UTM diarias/mensuales para la tabla <code>parametro</code>. Hay fuentes públicas y
+            gratuitas para esto; es la integración fácil.</p>
+          <span class="api__e"><span class="cita">gratis</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">Superintendencia<br>de Pensiones</span>
+          <p class="api__d">Comisiones de AFP, topes imponibles (AFP, salud, seguro de cesantía). Publicación periódica.
+            Probablemente scraping + confirmación humana, no API.</p>
+          <span class="api__e"><span class="cita cita--verificar">formato por ver</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">Firma electrónica<br>avanzada</span>
+          <p class="api__d">
+            Para que contratos y anexos se firmen sin imprimir. Proveedores chilenos con acreditación (tipo Acepta,
+            e-Sign, FirmaVirtual). <strong>Hay que verificar exactamente qué documentos laborales admiten firma
+            electrónica y con qué nivel</strong> — el finiquito, además, exige ratificación ante ministro de fe, que
+            es otra cosa. <span class="cita cita--norma">Art. 177 CT</span>
+          </p>
+          <span class="api__e"><span class="cita cita--verificar">alcance por validar</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">WhatsApp Business API</span>
+          <p class="api__d">Twilio o 360dialog. Es el canal donde el dueño de PYME sí lee. Las alertas de plazo
+            ("mañana vence el contrato de Fernanda") van por acá, no por correo.</p>
+          <span class="api__e"><span class="cita">~US$0,05/conv.</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">Transbank Webpay<br>· Flow · Khipu</span>
+          <p class="api__d">Suscripciones recurrentes en CLP. La comisión (~3,5%) está dentro del costo de servir que
+            <a href="negocio.html">Negocio</a> descuenta del margen.</p>
+          <span class="api__e"><span class="cita">~3,5%</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">AWS S3 · Postgres<br>· Cloudflare</span>
+          <p class="api__d">Documentos cifrados en reposo, región São Paulo o Chile. Postgres gestionado.
+            Sin datos de trabajadores saliendo de la región.</p>
+          <span class="api__e"><span class="cita">infra</span></span>
+        </div>
+
+        <div class="api__f">
+          <span class="api__n">API de Anthropic</span>
+          <p class="api__d">Los cuatro agentes de producción más el curador. Con caché de prompt sobre el corpus legal,
+            que es lo que hace viable el costo.</p>
+          <span class="api__e"><span class="cita">ver costo ↓</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================== COSTO -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">05 · Costo mensual, con la aritmética</div>
+      <h2 style="margin-bottom: var(--sp-2xs);">Este es el número que <a href="negocio.html">Negocio</a> descuenta del margen.</h2>
+      <p class="prose tenue" style="margin-bottom: var(--sp-m);">
+        Si estos dos números no cuadran entre las dos páginas, una de las dos está mintiendo. Cuadran.
+      </p>
+
+      <div class="calc">INFERENCIA DE IA · por cuenta, al mes
+<i>Supuesto de uso: una PYME de 15 trabajadores sube ~25 documentos al mes,
+genera ~8 documentos y hace ~10 preguntas al explicador.</i>
+
+Extractor · Haiku 4.5
+  25 docs × 6.000 tok entrada = 150.000 tok  × US$1/MTok  = US$0,150
+  25 docs ×   800 tok salida  =  20.000 tok  × US$5/MTok  = US$0,100
+                                                            ─────────
+                                                            US$0,250
+
+Redactor · Sonnet 5
+   8 docs × 4.000 tok entrada =  32.000 tok  × US$3/MTok  = US$0,096
+   8 docs × 1.200 tok salida  =   9.600 tok  × US$15/MTok = US$0,144
+                                                            ─────────
+                                                            US$0,240
+
+Explicador RAG · Sonnet 5
+  10 preg × 5.000 tok entrada =  50.000 tok  × US$3/MTok  = US$0,150
+  10 preg ×   600 tok salida  =   6.000 tok  × US$15/MTok = US$0,090
+                                                            ─────────
+                                                            US$0,240
+                                                          ═══════════
+  Subtotal de uso normal ................................. US$0,730
+
+  Caché de prompt sobre el corpus legal (se repite en cada
+  llamada del explicador y del redactor): −40% del input .. <b>US$0,550</b>
+
+  Evaluaciones de regresión, prorrateadas ................ US$0,350
+  <i>(cada vez que cambia una regla o un parámetro, se corre el corpus
+   completo de casos de prueba. Es caro y es innegociable.)</i>
+  Reintentos, validador post-hoc y picos de fin de mes ... US$0,400
+                                                          ═══════════
+  TOTAL POR CUENTA / MES ................................. <b>US$1,30</b>
+
+  × $950 CLP/US$ <i>(tipo de cambio referencial)</i> ............. <b>$1.235 CLP</b>
+  Redondeado con holgura en el modelo .................... <b>$1.400 CLP</b>
+
+<i>▲ Las tarifas por millón de tokens son las públicas de la API y hay que
+  verificarlas antes de comprometer un margen. El tipo de cambio también.</i></div>
+
+      <div class="calc" style="margin-top:var(--sp-s)">INFRAESTRUCTURA · en régimen (750 cuentas)
+
+  Postgres gestionado ...................... US$80/mes
+  Almacenamiento S3 + CDN .................. US$25/mes
+  Hosting de la aplicación ................. US$50/mes
+  Correo transaccional ..................... US$25/mes
+  Monitoreo y logs ......................... US$25/mes
+                                             ─────────
+  Fijo ..................................... US$205/mes ÷ 750 = US$0,27/cuenta
+  WhatsApp (4 alertas × US$0,05) ........... US$0,20/cuenta
+                                                            ─────────
+  TOTAL POR CUENTA / MES ................... US$0,47 = <b>$447 CLP</b>
+  Redondeado con holgura en el modelo ...... <b>$600 CLP</b></div>
+
+      <div class="calc" style="margin-top:var(--sp-s)">COSTO DE SERVIR COMPLETO · lo que Negocio descuenta
+
+  Inferencia de IA ......................... $1.400
+  Infraestructura .......................... $600
+  Pasarela de pago (3,5% de $46.000) ....... $1.610
+  Retainer del abogado laboral
+    $1.500.000/mes ÷ 750 cuentas ........... $2.000
+                                             ─────────
+  COGS EN RÉGIMEN .......................... <b>$5.610</b>
+
+  ARPU ..................................... $46.000
+  MARGEN BRUTO ............................. <b>87,8%</b>
+
+<i>▲ Al mes 24 hay 315 cuentas, no 750. El retainer se prorratea a $4.762
+  y el COGS real es $8.372 → margen 81,8%. Está dicho también en Negocio,
+  con el impacto en la caja. No lo escondemos en una nota al pie.</i></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ ENV -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">06 · Variables de entorno</div>
+      <h2 style="margin-bottom: var(--sp-m);">Lo que habría en el <span class="mono">.env</span>.</h2>
+
+      <div class="env"><i># ---- Modelos ----</i>
+ANTHROPIC_API_KEY=<b>sk-ant-...</b>
+MODELO_EXTRACTOR=<b>claude-haiku-4-5-20251001</b>
+MODELO_REDACTOR=<b>claude-sonnet-5</b>
+MODELO_EXPLICADOR=<b>claude-sonnet-5</b>
+MODELO_VIGIA=<b>claude-haiku-4-5-20251001</b>
+MODELO_CURADOR=<b>claude-opus-4-8</b>          <i># sólo en el pipeline interno</i>
+UMBRAL_CONFIANZA_EXTRACCION=<b>0.85</b>        <i># bajo esto, va a revisión humana</i>
+VALIDADOR_CIFRAS_ESTRICTO=<b>true</b>          <i># rechaza números no presentes en el input</i>
+
+<i># ---- Datos ----</i>
+DATABASE_URL=<b>postgres://...</b>
+S3_BUCKET=<b>contralta-documentos</b>
+S3_REGION=<b>sa-east-1</b>
+KMS_KEY_ID=<b>...</b>                          <i># cifrado en reposo de los documentos</i>
+
+<i># ---- Fuentes de parámetros (la tabla que salva el producto) ----</i>
+FUENTE_UF_UTM=<b>https://...</b>
+FUENTE_TOPES_IMPONIBLES=<b>https://...</b>
+FUENTE_COMISIONES_AFP=<b>https://...</b>
+FUENTE_FERIADOS=<b>https://...</b>
+PARAMETROS_REQUIEREN_CONFIRMACION_HUMANA=<b>true</b>   <i># innegociable</i>
+
+<i># ---- Integraciones por resolver ----</i>
+PREVIRED_MODO=<b>carga_archivo</b>             <i># hasta confirmar si hay API</i>
+MIDT_INTEGRACION=<b>false</b>                  <i># por verificar con la DT</i>
+FIRMA_ELECTRONICA_PROVEEDOR=<b>...</b>
+
+<i># ---- Canales ----</i>
+WHATSAPP_TOKEN=<b>...</b>
+WEBPAY_COMMERCE_CODE=<b>...</b>
+
+<i># ---- Cumplimiento del producto sobre sí mismo ----</i>
+ABOGADO_RETAINER_EMAIL=<b>...</b>              <i># a quién escala el explicador</i>
+BLOQUEAR_DESPLIEGUE_SIN_REVISION_LEGAL=<b>true</b></div>
+    </div>
+  </section>
+
+  <!-- =========================================================== FALSEADO -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">07 · Qué está falseado en el demo</div>
+      <h2 style="max-width: 26ch; margin-bottom: var(--sp-m);">Todo lo que el demo no es, dicho sin adornos.</h2>
+
+      <div class="falso">
+        <div class="falso__f">
+          <span style="color:var(--st-vencido)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <p><strong>No hay servidor, ni base de datos, ni login.</strong> Todo el estado vive en la memoria del
+            navegador. Si recargas la página, vuelve a empezar. Las diez tablas de arriba no existen en ninguna parte.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-vencido)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <p><strong>No hay una sola llamada a un modelo de IA.</strong> Cero. Todo lo que ves calculado en el demo lo
+            calcula <code class="mono">calculo.js</code>, que son 400 líneas de aritmética. Los cinco agentes descritos
+            arriba están documentados, no implementados.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-vencido)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <p><strong>No puedes subir un PDF.</strong> No hay OCR ni extracción documental. Los 15 trabajadores están
+            escritos a mano en el código.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-riesgo)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 3.6v4M7 10v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <p><strong>Los parámetros están cargados a mano.</strong> UF, UTM, ingreso mínimo, topes imponibles y
+            comisiones de AFP son valores referenciales escritos en <code class="mono">CL.PARAMS</code>. Están todos
+            marcados <span class="cita cita--verificar">por validar</span> dentro del propio demo, en la pestaña
+            Plazos. No inventamos precisión que no tenemos.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-riesgo)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 3.6v4M7 10v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <p><strong>Los feriados son una tabla escrita a mano para 2026 y 2027.</strong> En producción vienen de fuente
+            oficial. Un feriado que falta corre un plazo un día, y un día es la diferencia entre entregar a tiempo y no.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-riesgo)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 3.6v4M7 10v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <p><strong>Las multas son estimaciones dentro del rango legal</strong>, no montos reales. El rango
+            (1 a 10 UTM para pequeña empresa) está citado; el monto exacto lo fija un fiscalizador y nadie lo puede
+            predecir. Por eso el demo muestra rangos y lo dice.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-riesgo)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 3.6v4M7 10v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <p><strong>Los criterios interpretativos son interpretaciones.</strong> El cómputo de los días hábiles del
+            finiquito y el factor de conversión del feriado proporcional están marcados como
+            <span class="cita cita--verificar">por validar</span> en la interfaz — y lo están de verdad. El demo te
+            muestra las dos lecturas posibles del plazo justamente porque no vamos a fingir certeza donde no la hay.</p>
+        </div>
+        <div class="falso__f">
+          <span style="color:var(--st-ok)"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.4 7.2l1.8 1.8 3.4-3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg></span>
+          <p><strong>Lo que sí es real:</strong> la aritmética. Los años de servicio con la fracción sobre 6 meses, los
+            topes, la gratificación del art. 50, el valor de la hora extra con la jornada de 42, las cotizaciones, el
+            calendario de días hábiles y la validación de RUT con módulo 11 (los RUT del demo son sintéticos, pero
+            <em>todos tienen dígito verificador correcto</em>). Ese motor es el que iría a producción tal cual.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= DOMINIO -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">08 · Dominio</div>
+      <h2 style="margin-bottom: var(--sp-m);">Evidencia de disponibilidad.</h2>
+
+      <div class="calc">$ ./_kit/check-domain.sh contralta finiquita reglaria cauteo
+
+contralta              .com <b>AVAILABLE</b>          (http <b>404</b>)   .cl <b>AVAILABLE</b>
+finiquita              .com AVAILABLE          (http 404)   .cl AVAILABLE
+reglaria               .com AVAILABLE          (http 404)   .cl AVAILABLE
+cauteo                 .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+$ curl -s -o /dev/null -w 'HTTP %{http_code}' \
+    https://rdap.verisign.com/com/v1/domain/contralta.com
+HTTP <b>404</b>
+
+<i>RDAP de Verisign es la fuente autoritativa para .com:
+  404 = el dominio no está registrado (disponible)
+  200 = tomado
+Verificado el 13 de julio de 2026. .cl consultado en NIC Chile.</i>
+
+ELEGIDO ....... <b>contralta.com</b>   <i>(y contralta.cl, también libre)</i>
+ALTERNATIVAS .. finiquita.com · reglaria.com · cauteo.com</div>
+
+      <div class="ficha" style="margin-top:var(--sp-m); max-width:var(--measure)">
+        <div class="rotulo" style="margin-bottom:0.5rem">Por qué "Contralta"</div>
+        <p class="chico tenue" style="line-height:1.7">
+          Tres palabras adentro de una: <strong>contra</strong>to, dar de <strong>alta</strong> a un trabajador (el
+          verbo que ya usan en Previred), y <strong>contralor</strong>ía —la idea de fiscalización. Suena institucional
+          y serio, que es exactamente el registro que necesita un producto que te dice cuánto te va a costar una multa.
+          Está acuñado, se pronuncia en un golpe y no significa nada más en castellano.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div>
+      <a class="marca" href="index.html" style="margin-bottom:0.6rem">
+        <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+          <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+        Contralta
+      </a>
+      <p style="max-width:34ch">Cumplimiento laboral para PYMEs chilenas.</p>
+      <p class="mono chico" style="margin-top:0.8rem; color:#71757E">contralta.com · RDAP 404 · prototipo 2026</p>
+    </div>
+    <div>
+      <h4>Sitio</h4>
+      <ul>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Costo de servir</h4>
+      <ul>
+        <li>Inferencia $1.400</li>
+        <li>Infra $600</li>
+        <li>Pasarela $1.610</li>
+        <li>Abogado $2.000</li>
+        <li><strong>COGS $5.610</strong></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('hamb'), m = document.getElementById('menu');
+  b.addEventListener('click', function () {
+    var ab = b.getAttribute('aria-expanded') === 'true';
+    b.setAttribute('aria-expanded', String(!ab));
+    m.setAttribute('data-abierto', String(!ab));
+  });
+})();
+</script>
+</body>
+</html>

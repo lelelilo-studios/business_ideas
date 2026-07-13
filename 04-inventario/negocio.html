@@ -200,12 +200,12 @@
           <tr><th scope="row">TAM · universo</th><td class="num">81.000</td><td class="num">$82.620.000.000</td><td>—</td></tr>
           <tr><th scope="row">Con detalle por producto</th><td class="num">44.550</td><td class="num">$45.441.000.000</td><td>× 55%</td></tr>
           <tr><th scope="row">SAM · sobre $4M en insumos</th><td class="num">17.820</td><td class="num">$18.176.400.000</td><td>× 40%</td></tr>
-          <tr><th scope="row">SOM mes 24 (caso base)</th><td class="num">380</td><td class="num">$387.600.000</td><td>2,1% del SAM</td></tr>
+          <tr><th scope="row">SOM mes 24 (caso base)</th><td class="num">359</td><td class="num">$366.180.000</td><td>2,0% del SAM</td></tr>
           <tr><th scope="row">SOM año 5 (ambición)</th><td class="num">1.500</td><td class="num">$1.530.000.000</td><td>8,4% del SAM</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="pie-gfx">El SOM del mes 24 (380 locales) es el <b>caso base</b> del <a href="roadmap.html">roadmap</a>, y ahí está su derivación: tasa de cierre, ticket y churn declarados. El SOM de año 5 es una <b class="acento">ambición</b>, no un pronóstico.</p>
+    <p class="pie-gfx">El SOM del mes 24 (359 locales, MRR $30,5M) es el <b>caso base</b> del <a href="roadmap.html">roadmap</a>, y ahí está su derivación: tasa de cierre, nuevos por mes y churn declarados. El SOM de año 5 es una <b class="acento">ambición</b>, no un pronóstico.</p>
   </div>
 
   <div class="ficha nota nota-b" style="margin-top: var(--sp-s);">
@@ -389,7 +389,7 @@
   </div>
 
   <div class="ficha nota nota-b" style="margin-top: var(--sp-s);">
-    <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">La puesta en marcha ($190.000) no es margen, es costo recuperado.</b> Levantar recetas y proveedores toma ~6 horas de una persona ($140.000 cargado) más ~$20.000 de inferencia intensiva en el primer procesamiento de 12 meses de DTE. Cobrarla al costo hace dos cosas: filtra al curioso que nunca iba a comprar, y nos deja el CAC más limpio. No la usamos para inflar el margen bruto.</p>
+    <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">La puesta en marcha ($190.000) no es margen, es costo recuperado.</b> Levantar recetas y proveedores toma ~6 horas de una persona ($140.000 cargado) más <a href="stack.html#costos">$14.000 de inferencia</a> en el primer procesamiento de 12 meses de DTE. Cobrarla al costo hace dos cosas: filtra al curioso que nunca iba a comprar, y nos deja el CAC más limpio. No la usamos para inflar el margen bruto.</p>
   </div>
 </section>
 
@@ -627,7 +627,7 @@
     { n: 'Con detalle por producto',  v: 44550, c: '#4a8cb0', nota: '× 55% — el filtro duro' },
     { n: 'SAM · sobre $4M insumos',   v: 17820, c: '#1f6f99', nota: '× 40% — bajo eso el ROI no da' },
     { n: 'SOM año 5 · ambición',      v:  1500, c: '#0d5479', nota: '8,4% del SAM' },
-    { n: 'SOM mes 24 · caso base',    v:   380, c: '#08374f', nota: '2,1% del SAM · ver roadmap' }
+    { n: 'SOM mes 24 · caso base',    v:   359, c: '#08374f', nota: '2,0% del SAM · ver roadmap' }
   ];
   function num(n) { var s = String(n), o = '', c = 0;
     for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; } return o; }
@@ -653,7 +653,7 @@
       g.push('<text class="etiq" x="' + (m.l + an + 8) + '" y="' + (y + h / 2 + 4) + '">' + num(e.v) + '</text>');
     });
     g.push('<line class="base" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (m.t + ETAPAS.length * alto - (alto - 16)) + '"/>');
-    g.push('<text class="eje" x="' + m.l + '" y="' + (H - 8) + '" style="font-family:var(--sans)">Escala de potencia (0,42) — si fuera lineal, los 380 del caso base no se verían.</text>');
+    g.push('<text class="eje" x="' + m.l + '" y="' + (H - 8) + '" style="font-family:var(--sans)">Escala de potencia (0,42) — si fuera lineal, los 359 del caso base no se verían.</text>');
     g.push('</svg>');
     host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
 
