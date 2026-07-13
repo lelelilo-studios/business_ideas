@@ -7,30 +7,74 @@
 <meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="_kit/reset.css">
 <link rel="stylesheet" href="_kit/tokens.css">
 <style>
 /* ------------------------------------------------------------------
    Dirección de arte del hub: "sala de control", deliberadamente opuesta
-   a las diez ideas. Casi todas eligieron papel crema; si el índice fuera
-   papel también, el conjunto se leería como un solo sitio de 50 páginas.
-   Acá: tinta oscura, retícula técnica, mono para los datos duros, y el
+   a las quince ideas. Casi todas eligieron papel claro; si el índice fuera
+   papel también, el conjunto se leería como un solo sitio de 75 páginas.
+   Acá: tinta oscura, retícula técnica, mono para todo dato duro, y el
    acento de cada idea usado como su única firma de color.
+
+   Lo que cambia en esta versión, y por qué:
+
+   1. LAS DOS FAMILIAS SON DOS PIEZAS DISTINTAS, no dos títulos. Cada una es
+      una banda a sangre completa con su propio suelo: PYME en tinta cálida
+      (#12100E), Minería en grafito frío (#0A0F14 — el mismo grafito que
+      eligieron por su cuenta las ideas de faena). El ojo registra el cambio
+      de temperatura antes de leer el encabezado. Además cambia la densidad:
+      PYME va a dos columnas de tarjetas medianas (son diez, ticket bajo,
+      se escanean); Minería va a una columna de tarjetas anchas y con aire
+      (son cinco, ticket alto, pesan). La diferencia de familia es estructural.
+
+   2. LAS TARJETAS SON OBJETOS, NO UNA LOSA. Antes eran filas pegadas con un
+      filete de 1px compartido. Ahora cada una es un panel con borde, fondo
+      propio, su lomo en el acento de la idea y un hueco real alrededor.
+
+   3. JERARQUÍA DE LOS CINCO ENLACES, en tres niveles:
+        · Demo      → botón sólido en el acento. Es lo que la gente quiere tocar.
+        · Producto  → la tarjeta entera es el enlace (más el título de la marca).
+        · Negocio / Roadmap / Arquitectura → fila de expediente, mono, discreta.
+      Los cinco siguen ahí; dejaron de valer lo mismo.
+
+   4. CONTRASTE. Los acentos oscuros de PYME (#A81E12, #14624A…) daban 2,5:1
+      sobre la tinta. El generador deriva un acento del mismo tono que cruza
+      4,6:1. Ver accent_safe() en build-hub.py.
    ------------------------------------------------------------------ */
 :root {
-  --ink:#100F0E; --ink-2:#181614; --line:#2E2A26;
-  --paper:#EDE7DE; --mute:#9A9088; --mute-2:#6E655E;
+  --ink:#0B0A09;          /* suelo del masthead y del colofón */
+  --paper:#EDE7DE;
+  --mute:#9A9088;
+  --mute-2:#8A7F76;
+  --line:#2E2A26;
+  --hair:#1E1B18;
+  --sig:#EDE7DE;          /* color de señal de la sección actual */
+  --bg:var(--ink);
+  --card:#141210;
 }
+
+html { scroll-behavior:smooth; }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
 body {
   background:var(--ink); color:var(--paper);
   font-family:'Space Grotesk',system-ui,sans-serif;
   font-size:var(--step-0);
 }
 .mono { font-family:'JetBrains Mono',ui-monospace,monospace; }
+:focus-visible { outline:2px solid var(--sig); outline-offset:2px; }
 
-/* -- masthead -- */
-.masthead { padding-block:var(--sp-xl) var(--sp-l); border-bottom:1px solid var(--line); }
+.skip {
+  position:absolute; left:var(--sp-s); top:var(--sp-s); z-index:10;
+  background:var(--paper); color:var(--ink); padding:var(--sp-2xs) var(--sp-s);
+  text-decoration:none; transform:translateY(-200%);
+}
+.skip:focus { transform:none; }
+
+/* ============================================================== masthead === */
+.masthead { padding-block:var(--sp-xl) var(--sp-l); }
 .eyebrow {
   font-family:'JetBrains Mono',monospace; font-size:var(--step--1);
   letter-spacing:.14em; text-transform:uppercase; color:var(--mute-2);
@@ -43,101 +87,243 @@ body {
 .masthead h1 em { font-style:normal; color:var(--mute); }
 .lede { font-size:var(--step-1); color:var(--mute); max-width:56ch; text-wrap:pretty; }
 
-/* -- nota -- */
+/* -- el atajo a las dos familias: la única navegación de la página -- */
+.jump {
+  margin-top:var(--sp-l);
+  display:grid; gap:var(--sp-2xs);
+  border-top:1px solid var(--line);
+  padding-top:var(--sp-m);
+}
+.jump a {
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+  gap:var(--sp-s); min-height:56px; padding:var(--sp-2xs) var(--sp-s);
+  text-decoration:none; border:1px solid var(--line); background:var(--hair);
+  transition:border-color .15s ease, background .15s ease;
+}
+.jump a:hover { border-color:var(--mute); background:#17140F; }
+.jump a:nth-child(2):hover { background:#0F1720; }
+.jump__n { font-size:var(--step-2); font-weight:700; color:var(--paper); line-height:1; }
+.jump__t { font-weight:500; }
+.jump__t small {
+  display:block; color:var(--mute); font-weight:400;   /* mute-2 no cruza AA sobre --hair */
+  font-size:var(--step--1); margin-top:.15em;
+}
+.jump svg { color:var(--mute-2); flex:none; }
+.jump a:hover svg { color:var(--paper); }
+
+/* ================================================================= aviso === */
 .note {
-  margin-block:var(--sp-l); padding:var(--sp-m); background:var(--ink-2);
-  border-left:2px solid var(--line);
+  margin-block:var(--sp-l) var(--sp-2xl);
+  display:grid; gap:1px; background:var(--line);
+  border:1px solid var(--line);
 }
-.note p { color:var(--mute); max-width:var(--measure); }
-.note p + p { margin-top:var(--sp-s); }
-.note strong { color:var(--paper); font-weight:500; }
+.note > div { background:var(--ink); padding:var(--sp-m); }
+.note h2 {
+  font-family:'JetBrains Mono',monospace; font-size:var(--step--1); font-weight:500;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--paper);
+  padding-bottom:var(--sp-2xs); margin-bottom:var(--sp-2xs);
+  border-bottom:1px solid var(--line);
+}
+.note p { color:var(--mute); font-size:var(--step--1); line-height:1.65; }
+.note em { font-style:normal; color:var(--paper); }
 
-/* -- familia (PYME / Minería) -- */
-.fam { margin-block:var(--sp-2xl); }
+/* =============================================================== familia === */
+/* Cada familia es una banda a sangre completa con su propio suelo. El cambio
+   de temperatura (tinta cálida → grafito frío) es lo que avisa que entraste
+   a otra pieza, antes de que leas nada. */
+.fam { position:relative; background:var(--bg); border-top:1px solid var(--line); }
+.fam > .container { position:relative; z-index:1; }
+/* retícula técnica: sólo se ve en el encabezado, las tarjetas la tapan */
+.fam::before {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+  background-size:5rem 100%;
+  -webkit-mask-image:linear-gradient(to bottom, #000 0, transparent 22rem);
+  mask-image:linear-gradient(to bottom, #000 0, transparent 22rem);
+}
+.fam--pyme {
+  --bg:#12100E; --card:#191612; --line:#2E2A26; --hair:#221E1A;
+  --mute:#9A9088; --mute-2:#8A7F76; --sig:#EDE7DE;
+}
+.fam--mineria {
+  --bg:#0A0F14; --card:#111922; --line:#26333D; --hair:#161F27;
+  --mute:#93A1AB; --mute-2:#758590; --sig:#B9CBD6;
+}
+
 .fam__head {
-  display:grid; grid-template-columns:1fr auto; align-items:baseline;
-  gap:var(--sp-s); padding-bottom:var(--sp-s);
-  border-bottom:2px solid var(--paper);
+  padding-block:var(--sp-2xl) var(--sp-xl);
+  display:grid; grid-template-columns:1fr auto; align-items:start;
+  column-gap:var(--sp-s);
 }
-.fam__head h2 {
-  font-size:var(--step-3); font-weight:700; letter-spacing:-.02em;
-  grid-column:1;
+.fam__kicker {
+  grid-column:1 / -1;
+  display:flex; align-items:center; gap:var(--sp-2xs);
+  font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--mute-2);
 }
-.fam__head p {
-  grid-column:1; grid-row:2; color:var(--mute); max-width:62ch;
-  font-size:var(--step--1); line-height:1.6; margin-top:var(--sp-2xs);
+.fam__tick {
+  width:1.75rem; height:.5rem; background:var(--sig); flex:none;
 }
-.fam__n {
-  grid-column:2; grid-row:1; color:var(--mute-2); font-size:var(--step-2);
+.fam--mineria .fam__tick {
+  background:repeating-linear-gradient(90deg, var(--sig) 0 3px, transparent 3px 6px);
+}
+.fam__title {
+  grid-column:1; font-size:var(--step-4); font-weight:700; letter-spacing:-.03em;
+  color:var(--paper); margin-top:var(--sp-xs); line-height:1;
+}
+.fam__count {
+  grid-column:2; grid-row:2; text-align:right; color:var(--mute-2);
+  line-height:1; margin-top:var(--sp-xs);
+}
+.fam__count b { display:block; font-size:var(--step-3); font-weight:700; color:var(--sig); }
+.fam__count span { font-size:var(--step--1); letter-spacing:.1em; text-transform:uppercase; }
+.fam__lede {
+  grid-column:1 / -1; color:var(--mute); max-width:60ch;
+  margin-top:var(--sp-s); font-size:var(--step-1); line-height:1.5; text-wrap:pretty;
+}
+/* la ficha de la familia: acá es donde la diferencia PYME/minería se hace dato */
+.fam__facts {
+  grid-column:1 / -1; margin-top:var(--sp-l);
+  border-top:1px solid var(--line);
+  display:grid; gap:1px; background:var(--line);
+  border-bottom:1px solid var(--line);
+}
+.fam__facts > div { background:var(--bg); padding:var(--sp-s) 0; }
+.fam__facts dt {
+  font-size:var(--step--1); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--mute-2);
+}
+.fam__facts dd {
+  font-family:'Space Grotesk',sans-serif; color:var(--paper);
+  font-size:var(--step--1); line-height:1.5; margin-top:.25em; max-width:34ch;
 }
 
-/* -- grilla: móvil primero, una columna -- */
-.grid {
-  list-style:none; display:grid; gap:1px;
-  background:var(--line); border-bottom:1px solid var(--line);
+/* ================================================================ tarjeta === */
+/* Ya no es una losa: cada idea es un panel con borde, fondo y hueco propios. */
+.ideas {
+  display:grid; gap:var(--sp-s);
+  padding-bottom:var(--sp-2xl);
 }
 .idea {
-  position:relative; background:var(--ink);
-  display:grid; grid-template-columns:auto 1fr; gap:var(--sp-s);
-  padding:var(--sp-m) var(--gutter);
-  transition:background .18s ease;
+  position:relative; isolation:isolate;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:3px solid var(--acc);      /* el lomo: la firma de la idea */
+  display:grid; grid-template-columns:auto 1fr;
+  column-gap:var(--sp-s); row-gap:var(--sp-s);
+  padding:var(--sp-m) var(--sp-s) var(--sp-s);
+  transition:border-color .18s ease, background .18s ease, transform .18s ease;
 }
-.idea:hover, .idea:focus-within { background:var(--ink-2); }
-/* la tarjeta entera es clickeable, pero los enlaces de abajo siguen siendo
-   targets reales: el hit va detrás (z-index 0) y los links delante (z-index 1) */
+.idea:hover, .idea:focus-within {
+  background:var(--acc-soft); border-color:var(--acc-line); border-left-color:var(--acc);
+}
+/* el anillo de foco dentro de una tarjeta se tiñe con el acento de esa idea */
+.idea :focus-visible { outline:2px solid var(--acc); outline-offset:2px; }
+/* la tarjeta entera lleva a Producto; el pie va por encima con sus propios enlaces */
 .idea__hit { position:absolute; inset:0; z-index:0; }
-.idea__hit:focus-visible { outline:2px solid var(--accent); outline-offset:-4px; }
 
 .idea__num {
-  font-family:'JetBrains Mono',monospace; font-size:var(--step-1); font-weight:500;
-  color:var(--accent); line-height:1.1; padding-top:.15em;
+  grid-column:1; grid-row:1;
+  font-size:var(--step-1); font-weight:700; color:var(--acc);
+  line-height:1; padding-top:.15em; letter-spacing:-.02em;
 }
-.idea__brand { font-size:var(--step-2); font-weight:700; letter-spacing:-.02em; }
+.idea__head { grid-column:2; grid-row:1; min-width:0; }
+.idea__cat {
+  font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--mute-2); line-height:1.4;
+}
+.idea__brand {
+  font-size:var(--step-2); font-weight:700; letter-spacing:-.02em;
+  line-height:1.1; margin-top:.15em;
+}
+/* el padding/margen negativo sube el área táctil a 44px sin mover el layout */
+.idea__brand a {
+  display:inline-block; text-decoration:none;
+  padding-block:.62rem; margin-block:-.62rem;
+}
+.idea:hover .idea__brand a {
+  text-decoration:underline; text-decoration-color:var(--acc);
+  text-decoration-thickness:2px; text-underline-offset:4px;
+}
 .idea__domain {
-  font-family:'JetBrains Mono',monospace; font-size:var(--step--1);
-  color:var(--mute-2); margin-top:.15em;
+  font-size:var(--step--1); color:var(--mute-2); margin-top:.3em;
   display:flex; align-items:center; gap:var(--sp-2xs); flex-wrap:wrap;
 }
 .idea__free {
-  color:var(--accent); border:1px solid currentColor; border-radius:2px;
-  padding:.1em .4em; font-size:.85em; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--acc); border:1px solid currentColor;
+  padding:.15em .4em; font-size:.72rem; line-height:1;
+  letter-spacing:.08em; text-transform:uppercase;
 }
+/* sólo en minería: el mercado, porque el TAM chileno es chico y la plata está afuera */
+.idea__ext {
+  margin-top:var(--sp-m); padding-top:var(--sp-s);
+  border-top:1px solid var(--line);
+}
+.idea__ext dt {
+  font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--mute-2);
+}
+.idea__ext dd {
+  font-size:var(--step--1); color:var(--mute); margin-top:.35em; line-height:1.5;
+}
+
+.idea__pitch { grid-column:1 / -1; grid-row:2; min-width:0; }
 .idea__tagline {
-  font-size:var(--step-1); margin-top:var(--sp-s); text-wrap:pretty;
-  max-width:48ch;
+  font-size:var(--step-1); line-height:1.35; text-wrap:pretty; max-width:44ch;
 }
 .idea__problem {
   color:var(--mute); margin-top:var(--sp-2xs); max-width:60ch;
   font-size:var(--step--1); line-height:1.6;
 }
-.idea__meta {
-  margin-top:var(--sp-m); display:grid; gap:var(--sp-2xs);
+
+/* -- el pie: acá vive la jerarquía de los cinco enlaces -- */
+.idea__foot {
+  grid-column:1 / -1; grid-row:3; position:relative; z-index:1;
+  margin-top:auto; padding-top:var(--sp-s);
+  border-top:1px solid var(--line);
+  display:grid; gap:var(--sp-s);
+}
+.idea__price {
+  font-size:var(--step--1); color:var(--paper); font-weight:500;
+  display:flex; align-items:baseline; gap:var(--sp-2xs); flex-wrap:wrap;
+}
+.idea__more {
+  color:var(--mute-2); font-weight:400; font-size:.72rem;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+/* Nivel 1: el demo. Sólido, en el acento, con flecha. Es lo que se toca. */
+.idea__demo {
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--sp-2xs);
+  min-height:48px; padding-inline:var(--sp-m);
+  background:var(--acc); color:var(--acc-on);
+  font-weight:700; font-size:var(--step-0); letter-spacing:-.01em;
+  text-decoration:none; border:1px solid var(--acc);
+  transition:background .15s ease, color .15s ease;
+}
+.idea__demo:hover { background:transparent; color:var(--acc); }
+.idea__arrow { transition:transform .18s ease; }
+.idea__demo:hover .idea__arrow { transform:translateX(3px); }
+@media (prefers-reduced-motion:reduce) {
+  .idea__demo:hover .idea__arrow { transform:none; }
+}
+/* Nivel 3: el expediente. Mono, discreto, sin caja. No compite con el demo. */
+.idea__docs {
+  display:flex; flex-wrap:wrap; align-items:center;
+  column-gap:var(--sp-s); row-gap:0;
   font-size:var(--step--1);
 }
-.idea__meta > div { display:grid; grid-template-columns:6.5rem 1fr; gap:var(--sp-2xs); }
-.idea__meta dt {
-  font-family:'JetBrains Mono',monospace; color:var(--mute-2);
-  font-size:.85em; letter-spacing:.06em; text-transform:uppercase; padding-top:.25em;
+.idea__docs a {
+  display:inline-flex; align-items:center; min-height:44px;
+  color:var(--mute); text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:color .15s ease, border-color .15s ease;
 }
-.idea__meta dd { color:var(--paper); }
+.idea__docs a:hover { color:var(--paper); border-bottom-color:var(--acc); }
 
-.idea__links {
-  position:relative; z-index:1;
-  margin-top:var(--sp-m); display:flex; flex-wrap:wrap; gap:var(--sp-2xs);
-}
-.idea__links a {
-  display:inline-flex; align-items:center; min-height:44px; padding-inline:var(--sp-xs);
-  border:1px solid var(--line); border-radius:2px;
-  font-size:var(--step--1); text-decoration:none; color:var(--mute);
-  transition:border-color .15s ease, color .15s ease;
-}
-.idea__links a:hover { border-color:var(--accent); color:var(--paper); }
-.idea__links a.is-demo { color:var(--paper); border-color:var(--accent); }
-.idea__links a.is-demo:hover { background:var(--accent); color:var(--ink); }
-
-/* -- colofón -- */
+/* ================================================================ colofón === */
 .colofon {
-  border-top:1px solid var(--line); padding-block:var(--sp-xl) var(--sp-2xl);
+  background:var(--ink);
+  border-top:1px solid var(--line);
+  padding-block:var(--sp-xl) var(--sp-2xl);
   color:var(--mute-2); font-size:var(--step--1);
 }
 .colofon h2 {
@@ -149,409 +335,591 @@ body {
 .colofon p + p { margin-top:var(--sp-s); }
 .colofon a { color:var(--paper); text-decoration-color:var(--mute-2); text-underline-offset:3px; }
 
-/* -- tablet -- */
+/* ================================================================= tablet === */
 @media (min-width:48em) {
-  .idea { grid-template-columns:4rem 1fr; padding:var(--sp-l) var(--gutter); }
+  .jump { grid-template-columns:1fr 1fr; gap:var(--sp-s); }
+  .note { grid-template-columns:repeat(3,1fr); }
+  .fam__facts { grid-template-columns:repeat(2,1fr); column-gap:1px; }
+  .fam__facts > div { padding:var(--sp-s) var(--sp-m) var(--sp-s) 0; }
+  .fam__facts > div:nth-child(2n) { padding-left:var(--sp-m); }
+
+  .idea { padding:var(--sp-m) var(--sp-m) var(--sp-m); column-gap:var(--sp-m); }
   .idea__num { font-size:var(--step-2); }
-  .idea__meta > div { grid-template-columns:7rem 1fr; }
+  .idea__pitch { grid-column:2; }
+  .idea__foot {
+    grid-column:2;
+    grid-template-columns:1fr auto; align-items:center;
+  }
+  .idea__price { grid-column:1; grid-row:1; }
+  .idea__demo { grid-column:2; grid-row:1; }
+  .idea__docs { grid-column:1 / -1; grid-row:2; }
 }
-/* -- desktop: dos columnas, porque el problema de cada idea merece leerse -- */
+
+/* ================================================================ desktop === */
+@media (min-width:64em) {
+  .fam__facts { grid-template-columns:repeat(4,1fr); }
+  .fam__facts > div { padding:var(--sp-s) var(--sp-m); }
+  .fam__facts > div:first-child { padding-left:0; }
+  .fam__facts > div:nth-child(2n) { padding-left:var(--sp-m); }
+
+  /* PYME: diez tarjetas medianas, a dos columnas — se escanean. */
+  .fam--pyme .ideas { grid-template-columns:1fr 1fr; gap:var(--sp-m); }
+  .fam--pyme .idea { display:flex; flex-direction:column; }
+  .fam--pyme .idea__num {
+    position:absolute; top:var(--sp-m); right:var(--sp-m);
+    font-size:var(--step-2); color:var(--acc); opacity:.55;
+  }
+  .fam--pyme .idea__head { padding-right:3rem; }
+
+  /* Minería: cinco tarjetas anchas, a dos columnas internas y con aire — pesan. */
+  .fam--mineria .ideas { gap:var(--sp-m); }
+  .fam--mineria .idea {
+    grid-template-columns:5rem minmax(0,.85fr) minmax(0,1.15fr);
+    column-gap:var(--sp-xl);
+    padding:var(--sp-l) var(--sp-l) var(--sp-m);
+  }
+  .fam--mineria .idea__num { font-size:var(--step-3); }
+  .fam--mineria .idea__head { grid-column:2; grid-row:1; }
+  .fam--mineria .idea__pitch { grid-column:3; grid-row:1; }
+  .fam--mineria .idea__tagline { font-size:var(--step-2); letter-spacing:-.02em; }
+  .fam--mineria .idea__foot { grid-column:2 / -1; grid-row:2; }
+}
+
 @media (min-width:75em) {
-  .grid { grid-template-columns:1fr 1fr; }
+  .fam--mineria .idea { grid-template-columns:6rem minmax(0,.8fr) minmax(0,1.2fr); }
 }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <header class="masthead">
+<a class="skip" href="#pyme">Saltar al índice de ideas</a>
+
+<header class="masthead">
+  <div class="container">
     <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>15 ideas</span><span>·</span><span>2026</span></p>
     <h1>Quince negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
     <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería— con
       un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
       arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
-  </header>
 
-  <div class="note">
-    <p><strong>Nada de esto está conectado a nada.</strong> No hay base de datos, ni agentes de IA
-      corriendo, ni APIs contratadas. Los demos funcionan con datos falsos —creíbles, pero falsos— y
-      cada idea documenta en su página de <em>Arquitectura</em> exactamente qué habría que configurar,
-      cuánto costaría al mes y qué parte está fingida.</p>
-    <p><strong>Los quince dominios están verificados como libres</strong> al 13 de julio de 2026
-      (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para <span class="mono">.cl</span>).
-      Eso caduca: si vas a usar uno, verifícalo de nuevo antes de comprarlo.</p>
-    <p><strong>Los números son estimaciones, y se muestran con su aritmética.</strong> Ninguna idea
-      afirma un tamaño de mercado sin decir de dónde lo sacó, y ninguna promete un éxito seguro:
-      varias concluyen, en su propio roadmap, que el escenario base no cruza punto de equilibrio
-      en 24 meses.</p>
+    <nav class="jump" aria-label="Las dos familias">
+      <a href="#pyme">
+        <span class="jump__n mono">10</span>
+        <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+      <a href="#mineria">
+        <span class="jump__n mono">05</span>
+        <span class="jump__t">Minería<small>Ticket alto · decide operaciones · venta en 12-18 meses</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+    </nav>
+
+    <div class="note">
+      <div>
+        <h2>Sin conexión</h2>
+        <p><em>Nada de esto está conectado a nada.</em> No hay base de datos, ni agentes de IA
+          corriendo, ni APIs contratadas. Los demos funcionan con datos falsos —creíbles, pero
+          falsos— y cada idea documenta en su <em>Arquitectura</em> qué habría que configurar,
+          cuánto costaría al mes y qué parte está fingida.</p>
+      </div>
+      <div>
+        <h2>Dominios</h2>
+        <p><em>Los quince dominios están verificados como libres</em> al 13 de julio de 2026
+          (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
+          <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
+          antes de comprarlo.</p>
+      </div>
+      <div>
+        <h2>Números</h2>
+        <p><em>Son estimaciones, y se muestran con su aritmética.</em> Ninguna idea afirma un
+          tamaño de mercado sin decir de dónde lo sacó, y ninguna promete éxito: varias concluyen,
+          en su propio roadmap, que el escenario base no cruza punto de equilibrio en 24 meses.</p>
+      </div>
+    </div>
   </div>
+</header>
 
-  <main class="grid">
+<main>
 
-  <section class="fam">
-    <header class="fam__head">
-      <h2>PYME chilena</h2>
-      <p>El comprador es la dueña que contesta el WhatsApp mientras atiende. Ticket bajo, venta rápida, y un competidor que casi siempre es Excel o un cuaderno.</p>
-      <span class="fam__n mono">10</span>
-    </header>
-    <div class="grid">
+    <section class="fam fam--pyme" id="pyme" aria-labelledby="h-pyme">
+      <div class="container">
+        <header class="fam__head">
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 01 de 2</p>
+          <h2 class="fam__title" id="h-pyme">PYME chilena</h2>
+          <p class="fam__count mono"><b>10</b><span>ideas</span></p>
+          <p class="fam__lede">Diez problemas que hoy se resuelven en Excel, en un cuaderno o no se resuelven. Se venden solos: la dueña prueba el demo y decide.</p>
+          <dl class="fam__facts mono"><div><dt>Comprador</dt><dd>La dueña. Contesta el WhatsApp mientras atiende el mesón.</dd></div><div><dt>Ticket</dt><dd>Decenas de miles de pesos al mes.</dd></div><div><dt>Ciclo de venta</dt><dd>Días o semanas. Sin comité, sin procurement.</dd></div><div><dt>El rival real</dt><dd>Excel, un cuaderno, o simplemente nada.</dd></div></dl>
+        </header>
+        <div class="ideas">
 
-    <article class="idea" style="--accent:#C0362C">
-      <a class="idea__hit" href="01-licitaciones/index.html" aria-labelledby="t01"></a>
-      <div class="idea__num">01</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t01">Adjudate</h2>
-        <p class="idea__domain">adjudate.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">Deja de perder licitaciones por el Anexo N°4.</p>
-        <p class="idea__problem">Miles de licitaciones abiertas en Mercado Público, y la PYME que podría ganarlas ni las ve; cuando postula, la eliminan por un anexo que faltaba o un plazo que se le pasó.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>SaaS vertical · Compras públicas</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm (Perú, Colombia, México, Brasil)</dd></div>
-          <div><dt>Precio</dt><dd>Desde $59.000/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Adjudate">
-          <a href="01-licitaciones/index.html">Producto</a>
-          <a href="01-licitaciones/demo/index.html" class="is-demo">Demo</a>
-          <a href="01-licitaciones/negocio.html">Negocio</a>
-          <a href="01-licitaciones/roadmap.html">Roadmap</a>
-          <a href="01-licitaciones/stack.html">Arquitectura</a>
-        </nav>
+      <article class="idea" style="--acc:#D7584F;--acc-on:#0B0A09;--acc-soft:rgba(215,88,79,0.1);--acc-line:rgba(215,88,79,0.35)">
+        <a class="idea__hit" href="01-licitaciones/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">01</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">SaaS vertical · Compras públicas</p>
+          <h3 class="idea__brand"><a href="01-licitaciones/index.html">Adjudate</a></h3>
+          <p class="idea__domain mono">adjudate.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Deja de perder licitaciones por el Anexo N°4.</p>
+          <p class="idea__problem">Miles de licitaciones abiertas en Mercado Público, y la PYME que podría ganarlas ni las ve; cuando postula, la eliminan por un anexo que faltaba o un plazo que se le pasó.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $59.000/mes</p>
+          <a class="idea__demo" href="01-licitaciones/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Adjudate">
+            <a href="01-licitaciones/index.html">Producto</a>
+            <a href="01-licitaciones/negocio.html">Negocio</a>
+            <a href="01-licitaciones/roadmap.html">Roadmap</a>
+            <a href="01-licitaciones/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#D8593D;--acc-on:#0B0A09;--acc-soft:rgba(216,89,61,0.1);--acc-line:rgba(216,89,61,0.35)">
+        <a class="idea__hit" href="02-cobranza/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">02</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Fintech PYME · cuentas por cobrar</p>
+          <h3 class="idea__brand"><a href="02-cobranza/index.html">Tinoria</a></h3>
+          <p class="idea__domain mono">tinoria.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Cobrar con tino.</p>
+          <p class="idea__problem">La dueña se sienta cada viernes a perseguir facturas vencidas por correo y WhatsApp; lo posterga porque es incómodo, y la caja se muere esperando.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $49.000/mes (Libro)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="02-cobranza/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Tinoria">
+            <a href="02-cobranza/index.html">Producto</a>
+            <a href="02-cobranza/negocio.html">Negocio</a>
+            <a href="02-cobranza/roadmap.html">Roadmap</a>
+            <a href="02-cobranza/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#1E936F;--acc-on:#0B0A09;--acc-soft:rgba(30,147,111,0.1);--acc-line:rgba(30,147,111,0.35)">
+        <a class="idea__hit" href="03-agenda/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">03</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">SaaS vertical · Servicios locales</p>
+          <h3 class="idea__brand"><a href="03-agenda/index.html">Zurcia</a></h3>
+          <p class="idea__domain mono">zurcia.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La hora que se cae, se vuelve a vender sola.</p>
+          <p class="idea__problem">Los servicios locales chilenos (peluquerías, dentistas, veterinarias, talleres, kinesiólogos) agendan por WhatsApp a mano. Una persona contesta mensajes todo el día. Los no-shows y las cancelaciones tardías se comen el margen —una hora perdida no se recupera nunca— y la agenda tiene huecos mientras hay gente esperando a la que nadie avisa.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $34.000/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="03-agenda/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Zurcia">
+            <a href="03-agenda/index.html">Producto</a>
+            <a href="03-agenda/negocio.html">Negocio</a>
+            <a href="03-agenda/roadmap.html">Roadmap</a>
+            <a href="03-agenda/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#D35C41;--acc-on:#0B0A09;--acc-soft:rgba(211,92,65,0.1);--acc-line:rgba(211,92,65,0.35)">
+        <a class="idea__hit" href="04-inventario/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">04</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">SaaS vertical para gastronomía · pronóstico de demanda y compras</p>
+          <h3 class="idea__brand"><a href="04-inventario/index.html">Mermata</a></h3>
+          <p class="idea__domain mono">mermata.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Compra lo que vas a vender.</p>
+          <p class="idea__problem">El dueño compra a ojo por WhatsApp un martes en la mañana: bota lo que sobró (merma) y pierde la venta de lo que faltó (quiebre de stock), y como nadie mide la merma, nadie sabe que esas dos pérdidas juntas se comen la mitad de la utilidad del año.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $49.000/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="04-inventario/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Mermata">
+            <a href="04-inventario/index.html">Producto</a>
+            <a href="04-inventario/negocio.html">Negocio</a>
+            <a href="04-inventario/roadmap.html">Roadmap</a>
+            <a href="04-inventario/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#EA4638;--acc-on:#0B0A09;--acc-soft:rgba(234,70,56,0.1);--acc-line:rgba(234,70,56,0.35)">
+        <a class="idea__hit" href="05-contratos/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">05</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Legaltech PYME</p>
+          <h3 class="idea__brand"><a href="05-contratos/index.html">Antefirma</a></h3>
+          <p class="idea__domain mono">antefirma.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Lee el contrato antes de firmarlo. Y después te vigila las fechas que muerden.</p>
+          <p class="idea__problem">El contrato lo firmó porque había que firmarlo, y nadie lo leyó: el daño no llega el día que firmas, llega dos años después, cuando se renueva solo por 36 meses más.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $29.000 por contrato<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="05-contratos/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Antefirma">
+            <a href="05-contratos/index.html">Producto</a>
+            <a href="05-contratos/negocio.html">Negocio</a>
+            <a href="05-contratos/roadmap.html">Roadmap</a>
+            <a href="05-contratos/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#D35E43;--acc-on:#0B0A09;--acc-soft:rgba(211,94,67,0.1);--acc-line:rgba(211,94,67,0.35)">
+        <a class="idea__hit" href="06-arriendos/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">06</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">PropTech / SaaS vertical</p>
+          <h3 class="idea__brand"><a href="06-arriendos/index.html">Conserjo</a></h3>
+          <p class="idea__domain mono">conserjo.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El conserje de tu cartera: filtra al que entra, cobra el arriendo y diagnostica la filtracion por foto.</p>
+          <p class="idea__problem">Administrar arriendos es un segundo trabajo: filtrar al arrendatario sin equivocarse (un mal inquilino son 8-18 meses de juicio en Chile), perseguir la transferencia todos los meses, y diagnosticar a las 11 de la noche una foto de una filtración que en tres semanas cuesta cinco veces más.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $7.900/unidad/mes (1-5 unidades)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="06-arriendos/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Conserjo">
+            <a href="06-arriendos/index.html">Producto</a>
+            <a href="06-arriendos/negocio.html">Negocio</a>
+            <a href="06-arriendos/roadmap.html">Roadmap</a>
+            <a href="06-arriendos/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#D9F02B;--acc-on:#0B0A09;--acc-soft:rgba(217,240,43,0.1);--acc-line:rgba(217,240,43,0.35)">
+        <a class="idea__hit" href="07-terreno/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">07</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Software de terreno (field service) para PYME</p>
+          <h3 class="idea__brand"><a href="07-terreno/index.html">Rutamo</a></h3>
+          <p class="idea__domain mono">rutamo.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El despacho, la ruta y el cobro de tu cuadrilla en terreno, en un solo lugar.</p>
+          <p class="idea__problem">El despachador arma las rutas de memoria en un cuaderno, el técnico anota la visita en un papel que se moja, y la cotización se cobra tres semanas después — si es que se cobra.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $59.000/mes</p>
+          <a class="idea__demo" href="07-terreno/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Rutamo">
+            <a href="07-terreno/index.html">Producto</a>
+            <a href="07-terreno/negocio.html">Negocio</a>
+            <a href="07-terreno/roadmap.html">Roadmap</a>
+            <a href="07-terreno/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#DB525E;--acc-on:#0B0A09;--acc-soft:rgba(219,82,94,0.1);--acc-line:rgba(219,82,94,0.35)">
+        <a class="idea__hit" href="08-laboral/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">08</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Regtech / Cumplimiento laboral PYME</p>
+          <h3 class="idea__brand"><a href="08-laboral/index.html">Contralta</a></h3>
+          <p class="idea__domain mono">contralta.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El contador te lleva la contabilidad. Nadie te lleva el Código del Trabajo.</p>
+          <p class="idea__problem">Un finiquito mal hecho es una demanda en la Dirección del Trabajo, y el dueño de la PYME no sabe que las cotizaciones impagas hacen nulo el despido.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $34.000/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="08-laboral/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Contralta">
+            <a href="08-laboral/index.html">Producto</a>
+            <a href="08-laboral/negocio.html">Negocio</a>
+            <a href="08-laboral/roadmap.html">Roadmap</a>
+            <a href="08-laboral/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#E34E22;--acc-on:#0B0A09;--acc-soft:rgba(227,78,34,0.1);--acc-line:rgba(227,78,34,0.35)">
+        <a class="idea__hit" href="09-despacho/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">09</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Logística / E-commerce PYME</p>
+          <h3 class="idea__brand"><a href="09-despacho/index.html">Kilonauta</a></h3>
+          <p class="idea__domain mono">kilonauta.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El mismo paquete a Puerto Montt cuesta $9.930 o $5.320. Depende de a quién le preguntes.</p>
+          <p class="idea__problem">Cuatro couriers, cuatro portales, cuatro etiquetas: la dueña copia direcciones a mano, paga de más en cada envío a regiones y cuando un paquete se pierde prefiere regalar el producto antes que meterse al reclamo.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Gratis (pagas la etiqueta)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="09-despacho/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Kilonauta">
+            <a href="09-despacho/index.html">Producto</a>
+            <a href="09-despacho/negocio.html">Negocio</a>
+            <a href="09-despacho/roadmap.html">Roadmap</a>
+            <a href="09-despacho/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#E14F30;--acc-on:#0B0A09;--acc-soft:rgba(225,79,48,0.1);--acc-line:rgba(225,79,48,0.35)">
+        <a class="idea__hit" href="10-contabilidad/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">10</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Contabilidad PYME / Fintech tributaria</p>
+          <h3 class="idea__brand"><a href="10-contabilidad/index.html">Talonio</a></h3>
+          <p class="idea__domain mono">talonio.com<span class="idea__free">libre</span></p>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La boleta que botaste era plata.</p>
+          <p class="idea__problem">El gasto que no se documentó es IVA crédito fiscal perdido: la PYME chilena bota ~$2,6 millones al año en boletas de papel y compras con tarjeta personal que nunca llegan al contador.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Estudio (contador): desde $7.900/RUT/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="10-contabilidad/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Talonio">
+            <a href="10-contabilidad/index.html">Producto</a>
+            <a href="10-contabilidad/negocio.html">Negocio</a>
+            <a href="10-contabilidad/roadmap.html">Roadmap</a>
+            <a href="10-contabilidad/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+        </div>
       </div>
-    </article>
-    <article class="idea" style="--accent:#A93B22">
-      <a class="idea__hit" href="02-cobranza/index.html" aria-labelledby="t02"></a>
-      <div class="idea__num">02</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t02">Tinoria</h2>
-        <p class="idea__domain">tinoria.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">Cobrar con tino.</p>
-        <p class="idea__problem">La dueña se sienta cada viernes a perseguir facturas vencidas por correo y WhatsApp; lo posterga porque es incómodo, y la caja se muere esperando.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Fintech PYME · cuentas por cobrar</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm (donde la factura electrónica es obligatoria)</dd></div>
-          <div><dt>Precio</dt><dd>Desde $49.000/mes (Libro) · $99.000 (Cartera) · $229.000 (Cobranza)</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Tinoria">
-          <a href="02-cobranza/index.html">Producto</a>
-          <a href="02-cobranza/demo/index.html" class="is-demo">Demo</a>
-          <a href="02-cobranza/negocio.html">Negocio</a>
-          <a href="02-cobranza/roadmap.html">Roadmap</a>
-          <a href="02-cobranza/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#14624A">
-      <a class="idea__hit" href="03-agenda/index.html" aria-labelledby="t03"></a>
-      <div class="idea__num">03</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t03">Zurcia</h2>
-        <p class="idea__domain">zurcia.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">La hora que se cae, se vuelve a vender sola.</p>
-        <p class="idea__problem">Los servicios locales chilenos (peluquerías, dentistas, veterinarias, talleres, kinesiólogos) agendan por WhatsApp a mano. Una persona contesta mensajes todo el día. Los no-shows y las cancelaciones tardías se comen el margen —una hora perdida no se recupera nunca— y la agenda tiene huecos mientras hay gente esperando a la que nadie avisa.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>SaaS vertical · Servicios locales</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm</dd></div>
-          <div><dt>Precio</dt><dd>Desde $34.000/mes · plan Local $79.000/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Zurcia">
-          <a href="03-agenda/index.html">Producto</a>
-          <a href="03-agenda/demo/index.html" class="is-demo">Demo</a>
-          <a href="03-agenda/negocio.html">Negocio</a>
-          <a href="03-agenda/roadmap.html">Roadmap</a>
-          <a href="03-agenda/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#b8452b">
-      <a class="idea__hit" href="04-inventario/index.html" aria-labelledby="t04"></a>
-      <div class="idea__num">04</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t04">Mermata</h2>
-        <p class="idea__domain">mermata.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">Compra lo que vas a vender.</p>
-        <p class="idea__problem">El dueño compra a ojo por WhatsApp un martes en la mañana: bota lo que sobró (merma) y pierde la venta de lo que faltó (quiebre de stock), y como nadie mide la merma, nadie sabe que esas dos pérdidas juntas se comen la mitad de la utilidad del año.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>SaaS vertical para gastronomía · pronóstico de demanda y compras</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm (México, Perú, Colombia: mismo mandato de factura electrónica)</dd></div>
-          <div><dt>Precio</dt><dd>Desde $49.000/mes · plan Local $99.000/mes · plan Cadena $79.000/mes por local · puesta en marcha $190.000</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Mermata">
-          <a href="04-inventario/index.html">Producto</a>
-          <a href="04-inventario/demo/index.html" class="is-demo">Demo</a>
-          <a href="04-inventario/negocio.html">Negocio</a>
-          <a href="04-inventario/roadmap.html">Roadmap</a>
-          <a href="04-inventario/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#A81E12">
-      <a class="idea__hit" href="05-contratos/index.html" aria-labelledby="t05"></a>
-      <div class="idea__num">05</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t05">Antefirma</h2>
-        <p class="idea__domain">antefirma.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">Lee el contrato antes de firmarlo. Y después te vigila las fechas que muerden.</p>
-        <p class="idea__problem">El contrato lo firmó porque había que firmarlo, y nadie lo leyó: el daño no llega el día que firmas, llega dos años después, cuando se renueva solo por 36 meses más.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Legaltech PYME</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm hispanohablante</dd></div>
-          <div><dt>Precio</dt><dd>Desde $29.000 por contrato · $39.000/mes el plan Vigía</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Antefirma">
-          <a href="05-contratos/index.html">Producto</a>
-          <a href="05-contratos/demo/index.html" class="is-demo">Demo</a>
-          <a href="05-contratos/negocio.html">Negocio</a>
-          <a href="05-contratos/roadmap.html">Roadmap</a>
-          <a href="05-contratos/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#B2432A">
-      <a class="idea__hit" href="06-arriendos/index.html" aria-labelledby="t06"></a>
-      <div class="idea__num">06</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t06">Conserjo</h2>
-        <p class="idea__domain">conserjo.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El conserje de tu cartera: filtra al que entra, cobra el arriendo y diagnostica la filtracion por foto.</p>
-        <p class="idea__problem">Administrar arriendos es un segundo trabajo: filtrar al arrendatario sin equivocarse (un mal inquilino son 8-18 meses de juicio en Chile), perseguir la transferencia todos los meses, y diagnosticar a las 11 de la noche una foto de una filtración que en tres semanas cuesta cinco veces más.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>PropTech / SaaS vertical</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm (México, Colombia, Perú) → España</dd></div>
-          <div><dt>Precio</dt><dd>Desde $7.900/unidad/mes (1-5 unidades) · $5.900 (6-15) · $3.900 (16+, mínimo $69.000/mes) · Informe de arrendatario suelto: $6.900</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Conserjo">
-          <a href="06-arriendos/index.html">Producto</a>
-          <a href="06-arriendos/demo/index.html" class="is-demo">Demo</a>
-          <a href="06-arriendos/negocio.html">Negocio</a>
-          <a href="06-arriendos/roadmap.html">Roadmap</a>
-          <a href="06-arriendos/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#D9F02B">
-      <a class="idea__hit" href="07-terreno/index.html" aria-labelledby="t07"></a>
-      <div class="idea__num">07</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t07">Rutamo</h2>
-        <p class="idea__domain">rutamo.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El despacho, la ruta y el cobro de tu cuadrilla en terreno, en un solo lugar.</p>
-        <p class="idea__problem">El despachador arma las rutas de memoria en un cuaderno, el técnico anota la visita en un papel que se moja, y la cotización se cobra tres semanas después — si es que se cobra.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Software de terreno (field service) para PYME</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm</dd></div>
-          <div><dt>Precio</dt><dd>Desde $59.000/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Rutamo">
-          <a href="07-terreno/index.html">Producto</a>
-          <a href="07-terreno/demo/index.html" class="is-demo">Demo</a>
-          <a href="07-terreno/negocio.html">Negocio</a>
-          <a href="07-terreno/roadmap.html">Roadmap</a>
-          <a href="07-terreno/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#A8232E">
-      <a class="idea__hit" href="08-laboral/index.html" aria-labelledby="t08"></a>
-      <div class="idea__num">08</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t08">Contralta</h2>
-        <p class="idea__domain">contralta.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El contador te lleva la contabilidad. Nadie te lleva el Código del Trabajo.</p>
-        <p class="idea__problem">Un finiquito mal hecho es una demanda en la Dirección del Trabajo, y el dueño de la PYME no sabe que las cotizaciones impagas hacen nulo el despido.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Regtech / Cumplimiento laboral PYME</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm (el motor se exporta; el contenido legal no)</dd></div>
-          <div><dt>Precio</dt><dd>Desde $34.000/mes · plan Empresa $69.000/mes · auditoría de un finiquito $19.000</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Contralta">
-          <a href="08-laboral/index.html">Producto</a>
-          <a href="08-laboral/demo/index.html" class="is-demo">Demo</a>
-          <a href="08-laboral/negocio.html">Negocio</a>
-          <a href="08-laboral/roadmap.html">Roadmap</a>
-          <a href="08-laboral/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#D8461B">
-      <a class="idea__hit" href="09-despacho/index.html" aria-labelledby="t09"></a>
-      <div class="idea__num">09</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t09">Kilonauta</h2>
-        <p class="idea__domain">kilonauta.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El mismo paquete a Puerto Montt cuesta $9.930 o $5.320. Depende de a quién le preguntes.</p>
-        <p class="idea__problem">Cuatro couriers, cuatro portales, cuatro etiquetas: la dueña copia direcciones a mano, paga de más en cada envío a regiones y cuando un paquete se pierde prefiere regalar el producto antes que meterse al reclamo.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Logística / E-commerce PYME</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → Perú y Colombia</dd></div>
-          <div><dt>Precio</dt><dd>Gratis (pagas la etiqueta) · Bodega $34.900/mes · Cordillera $99.900/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Kilonauta">
-          <a href="09-despacho/index.html">Producto</a>
-          <a href="09-despacho/demo/index.html" class="is-demo">Demo</a>
-          <a href="09-despacho/negocio.html">Negocio</a>
-          <a href="09-despacho/roadmap.html">Roadmap</a>
-          <a href="09-despacho/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#c1391c">
-      <a class="idea__hit" href="10-contabilidad/index.html" aria-labelledby="t10"></a>
-      <div class="idea__num">10</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t10">Talonio</h2>
-        <p class="idea__domain">talonio.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">La boleta que botaste era plata.</p>
-        <p class="idea__problem">El gasto que no se documentó es IVA crédito fiscal perdido: la PYME chilena bota ~$2,6 millones al año en boletas de papel y compras con tarjeta personal que nunca llegan al contador.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Contabilidad PYME / Fintech tributaria</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → LatAm hispanohablante (México, Colombia, Perú, España)</dd></div>
-          <div><dt>Precio</dt><dd>Estudio (contador): desde $7.900/RUT/mes · Empresa (PYME): $34.900/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Talonio">
-          <a href="10-contabilidad/index.html">Producto</a>
-          <a href="10-contabilidad/demo/index.html" class="is-demo">Demo</a>
-          <a href="10-contabilidad/negocio.html">Negocio</a>
-          <a href="10-contabilidad/roadmap.html">Roadmap</a>
-          <a href="10-contabilidad/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    </div>
-  </section>
-  <section class="fam">
-    <header class="fam__head">
-      <h2>Minería</h2>
-      <p>El comprador tiene plata y miedo, pero compra lento: piloto, homologación, procurement. Por eso cuatro de las cinco no le venden a la minera, sino a la contratista que ya está adentro.</p>
-      <span class="fam__n mono">5</span>
-    </header>
-    <div class="grid">
+    </section>
+    <section class="fam fam--mineria" id="mineria" aria-labelledby="h-mineria">
+      <div class="container">
+        <header class="fam__head">
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 02 de 2</p>
+          <h2 class="fam__title" id="h-mineria">Minería</h2>
+          <p class="fam__count mono"><b>05</b><span>ideas</span></p>
+          <p class="fam__lede">Cinco problemas de faena, donde una hora de planta detenida cuesta más que un año de cualquiera de las diez de arriba. El comprador tiene plata y miedo, pero compra lento.</p>
+          <dl class="fam__facts mono"><div><dt>Comprador</dt><dd>El gerente de operaciones, contra su presupuesto operacional.</dd></div><div><dt>Ticket</dt><dd>De cientos de miles a millones de pesos al mes.</dd></div><div><dt>Ciclo de venta</dt><dd>12 a 18 meses: piloto, homologación, procurement.</dd></div><div><dt>La cuña</dt><dd>Cuatro de las cinco no le venden a la minera, sino a la contratista que ya está adentro.</dd></div></dl>
+        </header>
+        <div class="ideas">
 
-    <article class="idea" style="--accent:#FFB000">
-      <a class="idea__hit" href="11-correas/index.html" aria-labelledby="t11"></a>
-      <div class="idea__num">11</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t11">Cintavia</h2>
-        <p class="idea__domain">cintavia.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">La correa, kilómetro a kilómetro.</p>
-        <p class="idea__problem">Kilómetros de correa se inspeccionan con un tipo caminando con una linterna: se detecta tarde o se detecta cuando ya se cortó. Un polín trabado que roza la cinta un turno completo cuesta US$1,4 M de planta detenida, y es causa reconocida de incendio de correa.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Minería · confiabilidad de correas transportadoras</dd></div>
-          <div><dt>Mercado</dt><dd>Chile (laboratorio) → Perú, Brasil, Australia (el mercado de verdad)</dd></div>
-          <div><dt>Precio</dt><dd>Desde $890.000/mes (Ronda) · $3.900.000 (Faena) · desde $8.400.000 (Cinturón) · habilitación $2.250.000/estación o comodato +35%</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Cintavia">
-          <a href="11-correas/index.html">Producto</a>
-          <a href="11-correas/demo/index.html" class="is-demo">Demo</a>
-          <a href="11-correas/negocio.html">Negocio</a>
-          <a href="11-correas/roadmap.html">Roadmap</a>
-          <a href="11-correas/stack.html">Arquitectura</a>
-        </nav>
+      <article class="idea" style="--acc:#FFB000;--acc-on:#0B0A09;--acc-soft:rgba(255,176,0,0.1);--acc-line:rgba(255,176,0,0.35)">
+        <a class="idea__hit" href="11-correas/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">11</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Minería · confiabilidad de correas transportadoras</p>
+          <h3 class="idea__brand"><a href="11-correas/index.html">Cintavia</a></h3>
+          <p class="idea__domain mono">cintavia.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile (laboratorio) → Perú, Brasil, Australia (el mercado de verdad)</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La correa, kilómetro a kilómetro.</p>
+          <p class="idea__problem">Kilómetros de correa se inspeccionan con un tipo caminando con una linterna: se detecta tarde o se detecta cuando ya se cortó. Un polín trabado que roza la cinta un turno completo cuesta US$1,4 M de planta detenida, y es causa reconocida de incendio de correa.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $890.000/mes (Ronda)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="11-correas/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Cintavia">
+            <a href="11-correas/index.html">Producto</a>
+            <a href="11-correas/negocio.html">Negocio</a>
+            <a href="11-correas/roadmap.html">Roadmap</a>
+            <a href="11-correas/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#FFD100;--acc-on:#0B0A09;--acc-soft:rgba(255,209,0,0.1);--acc-line:rgba(255,209,0,0.35)">
+        <a class="idea__hit" href="12-seguridad/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">12</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Seguridad y gestión de riesgos para minería</p>
+          <h3 class="idea__brand"><a href="12-seguridad/index.html">Cuasio</a></h3>
+          <p class="idea__domain mono">cuasio.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → minería de LatAm</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El casi-accidente es el único aviso que vas a recibir. Captúralo en 30 segundos.</p>
+          <p class="idea__problem">El casi-accidente es la señal temprana que avisa antes de la muerte, y es justo la que se pierde: reportarlo es un trámite de veinte minutos al final del turno y a nadie le pagan por hacerlo.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $190.000/mes</p>
+          <a class="idea__demo" href="12-seguridad/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Cuasio">
+            <a href="12-seguridad/index.html">Producto</a>
+            <a href="12-seguridad/negocio.html">Negocio</a>
+            <a href="12-seguridad/roadmap.html">Roadmap</a>
+            <a href="12-seguridad/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#22C3AC;--acc-on:#0B0A09;--acc-soft:rgba(34,195,172,0.1);--acc-line:rgba(34,195,172,0.35)">
+        <a class="idea__hit" href="13-contratistas/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">13</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Compliance y control de acceso · Minería</p>
+          <h3 class="idea__brand"><a href="13-contratistas/index.html">Torniqua</a></h3>
+          <p class="idea__domain mono">torniqua.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile (Antofagasta / Calama) → construcción y energía → Perú</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">PASA o NO PASA en un segundo, con el motivo exacto y la ruta para arreglarlo.</p>
+          <p class="idea__problem">A las 06:12 el bus llegó a la portería y cuatro no pueden entrar: a uno se le venció el examen de altura geográfica hace tres días y nadie lo vio, porque las vigencias viven en una planilla que nadie mira.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $69.000/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="13-contratistas/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Torniqua">
+            <a href="13-contratistas/index.html">Producto</a>
+            <a href="13-contratistas/negocio.html">Negocio</a>
+            <a href="13-contratistas/roadmap.html">Roadmap</a>
+            <a href="13-contratistas/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#56D7EF;--acc-on:#0B0A09;--acc-soft:rgba(86,215,239,0.1);--acc-line:rgba(86,215,239,0.35)">
+        <a class="idea__hit" href="14-permisos/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">14</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">RegTech industrial · permitología de proyectos</p>
+          <h3 class="idea__brand"><a href="14-permisos/index.html">Cianota</a></h3>
+          <p class="idea__domain mono">cianota.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → Perú, Brasil, LatAm</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La ruta crítica de tus permisos, en un solo plano.</p>
+          <p class="idea__problem">Un permiso se atrasa un mes, arrastra a otros cuatro y la puesta en marcha se corre tres meses — y nadie tenía el grafo de dependencias para verlo venir.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $890.000/mes</p>
+          <a class="idea__demo" href="14-permisos/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Cianota">
+            <a href="14-permisos/index.html">Producto</a>
+            <a href="14-permisos/negocio.html">Negocio</a>
+            <a href="14-permisos/roadmap.html">Roadmap</a>
+            <a href="14-permisos/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#3F9BD6;--acc-on:#0B0A09;--acc-soft:rgba(63,155,214,0.1);--acc-line:rgba(63,155,214,0.35)">
+        <a class="idea__hit" href="15-agua/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">15</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">SaaS industrial · Gestión hídrica y monitoreo de depósitos de relaves</p>
+          <h3 class="idea__brand"><a href="15-agua/index.html">Freatia</a></h3>
+          <p class="idea__domain mono">freatia.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile (norte: Antofagasta, Atacama, Tarapacá) → Perú, Brasil, Australia</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El balance hídrico de la faena, cuadrado y auditable — y cuando no cuadra, te dice cuánto falta y dónde buscarlo.</p>
+          <p class="idea__problem">El balance hídrico de la faena vive en una planilla que arma una sola persona con datos de sensores, PDF y lecturas a mano. Cuando no cuadra —y casi nunca cuadra— nadie sabe si faltan 40 l/s porque un caudalímetro está descalibrado o porque el muro del tranque está filtrando. El reporte al regulador y a la comunidad se arma a última hora, sin trazabilidad, y una discrepancia que nadie miró es a la vez una multa de la SMA y el primer síntoma de una falla geotécnica.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Cuenca $2.900.000/mes<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="15-agua/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Freatia">
+            <a href="15-agua/index.html">Producto</a>
+            <a href="15-agua/negocio.html">Negocio</a>
+            <a href="15-agua/roadmap.html">Roadmap</a>
+            <a href="15-agua/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+        </div>
       </div>
-    </article>
-    <article class="idea" style="--accent:#FFD100">
-      <a class="idea__hit" href="12-seguridad/index.html" aria-labelledby="t12"></a>
-      <div class="idea__num">12</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t12">Cuasio</h2>
-        <p class="idea__domain">cuasio.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El casi-accidente es el único aviso que vas a recibir. Captúralo en 30 segundos.</p>
-        <p class="idea__problem">El casi-accidente es la señal temprana que avisa antes de la muerte, y es justo la que se pierde: reportarlo es un trámite de veinte minutos al final del turno y a nadie le pagan por hacerlo.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Seguridad y gestión de riesgos para minería</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → minería de LatAm</dd></div>
-          <div><dt>Precio</dt><dd>Desde $190.000/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Cuasio">
-          <a href="12-seguridad/index.html">Producto</a>
-          <a href="12-seguridad/demo/index.html" class="is-demo">Demo</a>
-          <a href="12-seguridad/negocio.html">Negocio</a>
-          <a href="12-seguridad/roadmap.html">Roadmap</a>
-          <a href="12-seguridad/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#22C3AC">
-      <a class="idea__hit" href="13-contratistas/index.html" aria-labelledby="t13"></a>
-      <div class="idea__num">13</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t13">Torniqua</h2>
-        <p class="idea__domain">torniqua.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">PASA o NO PASA en un segundo, con el motivo exacto y la ruta para arreglarlo.</p>
-        <p class="idea__problem">A las 06:12 el bus llegó a la portería y cuatro no pueden entrar: a uno se le venció el examen de altura geográfica hace tres días y nadie lo vio, porque las vigencias viven en una planilla que nadie mira.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>Compliance y control de acceso · Minería</dd></div>
-          <div><dt>Mercado</dt><dd>Chile (Antofagasta / Calama) → construcción y energía → Perú</dd></div>
-          <div><dt>Precio</dt><dd>Desde $69.000/mes · plan Faena $189.000/mes · lector de portería para la minera: $0</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Torniqua">
-          <a href="13-contratistas/index.html">Producto</a>
-          <a href="13-contratistas/demo/index.html" class="is-demo">Demo</a>
-          <a href="13-contratistas/negocio.html">Negocio</a>
-          <a href="13-contratistas/roadmap.html">Roadmap</a>
-          <a href="13-contratistas/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#56d7ef">
-      <a class="idea__hit" href="14-permisos/index.html" aria-labelledby="t14"></a>
-      <div class="idea__num">14</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t14">Cianota</h2>
-        <p class="idea__domain">cianota.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">La ruta crítica de tus permisos, en un solo plano.</p>
-        <p class="idea__problem">Un permiso se atrasa un mes, arrastra a otros cuatro y la puesta en marcha se corre tres meses — y nadie tenía el grafo de dependencias para verlo venir.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>RegTech industrial · permitología de proyectos</dd></div>
-          <div><dt>Mercado</dt><dd>Chile → Perú, Brasil, LatAm</dd></div>
-          <div><dt>Precio</dt><dd>Desde $890.000/mes</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Cianota">
-          <a href="14-permisos/index.html">Producto</a>
-          <a href="14-permisos/demo/index.html" class="is-demo">Demo</a>
-          <a href="14-permisos/negocio.html">Negocio</a>
-          <a href="14-permisos/roadmap.html">Roadmap</a>
-          <a href="14-permisos/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    <article class="idea" style="--accent:#3F9BD6">
-      <a class="idea__hit" href="15-agua/index.html" aria-labelledby="t15"></a>
-      <div class="idea__num">15</div>
-      <div class="idea__body">
-        <h2 class="idea__brand" id="t15">Freatia</h2>
-        <p class="idea__domain">freatia.com<span class="idea__free">libre</span></p>
-        <p class="idea__tagline">El balance hídrico de la faena, cuadrado y auditable — y cuando no cuadra, te dice cuánto falta y dónde buscarlo.</p>
-        <p class="idea__problem">El balance hídrico de la faena vive en una planilla que arma una sola persona con datos de sensores, PDF y lecturas a mano. Cuando no cuadra —y casi nunca cuadra— nadie sabe si faltan 40 l/s porque un caudalímetro está descalibrado o porque el muro del tranque está filtrando. El reporte al regulador y a la comunidad se arma a última hora, sin trazabilidad, y una discrepancia que nadie miró es a la vez una multa de la SMA y el primer síntoma de una falla geotécnica.</p>
-        <dl class="idea__meta">
-          <div><dt>Rubro</dt><dd>SaaS industrial · Gestión hídrica y monitoreo de depósitos de relaves</dd></div>
-          <div><dt>Mercado</dt><dd>Chile (norte: Antofagasta, Atacama, Tarapacá) → Perú, Brasil, Australia</dd></div>
-          <div><dt>Precio</dt><dd>Cuenca $2.900.000/mes · Tranque $4.900.000/mes · Corporativo desde $9.800.000/mes · Implementación $12.000.000–$28.000.000 por única vez</dd></div>
-        </dl>
-        <nav class="idea__links" aria-label="Freatia">
-          <a href="15-agua/index.html">Producto</a>
-          <a href="15-agua/demo/index.html" class="is-demo">Demo</a>
-          <a href="15-agua/negocio.html">Negocio</a>
-          <a href="15-agua/roadmap.html">Roadmap</a>
-          <a href="15-agua/stack.html">Arquitectura</a>
-        </nav>
-      </div>
-    </article>
-    </div>
-  </section>
-  </main>
+    </section>
+</main>
 
-  <footer class="colofon">
+<footer class="colofon">
+  <div class="container">
     <h2>Colofón</h2>
     <p>HTML, CSS y JavaScript escritos a mano. Sin build, sin framework, sin CDN: se abre el archivo
       y funciona. Los gráficos son SVG dibujado a mano, no una librería. La única petición externa
       son las tipografías de Google.</p>
-    <p>Las diez ideas se construyeron en paralelo, cada una por un agente distinto, siguiendo
+    <p>Las quince ideas se construyeron en paralelo, cada una por un agente distinto, siguiendo
       <a href="_kit/README.md">un contrato común</a> que fija el piso de accesibilidad, el mobile-first,
       la verificación de dominio y la regla que más importa: toda cifra va citada o va con su
       derivación a la vista.</p>
     <p><a href="https://github.com/lelelilo-studios/business_ideas">Código en GitHub</a></p>
-  </footer>
+  </div>
+</footer>
 
-</div>
 </body>
 </html>
