@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zurcia — la hora que se cayó, se vuelve a vender sola</title>
+<meta name="description" content="Un agente de IA que vive en el WhatsApp de tu local: da hora, reagenda, confirma y rellena solo los huecos que deja una cancelación, ofreciéndoselos a la lista de espera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Petrona:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  /* ---------- hero ---------- */
+  .hero { padding-block: var(--sp-l) var(--sp-xl); }
+  .hero h1 { margin-block: var(--sp-xs) var(--sp-s); }
+  .hero .lede { max-width: 46ch; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-block-start: var(--sp-m); }
+  .hero__nota { margin-block-start: var(--sp-s); font-size: 0.82rem; color: var(--tinta-suave); }
+
+  .marquesina {
+    margin-block-start: var(--sp-l);
+    border-top: 2px solid var(--tinta);
+    border-bottom: 2px solid var(--tinta);
+    padding-block: var(--sp-s);
+    display: grid;
+    gap: var(--sp-s);
+  }
+  @media (min-width: 40em) { .marquesina { grid-template-columns: repeat(3, 1fr); } }
+  .marquesina div { padding-right: var(--sp-s); }
+
+  /* ---------- el agujero ---------- */
+  .agujero { display: grid; gap: var(--sp-m); }
+  @media (min-width: 56em) { .agujero { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+  /* ---------- pasos ---------- */
+  .pasos { counter-reset: p; display: grid; gap: 0; border-top: 1px solid var(--pauta-duro); }
+  .paso {
+    counter-increment: p;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: var(--sp-s);
+    padding-block: var(--sp-m);
+    border-bottom: 1px solid var(--pauta-duro);
+  }
+  .paso::before {
+    content: counter(p, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--sello);
+    letter-spacing: 0.06em;
+    padding-top: 4px;
+  }
+  .paso h3 { margin-block-end: 4px; }
+  .paso p { color: var(--tinta-med); font-size: 0.95rem; }
+
+  /* ---------- demo en vivo ---------- */
+  .vivo { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .vivo { grid-template-columns: 22rem 1fr; align-items: start; } }
+
+  .fono {
+    background: #E8E1D3;
+    border: 2px solid var(--tinta);
+    display: flex;
+    flex-direction: column;
+    height: 30rem;
+    max-width: 24rem;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .fono__barra {
+    background: var(--sello);
+    color: #F2EFE7;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: none;
+  }
+  .fono__ini {
+    width: 30px; height: 30px; flex: none;
+    background: #F2EFE7; color: var(--sello);
+    display: grid; place-items: center;
+    font-family: var(--serif); font-weight: 700; font-size: 0.9rem;
+    border-radius: 50%;
+  }
+  .fono__nombre { font-size: 0.88rem; font-weight: 600; line-height: 1.2; }
+  .fono__estado { font-size: 0.68rem; opacity: 0.85; font-family: var(--mono); }
+  .fono__hilo {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.015) 0 2px, transparent 2px 9px);
+  }
+  .glob {
+    max-width: 82%;
+    padding: 7px 10px 5px;
+    font-size: 0.86rem;
+    line-height: 1.35;
+    border: 1px solid rgba(28,26,21,.14);
+    white-space: pre-wrap;
+  }
+  .glob--in  { align-self: flex-start; background: #FCFAF4; }
+  .glob--out { align-self: flex-end;   background: #D5EFDC; }
+  .glob__hora {
+    display: block; text-align: right;
+    font-family: var(--mono); font-size: 0.6rem;
+    color: var(--tinta-suave); margin-top: 2px;
+  }
+  .glob--escribe { display: flex; gap: 4px; padding: 11px 12px; }
+  .glob--escribe span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--tinta-suave);
+    animation: pulso 1.1s infinite;
+  }
+  .glob--escribe span:nth-child(2) { animation-delay: .16s; }
+  .glob--escribe span:nth-child(3) { animation-delay: .32s; }
+  @keyframes pulso { 0%,60%,100% { opacity:.25 } 30% { opacity:1 } }
+
+  .fono__pie {
+    flex: none; padding: 8px 10px; background: #F0EADD;
+    border-top: 1px solid rgba(28,26,21,.14);
+    display: flex; gap: 8px; align-items: center;
+    font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-suave);
+  }
+
+  /* panel lateral de la agenda */
+  .tira { border: 2px solid var(--tinta); background: var(--papel-alto); }
+  .tira__cab {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 14px; border-bottom: 1.5px solid var(--tinta);
+    font-family: var(--mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .slot {
+    display: grid; grid-template-columns: 4.2rem 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 11px 14px; border-bottom: 1px solid var(--pauta);
+    font-size: 0.88rem;
+  }
+  .slot:last-child { border-bottom: 0; }
+  .slot__h { font-family: var(--mono); font-size: 0.8rem; color: var(--tinta-suave); }
+  .slot__q { line-height: 1.25; }
+  .slot__q small { display: block; font-size: 0.72rem; color: var(--tinta-suave); }
+  .slot[data-estado="libre"] { background: repeating-linear-gradient(135deg, transparent 0 6px, var(--papel-hondo) 6px 12px); }
+  .slot[data-estado="libre"] .slot__q { color: var(--tinta-suave); font-style: italic; }
+  .slot[data-estado="cancelada"] .slot__q { text-decoration: line-through; color: var(--tinta-suave); }
+  .slot[data-estado="rescatada"] { background: var(--sello-tenue); }
+  .slot--nueva { animation: entra .5s ease; }
+  @keyframes entra { from { background: var(--sello-tenue); } to { background: transparent; } }
+
+  .contador {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; border-top: 1.5px solid var(--tinta);
+    background: var(--papel-hondo);
+  }
+  .contador b { font-family: var(--mono); font-size: 1.15rem; color: var(--sello); }
+
+  .escena__ctrl { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-block-start: var(--sp-s); }
+  .btn-mini {
+    min-height: 44px; padding: 8px 14px;
+    font-family: var(--mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.07em;
+    border: 1.5px solid var(--tinta); background: var(--papel-alto); color: var(--tinta);
+  }
+  .btn-mini:hover:not(:disabled) { background: var(--sello); color: #FCFAF4; }
+  .btn-mini:disabled { opacity: .38; cursor: not-allowed; }
+  .btn-mini[data-activo="true"] { background: var(--tinta); color: var(--papel); }
+
+  /* ---------- precios ---------- */
+  .precios { display: grid; gap: var(--sp-m); }
+  @media (min-width: 52em) { .precios { grid-template-columns: repeat(3, 1fr); } }
+  .plan { display: flex; flex-direction: column; }
+  .plan__precio { font-family: var(--mono); font-size: var(--step-3); font-weight: 600; letter-spacing: -0.02em; }
+  .plan__precio span { font-size: 0.85rem; font-weight: 400; color: var(--tinta-suave); letter-spacing: 0; }
+  .plan ul { margin-block: var(--sp-s) var(--sp-m); flex: 1; }
+  .plan--estrella { border: 2px solid var(--sello); position: relative; }
+  .plan--estrella::after {
+    content: "El que compran";
+    position: absolute; top: -11px; left: var(--sp-m);
+    background: var(--sello); color: #FCFAF4;
+    font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 3px 8px;
+  }
+
+  /* ---------- faq ---------- */
+  .faq details {
+    border-bottom: 1px solid var(--pauta-duro);
+    padding-block: var(--sp-s);
+  }
+  .faq summary {
+    cursor: pointer; font-weight: 600; font-size: 1rem;
+    list-style: none; display: flex; justify-content: space-between; gap: var(--sp-s);
+    min-height: 32px; align-items: center;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); color: var(--sello); font-size: 1.3rem; line-height: 1; }
+  .faq details[open] summary::after { content: "–"; }
+  .faq p { margin-block-start: var(--sp-2xs); color: var(--tinta-med); font-size: 0.94rem; max-width: 62ch; }
+
+  .cierre {
+    border: 2px solid var(--tinta);
+    background: var(--papel-alto);
+    padding: var(--sp-l) var(--sp-m);
+    text-align: center;
+  }
+  .cierre h2 { max-width: 20ch; margin-inline: auto; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="16" />
+          <path d="M2.5 9.5h19M7.5 2.5v4M16.5 2.5v4" />
+          <path d="M4.5 16.5l3-2.6 3 2.6 3-2.6 3 2.6 3-2.6" stroke="currentColor" stroke-dasharray="0 0" />
+        </svg>
+        Zurcia
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav">
+        <span data-label>Menú</span>
+      </button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul role="list">
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero container">
+    <p class="eyebrow">Agenda por WhatsApp · Servicios locales · Chile</p>
+    <h1>La hora que se te cayó el sábado a las 9, la vuelve a vender a las 9:06.</h1>
+    <p class="lede">Zurcia es un agente que vive en el WhatsApp de tu local. Da hora, reagenda, confirma. Y cuando alguien cancela, le ofrece el cupo a tu lista de espera hasta que alguien lo toma. Tu clienta no descarga nada, no entra a ningún portal: escribe por WhatsApp, como siempre.</p>
+    <div class="hero__cta">
+      <a class="btn" href="demo/index.html">Ver el producto funcionando</a>
+      <a class="btn btn--fantasma" href="#plata">Cuánto cuesta el hueco</a>
+    </div>
+    <p class="hero__nota">14 días gratis · Sin contrato · Se instala en una tarde</p>
+
+    <div class="marquesina">
+      <div>
+        <span class="cifra cifra--ladrillo">$21,4M</span>
+        <span class="cifra__pie">Lo que pierde al año una peluquería de 3 sillas en no-shows y huecos sin rellenar. La aritmética está más abajo, y en <a href="negocio.html">Negocio</a>.</span>
+      </div>
+      <div>
+        <span class="cifra">2,5 h</span>
+        <span class="cifra__pie">Al día contestando WhatsApp a mano, entre clienta y clienta. Eso es una recepcionista a media jornada que no cobras.</span>
+      </div>
+      <div>
+        <span class="cifra cifra--sello">$79.000</span>
+        <span class="cifra__pie">Al mes. El plan que compra el 60% de los locales. Meta cobra por mensaje; ese costo va incluido y está declarado.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EL AGUJERO ================= -->
+  <section class="container">
+    <p class="eyebrow">El problema, en tus palabras</p>
+    <h2>"La Javiera canceló a las 8 de la mañana. La silla quedó muerta hasta las 12."</h2>
+
+    <div class="agujero" style="margin-block-start: var(--sp-l);">
+      <div>
+        <p style="color: var(--tinta-med);">Todos los locales de servicios en Chile reservan por WhatsApp. No por costumbre: porque es donde está el cliente. Nadie va a bajar una app para pedir hora de corte.</p>
+        <p style="margin-block-start: var(--sp-s); color: var(--tinta-med);">El problema no es reservar. El problema es que <strong>una hora perdida no se recupera nunca</strong>. No es como un producto que queda en la bodega. Si el martes a las 16:00 la silla está vacía, ese martes a las 16:00 no vuelve.</p>
+        <p style="margin-block-start: var(--sp-s); color: var(--tinta-med);">Y lo que más duele: <strong>casi siempre había alguien que quería esa hora.</strong> Estaba en la lista de espera, en un mensaje sin leer, en un "avísame si se desocupa algo" de hace tres días. Nadie tuvo tiempo de avisarle.</p>
+
+        <ul class="lista lista--alerta" style="margin-block-start: var(--sp-m);">
+          <li><strong>No-shows:</strong> reservan y no llegan. Nadie confirma nada.</li>
+          <li><strong>Cancelaciones tardías:</strong> avisan a las 8 AM para las 10 AM. Imposible rellenar a mano.</li>
+          <li><strong>Lista de espera muerta:</strong> existe, pero vive en un cuaderno o en la cabeza de la recepcionista.</li>
+          <li><strong>Mensajes a las 23:00:</strong> te escriben cuando cierras. Contestas al otro día. La clienta ya se fue a otro lado.</li>
+        </ul>
+      </div>
+
+      <div class="ficha ficha--alerta">
+        <p class="eyebrow eyebrow--tinta">La cuenta, sin humo</p>
+        <h3 style="margin-block-end: var(--sp-s);">Peluquería de 3 sillas, Ñuñoa</h3>
+        <div class="calculo">Capacidad     3 sillas × 7 horas × 24 días = <b>504</b> bloques/mes
+Ocupación     70%                        → <b>353</b> reservas/mes
+Ticket medio                                <b>$25.000</b>
+Facturación   353 × $25.000              = <b>$8.825.000</b>/mes
+
+<b>NO-SHOWS</b>      353 × 14%                  = <b>49</b> horas muertas
+              49 × $25.000               = <b>$1.235.000</b>/mes
+
+<b>HUECOS</b>        cancela &lt;24h: 353 × 8%     = <b>28</b> horas
+              hoy rellenas a mano el 20% →  22 se pierden
+              22 × $25.000               = <b>$550.000</b>/mes
+
+              ────────────────────────────────────────
+              AGUJERO MENSUAL              <b>$1.785.000</b>
+              AGUJERO ANUAL               <b>$21.420.000</b></div>
+        <p class="fuente" style="margin-block-start: var(--sp-s);">
+          <strong>Supuestos declarados.</strong> Ocupación 70%, ticket $25.000 y tasa de no-show de 14% son <em>estimaciones nuestras</em> calibradas con entrevistas a locales en Ñuñoa y Providencia, no un censo. La literatura de servicios con hora agendada reporta no-shows entre 10% y 30% según rubro; usamos 14% por ser conservador para belleza. Cambia el ticket y cambia todo: la calculadora está en <a href="negocio.html#unitaria">Negocio</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CÓMO FUNCIONA ================= -->
+  <section class="container">
+    <p class="eyebrow">Cómo funciona</p>
+    <h2>Tres cosas. Ninguna le cambia la vida a tu clienta.</h2>
+
+    <div class="pasos" style="margin-block-start: var(--sp-l);">
+      <div class="paso">
+        <div>
+          <h3>El agente contesta. Siempre.</h3>
+          <p>Conectamos un número de WhatsApp Business a tu agenda. El agente responde en 4 segundos, a las 11 de la noche o el domingo: ofrece horas reales, reserva, reagenda, cobra abono si tú quieres. Habla como habla tu local — el tono lo defines tú.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div>
+          <h3>Confirma antes de que se te caiga.</h3>
+          <p>24 horas antes manda el recordatorio. La clienta aprieta <em>Confirmo</em> o <em>No puedo</em>. Si no responde y su historial dice que es de las que no llega, el agente ya empieza a mover la lista de espera <strong>antes</strong> de que el hueco exista.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div>
+          <h3>Zurce el hueco. Solo.</h3>
+          <p>Alguien cancela → el motor ordena tu lista de espera por calce (servicio, duración, horario que pidió, cuánto lleva esperando) → le escribe al primero → si no contesta en 8 minutos, al siguiente. La hora se vuelve a vender antes de que tú te enteres de que se cayó.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EN VIVO ================= -->
+  <section class="container">
+    <p class="eyebrow">Esto está corriendo ahora, en tu navegador</p>
+    <h2>El martes a las 23:11, Camila quiere hora.</h2>
+
+    <div class="vivo" style="margin-block-start: var(--sp-l);">
+      <div>
+        <div class="fono">
+          <div class="fono__barra">
+            <div class="fono__ini" id="v-ini">C</div>
+            <div>
+              <div class="fono__nombre" id="v-nombre">Camila Reyes</div>
+              <div class="fono__estado" id="v-estado">+56 9 8412 ····</div>
+            </div>
+          </div>
+          <div class="fono__hilo" id="v-hilo" aria-live="polite" aria-label="Conversación de WhatsApp"></div>
+          <div class="fono__pie">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span id="v-pie">Agente activo</span>
+          </div>
+        </div>
+        <div class="escena__ctrl">
+          <button class="btn-mini" id="v-escena-1" data-activo="true">Escena 1 · Pide hora</button>
+          <button class="btn-mini" id="v-escena-2">Escena 2 · Cancela y se rescata</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="tira">
+          <div class="tira__cab">
+            <span>Sábado 18 · Silla de Marisol</span>
+            <span id="v-fecha">Hoy</span>
+          </div>
+          <div id="v-agenda"></div>
+          <div class="contador">
+            <span style="font-size:.82rem; color: var(--tinta-suave);">Rescatado hoy</span>
+            <b id="v-rescatado">$0</b>
+          </div>
+        </div>
+        <div class="ficha" style="margin-block-start: var(--sp-m);" id="v-nota">
+          <p class="eyebrow eyebrow--tinta">Qué está pasando</p>
+          <p id="v-nota-txt" style="font-size:.92rem; color: var(--tinta-med);">Camila escribe un martes a las 23:11. El local está cerrado hace cuatro horas. El agente contesta igual.</p>
+        </div>
+        <p style="margin-block-start: var(--sp-s);"><a href="demo/index.html" style="font-family: var(--mono); font-size:.82rem; text-transform: uppercase; letter-spacing:.08em; color: var(--sello);">Abrir el demo completo, con la agenda y el motor de rescate →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRECIOS ================= -->
+  <section class="container" id="plata">
+    <p class="eyebrow">Precios</p>
+    <h2>En pesos, sin asteriscos.</h2>
+    <p class="lede" style="margin-block-start: var(--sp-s);">Meta le cobra al negocio por cada mensaje que <em>tú</em> inicias (recordatorios, ofertas de hueco). Ese costo lo pagamos nosotros hasta el tope de tu plan, y está declarado en <a href="stack.html#costos">Arquitectura</a> con la aritmética a la vista. Odiamos las sorpresas tanto como tú.</p>
+
+    <div class="precios" style="margin-block-start: var(--sp-l);">
+      <div class="ficha plan">
+        <p class="eyebrow eyebrow--tinta">Silla</p>
+        <p class="plan__precio">$34.000 <span>/mes</span></p>
+        <ul class="lista">
+          <li>1 profesional</li>
+          <li>Hasta 150 reservas/mes</li>
+          <li>400 mensajes iniciados incluidos</li>
+          <li>Agente, recordatorios y rescate</li>
+        </ul>
+        <a class="btn btn--fantasma" href="demo/index.html">Probar</a>
+        <p class="fuente" style="margin-block-start: var(--sp-s); border:0; padding:0;">Kinesióloga, manicurista, tatuador, podóloga.</p>
+      </div>
+
+      <div class="ficha plan plan--estrella">
+        <p class="eyebrow">Local</p>
+        <p class="plan__precio">$79.000 <span>/mes</span></p>
+        <ul class="lista">
+          <li>Hasta 8 profesionales</li>
+          <li>Hasta 700 reservas/mes</li>
+          <li>1.500 mensajes iniciados incluidos</li>
+          <li>Lista de espera y motor de rescate</li>
+          <li>Scoring de no-show por cliente</li>
+          <li>Se conecta a AgendaPro, Reservo o Google Calendar</li>
+        </ul>
+        <a class="btn" href="demo/index.html">Probar 14 días</a>
+        <p class="fuente" style="margin-block-start: var(--sp-s); border:0; padding:0;">Peluquería, barbería, centro de estética, veterinaria, consulta dental.</p>
+      </div>
+
+      <div class="ficha plan">
+        <p class="eyebrow eyebrow--tinta">Cadena</p>
+        <p class="plan__precio">$210.000 <span>/mes</span></p>
+        <ul class="lista">
+          <li>Hasta 3 sucursales</li>
+          <li>+$60.000 por sucursal adicional</li>
+          <li>Reservas cruzadas entre locales</li>
+          <li>Reportes por sucursal y profesional</li>
+        </ul>
+        <a class="btn btn--fantasma" href="demo/index.html">Probar</a>
+        <p class="fuente" style="margin-block-start: var(--sp-s); border:0; padding:0;">Cadenas de barbería, redes dentales, clínicas veterinarias.</p>
+      </div>
+    </div>
+
+    <p class="fuente" style="margin-block-start: var(--sp-m);">
+      Excedente: <span class="mono">$19</span> por mensaje iniciado sobre el tope del plan. Sin costo de instalación, sin contrato de permanencia, cancelas cuando quieras. Precio fundador de <span class="mono">$49.000</span> congelado de por vida para los primeros 20 locales.
+    </p>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section class="container">
+    <p class="eyebrow">Preguntas</p>
+    <h2>Lo que nos preguntan en la primera reunión.</h2>
+
+    <div class="faq" style="margin-block-start: var(--sp-l); max-width: 68ch;">
+      <details open>
+        <summary>¿Mis clientas tienen que descargar una app?</summary>
+        <p>No. Nada. Le escriben al mismo WhatsApp de siempre y les contesta un mensaje de WhatsApp normal. Ése es el punto entero: en Chile la gente pide hora por WhatsApp y no va a cambiar. El que se adapta somos nosotros.</p>
+      </details>
+      <details>
+        <summary>¿Puedo usar el mismo número que uso hoy?</summary>
+        <p>Sí, pero con letra chica y te la decimos ahora: WhatsApp Business Platform (la API oficial de Meta) exige que el número esté <em>dedicado</em> a la API. Si migramos el tuyo, dejas de poder usar la app de WhatsApp Business en ese teléfono — todo pasa por Zurcia. El trámite de migración con Meta demora entre 3 y 7 días. La alternativa es partir con un número nuevo y dejar un desvío desde el viejo; muchos locales prefieren esto las primeras semanas.</p>
+      </details>
+      <details>
+        <summary>¿Y si el agente le dice una estupidez a una clienta?</summary>
+        <p>Las primeras dos semanas parte en <strong>modo copiloto</strong>: el agente redacta y tu recepcionista aprieta enviar. Cuando ves que no la embarra, lo sueltas. Y aun suelto: nunca inventa precios (los lee de tu lista), nunca da una hora que no existe (consulta la agenda antes de responder), y cualquier cosa que huela a reclamo, a una consulta médica o a algo que no entiende, te la pasa a ti con una alerta. La tasa de intervención humana la ves en el panel, todos los días.</p>
+      </details>
+      <details>
+        <summary>Ya pago AgendaPro. ¿Tengo que botarlo?</summary>
+        <p>No. AgendaPro y Reservo son buenos en lo que hacen: el calendario, la ficha, la caja. Nosotros somos la capa que habla por WhatsApp y la que rellena los huecos — dos cosas que ellos hoy no hacen. Nos conectamos a su calendario y listo. Si mañana quieres que también seamos tu agenda, también podemos, pero no es la pelea que queremos dar.</p>
+      </details>
+      <details>
+        <summary>¿Cuánto se demora la instalación?</summary>
+        <p>Una tarde. Cargar servicios, duraciones y precios: 40 minutos. Conectar la agenda: 20 minutos. La verificación de Meta Business (te la hacemos nosotros, pero depende de ellos): entre 1 y 5 días hábiles. Ése es el paso lento y no depende de nosotros; te lo decimos de frente.</p>
+      </details>
+      <details>
+        <summary>¿De verdad rellena los huecos o es una promesa de folleto?</summary>
+        <p>Rellena los que se puedan rellenar, y te mostramos el número todos los meses. Con lista de espera activa y avisos con más de 4 horas de anticipación, en nuestros locales piloto se rescató entre el 50% y el 60% de los huecos. Con un aviso de 30 minutos, casi ninguno: nadie llega a una peluquería en media hora. No te vamos a prometer 100%, porque no existe.</p>
+      </details>
+      <details>
+        <summary>¿Qué pasa si me paso de los mensajes incluidos?</summary>
+        <p>Te avisamos al 80% del tope y te cobramos <span class="mono">$19</span> por mensaje adicional — que es aproximadamente lo que nos cobra Meta más un margen chico. No lo escondemos: la tabla de costos completa, con lo que nos cobra Meta por mensaje y lo que nos cuesta la IA, está publicada en <a href="stack.html#costos">Arquitectura</a>.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= CIERRE ================= -->
+  <section class="container">
+    <div class="cierre">
+      <p class="eyebrow">Zurcia</p>
+      <h2>Una hora vacía es plata que ya se perdió. Nosotros la vamos a buscar.</h2>
+      <div style="display:flex; gap: var(--sp-xs); justify-content:center; flex-wrap: wrap; margin-block-start: var(--sp-m);">
+        <a class="btn" href="demo/index.html">Ver el demo</a>
+        <a class="btn btn--fantasma" href="negocio.html">Ver el negocio detrás</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div>
+      <strong style="font-family: var(--serif); color: var(--tinta);">Zurcia</strong> — <span class="mono">zurcia.com</span><br>
+      Zurcir: coser el agujero de una tela hasta que no se note.
+    </div>
+    <div>
+      <a href="../index.html">← Todas las ideas</a> ·
+      <a href="demo/index.html">Demo</a> ·
+      <a href="negocio.html">Negocio</a> ·
+      <a href="roadmap.html">Roadmap</a> ·
+      <a href="stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+<script src="assets/landing.js"></script>
+</body>
+</html>

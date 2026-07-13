@@ -1,0 +1,91 @@
+{
+  "slug": "03-agenda",
+  "marca": "Zurcia",
+  "pitch": "Un agente que vive en el WhatsApp de tu local: agenda, confirma y —cuando una hora se cae— la vuelve a vender antes de que te des cuenta.",
+  "problema": "Los servicios locales chilenos (peluquerías, dentistas, veterinarias, talleres, kinesiólogos) agendan por WhatsApp a mano. Una persona contesta mensajes todo el día. Los no-shows y las cancelaciones tardías se comen el margen —una hora perdida no se recupera nunca— y la agenda tiene huecos mientras hay gente esperando a la que nadie avisa.",
+  "cliente": "Peluquería o barbería de 2 a 5 sillas, comuna urbana de clase media, dueña presente que corta pelo y contesta el WhatsApp al mismo tiempo. $9–14M de venta al mes.",
+  "dominio": {
+    "elegido": "zurcia.com",
+    "verificado": "2026-07-12",
+    "metodo": "_kit/check-domain.sh — RDAP de Verisign para .com (404 = libre), NIC Chile para .cl",
+    "evidencia": "zurcia .com AVAILABLE (http 404) .cl AVAILABLE",
+    "alternativas": [
+      { "dominio": "horaza.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
+      { "dominio": "horalta.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
+      { "dominio": "sillana.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
+      { "dominio": "zurcio.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" }
+    ]
+  },
+  "direccion_de_arte": "Libro de citas: papel crema con pauta, tinta negra y timbre verde botella — el cuaderno de agenda que el producto reemplaza, no un dashboard oscuro.",
+  "tipografia": {
+    "titulos": "Petrona",
+    "texto": "IBM Plex Sans",
+    "datos": "IBM Plex Mono"
+  },
+  "paleta": {
+    "papel": "#F5F0E6",
+    "tinta": "#1C1A15",
+    "sello": "#14624A",
+    "ladrillo": "#A83A22",
+    "ambar": "#8A6412",
+    "graficos": ["#C0451F", "#1B8A5F", "#3C6DB8"]
+  },
+  "precio": {
+    "moneda": "CLP",
+    "planes": [
+      { "nombre": "Silla", "mensual": 34000, "para": "1 profesional", "mensajes_incluidos": 600 },
+      { "nombre": "Local", "mensual": 79000, "para": "2 a 6 profesionales", "mensajes_incluidos": 2500, "destacado": true },
+      { "nombre": "Cadena", "mensual": 210000, "para": "3 a 10 sucursales", "mensajes_incluidos": 8000 }
+    ],
+    "excedente_por_mensaje": 19,
+    "precio_fundador": 49000,
+    "arpu_mezclado": 87000
+  },
+  "unit_economics": {
+    "arpu": 87000,
+    "costo_meta_mes": 7297,
+    "costo_ia_mes": 7958,
+    "costo_infra_mes": 2700,
+    "costo_soporte_mes": 9500,
+    "margen_bruto": 0.65,
+    "cac": 250000,
+    "churn_mensual": 0.04,
+    "ltv": 1413750,
+    "ltv_cac": 5.7,
+    "payback_meses": 4.4
+  },
+  "mercado": {
+    "tam_usd": 76100000,
+    "sam_usd": 19000000,
+    "som_ano3_usd": 979000,
+    "tipo_cambio_supuesto": 960,
+    "nota": "Establecimientos estimados (70.000) a partir del orden de magnitud del registro de empresas del SII. Estimación propia, no censo."
+  },
+  "ia": {
+    "modelo_principal": "claude-haiku-4-5",
+    "modelo_escalado": "claude-sonnet-5",
+    "por_que": "El 96% de los turnos son intención simple (pedir hora, cancelar, preguntar precio). Haiku 4.5 con un prefijo cacheado de 4.600 tokens —por sobre su mínimo de caché de 4.096— cuesta US$7,26 por local al mes. Sonnet 5 sólo entra cuando hay reclamo o ambigüedad (4%).",
+    "regla_dura": "El modelo nunca inventa disponibilidad, precios ni horarios: todo sale de una herramienta contra Postgres."
+  },
+  "roadmap": {
+    "hitos": 6,
+    "horizonte_meses": 24,
+    "mrr_mes24_base_clp": 53940000,
+    "arr_mes24_base_usd": 674000,
+    "break_even": "mes 24",
+    "valle_de_caja": { "mes": 23, "caja_clp": 30500000 },
+    "probabilidad_1m_arr_30m": "10–18%, condicional a cumplir M3 en el mes 12",
+    "resultado_modal": "35–45% de terminar en US$300–500k de ARR, bootstrapeado, sin levantar"
+  },
+  "stack": [
+    "Node 22 + Fastify",
+    "Postgres 16 (btree_gist, restricción EXCLUDE contra doble booking)",
+    "Redis + BullMQ (cola idempotente por wamid)",
+    "Meta WhatsApp Cloud API",
+    "Anthropic API (Haiku 4.5 + Sonnet 5)",
+    "Flow (pagos en CLP)",
+    "Fly.io, Sentry, Axiom"
+  ],
+  "paginas": ["index.html", "demo/index.html", "negocio.html", "roadmap.html", "stack.html"],
+  "estado": "prototipo navegable, sin backend"
+}

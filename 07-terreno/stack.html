@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Rutamo · qué hay que construir y contratar de verdad</title>
+<meta name="description" content="Modelo de datos, agentes de IA con modelo y prompt, APIs a contratar, variables de entorno, costo mensual con la aritmética a la vista, y la lista honesta de lo que está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/rutamo.css">
+<style>
+  h2 { margin-top: var(--sp-xl); }
+  h3 { margin-top: var(--sp-l); }
+  main p, main ul, main ol { margin-top: var(--sp-s); }
+  main ul, main ol { padding-left: 1.2em; }
+  main li { margin-bottom: 6px; color: var(--ink-2); }
+
+  .layers { display: grid; gap: 2px; background: var(--ink); border: 1px solid var(--ink); margin-top: var(--sp-m); }
+  .layer { background: var(--panel); padding: 12px 14px; display: grid; gap: 4px; }
+  @media (min-width: 48em) { .layer { grid-template-columns: 170px 1fr; gap: 16px; align-items: start; } }
+  .layer b { font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }
+  .layer p { margin: 0; font-size: .92rem; color: var(--ink-2); }
+  .layer--hi { background: var(--hi); }
+  .layer--hi p { color: var(--ink); }
+
+  .ent { border: 1px solid var(--rule-2); background: var(--panel); margin-top: var(--sp-s); }
+  .ent__h { background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: .78rem;
+    font-weight: 600; padding: 7px 12px; letter-spacing: .04em; }
+  .ent__b { padding: 4px 12px 10px; font-family: var(--mono); font-size: .76rem; }
+  .ent__b div { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 10px; padding: 5px 0;
+    border-bottom: 1px dashed var(--rule); }
+  .ent__b div:last-child { border-bottom: 0; }
+  .ent__b i { font-style: normal; color: var(--muted); }
+  .ent__b i em { font-style: normal; color: var(--accent-ink); font-weight: 600; }
+  .grid2 { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .grid2 { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+  .agent { border: 1px solid var(--ink); background: var(--panel); margin-top: var(--sp-m); }
+  .agent__h { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid var(--ink); background: #EDE9DE; }
+  .agent__h b { font-size: 1rem; }
+  .agent__m { font-family: var(--mono); font-size: .72rem; background: var(--ink); color: var(--paper); padding: 3px 7px; }
+  .agent__b { padding: 14px; }
+  .agent__b p { margin-top: 0; }
+  .pmt { background: var(--ink); color: #D8D4CB; font-family: var(--mono); font-size: .74rem; line-height: 1.7;
+    padding: 12px 14px; white-space: pre-wrap; overflow-x: auto; margin-top: var(--sp-2xs); border-left: 4px solid var(--hi); }
+  .pmt b { color: var(--hi); font-weight: 600; }
+  .pmt i { color: #8A8478; font-style: normal; }
+  .toolrow { font-family: var(--mono); font-size: .76rem; margin-top: 10px; }
+  .toolrow span { display: inline-block; border: 1px solid var(--rule-2); padding: 3px 7px; margin: 0 4px 4px 0; }
+
+  .fake { border-left: 4px solid var(--critical); background: #FBF0EF; padding: 12px 14px; margin-top: var(--sp-s); }
+  .fake b { display: block; font-family: var(--mono); font-size: .78rem; margin-bottom: 3px; }
+  .fake p { margin: 0; font-size: .92rem; }
+  .fake em { font-style: normal; color: var(--critical); font-weight: 600; }
+
+  .env { font-family: var(--mono); font-size: .78rem; }
+  .env td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" fill="none" stroke="#14161A" stroke-width="2"/>
+        <path d="M6 23 L12 9 L18 17 L24 7" fill="none" stroke="#14161A" stroke-width="2.4"/>
+        <circle cx="24" cy="7" r="3.4" fill="#D9F02B" stroke="#14161A" stroke-width="2"/>
+      </svg>
+      <span class="brand__name">Ruta<em>mo</em></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__back" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Menú">Menú</summary>
+      <div class="menu__panel">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html">Negocio</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="stack.html" aria-current="page">Arquitectura</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main class="container" style="padding-block: var(--sp-l)">
+  <span class="eyebrow">Arquitectura</span>
+  <h1 style="max-width:24ch">Lo que habría que construir, contratar y pagar para que esto exista.</h1>
+  <p class="prose" style="margin-top:var(--sp-m)">
+    El demo de este sitio es una maqueta: corre entero en tu navegador, sin servidor. Esta página es la
+    diferencia entre esa maqueta y un producto — incluida <a href="#falso">la lista completa de lo que está
+    falseado</a>, que es la sección más importante de todo el sitio.
+  </p>
+
+  <!-- ================================================== TESIS TÉCNICA -->
+  <div class="hazard" style="margin-top:var(--sp-m);max-width:none">
+    <p><strong>La decisión técnica que define el negocio:</strong> la optimización de rutas
+    <strong>no la hace un modelo de lenguaje</strong>. La hace un solver clásico (OR-Tools / VROOM) sobre
+    matrices de tiempo reales de OSRM. Un LLM sería más caro, más lento y peor. La IA se usa donde el
+    lenguaje es el problema: leer un WhatsApp desordenado, redactar una cotización, resumir una visita.
+    Esa disciplina es la que sostiene el <strong>87% de margen bruto</strong>.</p>
+  </div>
+
+  <!-- ======================================================== CAPAS -->
+  <h2>Las capas</h2>
+  <div class="layers">
+    <div class="layer">
+      <b>Cliente despacho</b>
+      <p>SPA en TypeScript sin framework pesado (Preact + signals) sobre un mapa <strong>MapLibre GL</strong>
+      con teselas de un proveedor de mapas contratado. Sin build exótico: Vite, y listo.</p>
+    </div>
+    <div class="layer layer--hi">
+      <b>Cliente terreno</b>
+      <p><strong>PWA instalable, offline-first, y esto no es negociable.</strong> Service worker + IndexedDB
+      (Dexie). Cada acción del técnico se escribe primero local con un <span class="mono">id</span> generado
+      en el dispositivo (ULID) y se encola; el sync sube la cola cuando hay señal. Resolución de conflictos:
+      last-write-wins por campo, salvo en pagos y firmas, que son <strong>append-only</strong> y nunca se
+      sobrescriben. Fotos y firma van a un almacén local y suben comprimidas cuando hay red.</p>
+    </div>
+    <div class="layer">
+      <b>API</b>
+      <p>Node 22 + Fastify + Postgres 16 (Neon o Fly Postgres). REST simple, no GraphQL. Autenticación por
+      OTP a WhatsApp/SMS — los técnicos no van a recordar una contraseña, y una contraseña compartida entre
+      cinco maestros es lo que hay hoy.</p>
+    </div>
+    <div class="layer">
+      <b>Motor de rutas</b>
+      <p><strong>OSRM</strong> autohospedado con el extracto de Chile de OpenStreetMap (matriz de tiempos
+      calle a calle) + <strong>VROOM</strong> u <strong>OR-Tools</strong> para resolver el VRPTW (ventanas de
+      tiempo, skills por técnico, capacidad, urgencias fijadas). Corre en un worker aparte, con cola. Se
+      recalcula al asignar, al reordenar y cuando entra una urgencia.</p>
+    </div>
+    <div class="layer">
+      <b>IA</b>
+      <p>Claude vía API de Anthropic. Cinco agentes acotados, ninguno en el camino crítico de la ruta.
+      Detalle y costo más abajo.</p>
+    </div>
+    <div class="layer">
+      <b>Integraciones</b>
+      <p>WhatsApp Business API (Meta Cloud API o Twilio), pasarela de pago (Transbank Webpay Plus / Mercado
+      Pago / Khipu), y DTE (boleta/factura electrónica ante el SII) a través de un proveedor certificado.</p>
+    </div>
+  </div>
+
+  <!-- ================================================= MODELO DE DATOS -->
+  <h2>Modelo de datos</h2>
+  <p class="prose">Doce tablas. El corazón es <span class="mono">visita</span>: todo lo que el técnico hace en
+  terreno cuelga de ahí, y todo lo que el despachador mueve en el mapa es la misma fila.</p>
+
+  <div class="grid2" style="margin-top:var(--sp-s)">
+    <div>
+      <div class="ent">
+        <div class="ent__h">empresa</div>
+        <div class="ent__b">
+          <div><span>id</span><i>uuid <em>PK</em></i></div>
+          <div><span>rut</span><i>text · 76.543.210-K</i></div>
+          <div><span>razon_social</span><i>text</i></div>
+          <div><span>plan</span><i>enum · maestro | cuadrilla | flota</i></div>
+          <div><span>bodega_lat/lng</span><i>numeric · punto de partida de las rutas</i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">usuario</div>
+        <div class="ent__b">
+          <div><span>id</span><i>uuid <em>PK</em></i></div>
+          <div><span>empresa_id</span><i><em>FK</em> → empresa</i></div>
+          <div><span>rol</span><i>enum · dueño | despacho | técnico</i></div>
+          <div><span>telefono</span><i>text · login por OTP</i></div>
+          <div><span>skills</span><i>text[] · clima, refri, gas, eléctrico, ascensor</i></div>
+          <div><span>costo_hora</span><i>int · CLP, alimenta el cálculo de ahorro</i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">cliente · sitio · equipo</div>
+        <div class="ent__b">
+          <div><span>cliente.id</span><i>uuid · Clínica Las Condes, Cencosud…</i></div>
+          <div><span>sitio.direccion</span><i>text + lat/lng geocodificados</i></div>
+          <div><span>sitio.acceso</span><i>text · «entrar por Bilbao, pedir llave a conserjería»</i></div>
+          <div><span>equipo.marca_modelo</span><i>text · Chiller Carrier 30RB-060</i></div>
+          <div><span>equipo.serie</span><i>text · única, es la llave del historial</i></div>
+          <div><span>equipo.historial</span><i>→ todas las visitas de esa serie</i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">repuesto · movimiento_bodega</div>
+        <div class="ent__b">
+          <div><span>sku / nombre</span><i>text · Contactor Schneider LC1D18</i></div>
+          <div><span>precio_venta</span><i>int · CLP neto</i></div>
+          <div><span>stock_bodega</span><i>int</i></div>
+          <div><span>stock_camioneta</span><i>jsonb · por usuario</i></div>
+          <div><span>movimiento</span><i>append-only · quién sacó qué y para qué OT</i></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ent" style="border-width:2px;border-color:var(--ink)">
+        <div class="ent__h" style="background:var(--hi);color:var(--ink)">visita ← el corazón</div>
+        <div class="ent__b">
+          <div><span>id</span><i>ulid <em>PK</em> · generado en el dispositivo, offline-safe</i></div>
+          <div><span>empresa_id</span><i><em>FK</em></i></div>
+          <div><span>sitio_id · equipo_id</span><i><em>FK</em></i></div>
+          <div><span>tecnico_id</span><i><em>FK</em> → usuario · null = sin asignar</i></div>
+          <div><span>tipo</span><i>enum · mantención | correctivo | urgencia | revisita</i></div>
+          <div><span>estado</span><i>enum · pendiente → en_ruta → en_sitio → cerrada | fallida</i></div>
+          <div><span>ventana</span><i>tstzrange · «entre 09:00 y 13:00»</i></div>
+          <div><span>duracion_est</span><i>int · minutos, alimenta el solver</i></div>
+          <div><span>orden_en_ruta</span><i>int · lo que el solver escribe</i></div>
+          <div><span>eta</span><i>timestamptz · lo que se le manda al cliente</i></div>
+          <div><span>llegada_real</span><i>timestamptz · para medir el error del ETA</i></div>
+          <div><span>origen</span><i>enum · manual | whatsapp | correo | recurrente</i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">orden_trabajo (1:1 con visita cerrada)</div>
+        <div class="ent__b">
+          <div><span>diagnostico</span><i>text · dictado o escrito por el técnico</i></div>
+          <div><span>items[]</span><i>jsonb · repuesto/servicio, cantidad, precio</i></div>
+          <div><span>neto · iva · total</i></span><i>int · IVA 19%</i></div>
+          <div><span>fotos[]</span><i>text[] · claves de objeto en el bucket</i></div>
+          <div><span>firma</span><i>text · PNG en base64, quién firmó y su RUT</i></div>
+          <div><span>firmada_en</span><i>timestamptz · <em>append-only</em></i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">pago</div>
+        <div class="ent__b">
+          <div><span>ot_id</span><i><em>FK</em></i></div>
+          <div><span>medio</span><i>enum · webpay | mercadopago | khipu | transferencia | efectivo</i></div>
+          <div><span>estado</span><i>enum · pendiente → pagado | rechazado</i></div>
+          <div><span>token_pasarela</span><i>text · idempotente, <em>append-only</em></i></div>
+          <div><span>dte_folio</span><i>text · folio del SII una vez emitido</i></div>
+        </div>
+      </div>
+      <div class="ent">
+        <div class="ent__h">evento_sync (cola offline)</div>
+        <div class="ent__b">
+          <div><span>id</span><i>ulid · generado en el teléfono</i></div>
+          <div><span>tipo</span><i>llegada | cierre | foto | firma | pago | repuesto</i></div>
+          <div><span>payload</span><i>jsonb</i></div>
+          <div><span>creado_en_disp</span><i>timestamptz · hora del teléfono, no del server</i></div>
+          <div><span>subido_en</span><i>timestamptz · null = todavía en el bolsillo</i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================== AGENTES IA -->
+  <h2>Agentes de IA</h2>
+  <p class="prose">Cinco agentes, cada uno con una tarea que un humano hace hoy en 3–10 minutos. Ninguno decide
+  rutas, ninguno decide precios sin que un humano confirme, y ninguno manda un mensaje a un cliente final sin
+  aprobación. El modelo se elige por tarea, no por prestigio: <strong>Haiku para clasificar, Sonnet para
+  redactar, Opus sólo para el informe semanal</strong> — donde el razonamiento sí paga.</p>
+
+  <article class="agent">
+    <div class="agent__h">
+      <b>A1 · Triaje de entrada</b>
+      <span class="agent__m">claude-haiku-4-5 · US$1,20/cuenta/mes</span>
+    </div>
+    <div class="agent__b">
+      <p><strong>Qué hace:</strong> lee el WhatsApp / correo / transcripción de llamada que llega y devuelve
+      una visita estructurada: cliente, sitio, equipo (haciendo <em>match</em> contra la lista real del cliente),
+      urgencia, duración estimada y qué repuesto probablemente se necesita. Lo que hoy hace la administradora
+      copiando a mano al cuaderno.</p>
+      <div class="pmt"><b>system:</b> Eres el triaje de una empresa chilena de servicio técnico en terreno.
+Recibes un mensaje crudo de un cliente. Devuelves SOLO la herramienta crear_visita.
+
+Reglas duras:
+- <b>Nunca inventes</b> un sitio o un equipo que no esté en el catálogo entregado.
+  Si no calza, deja el campo en null y marca requiere_confirmacion: true.
+- "urgente" en el texto NO basta: urgencia = true solo si hay riesgo
+  (fuga de gas, sin frío en cámara con producto, ascensor con gente adentro,
+  sin agua caliente en clínica). "Cuando puedas" nunca es urgencia.
+- duracion_min: usa el promedio histórico de ese tipo de trabajo en ese equipo
+  si viene en el contexto; si no, 60.
+- Español de Chile. No traduzcas nombres de repuestos ni marcas.
+
+<i>[contexto inyectado: catálogo de sitios y equipos del cliente, últimas 20 visitas
+ de ese cliente, catálogo de repuestos con precios]</i></div>
+      <div class="toolrow">
+        <span>tool: crear_visita(sitio_id, equipo_id, tipo, urgencia, duracion_min, resumen, repuestos_probables[], requiere_confirmacion)</span>
+        <span>tool: buscar_sitio(texto)</span>
+        <span>tool: escalar_a_humano(motivo)</span>
+      </div>
+      <p class="src"><b>Guardarraíl:</b> toda visita creada por A1 entra a la bandeja marcada
+      <span class="mono">IA</span> y necesita un clic del despachador para entrar a la ruta. Nunca escribe
+      directo en una ruta activa. Si <span class="mono">requiere_confirmacion</span> es true, se muestra el
+      texto original al lado.</p>
+    </div>
+  </article>
+
+  <article class="agent">
+    <div class="agent__h">
+      <b>A2 · Redactor de cotización en terreno</b>
+      <span class="agent__m">claude-sonnet-5 · US$1,76/cuenta/mes</span>
+    </div>
+    <div class="agent__b">
+      <p><strong>Qué hace:</strong> el técnico dicta «hay que cambiar el contactor y el presostato de baja, más
+      dos horas de mano de obra». A2 arma la cotización con SKU, precios del catálogo del cliente, neto, IVA y
+      total, y escribe la descripción que el cliente va a leer antes de firmar. <strong>El técnico revisa y
+      corrige antes de mostrarla.</strong></p>
+      <div class="pmt"><b>system:</b> Redactas cotizaciones para servicio técnico en terreno, en Chile.
+Entrada: notas del técnico (dictadas, con errores, en jerga de maestro).
+Salida: la herramienta armar_cotizacion.
+
+Reglas duras:
+- Precios SOLO del catálogo entregado. <b>Si un ítem no está, no le inventes precio:</b>
+  agrégalo con precio null y marca falta_precio: true.
+- Mano de obra se cobra por hora completa iniciada, tarifa del catálogo.
+- El monto va SIEMPRE en pesos chilenos, neto + IVA 19% desglosado.
+- La descripción para el cliente: máximo 3 frases, sin jerga, dice
+  QUÉ se rompió, QUÉ se hace y QUÉ pasa si no se hace.
+- No prometas plazos ni garantías que no estén en el catálogo.
+
+<i>[contexto: catálogo de repuestos con precio, tarifa de mano de obra del cliente,
+ historial del equipo por número de serie]</i></div>
+      <div class="toolrow">
+        <span>tool: armar_cotizacion(items[], neto, iva, total, descripcion_cliente, falta_precio)</span>
+        <span>tool: buscar_repuesto(texto)</span>
+        <span>tool: historial_equipo(serie)</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="agent">
+    <div class="agent__h">
+      <b>A3 · Cierre de visita desde la nota de voz</b>
+      <span class="agent__m">claude-haiku-4-5 + ASR · US$0,57 + US$0,85</span>
+    </div>
+    <div class="agent__b">
+      <p><strong>Qué hace:</strong> el técnico aprieta un botón grande y habla 40 segundos con el guante puesto.
+      Un servicio de transcripción (no un LLM) convierte el audio a texto; A3 lo convierte en el diagnóstico
+      formal, los repuestos consumidos (que descuenta de la camioneta) y la recomendación al cliente. Es la
+      diferencia entre que el técnico cierre la visita o no la cierre.</p>
+      <div class="pmt"><b>system:</b> Conviertes la nota de voz de un maestro en el cierre formal de la visita.
+El audio viene con ruido, muletillas y jerga chilena de terreno.
+
+Reglas duras:
+- Repuestos consumidos: SOLO los que el técnico nombra Y existen en el stock
+  de su camioneta. Cualquier otro va a "pendiente de confirmar".
+- Si el maestro dice que faltó un repuesto, marca requiere_revisita: true
+  y estima cuándo estará disponible según el stock de bodega.
+- Nunca escribas un diagnóstico más seguro que lo que dijo el técnico.
+  Si dijo "parece que es el compresor", escribe "posible falla de compresor".
+- No inventes mediciones (presiones, amperajes) que no estén en el audio.</div>
+      <div class="toolrow">
+        <span>tool: cerrar_visita(diagnostico, items_usados[], recomendacion, requiere_revisita)</span>
+        <span>tool: stock_camioneta(tecnico_id)</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="agent">
+    <div class="agent__h">
+      <b>A4 · Informe semanal para el dueño</b>
+      <span class="agent__m">claude-opus-4-8 · US$0,39/cuenta/mes</span>
+    </div>
+    <div class="agent__b">
+      <p><strong>Qué hace:</strong> los lunes a las 07:00 llega un WhatsApp de 6 líneas: qué se facturó, qué
+      quedó sin cobrar, qué técnico está sobrecargado, qué cliente está pidiendo más visitas de las que su
+      contrato cubre, y <strong>qué equipo se va a romper</strong> según su patrón de fallas. Es el único
+      agente que corre en Opus, porque es el único que tiene que <em>razonar</em> sobre datos cruzados en vez
+      de transformar un texto.</p>
+      <div class="pmt"><b>system:</b> Escribes el informe semanal para el dueño de una empresa de servicio
+técnico. Él lo lee en el teléfono, caminando. 6 líneas máximo.
+
+Reglas duras:
+- Cada afirmación va con su número. "Vas mal en cobranza" no sirve;
+  "$2.340.000 en 6 OT firmadas y no pagadas, la más vieja de hace 23 días" sí.
+- Prioriza por plata, no por cantidad.
+- Si detectas un equipo con 3+ visitas correctivas en 90 días, dilo:
+  es una venta de reemplazo, no una falla.
+- <b>Si no hay nada relevante, dilo en una línea y cállate.</b> No rellenes.
+- Nunca acuses a un técnico. Muestra el dato y deja que él concluya.</div>
+      <div class="toolrow">
+        <span>tool: metricas_semana(empresa_id)</span>
+        <span>tool: ot_impagas(empresa_id)</span>
+        <span>tool: equipos_reincidentes(empresa_id, dias)</span>
+        <span>tool: enviar_whatsapp(usuario_id, texto)</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="agent">
+    <div class="agent__h">
+      <b>A5 · Clasificador de repuesto faltante</b>
+      <span class="agent__m">claude-haiku-4-5 · US$0,23/cuenta/mes</span>
+    </div>
+    <div class="agent__b">
+      <p><strong>Qué hace:</strong> cuando una visita falla por falta de repuesto, A5 lo normaliza contra el
+      catálogo (el maestro escribe «presostato baja Danfoss», el catálogo dice «Presostato de baja Danfoss
+      TES2»), avisa a bodega y agenda la revisita. El 20% de las visitas fallidas del sector se pierden acá.</p>
+      <div class="pmt"><b>system:</b> Normalizas nombres de repuestos escritos por maestros contra un catálogo.
+Devuelves el SKU exacto o null. <b>Jamás adivines un SKU con confianza baja:</b>
+si la similitud no es evidente, devuelve null y propone los 3 candidatos
+más cercanos para que un humano elija. Un SKU equivocado hace viajar
+una camioneta al otro lado de Santiago para nada.</div>
+      <div class="toolrow">
+        <span>tool: normalizar_repuesto(texto) → sku | candidatos[]</span>
+        <span>tool: crear_revisita(visita_id, sku, eta_stock)</span>
+      </div>
+    </div>
+  </article>
+
+  <h3>Costo de inferencia, con la aritmética a la vista</h3>
+  <p class="prose">Cuenta de referencia: <strong>5 técnicos, ~260 visitas al mes</strong>. Precios de lista de
+  la API de Anthropic (Haiku 4.5 US$1/US$5 por 1M de tokens; Sonnet 5 US$3/US$15; Opus 4.8 US$5/US$25).</p>
+  <div class="math">
+A1 Triaje         400 msj  × (1.500 tok in + 300 out)   Haiku
+                  0,60M in × US$1  = US$0,60
+                  0,12M out× US$5  = US$0,60            → <b>US$1,20</b>
+
+A2 Cotización      90 cot  × (3.000 tok in + 700 out)   Sonnet 5
+                  0,27M in × US$3  = US$0,81
+                  0,063M out×US$15 = US$0,95            → <b>US$1,76</b>
+
+A3 Cierre de OT   260 vis  × (1.200 tok in + 200 out)   Haiku
+                  0,312M in× US$1  = US$0,31
+                  0,052M out× US$5 = US$0,26            → <b>US$0,57</b>
+   + transcripción 140 audios × ~1 min × US$0,006/min   → <b>US$0,85</b>
+
+A4 Informe          4 inf  × (12.000 tok in + 1.500 out) Opus 4.8
+                  0,048M in× US$5  = US$0,24
+                  0,006M out× US$25= US$0,15            → <b>US$0,39</b>
+
+A5 Repuestos      150 clas × (900 tok in + 120 out)     Haiku
+                  0,135M in× US$1  = US$0,14
+                  0,018M out× US$5 = US$0,09            → <b>US$0,23</b>
+                                                        ─────────────────
+TOTAL IA por cuenta/mes                                  <b>US$5,00</b>
+                                            × $950/US$ =  <b>$4.750 CLP</b>
+  </div>
+  <p class="src"><b>Dos cosas sobre este número.</b> Primero: está calculado <b>sin prompt caching</b>. El
+  catálogo del cliente que va en el contexto de A1 y A2 es idéntico en cada llamada — con caching, la entrada
+  baja ~30% y el costo real quedaría cerca de <b>US$3,7</b>. Ese colchón es a propósito: absorbe a las cuentas
+  intensivas sin que tengamos que subir el precio. Segundo: si mañana un modelo mejor baja el precio, el margen
+  sube solo. Si sube, tenemos 87 puntos de margen bruto para amortiguarlo.</p>
+
+  <!-- ====================================================== COSTO -->
+  <h2>Costo mensual por cuenta</h2>
+  <p class="prose">Este es el COGS que <a href="negocio.html">negocio.html</a> descuenta del ARPA de
+  <span class="mono">$145.000</span> para llegar al 87% de margen bruto. Calculado a <strong>40 cuentas</strong>
+  (la escala del mes 12 en el escenario base).</p>
+  <div class="scroll-x">
+    <table class="table">
+      <thead><tr><th>Línea</th><th>Cómo se calcula</th><th class="n">CLP/cuenta/mes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Inferencia (Claude)</strong></td><td>US$5,00 × $950 · derivación completa arriba</td><td class="n">$4.750</td></tr>
+        <tr><td><strong>WhatsApp Business API</strong></td><td>~60 conversaciones de servicio/utility al mes × US$0,04 = US$2,40 × $950</td><td class="n">$2.280</td></tr>
+        <tr><td><strong>Infraestructura</strong></td><td>app US$50 + Postgres US$40 + storage/CDN de fotos US$25 + worker OSRM/VROOM US$35 + logs US$10 = <strong>US$160/mes ÷ 40 cuentas</strong> = US$4,0 × $950</td><td class="n">$3.800</td></tr>
+        <tr><td><strong>Soporte + éxito de cliente</strong></td><td>Media jornada de un CS ($800.000 bruto ≈ $320.000 la media jornada al margen) ÷ 40 cuentas</td><td class="n">$8.000</td></tr>
+        <tr><td colspan="2"><strong>COGS total</strong></td><td class="n"><strong>$18.830</strong></td></tr>
+        <tr><td colspan="2">ARPA</td><td class="n">$145.000</td></tr>
+        <tr><td colspan="2"><strong>Margen bruto</strong></td><td class="n"><strong>$126.170 · 87,0%</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src">Lo que <b>no</b> está en el COGS y sí en la quema: sueldos de producto e ingeniería, el AE, la
+  comisión de la pasarela de pago (la paga el cliente final del cliente, no nosotros — pero hay que decírselo
+  al dueño en la venta), y el proveedor de teselas de mapa (plan gratuito hasta ~50k cargas/mes; sobre eso,
+  ~US$25/mes que entra en infraestructura). <b>El soporte es la línea que más miedo da:</b> si cada cuenta
+  necesita 2 horas al mes en vez de 30 minutos, el margen cae a 78% y el modelo de precio hay que rehacerlo.</p>
+
+  <!-- ================================================= APIS A CONTRATAR -->
+  <h2>APIs y servicios a contratar</h2>
+  <div class="scroll-x">
+    <table class="table">
+      <thead><tr><th>Servicio</th><th>Para qué</th><th>Qué hay que hacer, en concreto</th><th class="n">Fricción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Anthropic API</strong></td>
+          <td>Los 5 agentes</td>
+          <td>Cuenta, tarjeta, clave. Es lo más fácil de toda esta tabla: media hora.</td>
+          <td class="n">Baja</td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp Business Platform</strong> (Meta Cloud API)</td>
+          <td>Entrada de urgencias, aviso de ETA al cliente final, informe al dueño</td>
+          <td>Verificación de negocio en Meta (RUT, comprobante de domicilio), número dedicado, y
+          <strong>plantillas aprobadas</strong> por Meta para todo mensaje que iniciemos nosotros. La
+          aprobación de plantillas es lenta y arbitraria. <span class="tag">verificar precios por conversación
+          vigentes: Meta los ha cambiado varias veces</span></td>
+          <td class="n"><strong>Alta</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Transbank Webpay Plus</strong> · alternativas: Mercado Pago, Khipu, Flow</td>
+          <td>El link de pago que el técnico muestra en el teléfono</td>
+          <td>Transbank exige contrato de comercio y certificación técnica; el ambiente de integración es
+          público, la salida a producción no. <strong>Mercado Pago y Khipu se activan en un día</strong> — el
+          plan es partir con ellos y agregar Webpay cuando un cliente grande lo exija.</td>
+          <td class="n"><strong>Alta</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Proveedor DTE</strong> (Bsale · Nubox · Defontana · LibreDTE)</td>
+          <td>Emitir boleta o factura electrónica al cerrar la OT</td>
+          <td>No emitimos DTE nosotros: sería certificarnos ante el SII y no aporta nada. Nos integramos al
+          proveedor que el cliente <em>ya usa</em>. Cada uno tiene su API. Empezar por uno solo.
+          <span class="tag">verificar cuál domina en el segmento antes de elegir</span></td>
+          <td class="n">Media</td>
+        </tr>
+        <tr>
+          <td><strong>OpenStreetMap</strong> + OSRM autohospedado</td>
+          <td>Matriz de tiempos de viaje calle a calle</td>
+          <td>Extracto de Chile (~400 MB), un contenedor, y listo. Gratis. <strong>No tiene tráfico en tiempo
+          real</strong>: se compensa con perfiles de velocidad por comuna y hora, calibrados con nuestros
+          propios datos de llegada real. Ese dataset es, con el tiempo, nuestro foso.</td>
+          <td class="n">Baja</td>
+        </tr>
+        <tr>
+          <td><strong>Teselas de mapa</strong> (MapTiler o Protomaps)</td>
+          <td>El mapa que ve el despachador</td>
+          <td>Plan gratuito alcanza para los primeros ~40 clientes. Protomaps permite autohospedar y no
+          depender de nadie.</td>
+          <td class="n">Baja</td>
+        </tr>
+        <tr>
+          <td><strong>Transcripción de audio</strong></td>
+          <td>Nota de voz del técnico → texto para A3</td>
+          <td>Cualquier ASR con buen español chileno. Se prueban dos con audios reales grabados en una sala de
+          máquinas con el chiller andando — ese es el test, no el benchmark.</td>
+          <td class="n">Media</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================= ENV -->
+  <h2>Variables de entorno</h2>
+  <div class="scroll-x">
+    <table class="table env">
+      <thead><tr><th>Variable</th><th>Para qué</th></tr></thead>
+      <tbody>
+        <tr><td>ANTHROPIC_API_KEY</td><td>Los 5 agentes</td></tr>
+        <tr><td>ANTHROPIC_MODEL_TRIAJE</td><td><span class="mono">claude-haiku-4-5</span></td></tr>
+        <tr><td>ANTHROPIC_MODEL_COTIZA</td><td><span class="mono">claude-sonnet-5</span></td></tr>
+        <tr><td>ANTHROPIC_MODEL_INFORME</td><td><span class="mono">claude-opus-4-8</span></td></tr>
+        <tr><td>DATABASE_URL</td><td>Postgres 16</td></tr>
+        <tr><td>OSRM_URL</td><td>Endpoint del worker de rutas (matriz de tiempos)</td></tr>
+        <tr><td>VROOM_URL</td><td>Solver VRPTW</td></tr>
+        <tr><td>WHATSAPP_PHONE_ID<br>WHATSAPP_TOKEN<br>WHATSAPP_VERIFY_TOKEN</td><td>Meta Cloud API + verificación del webhook entrante</td></tr>
+        <tr><td>WEBPAY_COMMERCE_CODE<br>WEBPAY_API_KEY<br>WEBPAY_ENV</td><td>Transbank · <span class="mono">integracion</span> | <span class="mono">produccion</span></td></tr>
+        <tr><td>MERCADOPAGO_ACCESS_TOKEN</td><td>Pasarela alternativa (la del día 1)</td></tr>
+        <tr><td>DTE_PROVIDER<br>DTE_API_KEY</td><td>Emisión de boleta/factura por el proveedor del cliente</td></tr>
+        <tr><td>ASR_API_KEY</td><td>Transcripción de notas de voz</td></tr>
+        <tr><td>MAPTILER_KEY</td><td>Teselas del mapa del despachador</td></tr>
+        <tr><td>S3_BUCKET<br>S3_KEY<br>S3_SECRET</td><td>Fotos y firmas</td></tr>
+        <tr><td>JWT_SECRET<br>OTP_PEPPER</td><td>Sesiones y login por OTP</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================= LO FALSO -->
+  <h2 id="falso">Qué está falseado en el demo</h2>
+  <p class="prose">El <a href="demo/index.html">demo</a> no tiene servidor, no tiene base de datos, no tiene
+  cuenta de nada. Corre entero en tu navegador y se reinicia al recargar. Esto es lo que finge:</p>
+
+  <div class="fake"><b>1 · El optimizador de rutas</b>
+    <p><em>Real en el demo:</em> hay un optimizador de verdad — vecino más cercano + 2-opt sobre las
+    coordenadas del mapa, con las urgencias fijadas al principio. Los kilómetros y los minutos que ves
+    <strong>sí se recalculan</strong> con cada cambio. <em>Falso:</em> mide distancia en línea recta ×
+    factor, no por calles reales. En producción eso es OSRM sobre OpenStreetMap y un solver VRPTW que además
+    respeta ventanas horarias, skills del técnico y capacidad de la camioneta.</p>
+  </div>
+  <div class="fake"><b>2 · El mapa</b>
+    <p><em>Falso:</em> es un SVG que dibujamos a mano — las comunas están donde están, más o menos, pero es un
+    esquema, no cartografía. En producción, MapLibre + teselas reales. <strong>No cargamos ningún mapa de un
+    CDN en este sitio, a propósito.</strong></p>
+  </div>
+  <div class="fake"><b>3 · «La IA leyó el WhatsApp»</b>
+    <p><em>Falso:</em> la urgencia que aparece y su interpretación están <strong>escritas a mano en el código</strong>.
+    No hay ninguna llamada a Anthropic en este sitio: no hay servidor donde esconder una clave. El prompt real
+    de ese agente (A1) está arriba, completo, para que se juzgue por lo que dice y no por la animación.</p>
+  </div>
+  <div class="fake"><b>4 · El pago</b>
+    <p><em>Falso:</em> el botón «Cobrar ahora» cambia un estado en memoria. No hay Transbank, no hay Mercado
+    Pago, no se mueve un peso. En producción es una transacción Webpay con webhook de confirmación e
+    idempotencia.</p>
+  </div>
+  <div class="fake"><b>5 · El modo sin señal</b>
+    <p><em>Falso:</em> el switch de «sin señal» es una bandera en memoria y la cola de cambios es un arreglo.
+    <strong>No hay service worker ni IndexedDB.</strong> Lo real es una PWA con cola persistente que sobrevive
+    a que el teléfono se apague en el subterráneo — y esa es, técnicamente, la parte más difícil del producto
+    entero.</p>
+  </div>
+  <div class="fake"><b>6 · Los datos</b>
+    <p><em>Falso pero verosímil:</em> los clientes, sitios, equipos (Chiller Carrier 30RB-060, Otis Gen2,
+    Bitzer 4FES-3Y), repuestos y precios son inventados con cuidado, no reales. Las comunas, las marcas y los
+    órdenes de magnitud sí lo son.</p>
+  </div>
+  <div class="fake"><b>7 · No hay cuentas, ni login, ni multi-empresa</b>
+    <p><em>Falso:</em> todo el demo es una sola empresa con datos en memoria. Nada persiste. Nadie te puede
+    ver.</p>
+  </div>
+
+  <!-- ================================================= DOMINIO -->
+  <h2>Dominio</h2>
+  <div class="card" style="max-width:none">
+    <p class="tag">Verificado con <span class="mono">./_kit/check-domain.sh</span> el 2026-07-12</p>
+    <div class="math">
+$ ./_kit/check-domain.sh rutamo.com
+rutamo.com                     404  DISPONIBLE
+
+<i>(consulta a rdap.verisign.com/com/v1/domain/rutamo.com;
+ HTTP 404 = no existe registro = dominio libre)</i>
+
+Alternativas verificadas el mismo día, por si rutamo.com cae:
+faenko.com                     404  DISPONIBLE
+rutovia.com                    404  DISPONIBLE
+vueltek.com                    404  DISPONIBLE
+
+<i>Descartados (HTTP 200 = ya registrados): altiro.com, vaneo.com, rutik.com,
+ cuadrilla.com, rutero.com, ruteo.com, terreno.com, y ~30 más.</i>
+    </div>
+    <p style="margin-top:var(--sp-s)"><strong>Rutamo</strong> = «ruta» + el <em>-mo</em> de <em>vamo'</em>.
+    Se dice en chileno, se escribe fácil por teléfono, y no significa nada en inglés — que para un producto que
+    sólo se vende en Chile y después en la región, es exactamente lo que se necesita. También hay que tomar
+    <span class="mono">rutamo.cl</span>: en Chile la gente escribe <span class="mono">.cl</span> por reflejo.</p>
+  </div>
+
+  <h2>Lo primero que rompería esto en producción</h2>
+  <ol class="prose">
+    <li><strong>La cola offline.</strong> Un técnico en el subterráneo de un mall, sin señal, cierra 4 visitas,
+    se le muere la batería, carga el teléfono, abre la app. Si perdió una firma o un pago, perdimos el
+    cliente. Esta es la parte que hay que construir primero y probar con crueldad — con el celular en modo
+    avión, en un ascensor, matando la app a la mala.</li>
+    <li><strong>El ETA que se equivoca.</strong> Prometer 15:30 y llegar 17:00 es peor que no prometer nada:
+    ahora el cliente final está enojado con el cliente, y el cliente con nosotros. El error del ETA se mide
+    desde el día 1 (<span class="mono">llegada_real − eta</span>) y es una métrica de producto, no de vanidad.</li>
+    <li><strong>La aprobación de plantillas de WhatsApp.</strong> Si Meta no aprueba la plantilla de «tu técnico
+    va en camino», la mitad de la propuesta de valor se cae. Hay que probarlo en la semana 1, no en el mes 6.</li>
+  </ol>
+</main>
+
+<footer class="foot">
+  <div class="container" style="display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;width:100%">
+    <span>Rutamo · rutamo.com</span>
+    <span><a href="demo/index.html">Ver el demo →</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

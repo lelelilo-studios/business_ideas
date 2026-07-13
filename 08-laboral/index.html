@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contralta — cumplimiento laboral para PYMEs chilenas</title>
+<meta name="description" content="El contador te lleva la contabilidad. Nadie te lleva el Código del Trabajo. Contralta vigila contratos, plazos y finiquitos de tu PYME: qué está vencido, cuánto cuesta y cómo cerrarlo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* ---- landing: hero de portada de expediente ---------------------------- */
+  .hero { padding-top: var(--sp-l); padding-bottom: var(--sp-xl); }
+  .hero__folio {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--tinta-3);
+    border-bottom: 1px solid var(--linea); padding-bottom: 0.5rem;
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .hero h1 { margin-top: var(--sp-m); max-width: 16ch; }
+  .hero h1 em { font-style: normal; color: var(--lacre); }
+  .hero__lede { margin-top: var(--sp-s); max-width: 46ch; }
+  .hero__cta { margin-top: var(--sp-l); display: flex; flex-wrap: wrap; gap: var(--sp-2xs); }
+  @media (min-width: 62em) {
+    .hero__cols { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-xl); align-items: start; }
+    .hero h1 { font-size: clamp(2.6rem, 1.4rem + 3.2vw, 4.1rem); }
+  }
+
+  /* Tira de reloj: el plazo que corre hoy, calculado en vivo. */
+  .reloj {
+    margin-top: var(--sp-l);
+    border: 1px solid var(--linea-2); border-left: 3px solid var(--lacre);
+    background: #FBFAF7;
+    padding: var(--sp-s);
+    display: grid; gap: 0.5rem;
+  }
+  .reloj__t { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--tinta-3); }
+  .reloj__n { font-family: var(--mono); font-size: clamp(1.8rem, 1.2rem + 2vw, 2.4rem);
+    font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+  .reloj__n span { font-size: 0.9rem; letter-spacing: 0; color: var(--tinta-2); margin-left: 0.35rem; }
+
+  /* ---- voces del cliente ------------------------------------------------- */
+  .voces { display: grid; gap: var(--sp-s); }
+  @media (min-width: 48em) { .voces { grid-template-columns: repeat(3, 1fr); } }
+  .voz {
+    border-top: 2px solid var(--tinta); padding-top: var(--sp-s);
+    font-family: var(--serif); font-size: 1.05rem; line-height: 1.5;
+  }
+  .voz p:first-child::before { content: "“"; }
+  .voz p:first-child::after { content: "”"; }
+  .voz footer {
+    margin-top: 0.75rem; font-family: var(--mono); font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-3);
+  }
+
+  /* ---- widget en vivo ---------------------------------------------------- */
+  .aud { border: 1px solid var(--tinta); background: #FBFAF7; }
+  .aud__cab {
+    background: var(--tinta); color: var(--papel);
+    padding: 0.7rem var(--sp-s);
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .aud__cab b { color: #fff; font-weight: 500; }
+  .aud__cuerpo { padding: var(--sp-s); display: grid; gap: var(--sp-s); }
+  .campo { display: grid; gap: 0.3rem; }
+  .campo > label {
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--tinta-2);
+  }
+  select, input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%; min-height: 46px; padding: 0 0.6rem;
+    border: 1px solid var(--linea-2); background: var(--papel);
+    font-family: var(--sans); font-size: 0.95rem; border-radius: 0;
+    appearance: none;
+    background-image: none;
+  }
+  select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--tinta-2) 50%),
+                      linear-gradient(135deg, var(--tinta-2) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 20px, calc(100% - 13px) 20px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2rem;
+  }
+  select:focus, input:focus { outline: 2px solid var(--lacre); outline-offset: -1px; }
+
+  .switch { display: flex; align-items: center; gap: 0.6rem; min-height: 46px; cursor: pointer; }
+  .switch input { width: 20px; height: 20px; accent-color: var(--lacre); flex: none; }
+  .switch span { font-size: 0.9rem; }
+
+  .aud__total {
+    border-top: 1px solid var(--linea-2); padding-top: var(--sp-s);
+    display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .aud__total .cifra { font-size: 1.6rem; }
+  .hallazgos { display: grid; gap: 0.4rem; }
+  .hallazgo {
+    display: grid; grid-template-columns: 18px 1fr; gap: 0.55rem;
+    padding: 0.6rem; border: 1px solid var(--linea);
+    font-size: 0.88rem; line-height: 1.45; background: var(--papel);
+  }
+  .hallazgo--vencido { border-left: 3px solid var(--st-vencido); background: var(--st-vencido-bg); }
+  .hallazgo--riesgo  { border-left: 3px solid var(--st-riesgo);  background: var(--st-riesgo-bg); }
+  .hallazgo--ok      { border-left: 3px solid var(--st-ok);      background: var(--st-ok-bg); }
+  .hallazgo b { display: block; }
+  .hallazgo__meta { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+
+  /* ---- momentos ---------------------------------------------------------- */
+  .momentos { display: grid; gap: 0; border-top: 1px solid var(--linea); }
+  .momento {
+    display: grid; gap: 0.5rem;
+    grid-template-columns: 2.4rem 1fr;
+    padding: var(--sp-m) 0; border-bottom: 1px solid var(--linea);
+  }
+  .momento__n {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--lacre);
+    letter-spacing: 0.05em; padding-top: 0.35rem;
+  }
+  .momento h3 { margin-bottom: 0.3rem; }
+  .momento ul { list-style: none; display: grid; gap: 0.4rem; margin-top: 0.7rem; font-size: 0.92rem; }
+  .momento li { display: grid; grid-template-columns: 14px 1fr; gap: 0.5rem; align-items: start; color: var(--tinta-2); }
+  .momento li svg { margin-top: 0.32rem; }
+  @media (min-width: 62em) {
+    .momento { grid-template-columns: 3rem 1.1fr 1fr; align-items: start; gap: var(--sp-m); }
+  }
+
+  /* ---- precios ----------------------------------------------------------- */
+  .planes { display: grid; gap: var(--sp-s); }
+  @media (min-width: 48em) { .planes { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 68em) { .planes { grid-template-columns: repeat(4, 1fr); } }
+  .plan { border: 1px solid var(--linea-2); background: #FBFAF7; padding: var(--sp-s); display: flex; flex-direction: column; }
+  .plan--destacado { border: 1px solid var(--tinta); border-top: 3px solid var(--lacre); }
+  .plan__n { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--tinta-2); }
+  .plan__p { font-family: var(--mono); font-size: 1.55rem; font-weight: 500; letter-spacing: -0.03em; margin-top: 0.5rem; }
+  .plan__p small { font-size: 0.8rem; color: var(--tinta-2); letter-spacing: 0; font-weight: 400; }
+  .plan ul { list-style: none; display: grid; gap: 0.4rem; margin-top: var(--sp-s); font-size: 0.88rem; color: var(--tinta-2); flex: 1; }
+  .plan ul li { display: grid; grid-template-columns: 12px 1fr; gap: 0.5rem; }
+  .plan ul li::before { content: "—"; color: var(--linea-2); }
+  .plan .btn { margin-top: var(--sp-s); }
+
+  /* ---- faq --------------------------------------------------------------- */
+  .faq { border-top: 1px solid var(--linea); }
+  .faq details { border-bottom: 1px solid var(--linea); }
+  .faq summary {
+    list-style: none; cursor: pointer; padding: var(--sp-s) 2rem var(--sp-s) 0;
+    font-family: var(--serif); font-size: 1.08rem; font-weight: 600;
+    position: relative; min-height: 44px; display: flex; align-items: center;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: "+"; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 1.2rem; color: var(--lacre);
+  }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details > div { padding-bottom: var(--sp-s); }
+  .faq p { color: var(--tinta-2); font-size: 0.95rem; }
+  .faq p + p { margin-top: 0.6rem; }
+
+  /* ---- cierre ------------------------------------------------------------ */
+  .cierre { background: var(--tinta); color: var(--papel); }
+  .cierre h2 { color: var(--papel); }
+  .cierre .lede { color: #B9BCC4; }
+  .cierre .btn--fantasma { color: var(--papel); border-color: #4A4D55; }
+  .cierre .btn--fantasma:hover { background: var(--papel); color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra__fila">
+    <a class="marca" href="index.html">
+      <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+        <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+      </svg>
+      Contralta
+      <span class="marca__sub">Cumplimiento laboral</span>
+    </a>
+    <button class="hamb" id="hamb" aria-expanded="false" aria-controls="menu">Menú</button>
+  </div>
+  <nav class="container menu" id="menu" aria-label="Principal">
+    <ul>
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html" aria-current="page">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================================================================ HERO -->
+  <section class="hero container">
+    <div class="hero__cols">
+      <div>
+        <div class="hero__folio">
+          <span>Expediente laboral · PYME</span>
+          <span id="folio-fecha">—</span>
+        </div>
+
+        <h1>El contador te lleva la contabilidad.<br><em>Nadie te lleva el Código del Trabajo.</em></h1>
+
+        <p class="hero__lede lede">
+          Contralta vigila el ciclo de vida de cada trabajador —contratar, cambiar, terminar—
+          y te dice qué obligación está vencida, cuánto te cuesta y cómo cerrarla.
+          Con el artículo citado. Sin inventar.
+        </p>
+
+        <div class="hero__cta">
+          <a class="btn btn--lacre" href="demo/index.html">Ver el tablero funcionando</a>
+          <a class="btn btn--fantasma" href="#precios">Precios</a>
+        </div>
+
+        <div class="reloj">
+          <div class="reloj__t">Plazo corriendo ahora mismo · cotizaciones previsionales</div>
+          <div class="reloj__n" id="reloj-n">—</div>
+          <p class="chico tenue" id="reloj-txt">Calculando…</p>
+        </div>
+      </div>
+
+      <div style="margin-top: var(--sp-xl);">
+        <!-- WIDGET EN VIVO: el producto, no un screenshot -->
+        <div class="aud">
+          <div class="aud__cab">
+            <span>Auditoría de finiquito · <b>en vivo</b></span>
+            <span aria-hidden="true">◉</span>
+          </div>
+          <div class="aud__cuerpo">
+            <p class="chico tenue" style="margin:0">
+              Es el módulo real del producto, corriendo acá. Cambia los datos y mira qué pasa
+              antes de que el finiquito se firme.
+            </p>
+
+            <div class="campo">
+              <label for="w-trab">Trabajador</label>
+              <select id="w-trab">
+                <option value="0">Héctor Sandoval Lagos — 9 años — $680.000</option>
+                <option value="1">Jonathan Pizarro Aguilera — plazo fijo — $720.000</option>
+                <option value="2">Camila Riquelme Tapia — 3 años — $780.000</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="w-causal">Causal de término</label>
+              <select id="w-causal">
+                <option value="161">Art. 161 — necesidades de la empresa</option>
+                <option value="159-4">Art. 159 N°4 — vencimiento del plazo</option>
+                <option value="160-3">Art. 160 N°3 — no concurrencia (sin pago)</option>
+                <option value="159-2">Art. 159 N°2 — renuncia voluntaria</option>
+              </select>
+            </div>
+
+            <label class="switch">
+              <input type="checkbox" id="w-cot" checked>
+              <span>Las cotizaciones de los últimos 3 meses están pagadas</span>
+            </label>
+
+            <div class="aud__total">
+              <span class="mono chico tenue">Total a pagar en el finiquito</span>
+              <span class="cifra" id="w-total">$0</span>
+            </div>
+
+            <div class="hallazgos" id="w-hallazgos"></div>
+
+            <div class="aud__total" style="border-top:1px solid var(--linea-2)">
+              <span class="mono chico tenue">Riesgo adicional si firmas así</span>
+              <span class="cifra" id="w-riesgo" style="color:var(--lacre)">$0</span>
+            </div>
+
+            <a class="btn btn--bloque" href="demo/index.html">Abrir el expediente completo →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ PROBLEMA -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">01 · El problema, en palabras del dueño</div>
+      <h2 style="max-width: 20ch; margin-bottom: var(--sp-m);">Nadie despide a alguien queriendo hacerlo mal.</h2>
+
+      <div class="voces">
+        <blockquote class="voz">
+          <p>Le pregunté a mi contador si el finiquito estaba bien. Me dijo que sí. Después el abogado del chiquillo me
+          dijo que las cotizaciones de mayo no estaban pagadas y que el despido era nulo. Terminé pagando cuatro meses
+          de sueldo de alguien que ya no trabajaba conmigo.</p>
+          <footer>Dueño, panadería · 15 trabajadores · San Bernardo</footer>
+        </blockquote>
+        <blockquote class="voz">
+          <p>Tengo los contratos en una carpeta y en un Excel. Cuando entró la Fernanda en julio no alcancé a firmarle
+          nada, se me pasó. No sabía que había un plazo.</p>
+          <footer>Socia, empresa de aseo · 22 trabajadores · Maipú</footer>
+        </blockquote>
+        <blockquote class="voz">
+          <p>Lo de las 40 horas lo escuché en la radio. Mis contratos dicen 45. No sé si tengo que firmar algo o si
+          se cambia solo.</p>
+          <footer>Gerente, taller mecánico · 11 trabajadores · Concepción</footer>
+        </blockquote>
+      </div>
+
+      <div class="ficha ficha--lacre" style="margin-top: var(--sp-l); max-width: var(--measure);">
+        <div class="rotulo" style="margin-bottom:0.5rem">La cuña</div>
+        <p style="font-family: var(--serif); font-size: 1.15rem; line-height:1.5;">
+          El contador es un contador. Sabe de F29, de remuneraciones y de Previred. No es abogado laboral,
+          no le pagan por serlo, y no tiene por qué saber que la fracción de siete meses cuenta como un año
+          entero de indemnización.
+        </p>
+        <p class="chico tenue" style="margin-top:0.7rem">
+          Contralta no reemplaza al contador. Le tapa el hoyo que él mismo te dice que tiene.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= MOMENTOS -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">02 · Los tres momentos donde se pierde plata</div>
+      <h2 style="max-width: 22ch; margin-bottom: var(--sp-m);">Contratar, cambiar, terminar.</h2>
+
+      <div class="momentos">
+
+        <article class="momento">
+          <div class="momento__n">01</div>
+          <div>
+            <h3>Contratar</h3>
+            <p class="tenue chico">El contrato tiene que constar por escrito dentro de <strong>15 días</strong> de
+            iniciada la relación laboral (5 días si es por obra o faena, o dura menos de 30 días).
+            <span class="cita cita--norma">Art. 9 CT</span></p>
+          </div>
+          <div>
+            <ul>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="#A8232E" stroke-width="1.3"/><path d="M7 4v3.2l2 1.3" stroke="#A8232E" stroke-width="1.3" stroke-linecap="round"/></svg>
+              El reloj parte solo el día que la persona entra a trabajar, no el día que te acuerdas.</li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 2h5l3 3v7H3V2z" stroke="#4A4D55" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 2v3h3" stroke="#4A4D55" stroke-width="1.3"/></svg>
+              Genera el contrato con las menciones obligatorias del <span class="mono chico">art. 10</span> ya adentro,
+              y la jornada legal vigente hoy, no la de hace dos años.</li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2l5 2.5v3c0 2.5-2 4.3-5 5-3-.7-5-2.5-5-5v-3L7 2z" stroke="#2C6146" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Sin contrato escrito, la ley presume que las condiciones son <em>las que declare el trabajador</em>.
+              Ese es el verdadero costo, no la multa.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="momento">
+          <div class="momento__n">02</div>
+          <div>
+            <h3>Cambiar</h3>
+            <p class="tenue chico">Sueldo, cargo, jornada, turnos, teletrabajo. Cada cambio necesita anexo, y algunos
+            además tienen plazo. La jornada máxima bajó a <strong>42 horas</strong> el 26 de abril de 2026.
+            <span class="cita cita--norma">Ley 21.561</span></p>
+          </div>
+          <div>
+            <ul>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 11l4-4 2.5 2.5L12 3" stroke="#8A5A0F" stroke-width="1.3" stroke-linecap="square"/></svg>
+              Al bajar la jornada sin bajar el sueldo, <strong>la hora extra se encarece</strong>. Si sigues pagándola
+              con el divisor de 45, estás pagando de menos y la diferencia se acumula con intereses.</li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="3" width="10" height="9" stroke="#4A4D55" stroke-width="1.3"/><path d="M2 6h10M5 2v2M9 2v2" stroke="#4A4D55" stroke-width="1.3"/></svg>
+              El pacto de horas extraordinarias dura <strong>3 meses</strong> y hay que renovarlo. Se vence sin que
+              nadie lo note.</li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="#4A4D55" stroke-width="1.3"/></svg>
+              El contrato a plazo fijo que se renueva por segunda vez <strong>pasa a indefinido</strong> por ley. Ahí
+              se caen la mitad de los "no le renové el contrato".</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="momento">
+          <div class="momento__n">03</div>
+          <div>
+            <h3>Terminar</h3>
+            <p class="tenue chico">Es donde se pierde la plata de verdad. Causal, aviso, carta a la Inspección,
+            cotizaciones al día, cálculo, ratificación ante ministro de fe, y plazo para pagar.
+            <span class="cita cita--norma">Arts. 161–177 CT</span> <span class="cita cita--norma">Ley 21.361</span></p>
+          </div>
+          <div>
+            <ul>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1.5l6 11H1l6-11z" stroke="#A8232E" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v3M7 10.2v.1" stroke="#A8232E" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <strong>Ley Bustos:</strong> si al momento del despido las cotizaciones no están íntegramente pagadas,
+              el despido <em>no produce el efecto de terminar el contrato</em>. Sigues pagando sueldo hasta convalidarlo.
+              <span class="cita cita--norma">Art. 162 inc. 5</span></li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="#8A5A0F" stroke-width="1.3"/><path d="M7 4v3.2l2 1.3" stroke="#8A5A0F" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Contralta cuenta los días hábiles del plazo del finiquito y te muestra las <strong>dos lecturas</strong>
+              del cómputo cuando el criterio no es pacífico. En la duda, entrega antes.</li>
+              <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 12h10M4 12V6M7 12V4M10 12V8" stroke="#2C6146" stroke-width="1.3" stroke-linecap="square"/></svg>
+              El desglose se calcula con una tabla y un calendario, no con un modelo de lenguaje. Cada línea
+              muestra su fórmula.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== LA IA --->
+  <section class="seccion">
+    <div class="container">
+      <div class="rejilla rejilla--2" style="align-items:start; gap: var(--sp-xl);">
+        <div>
+          <div class="rotulo">03 · Dónde usamos IA y dónde no</div>
+          <h2 style="margin-bottom: var(--sp-s);">La IA no calcula tu finiquito.</h2>
+          <p class="lede" style="font-size: var(--step-0); font-family: var(--sans);">
+            Un modelo de lenguaje que "estima" una indemnización es un pasivo, no un producto.
+            Los montos y los plazos salen de código determinista: tablas de parámetros, un calendario
+            de días hábiles con los feriados de Chile, y las fórmulas escritas a mano. El mismo caso
+            da el mismo número las mil veces.
+          </p>
+        </div>
+        <div class="apilar">
+          <div class="ficha">
+            <div class="rotulo" style="margin-bottom:0.5rem">La IA sí hace esto</div>
+            <ul style="list-style:none; display:grid; gap:0.5rem; font-size:0.92rem;" class="tenue">
+              <li>— Lee el contrato, la liquidación o el certificado de Previred en PDF y saca los datos.</li>
+              <li>— Redacta el anexo o la carta de aviso a partir de una plantilla revisada por un abogado.</li>
+              <li>— Te explica en castellano por qué esto importa y qué pasa si no lo haces.</li>
+              <li>— Encuentra la contradicción entre lo que dice el contrato y lo que pasa en la práctica.</li>
+            </ul>
+          </div>
+          <div class="ficha" style="border-left:3px solid var(--st-vencido)">
+            <div class="rotulo" style="margin-bottom:0.5rem">La IA no hace esto</div>
+            <ul style="list-style:none; display:grid; gap:0.5rem; font-size:0.92rem;" class="tenue">
+              <li>— Calcular montos. Eso es aritmética, y la aritmética se programa.</li>
+              <li>— Contar plazos legales. Eso es un calendario.</li>
+              <li>— Decidir una causal de despido. Eso lo decides tú y, si es peleado, un abogado.</li>
+              <li>— Reemplazar a un abogado laboral. Contralta te dice cuándo llamarlo, y con qué preguntas.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= PRECIOS -->
+  <section class="seccion" id="precios">
+    <div class="container">
+      <div class="rotulo">04 · Precios</div>
+      <h2 style="margin-bottom: var(--sp-2xs);">Menos que una multa. Mucho menos que un juicio.</h2>
+      <p class="tenue" style="max-width: var(--measure); margin-bottom: var(--sp-m);">
+        Una PYME de 15 personas con una planilla de $10.500.000 al mes paga $69.000 por Contralta: el
+        <strong>0,66% de lo que ya gasta en sueldos</strong>. Una multa por infracción en pequeña empresa va de
+        1 a 10 UTM. <span class="cita cita--norma">Arts. 505 bis y 506 CT</span>
+      </p>
+
+      <div class="planes">
+        <div class="plan">
+          <div class="plan__n">Taller</div>
+          <div class="plan__p">$34.000 <small>/ mes</small></div>
+          <ul>
+            <li>Hasta 10 trabajadores</li>
+            <li>Tablero de cumplimiento y plazos</li>
+            <li>Contratos, anexos y finiquitos</li>
+            <li>Alertas por WhatsApp y correo</li>
+          </ul>
+          <a class="btn btn--fantasma" href="demo/index.html">Probar</a>
+        </div>
+
+        <div class="plan plan--destacado">
+          <div class="plan__n">Empresa · el más pedido</div>
+          <div class="plan__p">$69.000 <small>/ mes</small></div>
+          <ul>
+            <li>De 11 a 49 trabajadores</li>
+            <li>Todo lo del plan Taller</li>
+            <li>Auditoría de finiquito ilimitada</li>
+            <li>Revisión anual de la carpeta laboral</li>
+            <li>Consulta con abogado laboral: 2 al mes</li>
+          </ul>
+          <a class="btn btn--lacre" href="demo/index.html">Probar</a>
+        </div>
+
+        <div class="plan">
+          <div class="plan__n">Cartera · contadores</div>
+          <div class="plan__p">$22.000 <small>/ empresa / mes</small></div>
+          <ul>
+            <li>Desde 5 empresas</li>
+            <li>Vista de cartera con semáforo</li>
+            <li>Marca blanca del estudio</li>
+            <li>Comisión por referido: 20% a 12 meses</li>
+          </ul>
+          <a class="btn btn--fantasma" href="negocio.html">Ver el canal</a>
+        </div>
+
+        <div class="plan">
+          <div class="plan__n">Suelto</div>
+          <div class="plan__p">$19.000 <small>/ finiquito</small></div>
+          <ul>
+            <li>Sin suscripción</li>
+            <li>Auditoría completa de un finiquito antes de firmarlo</li>
+            <li>Informe con las normas citadas</li>
+            <li>Se descuenta del primer mes si te suscribes</li>
+          </ul>
+          <a class="btn btn--fantasma" href="demo/index.html#finiquito">Auditar uno</a>
+        </div>
+      </div>
+
+      <p class="chico tenue" style="margin-top: var(--sp-s);">
+        Valores mensuales en pesos, IVA incluido. Pago anual: dos meses libres.
+        Sobre 49 trabajadores el precio se conversa —y probablemente ya necesitas otra cosa.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================================================================= FAQ -->
+  <section class="seccion">
+    <div class="container">
+      <div class="rotulo">05 · Preguntas que nos hacen</div>
+      <h2 style="margin-bottom: var(--sp-m);">Lo que preguntan antes de pagar.</h2>
+
+      <div class="faq" style="max-width: 78ch;">
+        <details open>
+          <summary>¿Esto reemplaza a mi contador?</summary>
+          <div>
+            <p>No, y no queremos. Tu contador calcula las remuneraciones y paga en Previred. Contralta mira lo otro:
+            si el contrato existe, si está dentro de plazo, si el anexo se firmó, si la causal aguanta, si el finiquito
+            está bien armado. Son cosas distintas y hoy no las hace nadie.</p>
+            <p>De hecho, el contador es nuestro mejor canal: le sacamos de encima las preguntas laborales que no le
+            corresponde responder.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>¿Esto reemplaza a un abogado laboral?</summary>
+          <div>
+            <p>Tampoco. Contralta te dice qué está vencido, qué plazo corre, qué dice la norma y cuánto cuesta
+            equivocarse. Cuando el caso entra en zona gris —un despido peleado, un fuero, una causal del art. 160—
+            el producto <strong>te lo marca y te dice que llames a un abogado</strong>, con las preguntas ya escritas.</p>
+            <p>El plan Empresa incluye dos consultas al mes con un abogado laboral de nuestra red. Lo que Contralta
+            no hace es opinar como si fuera uno.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>¿Y si un dato legal está desactualizado?</summary>
+          <div>
+            <p>Es el riesgo central del producto y no lo escondemos. Cada cifra en Contralta tiene una de dos etiquetas:
+            <span class="cita cita--norma">norma citada</span> con el artículo o la ley, o
+            <span class="cita cita--verificar">por validar</span> cuando es un criterio interpretativo o un parámetro
+            que cambia (UF, UTM, ingreso mínimo, comisiones de AFP, topes imponibles).</p>
+            <p>Los parámetros se sincronizan y quedan con fecha de carga a la vista. Los criterios interpretativos los
+            revisa un abogado laboral con retainer, y cuando el cómputo de un plazo admite dos lecturas, el producto
+            te muestra las dos y te recomienda la conservadora.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>La Dirección del Trabajo ya tiene "Mi DT" y es gratis.</summary>
+          <div>
+            <p>Correcto, y hay que usarlo: ahí se registran contratos, se puede ratificar el finiquito electrónicamente
+            y se consultan las multas. Mi DT es un archivador oficial: guarda lo que le entregas.</p>
+            <p>Lo que no hace es <em>revisarte antes</em>. No te avisa que el plazo del contrato de la Fernanda vence el
+            jueves, no te dice que la causal que elegiste no aguanta sin registro de asistencia, y no te frena antes de
+            firmar un finiquito con las cotizaciones impagas. Contralta se conecta con Mi DT; no compite con él.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Tengo 15 personas. ¿De verdad necesito esto?</summary>
+          <div>
+            <p>Con 15 trabajadores ya estás obligado a tener Reglamento Interno de Orden, Higiene y Seguridad —la
+            obligación parte en 10 <span class="cita cita--norma">Art. 153 CT</span>—, ya te aplica el protocolo de
+            la Ley Karin, y ya no te acuerdas de memoria de las fechas de todos.</p>
+            <p>El punto de quiebre real no es el tamaño: es la primera vez que despides a alguien.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>¿Qué pasa con mis datos?</summary>
+          <div>
+            <p>Datos de trabajadores: RUT, sueldo, contratos, licencias. Es lo más sensible que tiene una empresa.
+            Se guardan en Chile o en la región de AWS más cercana, cifrados, con registro de quién vio qué.
+            No entrenamos modelos con tus documentos.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== CIERRE -->
+  <section class="seccion cierre">
+    <div class="container">
+      <div class="rotulo" style="color:#71757E">06 · Empezar</div>
+      <h2 style="max-width: 20ch;">Sube los contratos que tienes. Te decimos qué falta.</h2>
+      <p class="lede" style="max-width: 52ch; margin-top: var(--sp-s);">
+        La primera revisión de la carpeta laboral es gratis y demora una tarde. Si no encontramos nada,
+        te lo decimos y no nos debes nada. Nunca nos ha pasado.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--lacre" href="demo/index.html">Ver el tablero funcionando</a>
+        <a class="btn btn--fantasma" href="stack.html">Cómo está construido</a>
+      </div>
+
+      <div class="descargo" style="margin-top: var(--sp-l); max-width: var(--measure); background:#241F14; border-color:#4A3F22; color:#C9B98F;">
+        <strong style="color:#E4D6AE">Descargo.</strong> Contralta es una herramienta de gestión del cumplimiento, no
+        asesoría jurídica. Las normas citadas provienen del Código del Trabajo y de las leyes indicadas; los criterios
+        interpretativos y los parámetros variables están marcados como tales y deben validarse con un abogado laboral
+        antes de tomar una decisión de término. Este sitio es un prototipo: los datos son ficticios.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div>
+      <a class="marca" href="index.html" style="margin-bottom:0.6rem">
+        <svg class="marca__sello" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="23" height="23" stroke="#A8232E" stroke-width="1.5"/>
+          <path d="M6 13h4l2-5 3 10 2-5h3" stroke="#F5F3EE" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+        Contralta
+      </a>
+      <p style="max-width:34ch">Cumplimiento laboral para PYMEs chilenas. Contratar, cambiar y terminar sin pisar
+      la Dirección del Trabajo.</p>
+      <p class="mono chico" style="margin-top:0.8rem; color:#71757E">contralta.com · prototipo 2026</p>
+    </div>
+    <div>
+      <h4>Sitio</h4>
+      <ul>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Fuentes</h4>
+      <ul>
+        <li>Código del Trabajo</li>
+        <li>Ley 21.561 · 40 horas</li>
+        <li>Ley 21.361 · finiquito</li>
+        <li>Ley 21.643 · Karin</li>
+        <li>Dirección del Trabajo</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="demo/calculo.js"></script>
+<script>
+/* ---------------------------------------------------------------- menú ---- */
+(function () {
+  var b = document.getElementById('hamb');
+  var m = document.getElementById('menu');
+  b.addEventListener('click', function () {
+    var ab = b.getAttribute('aria-expanded') === 'true';
+    b.setAttribute('aria-expanded', String(!ab));
+    m.setAttribute('data-abierto', String(!ab));
+  });
+})();
+
+/* ------------------------------------------------- reloj de cotizaciones -- */
+(function () {
+  var hoy = CL.hoy();
+  document.getElementById('folio-fecha').textContent =
+    'Folio ' + CL.fechaCorta(hoy).replace(/-/g, '') + ' · ' + CL.fechaLarga(hoy);
+
+  var v = CL.vencimientoCotizaciones(hoy);
+  var n = document.getElementById('reloj-n');
+  var t = document.getElementById('reloj-txt');
+
+  if (v.dias < 0) {
+    n.innerHTML = 'Vencido<span>hace ' + Math.abs(v.dias) + ' día' + (Math.abs(v.dias) === 1 ? '' : 's') + '</span>';
+    n.style.color = 'var(--st-vencido)';
+  } else if (v.dias === 0) {
+    n.innerHTML = 'Vence hoy';
+    n.style.color = 'var(--st-vencido)';
+  } else {
+    n.innerHTML = v.dias + '<span>día' + (v.dias === 1 ? '' : 's') + ' para pagar</span>';
+    n.style.color = v.dias <= 3 ? 'var(--st-vencido)' : 'var(--st-riesgo)';
+  }
+  t.innerHTML = 'Las cotizaciones de <strong>' + v.periodo + '</strong> se declaran y pagan hasta el ' +
+    '<strong>' + CL.fechaLarga(v.fecha) + '</strong> por vía electrónica (Previred). ' +
+    'En papel, el plazo es el día 10. Si el 13 cae en día inhábil, corre al hábil siguiente. ' +
+    '<span class="cita cita--verificar">plazo a validar con Previred</span>';
+})();
+
+/* ------------------------------------------------ widget: auditoría viva -- */
+(function () {
+  var TRABS = [
+    { nombre: 'Héctor Sandoval Lagos', rut: '13.876.543-1', base: 680000, ingreso: '2017-11-20',
+      tipo: 'indefinido', feriado: 12.5, fuero: null },
+    { nombre: 'Jonathan Pizarro Aguilera', rut: '16.543.210-K', base: 720000, ingreso: '2025-09-01',
+      tipo: 'plazo_fijo_2a_renovacion', feriado: 4.5, fuero: null },
+    { nombre: 'Camila Riquelme Tapia', rut: '18.234.567-9', base: 780000, ingreso: '2023-02-20',
+      tipo: 'indefinido', feriado: 9, fuero: 'maternal' }
+  ];
+
+  var selT = document.getElementById('w-trab');
+  var selC = document.getElementById('w-causal');
+  var chk  = document.getElementById('w-cot');
+  var outT = document.getElementById('w-total');
+  var outR = document.getElementById('w-riesgo');
+  var outH = document.getElementById('w-hallazgos');
+
+  function render() {
+    var t = TRABS[+selT.value];
+    var causal = selC.value;
+    var cotOk = chk.checked;
+
+    var r = CL.finiquito({
+      base: t.base, ingreso: t.ingreso, termino: CL.fechaCorta(CL.hoy()),
+      causal: causal, diasFeriado: t.feriado, tipo: t.tipo, fuero: t.fuero,
+      cotizacionesAlDia: cotOk
+    });
+
+    outT.textContent = CL.clp(r.total);
+    outR.textContent = r.riesgo.total > 0 ? '+ ' + CL.clp(r.riesgo.total) : '$0';
+    outR.style.color = r.riesgo.total > 0 ? 'var(--lacre)' : 'var(--st-ok)';
+
+    outH.innerHTML = '';
+    var lista = r.hallazgos.length ? r.hallazgos : [{
+      nivel: 'ok', titulo: 'Sin hallazgos bloqueantes',
+      texto: 'Con estos datos el término se puede cursar. Igual revisa el desglose línea por línea.',
+      cita: 'Art. 177 CT', citaTipo: 'norma'
+    }];
+
+    lista.forEach(function (h) {
+      var d = document.createElement('div');
+      d.className = 'hallazgo hallazgo--' + h.nivel;
+      var icono = h.nivel === 'vencido'
+        ? '<svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1.5l6 11H1l6-11z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 5.5v3M7 10.2v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+        : h.nivel === 'riesgo'
+        ? '<svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 3.6v4M7 10v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.4 7.2l1.8 1.8 3.4-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="square"/></svg>';
+      var color = h.nivel === 'vencido' ? 'var(--st-vencido)' : h.nivel === 'riesgo' ? 'var(--st-riesgo)' : 'var(--st-ok)';
+      d.innerHTML =
+        '<span style="color:' + color + '">' + icono + '</span>' +
+        '<span><b>' + h.titulo + '</b>' + h.texto +
+        '<span class="hallazgo__meta">' +
+          (h.cita ? '<span class="cita cita--' + (h.citaTipo || 'norma') + '">' + h.cita + '</span>' : '') +
+          (h.costo ? '<span class="cita" style="border-color:var(--lacre);color:var(--lacre)">≈ ' + CL.clp(h.costo) + '</span>' : '') +
+        '</span></span>';
+      outH.appendChild(d);
+    });
+  }
+
+  selT.addEventListener('change', render);
+  selC.addEventListener('change', render);
+  chk.addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>

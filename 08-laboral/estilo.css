@@ -1,0 +1,296 @@
+/* ============================================================================
+   CONTRALTA — hoja de estilo compartida
+   ----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: "EXPEDIENTE".
+   La referencia no es un SaaS: es un expediente de la Dirección del Trabajo.
+   Papel de registro público (crema, no blanco), hairlines de 1px en vez de
+   sombras, esquinas rectas (0 radios salvo píldoras de estado), numeración de
+   artículos en el margen, y un único acento: rojo lacre — el color del timbre.
+   Nada es simpático. Un producto que te dice cuánto te va a costar una multa
+   no puede parecer una app de meditación.
+
+   TIPOGRAFÍA — pairing deliberado de tres roles, no de tres modas:
+     · Source Serif 4  → la LEY. Titulares y texto de norma. Serif institucional,
+                         legible, de origen editorial. No decorativa.
+     · IBM Plex Sans   → la INTERFAZ. Grotesca de ingeniería, neutral, densa.
+     · IBM Plex Mono   → el RELOJ y la PLATA. RUT, montos en CLP, plazos, UTM.
+                         Todo lo que es un dato duro va en mono y se alinea.
+   (No Inter, no Poppins. Plex Sans + Plex Mono son una superfamilia diseñada
+    en conjunto; Source Serif les da la voz legal que un grotesco no tiene.)
+
+   PALETA — contenida, un acento.
+     papel  #F5F3EE   tinta   #17181C   acento (lacre) #A8232E
+   Los colores de estado (vencido / por vencer / al día) son datos, no decoración,
+   y están anclados en la misma familia: todos ≥4.5:1 sobre papel.
+   ========================================================================== */
+
+:root {
+  --papel:      #F5F3EE;
+  --papel-2:    #EDEAE2;
+  --papel-3:    #E3DFD4;
+  --tinta:      #17181C;
+  --tinta-2:    #4A4D55;
+  --tinta-3:    #71757E;
+  --linea:      #D3CEC2;
+  --linea-2:    #BDB7A8;
+
+  --lacre:      #A8232E;   /* acento único */
+  --lacre-oscuro:#7E1922;
+  --lacre-tenue:#F3E3E3;
+
+  /* Estados de cumplimiento — son DATOS. Contraste AA sobre --papel. */
+  --st-vencido: #A8232E;   /* = acento: lo vencido es lo que sangra */
+  --st-vencido-bg:#F5E2E2;
+  --st-riesgo:  #8A5A0F;   /* ocre: por vencer */
+  --st-riesgo-bg:#F5EBD9;
+  --st-ok:      #2C6146;   /* verde profundo: al día */
+  --st-ok-bg:   #E0EBE4;
+  --st-nulo:    #6C6F78;   /* gris: no aplica */
+  --st-nulo-bg: #E7E5DF;
+
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --nav-h: 56px;
+}
+
+/* ---------------------------------------------------------------- base ---- */
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  /* Textura de expediente: una hairline horizontal cada 4 líneas, muy tenue. */
+  background-image: linear-gradient(var(--papel-2) 1px, transparent 1px);
+  background-size: 100% 8rem;
+}
+
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: var(--step-4); line-height: 1.05; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); line-height: 1.2; }
+p  { line-height: 1.6; }
+a  { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+::selection { background: var(--lacre); color: var(--papel); }
+
+:focus-visible { outline: 2px solid var(--lacre); outline-offset: 2px; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--serif); }
+
+/* Cifra: todo monto o plazo. Alineado, tabular, sin excusas. */
+.cifra {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------- navegación */
+
+.barra {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--tinta);
+  color: var(--papel);
+  border-bottom: 1px solid #000;
+}
+.barra__fila {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-s);
+  min-height: var(--nav-h);
+}
+.marca {
+  display: flex; align-items: center; gap: 0.55rem;
+  font-family: var(--serif);
+  font-size: 1.18rem; font-weight: 600; letter-spacing: 0.01em;
+  text-decoration: none; color: var(--papel);
+  padding-block: 0.5rem;
+}
+.marca__sello { flex: none; }
+.marca__sub {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #9A9DA6; display: none;
+}
+@media (min-width: 30em) { .marca__sub { display: inline; } }
+
+.hamb {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--papel); border: 1px solid #3A3D45; padding: 0 0.7rem;
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hamb[aria-expanded="true"] { background: var(--lacre); border-color: var(--lacre); }
+
+.menu { display: none; padding-bottom: var(--sp-s); }
+.menu[data-abierto="true"] { display: block; }
+.menu ul { list-style: none; display: flex; flex-direction: column; }
+.menu a {
+  display: flex; align-items: center; min-height: 46px;
+  padding: 0 0.25rem;
+  color: #D7D4CD; text-decoration: none;
+  font-size: 0.95rem;
+  border-top: 1px solid #2C2F36;
+}
+.menu a:hover { color: #fff; }
+.menu a[aria-current="page"] { color: var(--papel); font-weight: 600; }
+.menu a[aria-current="page"]::before {
+  content: ""; width: 3px; height: 16px; background: var(--lacre);
+  margin-right: 0.6rem; flex: none;
+}
+.menu a:not([aria-current="page"])::before {
+  content: ""; width: 3px; height: 16px; margin-right: 0.6rem; flex: none;
+}
+
+@media (min-width: 60em) {
+  .hamb { display: none; }
+  .menu { display: block !important; padding-bottom: 0; }
+  .menu ul { flex-direction: row; gap: 0.15rem; align-items: center; }
+  .menu a {
+    border-top: 0; padding: 0 0.75rem; min-height: var(--nav-h);
+    font-size: 0.88rem;
+  }
+  .menu a::before, .menu a[aria-current="page"]::before { display: none; }
+  .menu a[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--lacre); }
+  .barra__fila { flex-wrap: nowrap; }
+}
+
+/* ------------------------------------------------------------------ layout */
+
+.seccion { padding-block: var(--sp-xl); }
+.seccion + .seccion { border-top: 1px solid var(--linea); }
+@media (min-width: 48em) { .seccion { padding-block: var(--sp-2xl); } }
+
+/* Rótulo de sección: número de artículo en el margen, como un expediente. */
+.rotulo {
+  display: flex; align-items: baseline; gap: 0.7rem;
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--tinta-3);
+  margin-bottom: var(--sp-s);
+}
+.rotulo::before {
+  content: ""; width: 22px; height: 1px; background: var(--lacre); flex: none;
+  transform: translateY(-3px);
+}
+
+.lede { font-size: var(--step-1); line-height: 1.45; color: var(--tinta-2); font-family: var(--serif); }
+
+/* ------------------------------------------------------------------ fichas */
+
+.ficha {
+  background: #FBFAF7;
+  border: 1px solid var(--linea);
+  padding: var(--sp-s);
+}
+.ficha--lacre { border-left: 3px solid var(--lacre); }
+
+.rejilla { display: grid; gap: var(--sp-s); }
+@media (min-width: 48em) { .rejilla--2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 62em) { .rejilla--3 { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 48em) { .rejilla--12 { grid-template-columns: repeat(12, 1fr); } }
+
+/* ------------------------------------------------------------------ citas  */
+/* El componente más importante del producto: de dónde sale cada afirmación. */
+
+.cita {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.02em;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--linea-2);
+  background: var(--papel-2);
+  color: var(--tinta-2);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.cita--norma { border-color: #A9B4AC; background: var(--st-ok-bg); color: #1F4A34; }
+.cita--verificar { border-color: #C6A96A; background: var(--st-riesgo-bg); color: #6B4708; }
+.cita--verificar::before { content: "▲"; font-size: 0.55rem; }
+
+/* ------------------------------------------------------------------ estados */
+
+.pill {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.2rem 0.5rem; border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.pill--vencido { color: var(--st-vencido); background: var(--st-vencido-bg); }
+.pill--riesgo  { color: var(--st-riesgo);  background: var(--st-riesgo-bg); }
+.pill--ok      { color: var(--st-ok);      background: var(--st-ok-bg); }
+.pill--nulo    { color: var(--st-nulo);    background: var(--st-nulo-bg); }
+
+/* ------------------------------------------------------------------ botones */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 46px; padding: 0 1.1rem;
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 600;
+  text-decoration: none; border: 1px solid var(--tinta);
+  background: var(--tinta); color: var(--papel);
+  transition: background 120ms linear, color 120ms linear;
+}
+.btn:hover { background: var(--lacre); border-color: var(--lacre); }
+.btn--lacre { background: var(--lacre); border-color: var(--lacre); }
+.btn--lacre:hover { background: var(--lacre-oscuro); border-color: var(--lacre-oscuro); }
+.btn--fantasma { background: transparent; color: var(--tinta); border-color: var(--linea-2); }
+.btn--fantasma:hover { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.btn--bloque { width: 100%; }
+.btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/* ------------------------------------------------------------------ tablas  */
+
+.tabla { width: 100%; font-size: 0.9rem; border: 1px solid var(--linea); background: #FBFAF7; }
+.tabla th {
+  text-align: left; font-family: var(--mono); font-weight: 500;
+  font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--tinta-2); padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid var(--linea-2); background: var(--papel-2);
+  white-space: nowrap;
+}
+.tabla td { padding: 0.65rem 0.7rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.tabla tr:last-child td { border-bottom: 0; }
+.tabla td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.tabla th.num { text-align: right; }
+.scroll-x { border: 0; }
+.scroll-x table { min-width: 560px; }
+
+/* ------------------------------------------------------------------ pie     */
+
+.pie {
+  background: var(--tinta); color: #9A9DA6;
+  padding-block: var(--sp-l);
+  font-size: 0.85rem;
+  border-top: 3px solid var(--lacre);
+}
+.pie a { color: #D7D4CD; }
+.pie__grid { display: grid; gap: var(--sp-m); }
+@media (min-width: 48em) { .pie__grid { grid-template-columns: 2fr 1fr 1fr; } }
+.pie h4 { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #71757E; margin-bottom: 0.6rem; font-weight: 500; }
+.pie ul { list-style: none; display: grid; gap: 0.35rem; }
+
+/* --------------------------------------------------------------- descargo   */
+/* Aviso legal recurrente. No es letra chica: es parte del producto. */
+
+.descargo {
+  border: 1px solid var(--linea-2);
+  border-left: 3px solid var(--st-riesgo);
+  background: var(--st-riesgo-bg);
+  padding: var(--sp-s);
+  font-size: 0.85rem; line-height: 1.55; color: #57451C;
+}
+.descargo strong { color: #4A390F; }
+
+/* ------------------------------------------------------------------ util    */
+
+.apilar > * + * { margin-top: var(--sp-s); }
+.apilar-s > * + * { margin-top: var(--sp-2xs); }
+.apilar-m > * + * { margin-top: var(--sp-m); }
+.apilar-l > * + * { margin-top: var(--sp-l); }
+.centro { text-align: center; }
+.tenue { color: var(--tinta-2); }
+.chico { font-size: 0.85rem; }
+.hairline { border: 0; border-top: 1px solid var(--linea); }

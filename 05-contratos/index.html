@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antefirma — Lee el contrato antes de firmarlo</title>
+<meta name="description" content="Subes el contrato y en minutos sabes qué cláusulas te van a doler, cuánto te van a costar y qué pedir que cambien. Para PYMEs chilenas que firman sin abogado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/antefirma.css">
+<link rel="stylesheet" href="assets/paginas.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><text y='16' font-size='16'>📄</text></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+<nav class="nav" data-nav data-raiz="" data-actual="index.html" aria-label="Principal"></nav>
+
+<main id="principal">
+
+<!-- ═══════════════════════════════════════════════════════════════ HERO ═══ -->
+<section class="hero">
+  <div class="container">
+    <div class="rotulo">Antefirma · Contratos para PYMEs · Chile</div>
+    <h1 class="hero__t">El daño no llega el día que firmas. Llega <em>dos años después</em>.</h1>
+    <p class="hero__p">
+      Subes el contrato. En minutos sabes qué cláusulas te van a doler, cuánto te van a
+      costar en pesos, y qué texto exacto pedir que cambien. Antes de firmar.
+    </p>
+    <div class="hero__ctas">
+      <a class="btn btn--rojo" href="demo/index.html">Ver un contrato analizado →</a>
+      <a class="btn btn--fantasma" href="#precio">Cuánto cuesta</a>
+    </div>
+    <p class="hero__nota">
+      Desde $29.000 por contrato. No reemplaza a un abogado — y te lo vamos a repetir.
+    </p>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════ EL PROBLEMA ══ -->
+<section class="seccion" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="rej rej--2" style="align-items:center">
+      <div>
+        <div class="rotulo">Lo que pasa de verdad</div>
+        <h2 style="margin-bottom:var(--sp-m)">Nadie lo leyó. Ni tú, ni tu socio, ni tu contador.</h2>
+        <p class="gris ancho" style="margin-bottom:var(--sp-s)">
+          Te llegó el borrador un jueves. Son 14 páginas en letra chica, escritas por el
+          abogado de ellos, para ellos. Cotizaste un abogado: entre 5 y 15 UF y una semana.
+          El local se arrienda ahora o se lo lleva otro.
+        </p>
+        <p class="gris ancho">
+          Entonces pasó lo que pasa siempre: lo firmaste. Y quedó ahí, en una carpeta,
+          durmiendo. Dos años después despierta.
+        </p>
+
+        <blockquote class="voz">
+          «Yo firmé pensando que eran tres años. Cuando quise no renovar, me dijeron que
+          tenía que haber avisado 120 días antes, por notario. Ya se había renovado
+          solo. Por tres años más.»
+          <cite>— Dueña de una panadería, Peñalolén. Es el caso del demo.</cite>
+        </blockquote>
+      </div>
+
+      <div class="rej" style="gap:var(--sp-s)">
+        <div class="hoja dato">
+          <div class="dato__n rojo">$59.743.200</div>
+          <p class="dato__e">
+            Lo que cuesta salirse de un arriendo de strip center que se renovó solo,
+            en el contrato del demo: todas las rentas que faltan, con un mínimo de 12.
+          </p>
+          <p class="dato__f">Cláusula DÉCIMO PRIMERA del contrato de ejemplo. Aritmética visible en el demo.</p>
+        </div>
+        <div class="hoja dato">
+          <div class="dato__n">82%</div>
+          <p class="dato__e">
+            Cuánto más caro es ese arriendo respecto de la renta que negociaste, sumando
+            renta variable, fondo de promoción y el reajuste extra que nadie mira.
+          </p>
+          <p class="dato__f">62 UF dice el contrato · 113 UF pagas. El simulador del demo lo muestra en vivo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ MUESTRA EN VIVO ═════ -->
+<section class="seccion">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">Esto es el producto, funcionando</div>
+      <h2>Tres cláusulas reales. Toca cualquiera.</h2>
+      <p>
+        Están tomadas del contrato de arriendo del demo. El texto es el que efectivamente
+        se usa. El subrayado rojo es donde está la trampa.
+      </p>
+    </div>
+
+    <div class="muestra" id="muestra">
+      <div class="muestra__doc">
+        <span>arriendo-local-14B-portal-quilin.pdf</span>
+        <span>14 págs · 6.840 palabras</span>
+      </div>
+
+      <article class="mcl">
+        <div class="mcl__ord">Cláusula décima · Plazo y renovación</div>
+        <p class="mcl__txt">
+          «El presente contrato tendrá una duración de treinta y seis meses. Se entenderá
+          <span class="mcl__trampa">renovado automáticamente por períodos sucesivos de igual duración</span>
+          si ninguna de las partes manifestare su voluntad de ponerle término mediante
+          <span class="mcl__trampa">carta certificada despachada ante notario con a lo menos ciento veinte días
+          corridos de anticipación</span> a la fecha de vencimiento.»
+        </p>
+        <button class="mcl__btn" data-mcl="a" aria-expanded="false" aria-controls="n-a">
+          Qué significa y cuánto te cuesta <span>→</span>
+        </button>
+        <div class="mcl__nota" id="n-a" hidden>
+          <b>Si se te pasa una fecha, te amarras tres años más.</b>
+          El contrato no vence solo: se renueva solo. Para que termine tienes que avisar
+          120 días antes — no por correo, no por WhatsApp: <b>carta certificada ante notario</b>.
+          Son cuatro meses de anticipación sobre una fecha que ocurre dentro de tres años.
+          Nadie la anota. Y si se pasa, quedas amarrado hasta 2032, con la renta reajustada.
+          <span class="mcl__plata">Fecha límite real: 3 de mayo de 2029. Antefirma te la pone en el calendario hoy.</span>
+        </div>
+      </article>
+
+      <article class="mcl">
+        <div class="mcl__ord">Cláusula quinta · Gastos comunes y fondo de promoción</div>
+        <p class="mcl__txt">
+          «Serán de cargo exclusivo del Arrendatario los gastos comunes, los que serán
+          determinados y prorrateados por el administrador
+          <span class="mcl__trampa">conforme al criterio que éste estime pertinente, sin que el Arrendatario
+          pueda objetarlos</span>. Formará parte de los gastos comunes un fondo de promoción
+          equivalente al <span class="mcl__trampa">tres por ciento de las ventas netas mensuales</span>
+          del Arrendatario.»
+        </p>
+        <button class="mcl__btn" data-mcl="b" aria-expanded="false" aria-controls="n-b">
+          Qué significa y cuánto te cuesta <span>→</span>
+        </button>
+        <div class="mcl__nota" id="n-b" hidden>
+          <b>El cargo más caro del contrato va escondido dentro de «gastos comunes».</b>
+          El 3% de marketing no es sobre la utilidad ni sobre el excedente: es sobre
+          <b>cada peso que vendes, desde el primero</b>. Y los gastos comunes no tienen tope,
+          no tienen fórmula, y el contrato dice expresamente que no los puedes objetar.
+          Súmale que no pagarlos cuenta como no pagar la renta: es causal de término.
+          <span class="mcl__plata">$47.698.200 en 36 meses — más de la mitad de la renta base.</span>
+        </div>
+      </article>
+
+      <article class="mcl">
+        <div class="mcl__ord">Cláusula décimo tercera · Prohibición de ceder</div>
+        <p class="mcl__txt">
+          «Se prohíbe al Arrendatario ceder o transferir el contrato. Para estos efectos,
+          <span class="mcl__trampa">la transferencia de más del treinta por ciento de los derechos sociales
+          del Arrendatario se entenderá cesión del contrato</span> y facultará al Arrendador
+          para ponerle término de inmediato.»
+        </p>
+        <button class="mcl__btn" data-mcl="c" aria-expanded="false" aria-controls="n-c">
+          Qué significa y cuánto te cuesta <span>→</span>
+        </button>
+        <div class="mcl__nota" id="n-c" hidden>
+          <b>Esta cláusula te prohíbe vender tu propia empresa.</b>
+          Si entra un socio con el 31%, o levantas capital, o vendes el negocio: el
+          arrendador puede terminar el contrato ese mismo día. Para una panadería con dos
+          locales, el local <em>es</em> el negocio — sin él no hay nada que vender. En la
+          práctica, esta línea de cuatro renglones convierte tu empresa en invendible
+          durante toda la vigencia del contrato.
+          <span class="mcl__plata">No tiene precio en pesos. Tiene precio en que tu salida deja de existir.</span>
+        </div>
+      </article>
+
+      <p class="gris mono" style="font-size:.72rem;margin-top:var(--sp-m);padding-top:var(--sp-s);border-top:1px solid var(--regla)">
+        Hay 6 cláusulas más como éstas en el mismo contrato.
+        <a href="demo/index.html">Verlas todas en el demo →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ CÓMO FUNCIONA ══ -->
+<section class="seccion" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="rej rej--2" style="gap:var(--sp-2xl)">
+      <div>
+        <div class="rotulo">Cómo funciona</div>
+        <h2 style="margin-bottom:var(--sp-m)">Tres pasos, y ninguno te pide entender jerga.</h2>
+        <ol class="pasos" role="list">
+          <li class="paso">
+            <div>
+              <h3>Subes el contrato</h3>
+              <p>
+                PDF, Word, o una foto de las hojas si te lo pasaron impreso. Lo leemos
+                entero, incluyendo los anexos. Hasta 80 páginas.
+              </p>
+            </div>
+          </li>
+          <li class="paso">
+            <div>
+              <h3>Te devolvemos el contrato anotado</h3>
+              <p>
+                Cada cláusula peligrosa marcada, explicada en castellano y con el número:
+                cuánto te va a costar, con la aritmética a la vista. Sin latín, sin
+                «sin perjuicio de lo anterior».
+              </p>
+            </div>
+          </li>
+          <li class="paso">
+            <div>
+              <h3>Te quedamos vigilando las fechas</h3>
+              <p>
+                Las fechas que muerden salen del contrato y entran a tu calendario, con
+                aviso 30 y 7 días antes. Aunque falten tres años. Esto es lo que ningún
+                abogado te da, porque un abogado te entrega un informe y se va.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <div class="rotulo">Lo que te entregamos</div>
+        <div class="rej" style="gap:var(--sp-s)">
+          <div class="hoja tarjeta">
+            <span class="tarjeta__n">01</span>
+            <h3>El documento anotado</h3>
+            <p>
+              El contrato entero con las cláusulas de riesgo subrayadas y una nota al margen
+              en cada una: qué dice, por qué te va a doler, cuánto cuesta. En tu teléfono
+              parte filtrado en «sólo riesgos», porque nadie lee 14 páginas en un celular.
+            </p>
+          </div>
+          <div class="hoja tarjeta">
+            <span class="tarjeta__n">02</span>
+            <h3>El calendario de las obligaciones</h3>
+            <p>
+              Las fechas que el contrato esconde en el texto: renovar la boleta, avisar la
+              no renovación, acreditar el seguro, entregar el certificado de ventas. Con
+              descarga a Google Calendar y aviso por correo y WhatsApp.
+            </p>
+          </div>
+          <div class="hoja tarjeta">
+            <span class="tarjeta__n">03</span>
+            <h3>Los cambios que deberías pedir</h3>
+            <p>
+              El texto exacto para reemplazar cada cláusula abusiva, con el motivo, y el
+              correo listo para enviar — en tono colaborativo o firme, según cómo te
+              lleves con la contraparte.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ CONTRA QUÉ COMPETIMOS ═══ -->
+<section class="seccion">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">Seamos claros</div>
+      <h2>No competimos con un abogado. Competimos con «nadie lo leyó».</h2>
+      <p>
+        Un abogado hace algo que nosotros no hacemos: se hace responsable. Nosotros hacemos
+        algo que un abogado no hace: te acompañamos los tres años siguientes.
+      </p>
+    </div>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <caption class="visually-hidden">Comparación entre las alternativas reales de una PYME</caption>
+        <thead>
+          <tr>
+            <th>Alternativa</th><th>Cuesta</th><th>Demora</th>
+            <th>Te vigila las fechas</th><th>Se hace responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>No leerlo (lo que pasa hoy)</b></td>
+            <td>$0 hoy. Millones después.</td><td>0 min</td>
+            <td>No</td><td>No</td>
+          </tr>
+          <tr>
+            <td>Pegarlo en ChatGPT</td>
+            <td>$0</td><td>10 min</td>
+            <td>No</td><td>No</td>
+          </tr>
+          <tr>
+            <td>Abogado</td>
+            <td>5–15 UF ($200.000–$600.000)</td><td>3–10 días</td>
+            <td>No</td><td><b>Sí</b></td>
+          </tr>
+          <tr style="background:var(--rojo-tenue)">
+            <td><b>Antefirma</b></td>
+            <td><b>$29.000–$39.000/mes</b></td><td>Minutos</td>
+            <td><b>Sí, por años</b></td><td>No</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aviso mt-l">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M7 4v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="7" cy="9.6" r=".75" fill="currentColor"/>
+      </svg>
+      <div>
+        <strong>Antefirma no es asesoría legal y no reemplaza a un abogado.</strong>
+        Un modelo puede pasar por alto una cláusula. Por eso nunca vamos a certificar que un
+        contrato «está bien»: sólo afirmamos lo que encontramos. Si lo que está en juego es
+        grande, anda donde un abogado — pero anda sabiendo qué preguntar. Ese es el trabajo
+        que hacemos.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════ PRECIO ═══ -->
+<section class="seccion" id="precio" style="background:var(--hoja-2);border-block:1px solid var(--regla)">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">Precio</div>
+      <h2>En pesos, sin letra chica, sin «contáctanos».</h2>
+      <p>
+        Todos los planes incluyen el análisis completo, las anotaciones y los cambios
+        sugeridos. Lo que cambia es cuántos contratos y por cuánto tiempo te los vigilamos.
+      </p>
+    </div>
+
+    <div class="planes">
+      <div class="hoja plan">
+        <span class="plan__et">Suelta</span>
+        <div class="plan__n">Un contrato</div>
+        <div class="plan__p">$29.000</div>
+        <div class="plan__pu">por contrato · IVA incluido</div>
+        <ul class="plan__l" role="list">
+          <li class="si">Análisis completo</li>
+          <li class="si">Cláusulas anotadas</li>
+          <li class="si">Cambios sugeridos + correo</li>
+          <li class="si">Calendario descargable (.ics)</li>
+          <li>Sin vigilancia continua</li>
+        </ul>
+        <a class="btn btn--fantasma" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="hoja plan plan--destacado">
+        <span class="plan__et">Vigía · el que importa</span>
+        <div class="plan__n">Para tu empresa</div>
+        <div class="plan__p">$39.000</div>
+        <div class="plan__pu">al mes · IVA incluido</div>
+        <ul class="plan__l" role="list">
+          <li class="si">5 contratos nuevos al mes</li>
+          <li class="si"><b>25 contratos vigilados</b>, por años</li>
+          <li class="si">Avisos por correo y WhatsApp</li>
+          <li class="si">Sincroniza con Google Calendar</li>
+          <li class="si">Preguntas al contrato, cuando quieras</li>
+        </ul>
+        <a class="btn btn--rojo" href="demo/index.html">Empezar</a>
+      </div>
+
+      <div class="hoja plan">
+        <span class="plan__et">Cartera</span>
+        <div class="plan__n">Varios locales</div>
+        <div class="plan__p">$89.000</div>
+        <div class="plan__pu">al mes · IVA incluido</div>
+        <ul class="plan__l" role="list">
+          <li class="si">20 contratos nuevos al mes</li>
+          <li class="si">150 contratos vigilados</li>
+          <li class="si">3 usuarios</li>
+          <li class="si">Panel de vencimientos</li>
+          <li class="si">Exportación a Excel</li>
+        </ul>
+        <a class="btn btn--fantasma" href="demo/index.html">Empezar</a>
+      </div>
+
+      <div class="hoja plan">
+        <span class="plan__et">Estudio / Contador</span>
+        <div class="plan__n">Para tus clientes</div>
+        <div class="plan__p">$190.000</div>
+        <div class="plan__pu">al mes · IVA incluido</div>
+        <ul class="plan__l" role="list">
+          <li class="si">Hasta 20 RUT distintos</li>
+          <li class="si">Marca blanca en el informe</li>
+          <li class="si">Contratos ilimitados</li>
+          <li class="si">Vigilancia ilimitada</li>
+          <li class="si">Comisión por referidos</li>
+        </ul>
+        <a class="btn btn--fantasma" href="negocio.html">Ver el negocio</a>
+      </div>
+    </div>
+
+    <p class="gris mono mt-m" style="font-size:.74rem">
+      El primer contrato es gratis. Sin tarjeta. Es la única forma de que veas lo que dice
+      el tuyo antes de decidir si vale $39.000.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════ FAQ ═══ -->
+<section class="seccion">
+  <div class="container">
+    <div class="cab">
+      <div class="rotulo">Preguntas</div>
+      <h2>Lo que todos preguntan.</h2>
+    </div>
+
+    <div class="faq ancho">
+      <details>
+        <summary>¿Esto reemplaza a un abogado?</summary>
+        <div class="faq__r">
+          <p>
+            <b>No, y no queremos que lo haga.</b> Un abogado hace dos cosas que Antefirma
+            no hace: te da una opinión jurídica que él firma, y responde por ella.
+          </p>
+          <p>
+            Lo que hacemos es distinto: te mostramos qué dice el contrato y qué te va a
+            costar, para que sepas qué preguntar. En la práctica, quienes usan Antefirma
+            llegan mejor preparados donde el abogado — y le hacen perder menos horas, que
+            es lo que les cobran.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Y si la IA se le pasa una cláusula?</summary>
+        <div class="faq__r">
+          <p>
+            Puede pasar. Es el riesgo central de este producto y no lo escondemos: está
+            escrito, con nombre y apellido, en la <a href="negocio.html">página de negocio</a>.
+          </p>
+          <p>
+            Tres cosas hacemos al respecto. Primero, un segundo modelo revisa el trabajo del
+            primero buscando específicamente lo que se pasó. Segundo, <b>nunca emitimos un
+            certificado verde</b>: Antefirma jamás dice «este contrato está bien», sólo dice
+            «encontramos esto». La diferencia importa. Tercero, nuestros términos limitan la
+            responsabilidad al monto pagado — y te lo decimos acá, arriba, no en la página 9.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Por qué no lo pego en ChatGPT y listo?</summary>
+        <div class="faq__r">
+          <p>
+            Puedes, y va a darte algo. El análisis de un contrato se está volviendo un
+            commodity y no pretendemos que no.
+          </p>
+          <p>
+            Pero ChatGPT no te va a avisar en marzo de 2029 que te quedan 60 días para
+            mandar la carta al notario. <b>El análisis es el gancho; la vigilancia es el
+            producto.</b> Además, aquí el modelo trabaja sobre contratos chilenos: UF, tácita
+            reconducción, boleta bancaria de garantía, Ley 21.131. Un modelo genérico
+            responde sobre «leases» y te habla de «security deposits».
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Qué pasa con mi contrato? ¿Lo lee alguien?</summary>
+        <div class="faq__r">
+          <p>
+            Se procesa cifrado, se guarda cifrado en Chile, y no se usa para entrenar
+            ningún modelo. Puedes borrarlo cuando quieras y se borra de verdad. Nadie de
+            Antefirma lee tu contrato salvo que tú abras un ticket y nos autorices por
+            escrito.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>¿Sirve para cualquier contrato?</summary>
+        <div class="faq__r">
+          <p>
+            Hoy somos muy buenos en dos tipos: <b>arriendo comercial</b> (strip center, mall,
+            local a la calle) y <b>suministro con una empresa grande</b>. Ahí es donde está el
+            daño más caro y donde los contratos se repiten, que es lo que permite ser
+            realmente bueno y no sólo genérico.
+          </p>
+          <p>
+            Servicios, distribución y franquicia funcionan bien. Laboral, societario y
+            construcción todavía no: te lo vamos a decir en pantalla antes de cobrarte.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Ya firmé. ¿Sirve de algo?</summary>
+        <div class="faq__r">
+          <p>
+            <b>Sirve, y bastante.</b> La mitad de lo que Antefirma hace es sobre contratos ya
+            firmados: las fechas que vienen siguen ahí y todavía las puedes tomar a tiempo.
+            La carta de no renovación, la boleta que vence, el seguro que hay que acreditar.
+          </p>
+          <p>
+            Además, saber exactamente qué firmaste cambia cómo negocias la renovación. Sube
+            los contratos que ya tienes: es gratis vigilar el primero.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ LLAMADA ═══ -->
+<section class="seccion">
+  <div class="container">
+    <div class="llamada">
+      <h2>Tienes un contrato guardado en una carpeta.</h2>
+      <p>
+        Toma cinco minutos averiguar qué dice. Es bastante menos de lo que va a tomar
+        arreglarlo después.
+      </p>
+      <a class="btn" href="demo/index.html">Abrir el demo →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__fila">
+    <span>Antefirma · Santiago de Chile · antefirma.com</span>
+    <span>No constituye asesoría legal.</span>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+<script>
+/* La muestra en vivo: las notas al margen se abren de verdad. */
+(function () {
+  var btns = document.querySelectorAll("[data-mcl]");
+  Array.prototype.forEach.call(btns, function (b) {
+    b.addEventListener("click", function () {
+      var nota = document.getElementById("n-" + b.getAttribute("data-mcl"));
+      var abierta = !nota.hidden;
+      nota.hidden = abierta;
+      b.setAttribute("aria-expanded", String(!abierta));
+      b.firstChild.nodeValue = abierta
+        ? "Qué significa y cuánto te cuesta "
+        : "Cerrar la nota ";
+      b.querySelector("span").textContent = abierta ? "→" : "×";
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Conserjo</title>
+<meta name="description" content="El producto funcionando: portafolio, filtro de arrendatarios, cobro y conciliación, y triage de mantención desde una foto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/marca.css">
+<style>
+  main { padding-block: var(--sp-m) 6.5rem; }
+  @media (min-width: 48em) { main { padding-bottom: var(--sp-2xl); } }
+
+  /* Aviso de demo */
+  .demo-aviso {
+    background: var(--tinta);
+    color: rgba(242,237,227,.8);
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .05em;
+    padding: .45rem 0;
+  }
+  .demo-aviso b { color: var(--teja); }
+
+  /* Cabecera del portafolio: los 4 números que miras al despertar */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--papel-3); border: var(--borde); }
+  @media (min-width: 48em) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpi { background: var(--papel); padding: var(--sp-xs) var(--sp-s); }
+  .kpi .rotulo { font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .09em; color: var(--tinta-3); }
+  .kpi .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.32rem; font-weight: 600; letter-spacing: -.02em; margin-top: .15rem; }
+  .kpi .sub { font-size: .7rem; color: var(--tinta-3); }
+  .kpi.alerta .v { color: var(--teja); }
+
+  /* Pestañas */
+  .tabs { display: none; }
+  @media (min-width: 48em) {
+    .tabs {
+      display: flex; gap: 0; border-bottom: 2px solid var(--tinta);
+      margin-top: var(--sp-m);
+    }
+    .tabs button {
+      min-height: 46px; padding: .6rem 1rem; border: 0;
+      font-family: var(--mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--tinta-3); background: none; display: inline-flex; align-items: center; gap: .45rem;
+      margin-bottom: -2px; border-bottom: 3px solid transparent;
+    }
+    .tabs button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--teja); font-weight: 600; }
+    .tabs button:hover { color: var(--tinta); }
+    .tabs .badge { background: var(--teja); color: var(--papel); font-size: .62rem; padding: 0 .3rem; }
+  }
+  /* Barra inferior en teléfono */
+  .tabbar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--tinta); border-top: 3px solid var(--teja);
+  }
+  @media (min-width: 48em) { .tabbar { display: none; } }
+  .tabbar button {
+    min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .15rem; color: rgba(242,237,227,.55); border: 0; padding: .3rem;
+    font-family: var(--mono); font-size: .58rem; letter-spacing: .04em; text-transform: uppercase;
+    position: relative;
+  }
+  .tabbar button[aria-selected="true"] { color: var(--papel); }
+  .tabbar button[aria-selected="true"] svg { color: var(--teja); }
+  .tabbar .badge {
+    position: absolute; top: 6px; right: calc(50% - 20px);
+    background: var(--teja); color: var(--papel);
+    font-size: .55rem; min-width: 14px; height: 14px; line-height: 14px; text-align: center; padding: 0 3px;
+  }
+  .panel[hidden] { display: none; }
+  .panel { padding-top: var(--sp-m); }
+
+  /* Lista de unidades */
+  .unidad {
+    border: var(--borde); background: var(--papel); padding: var(--sp-xs) var(--sp-s);
+    display: grid; gap: .35rem; width: 100%; text-align: left; min-height: 0;
+  }
+  .unidad + .unidad { border-top: 0; }
+  .unidad:hover { background: var(--papel-2); }
+  .unidad[aria-expanded="true"] { background: var(--papel-2); border-left: 3px solid var(--teja); }
+  .unidad .l1 { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+  .unidad .dir { font-weight: 600; font-size: .95rem; }
+  .unidad .com { font-family: var(--mono); font-size: .68rem; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .06em; }
+  .unidad .l2 { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .unidad .arr { font-size: .82rem; color: var(--tinta-2); }
+  .unidad .monto { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: .95rem; }
+  .unidad .uf { font-family: var(--mono); font-size: .68rem; color: var(--tinta-3); }
+
+  .detalle { border: var(--borde); border-top: 0; background: var(--papel-2); padding: var(--sp-s); }
+  .detalle[hidden] { display: none; }
+  .detalle dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; font-size: .82rem; }
+  .detalle dt { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--tinta-3); padding-top: .15rem; }
+  .detalle dd { font-weight: 500; }
+
+  /* Segmentado dueño / arrendatario */
+  .seg { display: inline-flex; border: var(--borde); }
+  .seg button {
+    min-height: 42px; padding: .4rem .9rem; border: 0; background: none;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; color: var(--tinta-3);
+  }
+  .seg button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+
+  /* Teléfono del arrendatario */
+  .fono {
+    max-width: 340px; margin-inline: auto;
+    border: 3px solid var(--tinta); background: var(--papel);
+    box-shadow: 5px 5px 0 var(--papel-3);
+  }
+  .fono-top {
+    background: var(--tinta); color: var(--papel); padding: .4rem .7rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: .64rem; letter-spacing: .05em;
+  }
+  .fono-body { padding: var(--sp-s); }
+  .fono h3 { font-size: 1.05rem; }
+  .adjunta {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; margin-top: .6rem;
+  }
+  .adjunta button {
+    border: 2px dashed var(--papel-3); background: var(--papel-2); padding: 0; min-height: 0; min-width: 0; width: 100%;
+  }
+  .adjunta button[aria-pressed="true"] { border: 2px solid var(--teja); background: var(--papel); }
+  .adjunta svg { width: 100%; height: auto; display: block; }
+  .adjunta .cap { display: block; font-family: var(--mono); font-size: .55rem; padding: .2rem; color: var(--tinta-3); text-align: center; }
+  .adjunta button[aria-pressed="true"] .cap { color: var(--teja); font-weight: 600; }
+  textarea {
+    width: 100%; border: var(--borde); background: var(--papel); padding: .55rem;
+    font-family: var(--sans); font-size: .88rem; min-height: 68px; resize: vertical;
+  }
+  .enviado {
+    border: 1px solid var(--ok); background: rgba(58,99,64,.07); color: var(--tinta);
+    padding: .7rem; font-size: .85rem; display: flex; gap: .5rem; align-items: flex-start;
+  }
+  .enviado svg { color: var(--ok); flex: none; margin-top: 2px; }
+
+  /* Ticket / diagnóstico */
+  .ticket { border: var(--borde); background: var(--papel); }
+  .ticket-h {
+    background: var(--tinta); color: var(--papel); padding: .55rem var(--sp-s);
+    display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap;
+  }
+  .ticket-h .id { font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; color: rgba(242,237,227,.6); }
+  .ticket-h strong { font-family: var(--serif); font-size: 1rem; }
+  .ticket-b { padding: var(--sp-s); }
+  .kv { display: flex; justify-content: space-between; gap: .8rem; padding: .45rem 0; border-bottom: var(--hairline); font-size: .87rem; }
+  .kv:last-of-type { border-bottom: 0; }
+  .kv dt, .kv .k { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); flex: none; padding-top: .15rem; }
+  .kv .v { text-align: right; font-weight: 500; }
+
+  .sev { display: flex; gap: 2px; align-items: center; }
+  .sev i { width: 9px; height: 14px; background: var(--papel-3); display: block; }
+  .sev i.on { background: currentColor; }
+
+  .riesgo-box {
+    border: 1px solid var(--teja); background: rgba(178,67,42,.07);
+    padding: .65rem .75rem; font-size: .85rem; display: flex; gap: .5rem; margin-top: var(--sp-s);
+  }
+  .riesgo-box svg { color: var(--teja); flex: none; margin-top: 2px; }
+
+  /* Maestros */
+  .maestro {
+    display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap;
+    border: var(--borde); background: var(--papel); padding: .6rem .75rem; width: 100%; text-align: left; min-height: 0;
+  }
+  .maestro + .maestro { border-top: 0; }
+  .maestro:hover { background: var(--papel-2); }
+  .maestro[aria-pressed="true"] { border-left: 3px solid var(--teja); background: var(--papel-2); }
+  .maestro .n { font-weight: 600; font-size: .9rem; }
+  .maestro .o { font-family: var(--mono); font-size: .66rem; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .05em; }
+  .maestro .p { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: .88rem; text-align: right; }
+  .maestro .d { font-size: .68rem; color: var(--tinta-3); text-align: right; }
+  .estrella { color: var(--media); font-family: var(--mono); font-size: .72rem; font-weight: 600; }
+
+  /* Postulantes */
+  .control-box { border: var(--borde); background: var(--papel-2); padding: var(--sp-s); }
+  .slider-fila { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+  input[type="range"] { flex: 1; min-width: 160px; accent-color: var(--teja); height: 44px; }
+  .exig { font-family: var(--mono); font-weight: 600; font-size: 1.1rem; min-width: 3.2em; }
+  label.check { display: flex; align-items: center; gap: .5rem; font-size: .85rem; min-height: 44px; cursor: pointer; }
+  input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--teja); }
+
+  .post { border: var(--borde); background: var(--papel); padding: var(--sp-s); }
+  .post + .post { border-top: 0; }
+  .post.rechazado { background: var(--papel-2); opacity: .72; }
+  .post-h { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; flex-wrap: wrap; }
+  .post .nom { font-weight: 600; font-size: 1rem; }
+  .post .rut { font-size: .74rem; color: var(--tinta-3); }
+  .score {
+    font-family: var(--mono); font-size: 1.7rem; font-weight: 600; line-height: 1;
+    letter-spacing: -.03em;
+  }
+  .score small { font-size: .6rem; color: var(--tinta-3); font-weight: 400; letter-spacing: 0; }
+  .barras { display: grid; gap: .3rem; margin-top: .6rem; }
+  .barra-f { display: grid; grid-template-columns: 8.5rem 1fr auto; gap: .5rem; align-items: center; font-size: .75rem; }
+  .barra-f .et { font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-3); }
+  .barra-f .tr { height: 6px; background: var(--papel-3); }
+  .barra-f .tr i { display: block; height: 100%; background: var(--tinta-2); }
+  .barra-f .val { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .flags { margin-top: .6rem; display: grid; gap: .3rem; }
+  .flag { font-size: .8rem; display: flex; gap: .45rem; align-items: flex-start; }
+  .flag svg { flex: none; margin-top: 2px; }
+  .flag.mal { color: var(--teja); }
+  .flag.aviso { color: var(--media); }
+  .flag.bien { color: var(--ok); }
+
+  /* Cobros */
+  .mov { border: var(--borde); background: var(--papel); padding: .6rem .75rem; }
+  .mov + .mov { border-top: 0; }
+  .mov.pend { border-left: 3px solid var(--media); background: rgba(138,93,7,.05); }
+  .mov.listo { border-left: 3px solid var(--ok); }
+  .mov-h { display: flex; justify-content: space-between; gap: .6rem; align-items: baseline; }
+  .mov .glosa { font-family: var(--mono); font-size: .78rem; letter-spacing: .02em; }
+  .mov .m { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+  .mov .sug { font-size: .78rem; color: var(--tinta-2); margin-top: .35rem; }
+  .mov .conf { font-family: var(--mono); font-size: .68rem; color: var(--tinta-3); }
+  .mov .acciones { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .5rem; }
+  .mini {
+    min-height: 36px; min-width: 0; padding: .25rem .6rem; border: var(--borde);
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; background: var(--papel);
+  }
+  .mini:hover { background: var(--tinta); color: var(--papel); }
+  .mini--teja { background: var(--teja); border-color: var(--teja); color: var(--papel); }
+  .mini--teja:hover { background: var(--teja-osc); border-color: var(--teja-osc); }
+
+  .wa-prev {
+    border: var(--hairline); border-left: 3px solid var(--ok);
+    background: var(--papel-2); padding: .6rem .7rem; font-size: .84rem; color: var(--tinta-2);
+  }
+  .wa-prev b { font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .07em; color: var(--tinta-3); display: block; margin-bottom: .2rem; }
+
+  .bitacora { font-family: var(--mono); font-size: .74rem; color: var(--tinta-3); }
+  .bitacora li { padding: .3rem 0; border-bottom: var(--hairline); }
+  .bitacora li:last-child { border-bottom: 0; }
+  .bitacora b { color: var(--teja); font-weight: 500; }
+
+  .vacio { text-align: center; padding: var(--sp-l); color: var(--tinta-3); font-size: .88rem; border: 1px dashed var(--papel-3); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><path d="M10 10l10 10M17 17l2-2M14 14l2-2"/></symbol>
+  <symbol id="i-casa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10z"/></symbol>
+  <symbol id="i-llave-inglesa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5a5 5 0 0 1-6.5 6.4L6 19a2.1 2.1 0 0 1-3-3l7.6-7.5A5 5 0 0 1 17 2l-3 3 2 2 3-3c.6.6 1 1.3 1 2z"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-billete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12"/><circle cx="12" cy="12" r="2.5"/><path d="M5 12h.01M19 12h.01"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 20h20L12 3z"/><path d="M12 9v5M12 17.5v.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-camara" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+</svg>
+
+<header class="marca-bar">
+  <nav class="container" aria-label="Principal">
+    <a class="logo" href="../index.html">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-llave"/></svg>
+      Conserjo
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-menu"/></svg>
+      <span class="visually-hidden">Abrir menú</span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="../../index.html">← Ideas</a></li>
+      <li><a href="../index.html">Producto</a></li>
+      <li><a href="index.html" aria-current="page">Demo</a></li>
+      <li><a href="../negocio.html">Negocio</a></li>
+      <li><a href="../roadmap.html">Roadmap</a></li>
+      <li><a href="../stack.html">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="demo-aviso">
+  <div class="container">
+    <b>DEMO</b> · datos de ejemplo · todo corre en tu navegador · nada se envía a ninguna parte
+  </div>
+</div>
+
+<main class="container">
+
+  <div class="flex entre wrap gap-m centro-v mb-m">
+    <div>
+      <p class="kicker kicker--tinta">Portafolio de Verónica Alcaíno · julio 2026</p>
+      <h1 style="font-size:var(--step-2);margin-top:.2rem">8 unidades</h1>
+    </div>
+    <p class="small muted num">UF hoy: $39.184</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <p class="rotulo">Arriendo del mes</p>
+      <p class="v" id="k-facturado">$3.670.000</p>
+      <p class="sub num" id="k-facturado-uf">93,66 UF</p>
+    </div>
+    <div class="kpi">
+      <p class="rotulo">Recaudado</p>
+      <p class="v" id="k-recaudado">$2.640.000</p>
+      <p class="sub" id="k-recaudado-pct">72% del mes</p>
+    </div>
+    <div class="kpi alerta">
+      <p class="rotulo">Por cobrar</p>
+      <p class="v" id="k-deuda">$1.030.000</p>
+      <p class="sub" id="k-deuda-sub">2 arrendatarios</p>
+    </div>
+    <div class="kpi">
+      <p class="rotulo">Requiere acción</p>
+      <p class="v" id="k-acciones">6</p>
+      <p class="sub">tickets + conciliaciones</p>
+    </div>
+  </div>
+
+  <!-- Pestañas (escritorio) -->
+  <div class="tabs" role="tablist" aria-label="Secciones del producto">
+    <button role="tab" data-tab="portafolio" aria-selected="true" aria-controls="p-portafolio">
+      <svg width="16" height="16" aria-hidden="true"><use href="#i-casa"/></svg> Portafolio
+    </button>
+    <button role="tab" data-tab="triage" aria-selected="false" aria-controls="p-triage">
+      <svg width="16" height="16" aria-hidden="true"><use href="#i-llave-inglesa"/></svg> Mantención
+      <span class="badge" id="badge-t">2</span>
+    </button>
+    <button role="tab" data-tab="postulantes" aria-selected="false" aria-controls="p-postulantes">
+      <svg width="16" height="16" aria-hidden="true"><use href="#i-escudo"/></svg> Postulantes
+      <span class="badge" id="badge-p">4</span>
+    </button>
+    <button role="tab" data-tab="cobros" aria-selected="false" aria-controls="p-cobros">
+      <svg width="16" height="16" aria-hidden="true"><use href="#i-billete"/></svg> Cobros
+      <span class="badge" id="badge-c">3</span>
+    </button>
+  </div>
+
+  <!-- ======================= PORTAFOLIO ======================= -->
+  <section class="panel" id="p-portafolio" role="tabpanel" aria-labelledby="tab-portafolio">
+    <p class="small muted mb-m">Toca una unidad para ver la ficha.</p>
+    <div id="lista-unidades"></div>
+  </section>
+
+  <!-- ======================= MANTENCIÓN / TRIAGE ======================= -->
+  <section class="panel" id="p-triage" role="tabpanel" hidden>
+    <div class="flex entre wrap gap-m centro-v mb-m">
+      <div class="seg" role="group" aria-label="Cambiar de vista">
+        <button type="button" data-vista="duenio" aria-pressed="true">Vista dueño</button>
+        <button type="button" data-vista="arrendatario" aria-pressed="false">Vista arrendatario</button>
+      </div>
+    </div>
+
+    <!-- ---- VISTA ARRENDATARIO (teléfono) ---- -->
+    <div id="vista-arrendatario" hidden>
+      <p class="nota mb-l">
+        Esto es lo que ve el arrendatario cuando abre el link que le llega por WhatsApp.
+        No instala nada, no crea cuenta. Es el caso de uso central del producto — por eso
+        se diseña primero para el teléfono.
+      </p>
+
+      <div class="fono">
+        <div class="fono-top">
+          <span>23:14</span>
+          <span>conserjo.com/r/8f2c</span>
+        </div>
+        <div class="fono-body" id="fono-form">
+          <p class="kicker" style="font-size:.68rem">Irarrázaval 4210 · Depto 802</p>
+          <h3 class="mt-s">Reportar un problema</h3>
+          <p class="small muted mt-s">Saca una foto. Con eso basta.</p>
+
+          <div class="adjunta" role="group" aria-label="Adjuntar foto">
+            <button type="button" data-caso="a" aria-pressed="true">
+              <svg viewBox="0 0 100 78" aria-hidden="true">
+                <rect width="100" height="78" fill="#DED8CB"/><rect width="100" height="52" fill="#E7E2D6"/>
+                <path d="M0 40h100M32 0v40M68 0v40" stroke="#CFC7B6"/>
+                <path d="M38 8c9-4 20-2 24 5s3 15-3 19-19 4-25-2-5-18 4-22z" fill="#B79A78" opacity=".85"/>
+                <path d="M42 12c6-3 14-1 17 4s2 11-2 13-13 3-17-1-4-13 2-16z" fill="#8E6E4C" opacity=".8"/>
+                <path d="M48 18c4-2 8 0 9 3s0 6-3 7-7 1-8-2 0-7 2-8z" fill="#5E442A" opacity=".75"/>
+                <path d="M0 52h100M0 65h100M20 52v26M50 52v26M80 52v26" stroke="#CFC7B6"/>
+              </svg>
+              <span class="cap">Humedad</span>
+            </button>
+            <button type="button" data-caso="b" aria-pressed="false">
+              <svg viewBox="0 0 100 78" aria-hidden="true">
+                <rect width="100" height="78" fill="#2E2A24"/><rect y="52" width="100" height="26" fill="#4A4036"/>
+                <path d="M50 6v16" stroke="#B9BCC0" stroke-width="5" stroke-linecap="round"/>
+                <path d="M50 22c0 8-9 8-9 14s9 6 9 12v4" fill="none" stroke="#A7ABB0" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="41" cy="38" r="3" fill="#4C7A96"/>
+                <ellipse cx="42" cy="58" rx="11" ry="3.5" fill="#3E5F72" opacity=".8"/>
+                <path d="M62 48l3 12h12l3-12z" fill="none" stroke="#9AA0A6" stroke-width="1.5"/>
+              </svg>
+              <span class="cap">Gotera</span>
+            </button>
+            <button type="button" data-caso="c" aria-pressed="false">
+              <svg viewBox="0 0 100 78" aria-hidden="true">
+                <rect width="100" height="78" fill="#DCD6C9"/>
+                <rect x="16" y="8" width="68" height="62" fill="#EFEDE8" stroke="#B6AF9F" stroke-width="1.5"/>
+                <rect x="24" y="18" width="52" height="30" fill="#D9D5CC" stroke="#B6AF9F"/>
+                <rect x="28" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294"/>
+                <rect x="39" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294"/>
+                <rect x="50" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294"/>
+                <rect x="61" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294"/>
+                <path d="M46 20c6-3 16-2 20 4s2 14-6 16-18 0-20-6 0-11 6-14z" fill="#2A2622" opacity=".55"/>
+                <path d="M50 24c4-2 11-1 13 3s1 9-4 10-12 0-13-4 0-8 4-9z" fill="#171512" opacity=".7"/>
+              </svg>
+              <span class="cap">Eléctrico</span>
+            </button>
+          </div>
+
+          <label class="visually-hidden" for="ta-msg">Describe el problema</label>
+          <textarea id="ta-msg" class="mt-m"></textarea>
+
+          <button class="btn btn--teja mt-m" id="btn-enviar" type="button" style="width:100%">
+            <svg width="16" height="16" aria-hidden="true"><use href="#i-camara"/></svg>
+            Enviar reporte
+          </button>
+        </div>
+
+        <div class="fono-body" id="fono-ok" hidden>
+          <div class="enviado">
+            <svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>
+            <span><b>Reporte enviado.</b> Verónica ya lo tiene. Te avisamos cuando se agende la visita.</span>
+          </div>
+          <div class="riesgo-box mt-m" id="fono-contencion">
+            <svg width="16" height="16" aria-hidden="true"><use href="#i-alerta"/></svg>
+            <span></span>
+          </div>
+          <button class="btn btn--fantasma mt-m" id="btn-ver-duenio" type="button" style="width:100%">
+            Ver lo que le llegó al dueño →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- VISTA DUEÑO ---- -->
+    <div id="vista-duenio">
+      <div id="tickets"></div>
+    </div>
+  </section>
+
+  <!-- ======================= POSTULANTES ======================= -->
+  <section class="panel" id="p-postulantes" role="tabpanel" hidden>
+    <div class="ficha ficha--acento mb-l">
+      <p class="kicker" style="font-size:.68rem">Unidad vacante</p>
+      <h3 class="mt-s">Gral. Velásquez 1120, depto 2104 — Estación Central</h3>
+      <p class="small muted mt-s">
+        Arriendo publicado: <span class="clp" style="font-weight:600">$395.000</span> (10,08 UF) ·
+        Vacante hace <span class="num">18 días</span> · Costo de la vacancia hasta hoy:
+        <span class="clp" style="color:var(--teja);font-weight:600">$237.000</span>
+      </p>
+    </div>
+
+    <div class="control-box mb-l">
+      <p class="kicker kicker--tinta" style="font-size:.66rem">Tu política de entrada</p>
+      <div class="slider-fila mt-m">
+        <label for="exig" class="small" style="flex:none">Exigir renta líquida de al menos</label>
+        <input type="range" id="exig" min="20" max="50" step="1" value="30">
+        <output class="exig" id="exig-out">3,0×</output>
+        <span class="small muted" style="flex:none">el arriendo</span>
+      </div>
+      <label class="check mt-s">
+        <input type="checkbox" id="chk-dicom" checked>
+        Rechazar automáticamente si tiene morosidades o protestos vigentes
+      </label>
+      <p class="small muted" id="resumen-filtro">—</p>
+    </div>
+
+    <div id="lista-postulantes"></div>
+
+    <div id="contrato-ok" hidden class="ficha ficha--acento mt-l">
+      <div class="flex gap-m" style="align-items:flex-start">
+        <svg width="22" height="22" style="color:var(--ok);flex:none;margin-top:2px" aria-hidden="true"><use href="#i-check"/></svg>
+        <div>
+          <h3 id="contrato-nombre">—</h3>
+          <p class="small mt-s" style="color:var(--tinta-2)">
+            Contrato de arriendo generado con reajuste anual por UF, garantía de un mes y
+            cláusula de mora del 1% mensual. Va a firma electrónica. La unidad pasa a
+            <b>ocupada</b> en tu portafolio y el primer cargo se emite el día 5.
+          </p>
+          <p class="small muted mt-s">
+            Guardado en la carpeta de la unidad: cédula, liquidaciones, informe Equifax y esta evaluación.
+            Si algún día hay juicio, esto es exactamente lo que tu abogado va a pedir.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= COBROS ======================= -->
+  <section class="panel" id="p-cobros" role="tabpanel" hidden>
+
+    <div class="grid g-side">
+      <div>
+        <div class="section-head">
+          <p class="kicker">Conciliación de cartola · Banco de Chile · julio 2026</p>
+          <h2 style="font-size:var(--step-1);margin-top:.3rem">Conserjo calzó 5 de 8 abonos solo.</h2>
+          <p class="small muted mt-s" style="max-width:52ch">
+            Lo que no está seguro, no lo inventa: te lo deja acá con su mejor hipótesis y su
+            nivel de confianza. Dos clics y listo. Esto es la pega que hoy haces mirando la
+            cartola el día 5 de cada mes.
+          </p>
+        </div>
+        <div id="lista-movs" class="mt-m"></div>
+      </div>
+
+      <aside>
+        <div class="ficha ficha--hundida">
+          <p class="kicker kicker--tinta" style="font-size:.66rem">Cobranza</p>
+          <div id="cobranza"></div>
+        </div>
+
+        <div class="ficha mt-m">
+          <p class="kicker kicker--tinta" style="font-size:.66rem">Bitácora</p>
+          <ul class="bitacora lista mt-s" id="bitacora" role="list">
+            <li><b>08:02</b> Cartola leída · 8 movimientos nuevos</li>
+            <li><b>08:02</b> 5 abonos calzados automáticamente</li>
+            <li><b>08:03</b> 3 movimientos enviados a revisión</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<!-- Barra inferior (teléfono) -->
+<nav class="tabbar" role="tablist" aria-label="Secciones">
+  <button role="tab" data-tab="portafolio" aria-selected="true">
+    <svg width="20" height="20" aria-hidden="true"><use href="#i-casa"/></svg> Portafolio
+  </button>
+  <button role="tab" data-tab="triage" aria-selected="false">
+    <span class="badge" id="badge-t2">2</span>
+    <svg width="20" height="20" aria-hidden="true"><use href="#i-llave-inglesa"/></svg> Mantención
+  </button>
+  <button role="tab" data-tab="postulantes" aria-selected="false">
+    <span class="badge" id="badge-p2">4</span>
+    <svg width="20" height="20" aria-hidden="true"><use href="#i-escudo"/></svg> Postulantes
+  </button>
+  <button role="tab" data-tab="cobros" aria-selected="false">
+    <span class="badge" id="badge-c2">3</span>
+    <svg width="20" height="20" aria-hidden="true"><use href="#i-billete"/></svg> Cobros
+  </button>
+</nav>
+
+<script src="../assets/nav.js"></script>
+<script>
+(function () {
+  'use strict';
+  var UF = 39184;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var clp = function (n) { return '$' + Math.round(n).toLocaleString('es-CL'); };
+  var uf  = function (n) { return (n / UF).toFixed(2).replace('.', ',') + ' UF'; };
+  var el  = function (id) { return document.getElementById(id); };
+
+  /* ============ ESTADO ============ */
+  var S = {
+    unidades: [
+      { id: 1, dir: 'Irarrázaval 4210, depto 802', com: 'Ñuñoa',            arriendo: 580000, arr: 'Camila Rojas Vergara',      rut: '16.842.905-7', estado: 'al-dia',      desde: 'mar 2024', abierto: false },
+      { id: 2, dir: 'Dr. Johow 550, depto 305',    com: 'Ñuñoa',            arriendo: 640000, arr: 'Matías Fuenzalida Ortiz',   rut: '14.507.331-1', estado: 'atrasado',    dias: 6,  desde: 'ago 2025', abierto: false },
+      { id: 3, dir: 'Av. Ecuador 3450, depto 1207',com: 'Estación Central', arriendo: 420000, arr: 'Génesis Ramírez Piña',      rut: '21.044.819-2', estado: 'al-dia',      desde: 'ene 2026', abierto: false },
+      { id: 4, dir: 'Gral. Velásquez 1120, depto 2104', com: 'Estación Central', arriendo: 395000, arr: null,                 rut: null,           estado: 'vacante',     dias: 18, abierto: false },
+      { id: 5, dir: 'Av. Independencia 1450, depto 906', com: 'Independencia', arriendo: 450000, arr: 'Ignacio Peñaloza Soto', rut: '18.203.447-0', estado: 'reparacion',  desde: 'nov 2023', abierto: false },
+      { id: 6, dir: 'Santos Dumont 380, depto 512',com: 'Independencia',    arriendo: 470000, arr: 'Francisca Zúñiga Lagos',   rut: '19.570.362-1', estado: 'al-dia',      desde: 'jun 2025', abierto: false },
+      { id: 7, dir: 'San Diego 890, depto 1503',   com: 'Santiago Centro',  arriendo: 390000, arr: 'Rodrigo Cáceres Millán',   rut: '12.994.583-1', estado: 'atrasado',    dias: 23, desde: 'feb 2025', abierto: false },
+      { id: 8, dir: 'Vicuña Mackenna 8890, casa',  com: 'La Florida',       arriendo: 720000, arr: 'Paulina Ossandón Herrera', rut: '13.876.124-6', estado: 'al-dia',      desde: 'sep 2022', abierto: false }
+    ],
+    // Ticket abierto que ya existía + el que crea el arrendatario
+    tickets: [
+      { id: 'MNT-0231', unidadId: 5, caso: 'b', estado: 'diagnosticado', maestro: null }
+    ],
+    movs: [
+      { id: 1, fecha: '03/07', glosa: 'TRANSF CAMILA ROJAS VERGARA', monto: 580000, estado: 'listo', calce: 'Depto 802 · Irarrázaval', conf: 100 },
+      { id: 2, fecha: '03/07', glosa: 'TRANSF G RAMIREZ PINA',        monto: 420000, estado: 'listo', calce: 'Depto 1207 · Av. Ecuador', conf: 98 },
+      { id: 3, fecha: '04/07', glosa: 'TRANSF I PENALOZA S',          monto: 450000, estado: 'listo', calce: 'Depto 906 · Independencia', conf: 99 },
+      { id: 4, fecha: '05/07', glosa: 'TRANSF P OSSANDON HERRERA',    monto: 720000, estado: 'listo', calce: 'Casa · La Florida', conf: 100 },
+      { id: 5, fecha: '05/07', glosa: 'TRANSFERENCIA — glosa: "PAGO"', monto: 470000, estado: 'pend',
+        hip: 'Francisca Zúñiga — Depto 512, Santos Dumont', conf: 71,
+        razon: 'El monto calza exacto con el cargo del 512 y es el único cargo de $470.000 abierto. Pero la glosa no trae nombre ni RUT, así que no lo doy por hecho.' },
+      { id: 6, fecha: '08/07', glosa: 'TRANSF R CACERES MILLAN',      monto: 195000, estado: 'pend',
+        hip: 'Abono parcial de Rodrigo Cáceres — Depto 1503 (debe $390.000)', conf: 88,
+        razon: 'El nombre calza, pero el monto es exactamente la mitad del cargo. Lo trato como abono parcial, no como pago completo.' },
+      { id: 7, fecha: '02/07', glosa: 'TRANSF JUAN P SOTO ARAYA',     monto: 85000,  estado: 'pend',
+        hip: 'Ningún cargo abierto calza con este abono', conf: 12,
+        razon: 'No hay cargo de $85.000 ni un arrendatario con ese nombre. Probablemente no es un arriendo. No lo voy a inventar.' },
+      { id: 8, fecha: '05/07', glosa: 'TRANSF FRANCISCA ZUNIGA (rev.)', monto: 0, estado: 'oculto' }
+    ],
+    postulantes: [
+      { id: 1, nom: 'Josefa Arriagada Núñez', rut: '20.115.672-4', renta: 1480000, ratio: 3.7,
+        antig: '3 a 2 m', empleo: 'Contrato indefinido · Clínica Dávila', dicom: 0, ident: true, score: 88,
+        flags: [
+          { t: 'bien', txt: 'Identidad verificada contra Registro Civil (selfie + cédula)' },
+          { t: 'bien', txt: 'Liquidaciones cuadran con las cotizaciones de AFP de los últimos 12 meses' },
+          { t: 'bien', txt: 'DICOM limpio — sin protestos ni morosidades' }
+        ] },
+      { id: 2, nom: 'Cristóbal Meza Toledo', rut: '17.334.208-2', renta: 1150000, ratio: 2.9,
+        antig: '11 m', empleo: 'Contrato a plazo fijo · Retail', dicom: 1, ident: true, score: 54,
+        flags: [
+          { t: 'mal',   txt: '1 protesto vigente por $340.000 (dic 2025, casa comercial)' },
+          { t: 'aviso', txt: 'Contrato a plazo fijo, vence en 4 meses' },
+          { t: 'aviso', txt: 'Ratio arriendo/renta bajo el umbral que fijaste' }
+        ] },
+      { id: 3, nom: 'Daniela Sepúlveda Fritz', rut: '15.628.470-4', renta: 2100000, ratio: 5.3,
+        antig: '5 a 1 m', empleo: 'Independiente · boletas de honorarios', dicom: 0, ident: true, score: 76,
+        flags: [
+          { t: 'bien',  txt: 'DICOM limpio · 5 años emitiendo boletas de forma continua' },
+          { t: 'aviso', txt: 'Renta variable: promedio de 12 meses $2.100.000, mes más bajo $1.240.000' },
+          { t: 'aviso', txt: 'Sin contrato de trabajo — considerar aval o mes adicional de garantía' }
+        ] },
+      { id: 4, nom: 'Óscar Lillo Bravo', rut: '10.893.472-6', renta: 1600000, ratio: 4.1,
+        antig: '2 a 7 m', empleo: 'Contrato indefinido · declarado', dicom: 2, ident: false, score: 31,
+        flags: [
+          { t: 'mal', txt: 'La liquidación declara $1.600.000 pero las cotizaciones de AFP corresponden a una renta imponible de $620.000. El documento no cuadra.' },
+          { t: 'mal', txt: '2 morosidades vigentes por $1.180.000 en total' },
+          { t: 'mal', txt: 'La selfie no calza con la foto de la cédula (confianza 41%)' }
+        ] }
+    ],
+    exigencia: 3.0,
+    rechazarDicom: true,
+    aprobado: null,
+    vistaTriage: 'duenio',
+    casoFono: 'a',
+    tab: 'portafolio',
+    bitacora: []
+  };
+
+  var CASOS = {
+    a: {
+      nombre: 'Mancha de humedad en el cielo del baño',
+      msgDefault: 'Apareció esta mancha en el techo del baño y se está poniendo más grande. Se siente húmedo al tocarlo.',
+      titulo: 'Filtración desde la unidad de arriba',
+      sev: 4, urg: 'urgente', urgTxt: 'Atender en 48 h',
+      causa: 'Sello del receptáculo de ducha de la unidad superior',
+      costoMin: 80000, costoMax: 180000,
+      costoNota: 'si es solo el sello',
+      oficio: 'gasfiter',
+      riesgo: 'Si en tres semanas no se corta el agua, moja el tabique y hay que reponer yeso-cartón y pintar. El costo pasa a <b class="clp">$450.000 – $900.000</b> y el daño alcanza al departamento de abajo.',
+      contencion: 'Cierra la llave de paso del baño de tu departamento y avisa al conserje del edificio. Si la mancha crece esta noche, pon un balde y escríbenos.',
+      falta: 'Falta una foto del piso del baño de la unidad de arriba para confirmar la causa.'
+    },
+    b: {
+      nombre: 'Gotera bajo el lavaplatos',
+      msgDefault: 'Está goteando abajo del lavaplatos. Puse un balde. El mueble ya se ve hinchado por abajo.',
+      titulo: 'Fuga en el sifón del lavaplatos',
+      sev: 2, urg: 'media', urgTxt: 'Programable · 72 h',
+      causa: 'Sifón suelto o empaquetadura vencida',
+      costoMin: 25000, costoMax: 45000,
+      costoNota: 'visita + empaquetadura',
+      oficio: 'gasfiter',
+      riesgo: 'La melamina del mueble ya está hinchada. Si esto espera otro mes, hay que cambiar el mueble completo: <b class="clp">+$180.000</b>.',
+      contencion: 'Deja el balde puesto y no uses el lavaplatos hasta la visita. No es una emergencia — se agenda.',
+      falta: null
+    },
+    c: {
+      nombre: 'Tablero eléctrico con hollín',
+      msgDefault: 'Se cortó la luz de los enchufes y el tablero está negro por un lado. Huele raro.',
+      titulo: 'Sobrecarga y automático dañado',
+      sev: 5, urg: 'urgente', urgTxt: 'HOY · riesgo de incendio',
+      causa: 'Circuito de enchufes sobrecargado, con signos de calentamiento',
+      costoMin: 60000, costoMax: 140000,
+      costoNota: 'automático + revisión del circuito',
+      oficio: 'electrico',
+      riesgo: 'Esto no es un tema de plata: es <b>riesgo de incendio</b>. Es el único caso en que Conserjo llama por teléfono al dueño en vez de mandarle una notificación.',
+      contencion: 'Baja el automático general AHORA y no uses ese circuito hasta que llegue el eléctrico. Ya avisamos a Verónica por teléfono.',
+      falta: null
+    }
+  };
+
+  var MAESTROS = [
+    { id: 'm1', nom: 'Luis Cárdenas Vidal',  ofi: 'gasfiter',  ofiTxt: 'Gásfiter',              zona: 'Ñuñoa · Providencia · Independencia', rating: 4.8, trabajos: 37, visita: 35000, disp: 'Mañana 09:00' },
+    { id: 'm2', nom: 'Marcela Tapia Bustos', ofi: 'gasfiter',  ofiTxt: 'Gásfiter · SEC vigente', zona: 'Región Metropolitana',                rating: 4.7, trabajos: 24, visita: 38000, disp: 'Pasado mañana' },
+    { id: 'm3', nom: 'Servicios Riquelme SpA', ofi: 'gasfiter', ofiTxt: 'Maestro general · 77.281.940-1', zona: 'Santiago Centro · Estación Central', rating: 4.6, trabajos: 118, visita: 28000, disp: 'En 2 días' },
+    { id: 'm4', nom: 'Héctor Painemal Curín', ofi: 'electrico', ofiTxt: 'Eléctrico clase B · SEC B-12.847', zona: 'Región Metropolitana',      rating: 4.9, trabajos: 52, visita: 45000, disp: 'HOY 22:40' },
+    { id: 'm5', nom: 'Eléctrica Ñuble Ltda.', ofi: 'electrico', ofiTxt: 'Eléctrico clase B · SEC B-09.331', zona: 'Ñuñoa · Macul',            rating: 4.5, trabajos: 63, visita: 42000, disp: 'Mañana 08:30' }
+  ];
+
+  /* ============ NAVEGACIÓN POR PESTAÑAS ============ */
+  function irA(tab) {
+    S.tab = tab;
+    document.querySelectorAll('[role="tab"]').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b.dataset.tab === tab));
+    });
+    ['portafolio', 'triage', 'postulantes', 'cobros'].forEach(function (t) {
+      el('p-' + t).hidden = (t !== tab);
+    });
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  document.querySelectorAll('[role="tab"]').forEach(function (b) {
+    b.addEventListener('click', function () { irA(b.dataset.tab); });
+  });
+
+  /* ============ KPIs ============ */
+  function calcular() {
+    var facturado = 0, recaudado = 0, deuda = 0, morosos = 0;
+    S.unidades.forEach(function (u) {
+      if (u.estado === 'vacante') return;
+      facturado += u.arriendo;
+      if (u.estado === 'atrasado') {
+        var pagado = u.abonado || 0;
+        recaudado += pagado;
+        deuda += u.arriendo - pagado;
+        morosos++;
+      } else {
+        recaudado += u.arriendo;
+      }
+    });
+    return { facturado: facturado, recaudado: recaudado, deuda: deuda, morosos: morosos };
+  }
+
+  function pintarKpis() {
+    var c = calcular();
+    el('k-facturado').textContent = clp(c.facturado);
+    el('k-facturado-uf').textContent = uf(c.facturado);
+    el('k-recaudado').textContent = clp(c.recaudado);
+    el('k-recaudado-pct').textContent = Math.round(c.recaudado / c.facturado * 100) + '% del mes';
+    el('k-deuda').textContent = clp(c.deuda);
+    el('k-deuda-sub').textContent = c.morosos === 1 ? '1 arrendatario' : c.morosos + ' arrendatarios';
+
+    var pendMovs = S.movs.filter(function (m) { return m.estado === 'pend'; }).length;
+    var pendTickets = S.tickets.filter(function (t) { return t.estado !== 'agendado'; }).length;
+    el('k-acciones').textContent = pendMovs + pendTickets + (S.aprobado ? 0 : 1);
+
+    el('badge-t').textContent = pendTickets;  el('badge-t2').textContent = pendTickets;
+    el('badge-c').textContent = pendMovs;     el('badge-c2').textContent = pendMovs;
+    var np = S.aprobado ? 0 : S.postulantes.length;
+    el('badge-p').textContent = np;           el('badge-p2').textContent = np;
+    [el('badge-t'), el('badge-t2'), el('badge-c'), el('badge-c2'), el('badge-p'), el('badge-p2')].forEach(function (b) {
+      b.style.display = b.textContent === '0' ? 'none' : '';
+    });
+  }
+
+  /* ============ PORTAFOLIO ============ */
+  var ESTADOS = {
+    'al-dia':     { cls: 'ok',      txt: 'Al día',        icon: 'i-check' },
+    'atrasado':   { cls: 'urgente', txt: 'Atrasado',      icon: 'i-reloj' },
+    'vacante':    { cls: 'media',   txt: 'Vacante',       icon: 'i-alerta' },
+    'reparacion': { cls: 'media',   txt: 'En reparación', icon: 'i-llave-inglesa' }
+  };
+
+  function pintarUnidades() {
+    var cont = el('lista-unidades');
+    cont.innerHTML = '';
+    S.unidades.forEach(function (u) {
+      var e = ESTADOS[u.estado];
+      var sub = '';
+      if (u.estado === 'atrasado') sub = u.dias + ' días de mora' + (u.abonado ? ' · abonó ' + clp(u.abonado) : '');
+      else if (u.estado === 'vacante') sub = u.dias + ' días vacante · 4 postulantes';
+      else if (u.estado === 'reparacion') sub = 'Ticket MNT-0231 abierto';
+      else sub = 'Arrendatario desde ' + u.desde;
+
+      var b = document.createElement('button');
+      b.className = 'unidad';
+      b.type = 'button';
+      b.setAttribute('aria-expanded', String(u.abierto));
+      b.innerHTML =
+        '<span class="l1"><span class="dir">' + u.dir + '</span>' +
+        '<span class="pill pill--' + e.cls + '"><svg width="11" height="11" aria-hidden="true"><use href="#' + e.icon + '"/></svg>' + e.txt + '</span></span>' +
+        '<span class="com">' + u.com + '</span>' +
+        '<span class="l2"><span class="arr">' + (u.arr || '<em class="muted">Sin arrendatario</em>') + '<br><span class="small muted">' + sub + '</span></span>' +
+        '<span style="text-align:right"><span class="monto">' + clp(u.arriendo) + '</span><br><span class="uf">' + uf(u.arriendo) + '</span></span></span>';
+      b.addEventListener('click', function () {
+        u.abierto = !u.abierto;
+        pintarUnidades();
+      });
+      cont.appendChild(b);
+
+      var d = document.createElement('div');
+      d.className = 'detalle';
+      d.hidden = !u.abierto;
+      var filas = '';
+      if (u.arr) {
+        filas += '<dt>Arrendatario</dt><dd>' + u.arr + '</dd>';
+        filas += '<dt>RUT</dt><dd class="rut">' + u.rut + '</dd>';
+        filas += '<dt>Contrato</dt><dd>Desde ' + u.desde + ' · reajuste UF anual</dd>';
+        filas += '<dt>Garantía</dt><dd class="clp">' + clp(u.arriendo) + ' (1 mes, en custodia)</dd>';
+      } else {
+        filas += '<dt>Estado</dt><dd>Publicado en Portal Inmobiliario y Yapo</dd>';
+        filas += '<dt>Postulantes</dt><dd>4 evaluados · <a href="#" data-ir="postulantes">ver el filtro →</a></dd>';
+        filas += '<dt>Costo vacancia</dt><dd class="clp" style="color:var(--teja)">' + clp(Math.round(u.arriendo / 30 * u.dias)) + ' hasta hoy</dd>';
+      }
+      filas += '<dt>Arriendo</dt><dd class="clp">' + clp(u.arriendo) + ' · ' + uf(u.arriendo) + '</dd>';
+      d.innerHTML = '<dl>' + filas + '</dl>';
+      cont.appendChild(d);
+    });
+    cont.querySelectorAll('[data-ir]').forEach(function (a) {
+      a.addEventListener('click', function (ev) { ev.preventDefault(); irA(a.dataset.ir); });
+    });
+  }
+
+  /* ============ TRIAGE ============ */
+  document.querySelectorAll('[data-vista]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.vistaTriage = b.dataset.vista;
+      document.querySelectorAll('[data-vista]').forEach(function (o) {
+        o.setAttribute('aria-pressed', String(o.dataset.vista === S.vistaTriage));
+      });
+      el('vista-duenio').hidden = S.vistaTriage !== 'duenio';
+      el('vista-arrendatario').hidden = S.vistaTriage !== 'arrendatario';
+    });
+  });
+
+  // Teléfono del arrendatario
+  var ta = el('ta-msg');
+  ta.value = CASOS.a.msgDefault;
+  document.querySelectorAll('.adjunta button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.casoFono = b.dataset.caso;
+      document.querySelectorAll('.adjunta button').forEach(function (o) {
+        o.setAttribute('aria-pressed', String(o.dataset.caso === S.casoFono));
+      });
+      ta.value = CASOS[S.casoFono].msgDefault;
+    });
+  });
+
+  el('btn-enviar').addEventListener('click', function () {
+    var c = CASOS[S.casoFono];
+    var nuevoId = 'MNT-0' + (232 + S.tickets.length);
+    S.tickets.unshift({ id: nuevoId, unidadId: 1, caso: S.casoFono, estado: 'diagnosticado', maestro: null, texto: ta.value });
+    var u = S.unidades.find(function (x) { return x.id === 1; });
+    if (u.estado === 'al-dia') u.estado = 'reparacion';
+    el('fono-contencion').querySelector('span').innerHTML = '<b>Mientras tanto:</b> ' + c.contencion;
+    el('fono-form').hidden = true;
+    el('fono-ok').hidden = false;
+    log('Ticket ' + nuevoId + ' creado desde el teléfono del arrendatario');
+    pintarTickets(); pintarUnidades(); pintarKpis();
+  });
+
+  el('btn-ver-duenio').addEventListener('click', function () {
+    document.querySelector('[data-vista="duenio"]').click();
+    el('fono-form').hidden = false;
+    el('fono-ok').hidden = true;
+  });
+
+  function pintarTickets() {
+    var cont = el('tickets');
+    cont.innerHTML = '';
+    if (!S.tickets.length) {
+      cont.innerHTML = '<p class="vacio">No hay tickets abiertos. Cuando un arrendatario reporte algo, aparece acá.</p>';
+      return;
+    }
+    S.tickets.forEach(function (t) {
+      var c = CASOS[t.caso];
+      var u = S.unidades.find(function (x) { return x.id === t.unidadId; });
+      var d = document.createElement('div');
+      d.className = 'ticket mb-l';
+
+      var sevBars = '';
+      for (var i = 1; i <= 5; i++) sevBars += '<i class="' + (i <= c.sev ? 'on' : '') + '"></i>';
+
+      var maestros = MAESTROS.filter(function (m) { return m.ofi === c.oficio; });
+      var mHtml = '';
+      if (t.estado === 'agendado') {
+        var mm = MAESTROS.find(function (m) { return m.id === t.maestro; });
+        mHtml =
+          '<div class="riesgo-box" style="border-color:var(--ok);background:rgba(58,99,64,.07)">' +
+          '<svg width="16" height="16" style="color:var(--ok)" aria-hidden="true"><use href="#i-check"/></svg>' +
+          '<span><b>Orden de trabajo ' + t.id.replace('MNT', 'OT') + ' emitida.</b> ' + mm.nom + ' (' + mm.ofiTxt + ') confirmó para <b>' + mm.disp + '</b>. ' +
+          'Visita ' + clp(mm.visita) + ', tope aprobado ' + clp(c.costoMax) + '. ' +
+          'El arrendatario ya recibió la hora por WhatsApp; se le pedirá una foto del trabajo terminado antes de pagar.</span></div>';
+      } else {
+        mHtml =
+          '<p class="kicker kicker--tinta mt-l" style="font-size:.66rem">Maestros disponibles · ' + (c.oficio === 'electrico' ? 'eléctricos con SEC vigente' : 'gásfiteres') + '</p>' +
+          '<div class="mt-s">' +
+          maestros.map(function (m) {
+            return '<button class="maestro" type="button" data-t="' + t.id + '" data-m="' + m.id + '" aria-pressed="false">' +
+              '<span><span class="n">' + m.nom + '</span> <span class="estrella">★ ' + m.rating.toFixed(1).replace('.', ',') + '</span> ' +
+              '<span class="small muted">(' + m.trabajos + ')</span><br>' +
+              '<span class="o">' + m.ofiTxt + '</span><br><span class="small muted">' + m.zona + '</span></span>' +
+              '<span><span class="p">' + clp(m.visita) + '</span><br><span class="d">' + m.disp + '</span></span>' +
+              '</button>';
+          }).join('') +
+          '</div>' +
+          '<div class="btn-fila mt-m">' +
+          '<button class="btn btn--teja" type="button" data-asignar="' + t.id + '" disabled>Aprobar y asignar</button>' +
+          '</div>';
+      }
+
+      d.innerHTML =
+        '<div class="ticket-h">' +
+          '<strong>' + c.titulo + '</strong>' +
+          '<span class="id">' + t.id + ' · ' + u.dir + '</span>' +
+        '</div>' +
+        '<div class="ticket-b">' +
+          '<p class="msg-wa" style="border:var(--hairline);border-left:3px solid var(--tinta);background:var(--papel-2);padding:.6rem .75rem;font-size:.85rem;color:var(--tinta-2)">' +
+            '<b style="font-family:var(--mono);font-size:.66rem;color:var(--tinta-3);display:block;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem">' +
+            (u.arr || 'Arrendatario') + ' · WhatsApp</b>“' + (t.texto || c.msgDefault) + '”</p>' +
+
+          '<div class="mt-m">' +
+            '<div class="kv"><span class="k">Severidad</span><span class="v"><span class="sev" style="color:var(--' + c.urg + ')">' + sevBars + '</span></span></div>' +
+            '<div class="kv"><span class="k">Urgencia</span><span class="v"><span class="pill pill--' + c.urg + '"><svg width="11" height="11" aria-hidden="true"><use href="#i-reloj"/></svg>' + c.urgTxt + '</span></span></div>' +
+            '<div class="kv"><span class="k">Causa probable</span><span class="v">' + c.causa + '</span></div>' +
+            '<div class="kv"><span class="k">Costo estimado</span><span class="v"><span class="clp">' + clp(c.costoMin) + ' – ' + clp(c.costoMax) + '</span><br><span class="small muted" style="font-weight:400">' + c.costoNota + '</span></span></div>' +
+            '<div class="kv"><span class="k">Oficio</span><span class="v">' + (c.oficio === 'electrico' ? 'Eléctrico clase B (SEC)' : 'Gásfiter') + '</span></div>' +
+          '</div>' +
+
+          '<div class="riesgo-box">' +
+            '<svg width="16" height="16" aria-hidden="true"><use href="#i-alerta"/></svg>' +
+            '<span><b>Si no se atiende:</b> ' + c.riesgo + '</span>' +
+          '</div>' +
+
+          (c.falta ? '<p class="small muted mt-s"><svg width="12" height="12" style="display:inline;vertical-align:-1px" aria-hidden="true"><use href="#i-alerta"/></svg> ' + c.falta + '</p>' : '') +
+
+          '<p class="small muted mt-s"><b>Se le respondió al arrendatario:</b> “' + c.contencion + '”</p>' +
+
+          mHtml +
+        '</div>';
+
+      cont.appendChild(d);
+    });
+
+    // Selección de maestro
+    cont.querySelectorAll('.maestro').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var tid = b.dataset.t;
+        cont.querySelectorAll('.maestro[data-t="' + tid + '"]').forEach(function (o) {
+          o.setAttribute('aria-pressed', String(o === b));
+        });
+        var btn = cont.querySelector('[data-asignar="' + tid + '"]');
+        btn.disabled = false;
+        btn.dataset.maestro = b.dataset.m;
+      });
+    });
+
+    cont.querySelectorAll('[data-asignar]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = S.tickets.find(function (x) { return x.id === btn.dataset.asignar; });
+        t.maestro = btn.dataset.maestro;
+        t.estado = 'agendado';
+        var mm = MAESTROS.find(function (m) { return m.id === t.maestro; });
+        log('Orden de trabajo ' + t.id.replace('MNT', 'OT') + ' → ' + mm.nom);
+        pintarTickets(); pintarKpis();
+      });
+    });
+  }
+
+  /* ============ POSTULANTES ============ */
+  function evaluar(p) {
+    if (S.rechazarDicom && p.dicom > 0) return { pasa: false, motivo: 'Rechazado por tu política: tiene ' + p.dicom + (p.dicom === 1 ? ' registro' : ' registros') + ' en DICOM.' };
+    if (p.ratio < S.exigencia) return { pasa: false, motivo: 'Rechazado por tu política: gana ' + p.ratio.toFixed(1).replace('.', ',') + '× el arriendo, y exiges ' + S.exigencia.toFixed(1).replace('.', ',') + '×.' };
+    if (!p.ident) return { pasa: false, motivo: 'Rechazado: la verificación de identidad no pasó.' };
+    return { pasa: true, motivo: null };
+  }
+
+  function pintarPostulantes() {
+    var cont = el('lista-postulantes');
+    cont.innerHTML = '';
+
+    if (S.aprobado) {
+      var a = S.postulantes.find(function (p) { return p.id === S.aprobado; });
+      cont.innerHTML = '<p class="vacio">Postulación cerrada. Elegiste a <b>' + a.nom + '</b>. ' +
+        'A los otros 3 se les avisó automáticamente por correo.</p>';
+      return;
+    }
+
+    var pasan = 0;
+    S.postulantes.slice().sort(function (x, y) { return y.score - x.score; }).forEach(function (p) {
+      var ev = evaluar(p);
+      if (ev.pasa) pasan++;
+      var d = document.createElement('div');
+      d.className = 'post' + (ev.pasa ? '' : ' rechazado');
+
+      var col = p.score >= 75 ? 'var(--ok)' : (p.score >= 55 ? 'var(--media)' : 'var(--teja)');
+
+      d.innerHTML =
+        '<div class="post-h">' +
+          '<div><span class="nom">' + p.nom + '</span><br><span class="rut rut">' + p.rut + '</span>' +
+          '<br><span class="small muted">' + p.empleo + ' · ' + p.antig + '</span></div>' +
+          '<div style="text-align:right">' +
+            '<span class="score" style="color:' + col + '">' + p.score + '<small>/100</small></span><br>' +
+            (ev.pasa
+              ? '<span class="pill pill--ok"><svg width="11" height="11" aria-hidden="true"><use href="#i-check"/></svg>Pasa el filtro</span>'
+              : '<span class="pill pill--urgente"><svg width="11" height="11" aria-hidden="true"><use href="#i-x"/></svg>No pasa</span>') +
+          '</div>' +
+        '</div>' +
+
+        '<div class="barras">' +
+          '<div class="barra-f"><span class="et">Renta líquida</span><span class="tr"><i style="width:' + Math.min(100, p.renta / 25000) + '%"></i></span><span class="val clp">' + clp(p.renta) + '</span></div>' +
+          '<div class="barra-f"><span class="et">Arriendo / renta</span><span class="tr"><i style="width:' + Math.min(100, p.ratio / 6 * 100) + '%;background:' + (p.ratio >= S.exigencia ? 'var(--ok)' : 'var(--teja)') + '"></i></span><span class="val">' + p.ratio.toFixed(1).replace('.', ',') + '×</span></div>' +
+          '<div class="barra-f"><span class="et">DICOM</span><span class="tr"><i style="width:' + (p.dicom ? Math.min(100, p.dicom * 40) : 4) + '%;background:' + (p.dicom ? 'var(--teja)' : 'var(--ok)') + '"></i></span><span class="val">' + (p.dicom ? p.dicom + ' reg.' : 'Limpio') + '</span></div>' +
+        '</div>' +
+
+        '<div class="flags">' +
+          p.flags.map(function (f) {
+            var ic = f.t === 'bien' ? 'i-check' : (f.t === 'mal' ? 'i-x' : 'i-alerta');
+            return '<span class="flag ' + f.t + '"><svg width="13" height="13" aria-hidden="true"><use href="#' + ic + '"/></svg>' + f.txt + '</span>';
+          }).join('') +
+        '</div>' +
+
+        (ev.pasa
+          ? '<div class="btn-fila mt-m"><button class="mini mini--teja" type="button" data-aprobar="' + p.id + '">Elegir y generar contrato</button>' +
+            '<button class="mini" type="button" data-informe="' + p.id + '">Ver informe completo</button></div>'
+          : '<p class="small mt-m" style="color:var(--teja)"><b>' + ev.motivo + '</b></p>');
+
+      cont.appendChild(d);
+    });
+
+    var res = el('resumen-filtro');
+    res.innerHTML = '<b>' + pasan + '</b> de 4 postulantes pasan tu filtro. ' +
+      (pasan === 0
+        ? '<span style="color:var(--teja)">Con esta exigencia no te queda nadie — o la bajas, o sigues publicando y comes otro mes de vacancia (' + clp(395000) + ').</span>'
+        : 'Mueve el control y mira cómo cambia.');
+  }
+
+  el('exig').addEventListener('input', function () {
+    S.exigencia = parseInt(this.value, 10) / 10;
+    el('exig-out').textContent = S.exigencia.toFixed(1).replace('.', ',') + '×';
+    pintarPostulantes();
+  });
+  el('chk-dicom').addEventListener('change', function () {
+    S.rechazarDicom = this.checked;
+    pintarPostulantes();
+  });
+
+  document.getElementById('lista-postulantes').addEventListener('click', function (ev) {
+    var ap = ev.target.closest('[data-aprobar]');
+    if (ap) {
+      var id = parseInt(ap.dataset.aprobar, 10);
+      var p = S.postulantes.find(function (x) { return x.id === id; });
+      S.aprobado = id;
+      var u = S.unidades.find(function (x) { return x.id === 4; });
+      u.estado = 'al-dia';
+      u.arr = p.nom;
+      u.rut = p.rut;
+      u.desde = 'jul 2026';
+      el('contrato-nombre').textContent = 'Contrato generado — ' + p.nom;
+      el('contrato-ok').hidden = false;
+      log('Contrato de arriendo generado para ' + p.nom + ' · Depto 2104');
+      pintarPostulantes(); pintarUnidades(); pintarKpis();
+      el('contrato-ok').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      return;
+    }
+    var inf = ev.target.closest('[data-informe]');
+    if (inf) {
+      var pid = parseInt(inf.dataset.informe, 10);
+      var pp = S.postulantes.find(function (x) { return x.id === pid; });
+      inf.textContent = 'Informe Equifax · ' + pp.rut;
+      inf.disabled = true;
+      log('Informe Equifax consultado · ' + pp.rut + ' · $1.200 de costo');
+    }
+  });
+
+  /* ============ COBROS ============ */
+  function pintarMovs() {
+    var cont = el('lista-movs');
+    cont.innerHTML = '';
+    S.movs.filter(function (m) { return m.estado !== 'oculto'; }).forEach(function (m) {
+      var d = document.createElement('div');
+      d.className = 'mov ' + (m.estado === 'listo' ? 'listo' : 'pend');
+      var cabeza =
+        '<div class="mov-h"><span><span class="glosa">' + m.glosa + '</span><br>' +
+        '<span class="small muted num">' + m.fecha + '/2026</span></span>' +
+        '<span class="m">' + clp(m.monto) + '</span></div>';
+
+      if (m.estado === 'listo') {
+        d.innerHTML = cabeza +
+          '<p class="sug"><span class="pill pill--ok" style="margin-right:.4rem"><svg width="11" height="11" aria-hidden="true"><use href="#i-check"/></svg>Calzado</span>' +
+          m.calce + ' <span class="conf">confianza ' + m.conf + '%</span></p>';
+      } else {
+        d.innerHTML = cabeza +
+          '<p class="sug"><span class="pill pill--media" style="margin-right:.4rem"><svg width="11" height="11" aria-hidden="true"><use href="#i-alerta"/></svg>Revisar</span>' +
+          m.hip + ' <span class="conf">confianza ' + m.conf + '%</span></p>' +
+          '<p class="small muted mt-s" style="line-height:1.5">' + m.razon + '</p>' +
+          '<div class="acciones">' +
+            (m.conf > 40
+              ? '<button class="mini mini--teja" type="button" data-ok="' + m.id + '">Confirmar</button>'
+              : '') +
+            '<button class="mini" type="button" data-no="' + m.id + '">' + (m.conf > 40 ? 'No corresponde' : 'Marcar como no relacionado') + '</button>' +
+          '</div>';
+      }
+      cont.appendChild(d);
+    });
+
+    cont.querySelectorAll('[data-ok]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = S.movs.find(function (x) { return x.id === parseInt(b.dataset.ok, 10); });
+        m.estado = 'listo';
+        m.calce = m.hip;
+        m.conf = 100;
+        if (m.id === 5) {
+          var u6 = S.unidades.find(function (x) { return x.id === 6; });
+          u6.estado = 'al-dia';
+        }
+        if (m.id === 6) {
+          var u7 = S.unidades.find(function (x) { return x.id === 7; });
+          u7.abonado = 195000;
+        }
+        log('Abono de ' + clp(m.monto) + ' conciliado a mano');
+        pintarMovs(); pintarCobranza(); pintarUnidades(); pintarKpis();
+      });
+    });
+    cont.querySelectorAll('[data-no]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = S.movs.find(function (x) { return x.id === parseInt(b.dataset.no, 10); });
+        m.estado = 'listo';
+        m.calce = 'Marcado como no relacionado a un arriendo';
+        m.conf = 100;
+        log('Movimiento de ' + clp(m.monto) + ' descartado');
+        pintarMovs(); pintarCobranza(); pintarKpis();
+      });
+    });
+  }
+
+  function pintarCobranza() {
+    var cont = el('cobranza');
+    var morosos = S.unidades.filter(function (u) { return u.estado === 'atrasado'; });
+    if (!morosos.length) {
+      cont.innerHTML = '<p class="small muted mt-s">Nadie debe nada. Mes cerrado.</p>';
+      return;
+    }
+    cont.innerHTML = morosos.map(function (u) {
+      var debe = u.arriendo - (u.abonado || 0);
+      var multa = Math.round(debe * 0.01 / 30 * u.dias);
+      var esGrave = u.dias >= 20;
+      return '<div class="mt-m" style="border-top:var(--hairline);padding-top:.7rem">' +
+        '<div class="flex entre gap-s"><b style="font-size:.9rem">' + u.arr + '</b>' +
+        '<span class="pill pill--' + (esGrave ? 'urgente' : 'media') + '">' + u.dias + ' días</span></div>' +
+        '<p class="small muted">' + u.dir + '</p>' +
+        '<p class="small mt-s">Debe <span class="clp" style="font-weight:600">' + clp(debe) + '</span>' +
+        (u.abonado ? ' <span class="muted">(abonó ' + clp(u.abonado) + ')</span>' : '') +
+        ' + multa <span class="clp">' + clp(multa) + '</span></p>' +
+
+        (esGrave
+          ? '<p class="small mt-s" style="color:var(--teja)"><b>Ya hay un período de renta impago.</b> ' +
+            'El art. 1977 del Código Civil te permite pedir el término del contrato, previa reconvención de pago en juicio. ' +
+            'Conserjo tiene la carpeta lista: contrato, cargos, cartas fechadas y todas las conversaciones. ' +
+            'El juicio lo lleva tu abogado, no nosotros.</p>' +
+            '<div class="btn-fila mt-s">' +
+            '<button class="mini mini--teja" type="button" data-wa="' + u.id + '">Enviar carta de cobro</button>' +
+            '<button class="mini" type="button" data-carpeta="' + u.id + '">Descargar carpeta</button></div>'
+          : '<div class="btn-fila mt-s"><button class="mini mini--teja" type="button" data-wa="' + u.id + '">Recordar por WhatsApp</button></div>') +
+
+        '<div class="wa-prev mt-s" hidden data-prev="' + u.id + '"><b>WhatsApp enviado</b>' +
+        (esGrave
+          ? 'Hola ' + u.arr.split(' ')[0] + '. Te escribimos de parte de Verónica. El arriendo de ' + u.dir +
+            ' tiene ' + u.dias + ' días de mora (' + clp(debe) + ' + ' + clp(multa) + ' de multa). Te enviamos la carta de cobro al correo. ' +
+            'Si necesitas un convenio de pago, respóndenos hoy — todavía estamos a tiempo de arreglarlo sin abogados.'
+          : 'Hola ' + u.arr.split(' ')[0] + '. Recordatorio: el arriendo de julio (' + clp(debe) + ') venció hace ' + u.dias + ' días. ' +
+            'Puedes transferir a la misma cuenta de siempre. Si ya lo hiciste, ignora este mensaje — a veces la transferencia demora en aparecer.') +
+        '</div></div>';
+    }).join('');
+
+    cont.querySelectorAll('[data-wa]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var prev = cont.querySelector('[data-prev="' + b.dataset.wa + '"]');
+        prev.hidden = false;
+        b.disabled = true;
+        b.textContent = 'Enviado';
+        var u = S.unidades.find(function (x) { return x.id === parseInt(b.dataset.wa, 10); });
+        log('WhatsApp de cobranza enviado a ' + u.arr);
+      });
+    });
+    cont.querySelectorAll('[data-carpeta]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        b.disabled = true;
+        b.textContent = 'carpeta-1503.zip';
+        log('Carpeta de cobranza exportada · Depto 1503');
+      });
+    });
+  }
+
+  function log(txt) {
+    var h = new Date();
+    var hh = String(h.getHours()).padStart(2, '0') + ':' + String(h.getMinutes()).padStart(2, '0');
+    var li = document.createElement('li');
+    li.innerHTML = '<b>' + hh + '</b> ' + txt;
+    el('bitacora').prepend(li);
+  }
+
+  /* ============ ARRANQUE ============ */
+  pintarUnidades();
+  pintarTickets();
+  pintarPostulantes();
+  pintarMovs();
+  pintarCobranza();
+  pintarKpis();
+  el('exig-out').textContent = '3,0×';
+})();
+</script>
+</body>
+</html>

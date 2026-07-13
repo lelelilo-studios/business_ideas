@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermata — Compra lo que vas a vender</title>
+<meta name="description" content="Pronóstico de demanda y órdenes de compra automáticas para restaurantes, cafeterías, panaderías y minimarkets de Chile. Conectamos tu SII y tu POS, y medimos la merma que hoy nadie mide.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="mermata.css">
+<style>
+  .hero { padding: var(--sp-xl) 0 var(--sp-2xl); }
+  .hero h1 { margin: var(--sp-xs) 0 var(--sp-s); max-width: 16ch; }
+  .hero .bajada { font-size: var(--step-1); color: var(--tinta-2); max-width: 54ch; margin-bottom: var(--sp-m); }
+  .hero .ctas { display: flex; flex-wrap: wrap; gap: var(--sp-xs); }
+  @media (min-width: 62em) {
+    .hero-in { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-2xl); align-items: center; }
+  }
+
+  /* Voz del cliente */
+  .cita {
+    font-family: var(--serif); font-size: var(--step-2); line-height: 1.3;
+    border-left: 3px solid var(--acento); padding-left: var(--sp-s);
+    max-width: 30ch;
+  }
+  .cita-quien { font-family: var(--sans); font-size: var(--step--1); color: var(--tinta-3); margin-top: var(--sp-xs); }
+
+  /* Calculadora */
+  .calc { border: 2px solid var(--tinta); border-radius: var(--radio); background: var(--papel-2); }
+  .calc-cab { padding: var(--sp-s); border-bottom: 1px solid var(--regla); }
+  .calc-cuerpo { padding: var(--sp-s); }
+  .calc label {
+    font-family: var(--mono); font-size: .74rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--tinta-3); display: block; margin-bottom: 6px;
+  }
+  .calc input[type=range] { width: 100%; accent-color: var(--acento); min-height: 44px; }
+  .calc .lectura { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--step-0); color: var(--tinta); font-weight: 500; }
+  .calc .campo-c + .campo-c { margin-top: var(--sp-s); }
+  .calc-out { border-top: 2px solid var(--tinta); padding: var(--sp-s); background: var(--papel-3); }
+  .calc-linea { display: flex; justify-content: space-between; gap: var(--sp-s); align-items: baseline; padding: 5px 0; font-size: var(--step--1); }
+  .calc-linea b { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .calc-linea.tot { border-top: 1px solid var(--regla-2); margin-top: 6px; padding-top: 10px; font-size: var(--step-0); }
+  .calc-linea.tot b { font-size: var(--step-2); font-family: var(--sans); font-weight: 600; color: var(--acento-osc); }
+
+  /* Pasos del flujo */
+  .paso { border-top: 2px solid var(--tinta); padding-top: var(--sp-xs); }
+  .paso .n { font-family: var(--mono); font-size: var(--step--1); color: var(--acento-osc); display: block; margin-bottom: var(--sp-2xs); }
+  .paso h3 { margin-bottom: 6px; }
+  .paso p { color: var(--tinta-2); font-size: var(--step--1); }
+
+  /* Precios */
+  .plan { border: 1px solid var(--regla-2); border-radius: var(--radio); background: var(--papel-2); padding: var(--sp-s); display: flex; flex-direction: column; }
+  .plan-dest { border: 2px solid var(--tinta); }
+  .plan .etq { font-family: var(--mono); font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tinta-3); }
+  .plan-dest .etq { color: var(--acento-osc); }
+  .plan h3 { margin: var(--sp-2xs) 0; }
+  .plan .precio { font-size: var(--step-3); line-height: 1; margin-bottom: 2px; }
+  .plan .por { font-size: var(--step--1); color: var(--tinta-3); margin-bottom: var(--sp-s); }
+  .plan ul { list-style: none; padding: 0; margin: 0 0 var(--sp-s); flex: 1; }
+  .plan li { display: flex; gap: 8px; align-items: flex-start; font-size: var(--step--1); color: var(--tinta-2); padding: 5px 0; }
+  .plan li svg { flex: none; margin-top: 4px; color: var(--acento); }
+
+  .mini-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: var(--step--1);
+    border: 1px solid var(--regla-2); border-radius: var(--radio);
+    background: var(--papel); color: var(--tinta-3); padding: 0 10px; min-height: 44px;
+  }
+  .mini-toggle[aria-pressed="true"] { color: var(--acento-osc); border-color: var(--acento); background: var(--acento-lav); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="19" height="19" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 15.5L8.5 9.5L12 13L17 5.5" stroke="#b8452b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="5.5" r="1.9" fill="#b8452b"/>
+      </svg>
+      Merma<span class="marca-pt">ta</span>
+    </a>
+    <nav class="nav-lista" aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="navpanel">
+      <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M0 1h14M0 6h14M0 11h14" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-nav-txt>Menú</span>
+    </button>
+  </div>
+</header>
+<div class="nav-panel" id="navpanel" data-nav-panel>
+  <div class="container">
+    <nav class="nav-lista" aria-label="Principal móvil">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container hero-in">
+    <div>
+      <span class="sello sello-acento">Pronóstico de demanda para locales de comida</span>
+      <h1>Compra lo que vas a vender.</h1>
+      <p class="bajada">Mermata lee tu histórico de ventas del SII y de tu POS, pronostica cuánto vas a vender cada día — considerando el día de pago, los feriados y el clima — y te arma la orden de compra lista para mandarle a tu proveedor por WhatsApp. Y te dice, en pesos, cuánta plata dejaste de botar.</p>
+      <div class="ctas">
+        <a class="btn btn-acento" href="demo/index.html">
+          Ver el producto funcionando
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-fantasma" href="#precios">Ver precios</a>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-m);">Prototipo · <b>mermata.com</b> disponible · datos de demostración</p>
+    </div>
+    <div style="margin-top: var(--sp-l);">
+      <blockquote class="cita">
+        «Yo pido a ojo. Llevo doce años, ya sé más o menos. El problema es el <em>más o menos</em>.»
+        <div class="cita-quien">— Dueño de panadería, Ñuñoa. La frase con la que empezó esto.</div>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EL PROBLEMA ============ -->
+<section class="seccion seccion-tinta">
+  <div class="container">
+    <span class="sello">El problema</span>
+    <h2 style="margin: var(--sp-2xs) 0 var(--sp-m); max-width: 20ch;">Dos pérdidas al mismo tiempo, y ninguna de las dos aparece en la contabilidad.</h2>
+    <div class="rejilla rejilla-2" style="gap: var(--sp-l);">
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1); margin-bottom: var(--sp-2xs);">Compraste de más</h3>
+        <p style="color: #cfc7b4;">Y lo botaste. Se llama <b style="color:var(--papel)">merma</b>. Nadie la pesa, nadie la anota, nadie la ve. El pan que sobró el domingo, la palta que se pasó, la carne que llegó al límite. Sale de la caja, entra al basurero, y en el balance queda escondido dentro de «costo de ventas».</p>
+      </div>
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1); margin-bottom: var(--sp-2xs);">Compraste de menos</h3>
+        <p style="color: #cfc7b4;">Y no vendiste. Se llama <b style="color:var(--papel)">quiebre de stock</b>. Es peor, porque no deja rastro: no hay una boleta que diga «hoy no vendí 40 empanadas porque se me acabó la carne». El cliente se fue al local de al lado y quizás no vuelva.</p>
+      </div>
+    </div>
+
+    <hr class="regla" style="border-color: #3a352a; margin: var(--sp-l) 0;">
+
+    <p style="color: #cfc7b4; max-width: 62ch; margin-bottom: var(--sp-s);">En un rubro con márgenes netos de <b style="color:var(--papel)">un dígito</b>, esas dos pérdidas juntas no son un costo: <b style="color:var(--papel)">son la utilidad del año</b>. Y hoy la única herramienta para evitarlas es la memoria del dueño, un martes en la mañana, escribiendo un WhatsApp.</p>
+    <p class="fuente" style="color:#8f8877">Rango de merma en food service — <b style="color:#e8a892">estimación declarada</b>, 4%–10% del costo de insumos. La aritmética completa está más abajo y en <a href="negocio.html" style="color:#e8a892">negocio.html</a>.</p>
+  </div>
+</section>
+
+<!-- ============ CALCULADORA EN VIVO ============ -->
+<section class="seccion container">
+  <div class="cabeza-seccion">
+    <span class="sello">Cuánto te cuesta</span>
+    <h2>Mueve los dos controles. Ese es tu número.</h2>
+    <p>No es un número que inventamos: es tu venta, tu costo de insumos y un rango de merma declarado. Si crees que el rango está mal, muévelo. Es exactamente el cálculo que hacemos con cada local antes de venderle nada.</p>
+  </div>
+
+  <div class="rejilla rejilla-2" style="align-items: start;">
+    <div class="calc">
+      <div class="calc-cab">
+        <span class="sello">Tu local</span>
+      </div>
+      <div class="calc-cuerpo">
+        <div class="campo-c">
+          <label for="r-venta">Venta mensual (CLP)</label>
+          <input type="range" id="r-venta" min="6" max="90" step="1" value="35" aria-describedby="l-venta">
+          <div class="lectura" id="l-venta">$35.000.000</div>
+        </div>
+        <div class="campo-c">
+          <label for="r-food">Costo de insumos (% de la venta)</label>
+          <input type="range" id="r-food" min="20" max="42" step="1" value="31" aria-describedby="l-food">
+          <div class="lectura" id="l-food">31%</div>
+        </div>
+        <div class="campo-c">
+          <label for="r-merma">Merma estimada (% del costo de insumos)</label>
+          <input type="range" id="r-merma" min="2" max="12" step="1" value="6" aria-describedby="l-merma">
+          <div class="lectura" id="l-merma">6% <span class="tenue" style="font-family:var(--sans);font-size:var(--step--1)">— la literatura de food service pone el rango en 4–10%</span></div>
+        </div>
+      </div>
+      <div class="calc-out">
+        <div class="calc-linea"><span>Insumos al año</span><b id="o-insumos">—</b></div>
+        <div class="calc-linea"><span>Merma: lo que botas</span><b id="o-merma">—</b></div>
+        <div class="calc-linea"><span>Quiebre: utilidad no vendida <span class="tenue">(2% de la venta × 66% de margen)</span></span><b id="o-quiebre">—</b></div>
+        <div class="calc-linea tot"><span>Se te va al año</span><b id="o-total">—</b></div>
+        <div class="calc-linea" style="border-top:1px dashed var(--regla-2); margin-top:8px; padding-top:8px;">
+          <span>Como fracción de tu utilidad <span class="tenue">(margen neto 6%)</span></span><b id="o-frac" style="color:var(--riesgo)">—</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="apilar">
+      <div class="ficha">
+        <div class="ficha-titulo">Qué recupera Mermata, de forma realista</div>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin-bottom: var(--sp-s);">No prometemos merma cero: eso no existe. En los locales donde el pronóstico funciona, la merma baja del orden de <b>6%</b> a <b>3%</b> del costo de insumos en 3 a 4 meses. La mitad, no todo.</p>
+        <div class="calculo" style="margin-bottom: var(--sp-s);">
+          <div>Recuperado ≈ <b>50%</b> de la merma + <b>40%</b> de los quiebres</div>
+          <hr>
+          <div>Al año: <span class="res" id="o-recup">—</span></div>
+          <div>Costo del plan Local: <b>$1.188.000</b> al año</div>
+          <hr>
+          <div>Retorno: <span class="res" id="o-roi">—</span></div>
+        </div>
+        <p class="fuente"><b>Estimación</b>, no promesa. Los porcentajes de recuperación son nuestro supuesto, y salen de los primeros locales. Están puestos ahí arriba para que los discutas.</p>
+      </div>
+      <div class="ficha nota" style="border-left-color: var(--acento);">
+        <p style="font-size: var(--step--1); margin: 0;"><b>Si el número te da chico, no te vendemos nada.</b> Un local que compra $2 millones al mes en insumos no tiene un problema de pronóstico: tiene un problema de escala. Nuestro cliente parte más o menos donde el gasto en insumos supera los $4 millones mensuales.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CÓMO FUNCIONA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">Cómo funciona</span>
+    <h2>Cuatro pasos. Ninguno te pide registrar algo nuevo.</h2>
+    <p>La objeción que mata a todo software de inventario en un restaurante es la misma: «no tengo tiempo para andar anotando». Correcto. Por eso Mermata no te pide que anotes. Los datos ya existen — están en el SII y en tu POS.</p>
+  </div>
+  <div class="rejilla rejilla-4">
+    <div class="paso">
+      <span class="n">01</span>
+      <h3>Conectas</h3>
+      <p>Tu certificado digital del SII y la API de tu POS (Bsale, Toteat, Fudo, Relbase). 20 minutos. De ahí sale <b>qué vendiste</b> por producto y por día, y <b>qué compraste</b>, a quién y a qué precio.</p>
+    </div>
+    <div class="paso">
+      <span class="n">02</span>
+      <h3>Mapeamos</h3>
+      <p>Una sesión de dos horas contigo para levantar las recetas: cuánta harina lleva un kilo de marraqueta, cuánta palta un sándwich. Es la única parte con humano, y es la que hace que todo lo demás funcione.</p>
+    </div>
+    <div class="paso">
+      <span class="n">03</span>
+      <h3>Pronosticamos</h3>
+      <p>Un modelo por producto, con día de la semana, estacionalidad, <b>día de pago</b>, feriados y clima. Con banda de incertidumbre, porque un pronóstico honesto muestra su error.</p>
+    </div>
+    <div class="paso">
+      <span class="n">04</span>
+      <h3>Pides</h3>
+      <p>La orden de compra sale sola, agrupada por proveedor, redondeada al formato en que te venden, lista para mandar por WhatsApp. Tú revisas, ajustas y envías.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EL PRODUCTO, EN VIVO ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">En vivo</span>
+    <h2>Esto es el producto, no una foto del producto.</h2>
+    <p>El pronóstico de la marraqueta de La Espiga para esta semana. El jueves 16 de julio es feriado — Virgen del Carmen — y el modelo lo sabe. <b>Apaga la señal de feriados</b> y mira qué le pasa a la curva del jueves.</p>
+  </div>
+  <div class="ficha">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-xs);">
+      <div class="ficha-titulo" style="margin:0;">Marraqueta · kg por día</div>
+      <button type="button" class="mini-toggle" id="t-fer" aria-pressed="true">
+        <span style="width:12px;height:12px;border:1.5px solid currentColor;border-radius:1px;display:inline-flex;align-items:center;justify-content:center;background:currentColor">
+          <svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="#fffdf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        Señal: feriados
+      </button>
+    </div>
+    <div id="mini"></div>
+    <div class="leyenda">
+      <span><i class="llave" style="background:var(--s1)"></i> Venta real</span>
+      <span><i class="llave" style="background:var(--s2)"></i> Pronóstico</span>
+      <span><i class="llave llave-banda" style="background:var(--s2)"></i> Banda P10–P90</span>
+      <span><i class="llave" style="background:var(--acento-lav); border:1px solid var(--regla-2)"></i> Feriado</span>
+    </div>
+    <p class="pie-gfx" id="mini-pie">—</p>
+    <div style="margin-top: var(--sp-s);">
+      <a class="btn btn-acento" href="demo/index.html">Entrar al demo completo
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRECIOS ============ -->
+<section class="seccion seccion-borde container" id="precios">
+  <div class="cabeza-seccion">
+    <span class="sello">Precios</span>
+    <h2>Precios en pesos, sin «contáctanos».</h2>
+    <p>Si el plan cuesta más que la merma que evita, no lo compres. Por eso el precio está a la vista y el diagnóstico es gratis: primero medimos cuánta plata botaste el año pasado, después hablamos de contratar.</p>
+  </div>
+
+  <div class="rejilla rejilla-3">
+    <div class="plan">
+      <span class="etq">Barrio</span>
+      <h3>Almacén, panadería chica</h3>
+      <div class="precio heroe">$49.000</div>
+      <div class="por">+ IVA / mes · 1 local · hasta 120 SKU</div>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Pronóstico diario por producto</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Lista de compra sugerida</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Medición de merma mensual</li>
+        <li class="tenue"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="color:var(--regla-2)"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Sin envío automático a proveedores</li>
+      </ul>
+      <a class="btn btn-fantasma" href="demo/index.html">Ver el demo</a>
+    </div>
+
+    <div class="plan plan-dest">
+      <span class="etq">Local · el más contratado</span>
+      <h3>Restaurante, cafetería, panadería</h3>
+      <div class="precio heroe">$99.000</div>
+      <div class="por">+ IVA / mes · 1 local · SKU ilimitados</div>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Todo lo del plan Barrio</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> <b>Órdenes de compra por WhatsApp</b>, con el agente leyendo la respuesta del proveedor</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Recetas y consumo teórico</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Alertas de quiebre y de alza de precios</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Comparador de precios entre proveedores</li>
+      </ul>
+      <a class="btn btn-acento" href="demo/index.html">Ver el demo</a>
+    </div>
+
+    <div class="plan">
+      <span class="etq">Cadena</span>
+      <h3>3 locales o más</h3>
+      <div class="precio heroe">$79.000</div>
+      <div class="por">+ IVA / mes <b>por local</b> · mínimo 3</div>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Todo lo del plan Local</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Compra consolidada entre locales (mejor precio por volumen)</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Transferencias entre bodegas antes de botar</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> API y exportación al ERP</li>
+      </ul>
+      <a class="btn btn-fantasma" href="demo/index.html">Ver el demo</a>
+    </div>
+  </div>
+
+  <div class="rejilla rejilla-2" style="margin-top: var(--sp-s);">
+    <div class="ficha nota">
+      <b style="color: var(--tinta)">Puesta en marcha: $190.000, una vez.</b>
+      <p style="margin: 4px 0 0; font-size: var(--step--1);">Es el mapeo de recetas y proveedores, y lo hacemos nosotros. No es un cargo inventado: es el trabajo humano que hace que el pronóstico sirva. Se descuenta íntegro si contratas 12 meses por adelantado.</p>
+    </div>
+    <div class="ficha nota nota-b">
+      <b style="color: var(--tinta)">Diagnóstico de merma: gratis, 14 días.</b>
+      <p style="margin: 4px 0 0; font-size: var(--step--1);">Conectas el SII, y te decimos cuánta plata botaste los últimos 12 meses. Si el número no te mueve la aguja, no hay nada más que conversar y no te cobramos nada.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">Preguntas</span>
+    <h2>Las que de verdad nos hacen.</h2>
+  </div>
+  <div style="max-width: 72ch;">
+    <details class="det">
+      <summary>Mi POS no tiene API. ¿Sirve igual?</summary>
+      <p>Depende, y esta es la pregunta más importante de todas. Si tu POS emite la boleta electrónica con el <b>detalle por producto</b>, podemos reconstruir la venta diaria por SKU desde el DTE del SII sin tocar el POS. Si tu POS emite la boleta con una sola línea que dice «Venta», no hay señal que pronosticar y no podemos ayudarte todavía. Lo verificamos gratis en el diagnóstico, antes de que pagues nada.</p>
+    </details>
+    <details class="det">
+      <summary>No tengo recetas escritas. Nadie las tiene.</summary>
+      <p>Cierto, casi nadie las tiene. Por eso la puesta en marcha existe: nos sentamos dos horas contigo y con quien cocina, y las levantamos. Para lo que falte, el modelo infiere una receta aproximada comparando 12 meses de compras contra 12 meses de ventas — y te muestra su estimación para que la corrijas, en vez de fingir que la sabe.</p>
+    </details>
+    <details class="det">
+      <summary>¿Y si el pronóstico se equivoca y me quedo sin producto?</summary>
+      <p>Se va a equivocar. Todos los pronósticos se equivocan; el nuestro te muestra cuánto. Por eso el producto no te entrega una cifra: te entrega una banda y un <b>nivel de servicio</b> que tú eliges. Al 95% aceptas quebrar 1 de cada 20 días y compras el colchón para el resto. Al 98% no quiebras casi nunca, pero botas más. Esa decisión es tuya y es de negocio, no del modelo.</p>
+    </details>
+    <details class="det">
+      <summary>Mi proveedor es un puesto de Lo Valledor. No tiene sistema.</summary>
+      <p>Exacto, y por eso Mermata manda WhatsApp y no EDI. El pedido llega al celular de Don Sergio como le llega hoy: un mensaje. La diferencia es que el mensaje ahora tiene las cantidades correctas, los precios de la última factura, y queda registrado. Cuando Don Sergio contesta «no hay palta, el jueves», el agente lo lee, marca la línea y te propone el reemplazo.</p>
+    </details>
+    <details class="det">
+      <summary>Mi POS ya tiene módulo de inventario. ¿Para qué esto?</summary>
+      <p>Tu POS te dice cuánto <b>tienes</b>. Mermata te dice cuánto <b>vas a necesitar</b>. Son dos preguntas distintas y ningún POS chileno responde la segunda hoy. Y ninguno le pone un peso a la merma. Si mañana tu POS empieza a hacerlo, la respuesta honesta es que preferimos integrarnos con él antes que competirle — está escrito así en nuestro <a href="roadmap.html">roadmap</a>, junto con el criterio por el cual mataríamos la empresa.</p>
+    </details>
+    <details class="det">
+      <summary>¿Qué pasa con mis datos del SII?</summary>
+      <p>Se leen, no se escriben: Mermata solo consulta DTE recibidos y emitidos. Nunca emitimos un documento tributario en tu nombre. El certificado digital vive cifrado y con acceso auditado. Puedes revocarlo cuando quieras y exportar todo lo tuyo en CSV. El detalle técnico está en <a href="stack.html">arquitectura</a>.</p>
+    </details>
+    <details class="det">
+      <summary>¿Cuánto se demora en verse el resultado?</summary>
+      <p>Las primeras 6 semanas Mermata solo <b>mide</b>: necesitamos una línea base honesta de tu merma antes de prometer bajarla. Recién en el mes 2 empiezan las órdenes de compra. La baja de merma se hace visible entre el mes 3 y el 4. Cualquiera que te prometa resultados la primera semana te está vendiendo humo.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="seccion seccion-tinta">
+  <div class="container centro">
+    <span class="sello">Empezar</span>
+    <h2 style="margin: var(--sp-2xs) auto var(--sp-s); max-width: 22ch;">Primero te decimos cuánto botaste. Después conversamos.</h2>
+    <p style="color: #cfc7b4; max-width: 54ch; margin: 0 auto var(--sp-m);">Conectas el SII, esperas 48 horas, y te llega un informe con la plata que se fue al basurero los últimos 12 meses. Gratis, sin tarjeta, y sin que tengas que anotar absolutamente nada.</p>
+    <div class="fila" style="justify-content: center;">
+      <a class="btn btn-acento" href="demo/index.html">Ver el producto funcionando</a>
+      <a class="btn btn-fantasma" href="negocio.html" style="color: var(--papel); border-color: #4d4738;">Leer el plan de negocio</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <div class="marca" style="margin-bottom: 6px;">Merma<span class="marca-pt">ta</span></div>
+      <p class="tenue" style="font-size: var(--step--1); max-width: 40ch;">Compra lo que vas a vender. Prototipo — Santiago de Chile, 2026.</p>
+    </div>
+    <nav class="nav-lista" style="display:flex; flex-wrap:wrap; gap: var(--sp-s);" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="mermata.js"></script>
+<script>
+/* ---------- Calculadora de pérdida ---------- */
+(function () {
+  function clp(n) {
+    var s = String(Math.round(Math.abs(n))), o = '', c = 0;
+    for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; }
+    return (n < 0 ? '−$' : '$') + o;
+  }
+  var rv = document.getElementById('r-venta'), rf = document.getElementById('r-food'), rm = document.getElementById('r-merma');
+  function calc() {
+    var venta = +rv.value * 1000000;            // CLP / mes
+    var food = +rf.value / 100;
+    var merma = +rm.value / 100;
+
+    var insumosAnio = venta * 12 * food;
+    var mermaAnio = insumosAnio * merma;
+    var quiebreAnio = venta * 12 * 0.02 * 0.66; // 2% de venta perdida × 66% de margen de contribución
+    var total = mermaAnio + quiebreAnio;
+    var utilidad = venta * 12 * 0.06;           // margen neto declarado: 6%
+    var recup = mermaAnio * 0.50 + quiebreAnio * 0.40;
+    var costoPlan = 1188000;
+
+    document.getElementById('l-venta').textContent = clp(venta);
+    document.getElementById('l-food').textContent = rf.value + '%';
+    document.getElementById('l-merma').innerHTML = rm.value + '% <span class="tenue" style="font-family:var(--sans);font-size:var(--step--1)">— la literatura de food service pone el rango en 4–10%</span>';
+
+    document.getElementById('o-insumos').textContent = clp(insumosAnio);
+    document.getElementById('o-merma').textContent = clp(mermaAnio);
+    document.getElementById('o-quiebre').textContent = clp(quiebreAnio);
+    document.getElementById('o-total').textContent = clp(total);
+    document.getElementById('o-frac').textContent = Math.round(total / utilidad * 100) + '% de tu utilidad';
+    document.getElementById('o-recup').textContent = clp(recup) + ' al año';
+    document.getElementById('o-roi').textContent = (recup / costoPlan).toFixed(1).replace('.', ',') + '× lo que pagas';
+  }
+  [rv, rf, rm].forEach(function (r) { r.addEventListener('input', calc); });
+  calc();
+})();
+
+/* ---------- Mini-gráfico en vivo: mismo motor que el demo ---------- */
+(function () {
+  var DIA = ['dom','lun','mar','mié','jue','vie','sáb'], MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var D0 = new Date(2026, 5, 20), HOY = 23, HIST = 14, HZ = 7;
+  var FER = {9: 1, 26: 1};
+  var W_ = [0.00,0.25,0.75,0.95,0.45,-0.20,-0.35,-0.50,-0.15,0.35,0.80,1.00,0.70,0.45,0.20,0.05,0.35,0.75,0.90,0.50,0.25,-0.20,-0.35,0.05,0.45,0.85,1.00,0.65,0.40,0.10,0.00,0.25,0.35,0.45,0.30,0.10,-0.30,-0.20];
+  var S = {base:120, dow:[1.22,0.94,0.90,0.92,0.98,1.10,1.24], pago:1.06, feriado:1.30, clima:1.07, sigma:0.075};
+  var ferOn = true;
+
+  function f(i){ var d=new Date(D0); d.setDate(d.getDate()+i); return d; }
+  function dw(i){ return f(i).getDay(); }
+  function pago(i){ var d=f(i).getDate(); return d<=5||d>=28; }
+  function num(n,d){ d=d||0; var t=Math.abs(n).toFixed(d).split('.'),s=t[0],o='',c=0;
+    for(var i=s.length-1;i>=0;i--){o=s[i]+o; if(++c%3===0&&i>0)o='.'+o;} return (n<0?'−':'')+o+(t[1]?','+t[1]:''); }
+  function rnd(s){ var t=(s+0x6D2B79F5)|0; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
+  function ruido(i,sg){ var u1=Math.max(1e-6,rnd(0*7919+i*104729)), u2=rnd(0*15485863+i*32452843+17);
+    var z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); z=Math.max(-2.1,Math.min(2.1,z)); return 1+z*sg; }
+  function esp(i, fer){ var v=S.base*S.dow[dw(i)]*(1+0.0013*(i-HOY));
+    if(pago(i)) v*=S.pago; if(fer && FER[i]) v*=S.feriado; v*= 1+(S.clima-1)*W_[i]; return v; }
+  function real(i){ return esp(i, true)*ruido(i,S.sigma); }
+
+  function dibujar() {
+    var host = document.getElementById('mini');
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 520;
+    var H = chico ? 240 : 280, m = {t:22,r:12,b:40,l:40};
+    var pw = W-m.l-m.r, ph = H-m.t-m.b;
+    var pts = [];
+    for (var i = HOY-HIST; i < HOY+HZ; i++) {
+      var fut = i >= HOY, ff = esp(i, ferOn);
+      var sg = fut ? S.sigma*Math.sqrt(1+0.22*(i-HOY+1)) : 0;
+      pts.push({i:i, fut:fut, real: fut?null:real(i), f:ff,
+                p10: fut?ff*(1-1.2816*sg):null, p90: fut?ff*(1+1.2816*sg):null});
+    }
+    var max = 0; pts.forEach(function(p){ max = Math.max(max, p.real||0, p.f, p.p90||0); }); max *= 1.12;
+    var paso = Math.pow(10, Math.floor(Math.log(max/4)/Math.LN10)); var n0 = max/4/paso;
+    paso *= (n0<=1?1:n0<=2?2:n0<=5?5:10);
+    var ticks = []; for (var v = 0; v <= max; v += paso) ticks.push(v);
+    max = Math.max(max, ticks[ticks.length-1]);
+
+    var n = pts.length, X = function(k){ return m.l + k*pw/(n-1); }, Y = function(v){ return m.t+ph-(v/max)*ph; };
+    var pxs = pw/(n-1);
+    var g = ['<svg class="gfx" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Pronóstico de marraqueta">'];
+    pts.forEach(function(p,k){
+      var d = dw(p.i), x = X(k)-pxs/2;
+      if (FER[p.i]) g.push('<rect x="'+x.toFixed(1)+'" y="'+m.t+'" width="'+pxs.toFixed(1)+'" height="'+ph+'" fill="#f2e2dc"/>');
+      else if (d===0||d===6) g.push('<rect x="'+x.toFixed(1)+'" y="'+m.t+'" width="'+pxs.toFixed(1)+'" height="'+ph+'" fill="#e6dfcd" opacity=".55"/>');
+    });
+    ticks.forEach(function(v){ var y=Y(v);
+      g.push('<line class="grid" x1="'+m.l+'" y1="'+y.toFixed(1)+'" x2="'+(m.l+pw)+'" y2="'+y.toFixed(1)+'"/>');
+      g.push('<text class="eje" x="'+(m.l-7)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end">'+num(v)+'</text>'); });
+    var fut2 = pts.filter(function(p){return p.fut;}), k0 = n-fut2.length, up='', dn='';
+    fut2.forEach(function(p,j){ up += (j?' L':'M')+X(k0+j).toFixed(1)+' '+Y(p.p90).toFixed(1); });
+    for (var j=fut2.length-1;j>=0;j--) dn += ' L'+X(k0+j).toFixed(1)+' '+Y(fut2[j].p10).toFixed(1);
+    g.push('<path d="'+up+dn+' Z" fill="#b8452b" opacity="0.12"/>');
+    var dF=''; pts.forEach(function(p,k){ dF += (k?' L':'M')+X(k).toFixed(1)+' '+Y(p.f).toFixed(1); });
+    g.push('<path d="'+dF+'" fill="none" stroke="#b8452b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+    var dR='', kr=0; pts.forEach(function(p,k){ if(p.real!==null) dR += (kr++?' L':'M')+X(k).toFixed(1)+' '+Y(p.real).toFixed(1); });
+    g.push('<path d="'+dR+'" fill="none" stroke="#0a6296" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+    var xh = X(HIST)-pxs/2;
+    g.push('<line x1="'+xh.toFixed(1)+'" y1="'+(m.t-6)+'" x2="'+xh.toFixed(1)+'" y2="'+(m.t+ph)+'" stroke="#17150f" stroke-width="1"/>');
+    g.push('<text class="etiq" x="'+(xh+4).toFixed(1)+'" y="'+(m.t-10)+'" fill="#17150f">HOY</text>');
+    pts.forEach(function(p,k){ if(FER[p.i]) g.push('<text class="etiq" x="'+X(k).toFixed(1)+'" y="'+(m.t-10)+'" text-anchor="middle" fill="#9c3520">FERIADO</text>'); });
+    g.push('<circle cx="'+X(HIST-1).toFixed(1)+'" cy="'+Y(pts[HIST-1].real).toFixed(1)+'" r="4.5" fill="#0a6296" stroke="#fffdf7" stroke-width="2"/>');
+    g.push('<circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(pts[n-1].f).toFixed(1)+'" r="4.5" fill="#b8452b" stroke="#fffdf7" stroke-width="2"/>');
+    g.push('<line class="base" x1="'+m.l+'" y1="'+(m.t+ph)+'" x2="'+(m.l+pw)+'" y2="'+(m.t+ph)+'"/>');
+    var cada = chico ? Math.ceil(n/5) : Math.ceil(n/8);
+    pts.forEach(function(p,k){ if(k%cada!==0 && k!==n-1) return;
+      var d=f(p.i);
+      g.push('<text class="eje" x="'+X(k).toFixed(1)+'" y="'+(m.t+ph+16)+'" text-anchor="middle">'+d.getDate()+'/'+MES[d.getMonth()]+'</text>');
+      g.push('<text class="eje" x="'+X(k).toFixed(1)+'" y="'+(m.t+ph+29)+'" text-anchor="middle" opacity=".7">'+DIA[dw(p.i)]+'</text>'); });
+    g.push('</svg>');
+    host.innerHTML = g.join('');
+
+    var jue = esp(26, ferOn), jueSin = esp(26, false);
+    document.getElementById('mini-pie').innerHTML = ferOn
+      ? 'Con la señal de feriados activa, el modelo pide <b>' + num(jue) + ' kg</b> para el jueves 16. Sin ella pediría ' + num(jueSin) + ' kg: <b class="acento">' + num(jue-jueSin) + ' kg de marraqueta menos</b>, un jueves en que la gente está en su casa y sale a comprar pan. Eso es un quiebre de stock a las 10 de la mañana.'
+      : 'Señal apagada: el jueves 16 el modelo pide <b>' + num(jueSin) + ' kg</b> como si fuera un jueves cualquiera. Pero es feriado y la venta va a ser de <b class="acento">' + num(jue) + ' kg</b>. Faltan ' + num(jue-jueSin) + ' kg.';
+  }
+
+  var btn = document.getElementById('t-fer');
+  btn.addEventListener('click', function () {
+    ferOn = !ferOn;
+    btn.setAttribute('aria-pressed', ferOn);
+    btn.querySelector('span').style.background = ferOn ? 'currentColor' : 'transparent';
+    btn.querySelector('svg').style.opacity = ferOn ? '1' : '0';
+    dibujar();
+  });
+  var t; window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(dibujar, 140); });
+  dibujar();
+})();
+</script>
+</body>
+</html>

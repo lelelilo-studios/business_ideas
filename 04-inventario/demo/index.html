@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Mermata</title>
+<meta name="description" content="Mermata funcionando: pronóstico de demanda con banda de incertidumbre, orden de compra generada y merma medida. Panadería y Café La Espiga, Ñuñoa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../mermata.css">
+<style>
+  /* ---- Cabecera del local ---- */
+  .local {
+    border-bottom: 1px solid var(--regla);
+    padding: var(--sp-s) 0;
+  }
+  .local-in { display: flex; flex-wrap: wrap; gap: var(--sp-xs) var(--sp-m); align-items: baseline; justify-content: space-between; }
+  .local h1 { font-size: var(--step-1); margin: 0; }
+  .local .meta { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); }
+  .conex { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* ---- Barra de filtros: UNA fila, arriba de todo lo que afecta ---- */
+  .filtros {
+    position: sticky; top: 56px; z-index: 20;
+    background: var(--papel-3);
+    border-bottom: 1px solid var(--regla-2);
+    padding: var(--sp-2xs) 0;
+    background-image: none;
+  }
+  .filtros-in { display: flex; flex-wrap: wrap; gap: var(--sp-xs) var(--sp-m); align-items: center; }
+  .campo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .campo > label, .grupo-rot {
+    font-family: var(--mono); font-size: .74rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--tinta-3); white-space: nowrap;
+  }
+  select {
+    font-family: var(--sans); font-size: var(--step--1); font-weight: 500;
+    background: var(--papel-2); border: 1px solid var(--regla-2);
+    border-radius: var(--radio); padding: 0 30px 0 10px; min-height: 44px;
+    color: var(--tinta); cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%234d4738' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    max-width: 100%;
+  }
+  .seg { display: inline-flex; border: 1px solid var(--regla-2); border-radius: var(--radio); overflow: hidden; background: var(--papel-2); }
+  .seg button {
+    font-family: var(--mono); font-size: var(--step--1);
+    padding: 0 12px; min-height: 44px; min-width: 44px;
+    border-right: 1px solid var(--regla-2); color: var(--tinta-2);
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+  .toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tog {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: var(--step--1);
+    border: 1px solid var(--regla-2); border-radius: var(--radio);
+    background: var(--papel-2); color: var(--tinta-3);
+    padding: 0 10px; min-height: 44px;
+  }
+  .tog .caja {
+    width: 13px; height: 13px; flex: none;
+    border: 1.5px solid currentColor; border-radius: 1px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .tog .caja svg { opacity: 0; }
+  .tog[aria-pressed="true"] { color: var(--acento-osc); border-color: var(--acento); background: var(--acento-lav); }
+  .tog[aria-pressed="true"] .caja { background: var(--acento); border-color: var(--acento); color: #fffdf7; }
+  .tog[aria-pressed="true"] .caja svg { opacity: 1; }
+
+  /* ---- Alertas ---- */
+  .alerta {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 12px; border: 1px solid var(--regla-2);
+    border-left-width: 3px; border-radius: var(--radio);
+    background: var(--papel-2); font-size: var(--step--1);
+  }
+  .alerta-riesgo { border-left-color: var(--riesgo); }
+  .alerta-aten   { border-left-color: var(--atencion); }
+  .alerta svg { flex: none; margin-top: 2px; }
+  .alerta-riesgo svg { color: var(--riesgo); }
+  .alerta-aten svg { color: var(--atencion); }
+  .alerta b { display: block; color: var(--tinta); }
+  .alerta span { color: var(--tinta-2); }
+
+  /* ---- Orden de compra ---- */
+  .prov { border: 1px solid var(--regla-2); border-radius: var(--radio); background: var(--papel-2); margin-bottom: var(--sp-s); }
+  .prov-cab {
+    display: flex; flex-wrap: wrap; gap: var(--sp-2xs) var(--sp-s);
+    justify-content: space-between; align-items: baseline;
+    padding: 10px 12px; border-bottom: 2px solid var(--tinta); background: var(--papel-3);
+  }
+  .prov-cab h4 { margin: 0; font-size: var(--step-0); }
+  .prov-cab .det-p { font-family: var(--mono); font-size: .76rem; color: var(--tinta-3); }
+  .prov-tot { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+  .lineas { list-style: none; margin: 0; padding: 0; }
+  .linea {
+    display: grid; gap: 4px var(--sp-xs);
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 10px 12px; border-bottom: 1px solid var(--regla);
+  }
+  .linea:last-child { border-bottom: 0; }
+  .linea.fuera { opacity: .45; }
+  .linea.fuera .nom { text-decoration: line-through; }
+  .lin-info { min-width: 0; }
+  .lin-info .nom { font-weight: 500; font-size: var(--step--1); }
+  .lin-info .por { font-family: var(--mono); font-size: .74rem; color: var(--tinta-3); display: block; margin-top: 2px; }
+  .lin-ctl { display: flex; align-items: center; gap: var(--sp-2xs); justify-content: flex-end; }
+  .stepper { display: inline-flex; border: 1px solid var(--regla-2); border-radius: var(--radio); background: var(--papel); }
+  .stepper button { min-width: 40px; min-height: 40px; font-family: var(--mono); font-size: 1rem; color: var(--tinta-2); }
+  .stepper button:hover { background: var(--papel-3); color: var(--tinta); }
+  .stepper .qty {
+    min-width: 52px; text-align: center; align-self: center;
+    font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 500;
+    border-left: 1px solid var(--regla-2); border-right: 1px solid var(--regla-2);
+    line-height: 40px;
+  }
+  .lin-sub { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--step--1); min-width: 88px; text-align: right; }
+  .btn-x { min-width: 40px; min-height: 40px; color: var(--tinta-3); }
+  .btn-x:hover { color: var(--riesgo); }
+  @media (min-width: 40em) {
+    .linea { grid-template-columns: 1fr auto auto auto; }
+  }
+
+  .oc-total {
+    display: flex; flex-wrap: wrap; gap: var(--sp-xs) var(--sp-m);
+    justify-content: space-between; align-items: center;
+    border: 2px solid var(--tinta); border-radius: var(--radio);
+    background: var(--papel-2); padding: var(--sp-s);
+  }
+  .oc-total .cifra-total { font-size: var(--step-2); }
+
+  /* ---- WhatsApp ---- */
+  .wa { border: 1px solid var(--regla-2); border-radius: var(--radio); background: var(--papel-2); }
+  .wa-cab { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--regla); }
+  .wa-cab .quien { font-family: var(--mono); font-size: var(--step--1); }
+  .wa-msg {
+    margin: var(--sp-xs); padding: var(--sp-xs);
+    background: var(--papel-3); border: 1px solid var(--regla);
+    border-radius: var(--radio) var(--radio) var(--radio) 0;
+    font-size: var(--step--1); line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+    color: var(--tinta);
+  }
+  .wa-pie { padding: 0 var(--sp-xs) var(--sp-xs); }
+  .wa-tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px 0; }
+  .wa-tabs button {
+    font-family: var(--mono); font-size: .74rem;
+    padding: 0 8px; min-height: 40px;
+    border: 1px solid var(--regla-2); border-radius: var(--radio);
+    background: var(--papel); color: var(--tinta-3);
+  }
+  .wa-tabs button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+
+  /* ---- Tabla de datos del gráfico ---- */
+  .vista-tabla { display: none; }
+  .vista-tabla.on { display: block; }
+  .vista-gfx.off { display: none; }
+
+  .barra-drv {
+    display: flex; align-items: center; gap: 8px;
+    font-size: var(--step--1); padding: 6px 0;
+  }
+  .barra-drv .pista {
+    flex: 1; height: 8px; background: var(--papel-3);
+    border: 1px solid var(--regla); border-radius: var(--radio); overflow: hidden;
+    display: flex;
+  }
+  .barra-drv .rel { height: 100%; }
+  .barra-drv .val { font-family: var(--mono); font-variant-numeric: tabular-nums; min-width: 56px; text-align: right; }
+  .barra-drv .nom { min-width: 92px; color: var(--tinta-2); }
+
+  .pasos { counter-reset: p; list-style: none; padding: 0; }
+  .pasos li { counter-increment: p; padding-left: 30px; position: relative; margin-bottom: 6px; font-size: var(--step--1); color: var(--tinta-2); }
+  .pasos li::before {
+    content: counter(p); position: absolute; left: 0; top: 0;
+    font-family: var(--mono); font-size: .72rem; width: 20px; height: 20px;
+    border: 1px solid var(--regla-2); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: var(--tinta-3);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="barra">
+  <div class="container barra-in">
+    <a class="marca" href="../index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="19" height="19" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 15.5L8.5 9.5L12 13L17 5.5" stroke="#b8452b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="5.5" r="1.9" fill="#b8452b"/>
+      </svg>
+      Merma<span class="marca-pt">ta</span>
+    </a>
+    <nav class="nav-lista" aria-label="Principal">
+      <a class="volver" href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="./index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="navpanel">
+      <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
+        <path d="M0 1h14M0 6h14M0 11h14" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span data-nav-txt>Menú</span>
+    </button>
+  </div>
+</header>
+<div class="nav-panel" id="navpanel" data-nav-panel>
+  <div class="container">
+    <nav class="nav-lista" aria-label="Principal móvil">
+      <a class="volver" href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="./index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ============ LOCAL ============ -->
+<div class="local">
+  <div class="container local-in">
+    <div>
+      <h1>Panadería y Café La Espiga</h1>
+      <div class="meta">RUT 76.412.883-9 · Av. Irarrázaval 3410, Ñuñoa · lunes 13 de julio de 2026</div>
+    </div>
+    <div class="conex">
+      <span class="chip chip-bien">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SII · DTE al día
+      </span>
+      <span class="chip chip-bien">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        POS · 14 meses
+      </span>
+      <span class="chip chip-neutro">61 SKU · 18 insumos</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FILTROS (una sola fila, arriba de todo lo que afecta) ============ -->
+<div class="filtros">
+  <div class="container filtros-in">
+    <div class="campo">
+      <label for="sel-sku">Producto</label>
+      <select id="sel-sku"></select>
+    </div>
+    <div class="campo">
+      <span class="grupo-rot" id="rot-hz">Horizonte</span>
+      <div class="seg" role="group" aria-labelledby="rot-hz">
+        <button type="button" data-hz="7" aria-pressed="true">7 días</button>
+        <button type="button" data-hz="14" aria-pressed="false">14 días</button>
+      </div>
+    </div>
+    <div class="campo">
+      <span class="grupo-rot" id="rot-drv">Señales del modelo</span>
+      <div class="toggles" role="group" aria-labelledby="rot-drv">
+        <button type="button" class="tog" data-drv="pago" aria-pressed="true">
+          <span class="caja"><svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Día de pago
+        </button>
+        <button type="button" class="tog" data-drv="feriado" aria-pressed="true">
+          <span class="caja"><svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Feriados
+        </button>
+        <button type="button" class="tog" data-drv="clima" aria-pressed="true">
+          <span class="caja"><svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 5.2l2.5 2.5L9 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Clima
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ TILES + ALERTAS ============ -->
+<section class="seccion container" style="padding-top: var(--sp-m);">
+  <div class="rejilla rejilla-4" style="margin-bottom: var(--sp-m);">
+    <div class="ficha tile tile-bien">
+      <span class="rotulo">Merma evitada · julio</span>
+      <span class="valor heroe">$392.000</span>
+      <span class="delta up">+18% vs. junio · 3,1% de los insumos (era 6,4%)</span>
+    </div>
+    <div class="ficha tile tile-s1">
+      <span class="rotulo">Quiebres evitados · 30 d</span>
+      <span class="valor heroe">14</span>
+      <span class="delta">Venta rescatada estimada $658.000</span>
+    </div>
+    <div class="ficha tile tile-acento">
+      <span class="rotulo">Error del pronóstico · 21 d</span>
+      <span class="valor heroe" id="t-mape">—</span>
+      <span class="delta" id="t-mape-sub">—</span>
+    </div>
+    <div class="ficha tile">
+      <span class="rotulo">Orden de compra de hoy</span>
+      <span class="valor heroe" id="t-oc">—</span>
+      <span class="delta" id="t-oc-sub">—</span>
+    </div>
+  </div>
+
+  <div class="rejilla rejilla-2">
+    <div class="alerta alerta-riesgo">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1L13 12.5H1L7 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 5.5v3M7 10.4v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div>
+        <b>Quiebre en 0,9 días — Café en grano</b>
+        <span>Te quedan 3,6 kg. El pronóstico de hoy + mañana consume 4,3 kg y Café Regional despacha recién el miércoles. Sugerencia: llamar hoy antes de las 11:00 o comprar 5 kg de puente en Santa Elena a $14.200/kg.</span>
+      </div>
+    </div>
+    <div class="alerta alerta-aten">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M7 3.6v4M7 9.9v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div>
+        <b>Palta Hass: +22% en 3 semanas</b>
+        <span>Don Sergio pasó de $3.020 a $3.690/kg. Es el 2° insumo más caro de tu orden. Central Mayorista la tiene a $3.290 (Cal. 60, mismo calibre). Ahorro estimado: $16.400 en este pedido.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRONÓSTICO ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">01 · Pronóstico</span>
+    <h2 id="tit-gfx">Marraqueta — próximos 7 días</h2>
+    <p>La línea azul es lo que <em>vendiste</em>. La roja es lo que el modelo <em>dijo que ibas a vender</em> — y en el pasado no acierta siempre, ahí se ve el error. Hacia adelante mostramos una banda, no una línea mágica: el 80% de las veces la venta real cae dentro de ella, y la banda se ensancha mientras más lejos miras. Un pronóstico que no muestra su error es un adorno.</p>
+  </div>
+
+  <div class="ficha">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-2xs);">
+      <div class="ficha-titulo" style="margin:0;">Unidades por día · <span id="tit-unidad">kg</span></div>
+      <button type="button" class="btn btn-fantasma btn-sm" id="btn-tabla" aria-pressed="false">Ver como tabla</button>
+    </div>
+
+    <div class="vista-gfx" id="vista-gfx">
+      <div class="envoltura-gfx" id="wrap-fc">
+        <div id="gfx-fc"></div>
+        <div class="tip" id="tip-fc" role="status" aria-live="off"></div>
+      </div>
+      <div class="leyenda">
+        <span><i class="llave" style="background:var(--s1)"></i> Venta real</span>
+        <span><i class="llave" style="background:var(--s2)"></i> Pronóstico</span>
+        <span><i class="llave llave-banda" style="background:var(--s2)"></i> Banda P10–P90</span>
+        <span><i class="llave" style="background:var(--acento-lav); border:1px solid var(--regla-2)"></i> Feriado</span>
+      </div>
+      <p class="pie-gfx" id="pie-fc">—</p>
+    </div>
+
+    <div class="vista-tabla" id="vista-tabla">
+      <div class="scroll-x tabla-caja">
+        <table class="tabla">
+          <caption class="visually-hidden">Serie diaria de venta real y pronóstico con banda de incertidumbre</caption>
+          <thead><tr><th>Fecha</th><th>Día</th><th class="der">Real</th><th class="der">Pronóstico</th><th class="der">Error</th><th class="der">P10</th><th class="der">P90</th><th>Señales</th></tr></thead>
+          <tbody id="tb-fc"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="rejilla rejilla-2" style="margin-top: var(--sp-s);">
+    <div class="ficha">
+      <div class="ficha-titulo">Qué está moviendo el pronóstico de <span id="drv-sku">este producto</span></div>
+      <div id="drv-lista"></div>
+      <p class="pie-gfx">Efecto multiplicativo aprendido del histórico del local. Apaga una señal arriba y mira cómo se degrada el error — sobre todo en los días donde está la plata.</p>
+    </div>
+    <div class="ficha">
+      <div class="ficha-titulo">Error del pronóstico por producto (MAPE, 21 días)</div>
+      <div class="envoltura-gfx" id="wrap-mape">
+        <div id="gfx-mape"></div>
+        <div class="tip" id="tip-mape" role="status" aria-live="off"></div>
+      </div>
+      <p class="pie-gfx">Una sola serie: no hay leyenda que agregar. El almuerzo del día y el berlín son los peores — demanda chica, muy variable. Ahí <b>no confíes en el número</b>: pide con holgura.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ORDEN DE COMPRA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">02 · Orden de compra</span>
+    <h2>El pedido, ya escrito</h2>
+    <p>Del pronóstico de venta a la compra de insumos hay una receta de por medio. Mermata la recorre: proyecta cuánto pan vas a vender, lo convierte en kilos de harina, le resta lo que tienes en bodega, le suma un colchón según el nivel de servicio que elijas, y lo redondea al formato en que el proveedor de verdad te vende (sacos de 25 kg, no kilos sueltos).</p>
+  </div>
+
+  <div class="ficha" style="margin-bottom: var(--sp-s);">
+    <div class="filtros-in" style="gap: var(--sp-s) var(--sp-l);">
+      <div class="campo">
+        <span class="grupo-rot" id="rot-cob">Cobertura</span>
+        <div class="seg" role="group" aria-labelledby="rot-cob">
+          <button type="button" data-cob="4" aria-pressed="true">4 días</button>
+          <button type="button" data-cob="7" aria-pressed="false">7 días</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="sel-ns">Nivel de servicio</label>
+        <select id="sel-ns">
+          <option value="1.28">90% — pedido justo</option>
+          <option value="1.65" selected>95% — recomendado</option>
+          <option value="2.05">98% — nunca quiebro</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-fantasma btn-sm" id="btn-reset">Recalcular desde cero</button>
+    </div>
+    <p class="nota" style="margin-top: var(--sp-xs);">
+      <b>El jueves 16 es feriado</b> (Virgen del Carmen). Lo Valledor y Los Maitenes no despachan, y el feriado sube la venta de pan un 30% y la de empanadas un 45%. Esta orden ya lo considera: cubre hasta el <b>viernes 17</b>.
+    </p>
+  </div>
+
+  <div id="oc-lista"></div>
+
+  <div class="oc-total" style="margin-bottom: var(--sp-s);">
+    <div>
+      <span class="sello">Total orden de compra · <span id="oc-nlin">—</span> líneas · <span id="oc-nprov">—</span> proveedores</span>
+      <div class="cifra-total heroe" id="oc-total">—</div>
+      <span class="tenue" style="font-size: var(--step--1)">IVA incluido · precios de la última factura recibida por SII</span>
+    </div>
+    <button type="button" class="btn btn-acento" id="btn-wa">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2 14l1.1-3.4A6 6 0 1 1 5.6 13L2 14z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      Preparar mensajes de WhatsApp
+    </button>
+  </div>
+
+  <div id="wa-zona" hidden>
+    <div class="wa">
+      <div class="wa-cab">
+        <div class="quien">Mensaje a enviar · <b id="wa-quien">—</b></div>
+        <span class="chip chip-neutro">Borrador — nada se envía en este demo</span>
+      </div>
+      <div class="wa-tabs" id="wa-tabs" role="group" aria-label="Elegir proveedor"></div>
+      <pre class="wa-msg" id="wa-msg">—</pre>
+      <div class="wa-pie">
+        <p class="pie-gfx" style="border:0; margin:0; padding:0;">Se envía desde el WhatsApp Business del local, no desde un número desconocido. Cuando Don Sergio responde <em>«no hay palta hoy, el jueves te llega»</em>, el agente lee la respuesta, marca la línea como pendiente, y te sugiere el reemplazo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MERMA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <span class="sello">03 · Merma</span>
+    <h2>El número que nadie te mide</h2>
+    <p>Merma = lo que compraste − lo que la receta dice que consumiste − el cambio de inventario. Mermata la calcula sola: las compras salen de tus facturas del SII, el consumo teórico sale del pronóstico contrastado con la venta real. No te pedimos que peses la basura. Te decimos, en pesos, cuánto botaste.</p>
+  </div>
+
+  <div class="rejilla rejilla-2">
+    <div class="ficha">
+      <div class="ficha-titulo">Merma evitada por semana (CLP)</div>
+      <div class="envoltura-gfx" id="wrap-merma">
+        <div id="gfx-merma"></div>
+        <div class="tip" id="tip-merma" role="status" aria-live="off"></div>
+      </div>
+      <p class="pie-gfx">Contra la línea base medida en las 6 semanas <em>previas</em> a instalar Mermata (6,4% del costo de insumos). Sin esa línea base el número sería inventado, así que las primeras 6 semanas del producto solo miden — no prometen nada.</p>
+    </div>
+
+    <div class="ficha">
+      <div class="ficha-titulo">Merma de julio, por producto</div>
+      <div class="scroll-x tabla-caja">
+        <table class="tabla">
+          <thead><tr><th>Producto</th><th class="der">Merma</th><th class="der">Costo</th><th class="der">vs. junio</th></tr></thead>
+          <tbody>
+            <tr><td>Marraqueta</td><td class="der num">68 kg</td><td class="der num">$92.400</td><td class="der num" style="color:var(--bien)">−34%</td></tr>
+            <tr><td>Sándwich ave-palta</td><td class="der num">38 un</td><td class="der num">$61.300</td><td class="der num" style="color:var(--bien)">−19%</td></tr>
+            <tr><td>Empanada de pino</td><td class="der num">96 un</td><td class="der num">$54.900</td><td class="der num" style="color:var(--bien)">−41%</td></tr>
+            <tr><td>Almuerzo del día</td><td class="der num">22 un</td><td class="der num">$47.700</td><td class="der num" style="color:var(--bien)">−11%</td></tr>
+            <tr><td>Hallulla</td><td class="der num">31 kg</td><td class="der num">$46.100</td><td class="der num" style="color:var(--bien)">−28%</td></tr>
+            <tr><td>Palta Hass</td><td class="der num">9,4 kg</td><td class="der num">$34.700</td><td class="der num" style="color:var(--bien)">−52%</td></tr>
+            <tr><td>Berlín con crema</td><td class="der num">74 un</td><td class="der num">$31.200</td><td class="der num" style="color:var(--bien)">−22%</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td>Merma total de julio</td><td class="der num">—</td><td class="der num">$368.300</td><td class="der num">3,1%</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="pie-gfx">3,1% del costo de insumos del mes ($11.880.000). En junio de 2025, antes de Mermata, la misma medición daba 6,4% ($760.000).</p>
+    </div>
+  </div>
+
+  <div class="ficha" style="margin-top: var(--sp-s); border-left: 3px solid var(--tinta);">
+    <div class="ficha-titulo">Cómo se calcula, en cuatro pasos — sin pedirte que registres nada nuevo</div>
+    <ol class="pasos">
+      <li><b>Compras:</b> las facturas electrónicas que tus proveedores te emitieron (DTE 33) las descargamos del SII. Sabemos qué compraste, a quién, cuánto y a qué precio.</li>
+      <li><b>Ventas:</b> el detalle por SKU de las boletas electrónicas, vía la API de tu POS. Sabemos qué vendiste, cada día.</li>
+      <li><b>Consumo teórico:</b> venta × receta. 120 kg de marraqueta consumen 88,8 kg de harina. Es la parte que hay que mapear una vez, contigo, en la puesta en marcha.</li>
+      <li><b>Merma = compras − consumo teórico − Δinventario.</b> Con un conteo de bodega al mes basta para cerrar la ecuación. Sin conteo, el número es un estimador con supuesto de stock estable — y te lo decimos así, con su margen de error.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ QUÉ ES FALSO ============ -->
+<section class="seccion seccion-tinta">
+  <div class="container">
+    <span class="sello">Honestidad</span>
+    <h2 style="margin: var(--sp-2xs) 0 var(--sp-s);">Qué es real y qué está falseado en este demo</h2>
+    <div class="rejilla rejilla-2">
+      <div>
+        <h3 style="font-size: var(--step-0); margin-bottom: var(--sp-2xs);">Es real</h3>
+        <ul style="padding-left: 1.1rem; color: #cfc7b4; font-size: var(--step--1); line-height: 1.7;">
+          <li>El modelo de pronóstico corre en tu navegador. Cada toggle recalcula la curva y el MAPE de verdad.</li>
+          <li>Los feriados son feriados chilenos reales: <b style="color:var(--papel)">29 jun 2026</b> (San Pedro y San Pablo, en el histórico) y <b style="color:var(--papel)">16 jul 2026</b> (Virgen del Carmen, en el pronóstico).</li>
+          <li>La banda P10–P90 se ensancha con el horizonte, como debe. No hay una línea que acierte siempre.</li>
+          <li>La orden de compra se deriva de la receta, resta el stock, suma el colchón y redondea al formato del proveedor.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size: var(--step-0); margin-bottom: var(--sp-2xs);">Está falseado</h3>
+        <ul style="padding-left: 1.1rem; color: #cfc7b4; font-size: var(--step--1); line-height: 1.7;">
+          <li>La venta "real" del histórico la genera un modelo con ruido determinista, no un POS. En producción sale de la API del POS.</li>
+          <li>El motor de verdad no es este producto de factores: es un gradient boosting por SKU con validación temporal. Este es su esqueleto, y hace exactamente lo mismo con menos precisión.</li>
+          <li>No hay conexión al SII ni a WhatsApp. El mensaje se redacta pero no sale.</li>
+          <li>El local, el RUT, los proveedores y las personas son inventados. Los precios y los volúmenes son plausibles para una panadería-café de Ñuñoa; no son de un local real.</li>
+        </ul>
+        <p style="margin-top: var(--sp-s);"><a href="../stack.html" style="font-weight:600;">Ver todo lo que habría que conectar →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <div class="marca" style="margin-bottom: 6px;">Merma<span class="marca-pt">ta</span></div>
+      <p class="tenue" style="font-size: var(--step--1); max-width: 40ch;">Compra lo que vas a vender. Prototipo — datos de demostración.</p>
+    </div>
+    <nav class="nav-lista" style="display:flex; flex-wrap:wrap; gap: var(--sp-s);" aria-label="Pie">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="./index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="../mermata.js"></script>
+<script>
+/* =========================================================================
+   MERMATA — motor del demo
+   Todo es determinista: el mismo día produce el mismo número siempre.
+   ========================================================================= */
+(function () {
+'use strict';
+
+/* ---------- Formato ---------- */
+function clp(n) {
+  var neg = n < 0, s = String(Math.round(Math.abs(n))), o = '', c = 0;
+  for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; }
+  return (neg ? '−$' : '$') + o;
+}
+function num(n, d) {
+  d = d || 0;
+  var f = Math.abs(n).toFixed(d), p = f.split('.'), s = p[0], o = '', c = 0;
+  for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; }
+  return (n < 0 ? '−' : '') + o + (p[1] ? ',' + p[1] : '');
+}
+function pct(x, d) { return num(x * 100, d === undefined ? 1 : d) + '%'; }
+
+/* ---------- Calendario ---------- */
+var DIA = ['dom','lun','mar','mié','jue','vie','sáb'];
+var MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+var D0 = new Date(2026, 5, 20);           // sáb 20 jun 2026 — origen de la serie
+var IDX_HOY = 23;                          // lun 13 jul 2026
+var N_HIST = 21;                           // 22 jun → 12 jul
+
+// Feriados legales de Chile dentro de la ventana.
+var FERIADOS = { 9: 'San Pedro y San Pablo', 26: 'Virgen del Carmen' };
+
+// Pronóstico meteorológico Santiago (invierno). w: índice frío/lluvia [-1, 1].
+var CLIMA = [
+  [15,'Parcial',0.00],[13,'Nublado',0.25],[11,'Lluvia',0.75],[9,'Lluvia',0.95],[12,'Nublado',0.45],
+  [15,'Despejado',-0.20],[16,'Despejado',-0.35],[17,'Despejado',-0.50],[15,'Parcial',-0.15],[12,'Nublado',0.35],
+  [10,'Lluvia',0.80],[8,'Lluvia',1.00],[9,'Nublado',0.70],[11,'Nublado',0.45],[13,'Parcial',0.20],
+  [14,'Parcial',0.05],[12,'Nublado',0.35],[10,'Lluvia',0.75],[9,'Lluvia',0.90],[11,'Nublado',0.50],
+  [13,'Parcial',0.25],[15,'Despejado',-0.20],[16,'Despejado',-0.35],[14,'Parcial',0.05],[11,'Nublado',0.45],
+  [9,'Lluvia',0.85],[8,'Lluvia',1.00],[10,'Nublado',0.65],[12,'Nublado',0.40],[14,'Parcial',0.10],
+  [15,'Parcial',0.00],[13,'Nublado',0.25],[12,'Nublado',0.35],[11,'Nublado',0.45],[12,'Parcial',0.30],
+  [14,'Parcial',0.10],[16,'Despejado',-0.30],[15,'Despejado',-0.20]
+];
+
+function fecha(i) { var d = new Date(D0); d.setDate(d.getDate() + i); return d; }
+function dow(i) { return fecha(i).getDay(); }
+function esFeriado(i) { return !!FERIADOS[i]; }
+function esPago(i) { var d = fecha(i).getDate(); return d <= 5 || d >= 28; }
+function fLarga(i) { var d = fecha(i); return DIA[d.getDay()] + ' ' + d.getDate() + ' ' + MES[d.getMonth()]; }
+function fCorta(i) { var d = fecha(i); return d.getDate() + '/' + MES[d.getMonth()]; }
+
+/* ---------- Productos de venta (lo que se pronostica) ---------- */
+/* dow: índice 0 = domingo. pago/feriado/clima: factores multiplicativos.
+   sigma: desviación relativa de la demanda (ruido irreducible). */
+var SKUS = [
+  {id:'marraqueta', n:'Marraqueta',            u:'kg',      base:120, pv:2190,
+   dow:[1.22,0.94,0.90,0.92,0.98,1.10,1.24], pago:1.06, feriado:1.30, clima:1.07, sigma:0.075},
+  {id:'hallulla',   n:'Hallulla',              u:'kg',      base:52,  pv:2490,
+   dow:[1.28,0.90,0.88,0.90,0.96,1.12,1.30], pago:1.05, feriado:1.34, clima:1.05, sigma:0.088},
+  {id:'integral',   n:'Pan integral',          u:'kg',      base:19,  pv:3290,
+   dow:[1.05,1.04,1.02,1.00,1.02,1.00,0.92], pago:1.03, feriado:1.10, clima:1.02, sigma:0.130},
+  {id:'empanada',   n:'Empanada de pino',      u:'un',      base:58,  pv:2690,
+   dow:[1.35,0.84,0.86,0.90,1.02,1.20,1.32], pago:1.12, feriado:1.45, clima:1.22, sigma:0.140},
+  {id:'berlin',     n:'Berlín con crema',      u:'un',      base:46,  pv:1590,
+   dow:[1.18,0.92,0.94,0.96,1.02,1.12,1.20], pago:1.08, feriado:1.25, clima:1.06, sigma:0.170},
+  {id:'sandwich',   n:'Sándwich ave-palta',    u:'un',      base:44,  pv:4490,
+   dow:[0.86,1.12,1.14,1.12,1.12,1.00,0.80], pago:1.14, feriado:0.78, clima:0.96, sigma:0.150},
+  {id:'cafe',       n:'Café de máquina',       u:'tazas',   base:115, pv:2590,
+   dow:[0.92,1.10,1.10,1.10,1.10,1.02,0.86], pago:1.06, feriado:1.05, clima:1.18, sigma:0.100},
+  {id:'almuerzo',   n:'Almuerzo del día',      u:'un',      base:32,  pv:6900,
+   dow:[0.60,1.20,1.22,1.20,1.20,0.92,0.55], pago:1.16, feriado:0.55, clima:1.10, sigma:0.190},
+  {id:'leche',      n:'Leche entera 1 L',      u:'un',      base:34,  pv:1490,
+   dow:[1.00,1.06,1.06,1.04,1.06,1.04,0.94], pago:1.09, feriado:1.05, clima:1.08, sigma:0.095},
+  {id:'huevos',     n:'Huevos (bandeja 30 u)', u:'bandeja', base:5,   pv:7290,
+   dow:[1.02,1.04,1.04,1.02,1.04,1.02,0.94], pago:1.07, feriado:1.12, clima:1.02, sigma:0.115}
+];
+var SKU_IX = {}; SKUS.forEach(function (s, i) { SKU_IX[s.id] = i; s.ix = i; });
+
+/* ---------- Insumos, proveedores y receta ---------- */
+var PROVS = {
+  molinera: {n:'Molinera Curicó Ltda.',            rut:'78.902.115-6',  c:'Karen Fuentes',    tel:'+56 9 6203 1188', ent:'Entrega mié y sáb, 06:00'},
+  valledor: {n:'Verduras Lo Valledor · Puesto 214', rut:'12.884.021-K',  c:'Sergio Muñoz',     tel:'+56 9 8412 7735', ent:'Entrega mar, jue y sáb, 05:30'},
+  maitenes: {n:'Lácteos y Fiambres Los Maitenes',   rut:'76.554.310-8',  c:'Paola Riquelme',   tel:'+56 9 5518 0294', ent:'Entrega lun y jue, 08:00'},
+  rodeo:    {n:'Carnes El Rodeo',                   rut:'77.408.116-2',  c:'Luis Carrasco',    tel:'+56 9 4471 9033', ent:'Entrega mar y vie, 07:00'},
+  cafe:     {n:'Café Regional Tostaduría',          rut:'77.031.229-5',  c:'Ignacio Soto',     tel:'+56 9 7744 3081', ent:'Entrega mié, 10:00'},
+  elena:    {n:'Distribuidora Santa Elena',         rut:'76.219.540-3',  c:'Marcela Cid',      tel:'+56 9 3390 6612', ent:'Entrega mié, 09:00'}
+};
+
+/* r: receta. Coeficiente de consumo por unidad vendida del SKU (ya incluye
+   rendimiento y merma técnica de proceso). 'harina' es derivada: se usa como
+   insumo intermedio para levadura, sal y mejorador. */
+var INSUMOS = [
+  {id:'harina',   n:'Harina panadera',        p:'molinera', fmt:'saco 25 kg',  cont:25,  precio:16900, stock:148, base:'kg',
+   r:{marraqueta:0.74, hallulla:0.70, integral:0.62, empanada:0.055, berlin:0.045}},
+  {id:'levadura', n:'Levadura fresca',        p:'molinera', fmt:'bloque 500 g',cont:0.5, precio:2490,  stock:4.2, base:'kg', rHarina:0.020},
+  {id:'mejorador',n:'Mejorador panadero',     p:'molinera', fmt:'bolsa 1 kg',  cont:1,   precio:6400,  stock:2.8, base:'kg', rHarina:0.005},
+  {id:'sal',      n:'Sal de mar',             p:'molinera', fmt:'saco 25 kg',  cont:25,  precio:9900,  stock:31,  base:'kg', rHarina:0.018},
+
+  {id:'palta',    n:'Palta Hass Cal. 60',     p:'valledor', fmt:'kg',          cont:1,   precio:3690,  stock:7,   base:'kg',
+   r:{sandwich:0.110, almuerzo:0.040}},
+  {id:'tomate',   n:'Tomate larga vida',      p:'valledor', fmt:'kg',          cont:1,   precio:1590,  stock:6,   base:'kg',
+   r:{sandwich:0.055, almuerzo:0.060}},
+  {id:'lechuga',  n:'Lechuga costina',        p:'valledor', fmt:'unidad',      cont:1,   precio:690,   stock:9,   base:'un',
+   r:{sandwich:0.090, almuerzo:0.060}},
+  {id:'cebolla',  n:'Cebolla',                p:'valledor', fmt:'kg',          cont:1,   precio:890,   stock:14,  base:'kg',
+   r:{empanada:0.090, almuerzo:0.020}},
+
+  {id:'gauda',    n:'Queso Gauda laminado',   p:'maitenes', fmt:'kg',          cont:1,   precio:7990,  stock:3.4, base:'kg',
+   r:{sandwich:0.035, almuerzo:0.020}},
+  {id:'pavo',     n:'Pechuga de pavo',        p:'maitenes', fmt:'kg',          cont:1,   precio:5890,  stock:2.9, base:'kg',
+   r:{sandwich:0.045, almuerzo:0.020}},
+  {id:'lechep',   n:'Leche entera 1 L',       p:'maitenes', fmt:'caja 12 u',   cont:12,  precio:10680, stock:62,  base:'un',
+   r:{leche:1.0, cafe:0.110}},
+  {id:'manteq',   n:'Mantequilla 250 g',      p:'maitenes', fmt:'caja 24 u',   cont:24,  precio:42600, stock:11,  base:'un',
+   r:{marraqueta:0.032, hallulla:0.038, integral:0.024, berlin:0.048, empanada:0.024}},
+
+  {id:'molida',   n:'Carne molida',           p:'rodeo',    fmt:'kg',          cont:1,   precio:6990,  stock:5.1, base:'kg',
+   r:{empanada:0.075}},
+  {id:'pollo',    n:'Pechuga de pollo',       p:'rodeo',    fmt:'kg',          cont:1,   precio:5490,  stock:6.8, base:'kg',
+   r:{sandwich:0.090, almuerzo:0.150}},
+
+  {id:'grano',    n:'Café en grano blend Casa',p:'cafe',    fmt:'kg',          cont:1,   precio:12900, stock:3.6, base:'kg',
+   r:{cafe:0.019}},
+
+  {id:'huevob',   n:'Huevos',                 p:'elena',    fmt:'bandeja 30 u',cont:1,   precio:6290,  stock:9,   base:'bandeja',
+   r:{huevos:1.0, berlin:0.017, empanada:0.005}},
+  {id:'azucar',   n:'Azúcar granulada',       p:'elena',    fmt:'saco 25 kg',  cont:25,  precio:27400, stock:22,  base:'kg',
+   r:{berlin:0.050, cafe:0.010}},
+  {id:'aceite',   n:'Aceite maravilla',       p:'elena',    fmt:'bidón 10 L',  cont:10,  precio:14900, stock:6,   base:'L',
+   r:{empanada:0.008, almuerzo:0.010}}
+];
+
+/* ---------- Motor de pronóstico ---------- */
+function rnd(seed) {
+  var t = (seed + 0x6D2B79F5) | 0;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function ruido(ix, i, sigma) {
+  var u1 = Math.max(1e-6, rnd(ix * 7919 + i * 104729));
+  var u2 = rnd(ix * 15485863 + i * 32452843 + 17);
+  var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  z = Math.max(-2.1, Math.min(2.1, z));
+  return 1 + z * sigma;
+}
+function tendencia(i) { return 1 + 0.0013 * (i - IDX_HOY); }
+
+/* Valor esperado con las señales que se le pasan. */
+function esperado(s, i, drv) {
+  var v = s.base * s.dow[dow(i)] * tendencia(i);
+  if (drv.pago && esPago(i))       v *= s.pago;
+  if (drv.feriado && esFeriado(i)) v *= s.feriado;
+  if (drv.clima)                   v *= 1 + (s.clima - 1) * CLIMA[i][2];
+  return v;
+}
+var TODO = {pago:1, feriado:1, clima:1};
+/* La venta "real": el valor verdadero (todas las señales activas) + ruido. */
+function real(s, i) { return esperado(s, i, TODO) * ruido(s.ix, i, s.sigma); }
+
+/* Banda: la incertidumbre crece con el horizonte. */
+function sigmaH(s, h) { return s.sigma * Math.sqrt(1 + 0.22 * h); }
+
+/* ---------- Estado ---------- */
+var E = {
+  sku: 'marraqueta',
+  hz: 7,
+  drv: {pago: true, feriado: true, clima: true},
+  cob: 4,
+  z: 1.65,
+  tabla: false,
+  oc: null,       // líneas editadas por el usuario
+  wa: null
+};
+
+/* ---------- Métricas ---------- */
+function mape(s, drv) {
+  var sum = 0, n = 0, sumEsp = 0, nEsp = 0;
+  for (var i = IDX_HOY - N_HIST; i < IDX_HOY; i++) {
+    var r = real(s, i), f = esperado(s, i, drv);
+    var e = Math.abs(r - f) / r;
+    sum += e; n++;
+    if (esPago(i) || esFeriado(i)) { sumEsp += e; nEsp++; }
+  }
+  return {global: sum / n, esp: nEsp ? sumEsp / nEsp : 0, nEsp: nEsp};
+}
+function mapeGlobal(drv) {
+  var t = 0;
+  SKUS.forEach(function (s) { t += mape(s, drv).global; });
+  return t / SKUS.length;
+}
+
+/* ---------- Orden de compra ---------- */
+function consumoDia(ins, i, drv) {
+  if (ins.rHarina !== undefined) {
+    var h = INSUMOS[0], c = 0;
+    for (var k in h.r) c += esperado(SKUS[SKU_IX[k]], i, drv) * h.r[k];
+    return c * ins.rHarina;
+  }
+  var t = 0;
+  for (var key in ins.r) t += esperado(SKUS[SKU_IX[key]], i, drv) * ins.r[key];
+  return t;
+}
+function calcularOC() {
+  var lineas = [];
+  INSUMOS.forEach(function (ins) {
+    var necesidad = 0, dias = [];
+    for (var d = 0; d < E.cob; d++) {
+      var c = consumoDia(ins, IDX_HOY + d, E.drv);
+      necesidad += c; dias.push(c);
+    }
+    var prom = necesidad / E.cob;
+    // Colchón: z × σ de la demanda × √(cobertura). σ compuesto ≈ 0,13.
+    var colchon = E.z * (prom * 0.13) * Math.sqrt(E.cob);
+    var bruto = necesidad + colchon - ins.stock;
+    var uds = Math.max(0, Math.ceil(bruto / ins.cont));   // redondeo al formato del proveedor
+    lineas.push({
+      id: ins.id, ins: ins, uds: uds, uds0: uds, fuera: false,
+      necesidad: necesidad, colchon: colchon, cobertura: ins.stock / Math.max(prom, 0.0001)
+    });
+  });
+  return lineas;
+}
+function totalOC() {
+  var t = 0;
+  (E.oc || []).forEach(function (l) { if (!l.fuera) t += l.uds * l.ins.precio; });
+  return t;
+}
+
+/* =========================================================================
+   GRÁFICOS — SVG a mano. Se dibujan a la medida real del contenedor para que
+   el texto quede en píxeles reales (crítico en 390px).
+   ========================================================================= */
+var C = {
+  s1: '#0a6296', s2: '#b8452b', s3: '#2e7d4f',
+  tinta: '#17150f', tinta2: '#4d4738', tinta3: '#736b59',
+  grid: '#e3dbc9', regla: '#ddd5c4', regla2: '#c9bfa8',
+  papel: '#f7f3ea', papel2: '#fffdf7', papel4: '#e6dfcd', acentoLav: '#f2e2dc'
+};
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function tickY(max) {
+  var raw = max / 4, mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+  var n = raw / mag, paso = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * mag;
+  var t = [];
+  for (var v = 0; v <= max + paso * 0.001; v += paso) t.push(v);
+  return t;
+}
+
+/* ---- Gráfico 1: pronóstico ---- */
+function dibujarPronostico() {
+  var host = document.getElementById('gfx-fc');
+  var W = Math.max(300, host.clientWidth || 320);
+  var chico = W < 520;
+  var H = chico ? 300 : 340;
+  var m = {t: 22, r: chico ? 12 : 46, b: 44, l: chico ? 38 : 50};
+  var pw = W - m.l - m.r, ph = H - m.t - m.b;
+
+  var s = SKUS[SKU_IX[E.sku]];
+  var i0 = IDX_HOY - N_HIST, i1 = IDX_HOY + E.hz - 1;
+  var pts = [];
+  for (var i = i0; i <= i1; i++) {
+    var fut = i >= IDX_HOY;
+    var f = esperado(s, i, E.drv);
+    var sg = fut ? sigmaH(s, i - IDX_HOY + 1) : 0;
+    pts.push({
+      i: i, fut: fut,
+      real: fut ? null : real(s, i),
+      f: f,
+      p10: fut ? f * (1 - 1.2816 * sg) : null,
+      p90: fut ? f * (1 + 1.2816 * sg) : null
+    });
+  }
+  var max = 0;
+  pts.forEach(function (p) { max = Math.max(max, p.real || 0, p.f, p.p90 || 0); });
+  max *= 1.10;
+  var ticks = tickY(max);
+  max = Math.max(max, ticks[ticks.length - 1]);
+
+  var n = pts.length;
+  var X = function (k) { return m.l + (n === 1 ? pw / 2 : k * pw / (n - 1)); };
+  var Y = function (v) { return m.t + ph - (v / max) * ph; };
+  var paso = pw / Math.max(1, n - 1);
+
+  var g = [];
+  g.push('<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Pronóstico de ' + esc(s.n) + ' con banda de incertidumbre">');
+
+  // Franjas: fin de semana y feriados (contexto, no dato)
+  pts.forEach(function (p, k) {
+    var d = dow(p.i);
+    var x = X(k) - paso / 2, w = paso;
+    if (esFeriado(p.i)) {
+      g.push('<rect x="' + x.toFixed(1) + '" y="' + m.t + '" width="' + w.toFixed(1) + '" height="' + ph + '" fill="' + C.acentoLav + '"/>');
+    } else if (d === 0 || d === 6) {
+      g.push('<rect x="' + x.toFixed(1) + '" y="' + m.t + '" width="' + w.toFixed(1) + '" height="' + ph + '" fill="' + C.papel4 + '" opacity=".55"/>');
+    }
+  });
+
+  // Gridlines: sólidas, hairline, un paso del papel
+  ticks.forEach(function (v) {
+    var y = Y(v);
+    g.push('<line class="grid" x1="' + m.l + '" y1="' + y.toFixed(1) + '" x2="' + (m.l + pw) + '" y2="' + y.toFixed(1) + '"/>');
+    g.push('<text class="eje" x="' + (m.l - 7) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + num(v) + '</text>');
+  });
+
+  // Banda P10–P90 (lavado del hue del pronóstico, ~12%)
+  var fut = pts.filter(function (p) { return p.fut; });
+  if (fut.length) {
+    var k0 = pts.length - fut.length;
+    var up = '', dn = '';
+    fut.forEach(function (p, j) { up += (j ? ' L' : 'M') + X(k0 + j).toFixed(1) + ' ' + Y(p.p90).toFixed(1); });
+    for (var j2 = fut.length - 1; j2 >= 0; j2--) dn += ' L' + X(k0 + j2).toFixed(1) + ' ' + Y(fut[j2].p10).toFixed(1);
+    g.push('<path d="' + up + dn + ' Z" fill="' + C.s2 + '" opacity="0.12"/>');
+  }
+
+  // Línea de pronóstico (2px, round)
+  var dF = '';
+  pts.forEach(function (p, k) { dF += (k ? ' L' : 'M') + X(k).toFixed(1) + ' ' + Y(p.f).toFixed(1); });
+  g.push('<path d="' + dF + '" fill="none" stroke="' + C.s2 + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+
+  // Línea de venta real (solo pasado)
+  var dR = '', kr = 0;
+  pts.forEach(function (p, k) { if (p.real !== null) { dR += (kr++ ? ' L' : 'M') + X(k).toFixed(1) + ' ' + Y(p.real).toFixed(1); } });
+  g.push('<path d="' + dR + '" fill="none" stroke="' + C.s1 + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+
+  // Regla de HOY
+  var xh = X(N_HIST) - paso / 2;
+  g.push('<line x1="' + xh.toFixed(1) + '" y1="' + (m.t - 6) + '" x2="' + xh.toFixed(1) + '" y2="' + (m.t + ph) + '" stroke="' + C.tinta + '" stroke-width="1"/>');
+  g.push('<text class="etiq" x="' + (xh + 4).toFixed(1) + '" y="' + (m.t - 10) + '" fill="' + C.tinta + '">HOY</text>');
+
+  // Marcadores de extremo, con anillo de 2px del color de la superficie
+  var ult = pts[N_HIST - 1];
+  g.push('<circle cx="' + X(N_HIST - 1).toFixed(1) + '" cy="' + Y(ult.real).toFixed(1) + '" r="4.5" fill="' + C.s1 + '" stroke="' + C.papel2 + '" stroke-width="2"/>');
+  var fin = pts[pts.length - 1];
+  g.push('<circle cx="' + X(pts.length - 1).toFixed(1) + '" cy="' + Y(fin.f).toFixed(1) + '" r="4.5" fill="' + C.s2 + '" stroke="' + C.papel2 + '" stroke-width="2"/>');
+
+  // Etiquetas directas — selectivas: solo el último real y el último pronóstico.
+  if (!chico) {
+    g.push('<text class="etiq" x="' + (X(pts.length - 1) + 8).toFixed(1) + '" y="' + (Y(fin.f) + 4).toFixed(1) + '">' + num(fin.f, fin.f < 20 ? 1 : 0) + '</text>');
+  }
+
+  // Feriado: etiqueta
+  pts.forEach(function (p, k) {
+    if (esFeriado(p.i)) {
+      g.push('<text class="etiq" x="' + X(k).toFixed(1) + '" y="' + (m.t - 10) + '" text-anchor="middle" fill="#9c3520">FERIADO</text>');
+    }
+  });
+
+  // Eje X: base sólida + etiquetas espaciadas
+  g.push('<line class="base" x1="' + m.l + '" y1="' + (m.t + ph) + '" x2="' + (m.l + pw) + '" y2="' + (m.t + ph) + '"/>');
+  var cada = chico ? Math.ceil(n / 5) : Math.ceil(n / 9);
+  pts.forEach(function (p, k) {
+    if (k % cada !== 0 && k !== n - 1) return;
+    g.push('<text class="eje" x="' + X(k).toFixed(1) + '" y="' + (m.t + ph + 16) + '" text-anchor="middle">' + fCorta(p.i) + '</text>');
+    g.push('<text class="eje" x="' + X(k).toFixed(1) + '" y="' + (m.t + ph + 30) + '" text-anchor="middle" opacity=".7">' + DIA[dow(p.i)] + '</text>');
+  });
+
+  // Capa de captura para hover/touch (target ancho, no puntitos)
+  g.push('<rect id="cap-fc" x="' + m.l + '" y="' + m.t + '" width="' + pw + '" height="' + ph + '" fill="transparent" style="cursor:crosshair"/>');
+  g.push('<line id="cross-fc" x1="0" y1="' + m.t + '" x2="0" y2="' + (m.t + ph) + '" stroke="' + C.tinta3 + '" stroke-width="1" opacity="0"/>');
+  g.push('</svg>');
+  host.innerHTML = g.join('');
+
+  // Interacción
+  var svg = host.querySelector('svg'), cap = host.querySelector('#cap-fc'), cross = host.querySelector('#cross-fc');
+  var tip = document.getElementById('tip-fc'), wrap = document.getElementById('wrap-fc');
+  function mover(ev) {
+    var r = svg.getBoundingClientRect();
+    var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    var sx = cx * (W / r.width);
+    var k = Math.round((sx - m.l) / Math.max(paso, 0.001));
+    k = Math.max(0, Math.min(n - 1, k));
+    var p = pts[k];
+    cross.setAttribute('x1', X(k)); cross.setAttribute('x2', X(k)); cross.setAttribute('opacity', '1');
+    var dec = s.base < 20 ? 1 : 0;
+    var h = '<span class="t-f">' + fLarga(p.i) + (esFeriado(p.i) ? ' · feriado' : '') + '</span>';
+    if (p.real !== null) {
+      h += '<span class="t-l"><span class="t-k"><i style="width:8px;height:8px;border-radius:50%;background:' + C.s1 + ';display:inline-block"></i>Real</span><b>' + num(p.real, dec) + '</b></span>';
+    }
+    h += '<span class="t-l"><span class="t-k"><i style="width:8px;height:8px;border-radius:50%;background:' + C.s2 + ';display:inline-block"></i>Pronóstico</span><b>' + num(p.f, dec) + '</b></span>';
+    if (p.real !== null) {
+      h += '<span class="t-l"><span class="t-k">Error</span><b>' + pct(Math.abs(p.real - p.f) / p.real) + '</b></span>';
+    } else {
+      h += '<span class="t-l"><span class="t-k">P10–P90</span><b>' + num(p.p10, dec) + '–' + num(p.p90, dec) + '</b></span>';
+    }
+    h += '<span class="t-l"><span class="t-k">' + CLIMA[p.i][1] + '</span><b>' + CLIMA[p.i][0] + '°</b></span>';
+    tip.innerHTML = h;
+    tip.classList.add('on');
+    var tw = tip.offsetWidth, wr = wrap.getBoundingClientRect();
+    var px = X(k) * (r.width / W);
+    tip.style.left = Math.max(2, Math.min(wr.width - tw - 2, px - tw / 2)) + 'px';
+    tip.style.top = '6px';
+  }
+  function salir() { tip.classList.remove('on'); cross.setAttribute('opacity', '0'); }
+  cap.addEventListener('mousemove', mover);
+  cap.addEventListener('mouseleave', salir);
+  cap.addEventListener('touchstart', function (e) { mover(e); }, {passive: true});
+  cap.addEventListener('touchmove', function (e) { mover(e); }, {passive: true});
+  cap.addEventListener('touchend', salir);
+
+  return pts;
+}
+
+/* ---- Gráfico 2: MAPE por producto (una serie, barras horizontales) ---- */
+function dibujarMape() {
+  var host = document.getElementById('gfx-mape');
+  var W = Math.max(280, host.clientWidth || 300);
+  var datos = SKUS.map(function (s) { return {n: s.n, v: mape(s, E.drv).global, id: s.id}; })
+                  .sort(function (a, b) { return b.v - a.v; });
+  var fila = 26, m = {t: 6, r: 46, b: 6, l: Math.min(140, Math.max(96, W * 0.36))};
+  var H = m.t + m.b + datos.length * fila;
+  var pw = W - m.l - m.r;
+  var max = Math.max.apply(null, datos.map(function (d) { return d.v; })) * 1.12;
+
+  var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Error medio absoluto porcentual por producto">'];
+  datos.forEach(function (d, k) {
+    var y = m.t + k * fila, bh = 13;                       // marca fina: ≤ 24px
+    var w = Math.max(2, (d.v / max) * pw);
+    var sel = d.id === E.sku;
+    g.push('<text class="etiq-f" x="' + (m.l - 8) + '" y="' + (y + bh / 2 + 4) + '" text-anchor="end" ' + (sel ? 'font-weight="600" fill="#17150f"' : '') + '>' + esc(d.n) + '</text>');
+    // extremo del dato redondeado 4px, escuadra en la línea base
+    g.push('<path d="M' + m.l + ' ' + y + ' H' + (m.l + w - 4).toFixed(1) + ' a4 4 0 0 1 4 4 v' + (bh - 8) + ' a4 4 0 0 1 -4 4 H' + m.l + ' Z" fill="' + C.s1 + '" opacity="' + (sel ? 1 : 0.72) + '" data-k="' + k + '"/>');
+    g.push('<text class="etiq" x="' + (m.l + w + 7).toFixed(1) + '" y="' + (y + bh / 2 + 4) + '">' + pct(d.v) + '</text>');
+  });
+  g.push('<line class="base" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (H - m.b) + '"/>');
+  g.push('</svg>');
+  host.innerHTML = g.join('');
+
+  // Hover por barra, con área de golpe generosa (toda la fila)
+  var tip = document.getElementById('tip-mape'), wrap = document.getElementById('wrap-mape');
+  var svg = host.querySelector('svg');
+  svg.addEventListener('mousemove', function (ev) {
+    var r = svg.getBoundingClientRect();
+    var sy = (ev.clientY - r.top) * (H / r.height);
+    var k = Math.floor((sy - m.t) / fila);
+    if (k < 0 || k >= datos.length) { tip.classList.remove('on'); return; }
+    var d = datos[k];
+    tip.innerHTML = '<span class="t-f">' + esc(d.n) + '</span>' +
+      '<span class="t-l"><span class="t-k">MAPE 21 d</span><b>' + pct(d.v) + '</b></span>' +
+      '<span class="t-l"><span class="t-k">Fiabilidad</span><b>' + (d.v < 0.10 ? 'alta' : d.v < 0.18 ? 'media' : 'baja') + '</b></span>';
+    tip.classList.add('on');
+    var wr = wrap.getBoundingClientRect();
+    tip.style.left = Math.max(2, Math.min(wr.width - tip.offsetWidth - 2, ev.clientX - wr.left - 60)) + 'px';
+    tip.style.top = Math.max(2, (m.t + k * fila) * (r.height / H) - 8) + 'px';
+  });
+  svg.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+}
+
+/* ---- Gráfico 3: merma evitada por semana (columnas, token de estado) ---- */
+var MERMA = [
+  {s:'S-8', v:41000}, {s:'S-7', v:58000}, {s:'S-6', v:63000}, {s:'S-5', v:79000},
+  {s:'S-4', v:94000}, {s:'S-3', v:88000}, {s:'S-2', v:103000}, {s:'S-1', v:107000}
+];
+function dibujarMerma() {
+  var host = document.getElementById('gfx-merma');
+  var W = Math.max(280, host.clientWidth || 300);
+  var H = 220, m = {t: 24, r: 8, b: 34, l: 52};
+  var pw = W - m.l - m.r, ph = H - m.t - m.b;
+  var max = Math.max.apply(null, MERMA.map(function (d) { return d.v; })) * 1.15;
+  var ticks = tickY(max); max = Math.max(max, ticks[ticks.length - 1]);
+  var banda = pw / MERMA.length;
+  var bw = Math.min(24, banda - 8);                          // cap 24px + aire
+
+  var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Merma evitada por semana, últimas 8 semanas">'];
+  ticks.forEach(function (v) {
+    var y = m.t + ph - (v / max) * ph;
+    g.push('<line class="grid" x1="' + m.l + '" y1="' + y.toFixed(1) + '" x2="' + (m.l + pw) + '" y2="' + y.toFixed(1) + '"/>');
+    g.push('<text class="eje" x="' + (m.l - 7) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + (v ? '$' + num(v / 1000) + 'k' : '0') + '</text>');
+  });
+  MERMA.forEach(function (d, k) {
+    var x = m.l + k * banda + (banda - bw) / 2;
+    var h = (d.v / max) * ph, y = m.t + ph - h;
+    // extremo del dato redondeado 4px arriba, escuadra en la base
+    g.push('<path d="M' + x.toFixed(1) + ' ' + (m.t + ph) + ' V' + (y + 4).toFixed(1) + ' a4 4 0 0 1 4 -4 h' + (bw - 8) + ' a4 4 0 0 1 4 4 V' + (m.t + ph) + ' Z" fill="' + C.s3 + '" opacity="' + (k === MERMA.length - 1 ? 1 : 0.78) + '"/>');
+    g.push('<text class="eje" x="' + (x + bw / 2).toFixed(1) + '" y="' + (m.t + ph + 16) + '" text-anchor="middle">' + d.s + '</text>');
+    if (k === MERMA.length - 1) {   // etiqueta directa selectiva: solo la última
+      g.push('<text class="etiq" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 7).toFixed(1) + '" text-anchor="middle" font-weight="600">' + clp(d.v) + '</text>');
+    }
+  });
+  g.push('<line class="base" x1="' + m.l + '" y1="' + (m.t + ph) + '" x2="' + (m.l + pw) + '" y2="' + (m.t + ph) + '"/>');
+  g.push('<rect id="cap-m" x="' + m.l + '" y="' + m.t + '" width="' + pw + '" height="' + ph + '" fill="transparent"/>');
+  g.push('</svg>');
+  host.innerHTML = g.join('');
+
+  var tip = document.getElementById('tip-merma'), wrap = document.getElementById('wrap-merma');
+  var svg = host.querySelector('svg'), cap = host.querySelector('#cap-m');
+  cap.addEventListener('mousemove', function (ev) {
+    var r = svg.getBoundingClientRect();
+    var sx = (ev.clientX - r.left) * (W / r.width);
+    var k = Math.floor((sx - m.l) / banda);
+    if (k < 0 || k >= MERMA.length) return;
+    tip.innerHTML = '<span class="t-f">Semana ' + MERMA[k].s + '</span>' +
+      '<span class="t-l"><span class="t-k"><i style="width:8px;height:8px;border-radius:2px;background:' + C.s3 + ';display:inline-block"></i>Merma evitada</span><b>' + clp(MERMA[k].v) + '</b></span>';
+    tip.classList.add('on');
+    var wr = wrap.getBoundingClientRect();
+    tip.style.left = Math.max(2, Math.min(wr.width - tip.offsetWidth - 2, ev.clientX - wr.left - 60)) + 'px';
+    tip.style.top = '4px';
+  });
+  cap.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+function renderCabecera(pts) {
+  var s = SKUS[SKU_IX[E.sku]];
+  document.getElementById('tit-gfx').textContent = s.n + ' — próximos ' + E.hz + ' días';
+  document.getElementById('tit-unidad').textContent = s.u;
+  document.getElementById('drv-sku').textContent = s.n.toLowerCase();
+
+  var m = mape(s, E.drv);
+  var g = mapeGlobal(E.drv);
+  document.getElementById('t-mape').textContent = pct(g);
+  var falta = [];
+  if (!E.drv.pago) falta.push('día de pago');
+  if (!E.drv.feriado) falta.push('feriados');
+  if (!E.drv.clima) falta.push('clima');
+  var el = document.getElementById('t-mape-sub');
+  if (falta.length) {
+    el.className = 'delta down';
+    el.textContent = 'Sin ' + falta.join(', ') + '. Con todas las señales: ' + pct(mapeGlobal(TODO)) + '.';
+  } else {
+    el.className = 'delta';
+    el.textContent = 'Promedio de los 10 productos. El ojo del dueño anda en 25–40%.';
+  }
+
+  var mTodo = mape(s, TODO);
+  document.getElementById('pie-fc').innerHTML =
+    'Error de <b>' + esc(s.n) + '</b> en los últimos 21 días: <b>' + pct(m.global) + '</b> global · ' +
+    '<b>' + pct(m.esp) + '</b> en los ' + m.nEsp + ' días de pago o feriado' +
+    (falta.length
+      ? ' — con todas las señales activas serían ' + pct(mTodo.global) + ' y ' + pct(mTodo.esp) + '. <b>Ahí está la plata:</b> el día que más vendes es el día en que más te equivocas.'
+      : '. Ese resto es ruido irreducible: nadie lo pronostica, y por eso existe el stock de seguridad.');
+
+  // Barras de señales
+  var i = IDX_HOY + 1;
+  var senales = [
+    {n: 'Día de la semana', f: s.dow[dow(i)], on: true},
+    {n: 'Día de pago',      f: esPago(i) ? s.pago : 1, on: E.drv.pago, na: !esPago(i)},
+    {n: 'Feriado',          f: esFeriado(i) ? s.feriado : 1, on: E.drv.feriado, na: !esFeriado(i)},
+    {n: 'Clima (' + CLIMA[i][1].toLowerCase() + ', ' + CLIMA[i][0] + '°)', f: 1 + (s.clima - 1) * CLIMA[i][2], on: E.drv.clima}
+  ];
+  var out = '<p class="fuente" style="margin-bottom:6px">Para mañana, ' + fLarga(i) + '</p>';
+  senales.forEach(function (x) {
+    var f = x.on ? x.f : 1;
+    var d = (f - 1) * 100;
+    var w = Math.min(50, Math.abs(d) * 1.6);
+    var col = d >= 0 ? C.s3 : C.s2;
+    out += '<div class="barra-drv"><span class="nom">' + esc(x.n) + '</span>' +
+      '<span class="pista"><span class="rel" style="margin-left:' + (d >= 0 ? 50 : 50 - w) + '%; width:' + w + '%; background:' + col + '"></span></span>' +
+      '<span class="val" style="color:' + (x.na && x.on ? C.tinta3 : (!x.on ? C.tinta3 : C.tinta)) + '">' +
+      (x.na && x.on ? 'no aplica' : (d >= 0 ? '+' : '−') + num(Math.abs(d), 1) + '%') +
+      (!x.on ? ' (off)' : '') + '</span></div>';
+  });
+  var totalF = esperado(s, i, E.drv) / (s.base * s.dow[dow(i)] * tendencia(i));
+  out += '<div class="barra-drv" style="border-top:1px solid var(--regla); margin-top:6px; padding-top:8px;">' +
+    '<span class="nom"><b>Pronóstico</b></span><span class="pista" style="border:0;background:transparent"></span>' +
+    '<span class="val"><b>' + num(esperado(s, i, E.drv), s.base < 20 ? 1 : 0) + ' ' + s.u + '</b></span></div>';
+  document.getElementById('drv-lista').innerHTML = out;
+
+  // Tabla-gemela del gráfico
+  var tb = '';
+  pts.forEach(function (p) {
+    var dec = s.base < 20 ? 1 : 0;
+    var sen = [];
+    if (esPago(p.i)) sen.push('pago');
+    if (esFeriado(p.i)) sen.push(FERIADOS[p.i]);
+    sen.push(CLIMA[p.i][1].toLowerCase() + ' ' + CLIMA[p.i][0] + '°');
+    tb += '<tr' + (p.fut ? ' style="background:var(--acento-lav)"' : '') + '>' +
+      '<td class="num">' + fCorta(p.i) + '</td><td>' + DIA[dow(p.i)] + '</td>' +
+      '<td class="der num">' + (p.real !== null ? num(p.real, dec) : '—') + '</td>' +
+      '<td class="der num">' + num(p.f, dec) + '</td>' +
+      '<td class="der num">' + (p.real !== null ? pct(Math.abs(p.real - p.f) / p.real) : '—') + '</td>' +
+      '<td class="der num">' + (p.p10 !== null ? num(p.p10, dec) : '—') + '</td>' +
+      '<td class="der num">' + (p.p90 !== null ? num(p.p90, dec) : '—') + '</td>' +
+      '<td style="font-size:.76rem;color:var(--tinta-3)">' + esc(sen.join(' · ')) + '</td></tr>';
+  });
+  document.getElementById('tb-fc').innerHTML = tb;
+}
+
+function renderOC() {
+  if (!E.oc) E.oc = calcularOC();
+  var porProv = {};
+  E.oc.forEach(function (l) { (porProv[l.ins.p] = porProv[l.ins.p] || []).push(l); });
+
+  var html = '', nLin = 0, nProv = 0;
+  Object.keys(PROVS).forEach(function (pid) {
+    var ls = porProv[pid] || [];
+    var activas = ls.filter(function (l) { return !l.fuera && l.uds > 0; });
+    if (!ls.length) return;
+    var p = PROVS[pid];
+    var sub = 0;
+    activas.forEach(function (l) { sub += l.uds * l.ins.precio; });
+    if (activas.length) { nProv++; nLin += activas.length; }
+
+    html += '<div class="prov"><div class="prov-cab"><div>' +
+      '<h4>' + esc(p.n) + '</h4>' +
+      '<div class="det-p">RUT ' + p.rut + ' · ' + esc(p.c) + ' · ' + p.tel + ' · ' + esc(p.ent) + '</div>' +
+      '</div><div class="prov-tot">' + clp(sub) + '</div></div><ul class="lineas">';
+
+    ls.forEach(function (l) {
+      var i = l.ins;
+      var cob = l.cobertura;
+      var chip = '';
+      if (cob < 1.2) chip = '<span class="chip chip-riesgo" style="margin-left:6px"><svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1l4 8H1l4-8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>quiebre en ' + num(cob, 1) + ' d</span>';
+      else if (cob > 6) chip = '<span class="chip chip-aten" style="margin-left:6px"><svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.3"/></svg>' + num(cob, 1) + ' d en bodega</span>';
+      html += '<li class="linea' + (l.fuera ? ' fuera' : '') + '" data-id="' + l.id + '">' +
+        '<div class="lin-info"><span class="nom">' + esc(i.n) + '</span>' + chip +
+        '<span class="por">' + esc(i.fmt) + ' · ' + clp(i.precio) + ' c/u · necesitas ' + num(l.necesidad, 1) + ' ' + i.base +
+        ' en ' + E.cob + ' d · tienes ' + num(i.stock, 1) + ' ' + i.base + ' · colchón ' + num(l.colchon, 1) + '</span></div>' +
+        '<div class="lin-ctl"><span class="stepper">' +
+        '<button type="button" data-act="menos" aria-label="Restar una unidad de ' + esc(i.n) + '">−</button>' +
+        '<span class="qty">' + l.uds + '</span>' +
+        '<button type="button" data-act="mas" aria-label="Sumar una unidad de ' + esc(i.n) + '">+</button>' +
+        '</span></div>' +
+        '<div class="lin-sub">' + clp(l.uds * i.precio) + '</div>' +
+        '<button type="button" class="btn-x" data-act="quitar" aria-label="' + (l.fuera ? 'Volver a incluir ' : 'Quitar ') + esc(i.n) + ' de la orden">' +
+        (l.fuera
+          ? '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+          : '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>') +
+        '</button></li>';
+    });
+    html += '</ul></div>';
+  });
+
+  document.getElementById('oc-lista').innerHTML = html;
+  var t = totalOC();
+  document.getElementById('oc-total').textContent = clp(t);
+  document.getElementById('oc-nlin').textContent = nLin;
+  document.getElementById('oc-nprov').textContent = nProv;
+  document.getElementById('t-oc').textContent = clp(t);
+  document.getElementById('t-oc-sub').textContent = 'Cobertura ' + E.cob + ' días · nivel de servicio ' +
+    (E.z === 1.28 ? '90%' : E.z === 1.65 ? '95%' : '98%') + ' · ' + nProv + ' proveedores';
+
+  if (E.wa) renderWA();
+}
+
+function mensajeWA(pid) {
+  var p = PROVS[pid];
+  var ls = (E.oc || []).filter(function (l) { return l.ins.p === pid && !l.fuera && l.uds > 0; });
+  var tot = 0;
+  var cuerpo = ls.map(function (l) {
+    tot += l.uds * l.ins.precio;
+    return '• ' + l.ins.n + ' — ' + l.uds + ' × ' + l.ins.fmt;
+  }).join('\n');
+  if (!ls.length) return 'Sin líneas para este proveedor. Vuelve a incluir alguna con el botón +.';
+
+  var extra = '';
+  if (pid === 'valledor' || pid === 'maitenes') {
+    extra = '\nOjo: el jueves 16 es feriado y ustedes no despachan, así que este pedido tiene que cubrir hasta el viernes 17.';
+  }
+  if (pid === 'cafe') {
+    extra = '\nVamos justos con el grano: nos quedan 3,6 kg. Si pueden adelantar el despacho a mañana martes, mejor.';
+  }
+  if (pid === 'valledor') {
+    extra += '\nUna consulta aparte: la palta subió de $3.020 a $3.690 en tres semanas. ¿Hay algo mejor para el jueves?';
+  }
+
+  return 'Hola ' + p.c.split(' ')[0] + ', buen día.\n' +
+    'Pedido de Panadería y Café La Espiga (RUT 76.412.883-9), Av. Irarrázaval 3410, Ñuñoa.\n\n' +
+    cuerpo + '\n\n' +
+    'Total referencial: ' + clp(tot) + ' (IVA incl., precios de la última factura).\n' +
+    'Entrega: ' + p.ent.replace('Entrega ', '') + '.' + extra + '\n\n' +
+    '¿Me confirmas? Si cambia algún precio, avísame antes de despachar.\n' +
+    '— Rodrigo Espinoza, La Espiga';
+}
+
+function renderWA() {
+  var zona = document.getElementById('wa-zona');
+  zona.hidden = false;
+  var conLineas = Object.keys(PROVS).filter(function (pid) {
+    return (E.oc || []).some(function (l) { return l.ins.p === pid && !l.fuera && l.uds > 0; });
+  });
+  if (!conLineas.length) { zona.hidden = true; E.wa = null; return; }
+  if (conLineas.indexOf(E.wa) === -1) E.wa = conLineas[0];
+
+  document.getElementById('wa-tabs').innerHTML = conLineas.map(function (pid) {
+    return '<button type="button" data-wa="' + pid + '" aria-pressed="' + (pid === E.wa) + '">' + esc(PROVS[pid].c.split(' ')[0]) + ' · ' + esc(PROVS[pid].n.split(' ')[0]) + '</button>';
+  }).join('');
+  document.getElementById('wa-quien').textContent = PROVS[E.wa].c + ' — ' + PROVS[E.wa].tel;
+  document.getElementById('wa-msg').textContent = mensajeWA(E.wa);
+}
+
+/* ---------- Ciclo de render ---------- */
+function render() {
+  var pts = dibujarPronostico();
+  renderCabecera(pts);
+  dibujarMape();
+  dibujarMerma();
+}
+function renderTodo() { render(); renderOC(); }
+
+/* =========================================================================
+   CONTROLES — cada uno hace algo de verdad
+   ========================================================================= */
+var sel = document.getElementById('sel-sku');
+sel.innerHTML = SKUS.map(function (s) { return '<option value="' + s.id + '">' + esc(s.n) + '</option>'; }).join('');
+sel.value = E.sku;
+sel.addEventListener('change', function () { E.sku = sel.value; render(); });
+
+document.querySelectorAll('[data-hz]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    E.hz = +b.dataset.hz;
+    document.querySelectorAll('[data-hz]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    render();
+  });
+});
+
+document.querySelectorAll('[data-drv]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var k = b.dataset.drv;
+    E.drv[k] = !E.drv[k];
+    b.setAttribute('aria-pressed', E.drv[k]);
+    E.oc = null;                     // el pronóstico cambió → la orden cambia
+    renderTodo();
+  });
+});
+
+document.querySelectorAll('[data-cob]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    E.cob = +b.dataset.cob;
+    document.querySelectorAll('[data-cob]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    E.oc = null; renderOC();
+  });
+});
+
+document.getElementById('sel-ns').addEventListener('change', function (e) {
+  E.z = parseFloat(e.target.value);
+  E.oc = null; renderOC();
+});
+
+document.getElementById('btn-reset').addEventListener('click', function () {
+  E.oc = null; renderOC();
+});
+
+document.getElementById('oc-lista').addEventListener('click', function (ev) {
+  var b = ev.target.closest('button[data-act]');
+  if (!b) return;
+  var li = b.closest('.linea');
+  var l = E.oc.filter(function (x) { return x.id === li.dataset.id; })[0];
+  if (!l) return;
+  if (b.dataset.act === 'mas') { l.uds++; l.fuera = false; }
+  if (b.dataset.act === 'menos') l.uds = Math.max(0, l.uds - 1);
+  if (b.dataset.act === 'quitar') l.fuera = !l.fuera;
+  renderOC();
+});
+
+document.getElementById('btn-wa').addEventListener('click', function () {
+  E.wa = E.wa || 'molinera';
+  renderWA();
+  document.getElementById('wa-zona').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+});
+document.getElementById('wa-tabs').addEventListener('click', function (ev) {
+  var b = ev.target.closest('button[data-wa]');
+  if (!b) return;
+  E.wa = b.dataset.wa;
+  renderWA();
+});
+
+var btnTabla = document.getElementById('btn-tabla');
+btnTabla.addEventListener('click', function () {
+  E.tabla = !E.tabla;
+  btnTabla.setAttribute('aria-pressed', E.tabla);
+  btnTabla.textContent = E.tabla ? 'Ver como gráfico' : 'Ver como tabla';
+  document.getElementById('vista-tabla').classList.toggle('on', E.tabla);
+  document.getElementById('vista-gfx').classList.toggle('off', E.tabla);
+  if (!E.tabla) render();
+});
+
+/* Redibujo al cambiar el ancho (el SVG se dibuja a la medida real). */
+var tmr;
+window.addEventListener('resize', function () {
+  clearTimeout(tmr);
+  tmr = setTimeout(function () { if (!E.tabla) render(); else dibujarMape(), dibujarMerma(); }, 140);
+});
+
+renderTodo();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Kilonauta</title>
+<meta name="description" content="El producto funcionando: cotiza los cuatro couriers, imprime la etiqueta, sigue el envío, avisa al cliente y abre un reclamo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../kilonauta.css">
+<style>
+  /* ═══ barra de la tienda ═══ */
+  .shop {
+    background: var(--night);
+    color: var(--on-night);
+    padding: var(--sp-2xs) 0;
+  }
+  .shop__in { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s); flex-wrap: wrap; }
+  .shop__id { display: flex; align-items: center; gap: .55rem; min-width: 0; }
+  .shop__avatar {
+    width: 30px; height: 30px; flex: none;
+    background: var(--accent); color: #fff;
+    display: grid; place-items: center;
+    font-family: var(--display); font-weight: 900; font-size: .8rem;
+  }
+  .shop__name { font-weight: 600; font-size: .9rem; line-height: 1.2; }
+  .shop__rut { font-family: var(--mono); font-size: .7rem; color: var(--on-night-2); }
+  .shop__saldo { text-align: right; }
+  .shop__saldo b { font-family: var(--mono); font-size: .95rem; display: block; font-variant-numeric: tabular-nums; }
+  .shop__saldo span { font-size: .66rem; color: var(--on-night-2); text-transform: uppercase; letter-spacing: .1em; font-family: var(--display); font-weight: 700; }
+
+  /* ═══ tabs ═══ */
+  .tabs {
+    position: sticky; top: 0; z-index: 30;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule-2);
+    box-shadow: 0 2px 0 var(--accent);
+  }
+  .tabs__scroll { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs__scroll::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: none;
+    min-height: 52px;
+    padding: 0 .85rem;
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--display); font-weight: 700; font-stretch: 84%;
+    text-transform: uppercase; letter-spacing: .07em; font-size: .76rem;
+    color: var(--ink-3);
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    background: none;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab .badge {
+    font-family: var(--mono); font-size: .62rem; font-weight: 600;
+    background: var(--accent); color: #fff;
+    padding: 0 .3rem; min-width: 1.1rem; text-align: center;
+    letter-spacing: 0;
+  }
+  .tab[aria-selected="false"] .badge { background: var(--rule-2); color: var(--ink-2); }
+
+  .panel { padding-block: var(--sp-m) var(--sp-2xl); }
+  .panel[hidden] { display: none; }
+
+  /* ═══ franja de ahorro ═══ */
+  .savings {
+    display: grid; gap: var(--sp-2xs);
+    grid-template-columns: repeat(2, 1fr);
+    border: 1px solid var(--rule-2);
+    background: var(--card);
+    margin-bottom: var(--sp-m);
+  }
+  @media (min-width: 48em) { .savings { grid-template-columns: repeat(4, 1fr); } }
+  .stat { padding: .7rem .8rem; border-right: 1px dashed var(--rule); }
+  .stat:nth-child(2n) { border-right: 0; }
+  @media (min-width: 48em) { .stat:nth-child(2n) { border-right: 1px dashed var(--rule); } .stat:last-child { border-right: 0; } }
+  .stat span {
+    display: block;
+    font-family: var(--display); font-weight: 700; font-stretch: 82%;
+    text-transform: uppercase; letter-spacing: .09em; font-size: .64rem;
+    color: var(--ink-3); margin-bottom: .15rem;
+  }
+  .stat b {
+    font-family: var(--mono); font-weight: 600; font-size: 1.15rem;
+    font-variant-numeric: tabular-nums; line-height: 1.1;
+    display: block;
+  }
+  .stat[data-hi] b { color: var(--accent-deep); }
+  .stat small { font-size: .68rem; color: var(--ink-3); display: block; margin-top: .1rem; }
+
+  /* ═══ pedidos ═══ */
+  .order {
+    border: 1px solid var(--rule-2);
+    background: var(--card);
+    padding: .8rem;
+    display: grid; gap: .5rem;
+    width: 100%;
+    text-align: left;
+    min-height: 0;
+  }
+  .order + .order { margin-top: .6rem; }
+  .order:hover { border-color: var(--ink); }
+  .order[data-done="1"] { background: var(--paper-2); border-style: dashed; }
+  .order__top { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
+  .order__id { font-family: var(--mono); font-size: .78rem; color: var(--ink-3); }
+  .order__who { font-family: var(--display); font-weight: 800; font-stretch: 88%; font-size: 1.05rem; line-height: 1.15; }
+  .order__where { font-size: .85rem; color: var(--ink-2); }
+  .order__where b { color: var(--ink); }
+  .order__meta { display: flex; flex-wrap: wrap; gap: .5rem 1rem; font-family: var(--mono); font-size: .74rem; color: var(--ink-3); }
+  .order__cta { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+
+  .raw-addr {
+    font-family: var(--mono); font-size: .72rem;
+    background: var(--paper-2); border-left: 2px solid var(--warn);
+    padding: .35rem .5rem; color: var(--ink-2);
+  }
+
+  /* ═══ cotizador ═══ */
+  .quote-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .quote-grid { grid-template-columns: 20rem 1fr; align-items: start; } }
+  .controls { display: grid; gap: var(--sp-xs); }
+  .dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+  .switch { display: flex; align-items: center; gap: .5rem; min-height: 44px; cursor: pointer; font-size: .9rem; }
+  .switch input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+
+  .weight-box { border: 1px dashed var(--rule-2); background: var(--paper-2); padding: .6rem; font-size: .8rem; }
+  .weight-box .row { display: flex; justify-content: space-between; gap: .5rem; padding: .15rem 0; }
+  .weight-box .row.win { color: var(--accent-deep); font-weight: 600; }
+  .weight-box .row span:last-child { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* tarjetas de courier */
+  .opt {
+    border: 1px solid var(--rule-2); background: var(--card);
+    padding: .75rem; display: grid; gap: .5rem;
+    width: 100%; text-align: left; min-height: 0;
+    position: relative;
+  }
+  .opt + .opt { margin-top: .6rem; }
+  .opt:hover:not([data-out="1"]) { border-color: var(--ink); }
+  .opt[data-sel="1"] { border: 2px solid var(--accent); background: var(--accent-tint); }
+  .opt[data-out="1"] { opacity: .55; background: var(--paper-2); cursor: not-allowed; }
+  .opt__top { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+  .opt__name { font-family: var(--display); font-weight: 800; font-stretch: 84%; text-transform: uppercase; letter-spacing: .04em; font-size: 1rem; }
+  .opt__price { text-align: right; white-space: nowrap; }
+  .opt__price b { font-family: var(--mono); font-weight: 600; font-size: 1.28rem; font-variant-numeric: tabular-nums; display: block; line-height: 1.1; }
+  .opt__price s { font-family: var(--mono); font-size: .72rem; color: var(--ink-3); }
+  .opt__bars { display: grid; gap: 3px; }
+  .opt__bar { display: grid; grid-template-columns: 3.4rem 1fr; gap: .4rem; align-items: center; }
+  .opt__bar em { font-style: normal; font-family: var(--display); font-weight: 700; font-stretch: 80%; text-transform: uppercase; font-size: .58rem; letter-spacing: .08em; color: var(--ink-3); }
+  .opt__track { height: 7px; background: var(--paper-2); position: relative; }
+  .opt__track i { position: absolute; inset: 0 auto 0 0; display: block; background: var(--ink-3); }
+  .opt[data-sel="1"] .opt__track i { background: var(--accent); }
+  .opt__track i[data-k="price"] { background: var(--s1); }
+  .opt__track i[data-k="days"]  { background: var(--s2); }
+  .opt__track i[data-k="ot"]    { background: var(--s3); }
+  .opt__foot { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+  .opt__note { font-size: .76rem; color: var(--ink-3); }
+
+  .savings-callout {
+    border: 2px solid var(--accent); background: var(--accent-tint);
+    padding: var(--sp-s); margin-top: var(--sp-s);
+  }
+  .savings-callout b {
+    display: block;
+    font-family: var(--display); font-weight: 900; font-stretch: 76%;
+    font-size: var(--step-3); line-height: 1; color: var(--accent-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ═══ etiqueta ═══ */
+  .label-wrap { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .label-wrap { grid-template-columns: 1fr 18rem; align-items: start; } }
+
+  .label {
+    background: #fff;
+    color: #1C1A17;
+    border: 1px solid #1C1A17;
+    width: 100%;
+    max-width: 26rem;
+    margin-inline: auto;
+    font-family: var(--sans);
+    /* proporción 10 × 15 cm */
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+  }
+  .label * { border-color: #1C1A17; }
+  .lbl-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .4rem .55rem;
+    border-bottom: 2px solid #1C1A17;
+    background: #1C1A17; color: #fff;
+  }
+  .lbl-courier { font-family: var(--display); font-weight: 900; font-stretch: 78%; text-transform: uppercase; letter-spacing: .06em; font-size: .92rem; }
+  .lbl-svc { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .12em; }
+  .lbl-zone {
+    display: flex; justify-content: space-between; align-items: stretch;
+    border-bottom: 1px solid #1C1A17;
+  }
+  .lbl-zone__box { padding: .35rem .55rem; }
+  .lbl-zone__box + .lbl-zone__box { border-left: 1px solid #1C1A17; text-align: right; }
+  .lbl-zone__box span { display: block; font-family: var(--display); font-weight: 700; font-stretch: 80%; text-transform: uppercase; letter-spacing: .1em; font-size: .55rem; color: #55504a; }
+  .lbl-zone__box b { font-family: var(--mono); font-weight: 600; font-size: 1.35rem; line-height: 1.15; }
+  .lbl-body { padding: .55rem; display: grid; gap: .5rem; }
+  .lbl-party span { display: block; font-family: var(--display); font-weight: 700; font-stretch: 80%; text-transform: uppercase; letter-spacing: .11em; font-size: .55rem; color: #55504a; margin-bottom: .1rem; }
+  .lbl-party p { font-size: .78rem; line-height: 1.35; }
+  .lbl-party.to p { font-size: .88rem; }
+  .lbl-party.to strong { font-size: 1.02rem; display: block; font-weight: 600; }
+  .lbl-party.to .comuna {
+    font-family: var(--display); font-weight: 900; font-stretch: 78%;
+    text-transform: uppercase; font-size: 1.5rem; line-height: 1.05; display: block; margin-top: .1rem;
+  }
+  .lbl-specs {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid #1C1A17; border-bottom: 1px solid #1C1A17;
+  }
+  .lbl-specs div { padding: .3rem .45rem; }
+  .lbl-specs div + div { border-left: 1px dashed #9a948c; }
+  .lbl-specs span { display: block; font-family: var(--display); font-weight: 700; font-stretch: 80%; text-transform: uppercase; letter-spacing: .1em; font-size: .5rem; color: #55504a; }
+  .lbl-specs b { font-family: var(--mono); font-weight: 600; font-size: .82rem; }
+  .lbl-code { padding: .5rem .55rem .35rem; display: grid; grid-template-columns: 1fr 4.6rem; gap: .55rem; align-items: end; }
+  .lbl-code .barcode rect { fill: #1C1A17; }
+  .lbl-guia { font-family: var(--mono); font-weight: 600; font-size: .82rem; letter-spacing: .06em; text-align: center; margin-top: .15rem; }
+  .lbl-foot {
+    border-top: 2px solid #1C1A17;
+    padding: .3rem .55rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: .58rem; color: #55504a;
+  }
+  .lbl-foot b { font-family: var(--display); font-weight: 900; font-stretch: 78%; text-transform: uppercase; color: #1C1A17; font-size: .68rem; letter-spacing: .04em; }
+
+  /* ═══ envíos / tracking ═══ */
+  .ship {
+    border: 1px solid var(--rule-2); background: var(--card);
+    padding: .75rem; width: 100%; text-align: left; display: grid; gap: .4rem; min-height: 0;
+  }
+  .ship + .ship { margin-top: .6rem; }
+  .ship:hover { border-color: var(--ink); }
+  .ship[data-sel="1"] { border: 2px solid var(--accent); }
+  .ship__top { display: flex; justify-content: space-between; gap: .5rem; align-items: center; }
+  .ship__guia { font-family: var(--mono); font-size: .78rem; }
+  .ship__who { font-weight: 600; font-size: .95rem; }
+  .ship__where { font-size: .82rem; color: var(--ink-3); }
+
+  .timeline { list-style: none; display: grid; gap: 0; margin-top: var(--sp-s); }
+  .timeline li {
+    display: grid; grid-template-columns: 1.4rem 1fr; gap: .7rem;
+    padding-bottom: .9rem; position: relative;
+  }
+  .timeline li::before {
+    content: ""; position: absolute;
+    left: .62rem; top: 1rem; bottom: -.1rem; width: 1px;
+    background: repeating-linear-gradient(0deg, var(--rule-2) 0 3px, transparent 3px 6px);
+  }
+  .timeline li:last-child { padding-bottom: 0; }
+  .timeline li:last-child::before { display: none; }
+  .tl-dot {
+    width: 11px; height: 11px; margin-top: .3rem; margin-left: .1rem;
+    border: 2px solid var(--ink-3); background: var(--card); border-radius: 50%;
+  }
+  .timeline li[data-now="1"] .tl-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .timeline li[data-bad="1"] .tl-dot { background: var(--bad); border-color: var(--bad); }
+  .tl-when { font-family: var(--mono); font-size: .7rem; color: var(--ink-3); }
+  .tl-what { font-size: .88rem; font-weight: 500; }
+  .tl-where { font-size: .78rem; color: var(--ink-3); }
+
+  .stuck {
+    border: 1px solid var(--bad); background: var(--bad-soft);
+    padding: .7rem; display: grid; gap: .4rem; margin-top: var(--sp-s);
+  }
+  .stuck b { color: var(--bad); font-family: var(--display); font-weight: 800; font-stretch: 86%; }
+
+  /* aviso al cliente */
+  .wa {
+    background: #E9E2D6; border: 1px solid var(--rule-2);
+    padding: .8rem; display: grid; gap: .5rem;
+  }
+  .wa__bubble {
+    background: #fff; border: 1px solid var(--rule);
+    padding: .6rem .7rem; font-size: .85rem; line-height: 1.45;
+    max-width: 22rem; position: relative;
+  }
+  .wa__bubble::after {
+    content: ""; position: absolute; left: -7px; top: 10px;
+    width: 0; height: 0;
+    border: 7px solid transparent; border-right-color: #fff; border-left: 0;
+  }
+  .wa__bubble strong { display: block; color: var(--accent-deep); font-size: .78rem; margin-bottom: .2rem; }
+  .wa__meta { font-family: var(--mono); font-size: .68rem; color: var(--ink-3); }
+
+  /* ═══ reclamos ═══ */
+  .claim { border: 1px solid var(--rule-2); background: var(--card); padding: var(--sp-s); }
+  .claim + .claim { margin-top: var(--sp-s); }
+  .claim[data-open="1"] { border: 2px solid var(--warn); }
+  .claim__head { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; flex-wrap: wrap; }
+  .steps-c { list-style: none; display: grid; gap: .5rem; margin-top: var(--sp-s); }
+  .steps-c li { display: grid; grid-template-columns: 1.2rem 1fr; gap: .5rem; font-size: .86rem; color: var(--ink-2); align-items: start; }
+  .steps-c svg { margin-top: .2rem; color: var(--ok); }
+  .steps-c li[data-pending="1"] { color: var(--ink-3); }
+  .steps-c li[data-pending="1"] svg { color: var(--rule-2); }
+
+  .draft {
+    background: var(--paper-2); border: 1px dashed var(--rule-2);
+    padding: .8rem; font-size: .84rem; line-height: 1.55;
+    white-space: pre-wrap;
+    font-family: var(--sans);
+    max-height: 20rem; overflow-y: auto;
+  }
+  .thinking { display: flex; align-items: center; gap: .5rem; font-family: var(--mono); font-size: .8rem; color: var(--ink-3); }
+  .thinking i { width: 8px; height: 8px; background: var(--accent); display: block; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: .2 } }
+
+  .radio-row { display: grid; gap: .4rem; }
+  .radio-row label {
+    display: flex; align-items: center; gap: .55rem;
+    border: 1px solid var(--rule-2); background: var(--card);
+    padding: .55rem .6rem; min-height: 48px; cursor: pointer; font-size: .9rem;
+  }
+  .radio-row label:has(input:checked) { border-color: var(--accent); background: var(--accent-tint); }
+  .radio-row input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+
+  /* ═══ toast ═══ */
+  .toast {
+    position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%);
+    background: var(--night); color: var(--on-night);
+    border-left: 4px solid var(--accent);
+    padding: .7rem 1rem; font-size: .88rem;
+    z-index: 90; max-width: calc(100vw - 2rem);
+    box-shadow: 3px 3px 0 rgba(0,0,0,.2);
+    opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
+  }
+  .toast[data-show="1"] { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  .empty {
+    border: 1px dashed var(--rule-2); background: var(--paper-2);
+    padding: var(--sp-l) var(--sp-s); text-align: center; color: var(--ink-3);
+  }
+
+  /* ═══ impresión: sólo la etiqueta ═══ */
+  @media print {
+    body { background: #fff !important; }
+    .topbar, .shop, .tabs, .foot, .no-print { display: none !important; }
+    .panel { padding: 0 !important; }
+    .label-wrap { display: block !important; }
+    .label {
+      max-width: none; width: 10cm; height: 15cm;
+      border: 1px solid #000; margin: 0;
+      page-break-inside: avoid;
+    }
+    @page { size: 10cm 15cm; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar no-print">
+  <div class="container topbar__in">
+    <a class="wordmark" href="../index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#D8461B" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav" id="navBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      Menú
+    </button>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<div class="shop no-print">
+  <div class="container shop__in">
+    <div class="shop__id">
+      <div class="shop__avatar" aria-hidden="true">BR</div>
+      <div>
+        <div class="shop__name">Bruma · suplementos</div>
+        <div class="shop__rut">76.543.210-K · Providencia</div>
+      </div>
+    </div>
+    <div class="shop__saldo">
+      <span>Saldo</span>
+      <b id="saldo">$184.500</b>
+    </div>
+  </div>
+</div>
+
+<div class="tabs no-print">
+  <div class="container">
+    <div class="tabs__scroll" role="tablist" aria-label="Secciones del producto">
+      <button class="tab" role="tab" id="t-pedidos"  aria-controls="p-pedidos"  aria-selected="true">Pedidos <span class="badge" id="bPedidos">6</span></button>
+      <button class="tab" role="tab" id="t-cotizar"  aria-controls="p-cotizar"  aria-selected="false">Cotizar</button>
+      <button class="tab" role="tab" id="t-etiqueta" aria-controls="p-etiqueta" aria-selected="false">Etiqueta</button>
+      <button class="tab" role="tab" id="t-envios"   aria-controls="p-envios"   aria-selected="false">Envíos <span class="badge" id="bEnvios">4</span></button>
+      <button class="tab" role="tab" id="t-reclamos" aria-controls="p-reclamos" aria-selected="false">Reclamos <span class="badge" id="bReclamos">1</span></button>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- ══════════════════════════════════════════════════ PEDIDOS ═══ -->
+  <section class="panel" role="tabpanel" id="p-pedidos" aria-labelledby="t-pedidos">
+    <div class="savings">
+      <div class="stat">
+        <span>Envíos este mes</span>
+        <b id="sEnvios">128</b>
+        <small>+22 vs. junio</small>
+      </div>
+      <div class="stat" data-hi>
+        <span>Ahorrado este mes</span>
+        <b id="sAhorro">$412.300</b>
+        <small>vs. todo por Chilexpress</small>
+      </div>
+      <div class="stat">
+        <span>A tiempo</span>
+        <b>91,4%</b>
+        <small>2 atrasados hoy</small>
+      </div>
+      <div class="stat">
+        <span>Horas devueltas</span>
+        <b>8,5 h</b>
+        <small>4 min por envío que no copiaste</small>
+      </div>
+    </div>
+
+    <h2 style="margin-bottom:.2rem">Pedidos por despachar</h2>
+    <p class="muted" style="margin-bottom:var(--sp-s);font-size:.92rem">
+      Entraron solos desde Jumpseller esta mañana. Elige uno y cotízalo.
+    </p>
+
+    <div id="orders"></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ COTIZAR ═══ -->
+  <section class="panel" role="tabpanel" id="p-cotizar" aria-labelledby="t-cotizar" hidden>
+    <div id="quoteEmpty" class="empty">
+      <p>Elige un pedido en <b>Pedidos</b> para cotizarlo.</p>
+      <button class="btn btn--ghost btn--sm" style="margin-top:var(--sp-s)" data-go="pedidos">Ir a pedidos</button>
+    </div>
+
+    <div id="quoteMain" hidden>
+      <div class="quote-grid">
+
+        <!-- controles -->
+        <div class="controls">
+          <div class="perf">
+            <p class="stencil" style="margin-bottom:.5rem">Pedido <span class="mono" id="qOrderId"></span></p>
+            <p style="font-weight:600" id="qOrderWho"></p>
+            <p class="tiny muted" id="qOrderAddr" style="margin-bottom:.5rem"></p>
+            <details>
+              <summary class="tiny" style="cursor:pointer;color:var(--accent-deep);min-height:36px;display:flex;align-items:center">
+                Ver la dirección como la escribió el cliente
+              </summary>
+              <p class="raw-addr" style="margin-top:.4rem" id="qRawAddr"></p>
+              <p class="tiny muted" style="margin-top:.35rem">
+                Normalizada con IA (Haiku 4.5). Sin esto, el courier la rechaza o la deja en sucursal.
+              </p>
+            </details>
+          </div>
+
+          <label class="field">
+            <span>Destino</span>
+            <select id="qDest"></select>
+          </label>
+
+          <label class="field">
+            <span>Peso real — <b class="num" id="qKgOut">2,0</b> kg</span>
+            <input type="range" id="qKg" min="0.5" max="20" step="0.5" value="2">
+          </label>
+
+          <div>
+            <span class="field" style="display:block"><span style="display:block;font-family:var(--display);font-weight:700;font-stretch:82%;text-transform:uppercase;letter-spacing:.09em;font-size:.7rem;color:var(--ink-3);margin-bottom:.3rem">Caja (cm)</span></span>
+            <div class="dims">
+              <label><span class="visually-hidden">Largo</span><input type="number" id="qL" value="30" min="1" max="150" step="1" aria-label="Largo en cm"></label>
+              <label><span class="visually-hidden">Ancho</span><input type="number" id="qA" value="25" min="1" max="150" step="1" aria-label="Ancho en cm"></label>
+              <label><span class="visually-hidden">Alto</span><input type="number" id="qH" value="15" min="1" max="150" step="1" aria-label="Alto en cm"></label>
+            </div>
+          </div>
+
+          <div class="weight-box" id="qWeight"></div>
+
+          <label class="switch">
+            <input type="checkbox" id="qSeguro">
+            <span>Asegurar por <b class="clp" id="qValor">$48.900</b></span>
+          </label>
+
+          <label class="field">
+            <span>Plan</span>
+            <select id="qPlan">
+              <option value="nauta">Nauta — gratis</option>
+              <option value="bodega" selected>Bodega — $34.900/mes</option>
+              <option value="cordillera">Cordillera — $99.900/mes</option>
+            </select>
+          </label>
+          <p class="tiny muted" style="margin-top:-.4rem">
+            Cambia el plan y mira cómo baja el precio por etiqueta. Ese es el trato: más fijo, menos por envío.
+          </p>
+        </div>
+
+        <!-- resultados -->
+        <div>
+          <h2 style="margin-bottom:.2rem">Los cuatro, ahora</h2>
+          <p class="muted" style="margin-bottom:var(--sp-s);font-size:.92rem" id="qSubtitle"></p>
+
+          <div class="legend" aria-hidden="true">
+            <span><i style="background:var(--s1)"></i> precio</span>
+            <span><i style="background:var(--s2)"></i> plazo</span>
+            <span><i style="background:var(--s3)"></i> entregas a tiempo</span>
+          </div>
+
+          <div id="qOpts"></div>
+
+          <div class="savings-callout">
+            <p class="stencil stencil--accent">Si eliges bien</p>
+            <b id="qSave">$0</b>
+            <p class="tiny" id="qSaveTxt" style="margin-top:.2rem"></p>
+          </div>
+
+          <div style="margin-top:var(--sp-s);display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="btn btn--primary" id="qGo" disabled>
+              Generar etiqueta
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+            </button>
+            <button class="btn btn--ghost" data-go="pedidos">Volver a pedidos</button>
+          </div>
+          <p class="tiny muted" style="margin-top:.5rem" id="qCharge"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════════════════════════════ ETIQUETA ═══ -->
+  <section class="panel" role="tabpanel" id="p-etiqueta" aria-labelledby="t-etiqueta" hidden>
+    <div id="lblEmpty" class="empty">
+      <p>Todavía no generas ninguna etiqueta.</p>
+      <button class="btn btn--ghost btn--sm" style="margin-top:var(--sp-s)" data-go="pedidos">Elegir un pedido</button>
+    </div>
+
+    <div id="lblMain" hidden>
+      <div class="no-print">
+        <h2 style="margin-bottom:.2rem">Etiqueta lista</h2>
+        <p class="muted" style="margin-bottom:var(--sp-m);font-size:.92rem">
+          10 × 15 cm, térmica o papel. Un formato, una impresora, cualquiera de los cuatro couriers.
+        </p>
+      </div>
+
+      <div class="label-wrap">
+        <div id="labelSlot"></div>
+
+        <aside class="stack no-print">
+          <div class="card">
+            <p class="stencil" style="margin-bottom:.5rem">Acciones</p>
+            <div class="stack-s">
+              <button class="btn btn--primary btn--block" id="btnPrint">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 6V2h8v4M4 12H2V6h12v6h-2M4 10h8v4H4z"/></svg>
+                Imprimir
+              </button>
+              <button class="btn btn--block" id="btnPdf">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 2v8m0 0 3-3m-3 3L5 7M2 12v2h12v-2"/></svg>
+                Descargar
+              </button>
+              <button class="btn btn--ghost btn--block" id="btnAnother">Despachar otro pedido</button>
+            </div>
+          </div>
+
+          <div class="card card--sunk">
+            <p class="stencil" style="margin-bottom:.4rem">Se cobró de tu saldo</p>
+            <p class="clp" style="font-size:1.3rem" id="lblCobro">$0</p>
+            <p class="tiny muted" id="lblCobroTxt"></p>
+          </div>
+
+          <div class="card">
+            <p class="stencil" style="margin-bottom:.4rem">Lo que pasó solo</p>
+            <ul style="list-style:none;display:grid;gap:.35rem;font-size:.84rem;color:var(--ink-2)">
+              <li>· Se creó la guía en el sistema del courier</li>
+              <li>· El pedido quedó enganchado al tracking</li>
+              <li>· Tu clienta recibió el aviso “vamos en camino”</li>
+              <li>· Se descontó el flete de tu saldo</li>
+            </ul>
+            <p class="tiny muted" style="margin-top:.6rem">
+              Cero copiar y pegar. Cero pestañas.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ ENVÍOS ═══ -->
+  <section class="panel" role="tabpanel" id="p-envios" aria-labelledby="t-envios" hidden>
+    <h2 style="margin-bottom:.2rem">Todos tus envíos, un solo tracking</h2>
+    <p class="muted" style="margin-bottom:var(--sp-m);font-size:.92rem">
+      Cuatro couriers hablando idiomas distintos, traducidos a seis estados que sí significan algo.
+    </p>
+
+    <div class="quote-grid">
+      <div id="ships"></div>
+      <div id="shipDetail">
+        <div class="empty"><p>Elige un envío para ver el detalle.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════ RECLAMOS ═══ -->
+  <section class="panel" role="tabpanel" id="p-reclamos" aria-labelledby="t-reclamos" hidden>
+    <h2 style="margin-bottom:.2rem">Reclamos</h2>
+    <p class="muted" style="margin-bottom:var(--sp-m);font-size:.92rem">
+      El courier no habla contigo: habla con quien tiene el contrato. Ese somos nosotros.
+    </p>
+    <div id="claims"></div>
+  </section>
+
+</main>
+
+<footer class="foot no-print">
+  <div class="container" style="display:grid;gap:var(--sp-2xs)">
+    <p class="stencil" style="color:#E8A88F">Demo · datos ficticios</p>
+    <p style="max-width:56ch">
+      Las tarifas salen de un modelo calibrado, no de un contrato firmado. Los códigos de barras son
+      decorativos. Los avisos no se envían a nadie. Todo lo que está falseado y lo que costaría
+      hacerlo real está listado sin adornos en <a href="../stack.html#falso">arquitectura</a>.
+    </p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../tarifas.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* ═══════════════════════════════════════════════════ estado ═══ */
+  const TIENDA = {
+    nombre: 'Bruma · suplementos',
+    rut: '76.543.210-K',
+    dir: 'Av. Providencia 2134, of. 705',
+    comuna: 'Providencia',
+    fono: '+56 9 8421 7734',
+  };
+
+  const state = {
+    saldo: 184500,
+    envios: 128,
+    ahorro: 412300,
+    orderId: null,
+    sel: null,        // courier seleccionado en el cotizador
+    quote: null,
+    label: null,
+    shipSel: null,
+  };
+
+  const ORDERS = [
+    { id: '1042', who: 'Camila Ríos Bustamante', dest: 'nunoa',
+      addr: 'Av. Irarrázaval 3450, depto 902', comuna: 'Ñuñoa',
+      raw: 'irarrazaval 3450 dpto 902 ñuñoa santiago (portería recibe)',
+      kg: 1.2, l: 25, a: 20, h: 10, valor: 34900, items: 2, done: false },
+    { id: '1043', who: 'Ignacio Farías Molina', dest: 'puertomontt',
+      addr: 'Los Aromos 455, depto 52B, torre 2', comuna: 'Puerto Montt',
+      raw: 'los aromos 455 depto 52b torre 2, al lado del jardin infantil, pto montt',
+      kg: 2.0, l: 30, a: 25, h: 15, valor: 48900, items: 1, done: false },
+    { id: '1044', who: 'Javiera Contreras Pino', dest: 'antofagasta',
+      addr: 'Av. Angamos 1180, casa 4', comuna: 'Antofagasta',
+      raw: 'angamos 1180 casa 4 antofa',
+      kg: 4.5, l: 40, a: 30, h: 20, valor: 76400, items: 3, done: false },
+    { id: '1045', who: 'Rodrigo Sepúlveda Vera', dest: 'puntaarenas',
+      addr: 'Av. Bulnes 01890', comuna: 'Punta Arenas',
+      raw: 'bulnes 01890, punta arenas (dpto arriba de la ferreteria)',
+      kg: 0.8, l: 20, a: 15, h: 10, valor: 29900, items: 1, done: false },
+    { id: '1046', who: 'Fernanda Alarcón Soto', dest: 'villarrica',
+      addr: 'Camino Villarrica-Pucón km 3, parcela 12', comuna: 'Villarrica',
+      raw: 'camino a pucon km 3 parcela 12 villarrica, tocar bocina',
+      kg: 3.0, l: 35, a: 25, h: 15, valor: 52300, items: 2, done: false },
+    { id: '1047', who: 'Matías Vergara Leiva', dest: 'pwilliams',
+      addr: 'Arturo Prat 260', comuna: 'Puerto Williams',
+      raw: 'arturo prat 260 puerto williams, isla navarino',
+      kg: 1.5, l: 25, a: 20, h: 12, valor: 41500, items: 1, done: false },
+  ];
+
+  const SHIPS = [
+    {
+      id: 'E-2204', guia: 'RC482910375CL', courier: 'Correos de Chile',
+      who: 'Paulina Muñoz Tapia', comuna: 'Arica', pedido: '1038',
+      estado: 'reparto', precio: 8010, avisado: false,
+      eventos: [
+        { d: 'Hoy · 08:12',      t: 'En reparto',                w: 'Arica', now: true },
+        { d: 'Ayer · 19:40',    t: 'Llegó a sucursal de destino', w: 'Arica' },
+        { d: '4 jul · 06:15',   t: 'En tránsito',                w: 'Antofagasta' },
+        { d: '1 jul · 17:02',   t: 'Admitido',                   w: 'Santiago' },
+      ],
+    },
+    {
+      id: 'E-2203', guia: 'OT-58291746', courier: 'Starken',
+      who: 'Tomás Aguilera Cruz', comuna: 'Coyhaique', pedido: '1029',
+      estado: 'pegado', precio: 9510, dias: 11, valor: 48900, avisado: false,
+      eventos: [
+        { d: 'hace 11 días',   t: 'En tránsito',   w: 'Puerto Montt', bad: true },
+        { d: 'hace 12 días',   t: 'En tránsito',   w: 'Temuco' },
+        { d: 'hace 13 días',   t: 'Admitido',      w: 'Santiago' },
+      ],
+    },
+    {
+      id: 'E-2202', guia: 'OD-4471902838', courier: 'Blue Express',
+      who: 'Sebastián Ortiz Lagos', comuna: 'Maipú', pedido: '1035',
+      estado: 'entregado', precio: 4460, avisado: true,
+      eventos: [
+        { d: '9 jul · 14:22',  t: 'Entregado — firmó S. Ortiz', w: 'Maipú', now: true },
+        { d: '9 jul · 08:05',  t: 'En reparto',                 w: 'Maipú' },
+        { d: '8 jul · 20:11',  t: 'Admitido',                   w: 'Santiago' },
+      ],
+    },
+    {
+      id: 'E-2201', guia: 'CHX 998412370554', courier: 'Chilexpress',
+      who: 'Antonia Pérez Valdés', comuna: 'Valdivia', pedido: '1031',
+      estado: 'transito', precio: 7440, avisado: true,
+      eventos: [
+        { d: 'Hoy · 05:30',    t: 'En tránsito',  w: 'Osorno', now: true },
+        { d: 'Ayer · 22:14',   t: 'En tránsito',  w: 'Temuco' },
+        { d: 'Ayer · 16:48',   t: 'Admitido',     w: 'Santiago' },
+      ],
+    },
+  ];
+
+  const CLAIMS = [
+    {
+      id: 'RC-2187', guia: 'CHX 991204778310', courier: 'Chilexpress',
+      comuna: 'Castro', who: 'Loreto Cárdenas Vidal',
+      motivo: 'Extravío', valor: 62400, flete: 6210,
+      estado: 'pagado', dias: 17,
+      pasos: [
+        { t: 'Reclamo presentado al courier (día 1 de 7 de plazo)', ok: true },
+        { t: 'Evidencia adjunta: guía, boleta, foto del bulto',      ok: true },
+        { t: 'Reenvío al cliente sin costo de flete',                ok: true },
+        { t: 'Courier aprueba indemnización parcial ($37.400)',      ok: true },
+        { t: 'Kilonauta te transfirió $68.610 (tope + flete)',       ok: true },
+      ],
+    },
+  ];
+
+  const ESTADOS = {
+    reparto:   { txt: 'En reparto hoy', chip: 'chip--accent' },
+    transito:  { txt: 'En tránsito',    chip: 'chip--info' },
+    entregado: { txt: 'Entregado',      chip: 'chip--ok' },
+    pegado:    { txt: 'Sin movimiento', chip: 'chip--bad' },
+  };
+
+  /* ═══════════════════════════════════════════════════ utils ═══ */
+  const $  = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const n1 = (v) => v.toFixed(1).replace('.', ',');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  let toastT;
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.dataset.show = '1';
+    clearTimeout(toastT);
+    toastT = setTimeout(() => (el.dataset.show = '0'), 3200);
+  }
+
+  /* ═══════════════════════════════════════════════════ tabs ═══ */
+  const TABS = ['pedidos', 'cotizar', 'etiqueta', 'envios', 'reclamos'];
+  function go(name) {
+    TABS.forEach((t) => {
+      const btn = $('#t-' + t);
+      const pan = $('#p-' + t);
+      const on = t === name;
+      btn.setAttribute('aria-selected', String(on));
+      pan.hidden = !on;
+    });
+    $('#t-' + name).scrollIntoView({ block: 'nearest', inline: 'center' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  TABS.forEach((t) => $('#t-' + t).addEventListener('click', () => go(t)));
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-go]');
+    if (b) go(b.dataset.go);
+  });
+
+  $('#navBtn').addEventListener('click', () => {
+    const nav = $('#nav');
+    const open = nav.dataset.open === 'true';
+    nav.dataset.open = String(!open);
+    $('#navBtn').setAttribute('aria-expanded', String(!open));
+  });
+
+  /* ═══════════════════════════════════════════════ pedidos ═══ */
+  function renderOrders() {
+    const pend = ORDERS.filter((o) => !o.done).length;
+    $('#bPedidos').textContent = String(pend);
+    $('#orders').innerHTML = ORDERS.map((o) => {
+      const d = KN.DESTINOS.find((x) => x.id === o.dest);
+      const q = KN.cotizar({ destinoId: o.dest, kg: o.kg, largo: o.l, ancho: o.a, alto: o.h, plan: 'bodega' });
+      return `<button class="order" data-order="${o.id}" data-done="${o.done ? 1 : 0}" ${o.done ? 'disabled' : ''}>
+        <div class="order__top">
+          <span class="order__id">#${o.id}</span>
+          ${o.done
+            ? '<span class="chip chip--ok">Despachado</span>'
+            : `<span class="chip chip--info">${o.items} producto${o.items > 1 ? 's' : ''}</span>`}
+        </div>
+        <div>
+          <div class="order__who">${esc(o.who)}</div>
+          <div class="order__where">${esc(o.addr)} — <b>${esc(o.comuna)}</b>, ${esc(d.region)}</div>
+        </div>
+        <div class="order__meta">
+          <span>${n1(o.kg)} kg</span>
+          <span>${o.l}×${o.a}×${o.h} cm</span>
+          <span>${KN.clp(o.valor)}</span>
+        </div>
+        <div class="order__cta">
+          <span class="tiny muted">
+            ${o.done ? 'Guía generada' : `Desde <b class="clp">${KN.clp(q.min)}</b> · hasta <b class="clp">${KN.clp(q.max)}</b>`}
+          </span>
+          ${o.done ? '' : '<span class="chip chip--accent">Cotizar →</span>'}
+        </div>
+      </button>`;
+    }).join('');
+
+    $$('[data-order]').forEach((b) =>
+      b.addEventListener('click', () => openQuote(b.dataset.order))
+    );
+  }
+
+  /* ═══════════════════════════════════════════════ cotizar ═══ */
+  const qDest = $('#qDest');
+  KN.DESTINOS.forEach((d) => {
+    const o = document.createElement('option');
+    o.value = d.id;
+    o.textContent = `${d.comuna} — ${d.region}`;
+    qDest.appendChild(o);
+  });
+
+  function openQuote(id) {
+    const o = ORDERS.find((x) => x.id === id);
+    if (!o || o.done) return;
+    state.orderId = id;
+    state.sel = null;
+
+    $('#quoteEmpty').hidden = true;
+    $('#quoteMain').hidden = false;
+
+    $('#qOrderId').textContent = '#' + o.id;
+    $('#qOrderWho').textContent = o.who;
+    $('#qOrderAddr').textContent = `${o.addr} — ${o.comuna}`;
+    $('#qRawAddr').textContent = `“${o.raw}”`;
+    $('#qValor').textContent = KN.clp(o.valor);
+
+    qDest.value = o.dest;
+    $('#qKg').value = o.kg;
+    $('#qL').value = o.l;
+    $('#qA').value = o.a;
+    $('#qH').value = o.h;
+    $('#qSeguro').checked = false;
+
+    renderQuote();
+    go('cotizar');
+  }
+
+  function currentQuote() {
+    const o = ORDERS.find((x) => x.id === state.orderId);
+    return KN.cotizar({
+      destinoId: qDest.value,
+      kg: parseFloat($('#qKg').value),
+      largo: Math.max(1, parseInt($('#qL').value, 10) || 1),
+      ancho: Math.max(1, parseInt($('#qA').value, 10) || 1),
+      alto:  Math.max(1, parseInt($('#qH').value, 10) || 1),
+      seguro: $('#qSeguro').checked,
+      valor: o ? o.valor : 0,
+      plan: $('#qPlan').value,
+    });
+  }
+
+  function renderQuote() {
+    const q = currentQuote();
+    state.quote = q;
+
+    $('#qKgOut').textContent = n1(parseFloat($('#qKg').value));
+
+    /* peso facturable — la lección que nadie te enseñó */
+    const manda = q.pf.manda === 'volumen';
+    $('#qWeight').innerHTML = `
+      <div class="row"><span>Peso real</span><span>${n1(q.pf.real)} kg</span></div>
+      <div class="row"><span>Peso volumétrico (L×A×H ÷ 4000)</span><span>${n1(q.pf.volumetrico)} kg</span></div>
+      <div class="row win"><span>Se cobra ${manda ? 'el volumen' : 'el peso'}</span><span>${n1(q.pf.facturable)} kg</span></div>
+      ${manda ? '<p class="tiny muted" style="margin-top:.35rem">Tu caja es más grande que pesada. Achícala 5 cm por lado y bajas de tramo.</p>' : ''}`;
+
+    const validas = q.opciones.filter((o) => o.cobertura);
+    const maxP  = Math.max(...validas.map((o) => o.precio));
+    const maxD  = Math.max(...validas.map((o) => o.dias));
+
+    $('#qSubtitle').innerHTML =
+      `A <b>${esc(q.destino.comuna)}</b>, ${n1(q.pf.facturable)} kg facturables. ` +
+      `Entre el más caro y el más barato hay <b>${q.dispersion}%</b>.`;
+
+    $('#qOpts').innerHTML = q.opciones
+      .slice()
+      .sort((a, b) => (a.cobertura === b.cobertura ? a.precio - b.precio : a.cobertura ? -1 : 1))
+      .map((o) => {
+        if (!o.cobertura) {
+          return `<div class="opt" data-out="1">
+            <div class="opt__top">
+              <span class="opt__name">${o.nombre}</span>
+              <span class="chip chip--bad">Sin cobertura</span>
+            </div>
+            <p class="opt__note">No llega a ${esc(q.destino.comuna)}. No es cosa de precio: no tiene ruta.</p>
+          </div>`;
+        }
+        const flags = [];
+        if (o.recomendado)                    flags.push('<span class="chip chip--accent">Recomendado</span>');
+        if (o.esMasBarato && !o.recomendado)  flags.push('<span class="chip chip--ok">El más barato</span>');
+        if (o.esMasRapido)                    flags.push('<span class="chip chip--info">El más rápido</span>');
+        if (o.primaSeguro)                    flags.push(`<span class="chip chip--info">+ seguro ${KN.clp(o.primaSeguro)}</span>`);
+
+        return `<button class="opt" data-cour="${o.id}" data-sel="${state.sel === o.id ? 1 : 0}">
+          <div class="opt__top">
+            <span class="opt__name">${o.nombre}</span>
+            <span class="opt__price">
+              <s>${KN.clp(o.lista)}</s>
+              <b>${KN.clp(o.precio)}</b>
+            </span>
+          </div>
+          <div class="opt__bars">
+            <div class="opt__bar"><em>precio</em><div class="opt__track"><i data-k="price" style="width:${Math.round((o.precio / maxP) * 100)}%"></i></div></div>
+            <div class="opt__bar"><em>plazo</em><div class="opt__track"><i data-k="days" style="width:${Math.round((o.dias / maxD) * 100)}%"></i></div></div>
+            <div class="opt__bar"><em>a tiempo</em><div class="opt__track"><i data-k="ot" style="width:${o.ontime}%"></i></div></div>
+          </div>
+          <div class="opt__foot">
+            <span class="chip chip--info">${o.dias} día${o.dias > 1 ? 's' : ''}</span>
+            <span class="chip chip--info">${o.ontime}% a tiempo</span>
+            ${flags.join('')}
+          </div>
+          <p class="opt__note">${esc(o.nota)}</p>
+        </button>`;
+      })
+      .join('');
+
+    $$('[data-cour]').forEach((b) =>
+      b.addEventListener('click', () => {
+        state.sel = b.dataset.cour;
+        renderQuote();
+      })
+    );
+
+    /* ahorro */
+    const barato = validas.find((o) => o.esMasBarato);
+    $('#qSave').textContent = KN.clp(q.ahorro);
+    $('#qSaveTxt').innerHTML =
+      `<b class="clp">${KN.clp(barato.precio)}</b> con ${esc(barato.nombre)} contra los ` +
+      `<b class="clp">${KN.clp(q.referencia)}</b> que te cobra Chilexpress a precio de lista. ` +
+      `Un <b>${q.ahorroPct}%</b> menos, en este envío, hoy.`;
+
+    /* CTA */
+    const sel = validas.find((o) => o.id === state.sel);
+    const btn = $('#qGo');
+    btn.disabled = !sel;
+    btn.textContent = sel ? `Generar etiqueta — ${sel.nombre}` : 'Elige un courier arriba';
+    if (sel) {
+      btn.insertAdjacentHTML('beforeend',
+        ' <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>');
+    }
+    $('#qCharge').innerHTML = sel
+      ? `Se descontarán <b class="clp">${KN.clp(sel.precio)}</b> de tu saldo de <b class="clp">${KN.clp(state.saldo)}</b>. Sin crédito: pagas antes de despachar.`
+      : '';
+  }
+
+  ['qKg', 'qL', 'qA', 'qH', 'qSeguro', 'qPlan', 'qDest'].forEach((id) => {
+    const el = $('#' + id);
+    el.addEventListener('input', renderQuote);
+    el.addEventListener('change', renderQuote);
+  });
+
+  /* ══════════════════════════════════════════════ etiqueta ═══ */
+  $('#qGo').addEventListener('click', () => {
+    const q = state.quote;
+    const sel = q.opciones.find((o) => o.id === state.sel);
+    const o = ORDERS.find((x) => x.id === state.orderId);
+    if (!sel || !o) return;
+
+    if (sel.precio > state.saldo) {
+      toast('Saldo insuficiente. Recarga para despachar.');
+      return;
+    }
+
+    const cour = KN.COURIERS.find((c) => c.id === sel.id);
+    const guia = cour.guia();
+
+    state.label = {
+      guia, courier: sel.nombre, courierId: sel.id,
+      dias: sel.dias, precio: sel.precio,
+      order: o, quote: q, dest: q.destino,
+      zona: KN.ZONAS[q.destino.zona],
+      kg: q.pf.facturable,
+      dims: `${$('#qL').value}×${$('#qA').value}×${$('#qH').value}`,
+      seguro: $('#qSeguro').checked,
+    };
+
+    /* efectos de negocio: se cobra, se despacha, se ahorra, se avisa */
+    state.saldo  -= sel.precio;
+    state.envios += 1;
+    state.ahorro += Math.max(0, q.referencia - sel.precio);
+    o.done = true;
+
+    SHIPS.unshift({
+      id: 'E-' + (2205 + SHIPS.length - 3),
+      guia, courier: sel.nombre,
+      who: o.who, comuna: q.destino.comuna, pedido: o.id,
+      estado: 'transito', precio: sel.precio, avisado: true, nuevo: true,
+      eventos: [
+        { d: 'Recién · ' + hora(), t: 'Etiqueta creada — esperando retiro', w: 'Providencia', now: true },
+      ],
+    });
+
+    renderLabel();
+    renderOrders();
+    renderShips();
+    renderStats();
+    go('etiqueta');
+    toast(`Guía ${guia} creada. Aviso enviado a ${o.who.split(' ')[0]}.`);
+  });
+
+  function hora() {
+    const d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function labelHTML(L) {
+    const o = L.order;
+    return `<div class="label" id="theLabel">
+      <div class="lbl-head">
+        <span class="lbl-courier">${esc(L.courier)}</span>
+        <span class="lbl-svc">Terrestre · ${L.dias} día${L.dias > 1 ? 's' : ''}</span>
+      </div>
+
+      <div class="lbl-zone">
+        <div class="lbl-zone__box">
+          <span>Zona</span>
+          <b>${esc(L.zona)}</b>
+        </div>
+        <div class="lbl-zone__box">
+          <span>Bulto</span>
+          <b>1 / 1</b>
+        </div>
+      </div>
+
+      <div class="lbl-body">
+        <div class="lbl-party">
+          <span>Remitente</span>
+          <p>${esc(TIENDA.nombre)} · ${esc(TIENDA.rut)}<br>${esc(TIENDA.dir)}, ${esc(TIENDA.comuna)}<br>${esc(TIENDA.fono)}</p>
+        </div>
+        <div class="lbl-party to">
+          <span>Destinatario</span>
+          <p>
+            <strong>${esc(o.who)}</strong>
+            ${esc(o.addr)}
+            <span class="comuna">${esc(L.dest.comuna)}</span>
+            ${esc(L.dest.region)}
+          </p>
+        </div>
+      </div>
+
+      <div class="lbl-specs">
+        <div><span>Peso facturable</span><b>${n1(L.kg)} kg</b></div>
+        <div><span>Dimensiones</span><b>${esc(L.dims)} cm</b></div>
+        <div><span>Referencia</span><b>#${esc(o.id)}</b></div>
+      </div>
+
+      <div>
+        <div class="lbl-code">
+          <div>
+            ${KN.barras(L.guia, 300, 46)}
+            <div class="lbl-guia">${esc(L.guia)}</div>
+          </div>
+          <div>${KN.qr(L.guia, 21)}</div>
+        </div>
+        <div class="lbl-foot">
+          <span>Generada por <b>Kilonauta</b></span>
+          <span>${esc(L.seguro ? 'ASEGURADO' : 'S/SEGURO')} · ${new Date().toLocaleDateString('es-CL')}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderLabel() {
+    const L = state.label;
+    if (!L) return;
+    $('#lblEmpty').hidden = true;
+    $('#lblMain').hidden = false;
+    $('#labelSlot').innerHTML = labelHTML(L);
+    $('#lblCobro').textContent = KN.clp(L.precio);
+    $('#lblCobroTxt').innerHTML =
+      `Saldo restante: <b class="clp">${KN.clp(state.saldo)}</b>. ` +
+      `Habrías pagado <b class="clp">${KN.clp(L.quote.referencia)}</b> con Chilexpress a lista.`;
+  }
+
+  $('#btnPrint').addEventListener('click', () => window.print());
+  $('#btnAnother').addEventListener('click', () => go('pedidos'));
+
+  $('#btnPdf').addEventListener('click', () => {
+    const L = state.label;
+    if (!L) return;
+    const css = Array.from(document.styleSheets)
+      .filter((s) => !s.href || s.href.startsWith(location.origin))
+      .map((s) => { try { return Array.from(s.cssRules).map((r) => r.cssText).join('\n'); } catch { return ''; } })
+      .join('\n');
+    const html = `<!doctype html><html lang="es-CL"><head><meta charset="utf-8">
+<title>Etiqueta ${esc(L.guia)}</title>
+<style>${css}
+body{background:#fff;display:grid;place-items:center;padding:1rem}
+.label{max-width:26rem}
+</style></head><body>${labelHTML(L)}</body></html>`;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `etiqueta-${L.guia.replace(/\s/g, '')}.html`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Etiqueta descargada. En producción sale en PDF 10×15 listo para térmica.');
+  });
+
+  /* ════════════════════════════════════════════════ envíos ═══ */
+  function renderShips() {
+    $('#bEnvios').textContent = String(SHIPS.length);
+    $('#ships').innerHTML = SHIPS.map((s) => {
+      const e = ESTADOS[s.estado];
+      return `<button class="ship" data-ship="${s.id}" data-sel="${state.shipSel === s.id ? 1 : 0}">
+        <div class="ship__top">
+          <span class="ship__guia">${esc(s.guia)}</span>
+          <span class="chip ${e.chip}">${e.txt}</span>
+        </div>
+        <div>
+          <div class="ship__who">${esc(s.who)}</div>
+          <div class="ship__where">${esc(s.comuna)} · ${esc(s.courier)} · pedido #${esc(s.pedido)}</div>
+        </div>
+        ${s.estado === 'pegado'
+          ? `<p class="tiny" style="color:var(--bad);font-weight:600;margin:0">${s.dias} días sin un solo evento. Esto no llega.</p>`
+          : ''}
+      </button>`;
+    }).join('');
+
+    $$('[data-ship]').forEach((b) =>
+      b.addEventListener('click', () => { state.shipSel = b.dataset.ship; renderShips(); renderShipDetail(); })
+    );
+  }
+
+  function renderShipDetail() {
+    const s = SHIPS.find((x) => x.id === state.shipSel);
+    const box = $('#shipDetail');
+    if (!s) { box.innerHTML = '<div class="empty"><p>Elige un envío para ver el detalle.</p></div>'; return; }
+    const e = ESTADOS[s.estado];
+
+    const yaReclamado = CLAIMS.some((c) => c.guia === s.guia);
+
+    box.innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap">
+          <div>
+            <p class="stencil">${esc(s.courier)}</p>
+            <p class="mono" style="font-size:1.05rem;font-weight:600">${esc(s.guia)}</p>
+          </div>
+          <span class="chip ${e.chip}">${e.txt}</span>
+        </div>
+        <hr class="dotted" style="margin:var(--sp-s) 0">
+        <p style="font-weight:600">${esc(s.who)}</p>
+        <p class="tiny muted">${esc(s.comuna)} · pedido #${esc(s.pedido)} · flete ${KN.clp(s.precio)}</p>
+
+        <ul class="timeline">
+          ${s.eventos.map((ev) => `
+            <li data-now="${ev.now ? 1 : 0}" data-bad="${ev.bad ? 1 : 0}">
+              <span class="tl-dot" aria-hidden="true"></span>
+              <span>
+                <span class="tl-what">${esc(ev.t)}</span>
+                <span class="tl-where">${esc(ev.w)}</span>
+                <span class="tl-when">${esc(ev.d)}</span>
+              </span>
+            </li>`).join('')}
+        </ul>
+
+        ${s.estado === 'pegado' ? `
+          <div class="stuck">
+            <b>Esto se perdió.</b>
+            <p class="tiny">
+              Detectamos ${s.dias} días sin evento en un tramo donde el promedio es 2.
+              No hace falta que el cliente reclame: ya lo sabemos.
+            </p>
+            ${yaReclamado
+              ? '<span class="chip chip--warn">Reclamo abierto</span>'
+              : `<button class="btn btn--primary btn--sm" data-claim="${s.id}">Abrir reclamo por mí</button>`}
+          </div>` : ''}
+
+        ${s.estado !== 'pegado' ? `
+          <div style="margin-top:var(--sp-s)">
+            <p class="stencil" style="margin-bottom:.5rem">Aviso al cliente</p>
+            <div class="wa">
+              <div class="wa__bubble">
+                <strong>Bruma · suplementos</strong>
+                ${avisoTexto(s)}
+              </div>
+              <p class="wa__meta">WhatsApp · con la marca de tu tienda, no la nuestra</p>
+            </div>
+            <button class="btn btn--sm btn--block" style="margin-top:.5rem" data-aviso="${s.id}" ${s.avisado ? 'disabled' : ''}>
+              ${s.avisado ? 'Aviso ya enviado' : 'Enviar aviso ahora'}
+            </button>
+          </div>` : ''}
+      </div>`;
+
+    const cb = box.querySelector('[data-claim]');
+    if (cb) cb.addEventListener('click', () => openClaimWizard(cb.dataset.claim));
+
+    const ab = box.querySelector('[data-aviso]');
+    if (ab) ab.addEventListener('click', () => {
+      s.avisado = true;
+      renderShipDetail();
+      toast(`Aviso enviado a ${s.who.split(' ')[0]}. No te va a preguntar dónde está.`);
+    });
+  }
+
+  function avisoTexto(s) {
+    const nom = s.who.split(' ')[0];
+    if (s.estado === 'reparto')
+      return `Hola ${esc(nom)}: tu pedido #${esc(s.pedido)} sale a reparto hoy en ${esc(s.comuna)}. Si no hay nadie, lo dejamos en sucursal ${esc(s.courier)}. Seguimiento: kilonauta.com/t/${esc(s.guia.replace(/\s/g, ''))}`;
+    if (s.estado === 'entregado')
+      return `Hola ${esc(nom)}: tu pedido #${esc(s.pedido)} fue entregado. ¡Gracias por comprarnos! Si algo no está bien, respóndenos por acá.`;
+    return `Hola ${esc(nom)}: tu pedido #${esc(s.pedido)} va en camino a ${esc(s.comuna)} por ${esc(s.courier)}. Llega en ${s.estado === 'transito' ? '2 a 3 días' : 'unos días'}. Seguimiento: kilonauta.com/t/${esc(s.guia.replace(/\s/g, ''))}`;
+  }
+
+  /* ══════════════════════════════════════════════ reclamos ═══ */
+  function renderClaims() {
+    $('#bReclamos').textContent = String(CLAIMS.length);
+    $('#claims').innerHTML = CLAIMS.map((c) => `
+      <article class="claim" data-open="${c.estado !== 'pagado' ? 1 : 0}">
+        <div class="claim__head">
+          <div>
+            <p class="stencil">Reclamo ${esc(c.id)} · ${esc(c.motivo)}</p>
+            <p class="mono" style="font-size:.95rem;font-weight:600">${esc(c.guia)} — ${esc(c.courier)}</p>
+          </div>
+          <span class="chip ${c.estado === 'pagado' ? 'chip--ok' : 'chip--warn'}">
+            ${c.estado === 'pagado' ? 'Pagado · ' + c.dias + ' días' : 'Presentado · en evaluación'}
+          </span>
+        </div>
+        <p class="tiny muted" style="margin-top:.4rem">
+          ${esc(c.who)} · ${esc(c.comuna)} · mercadería ${KN.clp(c.valor)} · flete ${KN.clp(c.flete)}
+        </p>
+
+        ${c.draft ? `
+          <details style="margin-top:var(--sp-s)">
+            <summary class="tiny" style="cursor:pointer;color:var(--accent-deep);min-height:40px;display:flex;align-items:center">
+              Ver el reclamo que redactamos y presentamos
+            </summary>
+            <div class="draft" style="margin-top:.4rem">${esc(c.draft)}</div>
+          </details>` : ''}
+
+        <ul class="steps-c">
+          ${c.pasos.map((p) => `
+            <li data-pending="${p.ok ? 0 : 1}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                ${p.ok ? '<path d="M2 7.5 5.5 11 12 3"/>' : '<circle cx="7" cy="7" r="5"/>'}
+              </svg>
+              <span>${esc(p.t)}</span>
+            </li>`).join('')}
+        </ul>
+
+        ${c.estado === 'pagado' ? `
+          <div class="card card--sunk" style="margin-top:var(--sp-s)">
+            <p class="tiny" style="margin:0">
+              <b>Te transferimos ${KN.clp(Math.min(60000, c.valor) + c.flete)}</b> el día ${c.dias}.
+              El courier nos pagó ${KN.clp(37400)} el día 34. La diferencia la puso Kilonauta.
+              Eso es exactamente lo que te estamos vendiendo.
+            </p>
+          </div>` : ''}
+      </article>`).join('');
+  }
+
+  /* --- el asistente de reclamo --- */
+  function openClaimWizard(shipId) {
+    const s = SHIPS.find((x) => x.id === shipId);
+    if (!s) return;
+
+    const wrap = document.createElement('article');
+    wrap.className = 'claim';
+    wrap.dataset.open = '1';
+    wrap.innerHTML = `
+      <p class="stencil stencil--accent">Nuevo reclamo · ${esc(s.guia)}</p>
+      <h3 style="margin:.3rem 0 var(--sp-s)">¿Qué pasó con el paquete de ${esc(s.who.split(' ')[0])}?</h3>
+
+      <div class="radio-row" id="wMotivo">
+        <label><input type="radio" name="motivo" value="Extravío" checked> Se perdió. No llegó y no hay eventos.</label>
+        <label><input type="radio" name="motivo" value="Atraso grave"> Llegó, pero tardísimo. Quiero el flete de vuelta.</label>
+        <label><input type="radio" name="motivo" value="Daño"> Llegó roto.</label>
+      </div>
+
+      <div style="margin-top:var(--sp-s)">
+        <p class="stencil" style="margin-bottom:.5rem">Evidencia</p>
+        <ul class="steps-c">
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7.5 5.5 11 12 3"/></svg><span>Guía ${esc(s.guia)} — la tenemos</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7.5 5.5 11 12 3"/></svg><span>Historial de tracking completo — lo tenemos</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7.5 5.5 11 12 3"/></svg><span>Boleta electrónica del pedido #${esc(s.pedido)} — la tenemos</span></li>
+        </ul>
+        <label class="switch" style="margin-top:.4rem">
+          <input type="checkbox" id="wFoto" checked>
+          <span>Adjuntar foto del bulto embalado (la subiste al despachar)</span>
+        </label>
+      </div>
+
+      <button class="btn btn--primary btn--block" id="wGo" style="margin-top:var(--sp-s)">
+        Redactar y presentar el reclamo
+      </button>
+      <p class="tiny muted" style="margin-top:.5rem">
+        Plazo de ${esc(s.courier)} para reclamar: <b>7 días corridos</b> desde el último evento.
+        Te quedan <b>${Math.max(0, 7 - (s.dias - 7))} días</b>. Por eso lo hacemos nosotros.
+      </p>`;
+
+    $('#claims').prepend(wrap);
+    go('reclamos');
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    wrap.querySelector('#wGo').addEventListener('click', () => {
+      const motivo = wrap.querySelector('input[name=motivo]:checked').value;
+      const foto = wrap.querySelector('#wFoto').checked;
+
+      wrap.innerHTML = `
+        <p class="stencil stencil--accent">Reclamo ${esc(s.guia)}</p>
+        <div class="thinking" style="margin-top:var(--sp-s)">
+          <i></i> Leyendo el historial de tracking y redactando el reclamo…
+        </div>`;
+
+      setTimeout(() => {
+        const nuevo = {
+          id: 'RC-' + (2200 + CLAIMS.length + 12),
+          guia: s.guia, courier: s.courier, comuna: s.comuna, who: s.who,
+          motivo, valor: s.valor || 48900, flete: s.precio,
+          estado: 'presentado', dias: 0,
+          draft: draftReclamo(s, motivo, foto),
+          pasos: [
+            { t: `Reclamo formal presentado a ${s.courier} (dentro de plazo)`, ok: true },
+            { t: `Evidencia adjunta: guía, tracking, boleta${foto ? ', foto del bulto' : ''}`, ok: true },
+            { t: 'Reenvío al cliente sin costo de flete — sale hoy', ok: true },
+            { t: 'Respuesta del courier (plazo legal: 30 días hábiles)', ok: false },
+            { t: `Te transferimos ${KN.clp(Math.min(60000, s.valor || 48900) + s.precio)}`, ok: false },
+          ],
+        };
+        CLAIMS.unshift(nuevo);
+        s.estado = 'pegado';
+        renderClaims();
+        renderShips();
+        renderShipDetail();
+        toast('Reclamo presentado. Al cliente ya le sale el reemplazo.');
+        $('#claims').firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1400);
+    });
+  }
+
+  /* En producción esto lo escribe Sonnet 5 con el historial real de eventos.
+     Acá es una plantilla determinista con los datos del envío: el output se
+     parece, el mecanismo no. Está declarado en stack.html sin adornos. */
+  function draftReclamo(s, motivo, foto) {
+    const ult = s.eventos[0];
+    return `Señores ${s.courier}
+Área de Reclamos y Siniestros
+
+REF: Reclamo formal por ${motivo.toLowerCase()} — Guía ${s.guia}
+
+Por medio de la presente, KILONAUTA SpA, RUT 77.812.409-4, en calidad de titular del contrato de transporte y en representación del remitente BRUMA SUPLEMENTOS SpA (RUT 76.543.210-K), viene en presentar reclamo formal por el envío individualizado en la referencia.
+
+ANTECEDENTES DEL ENVÍO
+· Guía de despacho: ${s.guia}
+· Fecha de admisión: ${s.eventos[s.eventos.length - 1].d}, ${s.eventos[s.eventos.length - 1].w}
+· Destinatario: ${s.who}, comuna de ${s.comuna}
+· Flete pagado: ${KN.clp(s.precio)}
+· Valor declarado de la mercadería: ${KN.clp(s.valor || 48900)}
+
+HECHOS
+El último evento registrado en su propio sistema de seguimiento es "${ult.t}" en ${ult.w}, con fecha ${ult.d}. A la fecha de este documento han transcurrido ${s.dias || 11} días sin que se registre movimiento alguno, siendo el tiempo de tránsito comprometido para este tramo de 2 días hábiles.
+
+El destinatario no ha recibido la mercadería ni ha sido contactado para retiro en sucursal.
+
+EVIDENCIA ADJUNTA
+1. Guía de despacho ${s.guia}.
+2. Historial completo de eventos de seguimiento, extraído de su API.
+3. Boleta electrónica del pedido #${s.pedido}.${foto ? `
+4. Fotografía del bulto embalado, tomada al momento del despacho.` : ''}
+
+PETICIÓN CONCRETA
+Solicitamos, dentro del plazo legal:
+a) La indemnización del valor declarado de la mercadería, ascendente a ${KN.clp(s.valor || 48900)}.
+b) La devolución íntegra del flete pagado, ${KN.clp(s.precio)}.
+
+Se deja constancia de que el presente reclamo se presenta dentro del plazo contractual y que el remitente ya ha procedido a reenviar la mercadería al destinatario por su cuenta, a fin de no perjudicar al consumidor final.
+
+Quedamos a la espera de su pronunciamiento.
+
+KILONAUTA SpA
+Operaciones · reclamos@kilonauta.com`;
+  }
+
+  /* ═══════════════════════════════════════════════ métricas ═══ */
+  function renderStats() {
+    $('#saldo').textContent   = KN.clp(state.saldo);
+    $('#sEnvios').textContent = String(state.envios);
+    $('#sAhorro').textContent = KN.clp(state.ahorro);
+  }
+
+  /* ═══════════════════════════════════════════════════ boot ═══ */
+  renderOrders();
+  renderShips();
+  renderClaims();
+  renderStats();
+  state.shipSel = 'E-2203';   // el que se perdió: es lo primero que quieres ver
+  renderShips();
+  renderShipDetail();
+})();
+</script>
+</body>
+</html>

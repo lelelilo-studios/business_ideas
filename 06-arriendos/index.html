@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conserjo — El conserje digital de tus arriendos</title>
+<meta name="description" content="Filtra arrendatarios con DICOM y renta verificada, cobra el arriendo solo y diagnostica las reparaciones desde una foto. Para el dueño de 2 a 15 departamentos y la corredora chica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  /* --- Portada --- */
+  .hero { padding-block: var(--sp-xl) var(--sp-l); }
+  .hero h1 { margin-block: var(--sp-xs) var(--sp-s); max-width: 15ch; }
+  .hero .lead { max-width: 46ch; }
+  .hero-cta { margin-top: var(--sp-m); }
+  .hero-sello {
+    margin-top: var(--sp-m);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--tinta-3);
+    letter-spacing: 0.04em;
+  }
+  @media (min-width: 60em) {
+    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-2xl); align-items: center; }
+  }
+
+  /* Recibo del hero: la cuenta del dolor */
+  .recibo {
+    border: var(--borde);
+    background: var(--papel);
+    box-shadow: 4px 4px 0 var(--papel-3);
+    padding: var(--sp-m);
+    margin-top: var(--sp-xl);
+  }
+  @media (min-width: 60em) { .recibo { margin-top: 0; } }
+  .recibo-h {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--tinta-3);
+    border-bottom: 2px solid var(--tinta);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .recibo dl { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.5rem; }
+  .recibo dt { padding: 0.5rem 0; border-bottom: var(--hairline); font-size: 0.88rem; }
+  .recibo dd {
+    padding: 0.5rem 0;
+    border-bottom: var(--hairline);
+    text-align: right;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+  .recibo .total dt, .recibo .total dd {
+    border-bottom: 0;
+    border-top: 2px solid var(--tinta);
+    padding-top: 0.7rem;
+    font-weight: 700;
+  }
+  .recibo .total dd { color: var(--teja); font-size: 1.15rem; }
+  .recibo-pie { font-size: 0.72rem; color: var(--tinta-3); margin-top: 0.7rem; line-height: 1.5; }
+
+  /* --- Triage en vivo --- */
+  .triage { border: var(--borde); background: var(--papel-2); }
+  .triage-h {
+    background: var(--tinta);
+    color: var(--papel);
+    padding: 0.7rem var(--sp-s);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2xs);
+    flex-wrap: wrap;
+  }
+  .triage-h strong { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .triage-h span { font-family: var(--mono); font-size: 0.7rem; color: rgba(242,237,227,0.6); }
+  .triage-body { padding: var(--sp-s); }
+
+  .fotos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2xs); }
+  .foto-btn {
+    padding: 0;
+    border: 2px solid var(--papel-3);
+    background: var(--papel);
+    min-height: 0;
+    min-width: 0;
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  .foto-btn svg { width: 100%; height: auto; display: block; }
+  .foto-btn[aria-pressed="true"] { border-color: var(--teja); box-shadow: 0 0 0 2px var(--teja-tint); }
+  .foto-btn figcaption,
+  .foto-btn .cap {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.3rem 0.35rem;
+    border-top: 1px solid var(--papel-3);
+    color: var(--tinta-2);
+    text-align: left;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+  }
+  .foto-btn[aria-pressed="true"] .cap { color: var(--teja); font-weight: 600; }
+
+  .msg-wa {
+    margin-top: var(--sp-s);
+    background: var(--papel);
+    border: var(--hairline);
+    border-left: 3px solid var(--tinta);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--tinta-2);
+  }
+  .msg-wa b { font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3); display: block; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.2rem; }
+
+  /* Salida del diagnóstico */
+  .diag { margin-top: var(--sp-s); border-top: 2px solid var(--tinta); padding-top: var(--sp-s); }
+  .diag[hidden] { display: none; }
+  .diag-fila { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-xs); padding: 0.45rem 0; border-bottom: var(--hairline); }
+  .diag-fila:last-child { border-bottom: 0; }
+  .diag-k { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tinta-3); flex: none; }
+  .diag-v { text-align: right; font-size: 0.88rem; font-weight: 500; }
+  .diag-v .clp { font-weight: 600; }
+  .riesgo {
+    background: rgba(178, 67, 42, 0.07);
+    border: 1px solid var(--teja);
+    padding: 0.6rem 0.7rem;
+    margin-top: var(--sp-2xs);
+    font-size: 0.83rem;
+    color: var(--tinta);
+    display: flex;
+    gap: 0.5rem;
+  }
+  .riesgo svg { flex: none; color: var(--teja); margin-top: 2px; }
+
+  .cargando { font-family: var(--mono); font-size: 0.8rem; color: var(--tinta-3); padding: var(--sp-s) 0; }
+  .cargando[hidden] { display: none; }
+  .cargando b { color: var(--teja); font-weight: 500; }
+  .barra { height: 3px; background: var(--papel-3); margin-top: 0.5rem; overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--teja); width: 0; transition: width 0.4s linear; }
+
+  /* --- Cómo funciona: tres actos --- */
+  .acto { border-top: 2px solid var(--tinta); padding-top: var(--sp-s); }
+  .acto .ficha-num { font-size: 0.72rem; }
+  .acto h3 { margin-bottom: var(--sp-2xs); }
+  .acto p { color: var(--tinta-2); font-size: 0.92rem; }
+
+  /* --- Precios --- */
+  .plan { display: flex; flex-direction: column; height: 100%; }
+  .plan .precio { font-family: var(--mono); font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; margin-block: 0.3rem 0.1rem; }
+  .plan .precio small { font-size: 0.75rem; font-weight: 400; color: var(--tinta-3); letter-spacing: 0; }
+  .plan .quien { font-size: 0.83rem; color: var(--tinta-3); min-height: 2.6em; }
+  .plan ul { margin-block: var(--sp-s); flex: 1; }
+  .plan .btn { width: 100%; }
+  .destacado { position: relative; }
+  .destacado::after {
+    content: "El más usado";
+    position: absolute;
+    top: -1px; right: -1px;
+    background: var(--teja);
+    color: var(--papel);
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* --- FAQ --- */
+  details {
+    border-bottom: var(--hairline);
+    padding: var(--sp-xs) 0;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    min-height: 32px;
+    padding: 0.35rem 0;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: "+";
+    font-family: var(--mono);
+    color: var(--teja);
+    font-size: 1.3rem;
+    line-height: 1;
+    flex: none;
+  }
+  details[open] summary::after { content: "−"; }
+  details p { color: var(--tinta-2); font-size: 0.92rem; padding-top: var(--sp-2xs); max-width: 62ch; }
+
+  .cta-final {
+    border: 2px solid var(--tinta);
+    background: var(--tinta);
+    color: var(--papel);
+    padding: var(--sp-l) var(--sp-m);
+    text-align: center;
+  }
+  .cta-final h2 { color: var(--papel); }
+  .cta-final p { color: rgba(242,237,227,0.75); max-width: 44ch; margin: var(--sp-2xs) auto var(--sp-m); }
+  .cta-final .btn { background: var(--teja); border-color: var(--teja); }
+  .cta-final .btn:hover { background: var(--papel); color: var(--tinta); border-color: var(--papel); }
+</style>
+</head>
+<body>
+
+<!-- Sprite de iconos: trazo, dibujados a mano. Cero emojis. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="7" cy="7" r="4"/><path d="M10 10l10 10M17 17l2-2M14 14l2-2"/>
+  </symbol>
+  <symbol id="i-gota" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3s6 6.5 6 10.5A6 6 0 0 1 6 13.5C6 9.5 12 3 12 3z"/>
+  </symbol>
+  <symbol id="i-rayo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/>
+  </symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+  </symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3L2 20h20L12 3z"/><path d="M12 9v5M12 17.5v.01"/>
+  </symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z"/><path d="M9 12l2 2 4-4"/>
+  </symbol>
+  <symbol id="i-casa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10z"/>
+  </symbol>
+  <symbol id="i-llave-inglesa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 5a5 5 0 0 1-6.5 6.4L6 19a2.1 2.1 0 0 1-3-3l7.6-7.5A5 5 0 0 1 17 2l-3 3 2 2 3-3c.6.6 1 1.3 1 2z"/>
+  </symbol>
+  <symbol id="i-billete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="6" width="20" height="12"/><circle cx="12" cy="12" r="2.5"/><path d="M5 12h.01M19 12h.01"/>
+  </symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M3 6h18M3 12h18M3 18h18"/>
+  </symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h14M13 6l6 6-6 6"/>
+  </symbol>
+</svg>
+
+<header class="marca-bar">
+  <nav class="container" aria-label="Principal">
+    <a class="logo" href="index.html">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-llave"/></svg>
+      Conserjo
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-menu"/></svg>
+      <span class="visually-hidden">Abrir menú</span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html" aria-current="page">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" style="margin-top:0">
+    <div class="hero-grid">
+      <div>
+        <p class="kicker">Administración de arriendos · Chile</p>
+        <h1>El conserje que no duerme.</h1>
+        <p class="lead">
+          Filtra al arrendatario antes de que firme. Cobra el arriendo sin que tengas
+          que insistir. Y cuando llega la foto de la filtración a las 11 de la noche,
+          la diagnostica, la cotiza y te manda al maestro.
+        </p>
+        <div class="btn-fila hero-cta">
+          <a class="btn btn--teja" href="demo/index.html">
+            Ver el demo
+            <svg width="16" height="16" aria-hidden="true"><use href="#i-flecha"/></svg>
+          </a>
+          <a class="btn btn--fantasma" href="#precios">Precios</a>
+        </div>
+        <p class="hero-sello">
+          Desde $7.900 por unidad al mes · Sin contrato de permanencia
+        </p>
+      </div>
+
+      <!-- El recibo: cuánto cuesta el problema. Todo estimado y declarado. -->
+      <div class="recibo">
+        <p class="recibo-h">Lo que te cuesta hoy · dueño de 6 deptos</p>
+        <dl>
+          <dt>Horas persiguiendo el arriendo y conciliando transferencias<br><span class="muted small">9 h/mes × $15.000/h de tu tiempo</span></dt>
+          <dd>$1.620.000<br><span class="muted small" style="font-weight:400">al año</span></dd>
+
+          <dt>Sobrecosto por reparaciones mal atendidas<br><span class="muted small">2 de cada 10 incidentes escalan a ~4×</span></dt>
+          <dd>$840.000<br><span class="muted small" style="font-weight:400">al año</span></dd>
+
+          <dt>Un arrendatario malo, cuando toca<br><span class="muted small">10 meses de arriendo impago + abogado, prorrateado a 1 vez cada 6 años</span></dt>
+          <dd>$1.150.000<br><span class="muted small" style="font-weight:400">al año</span></dd>
+
+          <div class="total" style="display:contents">
+            <dt>Costo anual del problema</dt>
+            <dd>$3.610.000</dd>
+          </div>
+        </dl>
+        <p class="recibo-pie">
+          <b>Estimación, no cita.</b> Aritmética completa y cada supuesto declarado en
+          <a href="negocio.html">Negocio</a>. Conserjo para 6 unidades cuesta
+          <span class="clp">$425.000</span> al año.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EL PROBLEMA, EN SUS PALABRAS ================= -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">01 — El problema</p>
+      <h2>Es una segunda pega, y nadie te la paga.</h2>
+    </div>
+    <div class="grid g3">
+      <blockquote class="voz">
+        “Me llegan sesenta mensajes por Portal Inmobiliario. Les pido las liquidaciones
+        y el DICOM por WhatsApp, y al final elijo con la guata.”
+        <cite>Dueño de 4 deptos · Ñuñoa e Independencia</cite>
+      </blockquote>
+      <blockquote class="voz">
+        “Todos los días 5 me pongo a mirar la cartola a ver quién transfirió.
+        Y siempre hay uno que puso de glosa ‘pago’ y nada más.”
+        <cite>Dueña de 7 deptos · Estación Central</cite>
+      </blockquote>
+      <blockquote class="voz">
+        “La señora del 802 me mandó una foto de una mancha en el techo. Le dije que
+        no era nada. Tres semanas después había que cambiar el yeso-cartón entero.”
+        <cite>Corredor · cartera de 34 unidades</cite>
+      </blockquote>
+    </div>
+    <p class="nota mt-l">
+      Las tres frases son las tres pegas: <b>filtrar</b>, <b>cobrar</b> y <b>reparar</b>.
+      En Chile el desalojo por no pago se demora entre 8 y 18 meses en la práctica,
+      así que el <em>único</em> momento en que tienes poder de negociación es antes de
+      que firme. Ahí es donde este producto pega más fuerte.
+    </p>
+  </section>
+
+  <!-- ================= TRIAGE EN VIVO ================= -->
+  <section>
+    <div class="section-head">
+      <p class="kicker">02 — Pruébalo aquí mismo</p>
+      <h2>Llega una foto. Sale una orden de trabajo.</h2>
+      <p class="lead mt-s" style="max-width:52ch">
+        El arrendatario reporta por WhatsApp con una foto. Esto es lo que Conserjo te
+        devuelve, en menos de un minuto. Elige un caso:
+      </p>
+    </div>
+
+    <div class="triage">
+      <div class="triage-h">
+        <strong>Triage de mantención</strong>
+        <span id="hora-triage">Hoy · 23:14</span>
+      </div>
+      <div class="triage-body">
+
+        <div class="fotos" role="group" aria-label="Elige una foto de ejemplo">
+          <!-- FOTO A: mancha de humedad en cielo de baño -->
+          <button class="foto-btn" type="button" data-caso="a" aria-pressed="true">
+            <svg viewBox="0 0 100 78" aria-hidden="true">
+              <rect width="100" height="78" fill="#DED8CB"/>
+              <rect x="0" y="0" width="100" height="52" fill="#E7E2D6"/>
+              <!-- junta de cielo -->
+              <path d="M0 40h100M32 0v40M68 0v40" stroke="#CFC7B6" stroke-width="1"/>
+              <!-- mancha -->
+              <path d="M38 8c9-4 20-2 24 5s3 15-3 19-19 4-25-2-5-18 4-22z" fill="#B79A78" opacity=".85"/>
+              <path d="M42 12c6-3 14-1 17 4s2 11-2 13-13 3-17-1-4-13 2-16z" fill="#8E6E4C" opacity=".8"/>
+              <path d="M48 18c4-2 8 0 9 3s0 6-3 7-7 1-8-2 0-7 2-8z" fill="#5E442A" opacity=".75"/>
+              <!-- burbuja de pintura -->
+              <ellipse cx="61" cy="30" rx="6" ry="3.5" fill="none" stroke="#8E6E4C" stroke-width="1"/>
+              <!-- muro y cerámica -->
+              <path d="M0 52h100M0 65h100M20 52v26M50 52v26M80 52v26" stroke="#CFC7B6" stroke-width="1"/>
+            </svg>
+            <span class="cap">A · Mancha en el cielo del baño</span>
+          </button>
+
+          <!-- FOTO B: sifón goteando bajo el lavaplatos -->
+          <button class="foto-btn" type="button" data-caso="b" aria-pressed="false">
+            <svg viewBox="0 0 100 78" aria-hidden="true">
+              <rect width="100" height="78" fill="#2E2A24"/>
+              <rect x="0" y="52" width="100" height="26" fill="#4A4036"/>
+              <!-- mueble hinchado -->
+              <path d="M0 52h100" stroke="#6B5B48" stroke-width="1.5"/>
+              <path d="M8 52c0-4 6-3 10-3s10-1 10 3" fill="none" stroke="#8A7458" stroke-width="1.5"/>
+              <!-- tubos -->
+              <path d="M50 6v16" stroke="#B9BCC0" stroke-width="5" stroke-linecap="round"/>
+              <path d="M50 22c0 8-9 8-9 14s9 6 9 12v4" fill="none" stroke="#A7ABB0" stroke-width="5" stroke-linecap="round"/>
+              <path d="M50 22c0 8-9 8-9 14s9 6 9 12v4" fill="none" stroke="#D6D9DC" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- fuga -->
+              <circle cx="41" cy="38" r="3" fill="#4C7A96"/>
+              <path d="M41 44c0 3 1 5 1 7" stroke="#6FA6C4" stroke-width="1.5" stroke-linecap="round"/>
+              <ellipse cx="42" cy="58" rx="11" ry="3.5" fill="#3E5F72" opacity=".8"/>
+              <ellipse cx="42" cy="58" rx="6" ry="2" fill="#6FA6C4" opacity=".7"/>
+              <!-- balde -->
+              <path d="M62 48l3 12h12l3-12z" fill="none" stroke="#9AA0A6" stroke-width="1.5"/>
+            </svg>
+            <span class="cap">B · Gotera bajo el lavaplatos</span>
+          </button>
+
+          <!-- FOTO C: tablero eléctrico quemado -->
+          <button class="foto-btn" type="button" data-caso="c" aria-pressed="false">
+            <svg viewBox="0 0 100 78" aria-hidden="true">
+              <rect width="100" height="78" fill="#DCD6C9"/>
+              <rect x="16" y="8" width="68" height="62" fill="#EFEDE8" stroke="#B6AF9F" stroke-width="1.5"/>
+              <rect x="24" y="18" width="52" height="30" fill="#D9D5CC" stroke="#B6AF9F" stroke-width="1"/>
+              <!-- automáticos -->
+              <rect x="28" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294" stroke-width="1"/>
+              <rect x="39" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294" stroke-width="1"/>
+              <rect x="50" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294" stroke-width="1"/>
+              <rect x="61" y="22" width="8" height="22" fill="#F4F2ED" stroke="#A8A294" stroke-width="1"/>
+              <path d="M30 27h4M41 27h4M52 33h4M63 27h4" stroke="#6B665B" stroke-width="2"/>
+              <!-- hollín -->
+              <path d="M46 20c6-3 16-2 20 4s2 14-6 16-18 0-20-6 0-11 6-14z" fill="#2A2622" opacity=".55"/>
+              <path d="M50 24c4-2 11-1 13 3s1 9-4 10-12 0-13-4 0-8 4-9z" fill="#171512" opacity=".7"/>
+              <!-- derretido -->
+              <path d="M54 44v6M56 44v5" stroke="#4A3B2E" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M24 56h52" stroke="#B6AF9F" stroke-width="1"/>
+            </svg>
+            <span class="cap">C · Tablero eléctrico con hollín</span>
+          </button>
+        </div>
+
+        <p class="msg-wa">
+          <b>Mensaje del arrendatario</b>
+          <span id="msg-texto">“Hola, buenas noches. Perdón la hora. En el baño apareció esta mancha
+          en el techo y se está poniendo más grande. Se siente húmedo al tocarlo. Depto 802.”</span>
+        </p>
+
+        <div class="btn-fila mt-m">
+          <button class="btn btn--teja" id="btn-diag" type="button">Diagnosticar</button>
+          <button class="btn btn--fantasma" id="btn-reset" type="button" hidden>Otro caso</button>
+        </div>
+
+        <!-- Estado: analizando -->
+        <div class="cargando" id="cargando" hidden aria-live="polite">
+          <span id="paso-txt"><b>Leyendo la foto…</b></span>
+          <span class="barra"><i id="barra-i"></i></span>
+        </div>
+
+        <!-- Estado: diagnóstico -->
+        <div class="diag" id="diag" hidden>
+          <div class="flex entre centro-v wrap gap-s mb-m">
+            <h3 id="d-titulo" style="font-size:var(--step-1)">—</h3>
+            <span class="pill" id="d-pill"><svg width="12" height="12" aria-hidden="true"><use href="#i-alerta"/></svg><span id="d-pill-txt">—</span></span>
+          </div>
+
+          <div class="diag-fila">
+            <span class="diag-k">Causa probable</span>
+            <span class="diag-v" id="d-causa">—</span>
+          </div>
+          <div class="diag-fila">
+            <span class="diag-k">Atender antes de</span>
+            <span class="diag-v num" id="d-plazo">—</span>
+          </div>
+          <div class="diag-fila">
+            <span class="diag-k">Costo estimado</span>
+            <span class="diag-v clp" id="d-costo">—</span>
+          </div>
+          <div class="diag-fila">
+            <span class="diag-k">Oficio</span>
+            <span class="diag-v" id="d-oficio">—</span>
+          </div>
+          <div class="diag-fila">
+            <span class="diag-k">Maestro propuesto</span>
+            <span class="diag-v" id="d-maestro">—</span>
+          </div>
+
+          <div class="riesgo">
+            <svg width="16" height="16" aria-hidden="true"><use href="#i-alerta"/></svg>
+            <span><b>Si no se atiende:</b> <span id="d-riesgo">—</span></span>
+          </div>
+
+          <p class="small muted mt-m" id="d-contencion" style="line-height:1.5"></p>
+
+          <div class="btn-fila mt-m">
+            <a class="btn" href="demo/index.html">Ver el flujo completo en el demo</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <p class="fig-cap">
+      Esto corre en tu navegador con datos de ejemplo, y las respuestas están escritas a mano.
+      El agente real (visión + tabla de costos por comuna + historial de la unidad) está
+      especificado en <a href="stack.html">Arquitectura</a>, con su costo de inferencia.
+    </p>
+  </section>
+
+  <!-- ================= CÓMO FUNCIONA ================= -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">03 — Cómo funciona</p>
+      <h2>Tres pegas. Tres agentes.</h2>
+    </div>
+    <div class="grid g3">
+      <div class="acto">
+        <span class="ficha-num">01 / FILTRAR</span>
+        <h3>El único momento en que tienes poder</h3>
+        <p>
+          El postulante sube cédula, liquidaciones y autoriza la consulta a DICOM desde su
+          teléfono. Conserjo verifica la identidad, lee las liquidaciones, calcula la renta
+          líquida real y el ratio arriendo/renta, y te devuelve un puntaje <em>con sus razones</em>.
+          No decide por ti: te dice qué mirar y qué no cuadra.
+        </p>
+        <p class="small muted mt-s">
+          <svg width="13" height="13" style="display:inline;vertical-align:-2px" aria-hidden="true"><use href="#i-escudo"/></svg>
+          Nunca puntúa por nacionalidad, edad, sexo ni comuna de origen. Solo capacidad de pago
+          verificable y comportamiento crediticio.
+        </p>
+      </div>
+      <div class="acto">
+        <span class="ficha-num">02 / COBRAR</span>
+        <h3>Conciliar la cartola, que es la pega fome</h3>
+        <p>
+          En Chile el arriendo se paga por transferencia, no por PAC. Conserjo lee tu cartola
+          (vía Fintoc), calza cada abono con el cargo del mes —aunque la glosa diga solo “pago”—,
+          y lo que queda ambiguo te lo pone en una cola de dos clics. Los recordatorios salen
+          por WhatsApp antes de que se atrase, no después.
+        </p>
+        <p class="small muted mt-s">
+          <svg width="13" height="13" style="display:inline;vertical-align:-2px" aria-hidden="true"><use href="#i-billete"/></svg>
+          Reajuste por UF y multa por mora calculados según el contrato, sin planilla.
+        </p>
+      </div>
+      <div class="acto">
+        <span class="ficha-num">03 / REPARAR</span>
+        <h3>Diagnóstico desde una foto</h3>
+        <p>
+          El arrendatario manda la foto por WhatsApp. La IA la lee, la compara con el historial
+          de esa unidad, la cruza con una tabla de precios de tu comuna, y te dice: qué es, qué
+          tan grave, cuánto cuesta, para cuándo, y qué maestro. Tú aprietas “aprobar”. Y —lo
+          más importante— te dice <b>cuánto te va a costar si esperas</b>.
+        </p>
+        <p class="small muted mt-s">
+          <svg width="13" height="13" style="display:inline;vertical-align:-2px" aria-hidden="true"><use href="#i-llave-inglesa"/></svg>
+          Red de maestros con SEC vigente, calificados por trabajo terminado.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRECIOS ================= -->
+  <section id="precios">
+    <div class="section-head">
+      <p class="kicker">04 — Precio</p>
+      <h2>Se paga por unidad, no por usuario.</h2>
+      <p class="lead mt-s" style="max-width:52ch">
+        Una corredora te cobra entre 5% y 8% del arriendo por administrar.
+        Conserjo cuesta cerca del <b>1%</b> — y tú mantienes el control.
+      </p>
+    </div>
+
+    <div class="grid g3">
+      <div class="ficha plan">
+        <span class="ficha-num">LLAVERO</span>
+        <p class="precio">$7.900 <small>/ unidad · mes</small></p>
+        <p class="quien">De 2 a 4 unidades. El inversionista que compró para arrendar y lo lleva en un Excel.</p>
+        <ul class="lista lista--check small" role="list">
+          <li>Filtro de arrendatarios con DICOM</li>
+          <li>Cobro y conciliación de cartola</li>
+          <li>Triage de mantención por foto</li>
+          <li>Contrato de arriendo y reajuste UF</li>
+        </ul>
+        <a class="btn btn--fantasma" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="ficha plan destacado ficha--acento">
+        <span class="ficha-num">PORTAFOLIO</span>
+        <p class="precio">$5.900 <small>/ unidad · mes</small></p>
+        <p class="quien">De 5 a 15 unidades. El que ya tiene un portafolio y perdió la cuenta de quién le debe.</p>
+        <ul class="lista lista--check small" role="list">
+          <li>Todo lo de Llavero</li>
+          <li>Red de maestros con SEC vigente</li>
+          <li>Cartilla tributaria anual (renta de arriendos)</li>
+          <li>Alertas de vencimiento y renovación</li>
+        </ul>
+        <a class="btn btn--teja" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="ficha plan">
+        <span class="ficha-num">CORREDORA</span>
+        <p class="precio">$3.900 <small>/ unidad · mes</small></p>
+        <p class="quien">16 unidades o más. Mínimo $69.000/mes. Para la corredora chica que administra cartera ajena.</p>
+        <ul class="lista lista--check small" role="list">
+          <li>Todo lo de Portafolio</li>
+          <li>Multi-propietario y liquidación mensual al dueño</li>
+          <li>Marca propia en los mensajes al arrendatario</li>
+          <li>API y exportación contable</li>
+        </ul>
+        <a class="btn btn--fantasma" href="negocio.html">Hablar con nosotros</a>
+      </div>
+    </div>
+
+    <div class="ficha ficha--hundida mt-l">
+      <div class="flex entre wrap gap-m centro-v">
+        <div>
+          <h3 style="font-size:var(--step-0)">Informe de arrendatario — $6.900 por postulante</h3>
+          <p class="small muted mt-s" style="max-width:56ch">
+            DICOM/Equifax + verificación de identidad + lectura de liquidaciones + puntaje con razones.
+            Se lo puedes cobrar al postulante (es lo que hace todo el mercado) o absorberlo tú.
+            No necesitas ser cliente para comprar uno.
+          </p>
+        </div>
+        <span class="pill pill--neutro">Cobro por evento</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">05 — Preguntas</p>
+      <h2>Lo que nos preguntan primero.</h2>
+    </div>
+
+    <details>
+      <summary>¿Esto reemplaza a mi corredor?</summary>
+      <p>
+        Si lo que quieres es que otro haga todo y no ver nada, no: anda a Houm o a una corredora
+        y págales su 5–8%. Conserjo es para el que quiere seguir a cargo pero dejar de hacer la
+        pega manual. También lo usan corredoras chicas, que son nuestro mejor cliente:
+        les baja el costo de administrar cada unidad.
+      </p>
+    </details>
+    <details>
+      <summary>¿La IA decide a quién le arriendo?</summary>
+      <p>
+        No. Recomienda y muestra sus razones; la decisión la tomas tú y queda registrada a tu nombre.
+        El modelo nunca ve ni usa nacionalidad, sexo, edad, estado civil ni comuna de origen: solo
+        renta líquida verificada, ratio arriendo/renta, antigüedad laboral, morosidades y protestos.
+        Toda evaluación queda auditable y el postulante puede pedir la suya.
+      </p>
+    </details>
+    <details>
+      <summary>Mis arrendatarios pagan por transferencia. ¿Sirve igual?</summary>
+      <p>
+        Es exactamente el caso para el que está hecho. En Chile el débito automático para arriendos
+        casi no existe, y conciliar quién transfirió es trabajo manual real. Conserjo lee tu cartola
+        y calza los abonos con los cargos. Si prefieres, también puedes cobrar con tarjeta vía Webpay
+        (te cuesta la comisión de Transbank, ~2,95%).
+      </p>
+    </details>
+    <details>
+      <summary>¿Cuánto se demora el arrendatario en reportar un problema?</summary>
+      <p>
+        Le llega un link por WhatsApp, saca la foto y escribe dos líneas. No instala nada, no crea
+        cuenta. Es el caso de uso central del producto y por eso el demo está hecho para el teléfono.
+      </p>
+    </details>
+    <details>
+      <summary>¿Y si el maestro que me proponen lo hace mal?</summary>
+      <p>
+        Los maestros de la red tienen SEC vigente cuando el oficio lo exige y se califican por trabajo
+        terminado, no por estrellas sueltas. También puedes usar tu maestro de siempre: Conserjo le
+        manda el diagnóstico y la orden de trabajo igual. No te obligamos a usar nuestra red.
+      </p>
+    </details>
+    <details>
+      <summary>¿Qué pasa si el arrendatario deja de pagar de verdad?</summary>
+      <p>
+        Conserjo arma la carpeta: contrato, comprobantes, cartas de cobro fechadas y el registro de
+        comunicaciones. Eso es lo que tu abogado va a necesitar el día uno del juicio y es lo que
+        nadie tiene ordenado. No hacemos el juicio nosotros, y no te vamos a decir que lo evitamos:
+        te vamos a decir, desde el filtro, que ese postulante era riesgoso.
+      </p>
+    </details>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section>
+    <div class="cta-final">
+      <h2>Un mal arrendatario cuesta más que diez años de Conserjo.</h2>
+      <p>Recorre el producto completo con datos de ejemplo. No pedimos tarjeta, ni correo, ni nada.</p>
+      <a class="btn" href="demo/index.html">
+        Entrar al demo
+        <svg width="16" height="16" aria-hidden="true"><use href="#i-flecha"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container flex entre wrap gap-m">
+    <p><b>Conserjo</b> · conserjo.com — prototipo. Los datos son de ejemplo.</p>
+    <p><a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Ideas</a></p>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+<script>
+(function () {
+  var CASOS = {
+    a: {
+      msg: '“Hola, buenas noches. Perdón la hora. En el baño apareció esta mancha en el techo y se está poniendo más grande. Se siente húmedo al tocarlo. Depto 802.”',
+      titulo: 'Filtración desde la unidad de arriba',
+      urgencia: 'urgente', pillTxt: 'Severidad 4 / 5',
+      causa: 'Sello del receptáculo de ducha del 902',
+      plazo: '48 horas',
+      costo: '$80.000 – $180.000',
+      costoAlt: 'si es solo el sello',
+      oficio: 'Gásfiter',
+      maestro: 'Luis Cárdenas · Ñuñoa · 4,8 (37 trabajos)',
+      riesgo: 'en tres semanas el agua baja al 802 y hay que reponer yeso-cartón y pintar: <b class="clp">$450.000 – $900.000</b>. El daño se multiplica por cinco.',
+      contencion: 'Contención inmediata para el arrendatario: cerrar la llave de paso del baño del 902 y avisar al comité del edificio. Falta una foto del piso del baño del 902 para confirmar.'
+    },
+    b: {
+      msg: '“Buenas, está goteando abajo del lavaplatos. Puse un balde. El mueble ya se ve hinchado por abajo.”',
+      titulo: 'Fuga en el sifón del lavaplatos',
+      urgencia: 'media', pillTxt: 'Severidad 2 / 5',
+      causa: 'Sifón suelto o empaquetadura vencida',
+      plazo: '72 horas',
+      costo: '$25.000 – $45.000',
+      costoAlt: 'visita + empaquetadura',
+      oficio: 'Gásfiter o maestro general',
+      maestro: 'Servicios Riquelme SpA · 77.281.940-1 · 4,6',
+      riesgo: 'la melamina del mueble ya está hinchada. Si esperas otro mes hay que cambiar el mueble completo: <b class="clp">+$180.000</b>.',
+      contencion: 'Contención inmediata: mantener el balde y no usar el lavaplatos hasta la visita. No es urgencia de esta noche — se programa.'
+    },
+    c: {
+      msg: '“Se cortó la luz de los enchufes y el tablero está negro por un lado. Huele raro. ¿Qué hago?”',
+      titulo: 'Sobrecarga y automático dañado',
+      urgencia: 'urgente', pillTxt: 'Severidad 5 / 5',
+      causa: 'Circuito de enchufes sobrecargado; signos de calentamiento',
+      plazo: 'HOY',
+      costo: '$60.000 – $140.000',
+      costoAlt: 'automático + revisión del circuito',
+      oficio: 'Eléctrico clase B (SEC)',
+      maestro: 'Héctor Painemal · SEC B-12.847 · 4,9',
+      riesgo: 'esto no es un tema de plata, es riesgo de <b>incendio</b>. Es el único caso en que Conserjo te llama por teléfono en vez de mandarte una notificación.',
+      contencion: 'Contención inmediata: bajar el automático general y no usar ese circuito. Ya se le envió esta instrucción al arrendatario por WhatsApp.'
+    }
+  };
+
+  var PASOS = [
+    'Leyendo la foto…',
+    'Comparando con casos similares…',
+    'Cruzando con precios de tu comuna…',
+    'Buscando maestro disponible…'
+  ];
+
+  var casoActual = 'a';
+  var botones = document.querySelectorAll('.foto-btn');
+  var btnDiag = document.getElementById('btn-diag');
+  var btnReset = document.getElementById('btn-reset');
+  var cargando = document.getElementById('cargando');
+  var pasoTxt = document.getElementById('paso-txt');
+  var barra = document.getElementById('barra-i');
+  var diag = document.getElementById('diag');
+  var msgTexto = document.getElementById('msg-texto');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  botones.forEach(function (b) {
+    b.addEventListener('click', function () {
+      casoActual = b.dataset.caso;
+      botones.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      msgTexto.textContent = CASOS[casoActual].msg;
+      diag.hidden = true;
+      cargando.hidden = true;
+      btnReset.hidden = true;
+      btnDiag.hidden = false;
+    });
+  });
+
+  function pintar(c) {
+    document.getElementById('d-titulo').textContent = c.titulo;
+    var pill = document.getElementById('d-pill');
+    pill.className = 'pill pill--' + c.urgencia;
+    document.getElementById('d-pill-txt').textContent = c.pillTxt;
+    document.getElementById('d-causa').textContent = c.causa;
+    document.getElementById('d-plazo').textContent = c.plazo;
+    document.getElementById('d-costo').innerHTML = c.costo + ' <span class="muted small" style="font-weight:400">' + c.costoAlt + '</span>';
+    document.getElementById('d-oficio').textContent = c.oficio;
+    document.getElementById('d-maestro').textContent = c.maestro;
+    document.getElementById('d-riesgo').innerHTML = c.riesgo;
+    document.getElementById('d-contencion').textContent = c.contencion;
+    diag.hidden = false;
+    btnReset.hidden = false;
+  }
+
+  btnDiag.addEventListener('click', function () {
+    var c = CASOS[casoActual];
+    btnDiag.hidden = true;
+    diag.hidden = true;
+
+    if (reduce) { pintar(c); return; }
+
+    cargando.hidden = false;
+    var i = 0;
+    barra.style.width = '0';
+    pasoTxt.innerHTML = '<b>' + PASOS[0] + '</b>';
+    requestAnimationFrame(function () { barra.style.width = '25%'; });
+
+    var t = setInterval(function () {
+      i++;
+      if (i >= PASOS.length) {
+        clearInterval(t);
+        cargando.hidden = true;
+        pintar(c);
+        return;
+      }
+      pasoTxt.innerHTML = '<b>' + PASOS[i] + '</b>';
+      barra.style.width = ((i + 1) * 25) + '%';
+    }, 420);
+  });
+
+  btnReset.addEventListener('click', function () {
+    diag.hidden = true;
+    btnReset.hidden = true;
+    btnDiag.hidden = false;
+    document.querySelector('.fotos').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+  });
+})();
+</script>
+</body>
+</html>

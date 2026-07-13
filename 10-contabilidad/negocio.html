@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Talonio</title>
+<meta name="description" content="ICP, mercado, competencia, precio, economía unitaria y canales de Talonio. Con la aritmética a la vista.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&display=swap">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc-hd { border-bottom: 3px double var(--linea-2); padding-block: var(--sp-m) var(--sp-s); }
+  .doc-hd h1 { font-size: var(--step-4); }
+  .doc-hd p { color: var(--tinta-2); margin-top: 6px; max-width: 60ch; }
+
+  .idx { position: sticky; top: 58px; z-index: 40; background: var(--papel); border-bottom: 1px solid var(--linea); }
+  .idx-in { display: flex; gap: var(--sp-s); overflow-x: auto; padding-block: 10px; }
+  .idx a {
+    font-family: var(--f-doc); font-size: .74rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--tinta-3); text-decoration: none; white-space: nowrap; padding: 5px 0;
+  }
+  .idx a:hover { color: var(--timbre); }
+
+  h2.sec {
+    font-size: var(--step-2); padding-top: var(--sp-xl); margin-bottom: var(--sp-2xs);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  h2.sec::before {
+    content: attr(data-n); font-family: var(--f-doc); font-size: .8rem; color: var(--timbre);
+    font-weight: 700; flex: none;
+  }
+  h3.sub { font-size: var(--step-1); margin-top: var(--sp-m); margin-bottom: var(--sp-2xs); }
+  section > p, section > .prose > p { color: var(--tinta-2); max-width: var(--measure); line-height: 1.6; }
+  section > p + p { margin-top: var(--sp-s); }
+
+  /* Cálculo con la aritmética a la vista */
+  .calc {
+    background: var(--papel-2); border: 1px solid var(--linea-2); border-left: 3px solid var(--timbre);
+    border-radius: var(--radio); padding: var(--sp-s); margin-top: var(--sp-s);
+  }
+  .calc-t {
+    font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--tinta-3); margin-bottom: 10px;
+  }
+  .calc-f {
+    display: grid; grid-template-columns: 1fr auto; gap: var(--sp-s); align-items: baseline;
+    padding: 7px 0; border-bottom: 1px dotted var(--linea); font-size: .88rem;
+  }
+  .calc-f:last-of-type { border-bottom: 0; }
+  .calc-f > span:last-child { font-family: var(--f-doc); font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  .calc-f small { display: block; color: var(--tinta-3); font-size: .76rem; font-weight: 400; }
+  .calc-r {
+    display: grid; grid-template-columns: 1fr auto; gap: var(--sp-s); align-items: baseline;
+    border-top: 3px double var(--linea-2); margin-top: 8px; padding-top: 11px;
+  }
+  .calc-r b { font-size: .84rem; text-transform: uppercase; letter-spacing: .06em; }
+  .calc-r .cifra { font-size: var(--step-1); color: var(--timbre); font-weight: 700; }
+  .sup {
+    margin-top: var(--sp-2xs); font-size: .78rem; color: var(--tinta-3); line-height: 1.5;
+    border-top: 1px solid var(--linea); padding-top: 8px;
+  }
+  .sup b { color: var(--tinta-2); }
+
+  .etq {
+    display: inline-block; font-family: var(--f-doc); font-size: .66rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; padding: 2px 6px; border-radius: 2px;
+    background: var(--papel-3); color: var(--tinta-2); border: 1px solid var(--linea-2); vertical-align: middle;
+  }
+  .etq--est { background: var(--duda-lav); color: var(--duda); border-color: var(--duda); }
+  .etq--cit { background: var(--ok-lav); color: var(--ok); border-color: var(--ok); }
+
+  .cuadro { display: grid; gap: var(--sp-s); margin-top: var(--sp-m); }
+  @media (min-width: 52em) { .cuadro { grid-template-columns: 1fr 1fr; gap: var(--sp-m); } }
+
+  .versus { border: 1px solid var(--linea-2); border-radius: var(--radio); overflow: hidden; margin-top: var(--sp-s); }
+  .versus-h { background: var(--tinta); color: var(--papel); padding: 10px var(--sp-s); font-family: var(--f-doc); font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; }
+  .versus-b { background: var(--papel-2); }
+  .versus-f { padding: var(--sp-s); border-bottom: 1px solid var(--linea); }
+  .versus-f:last-child { border-bottom: 0; }
+  .versus-f b { display: block; font-size: .96rem; }
+  .versus-f .q { font-size: .8rem; color: var(--tinta-3); font-family: var(--f-doc); }
+  .versus-f p { font-size: .86rem; color: var(--tinta-2); margin-top: 5px; line-height: 1.5; }
+
+  .canal {
+    display: grid; grid-template-columns: 34px 1fr; gap: var(--sp-s);
+    padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea); align-items: start;
+  }
+  .canal:first-of-type { border-top: 1px solid var(--linea-2); }
+  .canal-n {
+    font-family: var(--f-doc); font-weight: 700; font-size: 1.05rem; color: var(--timbre);
+  }
+  .canal b { font-size: 1rem; }
+  .canal p { font-size: .88rem; color: var(--tinta-2); margin-top: 4px; line-height: 1.55; }
+  .canal .meta { font-family: var(--f-doc); font-size: .76rem; color: var(--tinta-3); margin-top: 6px; }
+  .canal.no .canal-n { color: var(--tinta-3); }
+  .canal.no b { color: var(--tinta-3); text-decoration: line-through; }
+
+  .sem { display: grid; gap: 0; margin-top: var(--sp-s); }
+  .sem-f { display: grid; grid-template-columns: 88px 1fr; gap: var(--sp-s); padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea); }
+  .sem-f:first-child { border-top: 1px solid var(--linea-2); }
+  .sem-k { font-family: var(--f-doc); font-size: .78rem; font-weight: 700; color: var(--timbre); }
+  .sem-v b { display: block; font-size: .95rem; margin-bottom: 3px; }
+  .sem-v p { font-size: .86rem; color: var(--tinta-2); line-height: 1.55; }
+
+  .mata {
+    background: var(--tinta); color: var(--papel); border-radius: var(--radio);
+    padding: var(--sp-m); margin-top: var(--sp-m);
+  }
+  .mata h3 { color: var(--papel); font-size: var(--step-1); margin-bottom: 6px; }
+  .mata p { color: #C6BCA9; font-size: .92rem; line-height: 1.6; max-width: 64ch; }
+  .mata p + p { margin-top: var(--sp-s); }
+  .mata strong { color: #F0836A; }
+  .mata .regla { border-color: rgba(255,255,255,.16); margin-block: var(--sp-m); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M4 2.5h11.5l3 3V19a.5.5 0 0 1-.76.43L16 18.2l-1.9 1.25a.5.5 0 0 1-.55 0L11.6 18.2 9.7 19.45a.5.5 0 0 1-.55 0L7.25 18.2l-1.9 1.25A.5.5 0 0 1 4.6 19V3.1a.6.6 0 0 1 .6-.6Z" stroke="#17140F" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7.6 7.4h7.2M7.6 10.6h7.2M7.6 13.8h4.2" stroke="#C1391C" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Talonio
+    </a>
+    <button class="nav-toggle" id="navBtn" aria-expanded="false" aria-controls="navLinks">
+      Menú
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1 3h11M1 6.5h11M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container doc-hd">
+  <p class="eyebrow eyebrow--timbre">Plan de negocio · julio 2026</p>
+  <h1>A quién le vendemos, cuánto vale y qué nos mata.</h1>
+  <p>
+    Toda cifra de esta página o está citada, o está marcada como
+    <span class="etq etq--est">Estimación</span> con su aritmética a la vista. Si un número no tiene
+    de dónde salir, lo decimos.
+  </p>
+</div>
+
+<div class="idx">
+  <div class="container idx-in">
+    <a href="#icp">1 · Cliente</a>
+    <a href="#mercado">2 · Mercado</a>
+    <a href="#cuna">3 · Cuña</a>
+    <a href="#competencia">4 · Competencia</a>
+    <a href="#precio">5 · Precio</a>
+    <a href="#canales">6 · Canales</a>
+    <a href="#ia">7 · IA en el marketing</a>
+    <a href="#dias">8 · 90 días</a>
+    <a href="#mata">9 · Qué nos mata</a>
+  </div>
+</div>
+
+<main class="container">
+
+<!-- 1. ICP -->
+<section id="icp">
+  <h2 class="sec" data-n="01">Cliente objetivo</h2>
+  <p>
+    Hay dos personas en esta historia y confundirlas cuesta el negocio entero. Una <strong>sufre</strong>
+    el problema. La otra <strong>firma</strong> el cheque. No son la misma.
+  </p>
+
+  <div class="cuadro">
+    <div class="tarjeta">
+      <p class="eyebrow">Quien sufre — el usuario</p>
+      <h3 style="margin-bottom:8px">Rodrigo, dueño de una maestranza</h3>
+      <ul class="lista-check" style="font-size:.9rem;color:var(--tinta-2)">
+        <li><strong>Segmento:</strong> PYME con operación física — maestranza, construcción chica, transporte, taller, gastronomía, servicios técnicos.</li>
+        <li><strong>Tamaño:</strong> 5 a 50 trabajadores. Ventas entre $150M y $1.500M al año (2.400–25.000 UF: pequeña empresa según el SII).</li>
+        <li><strong>Régimen:</strong> Pro Pyme 14 D N°3. Facturador electrónico obligado.</li>
+        <li><strong>Dónde ya está:</strong> WhatsApp todo el día. El contador es externo. La contabilidad "la lleva" un Excel y una carpeta de fotos del teléfono.</li>
+        <li><strong>Su dolor:</strong> gasta en terreno con boleta o con su tarjeta personal, y no sabe cuánto ganó hasta que el contador cierra, dos meses después.</li>
+      </ul>
+    </div>
+
+    <div class="tarjeta" style="border:2px solid var(--timbre)">
+      <p class="eyebrow eyebrow--timbre">Quien firma — el cliente</p>
+      <h3 style="margin-bottom:8px">Patricia, contadora con 43 RUT</h3>
+      <ul class="lista-check" style="font-size:.9rem;color:var(--tinta-2)">
+        <li><strong>Segmento:</strong> contador independiente o estudio contable chico, 15–80 RUT en cartera.</li>
+        <li><strong>Cobra:</strong> entre $90.000 y $150.000 al mes por RUT. Su ingreso es de $2M a $8M mensuales.</li>
+        <li><strong>Su costo es su tiempo:</strong> ~3,5 horas al mes por cliente entre perseguir documentos, digitar y armar el F29.</li>
+        <li><strong>Su infierno:</strong> los días 15 al 20 de cada mes. 43 F29 con lo que alcanzó a llegar.</li>
+        <li><strong>Su miedo:</strong> que un software la reemplace. Por eso Talonio nunca presenta el F29 — <strong>lo presenta ella</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">La decisión: le vendemos al contador</h3>
+  <p>
+    Y no es una preferencia estética. Es la aritmética de la sección 5: el mismo peso invertido en adquirir
+    a un contador rinde <strong>el doble de LTV/CAC</strong> y recupera el CAC en <strong>4 meses en vez de 5,6</strong>,
+    porque una sola venta trae 20 RUT en vez de uno. El contador es, además, el <em>guardián</em>:
+    si él dice que no, la PYME no lo usa aunque le encante. Si él dice que sí, entra sin fricción.
+  </p>
+  <p>
+    El plan directo a PYME (<strong>Empresa</strong>, $34.900) existe igual, pero no es el motor: es la puerta
+    de entrada para la PYME cuyo contador todavía no está adentro — y, en la práctica, el mejor argumento
+    de venta hacia ese contador ("tres de tus clientes ya nos usan").
+  </p>
+</section>
+
+<!-- 2. MERCADO -->
+<section id="mercado">
+  <h2 class="sec" data-n="02">Tamaño de mercado</h2>
+  <p>
+    Chile primero. Con los supuestos declarados uno por uno, para que cualquiera los pueda discutir.
+  </p>
+
+  <div class="calc">
+    <p class="calc-t">TAM — Chile <span class="etq etq--est">Estimación</span></p>
+    <div class="calc-f"><span>Pequeñas empresas formales (2.400–25.000 UF de ventas al año)<small>SII, Estadísticas de empresas por tamaño. Orden de magnitud: ~200.000</small></span><span>200.000</span></div>
+    <div class="calc-f"><span>Medianas (25.000–100.000 UF)<small>Mismo registro. ~15.000</small></span><span>15.000</span></div>
+    <div class="calc-f"><span>Universo PYME direccionable</span><span>215.000</span></div>
+    <div class="calc-f"><span>× precio anual del plan Empresa ($34.900 × 12)</span><span>$418.800</span></div>
+    <div class="calc-r"><b>TAM Chile</b><span class="cifra">$90.042 MM CLP ≈ US$94 M</span></div>
+    <p class="sup">
+      <b>Supuestos:</b> (a) todas las PYMEs formales son técnicamente direccionables porque todas presentan F29
+      mensual — eso es ley, no supuesto; (b) el precio de referencia es el plan directo, que es el techo teórico;
+      (c) tipo de cambio $960/USD. <b>Lo que hay que verificar antes de invertir:</b> la serie oficial del SII de
+      empresas por tamaño. Usamos el orden de magnitud, no un dato citado con página; no vamos a inventar
+      una precisión que no tenemos.
+    </p>
+  </div>
+
+  <div class="calc">
+    <p class="calc-t">SAM — a quien de verdad le duele <span class="etq etq--est">Estimación</span></p>
+    <div class="calc-f"><span>PYMEs con <strong>gasto significativo fuera del DTE</strong><small>Rubros con compra en terreno: construcción, transporte, comercio, gastronomía, servicios técnicos, agro. Supuesto: 45% del universo</small></span><span>96.750</span></div>
+    <div class="calc-f"><span>ARPU mensual del mix objetivo<small>70% vía contador ($7.900) + 30% directo ($34.900)</small></span><span>$16.000</span></div>
+    <div class="calc-f"><span>× 12 meses</span><span>$192.000</span></div>
+    <div class="calc-r"><b>SAM Chile</b><span class="cifra">$18.576 MM CLP ≈ US$19,4 M</span></div>
+    <p class="sup">
+      El 45% es el supuesto más frágil de esta página. Sale de mirar la composición sectorial de la PYME chilena
+      y preguntarse "¿este rubro compra en el mesón?". <b>Es contrastable</b> con 40 entrevistas: si baja al 25%,
+      el SAM cae a US$10,7 M y el negocio sólo funciona saliendo de Chile antes.
+    </p>
+  </div>
+
+  <div class="calc">
+    <p class="calc-t">SOM — lo que creemos que podemos tomar en 36 meses <span class="etq etq--est">Estimación</span></p>
+    <div class="calc-f"><span>RUT vía contadores<small>250 contadores × 22 RUT activos promedio</small></span><span>5.500</span></div>
+    <div class="calc-f"><span>RUT directos</span><span>1.100</span></div>
+    <div class="calc-f"><span>MRR<small>(5.500 × $7.900) + (1.100 × $34.900)</small></span><span>$81.840.000</span></div>
+    <div class="calc-r"><b>ARR al mes 36</b><span class="cifra">$982 MM CLP ≈ US$1,02 M</span></div>
+    <p class="sup">
+      Eso es un <b>3,4% del SAM</b> en tres años. Es agresivo pero no fantasioso: son 250 contadores, no 6.600
+      PYMEs convencidas una por una. El roadmap trabaja contra el hito del <b>mes 24</b>
+      (US$641k de ARR); esta línea es la extensión natural si M5 se cumple.
+    </p>
+  </div>
+
+  <h3 class="sub">Y después de Chile</h3>
+  <p>
+    El problema es idéntico en todo el mundo hispanohablante: gasto en papel, IVA que se pierde,
+    declaración mensual ineludible. Lo que cambia por país es <strong>el formulario y la API tributaria</strong>,
+    no la captura. México (IVA + CFDI + DIOT) tiene un universo PYME de un orden de magnitud mayor;
+    Colombia, Perú y España siguen. <span class="etq etq--est">Estimación</span> Cada país nuevo son
+    <strong>3 a 5 meses de ingeniería</strong> para reescribir el módulo tributario, y cero cambios en el motor
+    de extracción. La tesis de expansión es esa asimetría — y es exactamente la razón por la que México va
+    después del mes 24 y no antes: es una empresa nueva, no una traducción.
+  </p>
+</section>
+
+<!-- 3. CUÑA -->
+<section id="cuna">
+  <h2 class="sec" data-n="03">Posicionamiento y cuña</h2>
+
+  <div class="tarjeta" style="border-left:3px solid var(--timbre)">
+    <p class="eyebrow eyebrow--timbre">La frase</p>
+    <p style="font-family:var(--f-display);font-size:var(--step-2);line-height:1.25;color:var(--tinta);max-width:26ch">
+      El SII ya tiene tus facturas. Nosotros nos preocupamos de que todo lo que compras <em>sea</em> factura.
+    </p>
+  </div>
+
+  <h3 class="sub">La cabecera de playa: la maestranza y la constructora chica</h3>
+  <p>
+    No arrancamos con "PYMEs". Arrancamos con el rubro donde la fuga es más grande y más obvia:
+    <strong>oficios con compra en terreno</strong> — maestranzas, constructoras de menos de 30 personas,
+    transportistas, instaladores. Ahí la bencina, la ferretería, el repuesto y el almuerzo de faena
+    son un flujo diario de boletas, y el dueño los paga con su tarjeta porque está en la obra, no en la oficina.
+  </p>
+  <p>
+    Es la cuña correcta por tres razones: <strong>(1)</strong> el dolor es cuantificable en pesos el primer mes;
+    <strong>(2)</strong> el gremio existe y está organizado (CChC, cámaras comunales, ferreterías);
+    <strong>(3)</strong> los contadores que atienden estos rubros son los que más sufren, porque reciben las
+    carpetas más caóticas de todas.
+  </p>
+
+  <h3 class="sub">Lo que NO somos, dicho a propósito</h3>
+  <p>
+    No somos un ERP. No somos facturación electrónica. No presentamos el F29. No reemplazamos al contador.
+    Cada una de esas cuatro cosas es un negocio distinto, con un titular ya instalado, y meterse en cualquiera
+    de ellas nos convierte en un Nubox peor. Somos <strong>la bandeja de entrada de lo que hoy no llega a
+    ninguna parte</strong>, y nos conectamos con lo que el cliente ya tiene.
+  </p>
+</section>
+
+<!-- 4. COMPETENCIA -->
+<section id="competencia">
+  <h2 class="sec" data-n="04">Competencia</h2>
+  <p>El titular del puesto no es un software. Es una caja de zapatos, y hay que decirlo.</p>
+
+  <div class="versus">
+    <div class="versus-h">Contra quién competimos de verdad</div>
+    <div class="versus-b">
+      <div class="versus-f">
+        <b>La caja de zapatos + el WhatsApp al contador el día 18</b>
+        <span class="q">Cuota de mercado real: la mayoría · Precio: $0</span>
+        <p>
+          <strong>El verdadero titular.</strong> Funciona "más o menos" y no cuesta nada, que es precisamente
+          lo que lo hace difícil de desbancar. <strong>Cómo ganamos:</strong> no compitiendo en orden
+          — compitiendo en <em>plata</em>. El primer reporte de fuga le pone un número al desorden
+          ($194.343 este mes) y el desorden deja de ser gratis.
+        </p>
+      </div>
+      <div class="versus-f">
+        <b>Nubox</b>
+        <span class="q">Contabilidad PYME · fuerte en el canal contador · desde ~$20.000/mes</span>
+        <p>
+          Nuestro riesgo número uno. Ya tienen a miles de contadores y podrían agregar captura de boletas con IA.
+          <strong>Diferencia honesta hoy:</strong> Nubox es el libro donde <em>anotas</em>; nosotros somos el
+          embudo que hace que el gasto <em>llegue</em>. <strong>Diferencia honesta mañana:</strong> ninguna,
+          si se ponen las pilas. Por eso la velocidad importa y por eso el módulo de rescate de facturas
+          (pedirle la factura al proveedor) es el foso: es operacionalmente feo y por eso nadie lo hace.
+        </p>
+      </div>
+      <div class="versus-f">
+        <b>Defontana</b>
+        <span class="q">ERP · empresas medianas y grandes · desde ~$60.000/mes</span>
+        <p>
+          Caro, completo y pensado para una empresa con departamento de contabilidad. No compite por Rodrigo:
+          Rodrigo no tiene departamento de nada. Es más probable que sea un <strong>canal</strong> que un rival.
+        </p>
+      </div>
+      <div class="versus-f">
+        <b>Chipax</b>
+        <span class="q">Conciliación bancaria y flujo de caja · chileno · desde ~$30.000/mes</span>
+        <p>
+          El competidor más cercano en la parte bancaria, y muy bueno en ella. <strong>Pero entra por la
+          tesorería, no por el gasto:</strong> concilia lo que ya está documentado, no captura lo que nunca
+          se documentó, y no arma el F29. Es el competidor más relevante y, francamente, el comprador más probable.
+        </p>
+      </div>
+      <div class="versus-f">
+        <b>Bsale</b>
+        <span class="q">POS + facturación · retail</span>
+        <p>Vende el punto de venta, no la contabilidad. Se cruza poco con nosotros. Candidato a integración.</p>
+      </div>
+      <div class="versus-f">
+        <b>Dext (ex Receipt Bank) · Hubdoc</b>
+        <span class="q">Internacional · captura de gastos vendida vía contadores</span>
+        <p>
+          <strong>Validan el modelo entero</strong> — captura de boletas, canal contador, precio por cliente —
+          y ambos terminaron adquiridos (Hubdoc por Xero, Dext por IRIS). <strong>Pero ninguno hace el F29
+          chileno, ni baja el RCV del SII, ni concilia una cartola del Banco de Chile.</strong> Y en cuanto un
+          producto de gastos no cierra el ciclo tributario local, el contador chileno no lo adopta:
+          le deja el trabajo a medias.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. PRECIO -->
+<section id="precio">
+  <h2 class="sec" data-n="05">Precio y economía unitaria</h2>
+
+  <div class="cuadro">
+    <div class="tarjeta">
+      <p class="eyebrow eyebrow--timbre">Plan Estudio — el motor</p>
+      <p style="font-size:.88rem;color:var(--tinta-2);margin-bottom:10px">Por RUT activo, al mes. Lo paga el contador.</p>
+      <div style="border-top:1px solid var(--linea)">
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linea)"><span>1 – 10 RUT</span><b class="cifra">$12.900</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linea)"><span>11 – 30 RUT</span><b class="cifra">$9.900</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0"><span>31 RUT o más</span><b class="cifra">$7.900</b></div>
+      </div>
+      <p class="nota" style="margin-top:10px">
+        Un contador con 43 RUT paga <span class="cifra">$339.700</span> al mes — el <strong>7%</strong> de lo que
+        él le factura a esos mismos clientes, y le devuelve unas 100 horas mensuales.
+      </p>
+    </div>
+    <div class="tarjeta">
+      <p class="eyebrow">Plan Empresa — la puerta lateral</p>
+      <p style="font-size:.88rem;color:var(--tinta-2);margin-bottom:10px">Por RUT, al mes. Lo paga la PYME. Incluye un asiento gratis para su contador.</p>
+      <div style="border-top:1px solid var(--linea)">
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linea)"><span>Precio único</span><b class="cifra">$34.900</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linea)"><span>Pago anual</span><b class="cifra">−2 meses</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0"><span>Documentos</span><b class="cifra">Sin tope</b></div>
+      </div>
+      <p class="nota" style="margin-top:10px">
+        La PYME del demo recupera <span class="cifra">$194.343</span> al mes y paga <span class="cifra">$34.900</span>.
+        El descuento no es una palanca de venta: <strong>el ROI sí</strong>.
+      </p>
+    </div>
+  </div>
+
+  <h3 class="sub">Costo de servir un RUT</h3>
+  <p>
+    Este número viene entero de <a href="stack.html">Arquitectura</a> y tiene que cuadrar con esa página.
+    Es el costo a escala (≈3.400 RUT activos, el hito del mes 24):
+  </p>
+  <div class="calc">
+    <p class="calc-t">COGS por RUT activo, al mes <span class="etq etq--est">Estimación · aritmética en stack.html</span></p>
+    <div class="calc-f"><span>Inferencia de IA<small>115 documentos/mes: extracción + clasificación (Haiku 4.5), conciliación dudosa y revisor de F29 (Sonnet 5)</small></span><span>$1.114</span></div>
+    <div class="calc-f"><span>APIs de terceros<small>Fintoc (cartolas) $432 + proveedor DTE/SII $192 + WhatsApp $230</small></span><span>$854</span></div>
+    <div class="calc-f"><span>Soporte humano<small>2 personas por cada 3.400 RUT</small></span><span>$824</span></div>
+    <div class="calc-f"><span>Infraestructura<small>Postgres, storage, cola, observabilidad — prorrateada</small></span><span>$119</span></div>
+    <div class="calc-r"><b>COGS / RUT / mes</b><span class="cifra">$2.911</span></div>
+    <p class="sup">
+      <b>El costo variable más pesado no es la IA: es el agregador bancario.</b> Fintoc a ~US$0,45 por cuenta al
+      mes son $432/RUT — el 15% del COGS. <b>Mitigación:</b> la carga de cartola en CSV es gratis y siempre está
+      disponible; la conexión automática es un upgrade. Si el 50% se queda en CSV, el COGS baja a
+      <span class="cifra">$2.695</span>.
+    </p>
+  </div>
+
+  <h3 class="sub">La comparación que define el negocio</h3>
+  <div class="scroll-x" style="margin-top:var(--sp-s)">
+    <table class="tabla">
+      <caption class="visually-hidden">Economía unitaria comparada entre el canal contador y la venta directa</caption>
+      <thead>
+        <tr>
+          <th scope="col">Por RUT activo</th>
+          <th scope="col" class="num">Vía contador</th>
+          <th scope="col" class="num">Directo a PYME</th>
+          <th scope="col">De dónde sale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Precio (ARPU)</td><td class="num">$7.900</td><td class="num">$34.900</td><td class="nota">Tramo 31+ · plan Empresa</td></tr>
+        <tr><td>COGS</td><td class="num">$2.911</td><td class="num">$2.911</td><td class="nota">Mismo producto, mismo costo</td></tr>
+        <tr><td>Margen bruto</td><td class="num">$4.989 <b>(63%)</b></td><td class="num">$31.989 <b>(92%)</b></td><td class="nota">Precio − COGS</td></tr>
+        <tr><td>CAC</td><td class="num">$20.000</td><td class="num">$180.000</td><td class="nota">$420.000 por contador ÷ 21 RUT · vs. ads + inbound</td></tr>
+        <tr><td><strong>Payback del CAC</strong></td><td class="num"><strong>4,0 meses</strong></td><td class="num"><strong>5,6 meses</strong></td><td class="nota">CAC ÷ margen bruto mensual</td></tr>
+        <tr><td>Churn mensual</td><td class="num">4,0%</td><td class="num">5,5%</td><td class="nota">El contador retiene; la PYME chica se muere o se aburre</td></tr>
+        <tr><td>Vida esperada</td><td class="num">25 meses</td><td class="num">18 meses</td><td class="nota">1 ÷ churn</td></tr>
+        <tr><td><strong>LTV</strong></td><td class="num"><strong>$124.725</strong></td><td class="num"><strong>$582.200</strong></td><td class="nota">Margen bruto × vida</td></tr>
+        <tr><td><strong>LTV / CAC</strong></td><td class="num" style="color:var(--ok);font-weight:700">6,2×</td><td class="num" style="color:var(--duda);font-weight:700">3,2×</td><td class="nota">El doble por el canal contador</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="nota-fuente" style="margin-top:var(--sp-s)">
+    <strong>Ojo con la trampa:</strong> el margen bruto por RUT es mucho mejor en el plan directo (92% vs 63%).
+    Un análisis perezoso concluiría "vende directo". Lo que decide es el <strong>CAC</strong>: una venta al
+    contador cuesta 9 veces más ($420.000) pero trae 21 RUT. Y el CAC directo <em>sube</em> con el volumen
+    (los ads se encarecen), mientras que el CAC del contador <em>baja</em> (los contadores se recomiendan entre
+    ellos; el gremio es chico y conversa). Por eso el motor es el contador, y el mix objetivo del mes 24 es
+    83% de RUT vía canal.
+  </p>
+
+  <div class="calc">
+    <p class="calc-t">Margen bruto de la empresa · mes 24 <span class="etq etq--est">Escenario base del roadmap</span></p>
+    <div class="calc-f"><span>3.400 RUT vía contador × $7.900</span><span>$26.860.000</span></div>
+    <div class="calc-f"><span>700 RUT directos × $34.900</span><span>$24.430.000</span></div>
+    <div class="calc-f"><span>MRR total</span><span>$51.290.000</span></div>
+    <div class="calc-f"><span>− COGS (4.100 RUT × $2.911)</span><span>−$11.935.100</span></div>
+    <div class="calc-r"><b>Margen bruto mensual · 76,7%</b><span class="cifra">$39.354.900</span></div>
+    <p class="sup">
+      ARPU ponderado: $51.290.000 ÷ 4.100 = <b>$12.510</b>. Este MRR es exactamente el punto final del escenario
+      base de la <a href="roadmap.html">curva de ingresos</a>. Las dos páginas cuadran o una de las dos está mintiendo.
+    </p>
+  </div>
+</section>
+
+<!-- 6. CANALES -->
+<section id="canales">
+  <h2 class="sec" data-n="06">Canales de adquisición</h2>
+  <p>Rankeados por lo que creemos que funciona, no por lo que suena bien en una lámina.</p>
+
+  <div class="canal">
+    <span class="canal-n">1</span>
+    <div>
+      <b>Contadores y estudios contables — el canal, no <em>un</em> canal</b>
+      <p>
+        Outbound en LinkedIn a "Contador Auditor" con estudio propio. Grupos de WhatsApp y Facebook de
+        contadores (existen, son enormes y son donde se quejan del día 20). Colegio de Contadores de Chile.
+        Cursos de actualización tributaria: patrocinarlos es barato y la audiencia es exactamente el ICP.
+        El pitch no es "software": es <em>"deja de trabajar los fines de semana del 18 al 20"</em>.
+      </p>
+      <p class="meta">Ciclo estimado 3–6 semanas · CAC objetivo $420.000 por contador ($20.000/RUT) · gancho: piloto de 5 RUT gratis por 2 meses</p>
+    </div>
+  </div>
+
+  <div class="canal">
+    <span class="canal-n">2</span>
+    <div>
+      <b>Software PYME como reventa o integración</b>
+      <p>
+        Nubox, Defontana, Bsale y Chipax tienen el canal que queremos y <strong>no tienen captura de gastos en
+        terreno</strong>. Ser el módulo que a ellos les falta es la vía más rápida a escala — y también la más
+        peligrosa: es enseñarle a tu competidor exactamente qué construir. La regla que nos damos:
+        <strong>sólo conversamos de integración después del hito M3</strong> (venta repetible, mes 12), cuando
+        ya tengamos el dato de retención que hace cara la copia.
+      </p>
+      <p class="meta">Alto riesgo · alto retorno · gatillo explícito en el roadmap (M4)</p>
+    </div>
+  </div>
+
+  <div class="canal">
+    <span class="canal-n">3</span>
+    <div>
+      <b>Gremios del rubro cabeza de playa</b>
+      <p>
+        Cámara Chilena de la Construcción (y sus cámaras regionales, donde están las constructoras chicas de
+        verdad), ASECH, cámaras de comercio comunales, asociaciones de transportistas. Charla gratis:
+        <em>"cuánto IVA botó tu empresa el año pasado"</em>, con la calculadora en vivo. Se llevan la cifra
+        de su propia empresa en la mano.
+      </p>
+      <p class="meta">Barato · lento · genera los primeros design partners y la prueba social del gremio</p>
+    </div>
+  </div>
+
+  <div class="canal">
+    <span class="canal-n">4</span>
+    <div>
+      <b>SEO long-tail en español — intención altísima, volumen bajo</b>
+      <p>
+        "cómo pedir factura de una boleta de Sodimac", "recuperar IVA bencina empresa", "código 520 F29",
+        "boleta da crédito fiscal", "factura de reemplazo plazo". Cada una tiene poco volumen y una intención
+        enorme: quien busca eso <em>está</em> perdiendo plata en ese momento. Una página por proveedor grande
+        (~400 páginas), factual y verificada.
+      </p>
+      <p class="meta">Compone lento · el único canal cuyo costo marginal tiende a cero · es donde la IA sí sirve (ver sección 7)</p>
+    </div>
+  </div>
+
+  <div class="canal">
+    <span class="canal-n">5</span>
+    <div>
+      <b>WhatsApp outbound a PYMEs del rubro</b>
+      <p>
+        A maestranzas, constructoras y transportistas listadas en Mercado Público y en los directorios
+        gremiales. Mensaje corto con el cálculo de su fuga estimada según su rubro. Alimenta el plan Empresa
+        y, sobre todo, <strong>genera la pregunta "¿y mi contador puede verlo?"</strong> — que es la venta
+        que de verdad queremos.
+      </p>
+      <p class="meta">CPL bajo · conversión baja · su función real es abrirle la puerta al canal 1</p>
+    </div>
+  </div>
+
+  <div class="canal">
+    <span class="canal-n">6</span>
+    <div>
+      <b>Google Ads — sólo para el plan Empresa</b>
+      <p>
+        "software contabilidad pyme", "programa para llevar boletas". <span class="etq etq--est">Estimación</span>
+        CPC $900–$1.800; con 4% de conversión visita→lead y 5% lead→pago, el CAC sale entre $180.000 y $250.000.
+        Funciona con un LTV de $582.200, pero apenas — y empeora al escalar. <strong>Techo declarado: 15% del
+        presupuesto de adquisición.</strong>
+      </p>
+      <p class="meta">CAC estimado $180.000 · LTV/CAC 3,2× · no es el motor</p>
+    </div>
+  </div>
+
+  <div class="canal no">
+    <span class="canal-n">✕</span>
+    <div>
+      <b>Meta Ads</b>
+      <p>La segmentación B2B contable en Meta es mala y la audiencia está en otra cosa. Gastar ahí es comprar clics de curiosos.</p>
+    </div>
+  </div>
+  <div class="canal no">
+    <span class="canal-n">✕</span>
+    <div>
+      <b>Mercado Público</b>
+      <p>No aplica: el Estado no compra este software, y las PYMEs que licitan no lo hacen por esta necesidad. Sí es una <em>fuente de datos</em> para el canal 5, que es distinto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. IA EN EL MARKETING -->
+<section id="ia">
+  <h2 class="sec" data-n="07">Dónde usamos IA en el marketing (y dónde no)</h2>
+  <p>
+    "IA en todo" no es una respuesta. Vendemos a un gremio conservador que huele el humo a un kilómetro.
+    Estas son las cuatro decisiones:
+  </p>
+
+  <div class="cuadro">
+    <div class="tarjeta" style="border-left:3px solid var(--ok)">
+      <p class="eyebrow" style="color:var(--ok)">Sí — y de verdad mueve la aguja</p>
+      <h3 style="font-size:1.05rem;margin-bottom:6px">Las 400 páginas de SEO por proveedor</h3>
+      <p class="nota">
+        "Cómo pedir factura en Sodimac / Copec / Líder / Easy / Construmart…". Es contenido factual, verificable
+        y con intención altísima. A mano son 400 horas; con IA + verificación humana del proceso real de cada
+        proveedor, son 3 semanas. <strong>Regla:</strong> ninguna página se publica sin que una persona haya
+        hecho el trámite y confirmado que el instructivo funciona. Publicar un instructivo tributario falso nos
+        quema el único activo que tenemos, que es la credibilidad.
+      </p>
+    </div>
+    <div class="tarjeta" style="border-left:3px solid var(--ok)">
+      <p class="eyebrow" style="color:var(--ok)">Sí — calificación de leads</p>
+      <h3 style="font-size:1.05rem;margin-bottom:6px">Estimar la cartera de un contador antes de llamarlo</h3>
+      <p class="nota">
+        Cruzar su perfil público, su sitio y su presencia gremial para estimar cuántos RUT lleva y de qué rubro.
+        Un contador con 8 clientes de retail no es el mismo prospecto que uno con 50 constructoras.
+        Nos ahorra llamar a los que no califican, que es donde se va el CAC.
+      </p>
+    </div>
+    <div class="tarjeta" style="border-left:3px solid var(--malo)">
+      <p class="eyebrow" style="color:var(--malo)">No — los posts del fundador</p>
+      <h3 style="font-size:1.05rem;margin-bottom:6px">El contenido con olor a IA quema el canal</h3>
+      <p class="nota">
+        El canal contador es de confianza y de reputación. En un gremio chico, donde todos se conocen, un post
+        genérico de LinkedIn te marca como "otro más". El fundador escribe sus propios posts, con casos reales
+        y cifras propias. Es lento y no escala. Es exactamente por eso que funciona.
+      </p>
+    </div>
+    <div class="tarjeta" style="border-left:3px solid var(--malo)">
+      <p class="eyebrow" style="color:var(--malo)">No — chatbot de soporte, año 1</p>
+      <h3 style="font-size:1.05rem;margin-bottom:6px">Con 40 clientes, contesta el fundador</h3>
+      <p class="nota">
+        Cada pregunta de soporte del primer año es una entrevista de producto gratis. Automatizarlas es tirar
+        a la basura la única fuente de verdad que tenemos. El chatbot entra cuando el mismo problema aparezca
+        por décima vez — y aun así, sobre un producto que ya no lo genera.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 90 DÍAS -->
+<section id="dias">
+  <h2 class="sec" data-n="08">Los primeros 90 días</h2>
+  <p>Arranque: 1 de septiembre de 2026. Dos fundadores, sin sueldo de mercado, sin oficina.</p>
+
+  <div class="sem">
+    <div class="sem-f">
+      <span class="sem-k">Sem 1–2</span>
+      <div class="sem-v">
+        <b>20 entrevistas, y una sola pregunta que importa</b>
+        <p>
+          12 dueños de PYME (maestranzas, constructoras chicas, transportistas) y 8 contadores.
+          La pregunta no es "¿te sirve esto?" — todos dicen que sí. La pregunta es:
+          <strong>"¿me muestras dónde están tus boletas de este mes?"</strong> Que abran el cajón, la guantera
+          o la galería del teléfono. Lo que salga de ahí es el brief del producto.
+        </p>
+      </div>
+    </div>
+    <div class="sem-f">
+      <span class="sem-k">Sem 3–6</span>
+      <div class="sem-v">
+        <b>Sólo captura y extracción. Nada más.</b>
+        <p>
+          Ni conciliación, ni F29, ni libro. Foto → datos → lista. Un único KPI, y es despiadado:
+          <strong>documentos subidos por semana sin que se los pidamos.</strong> Si hay que recordarles,
+          el hábito no existe y el resto del producto no importa.
+        </p>
+      </div>
+    </div>
+    <div class="sem-f">
+      <span class="sem-k">Sem 5</span>
+      <div class="sem-v">
+        <b>5 PYMEs design partner, reclutadas por 3 contadores</b>
+        <p>
+          No las buscamos nosotros: se las pedimos a los contadores de las entrevistas. Si un contador no está
+          dispuesto a presentarnos a tres de sus clientes más caóticos, ya tenemos una señal sobre el canal.
+        </p>
+      </div>
+    </div>
+    <div class="sem-f">
+      <span class="sem-k">Sem 7–10</span>
+      <div class="sem-v">
+        <b>Conciliación bancaria (por CSV) y libro de compras</b>
+        <p>
+          Cartola en CSV primero: cero dependencia de agregadores, cero costo variable, funciona con todos
+          los bancos desde el día uno. Fintoc viene después, cuando alguien lo pida de verdad.
+        </p>
+      </div>
+    </div>
+    <div class="sem-f">
+      <span class="sem-k">Sem 11–12</span>
+      <div class="sem-v">
+        <b>El primer F29 real presentado con Talonio</b>
+        <p>
+          El de septiembre, que se presenta en octubre. Y medimos las dos únicas cifras que arman el pitch de
+          venta para siempre: <strong>minutos que el contador ahorró</strong> y <strong>pesos de IVA que la PYME
+          rescató</strong>. Ese par de números es todo el material de marketing del año 1.
+        </p>
+      </div>
+    </div>
+    <div class="sem-f">
+      <span class="sem-k">Día 90</span>
+      <div class="sem-v">
+        <b>Cobrar. A los tres contadores.</b>
+        <p>
+          Sin descuento de fundador, sin "después vemos". Precio de lista.
+          Si ninguno de los tres paga después de haber presentado un F29 completo con el producto, se activa el
+          criterio de muerte de M1 y hay que replantear el canal antes de gastar un peso más.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. QUÉ MATA -->
+<section id="mata">
+  <h2 class="sec" data-n="09">Qué mataría esto</h2>
+
+  <div class="mata">
+    <h3>1 · Que el SII lo haga gratis</h3>
+    <p>
+      Éste es <strong>el</strong> riesgo, y no tiene una mitigación cómoda. El SII lleva años ampliando el
+      Portal MIPYME, que ya ofrece contabilidad simplificada y una propuesta de F29 <strong>gratis</strong>.
+      El día que agregue captura de boletas con IA a esa propuesta, nuestro producto pierde su razón de ser
+      en menos de seis meses, y ninguna cantidad de UX nos salva de competir contra $0 en un mercado donde
+      el organismo que fija las reglas es también el proveedor.
+    </p>
+    <p>
+      <strong>Mitigación parcial y honesta:</strong> el SII no va a perseguir facturas de reemplazo con Sodimac,
+      no va a conciliar tu cartola del Banco de Chile y no va a decirte que la empresa te debe $1.290.000. Su
+      mandato es recaudar, no optimizar tu crédito fiscal. Es una defensa real pero delgada, y el equipo que
+      levante esto tiene que estar dispuesto a apostar contra ella.
+    </p>
+
+    <hr class="regla">
+
+    <h3>2 · Que el contador nos cierre la puerta</h3>
+    <p>
+      Todo el modelo cuelga de que el contador nos adopte. Pero parte de su valor es la asimetría de
+      información: él sabe cómo va tu negocio y tú no. Un producto que le muestra al dueño su resultado del mes
+      en curso <strong>le quita esa asimetría</strong>. Si el 60% de los contadores lee eso como una amenaza y
+      no como un ahorro de tiempo, el canal se cierra y quedamos vendiendo directo con un LTV/CAC de 3,2× —
+      un negocio mucho peor, y probablemente uno que no vale dos años de tu vida.
+    </p>
+    <p>
+      <strong>Es contrastable temprano y barato:</strong> las 8 entrevistas de la semana 1. Si más de la mitad
+      se pone tensa cuando ve la pantalla del dueño, hay que rediseñar el producto para que el contador
+      controle qué ve su cliente — o cambiar de negocio.
+    </p>
+
+    <hr class="regla">
+
+    <h3>3 · Que Nubox lo copie antes de que tengamos foso</h3>
+    <p>
+      Tienen el canal, tienen los contadores y la captura de boletas con IA hoy es una tarde de trabajo con una
+      API de visión. Lo que <em>no</em> es una tarde de trabajo es el módulo de rescate: pedirle la factura de
+      reemplazo a 40 proveedores distintos, cada uno con su portal, su plazo y su formulario. Es operacionalmente
+      feo, no sale en ninguna lámina y es lo único que no se copia en un trimestre.
+      <strong>El foso es el trabajo sucio.</strong> Si en 18 meses no lo tenemos hecho, no tenemos empresa.
+    </p>
+  </div>
+</section>
+
+<section>
+  <hr class="regla-doble">
+  <p style="margin-top:var(--sp-m)">
+    Sigue en <a href="roadmap.html">Roadmap</a>: los seis hitos, sus criterios de muerte, y la probabilidad
+    de éxito como rango con su derivación a la vista.
+  </p>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Talonio</strong> — talonio.com · Prototipo. Toda cifra está citada o marcada como estimación con su aritmética.</p>
+    <p style="margin-top:6px"><a href="../index.html">← Volver a las 10 ideas</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('navBtn'), l = document.getElementById('navLinks');
+  b.addEventListener('click', function () {
+    b.setAttribute('aria-expanded', String(l.classList.toggle('abierto')));
+  });
+})();
+</script>
+</body>
+</html>

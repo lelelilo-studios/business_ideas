@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adjudate — Deja de perder licitaciones por un anexo</title>
+<meta name="description" content="Adjudate encuentra las licitaciones de Mercado Público que tu empresa puede ganar de verdad, lee las bases con IA y te arma la postulación completa. Para PYMEs chilenas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* ---- Portada ---- */
+  .hero { padding-top: var(--sp-xl); padding-bottom: var(--sp-2xl); }
+  .hero h1 { margin-block: var(--sp-s) var(--sp-m); }
+  .hero h1 em { font-style: italic; color: var(--acento); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-l); }
+  .hero-datos {
+    margin-top: var(--sp-xl);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: grid; gap: var(--sp-m);
+    padding-block: var(--sp-m);
+  }
+  @media (min-width: 48em) { .hero-datos { grid-template-columns: repeat(3, 1fr); gap: var(--sp-l); } }
+
+  /* ---- Cita del cliente ---- */
+  .cita { border-left: 3px solid var(--acento); padding-left: var(--sp-m); }
+  .cita p { font-size: var(--step-1); font-style: italic; line-height: 1.5; }
+  .cita footer { border: 0; padding: 0; margin-top: var(--sp-s); font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+
+  /* ---- Widget en vivo ---- */
+  .vivo { background: var(--papel-bajo); }
+  .lector { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); }
+  .lector-top {
+    display: flex; flex-wrap: wrap; gap: var(--sp-2xs);
+    padding: var(--sp-s);
+    border-bottom: 1px solid var(--rule);
+    background: var(--papel-bajo);
+  }
+  .chip-id {
+    font-family: var(--mono); font-size: 0.72rem;
+    padding: 0.5rem 0.6rem; min-height: 44px;
+    border: 1px solid var(--rule-fuerte); background: var(--papel-alto);
+    color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  }
+  .chip-id[aria-pressed="true"] { background: var(--ink); color: var(--papel); border-color: var(--ink); }
+  .lector-body { padding: var(--sp-m); min-height: 340px; }
+  .doc-tit { font-size: var(--step-1); margin-bottom: var(--sp-2xs); }
+  .doc-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-bottom: var(--sp-m); }
+  .req { display: grid; grid-template-columns: 22px 1fr; gap: var(--sp-xs); padding: 0.6rem 0; border-bottom: 1px dotted var(--rule-fuerte); align-items: start; }
+  .req:last-child { border-bottom: 0; }
+  .req-t { font-size: 0.9rem; line-height: 1.4; }
+  .req-f { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+  .req svg { width: 18px; height: 18px; margin-top: 2px; }
+  .apareciendo { animation: entra .4s ease both; }
+  @keyframes entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .cursor { display:inline-block; width:8px; height:1em; background: var(--acento); vertical-align:-2px; animation: parpadeo 1s steps(2) infinite; }
+  @keyframes parpadeo { 50% { opacity: 0; } }
+
+  /* ---- Precios ---- */
+  .planes { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .planes { grid-template-columns: repeat(4, 1fr); align-items: start; } }
+  .plan { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); padding: var(--sp-m); display: flex; flex-direction: column; height: 100%; }
+  .plan.destaca { border: 2px solid var(--acento); background: var(--papel-alto); }
+  .plan-n { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .plan.destaca .plan-n { color: var(--acento); }
+  .plan-p { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; margin-block: var(--sp-2xs) 0.1rem; }
+  .plan-p small { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+  .plan-q { font-size: 0.86rem; color: var(--ink-2); margin-bottom: var(--sp-s); padding-bottom: var(--sp-s); border-bottom: 1px solid var(--rule); }
+  .plan ul { list-style: none; font-size: 0.86rem; display: grid; gap: 0.5rem; margin-bottom: var(--sp-m); }
+  .plan li { display: grid; grid-template-columns: 14px 1fr; gap: 0.5rem; color: var(--ink-2); line-height: 1.4; }
+  .plan li svg { width: 12px; height: 12px; margin-top: 5px; color: var(--acento); }
+  .plan .btn { margin-top: auto; }
+
+  /* ---- FAQ ---- */
+  details { border-bottom: 1px solid var(--rule); }
+  summary { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-s); padding: var(--sp-m) 0; cursor: pointer; font-weight: 600; font-size: var(--step-0); list-style: none; min-height: 44px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--mono); color: var(--acento); font-size: 1.3rem; flex: none; }
+  details[open] summary::after { content: "\2212"; }
+  details p { padding-bottom: var(--sp-m); color: var(--ink-2); max-width: var(--measure); }
+  details p + p { padding-top: 0; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-in">
+      <a class="marca" href="index.html"><i></i>ADJUDATE <span>Mercado Público</span></a>
+      <ul class="nav-links">
+        <li><a class="volver" href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+      <button class="nav-btn" id="navBtn" aria-expanded="false" aria-controls="navMob">Menú</button>
+    </div>
+  </div>
+  <div class="nav-mob" id="navMob">
+    <div class="container">
+      <ul>
+        <li><a href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== PORTADA ====================== -->
+<header class="hero">
+  <div class="container">
+    <p class="folio"><b>Folio 01</b> · El problema</p>
+    <h1>Te quedaste fuera<br>por el <em>Anexo N°4</em>.</h1>
+    <p class="lede prose">No por precio. No por experiencia. Por un formulario de tres líneas que nadie alcanzó a firmar antes de las 15:00.</p>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Adjudate lee las bases por ti, te dice exactamente qué te falta, escribe la postulación y no te deja enviarla incompleta.</p>
+
+    <div class="hero-cta">
+      <a class="btn" href="demo/index.html">Ver el producto funcionando &rarr;</a>
+      <a class="btn sec" href="#precios">Precios en CLP</a>
+    </div>
+
+    <div class="hero-datos">
+      <div>
+        <span class="cifra">~90 mil</span>
+        <span class="cifra-pie">licitaciones y procesos de compra publicados al año en Mercado Público.<br><b>Estimación</b> de orden de magnitud, ver derivación en <a href="negocio.html">Negocio</a>.</span>
+      </div>
+      <div>
+        <span class="cifra rojo">$150k&ndash;$400k</span>
+        <span class="cifra-pie">lo que cobra hoy un gestor de licitaciones freelance <b>por cada postulación</b>. Ese es el presupuesto que ya existe.</span>
+      </div>
+      <div>
+        <span class="cifra">3&ndash;9 hrs</span>
+        <span class="cifra-pie">de trabajo humano por postulación: leer bases, juntar anexos, pedir la garantía, foliar, subir.</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ====================== EL DOLOR ====================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>Folio 02</b> · En palabras del cliente</p>
+    <div class="grid g2">
+      <div>
+        <div class="cita">
+          <p>&ldquo;Nos enteramos de la licitación del hospital cuando quedaban cuatro días. Alcanzamos a armar todo, pero la boleta de garantía la pedimos tarde y el banco se demoró. Perdimos una pega de cuarenta millones por un papel.&rdquo;</p>
+          <footer>Rodrigo Sepúlveda &mdash; socio, empresa de mantención de áreas verdes, 34 trabajadores, Maipú</footer>
+        </div>
+        <div class="cita" style="margin-top:var(--sp-l)">
+          <p>&ldquo;Yo reviso Mercado Público a mano los lunes. Son cientos. Al final postulo a las que reconozco, no a las que me convienen. Estoy segura de que se me pasan.&rdquo;</p>
+          <footer>Marcela Fuentealba &mdash; jefa de operaciones, proveedora del Estado hace 6 años</footer>
+        </div>
+      </div>
+      <div>
+        <div class="ficha">
+          <p class="ficha-h">Lo que hace hoy en vez de usarnos</p>
+          <ol class="lista">
+            <li><span class="n">01</span><div><strong>El correo de alertas de ChileCompra.</strong> Llega por rubro, no por capacidad. Le avisa de 40 licitaciones, 39 no le sirven, y la que sí le sirve viene mezclada.</div></li>
+            <li><span class="n">02</span><div><strong>Excel.</strong> Una planilla con las licitaciones que alguien alcanzó a copiar y pegar, con fechas que se vencen sin que nadie mire.</div></li>
+            <li><span class="n">03</span><div><strong>Un gestor de licitaciones.</strong> Cobra por postulación o un % del monto. Funciona, pero no escala y no deja nada dentro de la empresa.</div></li>
+            <li><span class="n">04</span><div><strong>No postular.</strong> La opción más común. &ldquo;Esa es para las grandes.&rdquo; A veces es cierto. Muchas veces no.</div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== EL PRODUCTO EN VIVO ====================== -->
+<section class="vivo">
+  <div class="container">
+    <p class="folio"><b>Folio 03</b> · El producto, en vivo</p>
+    <h2 style="margin-bottom:var(--sp-s)">Esto es lo que hace la IA con las bases.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-bottom:var(--sp-l)">Elige una licitación real de ejemplo. Adjudate abre el PDF de las bases administrativas y técnicas, extrae cada requisito, y lo cruza con lo que tu empresa efectivamente tiene. Sin screenshots: esto corre acá mismo.</p>
+
+    <div class="lector">
+      <div class="lector-top" role="group" aria-label="Elige una licitación de ejemplo">
+        <button class="chip-id" data-lic="0" aria-pressed="true">1057-42-LE26 · Áreas verdes</button>
+        <button class="chip-id" data-lic="1" aria-pressed="false">2359-45-LP26 · Aseo hospital</button>
+        <button class="chip-id" data-lic="2" aria-pressed="false">4180-11-LE26 · Mantención colegios</button>
+      </div>
+      <div class="lector-body" id="lectorBody" aria-live="polite"></div>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)">Los datos son de demostración, con el formato real de Mercado Público. En producción, las bases se descargan de la ficha de la licitación y las lee un modelo Claude Sonnet 5 con salida estructurada &mdash; ver <a href="stack.html">Arquitectura</a>.</p>
+  </div>
+</section>
+
+<!-- ====================== CÓMO FUNCIONA ====================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>Folio 04</b> · Cómo funciona</p>
+    <div class="grid g3">
+      <div class="ficha">
+        <p class="ficha-h">Paso 01 &mdash; Te perfilamos</p>
+        <h3 style="margin-bottom:var(--sp-2xs)">Tu capacidad real, no tu rubro</h3>
+        <p style="color:var(--ink-2); font-size:0.92rem">Cuántos trabajadores tienes, qué máquinas, qué certificaciones, hasta qué monto te da la espalda financiera, en qué regiones operas de verdad, qué contratos ya ejecutaste. Eso es lo que decide si puedes ganar &mdash; no el código ONU.</p>
+      </div>
+      <div class="ficha">
+        <p class="ficha-h">Paso 02 &mdash; El feed</p>
+        <h3 style="margin-bottom:var(--sp-2xs)">Sólo las que puedes ganar</h3>
+        <p style="color:var(--ink-2); font-size:0.92rem">Cruzamos las licitaciones abiertas con tu capacidad y con el <strong>histórico de adjudicaciones</strong>: quién ganó licitaciones parecidas, a qué precio, contra cuántos oferentes. De ahí sale una probabilidad estimada, no un adjetivo.</p>
+      </div>
+      <div class="ficha">
+        <p class="ficha-h">Paso 03 &mdash; El taller</p>
+        <h3 style="margin-bottom:var(--sp-2xs)">La postulación armada</h3>
+        <p style="color:var(--ink-2); font-size:0.92rem">La IA redacta la propuesta técnica y los anexos con tus datos y tus contratos anteriores. El simulador te dice cuánto ofertar según la pauta de evaluación. Y el chequeo final <strong>bloquea el envío</strong> si falta un papel.</p>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-l); border-color: var(--acento);">
+      <p class="ficha-h" style="color:var(--acento)">Lo que NO hacemos (y lo decimos de frente)</p>
+      <p class="prose" style="color:var(--ink-2)">Mercado Público <strong>no tiene una API para enviar ofertas</strong>. La oferta se sube a mano en el portal, y así debe ser. Adjudate te deja el paquete completo, foliado, validado y en orden &mdash; y te acompaña en la subida paso a paso. El último clic lo das tú. Cualquiera que te prometa &ldquo;postulación automática&rdquo; te está mintiendo o está automatizando un navegador contra los términos de uso del Estado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== PRECIOS ====================== -->
+<section id="precios">
+  <div class="container">
+    <p class="folio"><b>Folio 05</b> · Precios</p>
+    <h2 style="margin-bottom:var(--sp-s)">En pesos, sin letra chica.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-bottom:var(--sp-l)">Suscripción pura. <strong>No cobramos comisión por adjudicación</strong>: crea un incentivo perverso a que postules a todo, y a los organismos compradores no les gusta. Preferimos que nos pagues poco y ganes tú.</p>
+
+    <div class="planes">
+      <div class="plan">
+        <p class="plan-n">Alerta</p>
+        <p class="plan-p">$0<small> /mes</small></p>
+        <p class="plan-q">Para saber si vale la pena.</p>
+        <ul>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Feed con match de capacidad</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Alertas de cierre por correo</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>3 análisis de bases al mes</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>1 usuario</li>
+        </ul>
+        <a class="btn sec" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="plan">
+        <p class="plan-n">Postulante</p>
+        <p class="plan-p">$59.000<small> /mes</small></p>
+        <p class="plan-q">Postulas de vez en cuando y quieres dejar de perder por formalismo.</p>
+        <ul>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Análisis de bases ilimitado</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>5 postulaciones armadas/mes</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Chequeo de formalismos</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Alertas por WhatsApp</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>2 usuarios</li>
+        </ul>
+        <a class="btn sec" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="plan destaca">
+        <p class="plan-n">Adjudica &mdash; el más elegido</p>
+        <p class="plan-p">$149.000<small> /mes</small></p>
+        <p class="plan-q">Postular al Estado es un canal de venta de la empresa, no un accidente.</p>
+        <ul>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Postulaciones ilimitadas</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg><strong>Histórico de adjudicaciones</strong> y quién te gana</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Simulador de precio contra la pauta</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Plantillas y biblioteca de la empresa</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>5 usuarios</li>
+        </ul>
+        <a class="btn" href="demo/index.html">Probar</a>
+      </div>
+
+      <div class="plan">
+        <p class="plan-n">Consorcio</p>
+        <p class="plan-p">$390.000<small> /mes</small></p>
+        <p class="plan-q">Varias razones sociales, o una empresa que vive del Estado.</p>
+        <ul>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Multi-empresa y multi-RUT</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Gestor de boletas de garantía</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>API y exportación de datos</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>Especialista asignado</li>
+          <li><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-6"/></svg>20 usuarios</li>
+        </ul>
+        <a class="btn sec" href="demo/index.html">Probar</a>
+      </div>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-m)">Anual: dos meses gratis. Precios netos, sin IVA. Un solo contrato adjudicado de $12.000.000 paga seis años del plan Adjudica.</p>
+  </div>
+</section>
+
+<!-- ====================== FAQ ====================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>Folio 06</b> · Preguntas</p>
+    <div class="prose" style="max-width: 72ch">
+      <details open>
+        <summary>¿De dónde sacan las licitaciones?</summary>
+        <p>De la API pública de Mercado Público (ChileCompra). Es información pública y gratuita: las licitaciones abiertas, sus bases, los oferentes y las adjudicaciones históricas. Lo que aportamos nosotros es el cruce con tu capacidad, la lectura de las bases y el armado de la postulación.</p>
+      </details>
+      <details>
+        <summary>¿La IA me va a inventar experiencia que no tengo?</summary>
+        <p>No, y está diseñado explícitamente para que no pueda. El redactor sólo usa contratos, certificados y datos que tú cargaste. Si un requisito pide experiencia que no tienes acreditada, el sistema te lo marca en rojo como <strong>&ldquo;no cumples&rdquo;</strong> y te dice que no postules, en vez de rellenarlo. Falsear una declaración jurada en una licitación pública te saca del Registro de Proveedores.</p>
+      </details>
+      <details>
+        <summary>¿La probabilidad de adjudicación la calcula un chatbot?</summary>
+        <p>No. La probabilidad sale de un modelo estadístico sobre el histórico real de adjudicaciones: tipo de licitación, organismo, monto, número de oferentes, precio ganador, y si tú u otros de tu perfil ganaron procesos parecidos. Un modelo de lenguaje escribe la explicación, pero no inventa el número. Cuando no hay suficiente historia, te decimos que no hay suficiente historia.</p>
+      </details>
+      <details>
+        <summary>Soy chico. ¿Igual me sirve?</summary>
+        <p>Si tu empresa ya se adjudicó al menos una licitación, sí. Si nunca has postulado, el plan gratis te sirve para ver si existen licitaciones a tu medida antes de pagarnos un peso. Si el feed te muestra dos oportunidades al mes y ninguna te calza, te vamos a decir que no nos pagues.</p>
+      </details>
+      <details>
+        <summary>¿Y si ChileCompra lanza esto mismo, gratis?</summary>
+        <p>Es el riesgo real que más nos puede matar y lo tenemos escrito en el <a href="roadmap.html">roadmap</a> como criterio de muerte. Tienen los datos, el canal y el mandato de apoyar a las PYMEs. Nuestra apuesta: el Estado puede publicar mejor la información, pero difícilmente va a redactar la oferta de un proveedor privado &mdash; sería juez y parte.</p>
+      </details>
+      <details>
+        <summary>¿Suben la oferta por mí?</summary>
+        <p>No. No existe API pública para enviar ofertas y automatizar el navegador contra el portal del Estado sería, como mínimo, una mala idea. Te dejamos el paquete completo y validado, y te guiamos en la subida. Ese último paso es humano a propósito.</p>
+      </details>
+    </div>
+
+    <div style="margin-top:var(--sp-2xl); text-align:center">
+      <span class="timbre">Cierra en 3 días</span>
+      <h2 style="margin-block: var(--sp-m) var(--sp-s)">Hay una licitación tuya abierta ahora mismo.</h2>
+      <p class="lede" style="margin-inline:auto; max-width:52ch">Y si no la ves, no es porque no exista.</p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn" href="demo/index.html">Entrar al demo &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong style="font-family:var(--mono); color:var(--ink)">ADJUDATE</strong> &mdash; adjudate.com · Prototipo. Datos de demostración.</p>
+    <p><a href="../index.html">&larr; Volver a las 10 ideas</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+/* ---------- Menú móvil (idéntico en las 5 páginas) ---------- */
+(function () {
+  var b = document.getElementById('navBtn'), m = document.getElementById('navMob');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.textContent = open ? 'Cerrar' : 'Menú';
+  });
+})();
+
+/* ---------- Lector de bases en vivo ---------- */
+(function () {
+  var LICS = [
+    {
+      id: '1057-42-LE26',
+      titulo: 'Servicio de mantención de áreas verdes y arbolado urbano',
+      organismo: 'I. Municipalidad de Peñalolén',
+      monto: '$48.600.000',
+      cierre: '3 días 14 hrs',
+      reqs: [
+        { e: 'ok',   t: 'Inscripción vigente en ChileProveedores',              f: 'Bases administrativas, punto 4.1' },
+        { e: 'ok',   t: 'Experiencia: 3 contratos similares en los últimos 5 años', f: 'Bases técnicas, punto 7.2 · Tú tienes 6' },
+        { e: 'ok',   t: 'Personal mínimo: 12 operarios + 1 supervisor con título técnico', f: 'Bases técnicas, punto 7.4 · Tú tienes 34' },
+        { e: 'warn', t: 'Garantía de seriedad: 3% del monto ($1.458.000), boleta o póliza', f: 'Bases administrativas, punto 9 · Pídela hoy: el banco demora 48 hrs' },
+        { e: 'mal',  t: 'Certificación ISO 14001 vigente (medio ambiente)',     f: 'Bases técnicas, punto 7.7 · NO la tienes. Vale 20 pts de 100.' },
+        { e: 'ok',   t: 'Anexos 1, 2, 3, 5 y 7 firmados ante notario',           f: 'Adjudate los genera y prellena' }
+      ],
+      pauta: 'Precio 45% · Experiencia 25% · Cumplimiento medioambiental 20% · Plazo 10%',
+      veredicto: { p: '38%', txt: 'Sin la ISO 14001 pierdes 20 puntos completos. Los 4 ganadores de licitaciones parecidas de este municipio la tenían. Recomendación: certifícate y anda por la del año que viene, o preséntate en unión temporal con alguien que la tenga.' }
+    },
+    {
+      id: '2359-45-LP26',
+      titulo: 'Servicio integral de aseo para recintos hospitalarios',
+      organismo: 'Servicio de Salud Metropolitano Sur',
+      monto: '$127.400.000',
+      cierre: '11 días 2 hrs',
+      reqs: [
+        { e: 'ok',   t: 'Inscripción vigente en ChileProveedores',              f: 'Bases administrativas, punto 4.1' },
+        { e: 'mal',  t: 'Capital de trabajo acreditado &ge; $60.000.000',        f: 'Bases administrativas, punto 6.3 · Tu balance declara $31.500.000' },
+        { e: 'ok',   t: 'Experiencia en recintos de salud: mínimo 2 contratos',  f: 'Bases técnicas, punto 5.1 · Tú tienes 2 (CESFAM Maipú, CESFAM Cerrillos)' },
+        { e: 'warn', t: 'Protocolo de manejo de residuos REAS aprobado por SEREMI', f: 'Bases técnicas, punto 8 · Tienes uno de 2023, verifica vigencia' },
+        { e: 'mal',  t: 'Personal mínimo: 45 auxiliares con curso IAAS',         f: 'Bases técnicas, punto 5.4 · Tú tienes 34 trabajadores en total' },
+        { e: 'ok',   t: 'Anexos 1 al 9 + declaración jurada de no inhabilidad',  f: 'Adjudate los genera y prellena' }
+      ],
+      pauta: 'Precio 40% · Experiencia en salud 30% · Dotación y capacitación 20% · Plazo 10%',
+      veredicto: { p: '6%', txt: 'Esta no es tuya y te lo decimos ahora, no después de tres días armando carpetas. Te falta dotación y capital de trabajo. Un competidor histórico (Servicios Génesis Ltda.) se ha adjudicado 4 de las últimas 5 de este servicio. Sáltala.' }
+    },
+    {
+      id: '4180-11-LE26',
+      titulo: 'Mantención correctiva de infraestructura en establecimientos educacionales',
+      organismo: 'Servicio Local de Educación Pública Barrancas',
+      monto: '$34.900.000',
+      cierre: '6 días 9 hrs',
+      reqs: [
+        { e: 'ok',   t: 'Inscripción vigente en ChileProveedores',               f: 'Bases administrativas, punto 4.1' },
+        { e: 'ok',   t: 'Experiencia: 2 contratos de mantención en los últimos 3 años', f: 'Bases técnicas, punto 6.1 · Tú tienes 5' },
+        { e: 'ok',   t: 'Garantía de seriedad: 3% ($1.047.000)',                 f: 'Bases administrativas, punto 9 · Tienes línea aprobada en BancoEstado' },
+        { e: 'ok',   t: 'Cuadrilla mínima: 8 personas, disponibilidad en 24 hrs', f: 'Bases técnicas, punto 6.5 · Tú cumples' },
+        { e: 'warn', t: 'Certificado de antecedentes laborales y previsionales (F30-1)', f: 'Bases administrativas, punto 5.2 · El tuyo vence en 12 días' },
+        { e: 'ok',   t: 'Anexos 1, 2, 4 y 6',                                     f: 'Adjudate los genera y prellena' }
+      ],
+      pauta: 'Precio 50% · Experiencia 25% · Tiempo de respuesta 15% · Sustentabilidad 10%',
+      veredicto: { p: '61%', txt: 'Esta sí es tuya. Cumples todo; sólo renueva el F30-1. Las últimas 3 licitaciones parecidas del SLEP tuvieron 4, 5 y 4 oferentes, y el precio ganador estuvo entre 88% y 94% del presupuesto. Ofertando $31.900.000 quedas primero en precio sin regalar margen.' }
+    }
+  ];
+
+  var body = document.getElementById('lectorBody');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip-id'));
+  var timers = [];
+
+  var ICO = {
+    ok:   '<svg viewBox="0 0 20 20" fill="none" stroke="#1A7F52" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M6 10.5l2.5 2.5L14 7"/></svg>',
+    warn: '<svg viewBox="0 0 20 20" fill="none" stroke="#8A5B0B" stroke-width="2" aria-hidden="true"><path d="M10 2.5L18.5 17.5H1.5z"/><path d="M10 8v3.5"/><path d="M10 14.2v.1"/></svg>',
+    mal:  '<svg viewBox="0 0 20 20" fill="none" stroke="#C0362C" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M7 7l6 6M13 7l-6 6"/></svg>'
+  };
+  var TXT = { ok: 'Cumples', warn: 'Ojo', mal: 'No cumples' };
+
+  function limpiar() { timers.forEach(clearTimeout); timers = []; }
+
+  function render(i) {
+    limpiar();
+    var L = LICS[i];
+    body.innerHTML =
+      '<p class="mono" style="font-size:.72rem;color:var(--acento);margin-bottom:.4rem">' + L.id + '</p>' +
+      '<p class="doc-tit">' + L.titulo + '</p>' +
+      '<p class="doc-meta">' + L.organismo + ' &nbsp;·&nbsp; Presupuesto ' + L.monto + ' &nbsp;·&nbsp; Cierra en ' + L.cierre + '</p>' +
+      '<p class="nota" id="estado" style="margin-bottom:var(--sp-s)">Leyendo bases administrativas y técnicas <span class="cursor"></span></p>' +
+      '<div id="reqs"></div>';
+
+    var cont = document.getElementById('reqs');
+    var estado = document.getElementById('estado');
+
+    L.reqs.forEach(function (r, k) {
+      timers.push(setTimeout(function () {
+        var d = document.createElement('div');
+        d.className = 'req apareciendo';
+        d.innerHTML = ICO[r.e] +
+          '<div><p class="req-t">' + r.t + ' <span class="pill ' + r.e + '" style="margin-left:.3rem">' + TXT[r.e] + '</span></p>' +
+          '<p class="req-f">' + r.f + '</p></div>';
+        cont.appendChild(d);
+      }, 420 + k * 380));
+    });
+
+    timers.push(setTimeout(function () {
+      estado.innerHTML = '<b>' + L.reqs.length + ' requisitos extraídos</b> · Pauta de evaluación: ' + L.pauta;
+      var v = document.createElement('div');
+      v.className = 'ficha apareciendo';
+      v.style.marginTop = 'var(--sp-m)';
+      v.style.borderColor = 'var(--acento)';
+      v.innerHTML =
+        '<p class="ficha-h" style="color:var(--acento)">Veredicto de Adjudate</p>' +
+        '<div style="display:flex;gap:var(--sp-m);align-items:flex-start;flex-wrap:wrap">' +
+          '<div style="flex:none"><span class="cifra rojo">' + L.veredicto.p + '</span>' +
+          '<span class="cifra-pie">probabilidad<br>estimada</span></div>' +
+          '<p style="flex:1 1 240px;color:var(--ink-2);font-size:.92rem">' + L.veredicto.txt + '</p>' +
+        '</div>';
+      cont.appendChild(v);
+    }, 420 + L.reqs.length * 380 + 280));
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      chips.forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+      c.setAttribute('aria-pressed', 'true');
+      render(parseInt(c.dataset.lic, 10));
+    });
+  });
+
+  render(0);
+})();
+</script>
+</body>
+</html>

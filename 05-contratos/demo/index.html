@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Antefirma</title>
+<meta name="description" content="Sube un contrato y mira lo que dice de verdad: cláusulas de riesgo anotadas en castellano, el calendario de las fechas que muerden y los cambios que deberías pedir.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/antefirma.css">
+<link rel="stylesheet" href="demo.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><text y='16' font-size='16'>📄</text></svg>">
+</head>
+<body>
+
+<a class="visually-hidden" href="#principal">Saltar al contenido</a>
+<nav class="nav" data-nav data-raiz="../" data-actual="demo/index.html" aria-label="Principal"></nav>
+
+<main id="principal" class="demo">
+<div class="container">
+
+  <!-- ═══════════════════════════════════════════════ 1. SUBIR / ELEGIR ═══ -->
+  <section id="pantalla-subir">
+    <div class="rotulo">Demo · Antefirma</div>
+    <h1 style="font-size:var(--step-3);margin-bottom:var(--sp-xs)">
+      Un contrato que nadie leyó.<br>Vamos a leerlo.
+    </h1>
+    <p class="gris centro" style="margin-bottom:var(--sp-l)">
+      Elige uno de los dos contratos de ejemplo. Están redactados enteros, en el mismo
+      lenguaje que usa un estudio jurídico chileno de verdad, y tienen adentro trampas
+      que se repiten en cientos de contratos reales.
+    </p>
+
+    <div class="subir">
+
+      <div>
+        <div class="zona" id="zona">
+          <svg width="34" height="34" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M8 4h11l6 6v18H8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M19 4v6h6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M16 22v-8M12.5 17.5 16 14l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="zona__t">Arrastra tu contrato aquí</p>
+          <p class="zona__s">PDF, Word o una foto de las hojas. Hasta 80 páginas.</p>
+          <label class="btn btn--fantasma" for="zona-input" style="cursor:pointer">
+            Elegir archivo
+            <input id="zona-input" type="file" class="visually-hidden" accept=".pdf,.doc,.docx,image/*">
+          </label>
+        </div>
+
+        <div class="aviso" id="zona-msg" tabindex="-1" hidden style="margin-top:var(--sp-s)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M7 4v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="7" cy="9.6" r=".75" fill="currentColor"/>
+          </svg>
+          <div>
+            <strong>Este demo no lee tu archivo, y preferimos decírtelo.</strong>
+            Corre entero en tu navegador: no hay servidor, no hay modelo, no se sube nada.
+            Fingir un análisis de tu contrato sería exactamente el tipo de cosa contra la
+            que existe este producto. Abre uno de los dos ejemplos de al lado: ahí está
+            todo el producto funcionando de verdad.
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="rotulo">Contratos de ejemplo</div>
+        <div class="ejemplos">
+
+          <button class="ejemplo" data-ejemplo="arriendo">
+            <span class="ejemplo__tipo">Arriendo comercial</span>
+            <span class="ejemplo__t">Local 14-B, Strip Center Portal Quilín</span>
+            <span class="ejemplo__m">
+              <span>14 págs</span><span>6.840 palabras</span><span>15 cláusulas</span>
+            </span>
+            <span class="ejemplo__m" style="margin-top:8px;color:var(--rojo)">
+              Panadería que abre su segundo local. Renta 62 UF.
+            </span>
+          </button>
+
+          <button class="ejemplo" data-ejemplo="suministro">
+            <span class="ejemplo__tipo">Suministro con retail</span>
+            <span class="ejemplo__t">Contrato marco con Retail Andes S.A.</span>
+            <span class="ejemplo__m">
+              <span>11 págs</span><span>4.930 palabras</span><span>10 cláusulas</span>
+            </span>
+            <span class="ejemplo__m" style="margin-top:8px;color:var(--rojo)">
+              PYME de alimentos que entra a supermercado. El sueño y la trampa.
+            </span>
+          </button>
+
+        </div>
+
+        <div class="aviso" style="margin-top:var(--sp-m)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M7 4v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="7" cy="9.6" r=".75" fill="currentColor"/>
+          </svg>
+          <div>
+            <strong>Antefirma no reemplaza a un abogado.</strong> Te muestra lo que el
+            contrato dice y lo que va a costarte, para que sepas qué preguntar y qué pedir.
+            Si el contrato es grande, anda igual donde un abogado — pero anda sabiendo.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ 2. ANALIZANDO ═══ -->
+  <section id="pantalla-analisis" hidden>
+    <div class="analisis">
+      <div class="rotulo" style="justify-content:center">Analizando</div>
+      <h2 style="font-size:var(--step-2)">Leyendo el contrato completo</h2>
+      <p class="gris mono" style="font-size:.78rem;margin-top:8px" id="analisis-doc"></p>
+
+      <div class="analisis__barra"><i id="barra"></i></div>
+
+      <ul class="etapas" id="etapas" role="list"></ul>
+
+      <button class="btn btn--chico btn--fantasma" id="saltar" style="margin-top:var(--sp-m)">
+        Saltar la espera
+      </button>
+      <p class="gris" style="font-size:.76rem;margin-top:var(--sp-s);max-width:44ch;margin-inline:auto">
+        En producción esto demora entre 60 y 180 segundos según el largo del contrato, y
+        llega por correo cuando está listo. Acá está acelerado.
+      </p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════ 3. INFORME ════ -->
+  <section id="pantalla-informe" hidden>
+
+    <div class="demo__cabecera">
+      <div class="demo__doc">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3.4 1.7h6L13 5.3v9H3.4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M9.4 1.7v3.6H13" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+        <b id="doc-nombre"></b>
+        <span id="doc-meta" style="white-space:nowrap"></span>
+      </div>
+      <div class="demo__acciones">
+        <button class="btn btn--chico btn--fantasma" id="otro">Analizar otro contrato</button>
+      </div>
+    </div>
+
+    <div class="pestanas" role="tablist" aria-label="Secciones del informe">
+      <button class="pestana" role="tab" data-tab="resumen"   aria-selected="true">Resumen</button>
+      <button class="pestana" role="tab" data-tab="documento" aria-selected="false">
+        Documento <small id="tab-doc-n">0</small>
+      </button>
+      <button class="pestana" role="tab" data-tab="fechas"    aria-selected="false">Fechas</button>
+      <button class="pestana" role="tab" data-tab="redlines"  aria-selected="false">Cambios</button>
+    </div>
+
+    <!-- ───────────────────────────────────────────────── panel: resumen ── -->
+    <div class="panel" data-panel="resumen" role="tabpanel">
+      <div class="veredicto" id="veredicto"></div>
+      <div class="marcadores" id="marcadores"></div>
+
+      <div class="hoja simulador" id="simulador" hidden>
+        <div class="rotulo">Simulador de renta efectiva</div>
+        <p class="simulador__titular" id="sim-titular"></p>
+        <p class="gris" style="font-size:var(--step--1)" id="sim-sub"></p>
+
+        <div class="simulador__ctrl">
+          <label for="sim-rango">
+            <span>Mueve tus ventas netas mensuales</span>
+            <output id="sim-out" for="sim-rango"></output>
+          </label>
+          <input type="range" id="sim-rango" min="400" max="1800" step="25" value="1100"
+                 aria-describedby="sim-titular">
+          <p class="gris mono" style="font-size:.68rem;display:flex;justify-content:space-between;margin-top:6px">
+            <span>400 UF</span><span>↑ 900 UF: se gatilla el 8%</span><span>1.800 UF</span>
+          </p>
+        </div>
+
+        <ul class="desglose" id="desglose" role="list"></ul>
+
+        <button class="btn btn--chico btn--rojo" id="simular-btn" style="margin-top:var(--sp-m)">
+          ¿Y si me quiero ir antes? →
+        </button>
+      </div>
+
+      <div class="rotulo">Lo que encontramos, de peor a mejor</div>
+      <ul class="riesgos-lista" id="riesgos-lista" role="list"></ul>
+
+      <div class="aviso" style="margin-top:var(--sp-l)">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M7 4v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <circle cx="7" cy="9.6" r=".75" fill="currentColor"/>
+        </svg>
+        <div>
+          <strong>Nunca vamos a decirte que un contrato está bien.</strong> Antefirma sólo
+          afirma lo que encontró; jamás certifica que no haya nada más. Un modelo puede
+          pasar por alto una cláusula, y una decisión de plata grande merece un abogado.
+          Esto no es asesoría legal.
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────── panel: documento ── -->
+    <div class="panel" data-panel="documento" role="tabpanel" hidden>
+      <div class="filtros">
+        <button class="filtro" id="f-solo" aria-pressed="true">
+          <span aria-hidden="true">◎</span><span>Sólo riesgos</span>
+        </button>
+        <button class="filtro" id="f-critico" aria-pressed="true">
+          <span class="filtro__punto filtro__punto--critico"></span>Críticas
+        </button>
+        <button class="filtro" id="f-revisar" aria-pressed="true">
+          <span class="filtro__punto filtro__punto--revisar"></span>A revisar
+        </button>
+        <button class="filtro" id="f-estandar" aria-pressed="true">
+          <span class="filtro__punto filtro__punto--estandar"></span>Estándar
+        </button>
+      </div>
+
+      <div class="visor">
+        <div>
+          <div class="encabezado-doc" id="encabezado-doc" hidden></div>
+          <div id="clausulas"></div>
+        </div>
+        <aside class="visor__margen" id="margen" aria-label="Anotación al margen"></aside>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────────── panel: fechas ── -->
+    <div class="panel" data-panel="fechas" role="tabpanel" hidden>
+      <div class="fechas__intro" id="fechas-intro"></div>
+      <ul class="linea" id="linea" role="list"></ul>
+      <div class="cartera" id="cartera"></div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────── panel: redlines ── -->
+    <div class="panel" data-panel="redlines" role="tabpanel" hidden>
+      <p class="gris centro" style="margin-bottom:var(--sp-m)">
+        Esto es lo que le pedirías a la contraparte, con el texto exacto para reemplazar.
+        No tienes que redactar nada: copias y mandas.
+      </p>
+
+      <div class="tono">
+        <span class="tono__et">Tono del correo</span>
+        <button class="filtro" data-tono="colaborativo" aria-pressed="true">Colaborativo</button>
+        <button class="filtro" data-tono="firme" aria-pressed="false">Firme</button>
+      </div>
+
+      <div class="correo">
+        <div class="correo__cab" id="correo-asunto"></div>
+        <div class="correo__cuerpo" id="correo-cuerpo"></div>
+        <div class="correo__pie">
+          <button class="btn btn--chico" id="copiar-correo">Copiar el correo completo</button>
+          <span class="gris mono" style="font-size:.68rem">Lo pegas en Gmail y lo mandas.</span>
+        </div>
+      </div>
+
+      <hr class="regla">
+
+      <div class="rotulo">Cláusula por cláusula</div>
+      <div id="redlines-lista"></div>
+    </div>
+
+  </section>
+
+</div>
+</main>
+
+<!-- Panel deslizante (teléfono): la anotación al margen, en el pulgar. -->
+<div class="velo" id="velo"></div>
+<div class="hoja-inf" id="hoja-inf" role="dialog" aria-modal="false" aria-label="Anotación de la cláusula">
+  <div class="hoja-inf__tirador" id="hoja-tirador"></div>
+  <button class="hoja-inf__cerrar" id="hoja-cerrar" aria-label="Cerrar la anotación">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <div class="hoja-inf__cuerpo" id="hoja-cuerpo"></div>
+</div>
+
+<!-- Navegador de riesgos: recorrer el peligro con el pulgar. -->
+<div class="navriesgo" id="navriesgo" hidden role="group" aria-label="Navegar entre riesgos">
+  <button id="nav-prev" aria-label="Riesgo anterior">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="navriesgo__txt" id="nav-txt" aria-live="polite"></div>
+  <button id="nav-next" aria-label="Riesgo siguiente">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<div class="copiado" id="copiado" role="status" aria-live="polite"></div>
+
+<footer class="pie">
+  <div class="container pie__fila">
+    <span>Antefirma — demo. Todo corre en tu navegador.</span>
+    <span>No constituye asesoría legal.</span>
+  </div>
+</footer>
+
+<script src="../assets/nav.js"></script>
+<script src="contratos.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Kilonauta</title>
+<meta name="description" content="Modelo de datos, agentes de IA con su costo real, qué hay que contratar, variables de entorno, y la lista completa de lo que está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="kilonauta.css">
+<style>
+  .doc { display: grid; gap: var(--sp-xl); }
+  .doc > section { padding-block: 0; scroll-margin-top: 5rem; }
+  .h-num { font-family: var(--mono); font-size: .8rem; color: var(--accent-deep); display: block; margin-bottom: .2rem; }
+
+  .toc { border: 1px solid var(--rule-2); background: var(--card); padding: var(--sp-s); }
+  .toc ol { list-style: none; counter-reset: t; display: grid; gap: .1rem; }
+  .toc li { counter-increment: t; }
+  .toc a {
+    display: flex; align-items: baseline; gap: .5rem;
+    min-height: 40px; text-decoration: none; font-size: .92rem; color: var(--ink-2);
+    border-bottom: 1px dashed var(--rule);
+  }
+  .toc li:last-child a { border-bottom: 0; }
+  .toc a::before { content: "0" counter(t); font-family: var(--mono); font-size: .74rem; color: var(--accent-deep); flex: none; }
+  @media (min-width: 72em) {
+    .layout { display: grid; grid-template-columns: 14rem 1fr; gap: var(--sp-xl); align-items: start; }
+    .toc { position: sticky; top: 5rem; }
+  }
+
+  /* diagrama */
+  .diagram { width: 100%; height: auto; display: block; }
+  .diagram text { font-family: var(--mono); font-size: 10px; }
+  .diagram .box { fill: #FFFDF8; stroke: #1C1A17; stroke-width: 1.5; }
+  .diagram .box-ai { fill: #FBEFE9; stroke: #C0400F; stroke-width: 1.5; }
+  .diagram .box-ext { fill: #EAE1D1; stroke: #B9AB92; stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .diagram .arrow { stroke: #6B655C; stroke-width: 1.2; fill: none; marker-end: url(#ah); }
+  .diagram .lab { font-weight: 600; fill: #1C1A17; }
+  .diagram .sub { fill: #6B655C; font-size: 8.5px; }
+
+  /* tablas de datos */
+  .schema { border: 1px solid var(--rule-2); background: var(--card); }
+  .schema + .schema { margin-top: var(--sp-s); }
+  .schema__h {
+    background: var(--night); color: var(--on-night);
+    padding: .45rem .7rem;
+    font-family: var(--mono); font-size: .85rem; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap;
+  }
+  .schema__h em { font-style: normal; font-size: .72rem; color: var(--on-night-2); font-family: var(--sans); }
+  .schema table { font-size: .8rem; }
+  .schema td:first-child { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+  .schema td:nth-child(2) { font-family: var(--mono); color: var(--accent-deep); font-size: .74rem; white-space: nowrap; }
+  .schema td:last-child { color: var(--ink-3); }
+
+  /* agentes */
+  .agent { border: 1px solid var(--rule-2); background: var(--card); }
+  .agent + .agent { margin-top: var(--sp-s); }
+  .agent__h { padding: .6rem .8rem; border-bottom: 1px solid var(--rule-2); display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+  .agent__h h3 { font-size: 1.05rem; }
+  .agent__b { padding: .8rem; display: grid; gap: .6rem; }
+  .agent__row { display: grid; grid-template-columns: 6rem 1fr; gap: .6rem; font-size: .86rem; }
+  @media (max-width: 30em) { .agent__row { grid-template-columns: 1fr; gap: .1rem; } }
+  .agent__row > span:first-child {
+    font-family: var(--display); font-weight: 700; font-stretch: 82%;
+    text-transform: uppercase; letter-spacing: .09em; font-size: .62rem; color: var(--ink-3);
+    padding-top: .18rem;
+  }
+  .prompt {
+    background: var(--paper-2); border-left: 2px solid var(--accent);
+    padding: .55rem .65rem; font-family: var(--mono); font-size: .76rem;
+    line-height: 1.6; white-space: pre-wrap;
+  }
+  .no-ai { border: 2px dashed var(--rule-2); background: var(--paper-2); padding: var(--sp-s); }
+
+  .math {
+    background: var(--night); color: var(--on-night);
+    padding: var(--sp-s); font-family: var(--mono); font-size: .82rem;
+    line-height: 1.75; overflow-x: auto;
+  }
+  .math b { color: #F5A882; font-weight: 600; }
+  .math .c { color: var(--on-night-2); }
+  .math .eq { color: #8FC9A8; }
+  .math hr { border: 0; border-top: 1px dashed #4A453D; margin: .5rem 0; }
+
+  .env { background: var(--night); color: var(--on-night); padding: var(--sp-s); font-family: var(--mono); font-size: .78rem; line-height: 1.85; overflow-x: auto; }
+  .env .k { color: #F5A882; }
+  .env .c { color: var(--on-night-2); }
+
+  /* falseado */
+  .fake { border-left: 3px solid var(--bad); background: var(--card); padding: .7rem .8rem; }
+  .fake + .fake { margin-top: .5rem; }
+  .fake h4 { font-family: var(--display); font-weight: 800; font-stretch: 88%; font-size: .98rem; margin-bottom: .2rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+  .fake p { font-size: .87rem; color: var(--ink-2); }
+  .fake .real { display: block; margin-top: .35rem; font-size: .82rem; color: var(--ink); border-top: 1px dashed var(--rule); padding-top: .35rem; }
+  .fake .real b { color: var(--accent-deep); }
+
+  .contract { display: grid; gap: .5rem; }
+  .contract > div { border: 1px solid var(--rule-2); background: var(--card); padding: .6rem .7rem; display: grid; gap: .3rem; }
+  .contract h4 { font-family: var(--display); font-weight: 800; font-stretch: 88%; font-size: .95rem; }
+  .contract .meta { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .contract p { font-size: .85rem; color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="wordmark" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#D8461B" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav" id="navBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      Menú
+    </button>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top:var(--sp-l)">
+
+  <p class="stencil stencil--accent">Arquitectura</p>
+  <h1 style="margin:.3rem 0 var(--sp-s)">Nada de esto está aprovisionado.</h1>
+  <p class="lead prose" style="margin-bottom:var(--sp-xl)">
+    Este documento existe para que nadie se lleve una sorpresa. Está el modelo de datos, los
+    agentes con su costo al centavo, qué habría que ir a firmar —y una lista completa,
+    sin adornos, de <a href="#falso">todo lo que está falseado en el demo</a>.
+  </p>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p class="stencil" style="margin-bottom:.5rem">Índice</p>
+      <ol>
+        <li><a href="#mapa">Mapa del sistema</a></li>
+        <li><a href="#datos">Modelo de datos</a></li>
+        <li><a href="#ia">Los agentes de IA</a></li>
+        <li><a href="#costos">Costo mensual</a></li>
+        <li><a href="#contratar">Qué hay que contratar</a></li>
+        <li><a href="#env">Variables de entorno</a></li>
+        <li><a href="#falso">Qué está falseado</a></li>
+        <li><a href="#dominio">El dominio</a></li>
+      </ol>
+    </nav>
+
+    <div class="doc">
+
+      <!-- ═════════════════════════════════════════════════ MAPA ═══ -->
+      <section id="mapa">
+        <span class="h-num">01</span>
+        <h2>Mapa del sistema</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Monolito en Node + Postgres, con una cola para todo lo que habla con un tercero.
+          Nada exótico: el riesgo de esta empresa es comercial, no técnico, y la arquitectura
+          debería reflejar eso.
+        </p>
+
+        <div class="figure">
+          <div class="scroll-x" style="border:0;background:none">
+            <svg class="diagram" viewBox="0 0 760 400" role="img" aria-labelledby="dt dd" style="min-width:42rem">
+              <title id="dt">Diagrama de arquitectura de Kilonauta</title>
+              <desc id="dd">Las tiendas conectan por integraciones o por la app web. El núcleo tiene el motor de tarifas, el generador de etiquetas, el normalizador de tracking y el motor de reclamos. Los workers hablan con las APIs de los cuatro couriers, con WhatsApp, con Transbank y con la API de Anthropic.</desc>
+              <defs>
+                <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M0 0 L8 4 L0 8 z" fill="#6B655C"/>
+                </marker>
+              </defs>
+
+              <!-- fuentes -->
+              <text x="14" y="24" class="lab" font-size="11">ENTRADA</text>
+              <rect class="box-ext" x="14" y="34" width="122" height="46" rx="0"/>
+              <text x="24" y="52" class="lab">Jumpseller / Shopify</text>
+              <text x="24" y="66" class="sub">WooCommerce · Bsale · MELI</text>
+
+              <rect class="box-ext" x="14" y="92" width="122" height="42"/>
+              <text x="24" y="110" class="lab">App web Kilonauta</text>
+              <text x="24" y="124" class="sub">la dueña, en su teléfono</text>
+
+              <rect class="box-ext" x="14" y="146" width="122" height="42"/>
+              <text x="24" y="164" class="lab">API pública</text>
+              <text x="24" y="178" class="sub">plan Cordillera</text>
+
+              <!-- núcleo -->
+              <rect x="176" y="20" width="240" height="360" fill="none" stroke="#B9AB92" stroke-width="1" stroke-dasharray="3 3"/>
+              <text x="186" y="14" class="lab" font-size="11">NÚCLEO · Node + Postgres</text>
+
+              <rect class="box" x="190" y="34" width="212" height="44"/>
+              <text x="200" y="52" class="lab">Motor de tarifas</text>
+              <text x="200" y="66" class="sub">cotiza los 4 · puntaje transparente</text>
+
+              <rect class="box" x="190" y="88" width="212" height="44"/>
+              <text x="200" y="106" class="lab">Generador de etiquetas</text>
+              <text x="200" y="120" class="sub">PDF 10×15 · Code128 · PDF417</text>
+
+              <rect class="box" x="190" y="142" width="212" height="44"/>
+              <text x="200" y="160" class="lab">Normalizador de tracking</text>
+              <text x="200" y="174" class="sub">4 vocabularios → 6 estados</text>
+
+              <rect class="box" x="190" y="196" width="212" height="44"/>
+              <text x="200" y="214" class="lab">Motor de reclamos</text>
+              <text x="200" y="228" class="sub">plazos · evidencia · recupero</text>
+
+              <rect class="box" x="190" y="250" width="212" height="44"/>
+              <text x="200" y="268" class="lab">Billetera y saldo</text>
+              <text x="200" y="282" class="sub">prepago · sin crédito, nunca</text>
+
+              <rect class="box" x="190" y="304" width="212" height="44"/>
+              <text x="200" y="322" class="lab">Cola de trabajos</text>
+              <text x="200" y="336" class="sub">Redis · reintentos con backoff</text>
+
+              <!-- agentes IA -->
+              <text x="440" y="14" class="lab" font-size="11" fill="#C0400F">AGENTES</text>
+              <rect class="box-ai" x="440" y="34" width="142" height="40"/>
+              <text x="450" y="51" class="lab">Normalizador</text>
+              <text x="450" y="64" class="sub">Haiku 4.5</text>
+
+              <rect class="box-ai" x="440" y="82" width="142" height="40"/>
+              <text x="450" y="99" class="lab">Traductor de eventos</text>
+              <text x="450" y="112" class="sub">Haiku 4.5 · sólo lo nuevo</text>
+
+              <rect class="box-ai" x="440" y="130" width="142" height="40"/>
+              <text x="450" y="147" class="lab">Redactor de reclamos</text>
+              <text x="450" y="160" class="sub">Sonnet 5</text>
+
+              <rect class="box-ai" x="440" y="178" width="142" height="40"/>
+              <text x="450" y="195" class="lab">Rescatador de dirección</text>
+              <text x="450" y="208" class="sub">Sonnet 5 · cuando rebota</text>
+
+              <rect x="440" y="226" width="142" height="40" fill="none" stroke="#6B655C" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <text x="450" y="243" class="lab">Detector de riesgo</text>
+              <text x="450" y="256" class="sub">SIN IA · reglas + percentiles</text>
+
+              <!-- externos -->
+              <text x="618" y="14" class="lab" font-size="11">TERCEROS</text>
+              <rect class="box-ext" x="618" y="34" width="128" height="56"/>
+              <text x="628" y="52" class="lab">Couriers</text>
+              <text x="628" y="65" class="sub">Chilexpress · Starken</text>
+              <text x="628" y="77" class="sub">Blue Express · Correos</text>
+
+              <rect class="box-ext" x="618" y="98" width="128" height="40"/>
+              <text x="628" y="115" class="lab">Meta WhatsApp</text>
+              <text x="628" y="128" class="sub">Cloud API · utility</text>
+
+              <rect class="box-ext" x="618" y="146" width="128" height="40"/>
+              <text x="628" y="163" class="lab">Transbank</text>
+              <text x="628" y="176" class="sub">Webpay · Oneclick</text>
+
+              <rect class="box-ext" x="618" y="194" width="128" height="40"/>
+              <text x="628" y="211" class="lab">SII / DTE</text>
+              <text x="628" y="224" class="sub">factura mensual única</text>
+
+              <rect class="box-ext" x="618" y="242" width="128" height="40"/>
+              <text x="628" y="259" class="lab">API Anthropic</text>
+              <text x="628" y="272" class="sub">Haiku 4.5 · Sonnet 5</text>
+
+              <!-- flechas -->
+              <path class="arrow" d="M136 57 L188 57"/>
+              <path class="arrow" d="M136 113 L170 113 L170 110 L188 110"/>
+              <path class="arrow" d="M136 167 L170 167 L170 164 L188 164"/>
+
+              <path class="arrow" d="M402 56 L438 54"/>
+              <path class="arrow" d="M402 164 L420 164 L420 102 L438 102"/>
+              <path class="arrow" d="M402 218 L420 218 L420 150 L438 150"/>
+              <path class="arrow" d="M402 110 L424 110 L424 198 L438 198"/>
+              <path class="arrow" d="M402 326 L424 326 L424 246 L438 246"/>
+
+              <path class="arrow" d="M582 54 L616 58"/>
+              <path class="arrow" d="M582 102 L600 102 L600 62 L616 62"/>
+              <path class="arrow" d="M582 150 L600 150 L600 262 L616 262"/>
+              <path class="arrow" d="M582 198 L600 198 L600 262 L616 262"/>
+
+              <path class="arrow" d="M402 340 L560 340 L560 130 L616 122"/>
+              <path class="arrow" d="M402 272 L570 272 L570 170 L616 168"/>
+              <path class="arrow" d="M402 300 L590 300 L590 218 L616 216"/>
+
+              <!-- webhook de vuelta -->
+              <path class="arrow" d="M680 90 L680 380 L300 380 L300 350" stroke-dasharray="3 3"/>
+              <text x="440" y="376" class="sub" fill="#C0400F">webhooks de tracking · cada courier a su manera</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════ DATOS ═══ -->
+      <section id="datos">
+        <span class="h-num">02</span>
+        <h2>Modelo de datos</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Postgres. Multi-tenant por <code class="mono">tienda_id</code> con row-level security.
+          Las tablas que importan de verdad son cuatro; el resto es plomería.
+        </p>
+
+        <div class="schema">
+          <div class="schema__h"><span>tiendas</span><em>el cliente que paga</em></div>
+          <div class="scroll-x" style="border:0">
+            <table>
+              <tbody>
+                <tr><td>id</td><td>uuid pk</td><td>—</td></tr>
+                <tr><td>razon_social</td><td>text</td><td>Bruma Suplementos SpA</td></tr>
+                <tr><td>rut</td><td>text</td><td>76.543.210-K · validado con dígito verificador</td></tr>
+                <tr><td>plan</td><td>enum</td><td>nauta · bodega · cordillera</td></tr>
+                <tr><td>saldo_clp</td><td>integer</td><td><b>nunca negativo.</b> Restricción a nivel de base de datos, no de código.</td></tr>
+                <tr><td>direccion_retiro</td><td>jsonb</td><td>de dónde retira el courier</td></tr>
+                <tr><td>marca_tracking</td><td>jsonb</td><td>logo, color y dominio para la página de seguimiento</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="schema">
+          <div class="schema__h"><span>envios</span><em>la tabla central. Todo cuelga de acá.</em></div>
+          <div class="scroll-x" style="border:0">
+            <table>
+              <tbody>
+                <tr><td>id</td><td>uuid pk</td><td>—</td></tr>
+                <tr><td>tienda_id</td><td>uuid fk</td><td>—</td></tr>
+                <tr><td>pedido_externo_id</td><td>text</td><td>el id en Jumpseller/Shopify. Único por tienda.</td></tr>
+                <tr><td>courier</td><td>enum</td><td>chilexpress · starken · blueexpress · correos</td></tr>
+                <tr><td>guia</td><td>text</td><td>el número del courier, con su formato</td></tr>
+                <tr><td>destino_id</td><td>uuid fk</td><td>→ direcciones (ya normalizada)</td></tr>
+                <tr><td>peso_real_g</td><td>integer</td><td>gramos, no kilos. Los decimales en flotante causan disputas de facturación.</td></tr>
+                <tr><td>largo_mm, ancho_mm, alto_mm</td><td>integer</td><td>milímetros, misma razón</td></tr>
+                <tr><td>peso_facturable_g</td><td>integer</td><td>max(real, volumétrico), congelado al momento de cotizar</td></tr>
+                <tr><td>precio_cobrado_clp</td><td>integer</td><td>lo que le cobramos a la tienda</td></tr>
+                <tr><td>costo_courier_clp</td><td>integer</td><td>lo que nos cobra el courier. <b>La diferencia es la empresa.</b></td></tr>
+                <tr><td>costo_real_clp</td><td>integer</td><td>lo que el courier <em>realmente</em> facturó. Puede diferir: sobrepeso, re-aforo, zona mal declarada. <b>Es el error más caro de este modelo.</b></td></tr>
+                <tr><td>estado</td><td>enum</td><td>creado · admitido · transito · reparto · entregado · problema</td></tr>
+                <tr><td>etiqueta_url</td><td>text</td><td>→ R2. PDF firmado, expira en 30 días.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="schema">
+          <div class="schema__h"><span>eventos_tracking</span><em>append-only. Nunca se edita una fila.</em></div>
+          <div class="scroll-x" style="border:0">
+            <table>
+              <tbody>
+                <tr><td>id</td><td>bigserial pk</td><td>—</td></tr>
+                <tr><td>envio_id</td><td>uuid fk</td><td>—</td></tr>
+                <tr><td>ocurrido_en</td><td>timestamptz</td><td>hora del courier, no la nuestra</td></tr>
+                <tr><td>codigo_courier</td><td>text</td><td>el string crudo: <code>"EN_RUTA_DEST"</code>, <code>"03"</code>, <code>"Recibido en sucursal"</code>…</td></tr>
+                <tr><td>estado_normalizado</td><td>enum</td><td>el nuestro. 95% por tabla de mapeo, 5% por Haiku.</td></tr>
+                <tr><td>ubicacion</td><td>text</td><td>—</td></tr>
+                <tr><td>crudo</td><td>jsonb</td><td><b>el payload completo del courier, siempre.</b> Cuando haya que pelear un reclamo, esto es la prueba.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="schema">
+          <div class="schema__h"><span>reclamos</span><em>el producto que nos diferencia</em></div>
+          <div class="scroll-x" style="border:0">
+            <table>
+              <tbody>
+                <tr><td>id</td><td>uuid pk</td><td>—</td></tr>
+                <tr><td>envio_id</td><td>uuid fk</td><td>—</td></tr>
+                <tr><td>motivo</td><td>enum</td><td>extravio · atraso · dano · entrega_fallida</td></tr>
+                <tr><td>plazo_vence_en</td><td>timestamptz</td><td><b>calculado por courier.</b> Chilexpress y Starken no dan el mismo plazo, y perderlo cuesta plata.</td></tr>
+                <tr><td>escrito_por_ia</td><td>text</td><td>el borrador de Sonnet 5</td></tr>
+                <tr><td>revisado_por</td><td>uuid fk</td><td><b>un humano, siempre.</b> Nunca sale un reclamo sin que alguien lo lea.</td></tr>
+                <tr><td>pagado_al_cliente_clp</td><td>integer</td><td>lo que le transferimos, y cuándo</td></tr>
+                <tr><td>recuperado_courier_clp</td><td>integer</td><td>lo que nos devolvió el courier. <b>La diferencia es nuestro costo real.</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p class="src" style="margin-top:var(--sp-s)">
+          Las otras: <span class="mono">usuarios · integraciones · direcciones · cotizaciones ·
+          movimientos_billetera · cuentas_courier · facturas_courier · notificaciones ·
+          reglas_ruteo</span>.
+          El campo que nadie modela y que hunde a los agregadores es
+          <b><span class="mono">envios.costo_real_clp</span></b>: la diferencia entre lo que el
+          courier <em>cotizó</em> y lo que después <em>facturó</em>. Si no lo concilias factura por
+          factura, el spread se te evapora y no sabes por qué.
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════ IA ═══ -->
+      <section id="ia">
+        <span class="h-num">03</span>
+        <h2>Los agentes de IA</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Cuatro agentes, y un quinto lugar donde <b>deliberadamente no usamos IA</b>. Cada uno
+          hace una tarea aburrida, acotada y verificable. Ninguno toma una decisión que la clienta
+          no pueda revisar.
+        </p>
+
+        <div class="agent">
+          <div class="agent__h">
+            <h3>Normalizador de direcciones</h3>
+            <span class="chip chip--accent">claude-haiku-4-5-20251001</span>
+          </div>
+          <div class="agent__b">
+            <div class="agent__row"><span>Por qué</span><span>El courier rechaza o deja en sucursal las direcciones mal escritas, y eso genera un reintento que <b>cuesta plata y confianza</b>. Es el uso de IA con mejor retorno de todo el producto.</span></div>
+            <div class="agent__row"><span>Entrada</span><span>El string tal como lo escribió el comprador. “los aromos 455 depto 52b torre 2, al lado del jardin infantil, pto montt”</span></div>
+            <div class="agent__row"><span>Salida</span><span>JSON estricto: <span class="mono">{calle, numero, depto, comuna, region, referencia, confianza}</span></span></div>
+            <div class="agent__row"><span>Herramientas</span><span><span class="mono">buscar_comuna(texto)</span> contra el catálogo oficial de 346 comunas. El modelo no adivina la comuna: la busca.</span></div>
+            <div class="agent__row"><span>Guardarraíl</span><span>Si <span class="mono">confianza &lt; 0,8</span>, no se despacha: se le pregunta a la dueña. Una dirección inventada con seguridad es peor que ninguna.</span></div>
+          </div>
+          <div class="prompt">Eres un normalizador de direcciones chilenas. Recibes texto libre escrito por un
+comprador y devuelves JSON estricto.
+
+REGLAS
+· La comuna SIEMPRE sale de buscar_comuna(). Nunca la inventes ni la deduzcas.
+· "pto montt", "ptomontt", "puerto mont" → Puerto Montt. Los chilenos escriben rápido.
+· Separa la referencia ("al lado del jardín") del domicilio. El courier necesita
+  el domicilio; el repartidor agradece la referencia.
+· Si falta el número de la calle, confianza = 0. No lo inventes.
+· Depto, torre, block y casa son campos distintos. No los mezcles.
+
+Devuelve SOLO el JSON.</div>
+        </div>
+
+        <div class="agent">
+          <div class="agent__h">
+            <h3>Traductor de eventos de tracking</h3>
+            <span class="chip chip--accent">claude-haiku-4-5-20251001</span>
+          </div>
+          <div class="agent__b">
+            <div class="agent__row"><span>Por qué</span><span>Cuatro couriers, cuatro vocabularios. Uno manda <span class="mono">"03"</span>, otro <span class="mono">"EN_RUTA_DEST"</span>, otro una frase en castellano. Hay que llevarlos a seis estados.</span></div>
+            <div class="agent__row"><span>El truco</span><span><b>El 95% de los eventos se resuelve con una tabla de mapeo.</b> El LLM sólo ve los strings que nunca antes había visto — cuando un courier inventa un estado nuevo sin avisar, que pasa. <b>Esto baja el costo 20 veces</b> contra mandarle todo al modelo, y es la diferencia entre una línea de costo trivial y una cara.</span></div>
+            <div class="agent__row"><span>Salida</span><span>El estado normalizado + una propuesta de nueva fila para la tabla de mapeo, que un humano aprueba.</span></div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent__h">
+            <h3>Redactor de reclamos</h3>
+            <span class="chip chip--accent">claude-sonnet-5</span>
+          </div>
+          <div class="agent__b">
+            <div class="agent__row"><span>Por qué</span><span>El reclamo formal necesita un relato coherente, la evidencia correcta y encajar en la tipificación del courier. Es exactamente la clase de escritura tediosa y estructurada que un modelo hace bien y una persona odia.</span></div>
+            <div class="agent__row"><span>Entrada</span><span>Historial completo de eventos, datos del envío, boleta, valor declarado, plazo que corre.</span></div>
+            <div class="agent__row"><span>Herramientas</span><span><span class="mono">plazo_courier(courier, motivo)</span> · <span class="mono">adjuntar_evidencia(tipo)</span> · <span class="mono">calcular_indemnizacion()</span></span></div>
+            <div class="agent__row"><span>Guardarraíl</span><span><b>Un humano lo lee antes de que salga. Siempre.</b> Es un documento legal dirigido a un proveedor con el que tenemos que seguir trabajando mañana. No se automatiza el envío, se automatiza el borrador.</span></div>
+            <div class="agent__row"><span>Por qué Sonnet</span><span>Haiku redacta bien, pero acá el tono importa: firme sin ser hostil. Y son 4 llamadas al mes por tienda — el ahorro de bajar a Haiku sería de US$0,08. No vale la pena.</span></div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent__h">
+            <h3>Rescatador de direcciones rebotadas</h3>
+            <span class="chip chip--accent">claude-sonnet-5</span>
+          </div>
+          <div class="agent__b">
+            <div class="agent__row"><span>Por qué</span><span>Cuando el courier rebota una dirección (“no existe el número”), hay que descifrar qué quiso decir el comprador antes de que el paquete se devuelva. Es un problema de razonamiento, no de formato — por eso Sonnet y no Haiku.</span></div>
+            <div class="agent__row"><span>Herramientas</span><span>Geocodificación, historial de envíos previos a esa persona, y el mensaje original del comprador.</span></div>
+            <div class="agent__row"><span>Salida</span><span>Dos o tres candidatas <b>con su razonamiento</b>, para que la dueña elija. No decide sola.</span></div>
+          </div>
+        </div>
+
+        <div class="no-ai">
+          <h3 style="margin-bottom:.4rem">Y acá, a propósito, NO hay IA</h3>
+          <p style="font-size:.9rem;color:var(--ink-2)">
+            <b>El detector de envíos en riesgo.</b> “Este paquete lleva 11 días sin evento y el
+            percentil 95 de ese tramo son 4 días” es una consulta SQL sobre nuestro propio
+            historial. Es más rápida, más barata, determinista y auditable. Meterle un LLM sería
+            ponerle un motor a vapor a una bicicleta.
+          </p>
+          <p style="font-size:.9rem;color:var(--ink-2);margin-top:.5rem">
+            <b>El ranking de couriers, tampoco.</b> Es una fórmula que la clienta puede reproducir
+            en una servilleta. La confianza es el producto: una caja negra que le dice “mándalo por
+            Starken” sobre un paquete de <span class="clp">$80.000</span> no se la gana nadie.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════ COSTOS ═══ -->
+      <section id="costos">
+        <span class="h-num">04</span>
+        <h2>Costo mensual estimado</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Tienda de referencia: <b>200 envíos/mes</b> — la misma que usa
+          <a href="negocio.html#unit">la economía unitaria</a>. Los dos números tienen que cuadrar
+          y cuadran: <b class="clp">$450</b> de IA por tienda al mes.
+        </p>
+
+        <div class="math">
+<span class="c">// precios de lista Anthropic (USD por millón de tokens)</span>
+<span class="c">// Haiku 4.5 : $1 in / $5 out    ·    Sonnet 5 : $3 in / $15 out</span>
+<hr>
+<b>1 · Normalizar direcciones</b> <span class="c">(Haiku 4.5)</span>
+  200 llamadas × 620 tok in  <span class="eq">=</span> 0,124 MTok × $1  <span class="eq">=</span> US$0,124
+  200 llamadas × 110 tok out <span class="eq">=</span> 0,022 MTok × $5  <span class="eq">=</span> US$0,110
+                                                <b>US$0,234</b>
+
+<b>2 · Traducir eventos desconocidos</b> <span class="c">(Haiku 4.5)</span>
+  <span class="c">200 envíos × 6 eventos = 1.200 eventos.</span>
+  <span class="c">El 95% se mapea con una tabla. Sólo 60 llegan al modelo.</span>
+  60 × 300 tok in  <span class="eq">=</span> 0,018 MTok × $1 <span class="eq">=</span> US$0,018
+  60 ×  40 tok out <span class="eq">=</span> 0,002 MTok × $5 <span class="eq">=</span> US$0,012
+                                                <b>US$0,030</b>
+
+<b>3 · Redactar reclamos</b> <span class="c">(Sonnet 5)</span>
+  <span class="c">0,9 extravíos + ~3 atrasos reclamables = 4 reclamos/mes</span>
+  4 × 5.500 tok in <span class="eq">=</span> 0,022 MTok × $3  <span class="eq">=</span> US$0,066
+  4 ×   900 tok out <span class="eq">=</span> 0,004 MTok × $15 <span class="eq">=</span> US$0,054
+                                                <b>US$0,120</b>
+
+<b>4 · Importar pedidos en formatos raros</b> <span class="c">(Haiku 4.5)</span>
+  20 × 1.200 in / 300 out                       <b>US$0,054</b>
+
+<b>5 · Rescatar direcciones rebotadas</b> <span class="c">(Sonnet 5)</span>
+  4 × 1.500 in / 400 out                        <b>US$0,042</b>
+<hr>
+<b>TOTAL IA = US$0,480 / tienda / mes  ≈  $456 CLP</b>  <span class="c">(a $950/USD)</span>
+<span class="c">// redondeado a $450 en negocio.html</span>
+        </div>
+
+        <h3 style="margin:var(--sp-l) 0 var(--sp-s)">Infraestructura fija (no depende del número de tiendas)</h3>
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Servicio</th><th>Para qué</th><th class="n">USD/mes</th></tr></thead>
+            <tbody>
+              <tr><td>Fly.io</td><td>2 apps (web + worker) + cron</td><td class="n">$62</td></tr>
+              <tr><td>Neon (Postgres)</td><td>base de datos, 8 GB</td><td class="n">$29</td></tr>
+              <tr><td>Upstash (Redis)</td><td>colas y reintentos</td><td class="n">$12</td></tr>
+              <tr><td>Cloudflare R2</td><td>PDFs de etiquetas y fotos de reclamos, ~60 GB</td><td class="n">$8</td></tr>
+              <tr><td>Sentry + Better Stack</td><td>errores, logs, uptime</td><td class="n">$34</td></tr>
+              <tr><td>Resend</td><td>correo transaccional</td><td class="n">$20</td></tr>
+              <tr><td colspan="2"><b>Total fijo</b></td><td class="n"><b>US$165/mes ≈ $157.000 CLP</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src" style="margin-top:.5rem">
+          Esto va en <b>gastos</b> (la quema del roadmap), no en el COGS por tienda. Lo que sí va
+          en COGS por tienda es la IA (<span class="clp">$450</span>), WhatsApp
+          (<span class="clp">$2.000</span>) y Transbank (1,77% del flete cobrado). Esa separación
+          es la que hace que los tres documentos cuadren.
+        </p>
+
+        <h3 style="margin:var(--sp-l) 0 var(--sp-s)">A escala (mes 24 · 620 tiendas)</h3>
+        <div class="math">
+IA         620 × $450    <span class="eq">=</span> $  279.000
+WhatsApp   620 × $2.000  <span class="eq">=</span> $1.240.000
+Infra fija <span class="c">(escalada: más máquinas, DB más grande)</span> <span class="eq">=</span> $  855.000
+<hr>
+<b>TOTAL ≈ $2,37M CLP/mes</b>
+contra un ingreso neto de $84,5M/mes <span class="eq">=</span> <b>2,8%</b>
+<span class="c">// el costo técnico no es el problema de este negocio.</span>
+<span class="c">// el problema son los $20.300/tienda de provisión de reclamos.</span>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ CONTRATAR ═══ -->
+      <section id="contratar">
+        <span class="h-num">05</span>
+        <h2>Qué hay que ir a contratar</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Ordenado por <b>cuánto tarda y cuánto duele</b>, no por importancia. Los primeros cuatro
+          son la empresa; el resto se resuelve en una tarde.
+        </p>
+
+        <div class="contract">
+          <div style="border:2px solid var(--accent)">
+            <h4>Contrato empresa + API con los 4 couriers</h4>
+            <div class="meta">
+              <span class="chip chip--bad">4–10 semanas cada uno</span>
+              <span class="chip chip--bad">boleta de garantía</span>
+              <span class="chip chip--accent">bloqueante</span>
+            </div>
+            <p>
+              Chilexpress, Starken, Blue Express y Correos de Chile. Cada uno con su ejecutivo, su
+              formato de contrato, su API de calidad variable (algunas SOAP, en 2026) y su
+              <b>boleta de garantía</b> equivalente a ~30 días de facturación estimada.
+              <b>Esto no es una integración técnica: es una negociación comercial que dura meses
+              y que define si la empresa existe.</b> Es el hito M2 del roadmap y su criterio de muerte.
+            </p>
+          </div>
+
+          <div>
+            <h4>WhatsApp Business API</h4>
+            <div class="meta">
+              <span class="chip chip--warn">2–3 semanas</span>
+              <span class="chip chip--info">Meta Cloud API</span>
+            </div>
+            <p>
+              Verificación de negocio con Meta, número dedicado, y <b>plantillas de mensaje
+              aprobadas una por una</b> (categoría <em>utility</em>, que es la barata). Los avisos
+              salen con el nombre de la tienda, no con el nuestro, y eso hay que configurarlo por
+              cliente. Costo estimado: US$0,015 por conversación de utilidad en Chile —
+              <b>la tabla de Meta cambia y hay que revisarla, no asumirla</b>.
+            </p>
+          </div>
+
+          <div>
+            <h4>Transbank — Webpay Plus + Oneclick</h4>
+            <div class="meta">
+              <span class="chip chip--warn">3–5 semanas</span>
+              <span class="chip chip--info">1,49% + IVA</span>
+            </div>
+            <p>
+              Para recargar el saldo prepago. Oneclick permite el cobro automático cuando el saldo
+              baja del umbral, que es lo que evita que la dueña no pueda despachar un viernes a las
+              7 de la tarde. Alternativa más rápida para partir: Flow o Khipu (transferencia,
+              comisión más baja, peor experiencia).
+            </p>
+          </div>
+
+          <div>
+            <h4>Facturación electrónica (SII / DTE)</h4>
+            <div class="meta">
+              <span class="chip chip--warn">2–4 semanas</span>
+              <span class="chip chip--info">vía Nubox / LibreDTE / Bsale</span>
+            </div>
+            <p>
+              Una factura mensual por tienda, con el detalle envío por envío. <b>Es una feature de
+              venta, no un trámite</b>: hoy la clienta recibe cuatro facturas de cuatro couriers y
+              su contador la odia. No emitimos DTE directo contra el SII — se usa un proveedor
+              certificado y se acabó el problema.
+            </p>
+          </div>
+
+          <div>
+            <h4>API de Anthropic</h4>
+            <div class="meta">
+              <span class="chip chip--ok">1 día</span>
+              <span class="chip chip--info">US$0,48/tienda/mes</span>
+            </div>
+            <p>Una tarjeta y una API key. Lo más fácil de toda esta lista, y por lejos lo más barato.</p>
+          </div>
+
+          <div>
+            <h4>Marketplace de apps de Jumpseller y Bsale</h4>
+            <div class="meta">
+              <span class="chip chip--warn">4–6 semanas de revisión</span>
+              <span class="chip chip--accent">es el canal #1</span>
+            </div>
+            <p>
+              OAuth, webhooks de pedidos, y pasar su revisión. <b>Es el canal de adquisición más
+              importante del plan</b>, así que la integración no es un “nice to have” de ingeniería:
+              es go-to-market.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════ ENV ═══ -->
+      <section id="env">
+        <span class="h-num">06</span>
+        <h2>Variables de entorno</h2>
+        <div class="env" style="margin-top:var(--sp-s)">
+<span class="c"># núcleo</span>
+<span class="k">DATABASE_URL</span>=postgres://…
+<span class="k">REDIS_URL</span>=rediss://…
+<span class="k">SESSION_SECRET</span>=…
+<span class="k">APP_URL</span>=https://app.kilonauta.com
+
+<span class="c"># IA</span>
+<span class="k">ANTHROPIC_API_KEY</span>=sk-ant-…
+<span class="k">MODELO_RAPIDO</span>=claude-haiku-4-5-20251001   <span class="c"># normalizar, traducir, importar</span>
+<span class="k">MODELO_JUICIO</span>=claude-sonnet-5             <span class="c"># reclamos, rescate de direcciones</span>
+<span class="k">IA_UMBRAL_CONFIANZA</span>=0.80                  <span class="c"># bajo esto, pregunta; no adivina</span>
+
+<span class="c"># couriers — uno por cada uno, y ninguno se parece al otro</span>
+<span class="k">CHILEXPRESS_API_KEY</span>=…
+<span class="k">CHILEXPRESS_CUENTA_CORRIENTE</span>=…
+<span class="k">STARKEN_USER</span>=…
+<span class="k">STARKEN_PASS</span>=…                          <span class="c"># sí, usuario y contraseña. En 2026.</span>
+<span class="k">BLUEEXPRESS_TOKEN</span>=…
+<span class="k">BLUEEXPRESS_CENTRO_COSTO</span>=…
+<span class="k">CORREOS_ADMIN_USER</span>=…
+<span class="k">CORREOS_ADMIN_PASS</span>=…
+
+<span class="c"># pagos y tributario</span>
+<span class="k">TRANSBANK_COMMERCE_CODE</span>=…
+<span class="k">TRANSBANK_API_KEY</span>=…
+<span class="k">DTE_PROVIDER_TOKEN</span>=…                    <span class="c"># Nubox / LibreDTE</span>
+
+<span class="c"># mensajería</span>
+<span class="k">META_WABA_ID</span>=…
+<span class="k">META_PHONE_NUMBER_ID</span>=…
+<span class="k">META_ACCESS_TOKEN</span>=…
+<span class="k">RESEND_API_KEY</span>=…
+
+<span class="c"># almacenamiento</span>
+<span class="k">R2_ACCOUNT_ID</span>=…
+<span class="k">R2_ACCESS_KEY_ID</span>=…
+<span class="k">R2_BUCKET</span>=kilonauta-etiquetas
+
+<span class="c"># límites duros del negocio (en env, no en el código, para poder cambiarlos sin deploy)</span>
+<span class="k">TOPE_INDEMNIZACION_CLP</span>=60000
+<span class="k">SALDO_MINIMO_CLP</span>=0                       <span class="c"># jamás negativo. No damos crédito.</span>
+<span class="k">MAX_VOLUMEN_POR_COURIER_PCT</span>=40           <span class="c"># ninguno sobre el 40%: no ser rehén de nadie</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════ FALSEADO ═══ -->
+      <section id="falso">
+        <span class="h-num">07</span>
+        <h2>Qué está falseado en el demo</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Todo lo de abajo es mentira, y preferimos decirlo nosotros. El demo se siente real
+          porque la <b>estructura</b> es real; los <b>datos y las conexiones</b> no lo son.
+        </p>
+
+        <div class="fake">
+          <h4>Las tarifas <span class="chip chip--bad">lo más importante</span></h4>
+          <p>
+            Salen de un modelo calibrado en <span class="mono">tarifas.js</span>, no de la API de
+            ningún courier. La <em>estructura</em> es correcta (base por zona + $/kg + peso
+            volumétrico con divisor 4000 + recargo por destino) y el <em>orden relativo</em> entre
+            couriers refleja la realidad chilena. Los valores exactos, no.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> firmar los cuatro contratos e integrar
+          cuatro APIs de cotización. 4 a 10 semanas cada una. <b>Ninguna tarifa del sitio es una
+          oferta.</b></span>
+        </div>
+
+        <div class="fake">
+          <h4>El código de barras y el QR</h4>
+          <p>
+            Son patrones deterministas derivados del número de guía. Se ven como códigos, pero
+            <b>un escáner no los lee</b>. No son Code128 ni PDF417 ni un QR válido.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> cada courier especifica su simbología y su
+          contenido. Se genera con una librería local (bwip-js) — <b>del lado del servidor</b>,
+          porque una etiqueta mal impresa es un paquete perdido.</span>
+        </div>
+
+        <div class="fake">
+          <h4>La normalización de dirección con IA</h4>
+          <p>
+            En el demo, la dirección “sucia” y la “limpia” <b>están las dos escritas a mano</b> en
+            el array de pedidos. No hay ninguna llamada a Haiku. Es la ilusión más barata de todo
+            el demo y la más convincente.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> el agente de §03, con el catálogo de las
+          346 comunas y el umbral de confianza.</span>
+        </div>
+
+        <div class="fake">
+          <h4>El reclamo “redactado por IA”</h4>
+          <p>
+            Es una plantilla determinista en JavaScript (<span class="mono">draftReclamo()</span>)
+            que interpola los datos del envío. Sonnet 5 no toca nada. El texto se parece al que
+            saldría, pero el mecanismo es otro y decirlo importa.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> el agente redactor, más un humano que lo
+          revise antes de enviarlo. Y un flujo de escalamiento con el ejecutivo del courier, que es
+          lo que de verdad hace que un reclamo se pague.</span>
+        </div>
+
+        <div class="fake">
+          <h4>El “% a tiempo en esta comuna” <span class="chip chip--warn">arranque en frío</span></h4>
+          <p>
+            Inventado. Y acá hay un problema honesto que no se resuelve con código: <b>en
+            producción ese número sale de nuestro propio historial de envíos, y el día 1 no
+            tenemos historial.</b>
+          </p>
+          <span class="real"><b>Para que fuera real:</b> los primeros 6 meses habría que mostrar el
+          promedio nacional publicado del courier, o no mostrar nada. <b>Mostrar un número inventado
+          sería exactamente lo que le criticamos a todos los demás.</b> Es una restricción de
+          producto, no un bug.</span>
+        </div>
+
+        <div class="fake">
+          <h4>Los números de guía</h4>
+          <p>
+            Generados con <span class="mono">Math.random()</span>, con el formato correcto de cada
+            courier (Chilexpress: 9–12 dígitos · Starken: OT-######## · Blue Express: OD-##########
+            · Correos: formato S10 de la UPU, <span class="mono">R·#########CL</span>).
+            <b>No existen en el sistema de nadie.</b>
+          </p>
+          <span class="real"><b>Para que fuera real:</b> la guía la emite el courier al crear el
+          envío por API. Nosotros no inventamos guías; las pedimos.</span>
+        </div>
+
+        <div class="fake">
+          <h4>Los avisos al cliente, el saldo y el pago</h4>
+          <p>
+            No se envía ningún WhatsApp ni ningún correo a nadie. El saldo baja en una variable de
+            JavaScript. Transbank no existe en el demo.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> Meta Cloud API con plantillas aprobadas,
+          Transbank Oneclick, y una tabla de movimientos con doble entrada — porque una billetera
+          sin contabilidad de doble entrada es un juicio esperando a pasar.</span>
+        </div>
+
+        <div class="fake">
+          <h4>El detector de “envío pegado”</h4>
+          <p>
+            En el demo es un campo <span class="mono">estado: 'pegado'</span> escrito a mano en el
+            envío E-2203.
+          </p>
+          <span class="real"><b>Para que fuera real:</b> un job que compara el tiempo desde el último
+          evento contra el percentil 95 histórico de ese tramo y ese courier. Sin IA, como dijimos.
+          Necesita ~3 meses de datos propios para ser útil.</span>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════ DOMINIO ═══ -->
+      <section id="dominio">
+        <span class="h-num">08</span>
+        <h2>El dominio</h2>
+
+        <div class="card card--ink" style="margin-top:var(--sp-s)">
+          <p class="stencil" style="margin-bottom:.6rem">Evidencia de disponibilidad</p>
+          <div class="env" style="padding:0;background:none">
+<span class="c">$</span> curl -s -o /dev/null -w '%{http_code}' \
+    https://rdap.verisign.com/com/v1/domain/kilonauta.com
+<b style="color:#8FC9A8">404</b>   <span class="c"># 404 en el RDAP de Verisign = el dominio NO está registrado</span>
+
+<span class="c">$</span> ./_kit/check-domain.sh kilonauta
+kilonauta   .com <b style="color:#8FC9A8">AVAILABLE</b>   (http 404)   .cl <b style="color:#8FC9A8">AVAILABLE</b>
+
+<span class="c"># verificado el 2026-07-12</span>
+          </div>
+          <p style="margin-top:.8rem;font-size:.9rem;color:var(--on-night-2)">
+            <b style="color:var(--on-night)">kilonauta.com</b> y <b style="color:var(--on-night)">kilonauta.cl</b>
+            están los dos libres. Kilo (la unidad con la que se cobra un paquete) + nauta (el que
+            navega). Chile es largo y hay que navegarlo por kilo.
+          </p>
+          <p style="margin-top:.6rem;font-size:.86rem;color:var(--on-night-2)">
+            Alternativas verificadas el mismo día, también con <span class="mono">.com</span> libre
+            (HTTP 404): <span class="mono">kilonave.com</span> · <span class="mono">zarpea.com</span> ·
+            <span class="mono">despachea.com</span>
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="foot" style="margin-top:var(--sp-2xl)">
+  <div class="container" style="display:grid;gap:var(--sp-2xs)">
+    <a class="wordmark" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#F08A5F" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <p style="max-width:56ch">
+      Chilexpress, Starken, Blue Express y Correos de Chile son proveedores de transporte reales,
+      listados como integraciones previstas. <b>No son clientes, ni socios, ni tienen relación
+      alguna con Kilonauta.</b>
+    </p>
+    <p class="mono tiny">kilonauta.com · disponible · rdap.verisign.com → HTTP 404 · 2026-07-12</p>
+  </div>
+</footer>
+
+<script>
+  const btn = document.getElementById('navBtn');
+  const nav = document.getElementById('nav');
+  btn.addEventListener('click', () => {
+    const open = nav.dataset.open === 'true';
+    nav.dataset.open = String(!open);
+    btn.setAttribute('aria-expanded', String(!open));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* ============================================================================
+   RUTAMO — Dirección de arte: "SEÑALÉTICA DE TERRENO"
+   ----------------------------------------------------------------------------
+   La oficina es papel: una orden de trabajo impresa. Fondo hueso, tinta negra,
+   reglas de 1px, esquinas rectas, cero sombras difusas, cero degradados.
+   El terreno es alta visibilidad: grafito y lima reflectante — el color exacto
+   del chaleco del técnico — con tipografía enorme para leerse con guantes.
+
+   Tipografía: Archivo (grotesca de señalética, pesos 600-800 para display,
+   versalitas con tracking para etiquetas) + IBM Plex Mono para todo número,
+   ETA, RUT, patente y monto. Nada de Inter ni Poppins: esto es un tablero de
+   despacho, no una landing de SaaS.
+
+   El único "efecto" permitido es la sombra dura de 3px offset en los bloques
+   de acento: es un sello de imprenta, no un glassmorphism.
+   ============================================================================ */
+
+:root {
+  --paper:    #F4F1EA;   /* hueso — papel de orden de trabajo */
+  --panel:    #FBFAF6;   /* panel elevado */
+  --ink:      #14161A;   /* tinta */
+  --ink-2:    #45443E;   /* tinta secundaria */
+  --muted:    #6E6A61;   /* etiquetas, metadatos */
+  --rule:     #DAD4C5;   /* hairline */
+  --rule-2:   #C3BBA7;   /* hairline fuerte */
+  --hi:       #D9F02B;   /* lima alta visibilidad (chaleco reflectante) */
+  --hi-dim:   #EDF7A8;   /* lima al 30% para resaltados de fondo */
+  --graphite: #191C1E;   /* UI del técnico */
+  --graphite-2:#26292C;
+  --critical: #C0332E;   /* criterio de muerte / urgencia */
+  --good:     #0B6E3B;
+
+  /* Paleta de datos — validada con scripts/validate_palette.js contra
+     la superficie #F4F1EA (ver stack.html). No se mezcla con la marca. */
+  --s-1: #2a78d6;  /* Rodrigo   / ingresos / escenario base */
+  --s-2: #1baf7a;  /* Camila */
+  --s-3: #eda100;  /* Nelson */
+  --s-4: #008300;  /* Ignacio */
+  --s-5: #4a3aa7;  /* Marisol */
+  --s-red: #e34948;/* quema */
+  --ramp-1: #6da7ec;
+  --ramp-2: #3987e5;
+  --ramp-3: #256abf;
+  --ramp-4: #104281;
+  --grid: #E3DDCE;
+
+  --sans: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  font-weight: 400;
+  /* trama de papel: una retícula de puntos casi invisible, como papel milimetrado */
+  background-image: radial-gradient(circle at 1px 1px, rgba(20,22,26,.055) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+::selection { background: var(--hi); color: var(--ink); }
+
+h1, h2, h3, h4 { font-weight: 800; letter-spacing: -0.02em; }
+h1 { font-size: var(--step-4); line-height: 1.02; }
+h2 { font-size: var(--step-3); line-height: 1.08; }
+h3 { font-size: var(--step-1); line-height: 1.15; }
+p  { color: var(--ink-2); }
+strong { color: var(--ink); font-weight: 700; }
+
+a { color: var(--ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-color: var(--hi); text-decoration-thickness: 3px; }
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num  { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* Etiqueta de señalética: versalitas con tracking */
+.tag {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- NAV ----- */
+.topbar {
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper);
+  position: sticky; top: 0; z-index: 60;
+}
+.topbar__in {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-s); min-height: 60px;
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand__mark { flex: 0 0 auto; }
+.brand__name {
+  font-weight: 800; font-size: 1.18rem; letter-spacing: -0.03em; text-transform: uppercase;
+}
+.brand__name em {
+  font-style: normal; background: var(--hi); padding: 0 3px; box-decoration-break: clone;
+}
+.nav { display: none; }
+.nav a {
+  font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none; padding: 8px 10px; border: 1px solid transparent; color: var(--ink-2);
+}
+.nav a:hover { border-color: var(--rule-2); color: var(--ink); }
+.nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+.nav a.nav__back { color: var(--muted); }
+
+.menu { border: 1px solid var(--ink); }
+.menu > summary {
+  list-style: none; cursor: pointer; min-height: 44px; min-width: 44px;
+  display: flex; align-items: center; justify-content: center; padding: 0 12px;
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.menu > summary::-webkit-details-marker { display: none; }
+.menu[open] > summary { background: var(--ink); color: var(--paper); }
+.menu__panel {
+  position: absolute; right: var(--gutter); left: var(--gutter); margin-top: 1px;
+  background: var(--panel); border: 1px solid var(--ink); z-index: 70;
+}
+.menu__panel a {
+  display: block; padding: 14px 16px; text-decoration: none; border-bottom: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.menu__panel a:last-child { border-bottom: 0; }
+.menu__panel a[aria-current="page"] { background: var(--hi); }
+
+@media (min-width: 60em) {
+  .nav { display: flex; align-items: center; gap: 2px; }
+  .menu { display: none; }
+}
+
+/* -------------------------------------------------------------- BLOQUES --- */
+.section { padding-block: var(--sp-xl); border-bottom: 1px solid var(--rule); }
+.section--tight { padding-block: var(--sp-l); }
+.section:last-of-type { border-bottom: 0; }
+
+.eyebrow {
+  display: inline-block; font-family: var(--mono); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
+  border-bottom: 3px solid var(--hi); padding-bottom: 2px; margin-bottom: var(--sp-s);
+}
+
+.card {
+  background: var(--panel); border: 1px solid var(--ink); padding: var(--sp-m);
+}
+.card--flat { border-color: var(--rule-2); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 20px;
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+  border: 2px solid var(--ink); background: var(--panel); color: var(--ink);
+  cursor: pointer; transition: transform .08s ease, box-shadow .08s ease;
+}
+.btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+.btn:active { transform: translate(0,0); box-shadow: none; }
+.btn--hi { background: var(--hi); box-shadow: 3px 3px 0 var(--ink); }
+.btn--hi:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn--ink { background: var(--ink); color: var(--paper); }
+.btn--sm { min-height: 40px; padding: 0 12px; font-size: 0.75rem; }
+
+/* Tabla de datos: hoja de cálculo impresa */
+.table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.table th, .table td {
+  border: 1px solid var(--rule-2); padding: 10px 12px; text-align: left; vertical-align: top;
+}
+.table th {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  background: #EDE9DE; font-weight: 600; color: var(--ink);
+}
+.table td.n, .table th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.table tbody tr:hover { background: #FFFDF5; }
+.scroll-x { border: 1px solid var(--rule-2); }
+.scroll-x .table { border: 0; }
+.scroll-x .table th, .scroll-x .table td { border-left: 0; border-right: 1px solid var(--rule); }
+
+/* Nota al pie de un número: obligación del contrato */
+.src {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+  border-left: 3px solid var(--rule-2); padding-left: 10px; margin-top: var(--sp-2xs);
+}
+.src b { color: var(--ink-2); font-weight: 600; }
+
+.grid { display: grid; gap: var(--sp-m); }
+@media (min-width: 48em) { .g2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 62em) { .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4,1fr); } }
+
+/* KPI / stat tile */
+.stat { border: 1px solid var(--ink); background: var(--panel); padding: var(--sp-s); }
+.stat__v { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; display: block; }
+.stat__l { display: block; margin-top: 4px; }
+
+.foot {
+  border-top: 1px solid var(--ink); padding-block: var(--sp-l);
+  font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: var(--sp-s); justify-content: space-between;
+}
+
+/* Cinta de advertencia — para criterios de muerte y riesgos */
+.hazard {
+  border: 2px solid var(--ink); padding: var(--sp-s) var(--sp-m);
+  background: repeating-linear-gradient(135deg, var(--hi) 0 14px, var(--paper) 14px 28px);
+}
+.hazard > * { background: var(--paper); display: inline-block; padding: 2px 6px; }
+
+.chart-wrap { border: 1px solid var(--ink); background: var(--panel); padding: var(--sp-s); }
+.chart-wrap svg { width: 100%; height: auto; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-2xs); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-2); }
+.legend i { width: 14px; height: 3px; display: block; }

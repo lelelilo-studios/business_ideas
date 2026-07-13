@@ -1,0 +1,2085 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinoria — demo del producto</title>
+<meta name="description" content="El producto funcionando: importa la cartera desde el SII, el agente redacta la cobranza, tú apruebas, el deudor responde.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* ═══════════════════════════════════════════════════════════════
+     DEMO — el libro de caja, ahora operable.
+     Mobile-first: todo esto es el layout de teléfono. El cajón del
+     deudor es una hoja a pantalla completa en el celular y un panel
+     lateral en escritorio.
+     Rampa ORDINAL validada (envejecimiento): claro = sano, oscuro = grave.
+     ═══════════════════════════════════════════════════════════════ */
+  :root {
+    --g1:#D89E86; --g2:#C77A5D; --g3:#B55334; --g4:#9E3119; --g5:#6B2312;
+  }
+
+  body { background-image: none; }
+
+  /* ---------- barra de la aplicación ---------- */
+  .app-barra { border-bottom: 1px solid var(--tinta); background: var(--papel-2); }
+  .app-barra__fila {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--sp-s); padding-block: 10px; flex-wrap: wrap;
+  }
+  .empresa { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .empresa__nombre { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .empresa__rut { font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3); }
+  .bandeja {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 0.72rem; color: var(--rojo);
+    border: 1px solid var(--rojo); background: var(--rojo-tenue);
+    padding: 5px 9px; border-radius: var(--radio); white-space: nowrap;
+  }
+
+  .tabs { display: flex; gap: 0; border-top: 1px solid var(--filete); overflow-x: auto; }
+  .tabs button {
+    flex: 1 0 auto; min-height: 46px; padding: 10px 16px;
+    font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--tinta-3);
+    border-bottom: 2px solid transparent; white-space: nowrap;
+  }
+  .tabs button[aria-selected="true"] { color: var(--rojo); border-bottom-color: var(--rojo); background: var(--papel); }
+  .tabs button:hover { color: var(--tinta); }
+
+  .panel { padding-block: var(--sp-m) var(--sp-2xl); }
+  .panel[hidden] { display: none; }
+
+  /* ---------- conexión SII ---------- */
+  .conexion { padding-block: var(--sp-xl); max-width: 640px; }
+  .conexion h1 { font-size: var(--step-3); margin-bottom: var(--sp-s); }
+  .conexion .bajada { margin-bottom: var(--sp-l); }
+  .opciones { display: grid; gap: var(--sp-s); }
+  .opcion {
+    display: grid; grid-template-columns: 24px 1fr; gap: var(--sp-s);
+    text-align: left; padding: var(--sp-m); border: 1px solid var(--filete-2);
+    background: var(--papel); border-radius: var(--radio); min-height: 44px;
+    width: 100%; align-items: start; transition: border-color .12s, background .12s;
+  }
+  .opcion:hover { border-color: var(--tinta); background: var(--papel-2); }
+  .opcion .ico { color: var(--rojo); margin-top: 2px; }
+  .opcion b { display: block; font-size: 0.98rem; margin-bottom: 3px; }
+  .opcion span { font-size: 0.85rem; color: var(--tinta-2); line-height: 1.5; }
+  .consola {
+    margin-top: var(--sp-m); font-family: var(--mono); font-size: 0.8rem;
+    background: var(--papel-2); border: 1px solid var(--filete-2);
+    padding: var(--sp-m); min-height: 150px; line-height: 1.9; color: var(--tinta-2);
+  }
+  .consola b { color: var(--verde); }
+  .consola .err { color: var(--rojo); }
+  .consola__linea { opacity: 0; animation: aparecer .25s ease forwards; }
+  @keyframes aparecer { to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .consola__linea { opacity: 1; animation: none; } }
+
+  /* ---------- KPI ---------- */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--filete-2); border: 1px solid var(--filete-2); }
+  @media (min-width: 48em) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpi { background: var(--papel); padding: var(--sp-s) var(--sp-m); }
+  .kpi .etiqueta { display: block; margin-bottom: 6px; font-size: 0.66rem; }
+  .kpi .cifra { font-size: var(--step-1); }
+  .kpi__nota { font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-3); margin-top: 4px; }
+  .kpi__nota b { color: var(--verde); }
+
+  /* ---------- filtros ---------- */
+  .filtros { display: flex; gap: 6px; overflow-x: auto; padding-block: var(--sp-s); -webkit-overflow-scrolling: touch; }
+  .chip {
+    min-height: 40px; padding: 6px 12px; white-space: nowrap;
+    border: 1px solid var(--filete-2); border-radius: var(--radio);
+    font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-2); background: var(--papel);
+  }
+  .chip[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+  .chip:hover { border-color: var(--tinta); }
+
+  /* ---------- tabla de cartera ---------- */
+  .libro th button {
+    font: inherit; color: inherit; min-height: 0; min-width: 0; padding: 0;
+    display: inline-flex; align-items: center; gap: 4px; text-transform: inherit; letter-spacing: inherit;
+  }
+  .libro th button:hover { color: var(--tinta); }
+  .libro th .flecha { color: var(--rojo); }
+  .fila-deudor { cursor: pointer; }
+  .fila-deudor:hover { background: var(--rojo-tenue) !important; }
+  .fila-deudor__nombre { font-weight: 500; }
+  .fila-deudor__meta { font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3); margin-top: 2px; }
+  .accion-mini {
+    font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-2);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .accion-mini .punto { width: 6px; height: 6px; border-radius: 50%; background: var(--rojo); flex: none; }
+  .accion-mini .punto--auto { background: var(--tinta-3); }
+  .vacio { padding: var(--sp-xl); text-align: center; color: var(--tinta-3); font-family: var(--mono); font-size: 0.85rem; }
+
+  /* relación */
+  .relacion { display: inline-flex; gap: 2px; align-items: center; }
+  .relacion i { width: 6px; height: 12px; background: var(--filete-2); display: block; }
+  .relacion i.on { background: var(--verde); }
+  .relacion.tensa i.on { background: var(--ambar); }
+  .relacion.riesgo i.on { background: var(--rojo); }
+
+  /* ---------- cajón del deudor ---------- */
+  .velo {
+    position: fixed; inset: 0; background: rgba(22,21,15,.42); z-index: 60;
+    opacity: 0; pointer-events: none; transition: opacity .18s ease;
+  }
+  .velo.on { opacity: 1; pointer-events: auto; }
+  .cajon {
+    position: fixed; inset: 0; z-index: 70; background: var(--papel);
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform .22s ease;
+    overflow: hidden;
+  }
+  .cajon.on { transform: translateX(0); }
+  @media (min-width: 62em) {
+    .cajon { left: auto; width: 620px; border-left: 1px solid var(--tinta); box-shadow: -8px 0 28px rgba(22,21,15,.10); }
+  }
+  .cajon__cab {
+    padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--tinta);
+    background: var(--papel-2); display: flex; justify-content: space-between;
+    align-items: flex-start; gap: var(--sp-s); flex: none;
+  }
+  .cajon__cab h2 { font-size: var(--step-1); line-height: 1.15; }
+  .cajon__meta { font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3); margin-top: 4px; }
+  .cajon__cerrar { color: var(--tinta-2); flex: none; }
+  .cajon__cerrar:hover { color: var(--rojo); }
+  .cajon__cuerpo { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .cajon__seccion { padding: var(--sp-m); border-bottom: 1px solid var(--filete); }
+  .cajon__seccion > .etiqueta { display: block; margin-bottom: var(--sp-s); }
+
+  .fact { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 9px 0; border-bottom: 1px solid var(--filete); align-items: center; }
+  .fact:last-child { border-bottom: 0; }
+  .fact__folio { font-family: var(--mono); font-size: 0.78rem; }
+  .fact__fechas { font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-3); grid-column: 1; }
+  .fact__monto { grid-row: 1 / span 2; text-align: right; }
+  .fact__monto .num { display: block; font-size: 0.9rem; font-weight: 500; }
+  .fact__pagar { margin-top: 4px; }
+
+  /* timeline */
+  .hilo { display: grid; gap: var(--sp-s); }
+  .msg { display: grid; gap: 4px; }
+  .msg__cab { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.66rem; color: var(--tinta-3); flex-wrap: wrap; }
+  .msg__cab .ico { width: 12px; height: 12px; }
+  .msg__txt {
+    font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap;
+    padding: 10px 12px; border-radius: var(--radio); border: 1px solid var(--filete);
+  }
+  .msg--out .msg__txt { background: var(--papel-2); border-left: 2px solid var(--tinta-3); }
+  .msg--in  .msg__txt { background: var(--azul-tenue); border-left: 2px solid var(--azul); }
+  .msg--sistema .msg__txt { background: transparent; border: 1px dashed var(--filete-2); color: var(--tinta-2); font-family: var(--mono); font-size: 0.75rem; }
+  .msg--nuevo { animation: entrar .3s ease; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(6px); } }
+  .escribiendo { font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3); padding: 8px 0; }
+  .escribiendo span { animation: parpadeo 1.1s infinite; }
+  @keyframes parpadeo { 50% { opacity: .25; } }
+
+  /* redactor */
+  .redactor { background: var(--papel-2); }
+  .redactor__tipo {
+    display: flex; align-items: center; gap: 8px; margin-bottom: var(--sp-s);
+    font-family: var(--sans); font-weight: 600; font-size: 0.95rem;
+  }
+  .redactor__tipo .ico { color: var(--rojo); }
+  .redactor__porque {
+    font-size: 0.8rem; color: var(--tinta-2); line-height: 1.55;
+    border-left: 2px solid var(--filete-2); padding-left: 10px; margin-bottom: var(--sp-m);
+  }
+  .redactor__ctrl { display: grid; gap: var(--sp-s); margin-bottom: var(--sp-s); }
+  @media (min-width: 34em) { .redactor__ctrl { grid-template-columns: 1.5fr 1fr; } }
+  .redactor__borrador {
+    width: 100%; min-height: 210px; resize: vertical;
+    font-family: var(--sans); font-size: 0.88rem; line-height: 1.6;
+    padding: 12px; background: var(--papel); color: var(--tinta);
+    border: 1px solid var(--filete-2); border-radius: var(--radio);
+  }
+  .redactor__borrador[readonly] { background: var(--papel); cursor: default; }
+  .redactor__asunto {
+    width: 100%; font-family: var(--mono); font-size: 0.78rem; padding: 9px 12px;
+    border: 1px solid var(--filete-2); border-bottom: 0; background: var(--papel);
+    border-radius: var(--radio) var(--radio) 0 0;
+  }
+  .redactor__asunto + .redactor__borrador { border-radius: 0 0 var(--radio) var(--radio); }
+  .redactor__acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--sp-s); }
+  .redactor__aviso {
+    margin-top: var(--sp-s); font-size: 0.78rem; line-height: 1.5;
+    color: var(--rojo); background: var(--rojo-tenue); border: 1px solid var(--rojo);
+    padding: 9px 12px; border-radius: var(--radio);
+    display: grid; grid-template-columns: 16px 1fr; gap: 8px;
+  }
+  .redactor__aviso .ico { color: var(--rojo); margin-top: 2px; }
+  .redactor__sello {
+    display: flex; align-items: center; gap: 8px; padding: var(--sp-m);
+    font-family: var(--mono); font-size: 0.8rem; color: var(--verde);
+  }
+
+  /* ---------- modal ---------- */
+  .modal-velo {
+    position: fixed; inset: 0; background: rgba(22,21,15,.55); z-index: 90;
+    display: grid; place-items: end center; padding: 0;
+  }
+  @media (min-width: 48em) { .modal-velo { place-items: center; padding: var(--sp-m); } }
+  .modal-velo[hidden] { display: none; }
+  .modal {
+    background: var(--papel); border: 1px solid var(--tinta); width: 100%;
+    max-width: 520px; max-height: 92svh; overflow-y: auto;
+  }
+  .modal__cab { padding: var(--sp-m); border-bottom: 1px solid var(--tinta); background: var(--papel-2); }
+  .modal__cab h3 { font-size: var(--step-1); }
+  .modal__cuerpo { padding: var(--sp-m); }
+  .modal__pie { padding: var(--sp-m); border-top: 1px solid var(--filete); display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .cuotas { display: grid; gap: 1px; background: var(--filete-2); border: 1px solid var(--filete-2); margin-top: var(--sp-s); }
+  .cuota { background: var(--papel); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+  .cuota .num { font-weight: 500; }
+
+  /* ---------- cadencia ---------- */
+  .paso-cad {
+    display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s);
+    padding: var(--sp-m) 0; border-bottom: 1px solid var(--filete); align-items: start;
+  }
+  .paso-cad__sw { display: flex; align-items: center; min-height: 44px; }
+  .interruptor {
+    position: relative; width: 42px; height: 24px; border-radius: 12px;
+    background: var(--filete-2); border: 0; min-width: 42px; min-height: 24px;
+    padding: 0; transition: background .15s ease; flex: none;
+  }
+  .interruptor::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--papel); transition: transform .15s ease;
+  }
+  .interruptor[aria-checked="true"] { background: var(--rojo); }
+  .interruptor[aria-checked="true"]::after { transform: translateX(18px); }
+  .paso-cad__cuerpo b { display: block; font-size: 0.95rem; margin-bottom: 3px; }
+  .paso-cad__cuerpo p { font-size: 0.82rem; color: var(--tinta-2); line-height: 1.5; }
+  .paso-cad.off { opacity: .45; }
+  .dia-input {
+    width: 62px; font-family: var(--mono); font-size: 0.8rem; text-align: center;
+    padding: 8px 4px; min-height: 40px; border: 1px solid var(--filete-2);
+    background: var(--papel); border-radius: var(--radio);
+  }
+  .paso-cad__cfg { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 10px; }
+  .paso-cad__cfg label { font-family: var(--mono); font-size: 0.7rem; color: var(--tinta-3); display: inline-flex; align-items: center; gap: 6px; }
+  .sel {
+    font-family: var(--mono); font-size: 0.72rem; padding: 8px 6px; min-height: 40px;
+    border: 1px solid var(--filete-2); background: var(--papel); border-radius: var(--radio);
+  }
+  .agenda { display: grid; gap: 0; }
+  .agenda__item {
+    display: grid; grid-template-columns: 62px 1fr auto; gap: 10px;
+    padding: 11px 0; border-bottom: 1px solid var(--filete); align-items: center; font-size: 0.85rem;
+  }
+  .agenda__cuando { font-family: var(--mono); font-size: 0.72rem; color: var(--rojo); }
+  .agenda__cuando.futuro { color: var(--tinta-3); }
+
+  /* ---------- impacto ---------- */
+  .grid-impacto { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .grid-impacto { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+  .leyenda { display: flex; flex-wrap: wrap; gap: var(--sp-s) var(--sp-m); font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-2); margin-top: var(--sp-s); }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .leyenda i { width: 11px; height: 11px; display: block; border-radius: 2px; }
+
+  .aviso-demo {
+    border: 1px dashed var(--filete-2); background: var(--papel-2);
+    padding: var(--sp-s) var(--sp-m); font-size: 0.8rem; color: var(--tinta-2);
+    line-height: 1.55; margin-top: var(--sp-l);
+  }
+  .aviso-demo b { color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container">
+    <div class="barra__fila">
+      <a class="marca" href="../index.html"><span class="marca__timbre" aria-hidden="true">T</span>Tinoria</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">
+        Menú
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════════ PASO 0 — CONEXIÓN AL SII ══════════════ -->
+<main id="vistaConexion">
+  <div class="container conexion">
+    <p class="epigrafe epigrafe--rojo">Paso 1 de 1 · Conectar la cartera</p>
+    <h1>Traigamos tus cuentas por cobrar.</h1>
+    <p class="bajada">
+      En Chile toda factura es electrónica, así que esto no lo tienes que escribir a mano.
+      Elige por dónde entramos.
+    </p>
+
+    <div class="opciones">
+      <button class="opcion" type="button" data-origen="sii">
+        <svg class="ico ico--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/><path d="M2 20h20"/></svg>
+        <span>
+          <b>Conectar con el SII (certificado digital)</b>
+          <span>Leemos tu Registro de Compras y Ventas y armamos la cartera sola. Once minutos, una vez.</span>
+        </span>
+      </button>
+      <button class="opcion" type="button" data-origen="csv">
+        <svg class="ico ico--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M12 18v-6M9 15l3-3 3 3"/></svg>
+        <span>
+          <b>Subir el Registro de Ventas (CSV del SII)</b>
+          <span>El archivo que bajas de sii.cl → Servicios online → Factura electrónica. Sin credenciales.</span>
+        </span>
+      </button>
+      <button class="opcion" type="button" data-origen="erp">
+        <svg class="ico ico--lg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/><path d="M7 7h.01M7 17h.01"/></svg>
+        <span>
+          <b>Conectar mi ERP</b>
+          <span>Nubox · Bsale · Defontana · Softland · Chipax. Sincroniza cada 30 minutos.</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="consola" id="consola" aria-live="polite">
+      <span style="color:var(--tinta-3)">Esperando…</span>
+    </div>
+
+    <p class="fuente" style="margin-top: var(--sp-m);">
+      Demo: no hay conexión real al SII. La cartera que verás es de una empresa ficticia,
+      Metalmecánica Vergara SpA, con datos construidos a mano. Lo que <em>sí</em> es real es el flujo.
+    </p>
+  </div>
+</main>
+
+<!-- ══════════════ LA APLICACIÓN ══════════════ -->
+<main id="vistaApp" hidden>
+
+  <div class="app-barra">
+    <div class="container">
+      <div class="app-barra__fila">
+        <div class="empresa">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--rojo)"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+          <div>
+            <div class="empresa__nombre">Metalmecánica Vergara SpA</div>
+            <div class="empresa__rut">RUT 76.129.884-5 · Quilicura · Paulina Vergara</div>
+          </div>
+        </div>
+        <span class="bandeja" id="bandeja">
+          <svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+          <span id="bandejaTxt">9 acciones para hoy</span>
+        </span>
+      </div>
+    </div>
+    <div class="container">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true"  data-tab="cartera">Cartera</button>
+        <button role="tab" aria-selected="false" data-tab="cadencia">Cadencia</button>
+        <button role="tab" aria-selected="false" data-tab="impacto">Impacto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── CARTERA ─────── -->
+  <section class="panel container" id="panelCartera">
+    <div class="kpis">
+      <div class="kpi">
+        <span class="etiqueta">Por cobrar</span>
+        <span class="cifra num" id="kpiPorCobrar">—</span>
+        <div class="kpi__nota" id="kpiFacturas">—</div>
+      </div>
+      <div class="kpi">
+        <span class="etiqueta">Vencido</span>
+        <span class="cifra num cifra--rojo" id="kpiVencido">—</span>
+        <div class="kpi__nota" id="kpiVencidoPct">—</div>
+      </div>
+      <div class="kpi">
+        <span class="etiqueta">Recuperado en julio</span>
+        <span class="cifra num" id="kpiRecuperado">—</span>
+        <div class="kpi__nota" id="kpiRecuperadoNota">—</div>
+      </div>
+      <div class="kpi">
+        <span class="etiqueta">DSO</span>
+        <span class="cifra num" id="kpiDso">—</span>
+        <div class="kpi__nota" id="kpiDsoNota">—</div>
+      </div>
+    </div>
+
+    <div style="margin-top: var(--sp-l);">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:var(--sp-s); flex-wrap:wrap;">
+        <p class="etiqueta">Envejecimiento de cartera</p>
+        <p class="etiqueta" id="agingTotal">—</p>
+      </div>
+      <div class="ficha" style="padding: var(--sp-m) var(--sp-s); margin-top: 8px;">
+        <div id="aging"></div>
+      </div>
+    </div>
+
+    <div style="margin-top: var(--sp-l);">
+      <p class="etiqueta">Deudores</p>
+      <div class="filtros" role="group" aria-label="Filtrar cartera">
+        <button class="chip" data-filtro="todos" aria-pressed="true">Todos</button>
+        <button class="chip" data-filtro="vencido" aria-pressed="false">Vencido</button>
+        <button class="chip" data-filtro="porvencer" aria-pressed="false">Por vencer</button>
+        <button class="chip" data-filtro="plan" aria-pressed="false">Plan de pago</button>
+        <button class="chip" data-filtro="promesa" aria-pressed="false">Con promesa</button>
+        <button class="chip" data-filtro="pagado" aria-pressed="false">Pagados</button>
+      </div>
+
+      <div class="scroll-x">
+        <table class="libro">
+          <thead>
+            <tr>
+              <th scope="col"><button type="button" data-orden="nombre">Deudor <span class="flecha" data-f="nombre"></span></button></th>
+              <th scope="col" class="der"><button type="button" data-orden="monto">Deuda <span class="flecha" data-f="monto"></span></button></th>
+              <th scope="col" class="der"><button type="button" data-orden="mora">Mora <span class="flecha" data-f="mora"></span></button></th>
+              <th scope="col">Estado</th>
+              <th scope="col">Relación</th>
+              <th scope="col">Próxima acción de Tinoria</th>
+            </tr>
+          </thead>
+          <tbody id="tablaDeudores"></tbody>
+        </table>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-s);">
+        Toca una fila para abrir el hilo del deudor y el borrador que el agente tiene listo.
+      </p>
+    </div>
+
+    <div class="aviso-demo">
+      <b>Esto es un demo.</b> El estado vive en tu navegador: si recargas, vuelve al inicio.
+      Todo lo que ves —montos, folios, mora, DSO— se recalcula solo cuando apruebas un envío,
+      marcas una factura pagada o cierras un plan de pago. Nada está pintado a mano.
+    </div>
+  </section>
+
+  <!-- ─────── CADENCIA ─────── -->
+  <section class="panel container" id="panelCadencia" hidden>
+    <div class="grid grid--2" style="gap: var(--sp-xl); align-items:start;">
+      <div>
+        <h2 style="font-size: var(--step-2); margin-bottom: 6px;">La cadencia</h2>
+        <p style="color:var(--tinta-2); font-size:0.92rem; line-height:1.6; margin-bottom: var(--sp-m);">
+          Cuándo hablar, por dónde y con qué tono. Cambia un día o apaga un paso y mira cómo se
+          reordena la agenda de la derecha — en el producto real, esto reprograma la cartera completa.
+        </p>
+        <div id="cadencia"></div>
+        <p class="fuente" style="margin-top: var(--sp-m);">
+          Los pasos marcados con visto bueno nunca salen sin que tú los apruebes. Los clientes marcados
+          como <b>sensibles</b> requieren tu aprobación siempre, incluso en los pasos automáticos.
+        </p>
+      </div>
+      <div>
+        <p class="etiqueta" style="margin-bottom: var(--sp-s);">Agenda que resulta de esta cadencia</p>
+        <div class="ficha">
+          <div class="agenda" id="agenda"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── IMPACTO ─────── -->
+  <section class="panel container" id="panelImpacto" hidden>
+    <h2 style="font-size: var(--step-2); margin-bottom: 6px;">Lo único que le importa al dueño</h2>
+    <p style="color:var(--tinta-2); font-size:0.92rem; line-height:1.6; margin-bottom: var(--sp-l); max-width: 60ch;">
+      No cuántos correos mandaste. Cuántos días demoran en pagarte, y cuánta plata tuya está afuera.
+    </p>
+
+    <div class="grid-impacto">
+      <div class="ficha">
+        <p class="etiqueta" style="margin-bottom: var(--sp-s);">DSO — días que demoras en cobrar</p>
+        <div id="chartDso"></div>
+        <p class="fuente" style="margin-top: var(--sp-s);">
+          Serie ilustrativa del demo. En producción se calcula del histórico real del SII:
+          DSO = (cuentas por cobrar / ventas a crédito del período) × días del período.
+        </p>
+      </div>
+
+      <div class="apilado">
+        <div class="ficha ficha--marcada">
+          <span class="etiqueta">Capital de trabajo liberado</span>
+          <p class="cifra num" id="impLiberado" style="margin-top:6px;">—</p>
+          <div class="calculo" style="margin-top: var(--sp-s);">
+Ventas a crédito (12 m): <b>$480.000.000</b>
+Por día:  480.000.000 / 365 = $1.315.068
+DSO: <b id="impDsoAntes">68</b> d → <b id="impDsoAhora">51</b> d
+Liberado: <span id="impDelta">17</span> × $1.315.068
+        = <b id="impLiberado2">—</b>
+          </div>
+        </div>
+        <div class="ficha">
+          <span class="etiqueta">Horas de cobranza que no hiciste</span>
+          <p class="cifra num" id="impHoras" style="margin-top:6px;">—</p>
+          <p class="fuente" style="margin-top:6px;">
+            Supuesto: 11 minutos por interacción hecha a mano (redactar, buscar la factura, mandar,
+            anotar). Contamos las que Tinoria ejecutó en tu nombre en este período.
+          </p>
+        </div>
+        <div class="ficha">
+          <span class="etiqueta">Recuperado sobre cartera vencida</span>
+          <p class="cifra num" id="impRecup" style="margin-top:6px;">—</p>
+          <p class="fuente" style="margin-top:6px;">
+            En el Plan Resultado esto sería la base del 1,2%. Con lo recuperado hoy,
+            tu factura de Tinoria este mes sería de <b id="impFactura">—</b>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ CAJÓN DEL DEUDOR ══════════════ -->
+<div class="velo" id="velo"></div>
+<aside class="cajon" id="cajon" role="dialog" aria-modal="true" aria-labelledby="cajonTitulo" tabindex="-1">
+  <div class="cajon__cab">
+    <div style="min-width:0;">
+      <h2 id="cajonTitulo">—</h2>
+      <div class="cajon__meta" id="cajonMeta">—</div>
+    </div>
+    <button class="cajon__cerrar" id="cerrarCajon" aria-label="Cerrar">
+      <svg class="ico ico--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="cajon__cuerpo" id="cajonCuerpo"></div>
+</aside>
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-velo" id="modalVelo" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal__cab"><h3 id="modalTitulo">—</h3></div>
+    <div class="modal__cuerpo" id="modalCuerpo"></div>
+    <div class="modal__pie" id="modalPie"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   TINORIA · demo
+   Sin dependencias. Estado en memoria, todo derivado, nada pintado a mano.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── menú móvil ─────────────────────────────────────────── */
+(function () {
+  var b = document.getElementById('menuBtn'), n = document.getElementById('nav');
+  b.addEventListener('click', function () {
+    var a = n.classList.toggle('abierta');
+    b.setAttribute('aria-expanded', a ? 'true' : 'false');
+  });
+})();
+
+/* ── utilidades ─────────────────────────────────────────── */
+var HOY = new Date(2026, 6, 12);           // domingo 12 de julio de 2026
+var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+var MESES_L = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function d(iso) { var p = iso.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function dias(a, b) { return Math.round((b - a) / 86400000); }
+function mora(f) { return dias(d(f.vence), HOY); }         // >0 = vencida
+function clp(n) { return '$' + Math.round(n).toLocaleString('es-CL').replace(/,/g, '.'); }
+function mm(n) { return (n / 1000000).toFixed(1).replace('.', ',') ; }
+function fecha(dt) { return dt.getDate() + ' ' + MESES[dt.getMonth()]; }
+function fechaCorta(iso) { var x = d(iso); return ('0' + x.getDate()).slice(-2) + '-' + MESES[x.getMonth()]; }
+function fechaLarga(dt) { return dt.getDate() + ' de ' + MESES_L[dt.getMonth()] + ' de ' + dt.getFullYear(); }
+function sumar(dt, n) { var x = new Date(dt.getTime()); x.setDate(x.getDate() + n); return x; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* Interés corriente Ley 21.131: corre desde el día 31. Tasa de trabajo 1,05% mensual
+   (interés corriente para operaciones no reajustables, orden de magnitud). */
+function interes(f) {
+  var m = mora(f);
+  if (m <= 30) return 0;
+  return Math.round(f.monto * 0.0105 / 30 * (m - 30));
+}
+
+/* ── ICONOS (trazo, dibujados a mano) ──────────────────── */
+var ICO = {
+  whatsapp: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 20.5l1.6-5.5A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.6 9.2c.4 2.6 2.6 4.8 5.2 5.2l1-1.3 1.9.8-.4 1.7c-3.6.5-7.4-3.3-7.9-7l1.7-.4.8 1.9z"/></svg>',
+  email:    '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg>',
+  llamada:  '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h3l2 5-2.5 1.5a11 11 0 0 0 5 5L15 12l5 2v3a2 2 0 0 1-2.3 2A16 16 0 0 1 4 5.3 2 2 0 0 1 6 3z"/></svg>',
+  sistema:  '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>',
+  pluma:    '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20s2-8 8-12 8-4 8-4-1 5-4 9-9 6-9 6z"/><path d="M4 20l5-5"/></svg>',
+  alerta:   '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  visto:    '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',
+  cuotas:   '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10h18M7 14h4"/></svg>'
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   LOS DATOS
+   Metalmecánica Vergara SpA · Quilicura · fabrica estructuras y piezas
+   para construcción, agro e industria de alimentos.
+   ════════════════════════════════════════════════════════════════════════ */
+
+var DEUDORES = [
+  {
+    id: 'rt', nombre: 'Ingeniería Ruiz-Tagle y Cía Ltda', rut: '79.554.320-7', comuna: 'Providencia',
+    contacto: 'Marcela Ruiz-Tagle', cargo: 'Gerenta de administración',
+    fono: '+56 9 5520 1187', email: 'mruiztagle@irt.cl',
+    cliente_desde: 2019, venta_anual: 96000000, relacion: 'riesgo', sensible: false,
+    accion: 'escalamiento',
+    porque: 'Dos promesas de pago rotas (28-abr y 3-jun). Sin respuesta desde hace 34 días, con mensajes leídos. Es el 34% de tu cartera vencida y sigue creciendo. La cadencia cordial ya se agotó: quedan la carta formal o asumir la pérdida.',
+    facturas: [
+      { folio: 987,  monto: 12300000, emision: '2026-02-11', vence: '2026-03-13', estado: 'abierta' },
+      { folio: 1001, monto: 10180000, emision: '2026-02-25', vence: '2026-03-27', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-03-10', h: '09:02', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 987 — vence el viernes',
+        txt: 'Estimada Marcela:\n\nUn recordatorio corto: la factura 987, por $12.300.000, vence este viernes 13 de marzo.\n\nSi necesitas que te reenvíe el DTE o el detalle de las piezas, me avisas.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' },
+      { f: '2026-03-16', h: '10:15', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Hola Marcela, buenos días. La factura 987 ($12.300.000) venció el viernes. ¿La alcanzas a dejar en el pago de esta semana? Cualquier cosa me dices. Saludos!' },
+      { f: '2026-03-19', h: '17:41', canal: 'whatsapp', dir: 'in',
+        txt: 'Hola Paulina. Estamos esperando un estado de pago del mandante que se atrasó. Apenas nos paguen a nosotros les pagamos a ustedes.' },
+      { f: '2026-04-14', h: '08:55', canal: 'email', dir: 'out', auto: false, tono: 'firme',
+        asunto: 'Facturas 987 y 1001 — necesitamos una fecha',
+        txt: 'Marcela:\n\nEntiendo lo del estado de pago, pero ya vamos en un mes y ahora son dos facturas: 987 y 1001, $22.480.000 en total.\n\nNecesito una fecha comprometida, aunque sea parcial. ¿Podemos cerrar al menos la 987 antes de fin de mes?\n\nPaulina' },
+      { f: '2026-04-16', h: '12:20', canal: 'whatsapp', dir: 'in',
+        txt: 'Paulina, el 28 de abril les transferimos la 987. Cuenta con eso.' },
+      { f: '2026-04-29', h: '09:00', canal: 'sistema', dir: 'sys',
+        txt: 'Promesa de pago incumplida: 28-abr, $12.300.000. Tinoria bajó la clasificación de Ruiz-Tagle a "riesgo" y sugiere revisar el crédito antes de la próxima venta.' },
+      { f: '2026-05-21', h: '11:30', canal: 'llamada', dir: 'out',
+        txt: 'Llamada de Paulina. Marcela pide 15 días más y ofrece pagar la 987 el 3 de junio.' },
+      { f: '2026-06-04', h: '09:00', canal: 'sistema', dir: 'sys',
+        txt: 'Segunda promesa incumplida: 3-jun, $12.300.000. Regla de cartera: dos promesas rotas → crédito suspendido y escalamiento propuesto.' },
+      { f: '2026-06-08', h: '16:12', canal: 'whatsapp', dir: 'out', auto: false, tono: 'firme',
+        txt: 'Marcela, es la segunda fecha que se cae. Necesito hablar contigo hoy. Si el problema es de caja, dímelo y armamos un calendario de pagos; lo que no puedo es seguir esperando sin información.' },
+      { f: '2026-06-08', h: '16:14', canal: 'sistema', dir: 'sys', txt: 'Mensaje leído. Sin respuesta en 34 días.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'nada', delay: 2200,
+        txt: null,
+        nota: 'Mensaje entregado y leído. Sin respuesta. Es la novena vez que un mensaje amable no obtiene reacción: la cordialidad con Ruiz-Tagle dejó de ser información nueva.' },
+      firme: { tipo: 'nada', delay: 2400,
+        txt: null,
+        nota: 'Mensaje entregado y leído. Sin respuesta en 48 horas. Tinoria sugiere que el problema ya no es de tono: es de capacidad de pago.' },
+      formal: { tipo: 'parcial', delay: 2600,
+        txt: 'Estimada Sra. Vergara:\n\nRecibimos su carta. Le confirmo que la factura 987 será pagada el viernes 17 de julio y la 1001 durante la primera semana de agosto.\n\nLe pido, eso sí, que no derive esto a cobranza externa. Somos clientes suyos hace siete años y esto es un problema de flujo, no de voluntad.\n\nMarcela Ruiz-Tagle',
+        nota: 'La carta formal funcionó donde ocho mensajes amables no funcionaron — y tuvo un costo: la relación quedó tensa. Tinoria lo registra para que lo decidas tú la próxima vez.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'sa', nombre: 'Servicios Austral SpA', rut: '76.980.114-K', comuna: 'Puerto Montt',
+    contacto: 'Ignacio Kramm', cargo: 'Socio',
+    fono: '+56 9 7734 0925', email: 'ikramm@serviciosaustral.cl',
+    cliente_desde: 2021, venta_anual: 62000000, relacion: 'tensa', sensible: false,
+    accion: 'plan_pago',
+    porque: 'Ignacio contestó todos los mensajes y fue honesto: tiene un problema de caja real, no de voluntad, por un cliente salmonero que le falló. Un deudor que responde y explica es el mejor candidato a plan de pago — y el peor candidato a carta formal.',
+    facturas: [
+      { folio: 994,  monto: 9100000, emision: '2026-03-08', vence: '2026-04-07', estado: 'abierta' },
+      { folio: 1012, monto: 5150000, emision: '2026-04-05', vence: '2026-05-05', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-04-04', h: '09:00', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 994 — vence el martes 7',
+        txt: 'Estimado Ignacio:\n\nRecordatorio de la factura 994, por $9.100.000, que vence el martes 7 de abril.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' },
+      { f: '2026-04-08', h: '10:05', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Hola Ignacio, ¿cómo va todo por el sur? Te escribo por la factura 994 ($9.100.000), que venció ayer. ¿La puedes dejar programada? Saludos.' },
+      { f: '2026-04-09', h: '19:33', canal: 'whatsapp', dir: 'in',
+        txt: 'Paulina, te voy a ser franco. Nos falló un pago grande de una salmonera y estamos con la caja apretada. No te quiero prometer una fecha que no voy a cumplir. Dame un par de semanas y te digo algo concreto.' },
+      { f: '2026-04-27', h: '09:12', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Ignacio, buenos días. Agradezco que hayas sido claro conmigo, en serio. Han pasado las dos semanas: ¿cómo va la cosa? Si necesitas dividir el pago, dímelo y lo conversamos.' },
+      { f: '2026-04-28', h: '08:40', canal: 'whatsapp', dir: 'in',
+        txt: 'Gracias por la paciencia. Todavía no me pagan. Estoy priorizando sueldos. Lo tuyo lo tengo presente, no me he escondido.' },
+      { f: '2026-05-20', h: '11:00', canal: 'email', dir: 'out', auto: false, tono: 'firme',
+        asunto: 'Facturas 994 y 1012 — armemos un calendario',
+        txt: 'Ignacio:\n\nYa son dos facturas: la 994 y la 1012, $14.250.000 en total. No te voy a apurar con una carta de abogado porque has dado la cara, pero necesito que esto tenga una estructura.\n\n¿Te sirve que lo dividamos en cuotas? Dime cuánto puedes pagar al mes y lo armamos.\n\nPaulina' },
+      { f: '2026-05-22', h: '17:05', canal: 'whatsapp', dir: 'in',
+        txt: 'Sí, eso me sirve. Mándame una propuesta y la firmo. Algo como cuatro o cinco millones al mes es lo que puedo sostener.' },
+      { f: '2026-07-12', h: '07:00', canal: 'sistema', dir: 'sys',
+        txt: 'Ignacio aceptó estructurar la deuda hace 51 días y todavía no le mandas la propuesta. Tinoria la tiene lista.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'plan', delay: 2000,
+        txt: 'Perfecto Paulina, eso lo puedo cumplir. Te firmo el plan hoy mismo. Gracias por no tratarme como un moroso; no lo soy, solo se me cayó la caja.',
+        nota: 'Plan de pago aceptado. Las tres cuotas quedan agendadas y Tinoria le va a recordar cada una tres días antes, sin que tú tengas que acordarte.',
+        relacion: 'buena' },
+      firme: { tipo: 'plan', delay: 2100,
+        txt: 'Está bien, acepto. Solo te pido que la primera cuota sea a fin de mes y no ahora, para calzarla con un pago que me entra el 30.',
+        nota: 'Plan aceptado con un ajuste menor de fecha. Tinoria mueve la primera cuota al 30 y recalcula el resto.',
+        relacion: 'tensa' },
+      formal: { tipo: 'ruptura', delay: 2300,
+        txt: 'Paulina, la verdad me sorprende. Te he contestado todos los mensajes, te expliqué la situación y nunca me escondí. Recibir una carta de cobro formal después de eso me parece innecesario. Voy a pagar, pero después de esto no les compro más.',
+        nota: 'Esto es exactamente lo que Tinoria trata de evitar. Ignacio es un deudor que colabora: la carta formal le costó $62.000.000 de venta anual para cobrar $14.250.000 que igual iban a llegar. El agente te lo advirtió antes de enviar.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'ac', nombre: 'Constructora Aguas Claras SpA', rut: '76.412.883-9', comuna: 'Maipú',
+    contacto: 'Rodrigo Aguayo', cargo: 'Jefe de finanzas',
+    fono: '+56 9 8871 4402', email: 'raguayo@aguasclaras.cl',
+    cliente_desde: 2022, venta_anual: 148000000, relacion: 'buena', sensible: true,
+    accion: 'insistencia',
+    porque: 'Tu cliente más grande: $148.000.000 al año. Siempre paga — pero siempre tarde, y ya van tres meses seguidos. Está marcado como cliente sensible, así que nada sale sin tu visto bueno. El tono aquí no es un detalle: es la diferencia entre cobrar y perder al cliente.',
+    facturas: [
+      { folio: 1042, monto: 5480000, emision: '2026-04-26', vence: '2026-05-26', estado: 'abierta' },
+      { folio: 1055, monto: 3460000, emision: '2026-05-10', vence: '2026-06-09', estado: 'abierta' },
+      { folio: 1103, monto: 6900000, emision: '2026-07-27', vence: '2026-08-26', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-05-23', h: '09:00', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 1042 — vence el martes 26',
+        txt: 'Estimado Rodrigo:\n\nUn recordatorio: la factura 1042, por $5.480.000, vence el martes 26 de mayo.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' },
+      { f: '2026-05-27', h: '10:30', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Hola Rodrigo, ¿cómo estás? La 1042 ($5.480.000) venció ayer. ¿La dejas en la nómina de esta semana? Saludos!' },
+      { f: '2026-05-27', h: '14:02', canal: 'whatsapp', dir: 'in',
+        txt: 'Hola Paulina! Sí, la veo con Jessica esta semana. Andamos a full con la obra de Buin.' },
+      { f: '2026-06-03', h: '10:00', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Rodrigo, buenos días. Te reboto la 1042, que sigue pendiente. ¿Alcanzó a entrar a la nómina?' },
+      { f: '2026-06-19', h: '09:15', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Facturas 1042 y 1055 pendientes',
+        txt: 'Rodrigo:\n\nAhora son dos: la 1042 ($5.480.000) y la 1055 ($3.460.000). $8.940.000 en total.\n\n¿Las puedes revisar? Cualquier cosa que falte para aprobarlas me avisas y te la mando el mismo día.\n\nPaulina' },
+      { f: '2026-06-19', h: '18:47', canal: 'whatsapp', dir: 'in',
+        txt: 'Anotado Pau, la próxima semana lo vemos sin falta.' },
+      { f: '2026-07-12', h: '07:00', canal: 'sistema', dir: 'sys',
+        txt: 'Tercer mes consecutivo con mora sobre 40 días. Aguas Claras responde siempre pero no paga: los mensajes cordiales están funcionando como acuse de recibo, no como cobranza. Tinoria sugiere subir el tono una sola vez.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'evasiva', delay: 1900,
+        txt: 'Hola Paulina! Perdona, se nos traspapeló entre tanta cosa. La veo con Jessica y te confirmo.',
+        nota: 'Cuarta respuesta amable sin fecha. Es el mismo mensaje que te mandó el 27 de mayo y el 19 de junio. El tono cordial ya agotó su efecto con este deudor: no está molesto, simplemente no le duele.' },
+      firme: { tipo: 'promesa', delay: 2100,
+        txt: 'Tienes toda la razón, Paulina, y te pido disculpas. Ya la puse en la nómina del viernes 17, las dos facturas. El viernes te mando el comprobante.',
+        nota: 'Promesa con fecha concreta. Tinoria la agenda para el viernes 17 y verifica sola: si a las 18:00 no llegó el comprobante, te avisa y prepara el siguiente mensaje.',
+        relacion: 'buena' },
+      formal: { tipo: 'promesa', delay: 2500,
+        txt: 'Paulina, recibimos la carta. Vamos a pagar el viernes 17.\n\nTe voy a ser honesto: mandarme una carta con mención a cobranza externa por 47 días, después de cuatro años trabajando juntos, me pareció desmedido. Te podrías haber levantado el teléfono.',
+        nota: 'Cobraste, y quemaste crédito relacional con tu cliente más grande ($148.000.000 al año) para adelantar 5 días un pago de $8.940.000. Tinoria te lo advirtió antes de enviar: era la jugada equivocada.',
+        relacion: 'tensa' }
+    }
+  },
+
+  {
+    id: 'am', nombre: 'Áridos del Maipo Ltda', rut: '76.331.007-2', comuna: 'Buin',
+    contacto: 'Patricio Sepúlveda', cargo: 'Dueño',
+    fono: '+56 9 6207 3318', email: 'psepulveda@aridosdelmaipo.cl',
+    cliente_desde: 2020, venta_anual: 41000000, relacion: 'tensa', sensible: false,
+    accion: 'insistencia',
+    porque: 'Prometió pagar el 26 de junio y no lo hizo. Una promesa rota no se trata como un olvido: Tinoria sube el tono automáticamente y le recuerda su propia promesa con la fecha exacta, que es el argumento más difícil de esquivar.',
+    facturas: [
+      { folio: 1035, monto: 3850000, emision: '2026-04-12', vence: '2026-05-12', estado: 'abierta' },
+      { folio: 1008, monto: 2450000, emision: '2026-03-01', vence: '2026-03-31', estado: 'pagada', pagada: '2026-07-01' }
+    ],
+    hilo: [
+      { f: '2026-05-13', h: '10:00', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Don Patricio, buenos días. La factura 1035 ($3.850.000) venció ayer. ¿La puede ver esta semana? Saludos!' },
+      { f: '2026-06-01', h: '10:00', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Don Patricio, ¿cómo está? Sigue pendiente la 1035, ya van 20 días. ¿Me confirma cuándo la pueden pagar?' },
+      { f: '2026-06-11', h: '20:14', canal: 'whatsapp', dir: 'in',
+        txt: 'Paulina buenas. Disculpe la demora. El 26 de junio le pago sin falta, cuando me entre el pago de la municipalidad.' },
+      { f: '2026-06-27', h: '09:00', canal: 'sistema', dir: 'sys',
+        txt: 'Promesa de pago incumplida: 26-jun, $3.850.000. Tinoria sube el tono a "firme" y baja la clasificación a "tensa".' },
+      { f: '2026-07-02', h: '09:00', canal: 'sistema', dir: 'sys',
+        txt: 'Factura 1008 ($2.450.000) pagada el 1 de julio, después de 2 recordatorios. Este deudor sí paga: hay que empujarlo.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'evasiva', delay: 1900,
+        txt: 'Paulina, ando complicado. Apenas pueda le aviso.',
+        nota: 'Respuesta sin fecha, otra vez. Con un deudor que ya rompió una promesa, el tono cordial se lee como permiso para seguir postergando.' },
+      firme: { tipo: 'promesa', delay: 2000,
+        txt: 'Tiene razón, le prometí el 26 y no cumplí. El viernes se la deposito, esta vez de verdad. Perdón, Paulina.',
+        nota: 'Segunda promesa. Tinoria la agenda y esta vez la marca como "promesa en observación": si se cae, el próximo paso es suspender el crédito, no insistir.',
+        relacion: 'tensa' },
+      formal: { tipo: 'promesa', delay: 2400,
+        txt: 'Recibí la carta. Voy a pagar el viernes. No era necesario llegar a esto por tres millones.',
+        nota: 'Funcionó, pero era caro: por $3.850.000 gastaste una carta formal en un cliente que igual paga cuando se le empuja. Guarda la carta formal para Ruiz-Tagle.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'tn', nombre: 'Textiles Nahuelbuta SpA', rut: '76.543.210-K', comuna: 'Concepción',
+    contacto: 'Carolina Sanhueza', cargo: 'Encargada de pagos',
+    fono: '+56 9 4418 2276', email: 'csanhueza@nahuelbuta.cl',
+    cliente_desde: 2023, venta_anual: 54000000, relacion: 'buena', sensible: false,
+    accion: 'disputa',
+    porque: 'Esto NO es una cobranza: es una disputa administrativa. Carolina dice que no puede aprobar la factura porque no calza con la orden de compra. Ninguna insistencia va a resolver eso — Tinoria detuvo la cadencia sola y te lo devuelve a ti, porque el número de una OC no lo inventa una IA.',
+    facturas: [
+      { folio: 1069, monto: 5670000, emision: '2026-05-15', vence: '2026-06-14', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-06-15', h: '10:00', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Hola Carolina, ¿cómo estás? La factura 1069 ($5.670.000) venció ayer. ¿La puedes dejar en el pago de esta semana? Saludos!' },
+      { f: '2026-06-15', h: '15:22', canal: 'whatsapp', dir: 'in',
+        txt: 'Hola Paulina. No la puedo aprobar: la factura viene por $5.670.000 pero la orden de compra que tengo acá es por $5.240.000. Alguien pidió más material y no lo cargaron a una OC nueva. Necesito la OC complementaria para poder pagarles.' },
+      { f: '2026-06-15', h: '15:23', canal: 'sistema', dir: 'sys',
+        txt: 'Tinoria clasificó la respuesta como DISPUTA (diferencia de $430.000 con la OC) y detuvo la cadencia automática. Una factura en disputa no se cobra: se resuelve. Escalado a Paulina Vergara hace 27 días.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'resuelto', delay: 2000,
+        txt: 'Perfecto, con la OC 4471 sí puedo aprobarla. La dejo para el pago del 20 de julio. Gracias Paulina!',
+        nota: 'Disputa resuelta. Nota de producto: 27 días de mora que no eran mora — eran una orden de compra faltante. Este es el segundo hallazgo más común en las carteras que hemos revisado, y ningún recordatorio automático lo detecta.',
+        relacion: 'buena' },
+      firme: { tipo: 'resuelto', delay: 2100,
+        txt: 'Paulina, yo no estoy dilatando nada, te avisé el mismo día. Mándame la OC y lo pago. Pero el tono me pareció innecesario.',
+        nota: 'Cobraste, pero le exigiste a alguien que hizo su trabajo bien. Tinoria te sugirió tono cordial: en una disputa el deudor es tu aliado, no tu adversario.',
+        relacion: 'tensa' },
+      formal: { tipo: 'resuelto', delay: 2400,
+        txt: 'Recibí una carta de cobro formal por una factura que YO te avisé que estaba mal emitida. Voy a pagar cuando me manden la OC correcta. Y voy a pedir cotizaciones a otros proveedores.',
+        nota: 'El peor resultado posible del demo: carta formal contra un deudor que tenía la razón. La factura estaba mal. Ninguna cobranza arregla esto — sólo lo empeora.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'ce', nombre: 'Comercial Elguetas Ltda', rut: '77.204.551-6', comuna: 'San Miguel',
+    contacto: 'Jaime Elgueta', cargo: 'Administrador',
+    fono: '+56 9 9312 6650', email: 'jelgueta@elguetas.cl',
+    cliente_desde: 2024, venta_anual: 28000000, relacion: 'buena', sensible: false,
+    accion: 'segundo_aviso',
+    porque: 'Doce días de mora, sin respuesta al primer aviso. Perfil clásico de olvido administrativo: paga rápido cuando se le recuerda. Este paso sale automático — es exactamente el mensaje que tú tampoco revisarías.',
+    facturas: [
+      { folio: 1078, monto: 2310000, emision: '2026-05-31', vence: '2026-06-30', estado: 'abierta' },
+      { folio: 1093, monto: 3180000, emision: '2026-06-28', vence: '2026-07-28', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-06-27', h: '09:00', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 1078 — vence el martes 30',
+        txt: 'Estimado Jaime:\n\nRecordatorio de la factura 1078, por $2.310.000, que vence el martes 30 de junio.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' },
+      { f: '2026-07-01', h: '10:00', canal: 'whatsapp', dir: 'out', auto: true, tono: 'cordial',
+        txt: 'Hola Jaime, ¿cómo estás? La factura 1078 ($2.310.000) venció ayer. ¿La puedes dejar programada? Saludos!' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'pago', delay: 1700,
+        txt: 'Uf, Paulina, se me pasó completamente. Perdona. Te la transfiero hoy mismo antes de las 6.',
+        nota: 'Pagada el mismo día. El 41% de tu cartera vencida es esto: gente que simplemente se olvidó. No necesita tono duro, necesita que alguien se acuerde de escribirle — y ése es el trabajo que ya no vas a hacer tú.',
+        relacion: 'buena' },
+      firme: { tipo: 'pago', delay: 1900,
+        txt: 'Se me pasó, Paulina, no hay que ponerse así. Ya te transferí.',
+        nota: 'Pagó, pero el tono firme sobró: doce días de mora en un cliente que nunca ha fallado es un olvido, no una conducta. Tinoria te sugería cordial.',
+        relacion: 'tensa' },
+      formal: { tipo: 'pago', delay: 2200,
+        txt: 'Recibí una carta de cobro formal con mención a interés corriente por una factura de 12 días. Ya la pagué. Que sea la última vez que me tratan así.',
+        nota: 'Caso de manual de cómo perder un cliente por $2.310.000. Doce días no son mora relevante: la Ley 21.131 ni siquiera devenga interés antes del día 31.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'tc', nombre: 'Transportes Cordillera SpA', rut: '77.842.316-1', comuna: 'Renca',
+    contacto: 'Héctor Pizarro', cargo: 'Gerente de operaciones',
+    fono: '+56 9 5508 7741', email: 'hpizarro@tcordillera.cl',
+    cliente_desde: 2023, venta_anual: 73000000, relacion: 'buena', sensible: false,
+    accion: 'primer_aviso',
+    porque: 'Cuatro días de mora. Primer aviso, automático y cordial. Nadie se enoja por esto y el 30% paga dentro de las 48 horas siguientes.',
+    facturas: [
+      { folio: 1084, monto: 4720000, emision: '2026-06-08', vence: '2026-07-08', estado: 'abierta' },
+      { folio: 1097, monto: 5640000, emision: '2026-07-13', vence: '2026-08-12', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-07-05', h: '09:00', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 1084 — vence el miércoles 8',
+        txt: 'Estimado Héctor:\n\nRecordatorio de la factura 1084, por $4.720.000, que vence el miércoles 8 de julio.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'promesa', delay: 1800,
+        txt: 'Hola Paulina, gracias por avisar. Va en el pago del martes 14. Saludos!',
+        nota: 'Promesa con fecha. Tinoria agenda el martes 14 y verifica; si no llega, retoma sola.',
+        relacion: 'buena' },
+      firme: { tipo: 'promesa', delay: 1900,
+        txt: 'Paulina, son cuatro días. Va en el pago del martes, como siempre.',
+        nota: 'Pagará igual, pero el tono firme a los 4 días es desproporcionado y se nota. Tinoria lo tenía marcado como paso automático cordial por algo.',
+        relacion: 'tensa' },
+      formal: { tipo: 'promesa', delay: 2200,
+        txt: 'Una carta de cobro formal por cuatro días de atraso. En serio?',
+        nota: 'No hagas esto. A los 4 días no hay mora legal, no hay interés devengado y no hay nada que escalar.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'fs', nombre: 'Frigorífico Puerto Sur Ltda', rut: '78.220.443-9', comuna: 'San Antonio',
+    contacto: 'Valeria Toro', cargo: 'Contadora',
+    fono: '+56 9 6893 2014', email: 'vtoro@puertosur.cl',
+    cliente_desde: 2022, venta_anual: 88000000, relacion: 'buena', sensible: false,
+    accion: 'primer_aviso',
+    porque: 'Un día de mora. Es casi certeza que sea un tema de calendario de pagos, no de plata. Un mensaje corto y cordial, hoy, evita que se convierta en treinta días.',
+    facturas: [
+      { folio: 1088, monto: 2980000, emision: '2026-06-11', vence: '2026-07-11', estado: 'abierta' },
+      { folio: 1095, monto: 7420000, emision: '2026-07-06', vence: '2026-08-05', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-07-08', h: '09:00', canal: 'email', dir: 'out', auto: true, tono: 'cordial',
+        asunto: 'Factura 1088 — vence el sábado 11',
+        txt: 'Estimada Valeria:\n\nRecordatorio de la factura 1088, por $2.980.000, que vence el sábado 11 de julio.\n\nSaludos,\nPaulina Vergara — Metalmecánica Vergara SpA' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'promesa', delay: 1700,
+        txt: 'Hola Paulina! Sí, la tengo. Los pagos los hacemos los días 15 y 30, así que va el miércoles. Saludos!',
+        nota: 'Dato nuevo y útil: Puerto Sur paga los 15 y los 30. Tinoria lo guarda y desde ahora le va a escribir el día 12, no el 8 — así el recordatorio llega justo antes de la nómina.',
+        relacion: 'buena' },
+      firme: { tipo: 'promesa', delay: 1800,
+        txt: 'Paulina, pagamos los 15 y los 30. Va el miércoles. No entiendo el tono.',
+        nota: 'Innecesario. Un día de mora contra un cliente que paga en calendario fijo.',
+        relacion: 'tensa' },
+      formal: { tipo: 'promesa', delay: 2100,
+        txt: 'Nos llegó una carta de cobranza formal por una factura de ayer. Debe ser un error, ¿no?',
+        nota: 'Sí, es un error. Esto es exactamente lo que un recordatorio automático mal configurado le hace a una relación comercial.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'la', nombre: 'Distribuidora Los Almendros Ltda', rut: '78.115.902-4', comuna: 'La Florida',
+    contacto: 'Sandra Molina', cargo: 'Jefa de administración',
+    fono: '+56 9 7126 4483', email: 'smolina@losalmendros.cl',
+    cliente_desde: 2021, venta_anual: 34000000, relacion: 'buena', sensible: false,
+    accion: 'recordatorio_previo',
+    porque: 'Vence en tres días y todavía no está vencida. Éste es el mensaje más rentable de todos y casi nadie lo manda: cuesta cero en la relación y adelanta el pago una semana. La mitad del trabajo de cobranza es no tener que cobrar.',
+    facturas: [
+      { folio: 1091, monto: 1290000, emision: '2026-06-15', vence: '2026-07-15', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-06-16', h: '09:00', canal: 'sistema', dir: 'sys',
+        txt: 'Factura 1091 importada desde el SII. Vencimiento: 15-jul-2026. Cadencia programada: recordatorio previo el 12 de julio.' }
+    ],
+    desenlace: {
+      cordial: { tipo: 'promesa', delay: 1600,
+        txt: 'Hola Paulina, gracias por el aviso! La dejo agendada para el miércoles 15. Un abrazo.',
+        nota: 'Cobrado antes de vencer. Ningún roce, ninguna incomodidad, cero días de mora. Así se ve una cartera sana.',
+        relacion: 'buena' },
+      firme: { tipo: 'promesa', delay: 1800,
+        txt: 'Paulina, la factura todavía no vence… la pago el 15, como siempre.',
+        nota: 'Tono firme sobre una factura que ni siquiera venció. Esto es lo que pasa cuando alguien automatiza cobranza sin pensar en el tono.',
+        relacion: 'tensa' },
+      formal: { tipo: 'promesa', delay: 2000,
+        txt: 'Recibimos una carta de cobro formal por una factura que vence en tres días. Voy a asumir que es un error de sistema.',
+        nota: 'Es un error de sistema. Tinoria te bloquea esto en producción: el escalamiento no está disponible antes del día 45.',
+        relacion: 'riesgo' }
+    }
+  },
+
+  {
+    id: 'sf', nombre: 'Agrícola Santa Filomena Ltda', rut: '76.601.882-3', comuna: 'Melipilla',
+    contacto: 'Emilio Bravo', cargo: 'Administrador',
+    fono: '+56 9 8342 1109', email: 'ebravo@santafilomena.cl',
+    cliente_desde: 2020, venta_anual: 67000000, relacion: 'buena', sensible: false,
+    accion: null,
+    porque: 'Al día. No hay nada que hacer, y ésa es la meta.',
+    facturas: [
+      { folio: 1021, monto: 6240000, emision: '2026-03-20', vence: '2026-04-19', estado: 'pagada', pagada: '2026-07-03' },
+      { folio: 1099, monto: 8310000, emision: '2026-07-20', vence: '2026-08-19', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-07-03', h: '11:20', canal: 'sistema', dir: 'sys',
+        txt: 'Factura 1021 ($6.240.000) pagada el 3 de julio, tras 3 mensajes de Tinoria. 75 días de mora al momento del pago.' }
+    ],
+    desenlace: { cordial: { tipo: 'nada', delay: 1500, txt: null, nota: 'Sin acción pendiente.' } }
+  },
+
+  {
+    id: 'sl', nombre: 'Panificadora San Lorenzo SpA', rut: '77.019.556-K', comuna: 'Estación Central',
+    contacto: 'Nelson Fuentes', cargo: 'Dueño',
+    fono: '+56 9 5471 8862', email: 'nfuentes@sanlorenzo.cl',
+    cliente_desde: 2024, venta_anual: 19000000, relacion: 'buena', sensible: false,
+    accion: null,
+    porque: 'Al día. Pagó a los 4 días de vencida, tras un solo recordatorio.',
+    facturas: [
+      { folio: 1058, monto: 1880000, emision: '2026-05-12', vence: '2026-06-11', estado: 'pagada', pagada: '2026-07-09' },
+      { folio: 1101, monto: 2240000, emision: '2026-07-23', vence: '2026-08-22', estado: 'abierta' }
+    ],
+    hilo: [
+      { f: '2026-07-09', h: '16:05', canal: 'sistema', dir: 'sys',
+        txt: 'Factura 1058 ($1.880.000) pagada el 9 de julio, tras 2 mensajes de Tinoria.' }
+    ],
+    desenlace: { cordial: { tipo: 'nada', delay: 1500, txt: null, nota: 'Sin acción pendiente.' } }
+  }
+];
+
+/* ════════════════════════════════════════════════════════════════════════
+   PLANTILLAS DEL REDACTOR
+   Un texto por (tipo de acción × tono × canal). Esto es, literalmente, lo
+   que el agente produce. En producción lo escribe el modelo con el contexto
+   del deudor; aquí está escrito a mano para que puedas juzgar el tono.
+   ════════════════════════════════════════════════════════════════════════ */
+var TIPOS = {
+  recordatorio_previo: { nombre: 'Recordatorio previo al vencimiento', aprueba: false },
+  primer_aviso:        { nombre: 'Primer aviso de mora',               aprueba: false },
+  segundo_aviso:       { nombre: 'Segundo aviso',                      aprueba: false },
+  insistencia:         { nombre: 'Insistencia',                        aprueba: true  },
+  plan_pago:           { nombre: 'Propuesta de plan de pago',          aprueba: true  },
+  escalamiento:        { nombre: 'Escalamiento — carta de cobro formal', aprueba: true },
+  disputa:             { nombre: 'Disputa — requiere que la resuelvas tú', aprueba: true }
+};
+
+var P = {}; /* P[tipo][tono] = { wa, asunto, email } */
+
+P.recordatorio_previo = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo estás?\n\nTe escribo de Metalmecánica Vergara para avisarte que la factura {folio}, por {monto}, vence el {vence}.\n\nNo es cobranza todavía, es sólo para que no se te pase entre tanta cosa. Si necesitas el XML o algún respaldo, me dices.\n\nSaludos,\nPaulina',
+    asunto: 'Factura {folio} — vence el {vence}',
+    email: 'Estimado/a {nombre}:\n\nTe escribo sólo para avisarte que la factura N° {folio}, por {monto}, vence el {vence}.\n\nSi necesitas el DTE, la orden de compra o cualquier respaldo para dejarla aprobada a tiempo, me avisas y te lo mando hoy.\n\nSaludos cordiales,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}, buenos días.\n\nLa factura {folio}, por {monto}, vence el {vence}. Te pido que quede en la nómina de esa semana; el mes pasado se nos atrasó y prefiero adelantarme.\n\nConfírmame, por favor.\n\nPaulina',
+    asunto: 'Factura {folio} — vence el {vence}. Necesito que entre en la nómina.',
+    email: '{nombre}:\n\nLa factura N° {folio}, por {monto}, vence el {vence}.\n\nTe pido expresamente que quede programada para esa fecha. En los meses anteriores hemos tenido atrasos y prefiero adelantarme antes que reclamar después.\n\nQuedo esperando tu confirmación.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nComunicamos que la factura electrónica N° {folio}, por {monto}, tiene fecha de vencimiento el {vence}.\n\nSe recuerda que, conforme a la Ley N° 21.131, transcurridos 30 días desde la recepción conforme del DTE, la obligación devenga interés corriente.\n\nMetalmecánica Vergara SpA',
+    asunto: 'Aviso de vencimiento — Factura electrónica N° {folio}',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nComunicamos a usted que la factura electrónica N° {folio}, por un monto de {monto}, tiene fecha de vencimiento el {vence}.\n\nSe hace presente que, conforme a la Ley N° 21.131 sobre pago a treinta días, transcurrido dicho plazo desde la recepción conforme del documento, la obligación devengará de pleno derecho el interés corriente para operaciones no reajustables.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+P.primer_aviso = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo estás?\n\nTe escribo por la factura {folio}, por {monto}, que venció el {vence}. Van {dias} días, así que lo más probable es que se haya traspapelado.\n\n¿La puedes dejar en la nómina de esta semana? Si falta algún respaldo, me avisas y te lo mando al tiro.\n\nSaludos,\nPaulina',
+    asunto: 'Factura {folio} — {monto} (venció el {vence})',
+    email: 'Estimado/a {nombre}:\n\nEspero que estés bien. Te escribo por la factura N° {folio}, por {monto}, que venció el {vence}: llevamos {dias} días.\n\nProbablemente se traspapeló entre tanta cosa. ¿La alcanzas a dejar en la nómina de pago de esta semana?\n\nSi falta la orden de compra o algún respaldo para aprobarla internamente, dime y te lo hago llegar hoy mismo.\n\nQuedo atenta,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}, buenos días.\n\nLa factura {folio}, por {monto}, venció el {vence} y ya van {dias} días.\n\nNecesito que me confirmes una fecha de pago concreta. ¿Entra en la nómina de esta semana, sí o no?\n\nPaulina',
+    asunto: 'Factura {folio} vencida — necesito una fecha',
+    email: '{nombre}:\n\nLa factura N° {folio}, por {monto}, venció el {vence}. Llevamos {dias} días de atraso.\n\nTe pido una fecha de pago concreta, no un "la estamos viendo". Si hay algo trabando la aprobación internamente, dímelo hoy y lo resolvemos.\n\nQuedo esperando tu respuesta.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nLe informamos que la factura electrónica N° {folio}, por {monto}, se encuentra impaga desde el {vence} ({dias} días).\n\nSolicitamos regularizar el pago a la brevedad.\n\nMetalmecánica Vergara SpA',
+    asunto: 'Factura electrónica N° {folio} impaga — {monto}',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nVenimos en comunicar que la factura electrónica N° {folio}, por un monto de {monto}, se encuentra impaga desde el {vence}, registrando {dias} días de mora.\n\nSolicitamos regularizar el pago a la brevedad.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+P.segundo_aviso = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo va todo?\n\nInsisto con la factura {folio} ({monto}), que ya lleva {dias} días vencida. Te escribí la semana pasada pero no tuve respuesta — capaz que no te llegó.\n\n¿Me confirmas si la puedes dejar programada? Con una fecha me quedo tranquila.\n\nSaludos,\nPaulina',
+    asunto: 'Insisto: factura {folio} — {dias} días vencida',
+    email: 'Estimado/a {nombre}:\n\nTe escribí la semana pasada por la factura N° {folio}, por {monto}, y no tuve respuesta — capaz que se perdió entre los correos.\n\nYa lleva {dias} días vencida. ¿Me puedes confirmar una fecha de pago? Con eso me organizo y no te sigo molestando.\n\nGracias,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}:\n\nEs el segundo mensaje por la factura {folio} ({monto}), que lleva {dias} días vencida y sin respuesta de tu parte.\n\nNecesito una fecha hoy. Si no me la puedes dar, dime con quién tengo que hablar.\n\nPaulina',
+    asunto: 'Segundo aviso — factura {folio}, {dias} días vencida',
+    email: '{nombre}:\n\nEs mi segundo mensaje por la factura N° {folio}, por {monto}. Lleva {dias} días vencida y no he tenido respuesta.\n\nNecesito hoy una de estas dos cosas:\n\n1. Una fecha de pago concreta.\n2. El nombre de la persona que debe aprobar el pago, para hablar directamente con ella.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nSegundo requerimiento por la factura electrónica N° {folio}, por {monto}, impaga desde el {vence} ({dias} días).\n\nDe no mediar regularización, el documento será derivado a cobranza.\n\nMetalmecánica Vergara SpA',
+    asunto: 'Segundo requerimiento — Factura N° {folio}',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nReiteramos el requerimiento de pago de la factura electrónica N° {folio}, por {monto}, impaga desde el {vence}, con {dias} días de mora, sin que hayamos recibido respuesta a nuestra comunicación anterior.\n\nDe no mediar regularización en los próximos días, el documento será derivado a cobranza.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+P.insistencia = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo estás?\n\nTe vuelvo a escribir por lo mismo: {total} pendientes, la más antigua desde hace {dias} días.\n\nSé que andan a mil, pero necesito ir cerrando esto. ¿Me das una fecha, aunque sea aproximada? Con eso me organizo la caja del mes.\n\nSaludos,\nPaulina',
+    asunto: 'Facturas pendientes — {total}',
+    email: 'Estimado/a {nombre}:\n\nTe escribo de nuevo por las facturas pendientes: {total} en total, la más antigua con {dias} días.\n\nEntiendo que andan con mucho trabajo. Aun así necesito ir cerrando esto: ¿me puedes dar una fecha, aunque sea aproximada? Con eso organizo la caja del mes y dejo de escribirte.\n\nQuedo atenta,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}, buenos días.\n\n{total} pendientes, {dias} días la más antigua. Es el tercer mes seguido que nos pasa lo mismo y ahora sí nos está complicando la caja.\n\nNecesito una fecha concreta, no un "la estamos viendo". ¿Queda en la nómina de este viernes?\n\nSi hay algo trabando la aprobación por dentro, dímelo ahora y lo resolvemos hoy. Pero necesito la fecha.\n\nPaulina',
+    asunto: '{total} pendientes — necesito una fecha de pago',
+    email: '{nombre}:\n\nTenemos {total} pendientes con ustedes, la más antigua con {dias} días de mora. Es el tercer mes consecutivo que ocurre.\n\nSomos proveedores de ustedes hace varios años. Nunca les hemos fallado con una entrega. Te pido que esa consideración sea recíproca.\n\nConcretamente, necesito hoy una de estas dos cosas:\n\n1. La confirmación de que las facturas entran en la nómina de pago de este viernes.\n2. El nombre de quien está trabando la aprobación, para hablar directamente con esa persona.\n\nNo quiero llegar a instancias formales con un cliente como ustedes. Tampoco puedo seguir financiando su operación con el capital de trabajo de mi empresa.\n\nQuedo esperando tu respuesta hoy.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nLe informamos que su empresa mantiene {total} impagos con Metalmecánica Vergara SpA, con hasta {dias} días de mora.\n\nConforme a la Ley N° 21.131, la deuda devenga interés corriente desde el día 31. A la fecha, el interés acumulado asciende a {interes}.\n\nLe enviamos por correo la carta de cobro formal.\n\nMetalmecánica Vergara SpA',
+    asunto: 'Cobro formal — {total} impagos — Metalmecánica Vergara SpA',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nVenimos en comunicar que su representada mantiene impagas facturas electrónicas por un total de {total}, con hasta {dias} días de mora, recepcionadas conforme y sin reclamo dentro del plazo legal.\n\nDe acuerdo a lo dispuesto en la Ley N° 21.131 sobre pago a treinta días, vencido dicho plazo la obligación devenga de pleno derecho el interés corriente para operaciones no reajustables. A la fecha, dicho interés asciende a {interes}, sin perjuicio de lo que se continúe devengando.\n\nSolicitamos regularizar el pago dentro de los próximos 10 días hábiles. Transcurrido dicho plazo sin respuesta, nos veremos en la necesidad de derivar la cobranza a un tercero.\n\nManifestamos, en todo caso, nuestra mejor disposición a acordar un calendario de pago en cuotas si existiera una dificultad transitoria de liquidez.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+P.plan_pago = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo estás?\n\nMe quedé pensando en lo que me dijiste y creo que lo mejor es que estructuremos esto en vez de seguir postergándolo.\n\nTe propongo dividir los {total} en {n} cuotas:\n\n{cuotas}\n\nSi te calza, me confirmas por acá y lo dejo firmado. Si prefieres otras fechas, me dices y lo acomodamos. Prefiero un plan que se cumpla a una promesa que no.\n\nSaludos,\nPaulina',
+    asunto: 'Propuesta de calendario de pago — {total} en {n} cuotas',
+    email: 'Estimado/a {nombre}:\n\nAgradezco que hayas sido franco conmigo sobre la situación de caja. Eso vale, y por eso prefiero proponerte una salida antes que seguir insistiendo.\n\nTe propongo dividir los {total} en {n} cuotas:\n\n{cuotas}\n\nSi te calza, me confirmas y lo dejamos por escrito. Si prefieres otras fechas o montos, dime y lo acomodamos: prefiero un calendario que se cumpla antes que una promesa que no.\n\nMientras el plan se esté cumpliendo, mantenemos el despacho normal.\n\nQuedo atenta,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}:\n\nLlevamos meses en esto y ya no puedo seguir sin una estructura. Te propongo un calendario, y es la última alternativa antes de escalar.\n\n{total} en {n} cuotas:\n\n{cuotas}\n\nNecesito tu confirmación esta semana. Si el plan se cae en cualquier cuota, la deuda completa se hace exigible y pasa a cobranza.\n\nPaulina',
+    asunto: 'Calendario de pago — {total} en {n} cuotas. Requiere tu confirmación.',
+    email: '{nombre}:\n\nLa deuda asciende a {total} y lleva hasta {dias} días de mora. Antes de escalar esto, te ofrezco una salida estructurada.\n\nCalendario propuesto:\n\n{cuotas}\n\nCondiciones: necesito tu confirmación por escrito esta semana. Si cualquiera de las cuotas no se paga en la fecha, el saldo completo se hace exigible de inmediato y el caso pasa a cobranza externa.\n\nMientras el plan se cumpla, mantenemos el despacho normal.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nEn atención a la deuda de {total}, con {dias} días de mora, ofrecemos un convenio de pago en {n} cuotas:\n\n{cuotas}\n\nEl convenio debe ser aceptado por escrito. El incumplimiento de cualquier cuota hará exigible el total, más el interés corriente devengado ({interes} a la fecha).\n\nMetalmecánica Vergara SpA',
+    asunto: 'Convenio de pago — {total} — Metalmecánica Vergara SpA',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nEn atención a la deuda que su representada mantiene con Metalmecánica Vergara SpA, ascendente a {total}, con hasta {dias} días de mora, y antes de derivar el caso a cobranza externa, venimos en ofrecer el siguiente convenio de pago en {n} cuotas:\n\n{cuotas}\n\nEl presente convenio deberá ser aceptado por escrito dentro de los próximos 5 días hábiles. El incumplimiento de cualquiera de las cuotas hará exigible de inmediato el total del saldo insoluto, más el interés corriente devengado conforme a la Ley N° 21.131, que a la fecha asciende a {interes}.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+P.escalamiento = {
+  cordial: {
+    wa: '{nombre}, te escribo antes de hacer algo que no quiero hacer.\n\nLa deuda va en {total} y llevamos {dias} días. Dos fechas comprometidas que no se cumplieron. El lunes esto tiene que pasar a cobranza formal — no porque yo quiera, sino porque no me queda otra.\n\nTe estoy dando el fin de semana. Llámame y armamos un calendario, lo que sea. Pero necesito hablar contigo hoy.\n\nPaulina',
+    asunto: 'Antes de escalar esto — te escribo a ti primero',
+    email: 'Estimado/a {nombre}:\n\nTe escribo antes de hacer algo que preferiría no hacer.\n\nLa deuda va en {total}, con {dias} días de mora, y hemos tenido dos compromisos de pago que no se cumplieron. El próximo paso, según nuestro procedimiento, es la carta de cobro formal y la derivación a cobranza externa.\n\nAntes de eso, te escribo directamente: llámame. Si hay un problema de caja, armamos un calendario de pagos y lo cumplimos. Lo que no puedo es seguir sin información.\n\nTienes hasta el lunes.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA\n+56 9 6142 8830'
+  },
+  firme: {
+    wa: '{nombre}:\n\n{total}. {dias} días. Dos promesas de pago rotas (28-abr y 3-jun). Treinta y cuatro días sin responderme un mensaje que sí leíste.\n\nEl lunes esto pasa a cobranza formal, con la carta y el interés que corresponde. Te lo estoy avisando, no consultando.\n\nSi quieres evitarlo, tienes hasta el viernes a las 18:00 para llamarme con una propuesta.\n\nPaulina Vergara\nMetalmecánica Vergara SpA',
+    asunto: 'Última comunicación antes de cobranza formal — {total}',
+    email: '{nombre}:\n\nEsta es mi última comunicación directa antes de derivar el caso.\n\nLos hechos: {total} impagos, hasta {dias} días de mora, dos compromisos de pago incumplidos (28 de abril y 3 de junio) y 34 días sin respuesta a mensajes que constan como leídos.\n\nEl lunes emitimos la carta de cobro formal, con el interés corriente devengado conforme a la Ley N° 21.131, y derivamos el caso a cobranza externa. Eso implica costos adicionales para ustedes y el fin de la relación comercial en los términos que la hemos tenido.\n\nTienes hasta el viernes a las 18:00 para llamarme con una propuesta de pago. Cualquier propuesta razonable la voy a escuchar.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA\n+56 9 6142 8830'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nComunicamos que las facturas electrónicas impagas de {empresa}, por {total}, con hasta {dias} días de mora, han sido derivadas a cobranza formal.\n\nInterés corriente devengado a la fecha (Ley N° 21.131): {interes}.\n\nLa carta de cobro formal fue enviada a su correo. Se otorga un plazo de 10 días hábiles antes de derivar el caso a un tercero.\n\nMetalmecánica Vergara SpA',
+    asunto: 'CARTA DE COBRO FORMAL — {total} — Metalmecánica Vergara SpA',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nRef.: Cobro formal de facturas electrónicas impagas.\n\nDe nuestra consideración:\n\nPor medio de la presente, Metalmecánica Vergara SpA, RUT 76.129.884-5, viene en requerir formalmente a {empresa}, RUT {rut}, el pago de las facturas electrónicas que se detallan, emitidas, recepcionadas conforme y no reclamadas dentro del plazo legal, por un total de {total}, con hasta {dias} días de mora:\n\n{detalle}\n\nDe acuerdo a lo dispuesto en la Ley N° 21.131 sobre pago a treinta días, vencido el plazo de 30 días desde la recepción conforme del documento, la obligación devenga de pleno derecho el interés corriente para operaciones no reajustables. A la fecha, el interés devengado asciende a {interes}, sin perjuicio de lo que se continúe devengando hasta el pago efectivo.\n\nSe deja constancia, además, de dos compromisos de pago incumplidos por su parte, con fechas 28 de abril y 3 de junio de 2026.\n\nSe otorga un plazo de 10 días hábiles contados desde la recepción de esta carta para regularizar íntegramente la deuda. Transcurrido dicho plazo sin que se verifique el pago, se derivará el cobro a un tercero para su gestión judicial o extrajudicial, con los costos y consecuencias que ello implique.\n\nSin perjuicio de lo anterior, mantenemos abierta la posibilidad de suscribir un convenio de pago en cuotas si existiere voluntad de regularización.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5\nQuilicura, {hoy}'
+  }
+};
+
+P.disputa = {
+  cordial: {
+    wa: 'Hola {nombre}, ¿cómo estás?\n\nRevisé lo que me dijiste y tienes toda la razón: la diferencia de $430.000 corresponde a material adicional que pidió la obra y que no quedó en una OC nueva. La culpa es nuestra, no tuya.\n\nTe emití la OC complementaria 4471 por esa diferencia y va adjunta. Con eso deberías poder aprobar la 1069 completa.\n\nGracias por avisarme en vez de dejarla ahí botada.\n\nPaulina',
+    asunto: 'Factura {folio} — te mando la OC complementaria',
+    email: 'Estimada {nombre}:\n\nRevisé la diferencia que me hiciste ver y tienes razón: los $430.000 corresponden a material adicional que la obra pidió y que no quedó respaldado con una orden de compra nueva. El error fue nuestro.\n\nAdjunto la OC complementaria N° 4471 por esa diferencia. Con ese documento deberías poder aprobar y pagar la factura N° {folio} completa.\n\nGracias por avisarme en vez de dejar la factura ahí botada — eso nos ahorró un mes a las dos.\n\nQuedo atenta,\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  firme: {
+    wa: '{nombre}:\n\nLa factura {folio} lleva {dias} días. Entiendo el tema de la OC, pero el material se despachó y se recibió conforme; la diferencia de $430.000 la pidió la obra de ustedes.\n\nTe mando la OC complementaria. Necesito que la factura quede pagada esta semana.\n\nPaulina',
+    asunto: 'Factura {folio} — {dias} días. Adjunto la OC.',
+    email: '{nombre}:\n\nLa factura N° {folio} lleva {dias} días sin pagarse por una diferencia de $430.000 con la orden de compra.\n\nEntiendo el punto administrativo, pero el material fue solicitado por la obra de ustedes, despachado y recibido conforme. Adjunto la OC complementaria N° 4471.\n\nCon eso no debería haber más obstáculos. Necesito que la factura quede pagada esta semana.\n\nPaulina Vergara\nAdministración — Metalmecánica Vergara SpA'
+  },
+  formal: {
+    wa: 'Sr./Sra. {nombre}:\n\nLa factura electrónica N° {folio}, por {monto}, se encuentra impaga desde el {vence} ({dias} días), habiendo sido recepcionada conforme y sin reclamo dentro del plazo legal del artículo 3° de la Ley N° 19.983.\n\nSe adjunta la orden de compra complementaria N° 4471. Solicitamos regularizar el pago a la brevedad.\n\nMetalmecánica Vergara SpA',
+    asunto: 'Requerimiento de pago — Factura N° {folio}',
+    email: 'Señor/a\n{nombre}\n{empresa}\nRUT {rut}\nPresente\n\nDe nuestra consideración:\n\nLa factura electrónica N° {folio}, por {monto}, se encuentra impaga desde el {vence}, registrando {dias} días de mora. El documento fue recepcionado conforme y no fue reclamado dentro del plazo legal.\n\nSe adjunta la orden de compra complementaria N° 4471, correspondiente a la diferencia observada.\n\nSolicitamos regularizar el pago a la brevedad.\n\nLe saluda atentamente,\n\nPaulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5'
+  }
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   CADENCIA (editable por el usuario)
+   ════════════════════════════════════════════════════════════════════════ */
+var CADENCIA = [
+  { id: 'recordatorio_previo', dia: -3, on: true, canal: 'email',    tono: 'cordial', aprueba: false,
+    desc: 'Antes de que venza. El mensaje más barato y el que más adelanta la caja.' },
+  { id: 'primer_aviso',        dia: 1,  on: true, canal: 'whatsapp', tono: 'cordial', aprueba: false,
+    desc: 'Al día siguiente del vencimiento. Sin drama: la mayoría simplemente se olvidó.' },
+  { id: 'segundo_aviso',       dia: 7,  on: true, canal: 'whatsapp', tono: 'cordial', aprueba: false,
+    desc: 'Una semana después, si no hubo respuesta.' },
+  { id: 'insistencia',         dia: 15, on: true, canal: 'whatsapp', tono: 'firme',   aprueba: true,
+    desc: 'Sube el tono. Pide una fecha concreta. Requiere tu visto bueno.' },
+  { id: 'plan_pago',           dia: 30, on: true, canal: 'email',    tono: 'cordial', aprueba: true,
+    desc: 'Si el deudor colabora pero no puede pagar de una: cuotas. Requiere tu visto bueno.' },
+  { id: 'escalamiento',        dia: 45, on: true, canal: 'email',    tono: 'formal',  aprueba: true,
+    desc: 'Carta de cobro formal, interés de la Ley 21.131 y aviso de derivación. Última instancia.' }
+];
+
+/* ════════════════════════════════════════════════════════════════════════
+   ESTADO
+   ════════════════════════════════════════════════════════════════════════ */
+var S = {
+  filtro: 'todos',
+  orden: { campo: 'mora', dir: -1 },
+  abierto: null,
+  tono: 'cordial',
+  canal: 'whatsapp',
+  editando: false,
+  borradorEditado: null,
+  enviados: 0,
+  recuperadoSesion: 0,
+  interaccionesTinoria: 47   // histórico del período, para el panel de impacto
+};
+
+/* ── derivados ─────────────────────────────────────────── */
+function facturasAbiertas(dd) { return dd.facturas.filter(function (f) { return f.estado !== 'pagada'; }); }
+function deudaDe(dd) { return facturasAbiertas(dd).reduce(function (a, f) { return a + f.monto; }, 0); }
+function vencidasDe(dd) { return facturasAbiertas(dd).filter(function (f) { return mora(f) > 0; }); }
+function deudaVencida(dd) { return vencidasDe(dd).reduce(function (a, f) { return a + f.monto; }, 0); }
+function moraMax(dd) {
+  var v = vencidasDe(dd).map(mora);
+  return v.length ? Math.max.apply(null, v) : 0;
+}
+function interesDe(dd) { return facturasAbiertas(dd).reduce(function (a, f) { return a + interes(f); }, 0); }
+
+function estadoDe(dd) {
+  if (dd.plan) return 'plan';
+  if (dd.promesa) return 'promesa';
+  if (deudaDe(dd) === 0) return 'pagado';
+  if (moraMax(dd) > 0) return 'vencido';
+  var prox = facturasAbiertas(dd).map(function (f) { return -mora(f); });
+  if (prox.length && Math.min.apply(null, prox) <= 7) return 'porvencer';
+  return 'aldia';
+}
+var TIMBRES = {
+  plan:      ['plan', 'Plan de pago'],
+  promesa:   ['neutro', 'Promesa'],
+  pagado:    ['pagado', 'Pagado'],
+  vencido:   ['vencido', 'Vencido'],
+  porvencer: ['porvencer', 'Por vencer'],
+  aldia:     ['pagado', 'Al día']
+};
+
+function totales() {
+  var t = { porCobrar: 0, vencido: 0, facturas: 0, recuperado: 0, buckets: [0, 0, 0, 0, 0] };
+  DEUDORES.forEach(function (dd) {
+    dd.facturas.forEach(function (f) {
+      if (f.estado === 'pagada') {
+        if (f.pagada && d(f.pagada).getMonth() === 6) t.recuperado += f.monto;
+        return;
+      }
+      t.porCobrar += f.monto;
+      t.facturas++;
+      var m = mora(f);
+      if (m <= 0) t.buckets[0] += f.monto;
+      else {
+        t.vencido += f.monto;
+        if (m <= 30) t.buckets[1] += f.monto;
+        else if (m <= 60) t.buckets[2] += f.monto;
+        else if (m <= 90) t.buckets[3] += f.monto;
+        else t.buckets[4] += f.monto;
+      }
+    });
+  });
+  return t;
+}
+
+/* DSO: cae a medida que se cobra. Base 68 al conectar. */
+function dso() {
+  var t = totales();
+  var base = 51;                                   // estado inicial del demo
+  var mejora = Math.round(S.recuperadoSesion / 1315068);  // $ por día de ventas
+  return Math.max(30, base - mejora);
+}
+
+function accionesPendientes() {
+  return DEUDORES.filter(function (dd) { return dd.accion && !dd.resuelto; });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — CARTERA
+   ════════════════════════════════════════════════════════════════════════ */
+function pintarKpis() {
+  var t = totales();
+  document.getElementById('kpiPorCobrar').textContent = clp(t.porCobrar);
+  document.getElementById('kpiFacturas').textContent = t.facturas + ' facturas abiertas · ' +
+    DEUDORES.filter(function (dd) { return deudaDe(dd) > 0; }).length + ' deudores';
+  document.getElementById('kpiVencido').textContent = clp(t.vencido);
+  document.getElementById('kpiVencidoPct').textContent = t.porCobrar
+    ? Math.round(t.vencido / t.porCobrar * 100) + '% de la cartera'
+    : 'cartera limpia';
+  document.getElementById('kpiRecuperado').textContent = clp(t.recuperado);
+  document.getElementById('kpiRecuperadoNota').innerHTML = S.recuperadoSesion > 0
+    ? '<b>+' + clp(S.recuperadoSesion) + ' en esta sesión</b>'
+    : 'facturas pagadas este mes';
+  document.getElementById('kpiDso').textContent = dso() + ' días';
+  document.getElementById('kpiDsoNota').innerHTML = '<b>−' + (68 - dso()) + ' d</b> desde que conectaste';
+
+  var n = accionesPendientes().length;
+  document.getElementById('bandejaTxt').textContent = n === 0
+    ? 'bandeja al día'
+    : n + (n === 1 ? ' acción para hoy' : ' acciones para hoy');
+  document.getElementById('agingTotal').textContent = clp(t.porCobrar) + ' · ' + t.facturas + ' facturas';
+}
+
+/* Envejecimiento: escala ORDINAL, una sola tinta, claro→oscuro = sano→grave.
+   Barras con extremo redondeado de 4px ancladas a la línea base, 2px de aire
+   entre barras, valor rotulado en cada una (no hay tooltip que dependa de hover). */
+function pintarAging() {
+  var t = totales();
+  var etq = ['al día', '1–30', '31–60', '61–90', '90+'];
+  var col = ['#D89E86', '#C77A5D', '#B55334', '#9E3119', '#6B2312'];
+  var max = Math.max.apply(null, t.buckets.concat([1]));
+  var W = 340, H = 168, base = 122, bw = 52, gap = 8, x0 = 14, alto = 88;
+
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="auto" role="img" aria-label="Envejecimiento de cartera por tramo de mora">';
+  s += '<g font-family="IBM Plex Mono, monospace" font-size="9" fill="#857E6E">';
+  t.buckets.forEach(function (v, i) {
+    var x = x0 + i * (bw + gap);
+    var h = v > 0 ? Math.max(6, v / max * alto) : 0;
+    var y = base - h;
+    if (h > 0) {
+      var r = Math.min(4, h);
+      s += '<path d="M' + x + ' ' + base + ' V' + (y + r) + ' Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y +
+           ' H' + (x + bw - r) + ' Q' + (x + bw) + ' ' + y + ' ' + (x + bw) + ' ' + (y + r) +
+           ' V' + base + ' Z" fill="' + col[i] + '"/>';
+      s += '<text x="' + (x + bw / 2) + '" y="' + (y - 6) + '" text-anchor="middle" fill="#16150F" font-size="10">' + mm(v) + '</text>';
+    } else {
+      s += '<text x="' + (x + bw / 2) + '" y="' + (base - 6) + '" text-anchor="middle" fill="#C6B99F" font-size="10">—</text>';
+    }
+    s += '<text x="' + (x + bw / 2) + '" y="' + (base + 15) + '" text-anchor="middle">' + etq[i] + '</text>';
+  });
+  s += '<line x1="8" y1="' + base + '" x2="' + (W - 8) + '" y2="' + base + '" stroke="#16150F" stroke-width="1"/>';
+  s += '<text x="' + (W / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="8">días de mora · millones de pesos</text>';
+  s += '</g></svg>';
+  document.getElementById('aging').innerHTML = s;
+}
+
+function pintarTabla() {
+  var lista = DEUDORES.slice();
+
+  lista = lista.filter(function (dd) {
+    var e = estadoDe(dd);
+    if (S.filtro === 'todos') return true;
+    if (S.filtro === 'pagado') return e === 'pagado';
+    return e === S.filtro;
+  });
+
+  var c = S.orden.campo, dir = S.orden.dir;
+  lista.sort(function (a, b) {
+    var va, vb;
+    if (c === 'nombre') { va = a.nombre; vb = b.nombre; return va < vb ? -dir : va > vb ? dir : 0; }
+    if (c === 'monto') { va = deudaDe(a); vb = deudaDe(b); }
+    else { va = moraMax(a); vb = moraMax(b); }
+    return (va - vb) * dir;
+  });
+
+  document.querySelectorAll('.flecha').forEach(function (f) {
+    f.textContent = f.dataset.f === c ? (dir === 1 ? '↑' : '↓') : '';
+  });
+
+  var tb = document.getElementById('tablaDeudores');
+  if (!lista.length) {
+    tb.innerHTML = '<tr><td colspan="6"><div class="vacio">Ningún deudor en este filtro.</div></td></tr>';
+    return;
+  }
+
+  tb.innerHTML = lista.map(function (dd) {
+    var e = estadoDe(dd);
+    var tb2 = TIMBRES[e];
+    var m = moraMax(dd);
+    var deuda = deudaDe(dd);
+    var acc = dd.accion && !dd.resuelto ? TIPOS[dd.accion] : null;
+    var rel = dd.relacion;
+    var barras = rel === 'buena' ? 3 : rel === 'tensa' ? 2 : 1;
+
+    var etiquetaEstado = '<span class="timbre timbre--' + tb2[0] + '">' + tb2[1] +
+      (e === 'plan' && dd.plan ? ' ' + dd.plan.n + ' cuotas' : '') +
+      (e === 'promesa' && dd.promesa ? ' ' + dd.promesa : '') + '</span>';
+
+    var accionHtml = acc
+      ? '<span class="accion-mini"><span class="punto' + (acc.aprueba ? '' : ' punto--auto') + '"></span>' +
+        acc.nombre + (acc.aprueba ? ' · tu visto bueno' : ' · automático') + '</span>'
+      : '<span class="accion-mini" style="color:var(--tinta-3)">' +
+        (dd.resuelto ? 'resuelto hoy' : 'nada pendiente') + '</span>';
+
+    return '<tr class="fila-deudor" tabindex="0" role="button" data-id="' + dd.id + '">' +
+      '<td><div class="fila-deudor__nombre">' + esc(dd.nombre) + '</div>' +
+        '<div class="fila-deudor__meta">' + dd.rut + ' · ' + dd.comuna + (dd.sensible ? ' · sensible' : '') + '</div></td>' +
+      '<td class="der num">' + (deuda ? clp(deuda) : '—') + '</td>' +
+      '<td class="der num">' + (m > 0 ? m + ' d' : '—') + '</td>' +
+      '<td>' + etiquetaEstado + '</td>' +
+      '<td><span class="relacion ' + (rel === 'tensa' ? 'tensa' : rel === 'riesgo' ? 'riesgo' : '') + '" title="Relación: ' + rel + '">' +
+        [1, 2, 3].map(function (i) { return '<i class="' + (i <= barras ? 'on' : '') + '"></i>'; }).join('') +
+        '</span></td>' +
+      '<td>' + accionHtml + '</td>' +
+    '</tr>';
+  }).join('');
+
+  tb.querySelectorAll('.fila-deudor').forEach(function (tr) {
+    tr.addEventListener('click', function () { abrirDeudor(tr.dataset.id); });
+    tr.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); abrirDeudor(tr.dataset.id); }
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — CAJÓN DEL DEUDOR
+   ════════════════════════════════════════════════════════════════════════ */
+function plantilla(dd) {
+  if (!dd.accion) return { txt: '', asunto: '' };
+  var tpl = P[dd.accion][S.tono];
+  var abiertas = facturasAbiertas(dd).filter(function (f) { return mora(f) > -30; });
+  var f0 = vencidasDe(dd).sort(function (a, b) { return mora(b) - mora(a); })[0] || abiertas[0] || dd.facturas[0];
+  var total = deudaVencida(dd) || deudaDe(dd);
+
+  var cuotasTxt = '';
+  if (dd.accion === 'plan_pago') {
+    var n = (dd.planPropuesto || 3);
+    cuotasTxt = calcCuotas(total, n).map(function (c, i) {
+      return '  Cuota ' + (i + 1) + ' — ' + clp(c.monto) + ' — ' + fechaLarga(c.fecha);
+    }).join('\n');
+  }
+
+  var detalle = facturasAbiertas(dd).filter(function (f) { return mora(f) > 0; }).map(function (f) {
+    return '  Factura N° ' + f.folio + ' — ' + clp(f.monto) + ' — emitida el ' + fechaLarga(d(f.emision)) +
+           ' — vencida el ' + fechaLarga(d(f.vence)) + ' — ' + mora(f) + ' días de mora';
+  }).join('\n');
+
+  var vars = {
+    '{nombre}':  dd.contacto.split(' ')[0],
+    '{empresa}': dd.nombre,
+    '{rut}':     dd.rut,
+    '{folio}':   f0.folio,
+    '{monto}':   clp(f0.monto),
+    '{vence}':   fechaLarga(d(f0.vence)),
+    '{dias}':    Math.max(0, mora(f0)),
+    '{total}':   clp(total),
+    '{interes}': clp(interesDe(dd)),
+    '{n}':       (dd.planPropuesto || 3),
+    '{cuotas}':  cuotasTxt,
+    '{detalle}': detalle,
+    '{hoy}':     fechaLarga(HOY)
+  };
+
+  function sub(s) {
+    Object.keys(vars).forEach(function (k) { s = s.split(k).join(vars[k]); });
+    return s;
+  }
+  return {
+    txt: sub(S.canal === 'email' ? tpl.email : tpl.wa),
+    asunto: sub(tpl.asunto)
+  };
+}
+
+function calcCuotas(total, n) {
+  var base = Math.floor(total / n / 10000) * 10000;
+  var out = [];
+  var acum = 0;
+  for (var i = 0; i < n; i++) {
+    var monto = (i === n - 1) ? total - acum : base;
+    acum += monto;
+    var f = new Date(HOY.getFullYear(), HOY.getMonth() + i + 1, 5);
+    out.push({ monto: monto, fecha: f });
+  }
+  return out;
+}
+
+function abrirDeudor(id) {
+  S.abierto = id;
+  S.editando = false;
+  S.borradorEditado = null;
+  var dd = DEUDORES.find(function (x) { return x.id === id; });
+  S.tono = dd.accion ? (CADENCIA.find(function (c) { return c.id === dd.accion; }) || { tono: 'cordial' }).tono : 'cordial';
+  if (dd.accion === 'disputa') S.tono = 'cordial';
+  S.canal = dd.accion ? (CADENCIA.find(function (c) { return c.id === dd.accion; }) || { canal: 'whatsapp' }).canal : 'whatsapp';
+  pintarCajon();
+  document.getElementById('velo').classList.add('on');
+  document.getElementById('cajon').classList.add('on');
+  document.getElementById('cajon').focus();
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarCajon() {
+  document.getElementById('velo').classList.remove('on');
+  document.getElementById('cajon').classList.remove('on');
+  document.body.style.overflow = '';
+  S.abierto = null;
+}
+
+function pintarCajon() {
+  var dd = DEUDORES.find(function (x) { return x.id === S.abierto; });
+  if (!dd) return;
+
+  document.getElementById('cajonTitulo').textContent = dd.nombre;
+  document.getElementById('cajonMeta').innerHTML =
+    dd.rut + ' · ' + dd.comuna + '<br>' + esc(dd.contacto) + ' — ' + esc(dd.cargo) +
+    '<br>Cliente desde ' + dd.cliente_desde + ' · ' + clp(dd.venta_anual) + '/año' +
+    (dd.sensible ? ' · <span style="color:var(--rojo)">cliente sensible</span>' : '');
+
+  var h = '';
+
+  /* --- resumen --- */
+  var deuda = deudaDe(dd), venc = deudaVencida(dd), m = moraMax(dd), inte = interesDe(dd);
+  h += '<div class="cajon__seccion">';
+  h += '<div class="kpis" style="border:0; background:transparent; gap:var(--sp-s); grid-template-columns:1fr 1fr 1fr;">';
+  h += '<div style="padding:0"><span class="etiqueta">Debe</span><div class="cifra num" style="font-size:var(--step-1)">' + (deuda ? clp(deuda) : '—') + '</div></div>';
+  h += '<div style="padding:0"><span class="etiqueta">Vencido</span><div class="cifra num cifra--rojo" style="font-size:var(--step-1)">' + (venc ? clp(venc) : '—') + '</div></div>';
+  h += '<div style="padding:0"><span class="etiqueta">Mora</span><div class="cifra num" style="font-size:var(--step-1)">' + (m > 0 ? m + ' d' : '—') + '</div></div>';
+  h += '</div>';
+  if (inte > 0) {
+    h += '<p class="fuente" style="margin-top:var(--sp-s)">Interés corriente devengado (Ley 21.131, desde el día 31): <b>' + clp(inte) + '</b>. Tinoria lo calcula factura por factura; usarlo o no lo decides tú.</p>';
+  }
+  h += '</div>';
+
+  /* --- facturas --- */
+  h += '<div class="cajon__seccion"><span class="etiqueta">Facturas</span>';
+  dd.facturas.forEach(function (f, i) {
+    var mm2 = mora(f);
+    var est = f.estado === 'pagada'
+      ? '<span class="timbre timbre--pagado">Pagada ' + fechaCorta(f.pagada) + '</span>'
+      : f.estado === 'plan'
+        ? '<span class="timbre timbre--plan">En plan</span>'
+        : mm2 > 0
+          ? '<span class="timbre timbre--vencido">' + mm2 + ' d</span>'
+          : mm2 > -8
+            ? '<span class="timbre timbre--porvencer">vence en ' + (-mm2) + ' d</span>'
+            : '<span class="timbre timbre--neutro">al día</span>';
+    h += '<div class="fact">' +
+      '<span class="fact__folio">Factura N° ' + f.folio + '</span>' +
+      '<span class="fact__fechas">emitida ' + fechaCorta(f.emision) + ' · vence ' + fechaCorta(f.vence) + '</span>' +
+      '<span class="fact__monto"><span class="num">' + clp(f.monto) + '</span>' + est +
+      (f.estado !== 'pagada'
+        ? '<div class="fact__pagar"><button class="btn btn--sm" data-pagar="' + i + '">Marcar pagada</button></div>'
+        : '') +
+      '</span></div>';
+  });
+  h += '</div>';
+
+  /* --- hilo --- */
+  h += '<div class="cajon__seccion"><span class="etiqueta">Hilo de conversación · ' + dd.hilo.length + ' interacciones</span>';
+  h += '<div class="hilo" id="hilo">' + dd.hilo.map(msgHtml).join('') + '</div>';
+  h += '<div id="anclaHilo"></div>';
+  h += '</div>';
+
+  /* --- redactor --- */
+  if (dd.resuelto) {
+    h += '<div class="cajon__seccion redactor"><div class="redactor__sello">' + ICO.visto +
+      ' Listo por hoy. Tinoria retoma este hilo según la cadencia.</div></div>';
+  } else if (!dd.accion) {
+    h += '<div class="cajon__seccion redactor"><div class="redactor__sello">' + ICO.visto +
+      ' Sin acción pendiente. Este deudor está al día.</div></div>';
+  } else {
+    var tipo = TIPOS[dd.accion];
+    var b = plantilla(dd);
+    var txt = S.borradorEditado !== null ? S.borradorEditado : b.txt;
+
+    h += '<div class="cajon__seccion redactor">';
+    h += '<div class="redactor__tipo">' + ICO.pluma + tipo.nombre + '</div>';
+    h += '<p class="redactor__porque"><b>Por qué esto y por qué ahora:</b> ' + esc(dd.porque) + '</p>';
+
+    h += '<div class="redactor__ctrl">';
+    h += '<div><p class="etiqueta" style="margin-bottom:6px">Tono</p><div class="segmentado segmentado--rojo" role="group" aria-label="Tono">' +
+      ['cordial', 'firme', 'formal'].map(function (t) {
+        return '<button type="button" data-tono="' + t + '" aria-pressed="' + (S.tono === t) + '">' +
+          t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
+      }).join('') + '</div></div>';
+    h += '<div><p class="etiqueta" style="margin-bottom:6px">Canal</p><div class="segmentado" role="group" aria-label="Canal">' +
+      ['whatsapp', 'email'].map(function (c) {
+        return '<button type="button" data-canal="' + c + '" aria-pressed="' + (S.canal === c) + '">' +
+          (c === 'email' ? 'Correo' : 'WhatsApp') + '</button>';
+      }).join('') + '</div></div>';
+    h += '</div>';
+
+    if (S.canal === 'email') {
+      h += '<input class="redactor__asunto" id="asunto" value="' + esc(b.asunto).replace(/"/g, '&quot;') + '" aria-label="Asunto">';
+    }
+    h += '<textarea class="redactor__borrador" id="borrador" ' + (S.editando ? '' : 'readonly') +
+      ' aria-label="Borrador del mensaje">' + esc(txt) + '</textarea>';
+
+    /* avisos del agente: aquí es donde el producto se gana el sueldo */
+    var aviso = avisoDelAgente(dd);
+    if (aviso) {
+      h += '<div class="redactor__aviso">' + ICO.alerta + '<span>' + aviso + '</span></div>';
+    }
+
+    h += '<div class="redactor__acciones">';
+    h += '<button class="btn btn--primario btn--sm" id="btnEnviar">' +
+      (tipo.aprueba ? 'Aprobar y enviar' : 'Enviar ahora') + '</button>';
+    h += '<button class="btn btn--sm" id="btnEditar">' + (S.editando ? 'Guardar cambios' : 'Editar') + '</button>';
+    if (dd.accion !== 'plan_pago') {
+      h += '<button class="btn btn--sm" id="btnPlan">' + ICO.cuotas + ' Ofrecer plan de pago</button>';
+    } else {
+      h += '<button class="btn btn--sm" id="btnCuotas">Cambiar N° de cuotas (' + (dd.planPropuesto || 3) + ')</button>';
+    }
+    h += '<button class="btn btn--sm" id="btnPosponer">Posponer 3 días</button>';
+    h += '</div>';
+    h += '</div>';
+  }
+
+  document.getElementById('cajonCuerpo').innerHTML = h;
+  cablearCajon(dd);
+}
+
+function avisoDelAgente(dd) {
+  var m = moraMax(dd);
+  if (dd.accion === 'disputa' && S.tono !== 'cordial') {
+    return '<b>No hagas esto.</b> Esta factura está en disputa por una orden de compra que falta — el error es tuyo, no de Carolina. Un tono ' + S.tono + ' contra un deudor que te avisó del problema el mismo día es la forma más rápida de perder un cliente que paga bien.';
+  }
+  if (S.tono === 'formal' && m < 45) {
+    return '<b>Tinoria no recomienda esto.</b> La carta formal está pensada para el día 45 en adelante; aquí van ' + m + ' días. Antes del día 31 ni siquiera hay interés devengado según la Ley 21.131, así que la carta no tiene sustento y sí tiene costo.';
+  }
+  if (S.tono === 'formal' && dd.sensible) {
+    return '<b>Cliente sensible.</b> ' + esc(dd.nombre) + ' te compra ' + clp(dd.venta_anual) + ' al año. Vas a cobrar ' + clp(deudaVencida(dd)) + '. Haz el cálculo antes de apretar el botón.';
+  }
+  if (S.tono === 'formal' && dd.accion === 'plan_pago') {
+    return '<b>Ojo.</b> Este deudor te contestó todos los mensajes y te explicó su situación. La carta formal se reserva para el que <em>no</em> da la cara.';
+  }
+  if (S.tono === 'cordial' && m > 90) {
+    return '<b>El tono cordial ya se agotó aquí.</b> Van ' + m + ' días y ocho mensajes amables sin resultado. Insistir con lo mismo no es amabilidad, es postergación.';
+  }
+  if (S.tono === 'firme' && m > 0 && m < 8) {
+    return 'Sólo ' + m + ' día' + (m > 1 ? 's' : '') + ' de mora. El tono firme a esta altura se lee como desconfianza y no acelera nada.';
+  }
+  return null;
+}
+
+function msgHtml(msg, nuevo) {
+  var canalIco = ICO[msg.canal] || ICO.sistema;
+  var etiqueta = msg.canal === 'sistema' ? 'Tinoria'
+    : msg.canal === 'llamada' ? 'Llamada'
+    : (msg.dir === 'out' ? (msg.auto ? 'Tinoria → ' : 'Paulina → ') : '← ');
+  var clase = msg.canal === 'sistema' ? 'msg--sistema' : (msg.dir === 'in' ? 'msg--in' : 'msg--out');
+  var canalTxt = msg.canal === 'whatsapp' ? 'WhatsApp' : msg.canal === 'email' ? 'Correo' : '';
+  return '<div class="msg ' + clase + (nuevo ? ' msg--nuevo' : '') + '">' +
+    '<div class="msg__cab">' + canalIco + '<span>' + etiqueta + canalTxt + '</span>' +
+    '<span>· ' + fechaCorta(msg.f) + (msg.h ? ' ' + msg.h : '') + '</span>' +
+    (msg.tono ? '<span>· tono ' + msg.tono + '</span>' : '') +
+    (msg.auto ? '<span>· automático</span>' : '') +
+    '</div>' +
+    (msg.asunto ? '<div class="msg__txt"><b style="font-family:var(--mono);font-size:0.75rem">' + esc(msg.asunto) + '</b>\n\n' + esc(msg.txt) + '</div>'
+                : '<div class="msg__txt">' + esc(msg.txt) + '</div>') +
+    '</div>';
+}
+
+/* ── cableado de los controles del cajón ─────────────────── */
+function cablearCajon(dd) {
+  var cuerpo = document.getElementById('cajonCuerpo');
+
+  cuerpo.querySelectorAll('[data-pagar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var f = dd.facturas[+b.dataset.pagar];
+      f.estado = 'pagada';
+      f.pagada = '2026-07-12';
+      S.recuperadoSesion += f.monto;
+      dd.hilo.push({ f: '2026-07-12', h: hora(), canal: 'sistema', dir: 'sys',
+        txt: 'Pago conciliado: factura ' + f.folio + ' por ' + clp(f.monto) + '. Tinoria detuvo la cobranza de este documento.' });
+      if (deudaDe(dd) === 0) { dd.accion = null; dd.resuelto = true; dd.promesa = null; }
+      pintarTodo();
+      pintarCajon();
+    });
+  });
+
+  cuerpo.querySelectorAll('[data-tono]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.tono = b.dataset.tono;
+      S.borradorEditado = null;
+      S.editando = false;
+      pintarCajon();
+    });
+  });
+  cuerpo.querySelectorAll('[data-canal]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.canal = b.dataset.canal;
+      S.borradorEditado = null;
+      S.editando = false;
+      pintarCajon();
+    });
+  });
+
+  var btnEditar = document.getElementById('btnEditar');
+  if (btnEditar) btnEditar.addEventListener('click', function () {
+    var ta = document.getElementById('borrador');
+    if (S.editando) {
+      S.borradorEditado = ta.value;
+      S.editando = false;
+      pintarCajon();
+    } else {
+      S.editando = true;
+      pintarCajon();
+      var t = document.getElementById('borrador');
+      t.focus();
+      t.setSelectionRange(t.value.length, t.value.length);
+    }
+  });
+
+  var btnEnviar = document.getElementById('btnEnviar');
+  if (btnEnviar) btnEnviar.addEventListener('click', function () { enviar(dd); });
+
+  var btnPlan = document.getElementById('btnPlan');
+  if (btnPlan) btnPlan.addEventListener('click', function () { modalPlan(dd); });
+
+  var btnCuotas = document.getElementById('btnCuotas');
+  if (btnCuotas) btnCuotas.addEventListener('click', function () { modalPlan(dd); });
+
+  var btnPosponer = document.getElementById('btnPosponer');
+  if (btnPosponer) btnPosponer.addEventListener('click', function () {
+    dd.hilo.push({ f: '2026-07-12', h: hora(), canal: 'sistema', dir: 'sys',
+      txt: 'Acción pospuesta por Paulina. Tinoria vuelve a proponer "' + TIPOS[dd.accion].nombre.toLowerCase() +
+           '" el ' + fechaLarga(sumar(HOY, 3)) + '. La mora sigue corriendo.' });
+    dd.resuelto = true;
+    pintarTodo();
+    pintarCajon();
+  });
+}
+
+function hora() {
+  var h = new Date();
+  return ('0' + h.getHours()).slice(-2) + ':' + ('0' + h.getMinutes()).slice(-2);
+}
+
+/* ── ENVIAR: el corazón del demo ─────────────────────────── */
+function enviar(dd) {
+  var b = plantilla(dd);
+  var txt = S.borradorEditado !== null ? S.borradorEditado : b.txt;
+  var asuntoEl = document.getElementById('asunto');
+
+  dd.hilo.push({
+    f: '2026-07-12', h: hora(), canal: S.canal, dir: 'out',
+    auto: !TIPOS[dd.accion].aprueba, tono: S.tono,
+    asunto: S.canal === 'email' ? (asuntoEl ? asuntoEl.value : b.asunto) : null,
+    txt: txt
+  });
+
+  var des = dd.desenlace[S.tono] || dd.desenlace.cordial;
+  var accionOriginal = dd.accion;
+
+  dd.enviando = true;
+  dd.resuelto = true;
+  S.enviados++;
+  S.interaccionesTinoria++;
+  S.borradorEditado = null;
+  S.editando = false;
+
+  pintarTodo();
+  pintarCajon();
+
+  /* indicador "escribiendo…" y luego la respuesta */
+  var hilo = document.getElementById('hilo');
+  if (hilo && des.txt) {
+    var esc2 = document.createElement('div');
+    esc2.className = 'escribiendo';
+    esc2.innerHTML = esc(dd.contacto.split(' ')[0]) + ' está escribiendo<span>…</span>';
+    hilo.appendChild(esc2);
+    esc2.scrollIntoView({ block: 'nearest' });
+  }
+
+  setTimeout(function () {
+    if (des.txt) {
+      dd.hilo.push({ f: '2026-07-12', h: hora(), canal: S.canal, dir: 'in', txt: des.txt });
+    }
+    dd.hilo.push({ f: '2026-07-12', h: hora(), canal: 'sistema', dir: 'sys', txt: des.nota });
+
+    if (des.relacion) dd.relacion = des.relacion;
+
+    if (des.tipo === 'pago') {
+      facturasAbiertas(dd).forEach(function (f) {
+        if (mora(f) > 0) { f.estado = 'pagada'; f.pagada = '2026-07-12'; S.recuperadoSesion += f.monto; }
+      });
+    } else if (des.tipo === 'promesa') {
+      dd.promesa = '17-jul';
+      dd.hilo.push({ f: '2026-07-12', h: hora(), canal: 'sistema', dir: 'sys',
+        txt: 'Promesa de pago agendada: 17-jul-2026. Tinoria verifica sola ese día a las 18:00. Si no llega el pago, retoma la cadencia en el paso siguiente sin que tengas que acordarte.' });
+    } else if (des.tipo === 'plan') {
+      var n = dd.planPropuesto || 3;
+      var total = deudaVencida(dd) || deudaDe(dd);
+      dd.plan = { n: n, cuotas: calcCuotas(total, n) };
+      facturasAbiertas(dd).forEach(function (f) { if (mora(f) > 0) f.estado = 'plan'; });
+      dd.hilo.push({ f: '2026-07-12', h: hora(), canal: 'sistema', dir: 'sys',
+        txt: 'Plan de pago vigente: ' + n + ' cuotas. ' +
+             dd.plan.cuotas.map(function (c, i) { return 'Cuota ' + (i + 1) + ': ' + clp(c.monto) + ' el ' + fechaCorta(iso(c.fecha)); }).join(' · ') +
+             '. Tinoria recuerda cada cuota 3 días antes.' });
+    } else if (des.tipo === 'resuelto') {
+      dd.promesa = '20-jul';
+    } else if (des.tipo === 'parcial') {
+      dd.promesa = '17-jul';
+    }
+
+    dd.enviando = false;
+    pintarTodo();
+    if (S.abierto === dd.id) {
+      pintarCajon();
+      var hilo2 = document.getElementById('hilo');
+      if (hilo2 && hilo2.lastElementChild) hilo2.lastElementChild.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, des.delay);
+}
+
+function iso(dt) {
+  return dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2);
+}
+
+/* ── MODAL: plan de pago ─────────────────────────────────── */
+var modalVelo = document.getElementById('modalVelo');
+function cerrarModal() { modalVelo.hidden = true; }
+modalVelo.addEventListener('click', function (e) { if (e.target === modalVelo) cerrarModal(); });
+
+function modalPlan(dd) {
+  var total = deudaVencida(dd) || deudaDe(dd);
+  var n = dd.planPropuesto || 3;
+
+  document.getElementById('modalTitulo').textContent = 'Plan de pago — ' + dd.nombre;
+
+  function pintar() {
+    var cuotas = calcCuotas(total, n);
+    var c = '';
+    c += '<p style="font-size:0.9rem; color:var(--tinta-2); line-height:1.6; margin-bottom:var(--sp-m)">' +
+      'Deuda vencida: <b class="num">' + clp(total) + '</b>. Tinoria propone repartirla en cuotas mensuales, ' +
+      'con vencimiento el 5 de cada mes, y le recuerda cada una tres días antes.</p>';
+    c += '<div class="segmentado segmentado--rojo" role="group" aria-label="Número de cuotas">' +
+      [2, 3, 4, 6].map(function (k) {
+        return '<button type="button" data-n="' + k + '" aria-pressed="' + (k === n) + '">' + k + ' cuotas</button>';
+      }).join('') + '</div>';
+    c += '<div class="cuotas">' + cuotas.map(function (q, i) {
+      return '<div class="cuota"><span>Cuota ' + (i + 1) + ' · ' + fechaLarga(q.fecha) + '</span><span class="num">' + clp(q.monto) + '</span></div>';
+    }).join('') + '</div>';
+    c += '<p class="fuente" style="margin-top:var(--sp-s)">Sin interés. La condición: si una cuota se cae, el saldo completo se hace exigible. Eso va escrito en la propuesta.</p>';
+    document.getElementById('modalCuerpo').innerHTML = c;
+
+    document.getElementById('modalCuerpo').querySelectorAll('[data-n]').forEach(function (b) {
+      b.addEventListener('click', function () { n = +b.dataset.n; pintar(); });
+    });
+  }
+  pintar();
+
+  document.getElementById('modalPie').innerHTML =
+    '<button class="btn btn--sm" id="mCancel">Cancelar</button>' +
+    '<button class="btn btn--primario btn--sm" id="mOk">Usar este plan en el borrador</button>';
+  document.getElementById('mCancel').addEventListener('click', cerrarModal);
+  document.getElementById('mOk').addEventListener('click', function () {
+    dd.planPropuesto = n;
+    dd.accion = 'plan_pago';
+    dd.resuelto = false;
+    S.tono = 'cordial';
+    S.canal = 'email';
+    S.borradorEditado = null;
+    cerrarModal();
+    pintarTodo();
+    pintarCajon();
+  });
+
+  modalVelo.hidden = false;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — CADENCIA
+   ════════════════════════════════════════════════════════════════════════ */
+function pintarCadencia() {
+  var c = document.getElementById('cadencia');
+  c.innerHTML = CADENCIA.map(function (p, i) {
+    return '<div class="paso-cad' + (p.on ? '' : ' off') + '">' +
+      '<div class="paso-cad__sw"><button class="interruptor" role="switch" aria-checked="' + p.on + '" data-sw="' + i + '" aria-label="Activar ' + TIPOS[p.id].nombre + '"></button></div>' +
+      '<div class="paso-cad__cuerpo">' +
+        '<b>' + TIPOS[p.id].nombre + '</b>' +
+        '<p>' + p.desc + '</p>' +
+        '<div class="paso-cad__cfg">' +
+          '<label>Día <input class="dia-input" type="number" value="' + p.dia + '" data-dia="' + i + '" aria-label="Día de la cadencia"></label>' +
+          '<label>Canal <select class="sel" data-canal-cad="' + i + '">' +
+            ['whatsapp', 'email'].map(function (x) { return '<option value="' + x + '"' + (p.canal === x ? ' selected' : '') + '>' + (x === 'email' ? 'Correo' : 'WhatsApp') + '</option>'; }).join('') +
+          '</select></label>' +
+          '<label>Tono <select class="sel" data-tono-cad="' + i + '">' +
+            ['cordial', 'firme', 'formal'].map(function (x) { return '<option value="' + x + '"' + (p.tono === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') +
+          '</select></label>' +
+          '<span style="font-family:var(--mono); font-size:0.7rem; color:' + (p.aprueba ? 'var(--rojo)' : 'var(--tinta-3)') + '">' +
+            (p.aprueba ? 'requiere tu visto bueno' : 'sale automático') + '</span>' +
+        '</div>' +
+      '</div></div>';
+  }).join('');
+
+  c.querySelectorAll('[data-sw]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = CADENCIA[+b.dataset.sw];
+      p.on = !p.on;
+      pintarCadencia();
+      pintarAgenda();
+    });
+  });
+  c.querySelectorAll('[data-dia]').forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      CADENCIA[+inp.dataset.dia].dia = parseInt(inp.value, 10) || 0;
+      pintarAgenda();
+    });
+  });
+  c.querySelectorAll('[data-canal-cad]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+      CADENCIA[+sel.dataset.canalCad].canal = sel.value;
+      pintarAgenda();
+    });
+  });
+  c.querySelectorAll('[data-tono-cad]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+      CADENCIA[+sel.dataset.tonoCad].tono = sel.value;
+      pintarAgenda();
+    });
+  });
+}
+
+/* La agenda se DERIVA de la cadencia y de la cartera: cambiar un día la mueve. */
+function pintarAgenda() {
+  var items = [];
+  DEUDORES.forEach(function (dd) {
+    facturasAbiertas(dd).forEach(function (f) {
+      if (f.estado === 'plan') return;
+      var m = mora(f);
+      CADENCIA.forEach(function (p) {
+        if (!p.on) return;
+        var enDias = p.dia - m;           // días desde hoy hasta que toca el paso
+        if (enDias < 0 || enDias > 21) return;
+        items.push({
+          enDias: enDias, dd: dd, f: f, p: p
+        });
+      });
+    });
+  });
+  items.sort(function (a, b) { return a.enDias - b.enDias || b.f.monto - a.f.monto; });
+
+  var el = document.getElementById('agenda');
+  if (!items.length) {
+    el.innerHTML = '<div class="vacio">Con esta cadencia no hay nada agendado en las próximas 3 semanas.</div>';
+    return;
+  }
+  el.innerHTML = items.slice(0, 14).map(function (it) {
+    var cuando = it.enDias === 0 ? 'hoy' : it.enDias === 1 ? 'mañana' : 'en ' + it.enDias + ' d';
+    return '<div class="agenda__item">' +
+      '<span class="agenda__cuando' + (it.enDias > 2 ? ' futuro' : '') + '">' + cuando + '</span>' +
+      '<span><b style="font-weight:500">' + esc(it.dd.nombre.split(' ').slice(0, 3).join(' ')) + '</b><br>' +
+      '<span style="font-family:var(--mono); font-size:0.7rem; color:var(--tinta-3)">' +
+      TIPOS[it.p.id].nombre + ' · ' + (it.p.canal === 'email' ? 'correo' : 'WhatsApp') + ' · ' + it.p.tono + '</span></span>' +
+      '<span class="num" style="font-size:0.8rem">' + clp(it.f.monto) + '</span>' +
+    '</div>';
+  }).join('') + (items.length > 14
+    ? '<p class="fuente" style="padding-top:var(--sp-s)">y ' + (items.length - 14) + ' más en las próximas 3 semanas.</p>'
+    : '');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — IMPACTO
+   ════════════════════════════════════════════════════════════════════════ */
+function pintarImpacto() {
+  var hoyDso = dso();
+  var serie = [68, 66, 63, 59, 55, 51];
+  serie[5] = hoyDso;
+
+  /* Línea de DSO: una sola serie → sin caja de leyenda, el título la nombra.
+     Marcadores de 8px, valor rotulado sólo en los extremos. */
+  var W = 340, H = 170, ml = 34, mr = 16, mt = 18, mb = 30;
+  var iw = W - ml - mr, ih = H - mt - mb;
+  var min = 30, max = 75;
+  var etq = ['feb', 'mar', 'abr', 'may', 'jun', 'jul'];
+  function X(i) { return ml + i * (iw / (serie.length - 1)); }
+  function Y(v) { return mt + ih - (v - min) / (max - min) * ih; }
+
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="auto" role="img" aria-label="DSO por mes: febrero 68 días, marzo 66, abril 63, mayo 59, junio 55, julio ' + hoyDso + ' días.">';
+  s += '<g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#857E6E">';
+  [30, 45, 60, 75].forEach(function (v) {
+    s += '<line x1="' + ml + '" y1="' + Y(v) + '" x2="' + (W - mr) + '" y2="' + Y(v) + '" stroke="#DED5C4" stroke-width="1"/>';
+    s += '<text x="' + (ml - 6) + '" y="' + (Y(v) + 3) + '" text-anchor="end">' + v + '</text>';
+  });
+  /* meta: 30 días, el plazo de la Ley 21.131 */
+  s += '<line x1="' + ml + '" y1="' + Y(30) + '" x2="' + (W - mr) + '" y2="' + Y(30) + '" stroke="#2B5FA8" stroke-width="1" stroke-dasharray="3 3"/>';
+  s += '<text x="' + (W - mr) + '" y="' + (Y(30) - 5) + '" text-anchor="end" fill="#2B5FA8" font-size="7.5">plazo legal · 30 d</text>';
+
+  var pts = serie.map(function (v, i) { return X(i) + ' ' + Y(v); }).join(' L ');
+  s += '<path d="M ' + pts + '" fill="none" stroke="#A93B22" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  serie.forEach(function (v, i) {
+    var r = (i === serie.length - 1) ? 5 : 4;
+    s += '<circle cx="' + X(i) + '" cy="' + Y(v) + '" r="' + r + '" fill="#A93B22" stroke="#FBF7EF" stroke-width="2"/>';
+    s += '<text x="' + X(i) + '" y="' + (H - 10) + '" text-anchor="middle">' + etq[i] + '</text>';
+  });
+  s += '<text x="' + X(0) + '" y="' + (Y(serie[0]) - 10) + '" text-anchor="middle" fill="#16150F" font-size="10">68</text>';
+  s += '<text x="' + X(5) + '" y="' + (Y(serie[5]) - 10) + '" text-anchor="end" fill="#16150F" font-size="11" font-weight="500">' + hoyDso + ' d</text>';
+  s += '</g></svg>';
+  document.getElementById('chartDso').innerHTML = s;
+
+  var delta = 68 - hoyDso;
+  var liberado = Math.round(delta * 1315068);
+  document.getElementById('impLiberado').textContent = clp(liberado);
+  document.getElementById('impLiberado2').textContent = clp(liberado);
+  document.getElementById('impDsoAhora').textContent = hoyDso;
+  document.getElementById('impDelta').textContent = delta;
+
+  var horas = Math.round(S.interaccionesTinoria * 11 / 60 * 10) / 10;
+  document.getElementById('impHoras').textContent = String(horas).replace('.', ',') + ' h';
+
+  var t = totales();
+  document.getElementById('impRecup').textContent = clp(t.recuperado);
+  document.getElementById('impFactura').textContent = clp(29000 + t.recuperado * 0.012);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ORQUESTACIÓN
+   ════════════════════════════════════════════════════════════════════════ */
+function pintarTodo() {
+  pintarKpis();
+  pintarAging();
+  pintarTabla();
+  pintarAgenda();
+  pintarImpacto();
+}
+
+/* filtros */
+document.querySelectorAll('[data-filtro]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    S.filtro = b.dataset.filtro;
+    document.querySelectorAll('[data-filtro]').forEach(function (o) {
+      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+    });
+    pintarTabla();
+  });
+});
+
+/* orden */
+document.querySelectorAll('[data-orden]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var c = b.dataset.orden;
+    if (S.orden.campo === c) S.orden.dir *= -1;
+    else { S.orden.campo = c; S.orden.dir = c === 'nombre' ? 1 : -1; }
+    pintarTabla();
+  });
+});
+
+/* tabs */
+document.querySelectorAll('[data-tab]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('[data-tab]').forEach(function (o) {
+      o.setAttribute('aria-selected', o === b ? 'true' : 'false');
+    });
+    ['cartera', 'cadencia', 'impacto'].forEach(function (t) {
+      document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).hidden = (t !== b.dataset.tab);
+    });
+  });
+});
+
+/* cerrar cajón */
+document.getElementById('cerrarCajon').addEventListener('click', cerrarCajon);
+document.getElementById('velo').addEventListener('click', cerrarCajon);
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if (!modalVelo.hidden) { cerrarModal(); return; }
+  if (S.abierto) cerrarCajon();
+});
+
+/* ── conexión al SII (la puesta en marcha) ───────────────── */
+var LINEAS = {
+  sii: [
+    ['Autenticando con certificado digital…', 500],
+    ['Certificado válido: METALMECÁNICA VERGARA SPA — 76.129.884-5', 700],
+    ['Descargando Registro de Compras y Ventas (jun 2025 – jul 2026)…', 900],
+    ['<b>218 DTE emitidos leídos.</b>', 600],
+    ['Filtrando documentos con saldo pendiente…', 600],
+    ['<b>18 facturas abiertas · 11 deudores</b>', 500],
+    ['Cruzando con cartola bancaria para conciliar pagos…', 800],
+    ['<b>3 pagos conciliados en julio ($10.570.000)</b>', 500],
+    ['Buscando contactos de cobranza (correo y celular)…', 700],
+    ['9 de 11 deudores con contacto verificado. 2 quedan sólo con correo.', 600],
+    ['<b>DSO calculado: 68 días.</b> Plazo pactado: 30. <span class="err">Exceso: 38 días.</span>', 700],
+    ['<b>Cartera lista. Tinoria tiene 9 acciones propuestas para hoy.</b>', 500]
+  ],
+  csv: [
+    ['Leyendo RCV_76129884_202607.csv…', 500],
+    ['<b>218 filas · 218 DTE válidos</b>', 600],
+    ['Filtrando documentos con saldo pendiente…', 700],
+    ['<b>18 facturas abiertas · 11 deudores</b>', 600],
+    ['El CSV del SII no trae contactos: buscando en tus correos enviados…', 900],
+    ['9 de 11 deudores con contacto verificado.', 600],
+    ['<b>DSO calculado: 68 días.</b> Plazo pactado: 30. <span class="err">Exceso: 38 días.</span>', 700],
+    ['<b>Cartera lista. Tinoria tiene 9 acciones propuestas para hoy.</b>', 500]
+  ],
+  erp: [
+    ['Conectando con Nubox (OAuth)…', 600],
+    ['Permisos otorgados: lectura de ventas y clientes.', 600],
+    ['Sincronizando cuentas por cobrar…', 900],
+    ['<b>18 facturas abiertas · 11 deudores</b>', 600],
+    ['Contactos importados desde la ficha de cliente del ERP.', 700],
+    ['11 de 11 deudores con contacto verificado.', 600],
+    ['<b>DSO calculado: 68 días.</b> Plazo pactado: 30. <span class="err">Exceso: 38 días.</span>', 700],
+    ['<b>Cartera lista. Tinoria tiene 9 acciones propuestas para hoy.</b>', 500]
+  ]
+};
+
+document.querySelectorAll('[data-origen]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('[data-origen]').forEach(function (o) { o.disabled = true; o.style.opacity = '.5'; });
+    var consola = document.getElementById('consola');
+    consola.innerHTML = '';
+    var lineas = LINEAS[b.dataset.origen];
+    var t = 0;
+    lineas.forEach(function (l) {
+      t += l[1];
+      setTimeout(function () {
+        var div = document.createElement('div');
+        div.className = 'consola__linea';
+        div.innerHTML = '<span style="color:var(--tinta-3)">›</span> ' + l[0];
+        consola.appendChild(div);
+        consola.scrollTop = consola.scrollHeight;
+      }, t);
+    });
+    setTimeout(function () {
+      document.getElementById('vistaConexion').hidden = true;
+      document.getElementById('vistaApp').hidden = false;
+      pintarTodo();
+      pintarCadencia();
+      window.scrollTo(0, 0);
+    }, t + 800);
+  });
+});
+
+/* arranque */
+pintarCadencia();
+</script>
+</body>
+</html>

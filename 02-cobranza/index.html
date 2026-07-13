@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinoria — cobrar con tino</title>
+<meta name="description" content="Un agente de IA que persigue tus facturas vencidas por WhatsApp y correo, con el tono exacto para que te paguen sin perder al cliente. Se conecta al SII.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* ---- landing ---- */
+  .hero { padding-block: var(--sp-xl) var(--sp-l); }
+  .hero h1 { margin-bottom: var(--sp-m); }
+  .hero .bajada { max-width: 46ch; margin-bottom: var(--sp-l); }
+  .hero__acciones { display: flex; flex-wrap: wrap; gap: var(--sp-xs); }
+  .hero__nota { margin-top: var(--sp-m); font-size: var(--step--1); color: var(--tinta-3); }
+  @media (min-width: 62em) {
+    .hero { padding-block: var(--sp-2xl) var(--sp-xl); }
+    .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-2xl); align-items: center; }
+  }
+
+  /* recorte de libro en el hero */
+  .recorte {
+    margin-top: var(--sp-xl);
+    border: 1px solid var(--tinta);
+    background: var(--papel);
+    box-shadow: 6px 6px 0 var(--papel-3);
+  }
+  @media (min-width: 62em) { .recorte { margin-top: 0; } }
+  .recorte__cab {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: var(--sp-s);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--tinta);
+    background: var(--papel-2);
+  }
+  .recorte__cab .etiqueta { font-size: 0.68rem; }
+  .recorte__fila {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--filete);
+    align-items: center;
+  }
+  .recorte__fila:last-child { border-bottom: 0; }
+  .recorte__nombre { font-size: 0.92rem; font-weight: 500; line-height: 1.25; }
+  .recorte__sub { grid-column: 1; font-size: 0.72rem; color: var(--tinta-3); font-family: var(--mono); }
+  .recorte__monto { grid-column: 2; grid-row: 1 / span 2; text-align: right; }
+  .recorte__monto .num { display: block; font-size: 0.95rem; font-weight: 500; }
+  .recorte__pie {
+    display: flex; justify-content: space-between; gap: var(--sp-s);
+    padding: 12px 14px; border-top: 1px solid var(--tinta); background: var(--papel-2);
+    font-family: var(--mono); font-size: 0.75rem;
+  }
+
+  /* cita del cliente */
+  .cita {
+    border-left: 3px solid var(--rojo);
+    padding-left: var(--sp-m);
+    font-family: var(--serif);
+    font-size: var(--step-2);
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .cita__firma {
+    display: block;
+    margin-top: var(--sp-s);
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 0.78rem;
+    color: var(--tinta-3);
+    letter-spacing: .03em;
+  }
+
+  /* pasos numerados */
+  .pasos { list-style: none; counter-reset: p; }
+  .pasos li {
+    counter-increment: p;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: var(--sp-s);
+    padding-block: var(--sp-m);
+    border-top: 1px solid var(--filete);
+  }
+  .pasos li::before {
+    content: counter(p, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--rojo);
+    padding-top: 3px;
+  }
+  .pasos h3 { margin-bottom: 4px; }
+  .pasos p { color: var(--tinta-2); font-size: var(--step--1); line-height: 1.6; }
+
+  /* --- widget de tono (en vivo) --- */
+  .tono { border: 1px solid var(--tinta); background: var(--papel); }
+  .tono__cab { padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--tinta); background: var(--papel-2); }
+  .tono__cab h3 { font-size: var(--step-0); font-family: var(--sans); font-weight: 600; }
+  .tono__cab p { font-size: 0.78rem; color: var(--tinta-2); font-family: var(--mono); margin-top: 2px; }
+  .tono__controles { padding: var(--sp-m); border-bottom: 1px solid var(--filete); display: grid; gap: var(--sp-m); }
+  @media (min-width: 40em) { .tono__controles { grid-template-columns: 1.4fr 1fr; } }
+
+  .segmentado { display: flex; border: 1px solid var(--filete-2); border-radius: var(--radio); overflow: hidden; }
+  .segmentado button {
+    flex: 1;
+    min-height: 46px;
+    padding: 8px 6px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--tinta-2);
+    background: var(--papel);
+    border-right: 1px solid var(--filete-2);
+    transition: background .12s ease, color .12s ease;
+  }
+  .segmentado button:last-child { border-right: 0; }
+  .segmentado button:hover { background: var(--papel-2); }
+  .segmentado button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+  .segmentado--rojo button[aria-pressed="true"] { background: var(--rojo); color: #fff; }
+
+  .tono__mensaje { padding: var(--sp-m); }
+  .burbuja {
+    border: 1px solid var(--filete-2);
+    border-radius: var(--radio);
+    background: var(--papel-2);
+    padding: var(--sp-s) var(--sp-m);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    min-height: 260px;
+  }
+  .burbuja__asunto {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--tinta);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--filete-2);
+    white-space: pre-wrap;
+  }
+  .tono__lectura {
+    margin-top: var(--sp-s);
+    display: flex; flex-wrap: wrap; gap: var(--sp-xs) var(--sp-m);
+    font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3);
+  }
+  .tono__lectura b { color: var(--tinta); font-weight: 500; }
+
+  /* precios */
+  .planes { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .planes { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+  .plan { border: 1px solid var(--filete-2); padding: var(--sp-m); background: var(--papel); display: flex; flex-direction: column; }
+  .plan--destacado { border: 1px solid var(--tinta); box-shadow: 5px 5px 0 var(--rojo-tenue); }
+  .plan__nombre { font-family: var(--serif); font-size: var(--step-1); margin-bottom: 2px; }
+  .plan__para { font-size: 0.78rem; color: var(--tinta-3); font-family: var(--mono); margin-bottom: var(--sp-s); }
+  .plan__precio { font-family: var(--mono); font-size: var(--step-2); font-weight: 500; letter-spacing: -.03em; }
+  .plan__precio span { font-size: 0.8rem; color: var(--tinta-3); letter-spacing: 0; }
+  .plan ul { list-style: none; margin: var(--sp-m) 0; display: grid; gap: 10px; font-size: 0.88rem; flex: 1; }
+  .plan ul li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; line-height: 1.45; }
+  .plan ul li .ico { color: var(--rojo); margin-top: 2px; }
+
+  /* faq */
+  .faq details {
+    border-bottom: 1px solid var(--filete);
+    padding-block: var(--sp-s);
+  }
+  .faq summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    align-items: center;
+    min-height: 44px;
+    font-weight: 500;
+    font-size: var(--step-0);
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: "+";
+    font-family: var(--mono);
+    color: var(--rojo);
+    font-size: 1.3rem;
+    flex: none;
+  }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details p { padding-top: var(--sp-s); color: var(--tinta-2); font-size: 0.95rem; line-height: 1.65; max-width: var(--measure); }
+
+  .cierre { text-align: center; padding-block: var(--sp-2xl); }
+  .cierre h2 { max-width: 20ch; margin-inline: auto; margin-bottom: var(--sp-m); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container">
+    <div class="barra__fila">
+      <a class="marca" href="index.html"><span class="marca__timbre" aria-hidden="true">T</span>Tinoria</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">
+        Menú
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__grid">
+        <div>
+          <p class="epigrafe epigrafe--rojo">Cuentas por cobrar · PYME · Chile</p>
+          <h1>La plata ya la ganaste.<br>Ahora hay que ir a buscarla.</h1>
+          <p class="bajada">
+            Tinoria es un agente de IA que persigue tus facturas vencidas por WhatsApp y correo —
+            con el tono exacto para que te paguen <em class="italica">sin</em> perder al cliente.
+            Se conecta a tu SII y empieza a trabajar el mismo día.
+          </p>
+          <div class="hero__acciones">
+            <a class="btn btn--primario" href="demo/index.html">
+              Ver el producto funcionando
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn" href="#tono">Escuchar el tono</a>
+          </div>
+          <p class="hero__nota">
+            Desde $49.000 + IVA al mes. Sin contrato anual. La primera cobranza sale hoy.
+          </p>
+        </div>
+
+        <!-- recorte del libro: producto real, no screenshot -->
+        <div class="recorte" role="img" aria-label="Extracto del tablero de Tinoria: cuatro deudores con montos, días de mora y la acción del agente.">
+          <div class="recorte__cab">
+            <span class="etiqueta">Cartera · Metalmecánica Vergara SpA</span>
+            <span class="etiqueta">12 jul</span>
+          </div>
+          <div class="recorte__fila">
+            <span class="recorte__nombre">Ingeniería Ruiz-Tagle y Cía Ltda</span>
+            <span class="recorte__sub">121 días · Providencia</span>
+            <span class="recorte__monto"><span class="num">$22.480.000</span><span class="timbre timbre--vencido">Vencido</span></span>
+          </div>
+          <div class="recorte__fila">
+            <span class="recorte__nombre">Servicios Austral SpA</span>
+            <span class="recorte__sub">96 días · Puerto Montt</span>
+            <span class="recorte__monto"><span class="num">$14.250.000</span><span class="timbre timbre--plan">Plan de pago</span></span>
+          </div>
+          <div class="recorte__fila">
+            <span class="recorte__nombre">Constructora Aguas Claras SpA</span>
+            <span class="recorte__sub">47 días · Maipú</span>
+            <span class="recorte__monto"><span class="num">$8.940.000</span><span class="timbre timbre--vencido">Vencido</span></span>
+          </div>
+          <div class="recorte__fila">
+            <span class="recorte__nombre">Distribuidora Los Almendros Ltda</span>
+            <span class="recorte__sub">vence en 3 días · La Florida</span>
+            <span class="recorte__monto"><span class="num">$1.290.000</span><span class="timbre timbre--porvencer">Por vencer</span></span>
+          </div>
+          <div class="recorte__pie">
+            <span>DSO <b>68 → 51 d</b></span>
+            <span style="color:var(--rojo)">9 acciones listas para hoy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ EL PROBLEMA ══════════ -->
+  <section class="seccion" id="problema">
+    <div class="container">
+      <p class="epigrafe">01 — El problema, en las palabras de quien lo tiene</p>
+      <div class="grid grid--2" style="gap: var(--sp-xl); align-items: start;">
+        <div class="apilado-l">
+          <blockquote class="cita">
+            “Todos los viernes en la tarde me siento a mandar los correos de cobranza. Los odio.
+            Le tengo que escribir a don Rodrigo, que es amigo de mi papá y nos compra hace cuatro años,
+            para decirle que nos debe ocho millones. Escribo, borro, escribo, borro. Al final mando algo tibio
+            que él ignora, y el viernes siguiente estoy de nuevo aquí.”
+            <span class="cita__firma">— Paulina V., administración, metalmecánica, 34 trabajadores, Quilicura</span>
+          </blockquote>
+
+          <p style="color: var(--tinta-2); line-height:1.7;">
+            La factura no está incobrable. El cliente <em class="italica">va</em> a pagar.
+            Lo que se pierde en el intertanto es lo caro: el capital de trabajo que ya no tienes,
+            el crédito que pides para tapar el hoyo, y las seis horas semanales de la única
+            persona que sabe cómo funciona tu empresa.
+          </p>
+
+          <p class="destacado">
+            El costo real de la cobranza no es la factura que nunca te pagan.
+            Es la que te pagan <em class="italica">45 días tarde</em>, todos los meses, para siempre.
+          </p>
+        </div>
+
+        <div class="ficha ficha--marcada">
+          <p class="epigrafe">La aritmética de una PYME cualquiera</p>
+          <div class="calculo" style="border-left:0; padding-left:0; background:transparent;">
+Facturación anual         <b>$480.000.000</b>
+Plazo pactado                    30 días
+DSO real (lo que demora)         <b>68 días</b>
+────────────────────────────────────────
+Capital atrapado por día:
+  $480.000.000 / 365     =     $1.315.068
+
+38 días de exceso sobre lo pactado:
+  38 × $1.315.068        =   <b>$49.972.584</b>
+  ↑ tu plata, trabajando gratis
+    para el balance de otro.
+
+Si eso se financia con factoring
+al 1,9% mensual:
+  $49.972.584 × 1,9% × 12 = <b>$11.393.749/año</b>
+  en puro costo financiero.
+
+Más 6 h/semana de administración:
+  6 × 52 × $6.200/h      =    <b>$1.934.400</b>
+────────────────────────────────────────
+Costo anual de cobrar mal ≈ <b>$13,3 MM</b>
+Tinoria (plan Cartera)    =  $1.188.000
+          </div>
+          <p class="fuente" style="margin-top: var(--sp-s);">
+            Estimación, no dato. Supuestos declarados arriba: facturación de una PYME pequeña del tramo
+            2.400–25.000 UF (SII); DSO de 68 días es nuestro supuesto de trabajo, a validar con los design
+            partners — es la primera métrica que Tinoria mide. Tasa de factoring PYME 1,7–2,4% mensual
+            (rango de mercado observado en Tanner / Factotal, 2025). Costo hora administrativo derivado de
+            un sueldo bruto de $1.100.000.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ CÓMO FUNCIONA ══════════ -->
+  <section class="seccion" id="como">
+    <div class="container">
+      <p class="epigrafe">02 — Cómo funciona</p>
+      <h2 style="margin-bottom: var(--sp-l); max-width: 24ch;">Cuatro pasos. El primero toma once minutos.</h2>
+
+      <div class="grid grid--2" style="gap: var(--sp-xl); align-items:start;">
+        <ol class="pasos">
+          <li>
+            <div>
+              <h3>Se conecta a tu SII</h3>
+              <p>
+                La factura electrónica es obligatoria en Chile, así que tus cuentas por cobrar ya son datos
+                estructurados: folio, RUT, monto, fecha de emisión, acuse de recibo. Tinoria lee tu Registro
+                de Compras y Ventas y arma la cartera sola. No transcribes nada.
+              </p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Define la cadencia</h3>
+              <p>
+                Cuándo hablar y por dónde. Tres días antes del vencimiento un recordatorio amable;
+                al día 1, 7, 15 la insistencia; al 30 una propuesta de plan de pago; al 45, escalamiento.
+                Cada cliente puede tener la suya — a los grandes se les habla distinto.
+              </p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>El agente escribe y conversa</h3>
+              <p>
+                Redacta el mensaje con el contexto completo: cuánto debe, desde cuándo, qué te respondió
+                la última vez, cuánto vale ese cliente para ti. Manda por WhatsApp o correo, lee la respuesta,
+                la entiende y sigue. Si el deudor dice “el jueves te pago”, agenda el jueves y verifica.
+              </p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Tú apruebas lo que importa</h3>
+              <p>
+                Los recordatorios salen solos. La insistencia dura, el plan de pago y el escalamiento pasan
+                por ti, con un botón. Nunca vas a descubrir un lunes que un robot le escribió una tontera a
+                tu mejor cliente.
+              </p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="ficha" style="background: var(--papel-2);">
+          <p class="epigrafe">Lo que Tinoria <em class="italica">no</em> es</p>
+          <ul class="lista-marcada" style="font-size:0.95rem;">
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <span><b>No es factoring.</b> No te compramos la factura ni te cobramos un 2% mensual.
+              Hacemos que te paguen a ti, directo, y no tengas que ir al factoring.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <span><b>No es un estudio de cobranza.</b> Ésos cobran entre 8% y 15% de lo recuperado y
+              queman la relación en la primera carta. Ese es el último recurso, no el primero.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <span><b>No es un recordatorio automático.</b> Tu ERP ya manda uno y ya sabes que nadie
+              lo abre. Un correo que dice “estimado cliente, su documento se encuentra impago” es ruido.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <span><b>No es un bot que finge ser tú a escondidas.</b> El deudor sabe que le está
+              escribiendo la administración de tu empresa, con la firma de una persona real. La IA redacta;
+              la empresa habla.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ EL TONO (widget en vivo) ══════════ -->
+  <section class="seccion" id="tono">
+    <div class="container">
+      <p class="epigrafe">03 — El tono es el producto</p>
+      <h2 style="margin-bottom: var(--sp-s); max-width: 26ch;">Mismo deudor, mismo día, tres maneras de decirlo.</h2>
+      <p class="bajada" style="max-width: 58ch; margin-bottom: var(--sp-l);">
+        Esto no es una captura de pantalla. Es el redactor de Tinoria: mueve los controles y lee lo que
+        le llegaría a Rodrigo Aguayo esta tarde. Elegir mal el tono cuesta un cliente; elegirlo bien
+        cobra una factura.
+      </p>
+
+      <div class="tono">
+        <div class="tono__cab">
+          <h3>Constructora Aguas Claras SpA &nbsp;·&nbsp; RUT 76.412.883-9</h3>
+          <p>Factura 1042 · $5.480.000 · venció el 26-05-2026 · <b style="color:var(--rojo)">47 días de mora</b> · cliente desde 2022</p>
+        </div>
+
+        <div class="tono__controles">
+          <div>
+            <p class="etiqueta" style="margin-bottom:8px;">Tono</p>
+            <div class="segmentado segmentado--rojo" role="group" aria-label="Tono del mensaje">
+              <button type="button" data-tono="cordial" aria-pressed="true">Cordial</button>
+              <button type="button" data-tono="firme" aria-pressed="false">Firme</button>
+              <button type="button" data-tono="formal" aria-pressed="false">Formal</button>
+            </div>
+          </div>
+          <div>
+            <p class="etiqueta" style="margin-bottom:8px;">Canal</p>
+            <div class="segmentado" role="group" aria-label="Canal de envío">
+              <button type="button" data-canal="whatsapp" aria-pressed="true">WhatsApp</button>
+              <button type="button" data-canal="email" aria-pressed="false">Correo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tono__mensaje">
+          <div class="burbuja" id="burbuja" aria-live="polite"></div>
+          <div class="tono__lectura">
+            <span>Riesgo relación: <b id="lecRiesgo">bajo</b></span>
+            <span>Prob. de pago en 7 días: <b id="lecProb">41%</b></span>
+            <span>Usado en cartera: <b id="lecUso">día 1 a 14 de mora</b></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="fuente" style="margin-top: var(--sp-s); max-width: var(--measure);">
+        Las probabilidades de pago que ves aquí son ilustrativas: el modelo real se entrena con el histórico
+        de tu propia cartera y no existe hasta que tengas ~200 interacciones. Antes de eso, Tinoria usa una
+        heurística conservadora y te lo dice.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ EL PRODUCTO ══════════ -->
+  <section class="seccion" id="producto">
+    <div class="container">
+      <p class="epigrafe">04 — El producto</p>
+      <div class="grid grid--2" style="gap: var(--sp-xl); align-items:center;">
+        <div class="apilado">
+          <h2>Un libro de cuentas que además habla.</h2>
+          <p style="color:var(--tinta-2); line-height:1.7;">
+            El tablero de cuentas por cobrar que tu ERP nunca te dio: envejecimiento real, quién debe qué
+            desde cuándo, y —la parte que no existe en ninguna otra parte— el <b>hilo completo de
+            conversación con cada deudor</b>. Todo lo que se le dijo, cuándo, por qué canal, qué contestó,
+            qué prometió y si cumplió.
+          </p>
+          <ul class="lista-marcada">
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>Envejecimiento de cartera por tramos, en vivo.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>Timeline de conversación por deudor: WhatsApp, correo y llamadas registradas.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>Planes de pago en cuotas, propuestos, aceptados y vigilados por el agente.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>Escalamiento con carta formal e interés corriente calculado según la Ley 21.131.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>Una sola métrica que le importa al dueño: tu DSO, y si está bajando.</span>
+            </li>
+          </ul>
+          <div style="padding-top: var(--sp-s);">
+            <a class="btn btn--primario" href="demo/index.html">
+              Recorrer el demo completo
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="ficha" style="padding:0; overflow:hidden; border-color: var(--tinta);">
+          <div class="recorte__cab" style="border-bottom:1px solid var(--tinta)">
+            <span class="etiqueta">Envejecimiento de cartera</span>
+            <span class="etiqueta">$100,2 MM</span>
+          </div>
+          <div style="padding: var(--sp-m);">
+            <!-- Envejecimiento: escala ORDINAL (bandas de mora), una sola tinta,
+                 de claro a oscuro = de sano a grave. Rampa validada. -->
+            <svg viewBox="0 0 320 150" width="100%" height="auto" role="img" aria-label="Envejecimiento de cartera en millones de pesos: al día 35,0; 1 a 30 días de mora 15,7; 31 a 60 días 8,9; 61 a 90 días 9,0; más de 90 días 31,6.">
+              <g font-family="IBM Plex Mono, monospace" font-size="8" fill="#857E6E">
+                <path d="M6 112 V34 Q6 30 10 30 H54 Q58 30 58 34 V112 Z"       fill="#D89E86"/>
+                <path d="M70 112 V79.2 Q70 75.2 74 75.2 H118 Q122 75.2 122 79.2 V112 Z"  fill="#C77A5D"/>
+                <path d="M134 112 V95.1 Q134 91.1 138 91.1 H182 Q186 91.1 186 95.1 V112 Z" fill="#B55334"/>
+                <path d="M198 112 V94.9 Q198 90.9 202 90.9 H246 Q250 90.9 250 94.9 V112 Z" fill="#9E3119"/>
+                <path d="M262 112 V42 Q262 38 266 38 H310 Q314 38 314 42 V112 Z"  fill="#6B2312"/>
+
+                <line x1="0" y1="112" x2="320" y2="112" stroke="#16150F" stroke-width="1"/>
+
+                <text x="32"  y="24"   text-anchor="middle" fill="#16150F" font-size="9">35,0</text>
+                <text x="96"  y="69.2" text-anchor="middle" fill="#16150F" font-size="9">15,7</text>
+                <text x="160" y="85.1" text-anchor="middle" fill="#16150F" font-size="9">8,9</text>
+                <text x="224" y="84.9" text-anchor="middle" fill="#16150F" font-size="9">9,0</text>
+                <text x="288" y="32"   text-anchor="middle" fill="#16150F" font-size="9">31,6</text>
+
+                <text x="32"  y="126" text-anchor="middle">al día</text>
+                <text x="96"  y="126" text-anchor="middle">1–30</text>
+                <text x="160" y="126" text-anchor="middle">31–60</text>
+                <text x="224" y="126" text-anchor="middle">61–90</text>
+                <text x="288" y="126" text-anchor="middle">90+</text>
+                <text x="160" y="143" text-anchor="middle" font-size="7.5">días de mora · millones de pesos</text>
+              </g>
+            </svg>
+          </div>
+          <div class="recorte__pie">
+            <span>Vencido: <b style="color:var(--rojo)">$65,2 MM</b> · 65%</span>
+            <span>18 facturas abiertas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PRECIOS ══════════ -->
+  <section class="seccion" id="precios">
+    <div class="container">
+      <p class="epigrafe">05 — Precio</p>
+      <h2 style="margin-bottom: var(--sp-s);">Valores en pesos, mensuales, más IVA.</h2>
+      <p class="bajada" style="margin-bottom: var(--sp-l); max-width:54ch;">
+        Sin contrato anual y sin comisión sobre lo recuperado — salvo que tú prefieras eso, y entonces
+        te lo damos abajo.
+      </p>
+
+      <div class="planes">
+        <div class="plan">
+          <p class="plan__nombre">Libro</p>
+          <p class="plan__para">La dueña que cobra sola</p>
+          <p class="plan__precio">$49.000<span> /mes</span></p>
+          <ul>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>1 empresa, hasta 60 facturas abiertas</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Importación desde el SII</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Agente redactor + cobranza por correo</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Tablero, envejecimiento y DSO</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>1 usuario</span></li>
+          </ul>
+          <a class="btn" href="demo/index.html">Probar</a>
+        </div>
+
+        <div class="plan plan--destacado">
+          <p class="plan__nombre">Cartera <span class="timbre timbre--vencido" style="vertical-align:middle; margin-left:6px;">El que se lleva</span></p>
+          <p class="plan__para">PYME de 10 a 60 personas</p>
+          <p class="plan__precio">$99.000<span> /mes</span></p>
+          <ul>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Hasta 250 facturas abiertas</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>WhatsApp Business con tu número</b> — 300 mensajes incluidos, luego $45 c/u</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Planes de pago en cuotas</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Cadencias distintas por segmento de cliente</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>3 usuarios</span></li>
+          </ul>
+          <a class="btn btn--primario" href="demo/index.html">Probar</a>
+        </div>
+
+        <div class="plan">
+          <p class="plan__nombre">Cobranza</p>
+          <p class="plan__para">Empresa mediana o holding</p>
+          <p class="plan__precio">$229.000<span> /mes</span></p>
+          <ul>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Hasta 800 facturas abiertas, varios RUT</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Escalamiento: carta formal, interés corriente, derivación a estudio</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>API y webhooks hacia tu ERP</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Revisión mensual de cartera con nuestro equipo</span></li>
+            <li><svg class="ico ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>Usuarios ilimitados</span></li>
+          </ul>
+          <a class="btn" href="demo/index.html">Probar</a>
+        </div>
+      </div>
+
+      <div class="ficha ficha--marcada" style="margin-top: var(--sp-m); background: var(--papel-2);">
+        <div class="grid grid--2" style="gap: var(--sp-m); align-items:center;">
+          <div>
+            <p class="plan__nombre" style="margin-bottom:4px;">Plan Resultado</p>
+            <p style="color:var(--tinta-2); font-size:0.95rem; line-height:1.6;">
+              Para el que no nos cree. <b>$29.000/mes + 1,2% de lo que efectivamente se recupere</b> sobre
+              facturas con más de 45 días de mora. Si no cobramos nada, pagas $29.000. Un estudio de cobranza
+              te cobra entre 8% y 15% por lo mismo, y con menos delicadeza.
+            </p>
+          </div>
+          <div>
+            <div class="calculo">
+Cartera vencida +45d:      <b>$36.000.000</b>
+Recuperado en el mes:      <b>$12.400.000</b>
+────────────────────────────────────
+Tinoria: $29.000 + 1,2%  =    <b>$177.800</b>
+Estudio de cobranza (10%) = <b>$1.240.000</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="fuente" style="margin-top: var(--sp-m);">
+        El costo de WhatsApp es el único variable y lo pasamos a costo: Meta cobra por conversación de
+        servicio (~US$0,04 en Chile) y nosotros lo facturamos a $45 el mensaje. La aritmética completa del
+        costo —incluida la inferencia de IA— está en <a href="stack.html">Arquitectura</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ FAQ ══════════ -->
+  <section class="seccion" id="faq">
+    <div class="container">
+      <p class="epigrafe">06 — Lo que siempre nos preguntan</p>
+      <h2 style="margin-bottom: var(--sp-l);">Preguntas incómodas primero.</h2>
+
+      <div class="faq" style="max-width: 76ch;">
+        <details open>
+          <summary>¿Le va a escribir cualquier cosa a mi mejor cliente?</summary>
+          <p>
+            No, porque tú tienes el botón. Los recordatorios previos al vencimiento y el primer aviso de mora
+            salen automáticos (es la parte que ni tú revisarías). Todo lo que sube de temperatura —la
+            insistencia firme, la propuesta de plan de pago, la carta formal— se te muestra redactada y espera
+            tu visto bueno. Además puedes marcar clientes como “sensibles”: a ésos Tinoria nunca les escribe
+            sin que tú apruebes, ni siquiera el recordatorio.
+          </p>
+        </details>
+        <details>
+          <summary>¿De dónde saca mis facturas? ¿Le tengo que dar mi clave del SII?</summary>
+          <p>
+            Hay dos caminos. El fácil: subes el Registro de Ventas que el SII te entrega en CSV, o conectas tu
+            ERP (Nubox, Bsale, Defontana, Softland, Chipax). El automático: le das acceso vía certificado
+            digital para que Tinoria consulte tu Registro de Compras y Ventas por sí sola. Nunca pedimos tu
+            clave tributaria en un formulario nuestro — si algún software te la pide, desconfía.
+          </p>
+        </details>
+        <details>
+          <summary>El cliente me responde por WhatsApp. ¿El agente entiende?</summary>
+          <p>
+            Sí, y esa es la mitad del producto. Clasifica la respuesta en: promesa de pago con fecha, disputa
+            (“esa factura tiene un error”), falta de documento (“me falta la orden de compra”), problema de
+            caja, o silencio. Cada una gatilla algo distinto: la promesa se agenda y se verifica el día
+            prometido; la disputa te la escala a ti de inmediato, porque eso no lo arregla una IA.
+          </p>
+        </details>
+        <details>
+          <summary>¿Esto no me va a hacer perder al cliente?</summary>
+          <p>
+            El riesgo existe y por eso el tono es el producto y no un detalle. Pero considera el
+            contrafactual: hoy no le cobras, o le cobras tarde, mal y con rabia acumulada de tres meses.
+            La cobranza que rompe relaciones es la esporádica y emocional, no la sistemática y respetuosa.
+            Un cliente que recibe un recordatorio cordial el día 3 no se ofende; uno que recibe una carta de
+            abogado el día 90 sin aviso previo, sí.
+          </p>
+        </details>
+        <details>
+          <summary>¿Qué es la Ley 21.131 y en qué me afecta?</summary>
+          <p>
+            Es la ley chilena de pago a 30 días: tu cliente tiene 30 días desde la recepción conforme del DTE
+            para pagarte, y pasado ese plazo la deuda devenga interés corriente y tienes derecho a una
+            comisión fija por recuperación. Casi ninguna PYME la usa, porque no sabe calcular el interés ni
+            se atreve a cobrarlo. Tinoria calcula el interés devengado factura por factura y te lo pone en la
+            carta formal cuando corresponde — y te avisa cuándo <em class="italica">no</em> conviene usarlo.
+          </p>
+        </details>
+        <details>
+          <summary>¿Y si igual no me pagan?</summary>
+          <p>
+            Entonces no era un problema de cobranza, era un problema de crédito: le vendiste a alguien que no
+            podía pagarte. Tinoria no te presta plata ni te compra la factura, y no te va a mentir sobre eso.
+            Lo que sí hace es detectarlo antes: cuando un deudor rompe dos promesas de pago seguidas, cambia
+            su clasificación y te sugiere cortarle el crédito antes de la próxima venta. La cobranza más
+            barata es la que no tuviste que hacer.
+          </p>
+        </details>
+        <details>
+          <summary>¿Dónde quedan mis datos?</summary>
+          <p>
+            En servidores en Chile (AWS región Santiago). Tus facturas y conversaciones no se usan para
+            entrenar modelos de terceros: los proveedores de IA que usamos operan bajo acuerdos de no
+            entrenamiento con datos de clientes. El detalle técnico está en <a href="stack.html">Arquitectura</a>.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ CIERRE ══════════ -->
+  <section class="cierre" style="border-top:1px solid var(--tinta); background: var(--papel-2);">
+    <div class="container">
+      <p class="epigrafe epigrafe--rojo" style="text-align:center;">Tinoria</p>
+      <h2>El viernes en la tarde deberías estar en otra cosa.</h2>
+      <p class="bajada" style="max-width: 44ch; margin-inline:auto; margin-bottom: var(--sp-l);">
+        Sube tu Registro de Ventas y en once minutos vas a saber exactamente cuánta plata tuya está en
+        el bolsillo de otro, y qué se va a hacer al respecto.
+      </p>
+      <a class="btn btn--primario" href="demo/index.html">
+        Entrar al demo
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <div style="display:flex; flex-wrap:wrap; gap: var(--sp-s) var(--sp-l); justify-content:space-between;">
+      <p><b>Tinoria</b> — cobrar con tino. Prototipo, julio 2026. Santiago de Chile.</p>
+      <p class="mono" style="font-size:0.78rem;">tinoria.com · verificado libre (RDAP → HTTP 404)</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── menú móvil ─────────────────────────────────────────── */
+(function () {
+  var btn = document.getElementById('menuBtn');
+  var nav = document.getElementById('nav');
+  btn.addEventListener('click', function () {
+    var abierto = nav.classList.toggle('abierta');
+    btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  });
+})();
+
+/* ── redactor en vivo: mismo deudor, tres tonos, dos canales ── */
+(function () {
+  var MENSAJES = {
+    cordial: {
+      riesgo: 'bajo',
+      prob: '41%',
+      uso: 'día 1 a 14 de mora',
+      whatsapp:
+"Hola Rodrigo, ¿cómo estás?\n\n" +
+"Te escribo de Metalmecánica Vergara. Tenemos pendiente la factura 1042 por $5.480.000, que venció el 26 de mayo.\n\n" +
+"Sé que andan a mil con la obra de Buin, así que lo más probable es que se haya traspapelado entre tanta cosa. ¿La alcanzas a dejar en la nómina de pago del viernes?\n\n" +
+"Si te falta el XML o algún respaldo para aprobarla, me dices y te lo mando al tiro.\n\n" +
+"Saludos,\nPaulina",
+      asunto: "Factura 1042 — $5.480.000 (venció el 26 de mayo)",
+      email:
+"Estimado Rodrigo:\n\n" +
+"Espero que estés bien. Te escribo para recordarte la factura N° 1042, por $5.480.000, emitida el 26 de abril y vencida el 26 de mayo.\n\n" +
+"Entiendo que estos meses han sido intensos con la obra de Buin y que estas cosas a veces se traspapelan. ¿Alcanzas a dejarla en la nómina de pago de este viernes 17?\n\n" +
+"Te adjunto de nuevo el DTE y el detalle. Si falta la orden de compra o algún respaldo para que la aprueben internamente, dime y te lo hago llegar hoy mismo.\n\n" +
+"Quedo atenta a tus comentarios.\n\n" +
+"Paulina Vergara\nAdministración — Metalmecánica Vergara SpA\n+56 9 6142 8830"
+    },
+    firme: {
+      riesgo: 'medio',
+      prob: '58%',
+      uso: 'día 15 a 45 de mora',
+      whatsapp:
+"Rodrigo, buenos días.\n\n" +
+"La factura 1042, por $5.480.000, venció el 26 de mayo: llevamos 47 días. Es el tercer mes seguido que nos pasa lo mismo y esta vez nos está complicando la caja de verdad.\n\n" +
+"Necesito una fecha concreta, no un “la estamos viendo”. ¿Queda en la nómina del viernes 17?\n\n" +
+"Si hay algo trabando la aprobación por dentro, dímelo ahora y lo resolvemos hoy mismo. Pero necesito la fecha.\n\n" +
+"Paulina",
+      asunto: "Factura 1042 — 47 días vencida. Necesito una fecha de pago.",
+      email:
+"Rodrigo:\n\n" +
+"La factura N° 1042, por $5.480.000, venció el 26 de mayo. Hoy llevamos 47 días de atraso, y es el tercer mes consecutivo que ocurre.\n\n" +
+"Somos proveedores de ustedes hace cuatro años. Nunca les hemos fallado con una entrega, e incluso hemos adelantado material cuando la obra lo necesitó. Te pido que esa consideración sea recíproca.\n\n" +
+"Concretamente, necesito hoy una de estas dos cosas:\n\n" +
+"1. La confirmación de que la factura entra en la nómina de pago del viernes 17 de julio.\n" +
+"2. El nombre de quien está trabando la aprobación, para hablar directamente con esa persona.\n\n" +
+"No quiero llegar a instancias formales con un cliente como ustedes. Tampoco puedo seguir financiando la obra con el capital de trabajo de mi empresa.\n\n" +
+"Quedo esperando tu respuesta hoy.\n\n" +
+"Paulina Vergara\nAdministración — Metalmecánica Vergara SpA"
+    },
+    formal: {
+      riesgo: 'alto',
+      prob: '71%',
+      uso: 'día 45 en adelante · requiere tu aprobación',
+      whatsapp:
+"Sr. Aguayo:\n\n" +
+"Le informamos que la factura electrónica N° 1042, por $5.480.000, se encuentra vencida desde el 26 de mayo de 2026 (47 días).\n\n" +
+"Conforme a la Ley N° 21.131, transcurridos 30 días desde la recepción conforme del DTE la obligación devenga interés corriente. A la fecha ese interés asciende a $32.600.\n\n" +
+"Le enviamos también por correo la carta de cobro formal. Si el pago no se regulariza al 24 de julio, el documento será derivado a cobranza externa.\n\n" +
+"Quedamos a la espera.\n\n" +
+"Metalmecánica Vergara SpA",
+      asunto: "Cobro formal — Factura electrónica N° 1042 — Metalmecánica Vergara SpA",
+      email:
+"Señor\nRodrigo Aguayo\nConstructora Aguas Claras SpA\nRUT 76.412.883-9\nPresente\n\n" +
+"De nuestra consideración:\n\n" +
+"Por medio de la presente venimos en comunicar que la factura electrónica N° 1042, emitida con fecha 26 de abril de 2026 por un monto de $5.480.000, recepcionada conforme y sin reclamo dentro del plazo legal, se encuentra impaga a esta fecha, registrando 47 días de mora.\n\n" +
+"De acuerdo a lo dispuesto en la Ley N° 21.131, sobre pago a treinta días, vencido dicho plazo la obligación devenga de pleno derecho el interés corriente para operaciones no reajustables. A la fecha dicho interés asciende a $32.600, sin perjuicio de lo que se continúe devengando.\n\n" +
+"Solicitamos regularizar el pago a más tardar el día 24 de julio de 2026. Transcurrido dicho plazo sin respuesta, nos veremos en la necesidad de derivar la cobranza a un tercero, con los costos y las consecuencias que ello implica para una relación comercial que hemos sostenido durante cuatro años.\n\n" +
+"Manifestamos, en todo caso, nuestra mejor disposición a acordar un calendario de pago en cuotas si existiera una dificultad transitoria de liquidez.\n\n" +
+"Le saluda atentamente,\n\n" +
+"Paulina Vergara\nAdministración\nMetalmecánica Vergara SpA — RUT 76.129.884-5"
+    }
+  };
+
+  var estado = { tono: 'cordial', canal: 'whatsapp' };
+  var burbuja = document.getElementById('burbuja');
+  var lecRiesgo = document.getElementById('lecRiesgo');
+  var lecProb = document.getElementById('lecProb');
+  var lecUso = document.getElementById('lecUso');
+
+  function pintar() {
+    var m = MENSAJES[estado.tono];
+    var html = '';
+    if (estado.canal === 'email') {
+      html += '<span class="burbuja__asunto">Para: raguayo@aguasclaras.cl\nAsunto: ' + m.asunto + '</span>';
+      html += escapar(m.email);
+    } else {
+      html += '<span class="burbuja__asunto">WhatsApp · +56 9 8871 4402 · Rodrigo Aguayo</span>';
+      html += escapar(m.whatsapp);
+    }
+    burbuja.innerHTML = html;
+    lecRiesgo.textContent = m.riesgo;
+    lecProb.textContent = m.prob;
+    lecUso.textContent = m.uso;
+  }
+
+  function escapar(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  document.querySelectorAll('[data-tono]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      estado.tono = b.dataset.tono;
+      document.querySelectorAll('[data-tono]').forEach(function (o) {
+        o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+      });
+      pintar();
+    });
+  });
+  document.querySelectorAll('[data-canal]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      estado.canal = b.dataset.canal;
+      document.querySelectorAll('[data-canal]').forEach(function (o) {
+        o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+      });
+      pintar();
+    });
+  });
+
+  pintar();
+})();
+</script>
+</body>
+</html>

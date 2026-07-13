@@ -1,0 +1,357 @@
+/* ============================================================================
+   ZURCIA — Dirección de arte: "LIBRO DE CITAS"
+   ----------------------------------------------------------------------------
+   El objeto que este producto reemplaza es un cuaderno de recepción: papel
+   crema con pauta, horas escritas a mano, tachones, un sello de goma cuando la
+   clienta confirmó. Toda la identidad sale de ahí y de ningún dashboard.
+
+   - Superficie: papel crema (#F5F0E6) con pauta horizontal tenue. Nunca blanco
+     puro, nunca modo oscuro, nunca degradados.
+   - Tinta: negro cálido (#1C1A15). Los datos duros (horas, CLP, RUT) van en
+     mono, como una libreta de registro.
+   - Un solo acento: verde botella de sello de goma (#14624A). Rojo ladrillo
+     (#A83A22) queda RESERVADO para el estado que nos da de comer: el no-show.
+     Ámbar (#8A6412) para el riesgo.
+   - Tipografía deliberada: Petrona (serif variable, latinoamericana, cálida)
+     para titulares — no es una grotesca de SaaS. IBM Plex Sans para la interfaz
+     e IBM Plex Mono para todo lo que es un dato de agenda.
+   - Bordes rectos o de 2px. Sombras: ninguna, salvo el "levante" de papel de
+     una hoja sobre otra. Cero glassmorphism, cero iconos-emoji.
+   - Mobile-first: 390px es el layout base. Este producto vive en un teléfono.
+   ============================================================================ */
+
+:root {
+  --papel:      #F5F0E6;
+  --papel-alto: #FCFAF4;
+  --papel-hondo:#EBE4D4;
+  --pauta:      #DCD3BE;
+  --pauta-duro: #C6B99B;
+
+  --tinta:      #1C1A15;
+  --tinta-med:  #4E4838;
+  --tinta-suave:#6E6650;
+
+  --sello:      #14624A;
+  --sello-alto: #1E8462;
+  --sello-tenue:#DFEBE4;
+
+  --ladrillo:   #A83A22;
+  --ladrillo-tenue: #F5E2DC;
+  --ambar:      #8A6412;
+  --ambar-tenue:#F5EAD1;
+
+  --serif: "Petrona", Georgia, "Times New Roman", serif;
+  --sans:  "IBM Plex Sans", system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* ---------- base ---------- */
+
+body {
+  background-color: var(--papel);
+  /* la pauta del cuaderno */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    var(--pauta) 31px,
+    var(--pauta) 32px
+  );
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  font-feature-settings: "tnum" 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); line-height: 1.05; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); line-height: 1.2; }
+
+p { text-wrap: pretty; }
+
+a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--sello); }
+
+strong { font-weight: 600; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.clp  { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+:focus-visible { outline: 2px solid var(--sello); outline-offset: 2px; border-radius: 1px; }
+
+/* ---------- barra superior / navegación ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--papel-alto);
+  border-bottom: 2px solid var(--tinta);
+}
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-s);
+  min-height: 56px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--tinta);
+  padding-block: 6px;
+}
+.brand svg { flex: none; }
+.brand:hover { color: var(--tinta); }
+
+.nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1.5px solid var(--tinta);
+  padding-inline: 10px;
+  background: var(--papel);
+}
+.nav-toggle:hover { background: var(--sello-tenue); }
+
+.nav {
+  display: none;
+  border-top: 1px solid var(--pauta-duro);
+  padding-block: var(--sp-2xs) var(--sp-s);
+}
+.nav[data-open="true"] { display: block; }
+.nav ul { list-style: none; display: flex; flex-direction: column; }
+.nav a {
+  display: block;
+  padding: 12px 0;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  text-decoration: none;
+  color: var(--tinta-med);
+  border-bottom: 1px solid var(--pauta);
+}
+.nav a:hover, .nav a[aria-current="page"] { color: var(--sello); }
+.nav a[aria-current="page"] { font-weight: 600; }
+
+@media (min-width: 56em) {
+  .nav-toggle { display: none; }
+  .nav {
+    display: block;
+    border: 0;
+    padding: 0;
+  }
+  .nav ul { flex-direction: row; gap: var(--sp-m); align-items: center; }
+  .nav a { border: 0; padding: 6px 0; min-height: 0; }
+  .nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--sello); }
+}
+
+/* ---------- estructura de página ---------- */
+
+main { padding-block: var(--sp-l) var(--sp-2xl); }
+
+section { margin-block-end: var(--sp-2xl); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--sello);
+  margin-block-end: var(--sp-2xs);
+}
+.eyebrow--tinta { color: var(--tinta-suave); }
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--tinta-med);
+  max-width: 40ch;
+}
+
+.rule {
+  border: 0;
+  border-top: 2px solid var(--tinta);
+  margin-block: var(--sp-l);
+}
+.rule--fino { border-top: 1px solid var(--pauta-duro); }
+
+/* ---------- ficha (la unidad de papel) ---------- */
+
+.ficha {
+  background: var(--papel-alto);
+  border: 1.5px solid var(--pauta-duro);
+  padding: var(--sp-m);
+}
+.ficha--marcada { border-color: var(--tinta); border-width: 2px; }
+.ficha--sello   { border-left: 5px solid var(--sello); }
+.ficha--alerta  { border-left: 5px solid var(--ladrillo); }
+
+.grid { display: grid; gap: var(--sp-m); }
+@media (min-width: 48em) {
+  .grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 62em) {
+  .grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .grid--sidebar { grid-template-columns: 1.35fr 1fr; align-items: start; }
+}
+
+/* ---------- botones ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid var(--tinta);
+  background: var(--sello);
+  color: #FCFAF4;
+  transition: transform .12s ease, background .12s ease;
+}
+.btn:hover { background: var(--sello-alto); color: #FCFAF4; transform: translate(-1px, -1px); }
+.btn:active { transform: none; }
+.btn--fantasma { background: transparent; color: var(--tinta); }
+.btn--fantasma:hover { background: var(--papel-hondo); color: var(--tinta); }
+
+/* ---------- etiquetas de estado ---------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.tag--sello    { color: var(--sello);    background: var(--sello-tenue); }
+.tag--ladrillo { color: var(--ladrillo); background: var(--ladrillo-tenue); }
+.tag--ambar    { color: var(--ambar);    background: var(--ambar-tenue); }
+.tag--tinta    { color: var(--tinta-med);background: var(--papel-hondo); }
+
+/* ---------- números grandes ---------- */
+
+.cifra {
+  font-family: var(--mono);
+  font-size: var(--step-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  display: block;
+}
+.cifra--ladrillo { color: var(--ladrillo); }
+.cifra--sello    { color: var(--sello); }
+.cifra__pie {
+  display: block;
+  margin-block-start: var(--sp-2xs);
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+  line-height: 1.35;
+}
+
+/* ---------- tablas ---------- */
+
+.tabla { width: 100%; font-size: 0.9rem; }
+.tabla th, .tabla td {
+  text-align: left;
+  padding: 10px 14px 10px 0;
+  border-bottom: 1px solid var(--pauta);
+  vertical-align: top;
+}
+.tabla th {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tinta-suave);
+  border-bottom: 1.5px solid var(--tinta);
+  white-space: nowrap;
+}
+.tabla td.num, .tabla th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; padding-right: 0; }
+.scroll-x { border-bottom: 1px solid var(--pauta-duro); }
+.scroll-x table { min-width: 34rem; }
+
+/* ---------- listas ---------- */
+
+.lista { list-style: none; }
+.lista li {
+  position: relative;
+  padding-left: 22px;
+  margin-block-end: var(--sp-2xs);
+  line-height: 1.5;
+}
+.lista li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.62em;
+  width: 9px; height: 2px;
+  background: var(--sello);
+}
+.lista--alerta li::before { background: var(--ladrillo); }
+
+/* ---------- nota al pie / fuente ---------- */
+
+.fuente {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--tinta-suave);
+  font-family: var(--sans);
+  border-left: 2px solid var(--pauta-duro);
+  padding-left: 10px;
+}
+.fuente code { font-family: var(--mono); font-size: 0.95em; }
+
+/* ---------- cálculo a la vista ---------- */
+
+.calculo {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  background: var(--papel-hondo);
+  border: 1px dashed var(--pauta-duro);
+  padding: var(--sp-s);
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--tinta-med);
+}
+.calculo b { color: var(--tinta); font-weight: 600; }
+
+/* ---------- pie ---------- */
+
+.pie {
+  border-top: 2px solid var(--tinta);
+  padding-block: var(--sp-m) var(--sp-l);
+  font-size: 0.84rem;
+  color: var(--tinta-suave);
+}
+.pie a { color: var(--tinta-med); }
+.pie__grid { display: flex; flex-wrap: wrap; gap: var(--sp-m); justify-content: space-between; }

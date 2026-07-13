@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rutamo — el día de tu cuadrilla, ordenado antes de las 8:00</title>
+<meta name="description" content="Despacho con mapa, app de terreno que funciona sin señal, cotización firmada en el lugar y link de pago. Para empresas chilenas de gasfitería, electricidad, climatización, refrigeración y ascensores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/rutamo.css">
+<style>
+  /* ---- Hero: cartel de obra. Tipografía enorme, regla dura, sin imagen. ---- */
+  .hero { padding-top: var(--sp-l); padding-bottom: var(--sp-xl); border-bottom: 1px solid var(--ink); }
+  .hero h1 { font-size: var(--step-5); max-width: 16ch; }
+  .hero h1 mark { background: var(--hi); color: var(--ink); padding: 0 .12em; box-decoration-break: clone; }
+  .hero__sub { font-size: var(--step-1); max-width: 46ch; margin-top: var(--sp-m); color: var(--ink-2); }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-l); }
+  .hero__meta { margin-top: var(--sp-l); display: grid; gap: var(--sp-2xs); border-top: 1px solid var(--rule-2); padding-top: var(--sp-s); }
+  @media (min-width: 48em) { .hero__meta { grid-template-columns: repeat(3, 1fr); gap: var(--sp-m); } }
+
+  /* ---- Arquetipos: tres personas que existen en toda empresa de terreno ---- */
+  .who { border: 1px solid var(--ink); background: var(--panel); }
+  .who + .who { margin-top: -1px; }
+  .who__q { font-size: var(--step-1); font-weight: 700; letter-spacing: -0.02em; padding: var(--sp-m); border-bottom: 1px solid var(--rule); }
+  .who__q::before { content: "“"; color: var(--hi); -webkit-text-stroke: 1px var(--ink); font-size: 1.6em; line-height: 0; vertical-align: -0.15em; margin-right: 4px; }
+  .who__w { padding: var(--sp-s) var(--sp-m); display: flex; justify-content: space-between; gap: var(--sp-s); flex-wrap: wrap; }
+  .who__cost { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+
+  /* ---- Pasos ---- */
+  .step { display: grid; grid-template-columns: 56px 1fr; gap: var(--sp-s); align-items: start; padding-block: var(--sp-m); border-top: 1px solid var(--rule); }
+  .step__n { font-family: var(--mono); font-weight: 600; font-size: 1.5rem; border: 2px solid var(--ink); width: 48px; height: 48px; display: grid; place-items: center; background: var(--hi); }
+  .step h3 { margin-bottom: 4px; }
+
+  /* ---- Mini-demo en vivo ---- */
+  .live { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .live { grid-template-columns: 1.4fr 1fr; } }
+  .live__map { border: 1px solid var(--ink); background: var(--panel); }
+  .live__map svg { display: block; width: 100%; height: auto; }
+  .live__panel { display: grid; gap: var(--sp-s); align-content: start; }
+  .live__nums { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--ink); border: 1px solid var(--ink); }
+  .live__num { background: var(--panel); padding: var(--sp-xs); }
+  .live__num b { font-family: var(--mono); font-size: var(--step-1); font-weight: 600; display: block; }
+  .live__num s { color: var(--muted); font-family: var(--mono); font-size: .75rem; }
+  .stop-list { list-style: none; font-family: var(--mono); font-size: .8rem; border: 1px solid var(--rule-2); }
+  .stop-list li { display: flex; gap: 8px; align-items: baseline; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+  .stop-list li:last-child { border-bottom: 0; }
+  .stop-list b { width: 1.6em; text-align: right; }
+  .dot { width: 10px; height: 10px; flex: 0 0 auto; border: 1px solid var(--ink); }
+
+  /* ---- Calculadora ---- */
+  .calc { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .calc { grid-template-columns: 1fr 1.15fr; } }
+  .ctrl { display: grid; gap: 6px; padding-block: var(--sp-xs); border-bottom: 1px dashed var(--rule-2); }
+  .ctrl__top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-s); }
+  .ctrl label { font-weight: 600; font-size: .95rem; }
+  .ctrl output { font-family: var(--mono); font-weight: 600; background: var(--hi); padding: 1px 8px; border: 1px solid var(--ink); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; cursor: pointer; }
+  input[type=range]::-webkit-slider-runnable-track { height: 4px; background: var(--ink); }
+  input[type=range]::-moz-range-track { height: 4px; background: var(--ink); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; background: var(--hi); border: 2px solid var(--ink); margin-top: -11px; }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; background: var(--hi); border: 2px solid var(--ink); border-radius: 0; }
+  .lineitem { display: flex; justify-content: space-between; gap: var(--sp-s); padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: .92rem; }
+  .lineitem span:last-child { font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+  .lineitem small { display: block; color: var(--muted); font-family: var(--mono); font-size: .72rem; }
+  .total { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-s); margin-top: var(--sp-s); padding: var(--sp-s); background: var(--ink); color: var(--paper); }
+  .total b { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; }
+
+  /* ---- Precios ---- */
+  .price { border: 1px solid var(--ink); background: var(--panel); display: flex; flex-direction: column; }
+  .price--mid { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .price__h { padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: center; }
+  .price--mid .price__h { background: var(--hi); }
+  .price__p { padding: var(--sp-m); border-bottom: 1px solid var(--rule); }
+  .price__p b { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; display: block; letter-spacing: -0.03em; }
+  .price ul { list-style: none; padding: var(--sp-m); display: grid; gap: 10px; font-size: .92rem; flex: 1; }
+  .price li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; }
+  .price li svg { margin-top: 4px; }
+  .price__f { padding: var(--sp-m); border-top: 1px solid var(--rule); }
+
+  /* ---- FAQ ---- */
+  .faq { border-top: 1px solid var(--ink); }
+  .faq details { border-bottom: 1px solid var(--rule-2); }
+  .faq summary { list-style: none; cursor: pointer; padding: var(--sp-s) 0; font-weight: 700; display: flex; justify-content: space-between; gap: var(--sp-s); min-height: 56px; align-items: center; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); font-size: 1.4rem; }
+  .faq details[open] summary::after { content: "–"; }
+  .faq p { padding-bottom: var(--sp-m); max-width: 62ch; }
+
+  .cta-final { background: var(--ink); color: var(--paper); border: 0; }
+  .cta-final h2 { color: var(--paper); }
+  .cta-final p { color: #C9C6BC; }
+  .cta-final .field { display: grid; gap: 6px; }
+  .cta-final input, .cta-final select {
+    background: var(--graphite-2); border: 1px solid #4A4E52; color: var(--paper);
+    padding: 12px; min-height: 48px; font-family: var(--mono); font-size: .9rem; width: 100%;
+  }
+  .cta-final label { font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: #A9A69C; }
+  #formOk { display: none; border: 2px solid var(--hi); padding: var(--sp-m); font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" fill="none" stroke="#14161A" stroke-width="2"/>
+        <path d="M6 23 L12 9 L18 17 L24 7" fill="none" stroke="#14161A" stroke-width="2.4" stroke-linejoin="miter"/>
+        <circle cx="24" cy="7" r="3.4" fill="#D9F02B" stroke="#14161A" stroke-width="2"/>
+      </svg>
+      <span class="brand__name">Ruta<em>mo</em></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__back" href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Menú">Menú</summary>
+      <div class="menu__panel">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html" aria-current="page">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html">Negocio</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="stack.html">Arquitectura</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main>
+
+<!-- ================================================================= HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="eyebrow">Despacho para empresas de terreno · Chile</span>
+    <h1>El día de tu cuadrilla, <mark>ordenado</mark> antes de las 8:00.</h1>
+    <p class="hero__sub">
+      Rutamo arma la ruta de cada técnico, le pone el trabajo en el teléfono —aunque esté
+      en un subterráneo sin señal—, deja la cotización firmada en el lugar y manda el link
+      de pago antes de que el técnico se suba a la camioneta.
+    </p>
+    <div class="hero__cta">
+      <a class="btn btn--hi" href="demo/index.html">Abrir el demo →</a>
+      <a class="btn" href="#calculadora">¿Cuánto te cuesta el desorden?</a>
+    </div>
+    <div class="hero__meta">
+      <div><span class="tag">Para quién</span><p>Gasfitería · Electricidad · Climatización · Refrigeración · Ascensores. De 3 a 25 técnicos.</p></div>
+      <div><span class="tag">Precio</span><p>Desde <strong class="mono">$59.000</strong>/mes. Sin permanencia, sin costo de implementación.</p></div>
+      <div><span class="tag">Cobro</span><p>Link de pago Webpay o Mercado Pago. El cliente paga con el técnico todavía adentro.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= PROBLEMA -->
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">El problema, en las palabras de siempre</span>
+    <h2 style="max-width:22ch">Tres personas que existen en toda empresa de terreno.</h2>
+    <p class="prose" style="margin-top:var(--sp-s)">
+      No son citas de entrevistas: son arquetipos. Si tienes una empresa de oficios en Santiago,
+      reconoces a los tres antes de terminar de leerlos.
+    </p>
+
+    <div style="margin-top:var(--sp-l)">
+      <article class="who">
+        <p class="who__q">Yo soy el que agenda, el que cotiza y el que va cuando falta uno. Si me enfermo un martes, la empresa se para.</p>
+        <div class="who__w">
+          <span class="tag">El dueño · 42 años · 8 técnicos · gasfitería y climatización</span>
+          <span class="who__cost">2 h/día en el cuaderno y el WhatsApp</span>
+        </div>
+      </article>
+      <article class="who">
+        <p class="who__q">Llegué a Maipú y era una válvula de expansión. No la tenía. Volví a la bodega en Quinta Normal, la busqué, y el cliente ya no estaba. Perdí la mañana entera.</p>
+        <div class="who__w">
+          <span class="tag">El técnico · refrigeración comercial · 4 a 6 visitas por día</span>
+          <span class="who__cost">1 de cada 8 visitas se pierde</span>
+        </div>
+      </article>
+      <article class="who">
+        <p class="who__q">La cotización la anotó en una hoja, me la pasó el sábado arrugada, la pasé a Excel el lunes y la mandé el martes. El cliente ya había llamado a otro.</p>
+        <div class="who__w">
+          <span class="tag">La administradora · contesta el teléfono, factura en Nubox, persigue pagos</span>
+          <span class="who__cost">La mitad de las cotizaciones nunca sale</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="hazard" style="margin-top:var(--sp-l)">
+      <p><strong>El verdadero costo no es la app que no tienes. Es el día de técnico que pagas igual.</strong>
+      Un técnico con camioneta le cuesta a la empresa cerca de <b class="mono">$1.600.000</b> al mes cargado.
+      Son <b class="mono">$76.000</b> por día hábil, <b class="mono">$9.500</b> por hora. Lo pagas esté donde esté:
+      arreglando un chiller o dando vueltas por Américo Vespucio.</p>
+    </div>
+    <p class="src"><b>Aritmética:</b> sueldo bruto $1.000.000 + leyes sociales y seguros ~25% + camioneta, combustible, TAG y herramientas ~$350.000 ≈ $1.600.000/mes. ÷ 21 días hábiles = $76.190/día ÷ 8 h = $9.524/h. <b>Estimación nuestra</b>, ajústala a tu planilla en la calculadora de abajo.</p>
+  </div>
+</section>
+
+<!-- ============================================================ CÓMO VA ---- -->
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Cómo funciona</span>
+    <h2>Cuatro movimientos. Ninguno es un cuaderno.</h2>
+
+    <div style="margin-top:var(--sp-m)">
+      <div class="step">
+        <div class="step__n">1</div>
+        <div>
+          <h3>Entra el trabajo</h3>
+          <p>Llega por WhatsApp, por teléfono o desde un contrato de mantención programada.
+          Rutamo lo convierte en una orden con cliente, dirección, equipo, síntoma y urgencia —
+          y te dice si es la tercera vez que ese mismo chiller falla este año.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__n">2</div>
+        <div>
+          <h3>Se despacha con el mapa</h3>
+          <p>Ves a los cinco técnicos, dónde están y en qué orden van. Le pides a Rutamo que
+          ordene el día y te devuelve la ruta más corta por técnico, con la ETA de cada visita
+          y el ahorro en pesos. El tráfico de Santiago es el costo real: la ruta es plata.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__n">3</div>
+        <div>
+          <h3>El técnico trabaja con el teléfono en una mano</h3>
+          <p>Botones gigantes, la ficha del equipo, el historial del cliente y los repuestos que
+          se usaron la última vez. Funciona en un subterráneo sin señal: todo se guarda en el
+          teléfono y se sincroniza cuando vuelve la barra.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__n">4</div>
+        <div>
+          <h3>Se cotiza, se firma y se cobra ahí mismo</h3>
+          <p>El técnico arma la cotización con el catálogo de repuestos, el cliente firma con
+          el dedo en la pantalla y recibe el link de pago por WhatsApp. Muchos pagan antes de
+          que la camioneta salga del estacionamiento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================== PRODUCTO EN VIVO ---- -->
+<section class="section" id="envivo">
+  <div class="container">
+    <span class="eyebrow">El producto, en vivo</span>
+    <h2>Dos técnicos, ocho visitas, un martes cualquiera.</h2>
+    <p class="prose" style="margin-top:var(--sp-s)">
+      Esto no es una foto. Aprieta <strong>Optimizar</strong> y mira lo que pasa con los kilómetros.
+      Es el mismo motor que corre en el demo completo, con comunas de verdad.
+    </p>
+
+    <div class="live" style="margin-top:var(--sp-m)">
+      <div class="live__map">
+        <svg id="miniMap" viewBox="0 0 560 420" role="img" aria-labelledby="mmTitle mmDesc">
+          <title id="mmTitle">Mapa esquemático de Santiago con dos rutas de técnico</title>
+          <desc id="mmDesc">Ocho visitas repartidas entre Rodrigo (azul) y Camila (verde agua). El listado de paradas de cada técnico aparece a un costado en texto.</desc>
+          <rect width="560" height="420" fill="#FBFAF6"/>
+          <!-- comunas esquemáticas -->
+          <g fill="#EDE9DE" stroke="#C3BBA7" stroke-width="1">
+            <path d="M330 30 L470 22 L520 70 L455 105 L340 92 Z"/>
+            <path d="M170 40 L330 30 L340 92 L200 108 Z"/>
+            <path d="M455 105 L520 70 L545 140 L470 168 Z"/>
+            <path d="M340 92 L455 105 L470 168 L350 178 Z"/>
+            <path d="M200 108 L340 92 L350 178 L215 190 Z"/>
+            <path d="M60 120 L200 108 L215 190 L70 205 Z"/>
+            <path d="M350 178 L470 168 L480 250 L360 258 Z"/>
+            <path d="M215 190 L350 178 L360 258 L225 268 Z"/>
+            <path d="M470 168 L545 140 L555 245 L480 250 Z"/>
+            <path d="M70 205 L225 268 L200 350 L60 320 Z"/>
+            <path d="M225 268 L360 258 L370 340 L235 352 Z"/>
+            <path d="M360 258 L480 250 L490 345 L370 340 Z"/>
+            <path d="M235 352 L370 340 L380 410 L245 400 Z"/>
+            <path d="M370 340 L490 345 L500 405 L380 410 Z"/>
+          </g>
+          <!-- Mapocho -->
+          <path d="M545 95 C 470 120, 380 130, 300 150 C 220 168, 130 165, 40 190" fill="none" stroke="#B9C7CE" stroke-width="5" opacity=".85"/>
+          <!-- Vespucio -->
+          <path d="M120 130 C 300 60, 470 110, 500 230 C 520 330, 330 400, 180 340 C 80 300, 70 200, 120 130" fill="none" stroke="#C3BBA7" stroke-width="2" stroke-dasharray="7 5"/>
+          <g font-family="'IBM Plex Mono',monospace" font-size="9" fill="#6E6A61" letter-spacing=".08em">
+            <text x="360" y="60">HUECHURABA</text>
+            <text x="215" y="70">QUILICURA</text>
+            <text x="472" y="90">LO BARNECHEA</text>
+            <text x="365" y="140">RECOLETA</text>
+            <text x="235" y="150">RENCA</text>
+            <text x="90" y="165">PUDAHUEL</text>
+            <text x="380" y="215">SANTIAGO</text>
+            <text x="240" y="230">EST. CENTRAL</text>
+            <text x="492" y="205">LAS CONDES</text>
+            <text x="95" y="270">MAIPÚ</text>
+            <text x="255" y="310">CERRILLOS</text>
+            <text x="392" y="305">ÑUÑOA</text>
+            <text x="262" y="380">LA CISTERNA</text>
+            <text x="398" y="378">LA FLORIDA</text>
+          </g>
+          <!-- rutas -->
+          <polyline id="mmR1" fill="none" stroke="#2a78d6" stroke-width="2.5" stroke-linejoin="round" points=""/>
+          <polyline id="mmR2" fill="none" stroke="#1baf7a" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6 3" points=""/>
+          <!-- base -->
+          <g>
+            <rect x="243" y="243" width="14" height="14" fill="#14161A"/>
+            <text x="262" y="255" font-family="'IBM Plex Mono',monospace" font-size="9" fill="#14161A">BODEGA</text>
+          </g>
+          <g id="mmPins"></g>
+        </svg>
+      </div>
+
+      <div class="live__panel">
+        <div class="live__nums">
+          <div class="live__num"><b id="mmKm">–</b><s>km del día</s></div>
+          <div class="live__num"><b id="mmMin">–</b><s>min en ruta</s></div>
+          <div class="live__num"><b id="mmSave">$0</b><s>ahorro hoy</s></div>
+        </div>
+        <div style="display:flex;gap:var(--sp-2xs);flex-wrap:wrap">
+          <button class="btn btn--hi btn--sm" id="mmOpt">Optimizar rutas</button>
+          <button class="btn btn--sm" id="mmReset">Volver al desorden</button>
+        </div>
+        <div>
+          <p class="tag" style="margin-bottom:6px">Rodrigo Fuentes — gasfitería</p>
+          <ol class="stop-list" id="mmL1"></ol>
+        </div>
+        <div>
+          <p class="tag" style="margin-bottom:6px">Camila Soto — climatización</p>
+          <ol class="stop-list" id="mmL2"></ol>
+        </div>
+        <p class="src"><b>Supuestos del cálculo:</b> velocidad media efectiva en Santiago <b>22 km/h</b> (tráfico incluido); costo variable de camioneta <b>$180/km</b> (combustible + desgaste + TAG); hora-técnico cargada <b>$9.500</b>. La distancia es geométrica sobre el mapa esquemático; en producción es matriz OSRM sobre la red vial real (ver <a href="stack.html">Arquitectura</a>).</p>
+      </div>
+    </div>
+
+    <p style="margin-top:var(--sp-m)"><a class="btn" href="demo/index.html">Ver el demo completo: despacho + terreno + cobro →</a></p>
+  </div>
+</section>
+
+<!-- =========================================================== CALCULADORA -->
+<section class="section" id="calculadora">
+  <div class="container">
+    <span class="eyebrow">La cuenta</span>
+    <h2>¿Cuánto te cuesta el desorden al año?</h2>
+    <p class="prose" style="margin-top:var(--sp-s)">
+      Mueve los controles con tus números. No hay número mágico: cada línea muestra su aritmética.
+      Si el resultado te parece exagerado, baja los supuestos — igual va a doler.
+    </p>
+
+    <div class="calc" style="margin-top:var(--sp-l)">
+      <div class="card">
+        <div class="ctrl">
+          <div class="ctrl__top"><label for="cTec">Técnicos en terreno</label><output id="oTec">8</output></div>
+          <input type="range" id="cTec" min="2" max="25" value="8" step="1">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl__top"><label for="cCosto">Costo cargado por técnico ($/mes)</label><output id="oCosto">$1.600.000</output></div>
+          <input type="range" id="cCosto" min="900000" max="2600000" value="1600000" step="50000">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl__top"><label for="cHoras">Horas perdidas al día en ruta y desorden</label><output id="oHoras">1,0 h</output></div>
+          <input type="range" id="cHoras" min="0" max="3" value="1" step="0.25">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl__top"><label for="cFalla">Visitas fallidas (falta repuesto, no estaba el cliente)</label><output id="oFalla">8%</output></div>
+          <input type="range" id="cFalla" min="0" max="20" value="8" step="1">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl__top"><label for="cCot">Cotizaciones al mes que salen del terreno</label><output id="oCot">40</output></div>
+          <input type="range" id="cCot" min="0" max="150" value="40" step="5">
+        </div>
+        <div class="ctrl" style="border-bottom:0">
+          <div class="ctrl__top"><label for="cTicket">Ticket promedio de una cotización</label><output id="oTicket">$185.000</output></div>
+          <input type="range" id="cTicket" min="40000" max="900000" value="185000" step="5000">
+        </div>
+      </div>
+
+      <div>
+        <div class="card card--flat">
+          <div class="lineitem">
+            <span>Horas de técnico que se van en la ruta
+              <small id="fHoras"></small></span>
+            <span id="vHoras">–</span>
+          </div>
+          <div class="lineitem">
+            <span>Visitas fallidas: viaje + hora perdida + la vuelta
+              <small id="fFalla"></small></span>
+            <span id="vFalla">–</span>
+          </div>
+          <div class="lineitem">
+            <span>Cotizaciones que se enfrían y no cierran
+              <small id="fCot"></small></span>
+            <span id="vCot">–</span>
+          </div>
+          <div class="lineitem">
+            <span>Cobranza que se atrasa (costo financiero del capital de trabajo)
+              <small id="fCob"></small></span>
+            <span id="vCob">–</span>
+          </div>
+          <div class="total">
+            <span class="tag" style="color:#C9C6BC">Se te va al año</span>
+            <b id="vTotal">–</b>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:var(--sp-s);border-color:var(--ink)">
+          <p class="tag">Lo que costaría Rutamo para tu tamaño</p>
+          <p style="font-family:var(--mono);font-size:var(--step-2);font-weight:600;color:var(--ink);margin-top:4px">
+            <span id="vPlan">$191.000</span> <span style="font-size:1rem;color:var(--muted)">/mes</span>
+          </p>
+          <p style="margin-top:6px" id="vRoi"></p>
+          <p class="src"><b>Supuestos de la cuenta:</b> 21 días hábiles/mes; una visita fallida cuesta 1,5 h de técnico + 1 viaje ida y vuelta (24 km a $180/km); una cotización entregada y firmada en el lugar cierra al <b>60%</b> vs <b>35%</b> cuando se manda a los 4 días (estimación nuestra, es el supuesto más discutible de la tabla); margen bruto sobre trabajo cotizado <b>38%</b>; costo financiero del capital de trabajo <b>1,4%/mes</b> sobre 45 días de mora promedio, que Rutamo reduce a 15 con link de pago inmediato.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== PRECIOS -->
+<section class="section" id="precios">
+  <div class="container">
+    <span class="eyebrow">Precios en pesos, sin asterisco</span>
+    <h2>Se paga por técnico activo. Si el técnico no despacha, no lo cobramos.</h2>
+
+    <div class="grid g3" style="margin-top:var(--sp-l)">
+      <article class="price">
+        <div class="price__h"><h3>Cuadrilla</h3><span class="tag">1–3 técnicos</span></div>
+        <div class="price__p"><b>$59.000</b><span class="tag">por mes, todo incluido</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Despacho con mapa y optimización de ruta</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>App de terreno offline, técnicos ilimitados en modo lectura</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Cotización firmada + link de pago</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Ficha de equipo e historial por cliente</span></li>
+        </ul>
+        <div class="price__f"><a class="btn btn--sm" href="#demo-form">Empezar</a></div>
+      </article>
+
+      <article class="price price--mid">
+        <div class="price__h"><h3>Terreno</h3><span class="tag">4–15 técnicos</span></div>
+        <div class="price__p"><b>$39.000 <span style="font-size:1rem;color:var(--muted)">+ $19.000/técnico</span></b><span class="tag">8 técnicos = $191.000/mes</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Todo lo de Cuadrilla</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Mantenciones programadas y contratos recurrentes</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Intake de WhatsApp → orden de trabajo estructurada</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Inventario de camioneta y bodega</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Facturación al SII vía Bsale, Nubox o Defontana</span></li>
+        </ul>
+        <div class="price__f"><a class="btn btn--hi btn--sm" href="#demo-form">Agendar demo</a></div>
+      </article>
+
+      <article class="price">
+        <div class="price__h"><h3>Flota</h3><span class="tag">16+ técnicos</span></div>
+        <div class="price__p"><b>$149.000 <span style="font-size:1rem;color:var(--muted)">+ $16.000/técnico</span></b><span class="tag">multi-sucursal</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Todo lo de Terreno</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>API y webhooks</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Portal del cliente corporativo (SLA, reportes de mantención)</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Onboarding en terreno y soporte con SLA de 4 h</span></li>
+        </ul>
+        <div class="price__f"><a class="btn btn--sm" href="#demo-form">Hablemos</a></div>
+      </article>
+    </div>
+
+    <p class="src" style="margin-top:var(--sp-m)"><b>Comisión de pago:</b> la de tu pasarela, tal cual, sin recargo nuestro. Referencia pública: Webpay de Transbank negocia entre 1,19% y 2,95% + IVA según rubro y volumen; Mercado Pago cobra 3,49% + IVA al acreditar de inmediato; Khipu (transferencia) cobra una tarifa fija por transacción. <b>Verifica la tarifa vigente con tu ejecutivo</b> — Rutamo no toma comisión sobre tu cobro.</p>
+  </div>
+</section>
+
+<!-- =================================================================== FAQ -->
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Preguntas que siempre nos hacen</span>
+    <h2>FAQ</h2>
+    <div class="faq" style="margin-top:var(--sp-m)">
+      <details open>
+        <summary>Mis técnicos no van a usar una app.</summary>
+        <p>Es la objeción correcta y es la que puede matar esto. Por eso la vista del técnico
+        tiene cuatro botones del tamaño de una mano, no un formulario. El flujo entero de una
+        visita son tres toques: <em>Llegué</em>, <em>Terminé</em>, <em>Firmar</em>. Si el técnico
+        no la usa la primera semana, no cobramos el mes: es nuestro problema, no el tuyo.</p>
+      </details>
+      <details>
+        <summary>¿Y si no hay señal? La mitad de las salas de máquina están en el subterráneo.</summary>
+        <p>La app del técnico guarda todo en el teléfono y sigue funcionando: puede iniciar la
+        visita, sacar fotos, cotizar y tomar la firma sin una barra de señal. Cuando vuelve la
+        cobertura, sincroniza en segundo plano y avisa. En el demo puedes activar el
+        <strong>modo sin señal</strong> y comprobarlo.</p>
+      </details>
+      <details>
+        <summary>¿Emite factura o boleta?</summary>
+        <p>Rutamo no es un emisor de DTE y no pretende serlo. Se conecta con lo que ya tienes —
+        Bsale, Nubox, Defontana o LibreDTE — y le pasa la orden ya firmada para que emita la
+        boleta o la factura al SII. Si no tienes ninguno, te conectamos a uno.</p>
+      </details>
+      <details>
+        <summary>Ya tengo Bsale / Defontana. ¿Para qué me sirve esto?</summary>
+        <p>Esos sistemas saben facturar; no saben quién va a Puente Alto a las 11:20 ni qué
+        repuesto llevar. Rutamo se ocupa del día del técnico y le entrega el documento cerrado
+        a tu sistema de facturación. No lo reemplaza, lo alimenta.</p>
+      </details>
+      <details>
+        <summary>¿Cuánto demora tenerlo andando?</summary>
+        <p>Una tarde. Cargamos tus clientes y equipos desde el Excel que ya tienes, damos de alta
+        a los técnicos y el primer despacho real es al día siguiente. No cobramos implementación.</p>
+      </details>
+      <details>
+        <summary>¿Optimizan la ruta con inteligencia artificial?</summary>
+        <p>No, y lo decimos con gusto: la ruta se resuelve con un <em>solver</em> (OR-Tools sobre
+        una matriz de tiempos OSRM), que es la herramienta correcta y da una respuesta estable.
+        La IA la usamos donde sí sirve: convertir el WhatsApp desordenado del cliente en una orden
+        de trabajo, redactar la cotización desde lo que dicta el técnico y resumir el historial
+        del equipo antes de que llegue. Está todo detallado en
+        <a href="stack.html">Arquitectura</a>, incluido lo que cuesta.</p>
+      </details>
+      <details>
+        <summary>¿Los datos de mis clientes quedan en Chile?</summary>
+        <p>La base de datos y las fotos viven en la región de São Paulo (la más cercana con
+        latencia razonable); no hay hosting de nivel productivo en Chile a este precio y preferimos
+        decirlo antes que adornarlo. Los datos son tuyos y los exportas cuando quieras, sin pedir
+        permiso ni pagar nada.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== CTA -->
+<section class="section cta-final" id="demo-form">
+  <div class="container">
+    <div class="grid g2">
+      <div>
+        <span class="eyebrow" style="color:var(--paper);border-color:var(--hi)">Partamos</span>
+        <h2>Traes la lista de mañana. Te la despachamos en la reunión.</h2>
+        <p style="margin-top:var(--sp-s);max-width:44ch">
+          No hacemos demos genéricas. Llegas con las visitas que tienes agendadas para mañana
+          y las ordenamos juntos en pantalla. Si no te ahorramos kilómetros, te vas y no perdiste
+          nada más que 30 minutos.
+        </p>
+      </div>
+      <div>
+        <form id="leadForm" style="display:grid;gap:var(--sp-s)">
+          <div class="field">
+            <label for="fEmpresa">Empresa</label>
+            <input id="fEmpresa" name="empresa" required placeholder="Refrigeración Andes SpA">
+          </div>
+          <div class="field">
+            <label for="fRubro">Rubro</label>
+            <select id="fRubro" name="rubro">
+              <option>Climatización / HVAC</option>
+              <option>Refrigeración comercial</option>
+              <option>Gasfitería y sanitarios</option>
+              <option>Instalaciones eléctricas</option>
+              <option>Ascensores y mantención de edificios</option>
+              <option>Extintores y redes húmedas</option>
+              <option>Otro oficio de terreno</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fTec">Técnicos en terreno</label>
+            <input id="fTec" name="tecnicos" type="number" min="1" max="200" value="8" required>
+          </div>
+          <div class="field">
+            <label for="fWsp">WhatsApp</label>
+            <input id="fWsp" name="wsp" required placeholder="+56 9 ...">
+          </div>
+          <button class="btn btn--hi" type="submit">Agendar los 30 minutos</button>
+        </form>
+        <div id="formOk" role="status"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container" style="display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;width:100%">
+    <span>Rutamo · rutamo.com · Santiago de Chile</span>
+    <span>Prototipo. Datos y empresas del demo son ficticios.</span>
+  </div>
+</footer>
+
+<script>
+/* ===================================================================
+   MINI-DEMO: dos rutas sobre el mapa esquemático. Todo el control
+   responde: optimizar reordena de verdad (vecino más cercano + 2-opt)
+   y recalcula km, minutos y pesos.
+   =================================================================== */
+(function () {
+  var KMPX = 0.083;      // 1 px del mapa ≈ 83 m (mapa 560px ≈ 46 km de ancho)
+  var VEL = 22;          // km/h medios en Santiago con tráfico
+  var COSTO_KM = 180;    // $/km camioneta
+  var COSTO_H = 9500;    // $/hora técnico cargado
+  var BASE = { x: 250, y: 250, n: "Bodega" };
+
+  var visitas = [
+    { id: "V1", t: 1, x: 505, y: 195, n: "Edificio Costanera 4", c: "Vitacura" },
+    { id: "V2", t: 1, x: 120, y: 300, n: "Unimarc Maipú", c: "Maipú" },
+    { id: "V3", t: 1, x: 415, y: 225, n: "Rest. Doña Pancha", c: "Santiago" },
+    { id: "V4", t: 1, x: 430, y: 375, n: "Cond. Los Aromos", c: "La Florida" },
+    { id: "V5", t: 2, x: 400, y: 300, n: "Panadería San Camilo", c: "Ñuñoa" },
+    { id: "V6", t: 2, x: 480, y: 175, n: "Grupo Kaufmann", c: "Las Condes" },
+    { id: "V7", t: 2, x: 270, y: 230, n: "Lavandería Wash&Go", c: "Est. Central" },
+    { id: "V8", t: 2, x: 300, y: 370, n: "Farmacia Cruz Verde", c: "La Cisterna" }
+  ];
+  var COL = { 1: "#2a78d6", 2: "#1baf7a" };
+  var ordenMalo = { 1: ["V1", "V2", "V3", "V4"], 2: ["V5", "V6", "V7", "V8"] };
+  var estado = JSON.parse(JSON.stringify(ordenMalo));
+  var kmBase = null;
+
+  function get(id) { for (var i = 0; i < visitas.length; i++) if (visitas[i].id === id) return visitas[i]; }
+  function d(a, b) { return Math.hypot(a.x - b.x, a.y - b.y) * KMPX; }
+  function largo(ids) {
+    var km = 0, p = BASE;
+    for (var i = 0; i < ids.length; i++) { var v = get(ids[i]); km += d(p, v); p = v; }
+    return km + d(p, BASE);
+  }
+  function optimizar(ids) {
+    // vecino más cercano
+    var rest = ids.slice(), out = [], p = BASE;
+    while (rest.length) {
+      var bi = 0, bd = Infinity;
+      for (var i = 0; i < rest.length; i++) { var dd = d(p, get(rest[i])); if (dd < bd) { bd = dd; bi = i; } }
+      p = get(rest[bi]); out.push(rest.splice(bi, 1)[0]);
+    }
+    // 2-opt
+    var mejora = true;
+    while (mejora) {
+      mejora = false;
+      for (var i = 0; i < out.length - 1; i++) {
+        for (var j = i + 1; j < out.length; j++) {
+          var cand = out.slice(0, i).concat(out.slice(i, j + 1).reverse(), out.slice(j + 1));
+          if (largo(cand) < largo(out) - 0.001) { out = cand; mejora = true; }
+        }
+      }
+    }
+    return out;
+  }
+  function pts(ids) {
+    var s = BASE.x + "," + BASE.y;
+    for (var i = 0; i < ids.length; i++) { var v = get(ids[i]); s += " " + v.x + "," + v.y; }
+    return s + " " + BASE.x + "," + BASE.y;
+  }
+  function clp(n) { return "$" + Math.round(n).toLocaleString("es-CL"); }
+
+  function render() {
+    document.getElementById("mmR1").setAttribute("points", pts(estado[1]));
+    document.getElementById("mmR2").setAttribute("points", pts(estado[2]));
+
+    var pins = "";
+    [1, 2].forEach(function (t) {
+      estado[t].forEach(function (id, i) {
+        var v = get(id);
+        pins += '<g><circle cx="' + v.x + '" cy="' + v.y + '" r="11" fill="' + COL[t] + '" stroke="#14161A" stroke-width="1.5"/>' +
+          '<text x="' + v.x + '" y="' + (v.y + 4) + '" text-anchor="middle" font-family="\'IBM Plex Mono\',monospace" font-size="11" font-weight="600" fill="#fff">' + (i + 1) + '</text></g>';
+      });
+    });
+    document.getElementById("mmPins").innerHTML = pins;
+
+    [1, 2].forEach(function (t) {
+      var ul = document.getElementById("mmL" + t), h = "";
+      estado[t].forEach(function (id, i) {
+        var v = get(id);
+        h += '<li><i class="dot" style="background:' + COL[t] + '"></i><b>' + (i + 1) + '</b><span>' + v.n + ' <span style="color:var(--muted)">· ' + v.c + '</span></span></li>';
+      });
+      ul.innerHTML = h;
+    });
+
+    var km = largo(estado[1]) + largo(estado[2]);
+    var min = km / VEL * 60;
+    if (kmBase === null) kmBase = km;
+    var ahorro = Math.max(0, (kmBase - km) * COSTO_KM + (kmBase - km) / VEL * COSTO_H);
+    document.getElementById("mmKm").textContent = km.toFixed(1);
+    document.getElementById("mmMin").textContent = Math.round(min);
+    document.getElementById("mmSave").textContent = clp(ahorro);
+  }
+
+  document.getElementById("mmOpt").addEventListener("click", function () {
+    estado[1] = optimizar(estado[1]); estado[2] = optimizar(estado[2]); render();
+    this.textContent = "Optimizado ✓";
+    var self = this;
+    setTimeout(function () { self.textContent = "Optimizar rutas"; }, 1600);
+  });
+  document.getElementById("mmReset").addEventListener("click", function () {
+    estado = JSON.parse(JSON.stringify(ordenMalo)); render();
+  });
+  render();
+})();
+
+/* =========================== CALCULADORA DE PLATA PERDIDA ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var clp = function (n) { return "$" + Math.round(n).toLocaleString("es-CL"); };
+  var ins = ["cTec", "cCosto", "cHoras", "cFalla", "cCot", "cTicket"];
+
+  function plan(t) {
+    if (t <= 3) return 59000;
+    if (t <= 15) return 39000 + 19000 * t;
+    return 149000 + 16000 * t;
+  }
+
+  function calc() {
+    var tec = +$("cTec").value, costo = +$("cCosto").value, horas = +$("cHoras").value,
+      falla = +$("cFalla").value / 100, cot = +$("cCot").value, ticket = +$("cTicket").value;
+
+    var horaTec = costo / 21 / 8;
+    var visitasMes = tec * 4.5 * 21;
+
+    // 1. horas en ruta
+    var vHoras = horas * 21 * 12 * tec * horaTec;
+    // 2. visitas fallidas: 1,5h de técnico + 24 km ida y vuelta
+    var fallidas = visitasMes * falla;
+    var vFalla = fallidas * 12 * (1.5 * horaTec + 24 * 180);
+    // 3. cotizaciones: 60% cierre en el lugar vs 35% enfriadas
+    var vCot = cot * 12 * ticket * (0.60 - 0.35) * 0.38;
+    // 4. costo financiero de la mora: 30 días menos de cobro
+    var facturacionMes = cot * ticket;
+    var vCob = facturacionMes * (30 / 30) * 0.014 * 12;
+
+    var total = vHoras + vFalla + vCot + vCob;
+
+    $("oTec").textContent = tec;
+    $("oCosto").textContent = clp(costo);
+    $("oHoras").textContent = horas.toFixed(2).replace(".", ",").replace(",00", ",0") + " h";
+    $("oFalla").textContent = (falla * 100) + "%";
+    $("oCot").textContent = cot;
+    $("oTicket").textContent = clp(ticket);
+
+    $("vHoras").textContent = clp(vHoras);
+    $("fHoras").textContent = horas.toString().replace(".", ",") + " h × 21 días × 12 meses × " + tec + " téc. × " + clp(horaTec) + "/h";
+    $("vFalla").textContent = clp(vFalla);
+    $("fFalla").textContent = Math.round(fallidas) + " visitas perdidas/mes × 12 × (1,5 h + 24 km)";
+    $("vCot").textContent = clp(vCot);
+    $("fCot").textContent = cot + " cotiz./mes × 12 × " + clp(ticket) + " × 25 pts de cierre × 38% margen";
+    $("vCob").textContent = clp(vCob);
+    $("fCob").textContent = clp(facturacionMes) + "/mes × 30 días menos de mora × 1,4% mensual";
+    $("vTotal").textContent = clp(total);
+
+    var p = plan(tec);
+    $("vPlan").textContent = clp(p);
+    var ratio = total / (p * 12);
+    $("vRoi").innerHTML = ratio > 1
+      ? "Recuperas lo que pagas <strong>" + ratio.toFixed(1).replace(".", ",") + " veces</strong> al año. Si con Rutamo recuperas apenas <strong>un cuarto</strong> de lo de arriba, ya te conviene."
+      : "Con estos números <strong>todavía no te conviene</strong>. Es en serio: guarda la plata hasta tener más técnicos o más visitas.";
+  }
+  ins.forEach(function (id) { $(id).addEventListener("input", calc); });
+  calc();
+})();
+
+/* ================================= FORM ============================= */
+document.getElementById("leadForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var f = new FormData(this);
+  var ok = document.getElementById("formOk");
+  ok.style.display = "block";
+  ok.innerHTML = "Listo. Te escribimos a <b>" + (f.get("wsp") || "") + "</b> para coordinar los 30 minutos con <b>" +
+    (f.get("empresa") || "") + "</b> (" + f.get("tecnicos") + " técnicos).<br><span style='color:#A9A69C'>Esto es un prototipo: no se envió nada a ningún lado.</span>";
+  this.reset();
+});
+</script>
+</body>
+</html>

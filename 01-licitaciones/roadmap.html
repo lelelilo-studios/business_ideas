@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adjudate — Roadmap, criterios de muerte y probabilidad</title>
+<meta name="description" content="Del día 1 al mes 24: seis hitos con criterio de muerte, trayectoria de MRR en tres escenarios, valle de runway, retención por cohorte y una probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .fig { margin-block: var(--sp-m); }
+  .fig-h { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
+  .fig-t { font-size: var(--step-1); margin-bottom: .3rem; }
+  .fig-s { font-family: var(--mono); font-size: .72rem; color: var(--muted); line-height: 1.6; margin-bottom: var(--sp-s); }
+  .fig-box { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); padding: var(--sp-s); }
+  .fig-box .scroll-x { border: 0; background: none; }
+  .fig-box svg { min-width: 620px; }
+  .sup { display: grid; grid-template-columns: auto 1fr; gap: .3rem .7rem; font-family: var(--mono); font-size: .72rem; margin-top: var(--sp-s); }
+  .sup dt { color: var(--acento); white-space: nowrap; }
+  .sup dd { color: var(--ink-2); }
+  .calc { font-family: var(--mono); font-size: .78rem; background: var(--papel-bajo); border: 1px solid var(--rule-fuerte); padding: var(--sp-s); line-height: 1.9; overflow-x: auto; }
+  .calc .eq { color: var(--acento); }
+  .calc .res { color: var(--ink); font-weight: 600; }
+
+  /* Hitos */
+  .hito { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); margin-bottom: var(--sp-m); }
+  .hito-h { display: flex; gap: var(--sp-s); align-items: baseline; flex-wrap: wrap; padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--rule); background: var(--papel-bajo); }
+  .hito-n { font-family: var(--mono); font-size: .72rem; color: var(--acento); letter-spacing: .1em; }
+  .hito-f { font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-left: auto; }
+  .hito-t { font-size: var(--step-1); font-weight: 600; width: 100%; }
+  .hito-b { padding: var(--sp-m); display: grid; gap: var(--sp-m); }
+  @media (min-width: 48em) { .hito-b { grid-template-columns: 1.4fr 1fr; } }
+  .hito-b h4 { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+  .hito-b p { color: var(--ink-2); font-size: .92rem; }
+  .muerte { border-top: 2px solid var(--acento); padding: var(--sp-s) var(--sp-m); background: var(--acento-lav); }
+  .muerte h4 { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--acento); margin-bottom: .3rem; }
+  .muerte p { color: var(--ink); font-size: .92rem; }
+  .recursos { display: flex; gap: var(--sp-m); flex-wrap: wrap; font-family: var(--mono); font-size: .74rem; }
+  .recursos b { display: block; color: var(--muted); font-weight: 400; font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-in">
+      <a class="marca" href="index.html"><i></i>ADJUDATE <span>Mercado Público</span></a>
+      <ul class="nav-links">
+        <li><a class="volver" href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+      <button class="nav-btn" id="navBtn" aria-expanded="false" aria-controls="navMob">Menú</button>
+    </div>
+  </div>
+  <div class="nav-mob" id="navMob">
+    <div class="container">
+      <ul>
+        <li><a href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header style="padding-block: var(--sp-xl) var(--sp-l)">
+  <div class="container">
+    <p class="folio"><b>Roadmap</b> · Día 1 → mes 24</p>
+    <h1 style="font-size:var(--step-3)">Seis hitos, y la observación que debería hacernos parar en cada uno.</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de acá abajo trae el suyo, escrito antes de empezar, cuando todavía somos honestos.</p>
+  </div>
+</header>
+
+<!-- ===================== GRÁFICO 1: MRR ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>01</b> · Trayectoria de ingresos</p>
+
+    <div class="fig">
+      <p class="fig-h">Figura 1</p>
+      <h2 class="fig-t">MRR a 24 meses — tres escenarios</h2>
+      <p class="fig-s">Los tres escenarios comparten el mismo embudo de leads (lo mueve el equipo, no el mercado). Lo que cambia son <b>tres supuestos declarados</b>: tasa de cierre, ticket y churn.</p>
+
+      <div class="fig-box">
+        <div class="scroll-x">
+          <svg class="chart" viewBox="0 0 800 300" role="img" aria-labelledby="t1 d1">
+            <title id="t1">MRR mensual proyectado a 24 meses en tres escenarios</title>
+            <desc id="d1">En el escenario base el MRR llega a 25,7 millones de pesos en el mes 24. El pesimista llega a 8,3 millones y el optimista a 53,7 millones.</desc>
+
+            <!-- grilla -->
+            <line class="grid-line" x1="58" y1="268" x2="782" y2="268"/>
+            <line class="grid-line" x1="58" y1="207.5" x2="782" y2="207.5"/>
+            <line class="grid-line" x1="58" y1="147" x2="782" y2="147"/>
+            <line class="grid-line" x1="58" y1="86.5" x2="782" y2="86.5"/>
+            <line class="grid-line" x1="58" y1="26" x2="782" y2="26"/>
+            <text x="52" y="271" text-anchor="end" font-size="10">0</text>
+            <text x="52" y="211" text-anchor="end" font-size="10">$15M</text>
+            <text x="52" y="150" text-anchor="end" font-size="10">$30M</text>
+            <text x="52" y="90" text-anchor="end" font-size="10">$45M</text>
+            <text x="52" y="29" text-anchor="end" font-size="10">$60M</text>
+            <line class="axis-line" x1="58" y1="26" x2="58" y2="268"/>
+
+            <!-- eje x -->
+            <text x="58" y="286" font-size="10">m1</text>
+            <text x="215" y="286" text-anchor="middle" font-size="10">m6</text>
+            <text x="404" y="286" text-anchor="middle" font-size="10">m12</text>
+            <text x="593" y="286" text-anchor="middle" font-size="10">m18</text>
+            <text x="782" y="286" text-anchor="end" font-size="10">m24</text>
+
+            <!-- Escenarios: rampa ordinal de un solo tono (pesimista claro → optimista oscuro).
+                 Al ser una rampa de un hue, la separación bajo daltonismo está en la banda mínima:
+                 por eso cada línea lleva ADEMÁS trazo distinto y etiqueta directa. -->
+            <polyline fill="none" stroke="#D46B5A" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"
+              points="58.0,268.0 89.5,268.0 121.0,267.6 152.4,267.1 183.9,266.6 215.4,265.9 246.9,265.2 278.3,264.3 309.8,263.3 341.3,262.1 372.8,260.8 404.3,259.3 435.7,257.7 467.2,255.9 498.7,254.0 530.2,252.0 561.7,249.9 593.1,247.8 624.6,245.6 656.1,243.4 687.6,241.1 719.0,238.9 750.5,236.7 782.0,234.6"/>
+            <polyline fill="none" stroke="#C0362C" stroke-width="2.5" stroke-linejoin="round"
+              points="58.0,268.0 89.5,268.0 121.0,266.9 152.4,265.5 183.9,264.0 215.4,262.1 246.9,259.9 278.3,257.4 309.8,254.4 341.3,251.0 372.8,247.1 404.3,242.7 435.7,237.7 467.2,232.2 498.7,226.4 530.2,220.2 561.7,213.8 593.1,207.1 624.6,200.2 656.1,193.1 687.6,185.9 719.0,178.6 750.5,171.3 782.0,164.2"/>
+            <polyline fill="none" stroke="#953125" stroke-width="2" stroke-dasharray="1 3" stroke-linecap="round" stroke-linejoin="round"
+              points="58.0,268.0 89.5,268.0 121.0,265.8 152.4,263.3 183.9,260.2 215.4,256.6 246.9,252.4 278.3,247.3 309.8,241.4 341.3,234.6 372.8,226.7 404.3,217.7 435.7,207.7 467.2,196.5 498.7,184.6 530.2,171.8 561.7,158.4 593.1,144.3 624.6,129.7 656.1,114.6 687.6,99.1 719.0,83.3 750.5,67.4 782.0,51.5"/>
+
+            <!-- marcadores de fin -->
+            <circle cx="782" cy="51.5" r="4" fill="#953125" stroke="#FBF9F4" stroke-width="2"/>
+            <circle cx="782" cy="164.2" r="4.5" fill="#C0362C" stroke="#FBF9F4" stroke-width="2"/>
+            <circle cx="782" cy="234.6" r="4" fill="#D46B5A" stroke="#FBF9F4" stroke-width="2"/>
+
+            <!-- etiquetas directas (encoding secundario obligatorio para esta rampa) -->
+            <text x="775" y="42" text-anchor="end" font-size="10.5" fill="#953125" font-weight="600">Optimista · $53,7M</text>
+            <text x="775" y="155" text-anchor="end" font-size="10.5" fill="#C0362C" font-weight="600">Base · $25,7M</text>
+            <text x="775" y="226" text-anchor="end" font-size="10.5" fill="#8A5B0B" font-weight="600">Pesimista · $8,3M</text>
+          </svg>
+        </div>
+
+        <div class="leyenda">
+          <span><i style="background:#D46B5A; border-bottom:2px dashed #D46B5A; height:0"></i> Pesimista</span>
+          <span><i style="background:#C0362C"></i> Base</span>
+          <span><i style="background:#953125; height:0; border-bottom:2px dotted #953125"></i> Optimista</span>
+        </div>
+      </div>
+
+      <div class="scroll-x" style="margin-top:var(--sp-s)">
+        <table>
+          <caption>Los supuestos que mueven cada escenario</caption>
+          <thead><tr><th>Escenario</th><th class="num">Cierre de demo</th><th class="num">Ticket</th><th class="num">Churn/mes</th><th class="num">Clientes m24</th><th class="num">ARR m24</th></tr></thead>
+          <tbody>
+            <tr><td>Pesimista</td><td class="num">6%</td><td class="num">$69.000</td><td class="num">6,0%</td><td class="num">120</td><td class="num">$99M</td></tr>
+            <tr style="background:var(--acento-lav)"><td><strong>Base</strong></td><td class="num">12%</td><td class="num">$95.000</td><td class="num">4,0%</td><td class="num">271</td><td class="num">$309M</td></tr>
+            <tr><td>Optimista</td><td class="num">18%</td><td class="num">$120.000</td><td class="num">2,5%</td><td class="num">447</td><td class="num">$644M</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <dl class="sup">
+        <dt>Embudo</dt><dd>Leads calificados/mes: 0 en m1-2 (design partners), 25 en m3, subiendo a 240 en m24. <b>Estimación</b>: 1 vendedor logra ~50 leads calificados/mes con el canal de outbound sobre dato público; el equipo llega a 4 vendedores + inbound.</dd>
+        <dt>Ticket</dt><dd>El ARPU de $95.000 del escenario base es el mismo que se deriva en <a href="negocio.html">Negocio</a>.</dd>
+        <dt>Aviso</dt><dd>Ninguna de estas tres curvas es una predicción. Son la aritmética de tres juegos de supuestos. <b>El único número que importa es cuál de los tres se parece a la realidad al mes 6.</b></dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRÁFICO 2: CAJA ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>02</b> · Caja</p>
+
+    <div class="fig">
+      <p class="fig-h">Figura 2</p>
+      <h2 class="fig-t">Quema vs. ingresos — y el valle de runway</h2>
+      <p class="fig-s">Escenario base. Ingreso mostrado <b>neto de COGS</b> (margen bruto 82,5%), que es la plata que realmente entra a pagar la quema. Un solo eje: CLP por mes.</p>
+
+      <div class="fig-box">
+        <div class="scroll-x">
+          <svg class="chart" viewBox="0 0 800 300" role="img" aria-labelledby="t2 d2">
+            <title id="t2">Quema mensual contra ingreso neto mensual, 24 meses</title>
+            <desc id="d2">La quema sube en escalones de 7 a 18 y a 28 millones al mes. El ingreso neto crece hasta 21,2 millones en el mes 24 y no alcanza a cruzar la quema dentro del horizonte. El valle de runway está en el mes 9, con 6,4 millones en caja.</desc>
+
+            <!-- zona del valle -->
+            <rect x="278" y="26" width="63" height="242" fill="#C0362C" opacity="0.07"/>
+
+            <line class="grid-line" x1="58" y1="268" x2="782" y2="268"/>
+            <line class="grid-line" x1="58" y1="207.5" x2="782" y2="207.5"/>
+            <line class="grid-line" x1="58" y1="147" x2="782" y2="147"/>
+            <line class="grid-line" x1="58" y1="86.5" x2="782" y2="86.5"/>
+            <line class="grid-line" x1="58" y1="26" x2="782" y2="26"/>
+            <text x="52" y="271" text-anchor="end" font-size="10">0</text>
+            <text x="52" y="211" text-anchor="end" font-size="10">$7,5M</text>
+            <text x="52" y="150" text-anchor="end" font-size="10">$15M</text>
+            <text x="52" y="90" text-anchor="end" font-size="10">$22,5M</text>
+            <text x="52" y="29" text-anchor="end" font-size="10">$30M</text>
+            <line class="axis-line" x1="58" y1="26" x2="58" y2="268"/>
+
+            <text x="58" y="286" font-size="10">m1</text>
+            <text x="215" y="286" text-anchor="middle" font-size="10">m6</text>
+            <text x="404" y="286" text-anchor="middle" font-size="10">m12</text>
+            <text x="593" y="286" text-anchor="middle" font-size="10">m18</text>
+            <text x="782" y="286" text-anchor="end" font-size="10">m24</text>
+
+            <!-- quema (escalonada) -->
+            <polyline fill="none" stroke="#C0362C" stroke-width="2.5" stroke-linejoin="miter"
+              points="58.0,211.5 89.5,211.5 121.0,211.5 152.4,211.5 183.9,211.5 215.4,211.5 246.9,211.5 278.3,211.5 309.8,211.5 341.3,122.8 372.8,122.8 404.3,122.8 435.7,122.8 467.2,122.8 498.7,122.8 530.2,42.1 561.7,42.1 593.1,42.1 624.6,42.1 656.1,42.1 687.6,42.1 719.0,42.1 750.5,42.1 782.0,42.1"/>
+            <!-- ingreso neto -->
+            <polyline fill="none" stroke="#1A7F52" stroke-width="2.5" stroke-linejoin="round"
+              points="58.0,268.0 89.5,268.0 121.0,266.1 152.4,263.9 183.9,261.3 215.4,258.3 246.9,254.7 278.3,250.5 309.8,245.6 341.3,240.0 372.8,233.5 404.3,226.2 435.7,218.0 467.2,209.0 498.7,199.4 530.2,189.2 561.7,178.6 593.1,167.5 624.6,156.1 656.1,144.4 687.6,132.5 719.0,120.5 750.5,108.5 782.0,96.7"/>
+
+            <circle cx="782" cy="42.1" r="4.5" fill="#C0362C" stroke="#FBF9F4" stroke-width="2"/>
+            <circle cx="782" cy="96.7" r="4.5" fill="#1A7F52" stroke="#FBF9F4" stroke-width="2"/>
+            <text x="775" y="33" text-anchor="end" font-size="10.5" fill="#C0362C" font-weight="600">Quema · $28M/mes</text>
+            <text x="775" y="88" text-anchor="end" font-size="10.5" fill="#1A7F52" font-weight="600">Ingreso neto · $21,2M/mes</text>
+
+            <!-- marca del valle de runway -->
+            <line x1="309.8" y1="26" x2="309.8" y2="268" stroke="#C0362C" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <circle cx="309.8" cy="245.6" r="4" fill="#FBF9F4" stroke="#C0362C" stroke-width="2"/>
+            <text x="316" y="52" font-size="10.5" fill="#C0362C" font-weight="600">VALLE DE RUNWAY — mes 9</text>
+            <text x="316" y="66" font-size="10" fill="#4A463C">Quedan $6,4M en caja.</text>
+            <text x="316" y="79" font-size="10" fill="#4A463C">O levantas, o achicas, o mueres.</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="ficha" style="margin-top:var(--sp-s); border-color:var(--acento)">
+        <p class="ficha-h" style="color:var(--acento)">Las dos cosas que este gráfico dice y que no queremos suavizar</p>
+        <p class="prose"><strong>1. El valle es el mes 9.</strong> Partimos con $60M (ahorros de los fundadores + un instrumento CORFO tipo Semilla Inicia — <em>estimación, sujeta a postulación y no garantizada</em>). Quemando $7M/mes, la caja llega a <strong>$6,4M en el mes 9</strong>. Ahí se decide todo: o entra una ronda de ~$450M (≈US$470k), o el equipo se achica a dos personas y esto se vuelve un negocio bootstrapeado.</p>
+        <p class="prose"><strong>2. En el escenario base NO cruzamos en 24 meses.</strong> Ingreso neto de $21,2M/mes contra una quema de $28M/mes. <strong>Seguimos quemando en el mes 24</strong>, y eso es precisamente por qué el mes 24 es un punto de decisión real y no un trámite. Sólo el escenario optimista cruza dentro del horizonte.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRÁFICO 3: COHORTES ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>03</b> · La restricción real</p>
+
+    <div class="fig">
+      <p class="fig-h">Figura 3</p>
+      <h2 class="fig-t">Retención por cohorte, partida por resultado</h2>
+      <p class="fig-s">La restricción de este negocio no es el embudo de arriba: es <b>la retención, y está atada a un resultado que sólo controlamos a medias</b>. Este gráfico es la tesis y la amenaza al mismo tiempo.</p>
+
+      <div class="fig-box">
+        <div class="scroll-x">
+          <svg class="chart" viewBox="0 0 800 300" role="img" aria-labelledby="t3 d3">
+            <title id="t3">Retención de clientes a 12 meses, separada según si se adjudicaron algo en los primeros 90 días</title>
+            <desc id="d3">Los clientes que se adjudicaron al menos una licitación en 90 días retienen 76% al mes 12. Los que no se adjudicaron nada caen a 24%. La mezcla ponderada queda en 46%.</desc>
+
+            <line class="grid-line" x1="58" y1="268" x2="782" y2="268"/>
+            <line class="grid-line" x1="58" y1="207.5" x2="782" y2="207.5"/>
+            <line class="grid-line" x1="58" y1="147" x2="782" y2="147"/>
+            <line class="grid-line" x1="58" y1="86.5" x2="782" y2="86.5"/>
+            <line class="grid-line" x1="58" y1="26" x2="782" y2="26"/>
+            <text x="52" y="271" text-anchor="end" font-size="10">0%</text>
+            <text x="52" y="211" text-anchor="end" font-size="10">25%</text>
+            <text x="52" y="150" text-anchor="end" font-size="10">50%</text>
+            <text x="52" y="90" text-anchor="end" font-size="10">75%</text>
+            <text x="52" y="29" text-anchor="end" font-size="10">100%</text>
+            <line class="axis-line" x1="58" y1="26" x2="58" y2="268"/>
+
+            <text x="58" y="286" font-size="10">mes 0</text>
+            <text x="239" y="286" text-anchor="middle" font-size="10">mes 3</text>
+            <text x="420" y="286" text-anchor="middle" font-size="10">mes 6</text>
+            <text x="601" y="286" text-anchor="middle" font-size="10">mes 9</text>
+            <text x="782" y="286" text-anchor="end" font-size="10">mes 12</text>
+
+            <!-- se adjudicó algo -->
+            <polyline fill="none" stroke="#1A7F52" stroke-width="2.5" stroke-linejoin="round"
+              points="58.0,26.0 118.3,33.3 178.7,40.5 239.0,45.4 299.3,52.6 359.7,57.5 420.0,62.3 480.3,67.1 540.7,72.0 601.0,74.4 661.3,79.2 721.7,81.7 782.0,84.1"/>
+            <!-- no se adjudicó nada -->
+            <polyline fill="none" stroke="#C0362C" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round"
+              points="58.0,26.0 118.3,45.4 178.7,69.6 239.0,88.9 299.3,113.1 359.7,134.9 420.0,151.8 480.3,166.4 540.7,178.5 601.0,188.1 661.3,197.8 721.7,205.1 782.0,209.9"/>
+
+            <circle cx="782" cy="84.1" r="4.5" fill="#1A7F52" stroke="#FBF9F4" stroke-width="2"/>
+            <circle cx="782" cy="209.9" r="4.5" fill="#C0362C" stroke="#FBF9F4" stroke-width="2"/>
+            <text x="775" y="75" text-anchor="end" font-size="10.5" fill="#1A7F52" font-weight="600">Se adjudicó algo · 76%</text>
+            <text x="775" y="201" text-anchor="end" font-size="10.5" fill="#C0362C" font-weight="600">No ganó nada · 24%</text>
+
+            <!-- marca de los 90 días -->
+            <line x1="239" y1="26" x2="239" y2="268" stroke="#8A5B0B" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="245" y="40" font-size="10" fill="#8A5B0B" font-weight="600">Día 90: el momento de la verdad</text>
+          </svg>
+        </div>
+        <div class="leyenda">
+          <span><i style="background:#1A7F52"></i> Se adjudicó ≥1 licitación en 90 días</span>
+          <span><i style="background:#C0362C; height:0; border-bottom:2px dashed #C0362C"></i> No se adjudicó nada</span>
+        </div>
+      </div>
+
+      <div class="ficha" style="margin-top:var(--sp-s)">
+        <p class="ficha-h">Qué hacemos con esto</p>
+        <div class="calc" style="margin-bottom:var(--sp-s)">
+          Si 42% de los clientes gana algo en 90 días:<br>
+          Retención m12 <span class="eq">=</span> 0,42 × 76% <span class="eq">+</span> 0,58 × 24% <span class="eq">=</span> <span class="res">46%</span><br>
+          <span class="eq">→</span> churn implícito ≈ <span class="res">6,3% / mes</span> &nbsp; <span style="color:var(--muted)">(peor que el 4% del escenario base)</span>
+        </div>
+        <p class="prose"><strong>El escenario base sólo se sostiene si más de la mitad de los clientes se adjudica algo en 90 días.</strong> De ahí salen las dos decisiones de producto menos obvias de todo el plan:</p>
+        <ol class="lista" style="margin-top:var(--sp-s)">
+          <li><span class="n">01</span><div><strong>Calificar duro en la venta.</strong> Si el feed de un prospecto muestra dos oportunidades al mes y ninguna le calza, <strong>le decimos que no nos pague</strong>. Vender a quien no puede ganar es comprar churn con descuento.</div></li>
+          <li><span class="n">02</span><div><strong>Vender también el ahorro de horas.</strong> Las horas ahorradas las controlamos al 100%; las adjudicaciones no. Un cliente que no ganó nada pero ahorró 30 horas al mes tiene una razón para quedarse. Es nuestra red de seguridad contra este mismo gráfico.</div></li>
+        </ol>
+        <p class="nota" style="margin-top:var(--sp-s)"><b>Estos números son un modelo, no una medición.</b> Las curvas son la forma que esperamos, no datos observados: no tenemos clientes todavía. La forma (una brecha grande entre quien obtiene resultado y quien no) es el patrón conocido de SaaS atado a outcomes. <b>La magnitud hay que medirla, y es la métrica #1 a instrumentar desde el cliente número uno.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRÁFICO 4: HITOS ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>04</b> · Línea de tiempo</p>
+
+    <div class="fig">
+      <p class="fig-h">Figura 4</p>
+      <h2 class="fig-t">Los seis hitos y dónde está la guillotina</h2>
+      <p class="fig-s">Cada rombo es un criterio de muerte: la observación concreta que debería hacernos parar.</p>
+
+      <div class="fig-box">
+        <div class="scroll-x">
+          <svg class="chart" viewBox="0 0 800 210" role="img" aria-labelledby="t4 d4">
+            <title id="t4">Línea de tiempo de los seis hitos con sus criterios de muerte</title>
+            <desc id="d4">Seis hitos entre el mes 0 y el mes 24: validación, primer cliente pagando, primeros diez, venta repetible, escala de canal y punto de decisión.</desc>
+
+            <line x1="40" y1="105" x2="770" y2="105" stroke="#C4BBA6" stroke-width="2"/>
+
+            <!-- H1 m0-3 -->
+            <circle cx="40" cy="105" r="7" fill="#C0362C"/>
+            <text x="40" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H1</text>
+            <text x="40" y="130" text-anchor="middle" font-size="9.5">m0–3</text>
+            <text x="40" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Validación</text>
+            <rect x="33" y="160" width="14" height="14" fill="#C0362C" transform="rotate(45 40 167)"/>
+
+            <!-- H2 m4-6 -->
+            <circle cx="186" cy="105" r="7" fill="#C0362C"/>
+            <text x="186" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H2</text>
+            <text x="186" y="130" text-anchor="middle" font-size="9.5">m4–6</text>
+            <text x="186" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Primer pago</text>
+            <rect x="179" y="160" width="14" height="14" fill="#C0362C" transform="rotate(45 186 167)"/>
+
+            <!-- H3 m7-9 (valle) -->
+            <circle cx="332" cy="105" r="9" fill="#C0362C" stroke="#17150F" stroke-width="2"/>
+            <text x="332" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H3</text>
+            <text x="332" y="130" text-anchor="middle" font-size="9.5">m7–9</text>
+            <text x="332" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Primeros 10</text>
+            <text x="332" y="60" text-anchor="middle" font-size="9.5" fill="#C0362C" font-weight="600">▲ VALLE DE CAJA</text>
+            <rect x="325" y="160" width="14" height="14" fill="#C0362C" transform="rotate(45 332 167)"/>
+
+            <!-- H4 m10-15 -->
+            <circle cx="478" cy="105" r="7" fill="#C0362C"/>
+            <text x="478" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H4</text>
+            <text x="478" y="130" text-anchor="middle" font-size="9.5">m10–15</text>
+            <text x="478" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Venta repetible</text>
+            <rect x="471" y="160" width="14" height="14" fill="#C0362C" transform="rotate(45 478 167)"/>
+
+            <!-- H5 m16-23 -->
+            <circle cx="624" cy="105" r="7" fill="#C0362C"/>
+            <text x="624" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H5</text>
+            <text x="624" y="130" text-anchor="middle" font-size="9.5">m16–23</text>
+            <text x="624" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Escala de canal</text>
+            <rect x="617" y="160" width="14" height="14" fill="#C0362C" transform="rotate(45 624 167)"/>
+
+            <!-- H6 m24 -->
+            <circle cx="770" cy="105" r="9" fill="#17150F"/>
+            <text x="770" y="88" text-anchor="middle" font-size="11" fill="#17150F" font-weight="600">H6</text>
+            <text x="770" y="130" text-anchor="middle" font-size="9.5">m24</text>
+            <text x="770" y="143" text-anchor="middle" font-size="9.5" fill="#4A463C">Decisión</text>
+            <rect x="763" y="160" width="14" height="14" fill="#17150F" transform="rotate(45 770 167)"/>
+
+            <text x="400" y="195" text-anchor="middle" font-size="9.5" fill="#6B6455">◆ = criterio de muerte declarado</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HITOS DETALLADOS ===== -->
+    <div style="margin-top:var(--sp-l)">
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 1</span><span class="hito-f">Mes 0 → 3</span>
+          <span class="hito-t">Validación con design partners</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>Qué es cierto si lo logramos</h4>
+            <p>8 design partners usaron Adjudate para enviar <strong>25 postulaciones reales</strong>. Al menos 6 de 8 dicen que no volverían a postular sin esto. Tenemos medido cuántas horas ahorra por postulación y cuántos requisitos habrían olvidado sin el chequeo. El lector de bases extrae ≥90% de los requisitos de 50 bases reales, verificado a mano, una por una.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>$21M</span>
+              <span><b>Headcount</b>2 fundadores</span>
+              <span><b>Quema</b>$7M/mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>Si en las 40 entrevistas los proveedores dicen que <strong>pierden por precio o por relaciones, no por formalismo</strong> — o si al reconstruir 20 postulaciones perdidas resulta que menos de 4 se perdieron por un tema de papeleo o de plazo — el producto no ataca la causa real. <strong>Se para acá, en el mes 3, y nos ahorramos dos años.</strong></p>
+        </div>
+      </article>
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 2</span><span class="hito-f">Mes 4 → 6</span>
+          <span class="hito-t">Primer cliente pagando</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>Qué es cierto si lo logramos</h4>
+            <p>Al menos <strong>3 clientes pagan con tarjeta</strong>, sin descuento de fundador y sin favor personal. Uno de ellos pasó de gratis a pagado por decisión propia. Al menos un design partner se adjudicó una licitación usando Adjudate y podemos contarlo con nombre y monto.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>$21M acum.</span>
+              <span><b>Headcount</b>2 + 1 especialista part-time</span>
+              <span><b>Quema</b>$7M/mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>Si de 8 design partners que dijeron amarlo, <strong>menos de 3 pagan cuando les cobramos</strong>. "Me encanta pero no lo pagaría" es un NO con buenos modales. Si dos rondas de venta seguidas mueren en el precio, el problema es real pero no vale $59.000/mes: hay que rediseñar el negocio, no seguir vendiendo.</p>
+        </div>
+      </article>
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 3</span><span class="hito-f">Mes 7 → 9 · valle de caja</span>
+          <span class="hito-t">Primeros 10 clientes pagando</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>Qué es cierto si lo logramos</h4>
+            <p><strong>10+ clientes pagando</strong>, MRR ≈ $1M, CAC medido bajo $300.000 y al menos 5 clientes llegados por el canal de outbound sobre dato público (no por el amigo de un fundador). Ya tenemos <strong>2 adjudicaciones ganadas con Adjudate</strong> que podemos publicar. Con eso se sale a levantar la ronda de ~$450M.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>$6,4M ⚠</span>
+              <span><b>Headcount</b>3</span>
+              <span><b>Quema</b>$7M/mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>Aquí hay dos guillotinas. <strong>(a)</strong> Si en el mes 9 no hay 10 clientes pagando y la caja está en $6,4M, <strong>no se levanta plata con esa tracción</strong>: se achica a 2 personas y se bootstrapea, o se cierra. <strong>(b)</strong> Si el CAC medido supera <strong>$450.000</strong> (payback &gt;5,7 meses), el canal no funciona y no hay ronda que lo arregle — se apaga el gasto y se vuelve a distribución (contadores, gremios).</p>
+        </div>
+      </article>
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 4</span><span class="hito-f">Mes 10 → 15</span>
+          <span class="hito-t">Venta repetible (sale sin los fundadores)</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>Qué es cierto si lo logramos</h4>
+            <p>Un vendedor <strong>que no es fundador</strong> cierra clientes con un guion escrito, a un CAC comparable. 45-60 clientes pagando, MRR ≈ $5M. Y lo más importante: la primera cohorte cumplió 6 meses y <strong>retiene sobre 70%</strong>. El gráfico de cohortes deja de ser un modelo y pasa a ser un dato.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>~$415M post-ronda</span>
+              <span><b>Headcount</b>5</span>
+              <span><b>Quema</b>$18M/mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>Si la <strong>retención a 6 meses de la primera cohorte cae bajo 55%</strong>, la Figura 3 se hizo realidad en su versión mala: los clientes se van porque no ganan, y no lo podemos arreglar con producto. El negocio no tiene fondo. Se para y se devuelve lo que quede de la ronda.</p>
+        </div>
+      </article>
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 5</span><span class="hito-f">Mes 16 → 23</span>
+          <span class="hito-t">Escala de canal + primer país nuevo</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>Qué es cierto si lo logramos</h4>
+            <p>El canal de contadores y software PYME entrega ≥30% de los clientes nuevos a un CAC bajo $150.000. 150-270 clientes, MRR $15-25M. <strong>Y hay una versión de Perú (SEACE) corriendo con 10 clientes pagando</strong>, que es lo único que demuestra que la tesis LatAm no era una lámina de PowerPoint.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>~$280M</span>
+              <span><b>Headcount</b>8</span>
+              <span><b>Quema</b>$28M/mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>Si al mes 20 <strong>ningún canal escala</strong> (todo sigue siendo outbound hecho a mano por humanos) <strong>y</strong> Perú no despega, entonces esto es una consultora con software, no una empresa de software. Hay que reconocerlo, achicar a un equipo rentable de 4 y dejar de fingir que es una startup de riesgo.</p>
+        </div>
+      </article>
+
+      <article class="hito">
+        <div class="hito-h">
+          <span class="hito-n">HITO 6</span><span class="hito-f">Mes 24</span>
+          <span class="hito-t">Punto de decisión: levantar, bootstrapear o matar</span>
+        </div>
+        <div class="hito-b">
+          <div>
+            <h4>La decisión, con umbrales puestos antes de tener el dato</h4>
+            <p><strong>LEVANTAR (Serie A):</strong> MRR ≥ $25M (base o mejor), retención a 12 meses ≥ 65%, Perú creciendo. Hay una historia de mercado regional que se sostiene sola.</p>
+            <p style="margin-top:.5rem"><strong>BOOTSTRAPEAR:</strong> MRR entre $8M y $25M, retención ≥ 55%, y el negocio está cerca de punto de equilibrio con un equipo de 5. <strong>No es fracaso.</strong> Es una empresa rentable de nicho, y en un TAM chileno de US$35M es probablemente el resultado más honesto.</p>
+            <p style="margin-top:.5rem"><strong>MATAR:</strong> MRR &lt; $8M (peor que pesimista) o retención &lt; 45%. Se devuelve lo que quede y se escribe el post-mortem público.</p>
+          </div>
+          <div>
+            <h4>Recursos</h4>
+            <div class="recursos">
+              <span><b>Caja</b>~$271M</span>
+              <span><b>Headcount</b>8</span>
+              <span><b>Quema</b>$28M/mes</span>
+            </div>
+            <p class="nota" style="margin-top:var(--sp-s)">Al mes 24 la quema todavía supera el ingreso neto en el escenario base ($28M vs $21,2M). <strong>Esta decisión no se puede postergar.</strong></p>
+          </div>
+        </div>
+        <div class="muerte">
+          <h4>Criterio de muerte</h4>
+          <p>El default es <strong>matar</strong>, no continuar. Si al mes 24 hay que argumentar mucho para justificar por qué seguir, la respuesta ya es no.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROBABILIDAD ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>05</b> · Probabilidad de éxito</p>
+    <h2>Un rango, con la derivación a la vista.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-block: var(--sp-s) var(--sp-m); max-width:70ch">Un número único y confiado ("68% de éxito") es autoridad inventada. Acá va el método: clase de referencia, ajustes declarados, y un rango condicional a los hitos.</p>
+
+    <h3 style="margin-top:var(--sp-l)">Paso 1 — Clase de referencia</h3>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Clase de referencia</th><th class="num">Tasa base</th><th>Calidad del dato</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>SaaS B2B que llega a <strong>US$1M ARR</strong></td>
+            <td class="num">~5–10%</td>
+            <td>Orden de magnitud ampliamente reportado en la industria (datos agregados tipo ChartMogul / Point Nine). <strong>No es un estudio revisado; lo usamos como ancla, no como verdad.</strong></td>
+          </tr>
+          <tr>
+            <td>Startups que pasan de <strong>seed a Serie A</strong></td>
+            <td class="num">~25–35%</td>
+            <td>Cifra ampliamente reportada por Crunchbase/PitchBook. Sirve para el hito 6, no para "éxito".</td>
+          </tr>
+          <tr style="background:var(--acento-lav)">
+            <td><strong>SaaS B2B vertical fundado en Chile que llega a US$1M ARR</strong></td>
+            <td class="num">No lo sabemos</td>
+            <td><strong>No encontramos una serie chilena confiable</strong>, y no la vamos a inventar. Ni CORFO ni Start-Up Chile publican supervivencia de SaaS B2B por tramo de ARR. Trabajamos con la clase global y ajustamos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s)"><b>Tomamos 7% como tasa base</b> (punto medio de la clase SaaS B2B → US$1M ARR).</p>
+
+    <h3>Paso 2 — Ajustes para <em>esta</em> idea</h3>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Ajuste</th><th class="num">Factor</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>↑ El presupuesto <strong>ya existe</strong></td><td class="num">×1,4</td><td>No hay que crear una categoría: las PYMEs ya pagan $150k–$400k por postulación a un gestor. Vender contra un gasto existente es mucho más fácil que contra la nada.</td></tr>
+          <tr><td>↑ Canal de outbound sobre <strong>dato público</strong></td><td class="num">×1,6</td><td>Sabemos por nombre, RUT y monto quién perdió una licitación. Casi ninguna startup B2B arranca con un ICP tan perfectamente enumerable.</td></tr>
+          <tr><td>↑ Cuña afilada y dato propietario acumulable</td><td class="num">×1,2</td><td>Un rubro, bases repetidas, y con cada postulación aprendemos qué gana.</td></tr>
+          <tr><td>↓ <strong>TAM chileno chico</strong> (US$35M)</td><td class="num">×0,7</td><td>Llegar a US$1M ARR exige ~3% del TAM chileno total o salir a LatAm antes del mes 24. La expansión suma riesgo de ejecución.</td></tr>
+          <tr><td>↓ <strong>Riesgo de incumbente estatal</strong></td><td class="num">×0,8</td><td>ChileCompra puede lanzar algo gratis. Es un riesgo binario que no controlamos.</td></tr>
+          <tr><td>↓ <strong>Retención atada a un outcome ajeno</strong></td><td class="num">×0,8</td><td>La Figura 3. Es el riesgo que más nos preocupa y el que menos podemos gestionar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Paso 3 — El resultado, como rango</h3>
+    <div class="calc">
+      Base  <span class="eq">=</span> 7%<br>
+      Ajustes al alza  <span class="eq">=</span> 1,4 × 1,6 × 1,2  <span class="eq">=</span> <span class="res">2,69</span><br>
+      Ajustes a la baja <span class="eq">=</span> 0,7 × 0,8 × 0,8  <span class="eq">=</span> <span class="res">0,448</span><br>
+      <span class="eq">──────────────────────────────────────────</span><br>
+      7% × 2,69 × 0,448  <span class="eq">=</span> <span class="res">8,4%</span><br><br>
+      Los seis factores son juicios nuestros, no mediciones. Aplicando ±40% de incertidumbre<br>
+      sobre el producto de los ajustes:<br>
+      <span class="eq">→</span> <span class="res">Rango: 5% – 12%</span>
+    </div>
+
+    <div class="grid g3" style="margin-top:var(--sp-m)">
+      <div class="ficha" style="border-color:var(--acento)">
+        <span class="cifra rojo">5 – 12%</span>
+        <span class="cifra-pie"><strong>Llegar a US$1M ARR en 36 meses</strong> (≈ el caso "levantar Serie A"). Condicional a superar el Hito 3 en el mes 9.</span>
+      </div>
+      <div class="ficha" style="border-color:var(--ok)">
+        <span class="cifra" style="color:var(--ok)">30 – 40%</span>
+        <span class="cifra-pie"><strong>Negocio rentable y sostenible</strong> (US$300k–500k ARR, equipo de 5, sin levantar). El TAM chileno da exactamente para esto. Condicional a 10 clientes pagando en el mes 9 con CAC &lt; $300.000.</span>
+      </div>
+      <div class="ficha">
+        <span class="cifra">50 – 60%</span>
+        <span class="cifra-pie"><strong>Muerte total</strong> (cierre o abandono en 24 meses). Es lo más probable, y decirlo es el punto de este documento.</span>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m)">
+      <p class="ficha-h">Cómo leer estos tres números</p>
+      <p class="prose"><strong>Esta idea es mucho mejor negocio pequeño que negocio grande</strong>, y el análisis lo dice sin ambigüedad: 30-40% de que sea un buen negocio de US$400k ARR, 5-12% de que sea una startup de riesgo. Si lo que buscas es levantar una Serie A, la única versión que sirve es la de LatAm, y hay que decidirlo <strong>antes</strong> de empezar, no en el mes 20.</p>
+      <p class="prose" style="margin-top:var(--sp-s)"><strong>Y hay un número que domina a todos los demás:</strong> qué fracción de clientes se adjudica algo en 90 días. Si es &gt;50%, el escenario base se sostiene. Si es &lt;30%, ninguno de los tres escenarios ocurre y todo esto es aritmética decorativa. <strong>Se instrumenta desde el cliente número uno.</strong></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong style="font-family:var(--mono); color:var(--ink)">ADJUDATE</strong> &mdash; adjudate.com · Prototipo. Todas las proyecciones son modelos con supuestos declarados, no predicciones.</p>
+    <p><a href="../index.html">&larr; Ideas</a> · <a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('navBtn'), m = document.getElementById('navMob');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.textContent = open ? 'Cerrar' : 'Menú';
+  });
+})();
+</script>
+</body>
+</html>

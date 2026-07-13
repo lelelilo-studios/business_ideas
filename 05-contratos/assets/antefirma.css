@@ -1,0 +1,283 @@
+/* ============================================================================
+   ANTEFIRMA — Dirección de arte: MARGINALIA JURÍDICA
+   ----------------------------------------------------------------------------
+   El producto es un documento. Entonces el sitio es un documento: papel de
+   expediente cálido, tipografía de imprenta legal, números de cláusula colgando
+   en el margen, reglas finas de formulario — y una sola tinta roja de corrector
+   que aparece ÚNICAMENTE donde hay peligro. El rojo no decora: acusa.
+
+   Pairing tipográfico deliberado:
+     · Spectral      — el documento y los titulares. Serif de contraste alto
+                       diseñada para pantalla, con aire de imprenta jurídica.
+     · IBM Plex Mono — la anotación al margen: números de cláusula, montos en
+                       CLP/UF, RUT, fechas, etiquetas. La letra del timbre.
+   Nada de Inter/Poppins: son la tipografía de un dashboard SaaS. Esto no es un
+   dashboard, es un contrato que alguien por fin leyó.
+
+   Paleta de riesgo VALIDADA (validate_palette.js, superficie #F7F4EC):
+     crítico #A81E12 · revisar #B8811A · estándar #1F7A4C
+     CVD deutan ΔE 22.1 (objetivo ≥12) · contraste ≥3:1 · todos PASS.
+   Aun así, cada nivel se acompaña SIEMPRE de icono + palabra. Nunca color solo.
+   ========================================================================== */
+
+:root {
+  /* Papel y tinta */
+  --papel:        #F7F4EC;
+  --hoja:         #FFFDF7;
+  --hoja-2:       #F1EDE1;
+  --tinta:        #15120D;
+  --tinta-2:      #57503F;
+  --tinta-3:      #8A8271;
+  --regla:        #D8D2C2;
+  --regla-fuerte: #B9B099;
+
+  /* Acento único: rojo de corrector */
+  --rojo:         #A81E12;
+  --rojo-hover:   #8B180E;
+  --rojo-tenue:   #F6E5E2;
+
+  /* Escala de riesgo (dato, no marca) — validada */
+  --critico:       #A81E12;
+  --critico-tenue: #F6E5E2;
+  --revisar:       #B8811A;
+  --revisar-tenue: #F8EFDD;
+  --estandar:      #1F7A4C;
+  --estandar-tenue:#E2EFE7;
+
+  --foco: #15120D;
+
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --serif: "Spectral", Georgia, "Times New Roman", serif;
+}
+
+/* ---------------------------------------------------------------- base ---- */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--serif);
+  font-size: var(--step-0);
+  font-weight: 400;
+  /* Textura de papel: una trama finísima, no una imagen. */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(21,18,13,.014) 0 1px, transparent 1px 3px);
+}
+
+::selection { background: var(--rojo); color: var(--hoja); }
+
+h1, h2, h3, h4 {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); font-weight: 700; line-height: 1.04; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); line-height: 1.2; }
+p  { text-wrap: pretty; }
+
+a { color: var(--rojo); text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible { outline: 2px solid var(--foco); outline-offset: 3px; border-radius: 1px; }
+
+/* Etiqueta de sección: mono, versalita, con una regla al lado. */
+.rotulo {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2xs);
+  margin-bottom: var(--sp-s);
+}
+.rotulo::after {
+  content: ""; flex: 1; height: 1px; background: var(--regla);
+}
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.cifra { font-family: var(--mono); font-weight: 600; font-variant-numeric: tabular-nums;
+         letter-spacing: -0.02em; }
+
+/* --------------------------------------------------------- navegación ---- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--papel) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--regla);
+}
+.nav__fila {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-s); min-height: 58px;
+}
+.marca {
+  font-family: var(--serif);
+  font-weight: 700; font-size: 1.16rem; letter-spacing: -0.02em;
+  text-decoration: none; color: var(--tinta);
+  display: flex; align-items: center; gap: 8px;
+}
+.marca:hover { text-decoration: none; }
+.marca svg { flex: none; }
+.marca__punto { color: var(--rojo); }
+
+.nav__toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 0 10px;
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--tinta-2);
+  border: 1px solid var(--regla-fuerte); background: var(--hoja);
+}
+.nav__menu {
+  display: none; list-style: none;
+  border-top: 1px solid var(--regla);
+  padding: var(--sp-2xs) 0 var(--sp-s);
+}
+.nav__menu.abierto { display: block; }
+.nav__menu a {
+  display: block; padding: 13px 2px;
+  font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.04em;
+  color: var(--tinta-2); text-decoration: none;
+  border-bottom: 1px solid var(--regla);
+  min-height: 44px; line-height: 20px;
+}
+.nav__menu a:hover { color: var(--rojo); }
+.nav__menu a[aria-current="page"] { color: var(--tinta); font-weight: 600; }
+.nav__menu a[aria-current="page"]::before { content: "▸ "; color: var(--rojo); }
+
+@media (min-width: 62em) {
+  .nav__toggle { display: none; }
+  .nav__menu {
+    display: flex !important; gap: var(--sp-m); align-items: center;
+    border: 0; padding: 0;
+  }
+  .nav__menu a {
+    border: 0; padding: 4px 0; min-height: 0;
+    border-bottom: 2px solid transparent;
+  }
+  .nav__menu a[aria-current="page"] { border-bottom-color: var(--rojo); }
+  .nav__menu a[aria-current="page"]::before { content: none; }
+}
+
+/* -------------------------------------------------------------- botones -- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 13px 22px; min-height: 48px;
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 500;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  text-decoration: none; border: 1px solid var(--tinta);
+  background: var(--tinta); color: var(--papel);
+  transition: transform .12s ease, background .12s ease;
+}
+.btn:hover { background: var(--rojo); border-color: var(--rojo); text-decoration: none;
+             transform: translateY(-1px); }
+.btn--fantasma { background: transparent; color: var(--tinta); }
+.btn--fantasma:hover { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.btn--rojo { background: var(--rojo); border-color: var(--rojo); color: var(--hoja); }
+.btn--rojo:hover { background: var(--rojo-hover); border-color: var(--rojo-hover); }
+.btn--chico { padding: 8px 13px; min-height: 40px; font-size: 0.72rem; }
+
+/* --------------------------------------------------------------- hoja ---- */
+/* La superficie base: una hoja de papel sobre el escritorio. Sin sombra suave,
+   sin esquinas redondeadas: una hoja tiene cantos. */
+.hoja {
+  background: var(--hoja);
+  border: 1px solid var(--regla);
+  box-shadow: 3px 3px 0 var(--hoja-2);
+}
+
+/* Sello: el veredicto, rotado como un timbre mal puesto. */
+.sello {
+  display: inline-block;
+  border: 2px solid var(--rojo); outline: 1px solid var(--rojo); outline-offset: 2px;
+  color: var(--rojo);
+  font-family: var(--mono); font-weight: 600;
+  font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 7px 13px; transform: rotate(-2.5deg);
+  background: color-mix(in srgb, var(--rojo-tenue) 60%, transparent);
+}
+
+/* Insignia de riesgo — SIEMPRE icono + palabra. Nunca color solo. */
+.insignia {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px 4px 7px; border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.insignia svg { flex: none; }
+.insignia--critico  { color: var(--critico);  background: var(--critico-tenue); }
+.insignia--revisar  { color: var(--revisar);  background: var(--revisar-tenue); }
+.insignia--estandar { color: var(--estandar); background: var(--estandar-tenue); }
+
+/* Subrayado ondulado del corrector, bajo el texto que muerde. */
+.ondulado {
+  text-decoration: underline wavy var(--rojo);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+/* Nota al margen — el gesto central de la dirección de arte. */
+.nota-margen {
+  border-left: 2px solid var(--rojo);
+  padding-left: var(--sp-s);
+  font-size: var(--step--1);
+  color: var(--tinta-2);
+}
+
+/* Regla de formulario */
+.regla { height: 1px; background: var(--regla); border: 0; margin: var(--sp-xl) 0; }
+
+/* Aviso legal: honesto y visible, no en letra chica. Eso es el punto. */
+.aviso {
+  border: 1px dashed var(--regla-fuerte);
+  background: var(--hoja-2);
+  padding: var(--sp-s);
+  font-size: var(--step--1);
+  color: var(--tinta-2);
+  display: flex; gap: var(--sp-xs); align-items: flex-start;
+}
+.aviso svg { flex: none; margin-top: 2px; color: var(--tinta-3); }
+.aviso strong { color: var(--tinta); font-weight: 600; }
+
+/* --------------------------------------------------------------- tabla --- */
+.tabla { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.tabla th, .tabla td {
+  text-align: left; padding: 11px 14px 11px 0;
+  border-bottom: 1px solid var(--regla); vertical-align: top;
+}
+.tabla th {
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--tinta-3);
+  border-bottom: 1px solid var(--regla-fuerte);
+  white-space: nowrap;
+}
+.tabla td.num, .tabla th.num { text-align: right; font-family: var(--mono);
+  font-variant-numeric: tabular-nums; padding-right: 0; }
+.tabla tbody tr:hover { background: var(--hoja); }
+.scroll-x { border-bottom: 1px solid var(--regla); }
+.scroll-x table { min-width: 640px; }
+
+/* ---------------------------------------------------------------- pie ---- */
+.pie {
+  border-top: 1px solid var(--regla); margin-top: var(--sp-3xl);
+  padding: var(--sp-l) 0 var(--sp-xl);
+  font-family: var(--mono); font-size: 0.74rem; color: var(--tinta-3);
+}
+.pie__fila { display: flex; flex-direction: column; gap: var(--sp-2xs); }
+@media (min-width: 48em) {
+  .pie__fila { flex-direction: row; justify-content: space-between; align-items: center; }
+}
+
+/* -------------------------------------------------------------- utilid --- */
+.seccion { padding: var(--sp-2xl) 0; }
+@media (min-width: 62em) { .seccion { padding: var(--sp-3xl) 0; } }
+.pila > * + * { margin-top: var(--sp-s); }
+.centro { max-width: 62ch; }
+.gris { color: var(--tinta-2); }
+.rojo { color: var(--rojo); }

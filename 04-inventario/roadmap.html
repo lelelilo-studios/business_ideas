@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermata — Roadmap</title>
+<meta name="description" content="Seis hitos del día 1 al mes 24, cada uno con su criterio de muerte. Trayectoria de MRR en tres escenarios, caja, embudo de activación y probabilidad de éxito con su derivación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="mermata.css">
+<style>
+  .hito { border-top: 2px solid var(--tinta); padding-top: var(--sp-s); }
+  .hito-cab { display: flex; gap: var(--sp-xs); align-items: baseline; flex-wrap: wrap; margin-bottom: var(--sp-2xs); }
+  .hito-n { font-family: var(--mono); font-size: var(--step-1); font-weight: 500; color: var(--acento-osc); }
+  .hito-fecha { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); margin-left: auto; }
+  .hito h3 { font-size: var(--step-1); margin: 0; }
+  .hito-meta { display: flex; gap: var(--sp-s); flex-wrap: wrap; margin: var(--sp-xs) 0; }
+  .hito-meta div { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); }
+  .hito-meta b { color: var(--tinta); font-weight: 500; }
+  .muerte {
+    background: #f6e4e0; border-left: 3px solid var(--riesgo);
+    padding: var(--sp-xs); margin-top: var(--sp-xs); border-radius: var(--radio);
+  }
+  .muerte .rot {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--riesgo); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-weight: 500;
+  }
+  .muerte p { margin: 0; font-size: var(--step--1); color: var(--tinta-2); }
+  .prob-barra { height: 26px; background: var(--papel-3); border: 1px solid var(--regla-2); border-radius: var(--radio); position: relative; overflow: hidden; margin: var(--sp-s) 0 var(--sp-2xs); }
+  .prob-rango { position: absolute; top: 0; bottom: 0; background: var(--s1); opacity: .85; }
+  .prob-esc { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="19" height="19" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 15.5L8.5 9.5L12 13L17 5.5" stroke="#b8452b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="5.5" r="1.9" fill="#b8452b"/>
+      </svg>
+      Merma<span class="marca-pt">ta</span>
+    </a>
+    <nav class="nav-lista" aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="navpanel">
+      <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M0 1h14M0 6h14M0 11h14" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-nav-txt>Menú</span>
+    </button>
+  </div>
+</header>
+<div class="nav-panel" id="navpanel" data-nav-panel>
+  <div class="container">
+    <nav class="nav-lista" aria-label="Principal móvil">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+<section class="seccion container">
+  <span class="sello sello-acento">Roadmap · jul 2026 → jul 2028</span>
+  <h1 style="margin: var(--sp-2xs) 0 var(--sp-s); max-width: 22ch;">Seis hitos. Cada uno con la forma exacta en que puede matarnos.</h1>
+  <p class="prose" style="font-size: var(--step-1); color: var(--tinta-2);">Un roadmap sin criterios de muerte es una lista de deseos. Cada hito de abajo trae, además de la fecha y la plata, la condición concreta bajo la cual <b>hay que parar</b>. Escritas ahora, en frío, para que no se puedan renegociar después en caliente.</p>
+  <p class="prose fuente">Mes 0 = julio de 2026. Todas las cifras de caja, equipo y MRR salen de un mismo modelo mensual; los supuestos están declarados junto a cada gráfico y son los mismos que aparecen en <a href="negocio.html">negocio</a> y <a href="stack.html">arquitectura</a>.</p>
+</section>
+
+<!-- ============ GRÁFICO 4: LÍNEA DE TIEMPO ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>El mapa completo</h2>
+    <p>Seis hitos, dos levantamientos, y el punto exacto donde la caja llega a su mínimo. El rombo rojo marca dónde cada hito puede fallar.</p>
+  </div>
+  <div class="envoltura-gfx">
+    <div id="g-tiempo"></div>
+    <div class="leyenda">
+      <span><i class="llave" style="background:var(--s1)"></i> Ventana del hito</span>
+      <span style="color: var(--riesgo)">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="flex:none"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg>
+        Criterio de muerte — se evalúa en esa fecha
+      </span>
+      <span><i class="llave" style="background:var(--tinta); width:2px; height:14px; border-radius:0"></i> Levantamiento de capital</span>
+    </div>
+    <p class="pie-gfx">Cada barra va desde que el trabajo empieza hasta la fecha en que el hito se declara logrado o fallido. No hay barras que se solapen por casualidad: H4 (canal) y H5 (retención) corren en paralelo a propósito, porque si el canal funciona y la retención no, escalamos un producto roto.</p>
+  </div>
+</section>
+
+<!-- ============ LOS 6 HITOS ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Los seis hitos</h2>
+  </div>
+
+  <div class="rejilla rejilla-2" style="gap: var(--sp-l) var(--sp-l);">
+
+    <!-- H1 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H1</span>
+        <h3>La señal existe</h3>
+        <span class="hito-fecha">Mes 2 · sep 2026</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> que se puede reconstruir la venta diaria por producto de un local chileno leyendo <b>solo</b> sus DTE del SII, sin integrar el POS. Es la hipótesis sobre la que descansa todo lo demás, y se responde con 20 conexiones y cero código de producto.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$12,6M</b></div>
+        <div>Equipo <b>2</b></div>
+        <div>Producto <b>ninguno</b></div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p>De 20 locales conectados, <b>menos de 8</b> emiten boleta con detalle por producto utilizable. Si el 60% del rubro emite una boleta que dice «VENTA $12.400» y nada más, no hay serie que pronosticar y este producto no puede existir sobre el SII. Se mata, o se pivota a integración POS una por una — que es un negocio distinto, más lento y peor, y esa decisión hay que tomarla explícitamente, no por inercia.</p>
+      </div>
+    </article>
+
+    <!-- H2 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H2</span>
+        <h3>Alguien paga</h3>
+        <span class="hito-fecha">Mes 4 · nov 2026</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> que el número de la merma, por sí solo, vale plata. Entregamos 10 diagnósticos gratis; cobramos $190.000 por el informe; 3 locales pasan a pagar $99.000/mes con un producto que todavía es medio manual y una planilla.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$28,9M</b></div>
+        <div>Equipo <b>2</b></div>
+        <div>MRR <b>$297.000</b></div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p><b>Menos de 2 de cada 10</b> diagnósticos convierten a pago después de que el dueño vio, en pesos, cuánta plata botó el año pasado. Si mostrarle a alguien que perdió $9 millones no lo mueve a pagar $99.000, el dolor no es lo bastante agudo y ningún producto lo va a arreglar. Es la señal más limpia y la más barata de obtener.</p>
+      </div>
+    </article>
+
+    <!-- H3 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H3</span>
+        <h3>El modelo le gana al dueño</h3>
+        <span class="hito-fecha">Mes 6 · ene 2027</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> que la máquina pronostica mejor que doce años de oficio. Medición ciega: el dueño escribe su pedido, nosotros escribimos el nuestro, se comparan contra la venta real a 7 días. Objetivo: MAPE del modelo menor que el del dueño en <b>15 de 20 SKU de alta rotación</b>, en 5 locales.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$52,3M</b></div>
+        <div>Equipo <b>3</b></div>
+        <div>Pre-seed <b>US$350k</b> (mes 5)</div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p>Empatar cuenta como perder. El dueño ya tiene su método, es gratis y le funciona; para reemplazarlo hay que ganarle con claridad, no con un 2% de mejora que se pierde en el ruido. Si el modelo no gana en al menos 15 de 20 SKU, el producto no tiene razón de existir y hay que devolver la plata del pre-seed.</p>
+      </div>
+    </article>
+
+    <!-- H4 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H4</span>
+        <h3>Un POS nos distribuye</h3>
+        <span class="hito-fecha">Mes 10 · may 2027</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> que existe un canal que no depende de que nosotros toquemos puertas. Un acuerdo firmado con al menos uno de {Bsale, Toteat, Fudo, Relbase}: integración nativa, revenue share 20%, y <b>≥30 locales llegados por ese canal</b>. No es una carta de intención: son locales pagando.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$128,8M</b></div>
+        <div>Equipo <b>5</b></div>
+        <div>Locales <b>50</b></div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p>Al <b>mes 12</b>, ningún POS quiso firmar <b>y</b> alguno anunció su propio módulo de pronóstico. Esa combinación significa que la ventana se cerró: ellos tienen el dato, la relación y el canal, y ya decidieron usarlos. En ese escenario la única jugada racional es venderles la tecnología y salir, no competirle a tu propio canal de distribución con un décimo de su base instalada. Escrito ahora para no negociarlo después.</p>
+      </div>
+    </article>
+
+    <!-- H5 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H5</span>
+        <h3>El dueño cambia de conducta</h3>
+        <span class="hito-fecha">Mes 15 · oct 2027</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> que el producto no solo acierta, sino que <b>lo usan</b>. 139 locales pagando, churn mensual bajo 5%, y —la métrica que de verdad importa— <b>≥60% de las órdenes se envían editando menos del 20%</b> de las cantidades sugeridas.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$285,9M</b></div>
+        <div>Equipo <b>8</b></div>
+        <div>Seed <b>US$450k</b> (mes 15)</div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p>Churn sobre <b>8% mensual durante 3 meses seguidos</b> en la cohorte madura (más de 6 meses), <b>o</b> tasa de edición del pedido sobre 40% de forma sostenida. Cualquiera de las dos dice lo mismo: el dueño no confía en el modelo y volvió a pedir a ojo. Un pronóstico en el que nadie confía vale exactamente cero, por muy bueno que sea el MAPE.</p>
+      </div>
+    </article>
+
+    <!-- H6 -->
+    <article class="hito">
+      <div class="hito-cab">
+        <span class="hito-n">H6</span>
+        <h3>Máquina, y una prueba fuera de Chile</h3>
+        <span class="hito-fecha">Mes 24 · jul 2028</span>
+      </div>
+      <p style="color: var(--tinta-2); font-size: var(--step--1);"><b style="color:var(--tinta)">Qué es cierto si lo logramos:</b> 359 locales, MRR <b>$30,5M</b> (ARR ~US$381k), dos canales funcionando en paralelo, margen de contribución positivo por cuenta, y 5 locales corriendo en Perú o México sobre el conector de facturación local. Eso último no es un capricho: es la prueba de que el motor no era una curiosidad chilena.</p>
+      <div class="hito-meta">
+        <div>Caja gastada <b>$681,3M</b></div>
+        <div>Caja restante <b>$373M</b></div>
+        <div>Equipo <b>11</b></div>
+      </div>
+      <div class="muerte">
+        <div class="rot"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1L11 6L6 11L1 6Z" fill="currentColor"/></svg> Criterio de muerte</div>
+        <p>CAC sobre <b>$600.000</b> y LTV/CAC bajo <b>2,5×</b> al mes 24. Si eso pasa, el negocio no escala con capital de riesgo — y sigue siendo, tranquilamente, un buen negocio de servicios de 10 personas con clientes contentos. Hay que decirlo en voz alta, dejar de llamarlo startup, dejar de levantar, y operarlo como lo que es. No es un fracaso; es una empresa distinta.</p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ GRÁFICO 1: MRR ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Trayectoria de MRR — tres escenarios</h2>
+    <p>Escenarios <b>ordenados</b>, de peor a mejor. El caso base es el que financia el modelo de caja; el pesimista es el que hay que poder sobrevivir; el optimista existe para saber cuánto capital haría falta si funcionara.</p>
+  </div>
+
+  <div class="envoltura-gfx">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-xs);">
+      <div class="ficha-titulo" style="margin:0;">MRR, CLP por mes · mes 1 a mes 24</div>
+      <button type="button" class="btn btn-fantasma btn-sm" data-tabla="t-mrr" aria-pressed="false">Ver como tabla</button>
+    </div>
+    <div id="g-mrr"></div>
+    <div class="leyenda">
+      <span><i class="llave" style="background:#7dabc6"></i> Pesimista</span>
+      <span><i class="llave" style="background:#1f6f99"></i> Base</span>
+      <span><i class="llave" style="background:#08374f"></i> Optimista</span>
+    </div>
+    <div id="t-mrr" hidden>
+      <div class="scroll-x">
+        <table class="tabla tabla-caja" style="min-width: 560px;">
+          <thead><tr><th scope="col">Mes</th><th scope="col" style="text-align:right">Pesimista</th><th scope="col" style="text-align:right">Base</th><th scope="col" style="text-align:right">Optimista</th></tr></thead>
+          <tbody id="tb-mrr"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="pie-gfx">El caso base termina en <b>$30,5M de MRR</b> (359 locales, ARR ~US$381k). No es un número que impresione a un fondo de Silicon Valley — y esa es exactamente la discusión que hay que tener, más abajo.</p>
+  </div>
+
+  <div class="rejilla rejilla-3" style="margin-top: var(--sp-s);">
+    <div class="ficha">
+      <div class="ficha-titulo">Supuestos · Pesimista</div>
+      <div class="calculo">
+        <div>Tasa de cierre <b>8%</b> de los diagnósticos</div>
+        <div>Nuevos/mes al mes 24: <b>11</b></div>
+        <div>Churn mensual <b>5,5%</b></div>
+        <div>ARPU <b>$85.000</b></div>
+        <div>Sin canal POS. Todo a terreno.</div>
+        <hr>
+        <div>Mes 24: <span class="res">92 locales · $7,8M</span></div>
+      </div>
+    </div>
+    <div class="ficha" style="border: 2px solid var(--tinta);">
+      <div class="ficha-titulo">Supuestos · Base</div>
+      <div class="calculo">
+        <div>Tasa de cierre <b>22%</b> de los diagnósticos</div>
+        <div>Nuevos/mes al mes 24: <b>38</b></div>
+        <div>Churn mensual <b>4,0%</b></div>
+        <div>ARPU <b>$85.000</b></div>
+        <div>Un canal POS firmado en el mes 10.</div>
+        <hr>
+        <div>Mes 24: <span class="res">359 locales · $30,5M</span></div>
+      </div>
+    </div>
+    <div class="ficha">
+      <div class="ficha-titulo">Supuestos · Optimista</div>
+      <div class="calculo">
+        <div>Tasa de cierre <b>32%</b> de los diagnósticos</div>
+        <div>Nuevos/mes al mes 24: <b>112</b></div>
+        <div>Churn mensual <b>3,0%</b></div>
+        <div>ARPU <b>$85.000</b></div>
+        <div>Dos canales POS + gremio panadero.</div>
+        <hr>
+        <div>Mes 24: <span class="res">901 locales · $76,5M</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="fuente" style="margin-top: var(--sp-xs);">Las tres curvas usan la misma mecánica: <b>locales(m) = locales(m−1) × (1 − churn) + nuevos(m)</b>, y MRR = locales × ARPU. Lo único que cambia entre escenarios son la tasa de cierre (que fija los nuevos por mes) y el churn. El ARPU se mantiene fijo a propósito: no vamos a explicar el crecimiento subiendo el precio en el escenario que nos conviene.</p>
+</section>
+
+<!-- ============ GRÁFICO 2: CAJA ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>Quema contra ingresos, y el valle</h2>
+    <p>Caso base. Todo en pesos por mes, en un solo eje. El punto que importa es el <b>mes 14</b>: la caja toca su mínimo con 6,4 meses de runway, y ese es el momento en que hay que estar levantando la Seed, no empezando a pensarla.</p>
+  </div>
+
+  <div class="envoltura-gfx">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-xs);">
+      <div class="ficha-titulo" style="margin:0;">Ingresos y egresos, CLP por mes</div>
+      <button type="button" class="btn btn-fantasma btn-sm" data-tabla="t-caja" aria-pressed="false">Ver como tabla</button>
+    </div>
+    <div id="g-caja"></div>
+    <div class="leyenda">
+      <span><i class="llave" style="background:var(--s1)"></i> Ingresos</span>
+      <span><i class="llave" style="background:var(--s2)"></i> Egresos</span>
+      <span><i class="llave" style="background:var(--tinta); width:2px; height:14px; border-radius:0"></i> Levantamiento</span>
+    </div>
+    <div id="t-caja" hidden>
+      <div class="scroll-x">
+        <table class="tabla tabla-caja" style="min-width: 640px;">
+          <thead><tr><th scope="col">Mes</th><th scope="col" style="text-align:right">Ingresos</th><th scope="col" style="text-align:right">Egresos</th><th scope="col" style="text-align:right">Neto</th><th scope="col" style="text-align:right">Caja en banco</th></tr></thead>
+          <tbody id="tb-caja"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="pie-gfx">Las dos series están en la <b>misma unidad y el mismo eje</b> (CLP por mes). La caja en banco no se dibuja acá: es un acumulado, no un flujo, y meterla en el mismo gráfico obligaría a un segundo eje. Está en la tabla y en las fichas de abajo.</p>
+  </div>
+
+  <div class="rejilla rejilla-4" style="margin-top: var(--sp-s);">
+    <div class="tile tile-riesgo">
+      <span class="rotulo">Valle de caja</span>
+      <span class="valor heroe">$160M</span>
+      <span class="delta">mes 14 · 6,4 meses de runway</span>
+    </div>
+    <div class="tile tile-s1">
+      <span class="rotulo">Capital total levantado</span>
+      <span class="valor heroe">US$800k</span>
+      <span class="delta">pre-seed 350k + seed 450k</span>
+    </div>
+    <div class="tile tile-acento">
+      <span class="rotulo">Quema neta, mes 24</span>
+      <span class="valor heroe">$19,2M</span>
+      <span class="delta">al mes · con 11 personas</span>
+    </div>
+    <div class="tile">
+      <span class="rotulo">Punto de equilibrio</span>
+      <span class="valor heroe">~mes 36</span>
+      <span class="delta">≈600 locales, con el equipo congelado en 11</span>
+    </div>
+  </div>
+
+  <div class="ficha" style="margin-top: var(--sp-s);">
+    <div class="ficha-titulo">Los supuestos de costo, uno por uno</div>
+    <div class="calculo">
+      <div>Nómina: <b>$2.400.000</b> cargado promedio por persona/mes (sueldo chileno de ingeniería y ventas, con leyes sociales)</div>
+      <div>Equipo: 2 → 3 (mes 5) → 5 (mes 9) → 7 (mes 13) → 8 (mes 15) → 11 (mes 22)</div>
+      <div>COGS: <b>$12.600</b> por cuenta/mes — el mismo de <a href="negocio.html#precio">negocio</a>, del cual $4.100 es IA + infra + WhatsApp (ver <a href="stack.html#costos">arquitectura</a>)</div>
+      <div>Ventas y marketing: CAC <b>$600.000</b> hasta el mes 14, <b>$420.000</b> desde el 15 (cuando el canal POS ya aporta)</div>
+      <div>Generales: <b>$1.200.000</b> + <b>$150.000</b> por persona (oficina, herramientas, contador, legal)</div>
+      <div>Tipo de cambio: <b>$960 CLP / US$1</b></div>
+      <hr>
+      <div>Capital: fundadores y FFF <b>$30M</b> (mes 0) + pre-seed <b>US$350k</b> (mes 5) + seed <b>US$450k</b> (mes 15)</div>
+      <div>Total: <span class="res">US$800.000 ≈ $768M CLP</span></div>
+    </div>
+    <p class="fuente" style="margin-top: var(--sp-xs);"><b>Por qué se levanta tan poco.</b> Con la base de costos chilena, la quema neta nunca supera los $25M al mes en el caso base. Levantar US$3M sería levantar 10 años de runway y diluirse por deporte. Que este negocio necesite menos de un millón de dólares para llegar a la frontera de la rentabilidad <b>es la tesis</b>, no un detalle.</p>
+  </div>
+</section>
+
+<!-- ============ GRÁFICO 3: EMBUDO DE ACTIVACIÓN ============ -->
+<section class="seccion seccion-borde container">
+  <div class="cabeza-seccion">
+    <h2>El embudo de activación — la restricción real</h2>
+    <p>Este es el gráfico más importante de la página, y no tiene nada que ver con vender. Es lo que pasa <b>después</b> de que el cliente firma. El cuello de botella de este producto no es la venta: es que el dueño le haga caso al pronóstico.</p>
+  </div>
+
+  <div class="envoltura-gfx">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-xs);">
+      <div class="ficha-titulo" style="margin:0;">De 100 locales que conectan el SII</div>
+      <button type="button" class="btn btn-fantasma btn-sm" data-tabla="t-emb" aria-pressed="false">Ver como tabla</button>
+    </div>
+    <div id="g-embudo"></div>
+    <div id="t-emb" hidden>
+      <div class="scroll-x">
+        <table class="tabla tabla-caja" style="min-width: 620px;">
+          <thead><tr><th scope="col">Etapa</th><th scope="col" style="text-align:right">Llegan</th><th scope="col" style="text-align:right">Caída</th><th scope="col">Por qué se caen</th></tr></thead>
+          <tbody id="tb-emb"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="pie-gfx"><b class="acento">La caída que decide la empresa está entre la etapa 4 y la 5.</b> El local recibe su orden de compra, la mira, y la manda a su proveedor <em>reescribiéndola entera</em>. Formalmente es un cliente activo y paga. En la práctica el producto no está haciendo nada, va a churnear en 4 meses, y nosotros no nos vamos a dar cuenta hasta que sea tarde — porque el MRR se veía bien.</p>
+  </div>
+
+  <div class="rejilla rejilla-2" style="margin-top: var(--sp-s);">
+    <div class="ficha nota" style="border-left-color: var(--acento);">
+      <b style="color: var(--tinta)">Qué haríamos para arreglar esa caída</b>
+      <ol style="padding-left: 1.2em; font-size: var(--step--1); color: var(--tinta-2); margin: 6px 0 0;">
+        <li style="margin-bottom:6px;"><b>Mostrar el error, no esconderlo.</b> Cada semana, el pronóstico de la semana pasada contra lo que realmente vendió. La confianza se construye mostrando cuándo nos equivocamos, no fingiendo que nunca pasa.</li>
+        <li style="margin-bottom:6px;"><b>Empezar por un solo producto.</b> No 120 SKU el primer día. Uno: la marraqueta. Que le acertemos a la marraqueta cuatro semanas seguidas, y él solo va a preguntar por el resto.</li>
+        <li><b>Poner el nivel de servicio en sus manos.</b> Si el dueño elige 98% en vez de 95%, deja de sentir que la máquina decide por él. El control es lo que compra la adopción.</li>
+      </ol>
+    </div>
+    <div class="ficha nota nota-b">
+      <b style="color: var(--tinta)">Cómo se mide, sin preguntarle nada al cliente</b>
+      <p style="margin: 6px 0 0; font-size: var(--step--1);">Mermata genera la orden con cantidades <b>Q<sub>sugerida</sub></b>. El dueño edita y envía <b>Q<sub>enviada</sub></b>. La <b>tasa de edición</b> es <code style="font-family:var(--mono)">Σ|Q<sub>env</sub> − Q<sub>sug</sub>| / Σ Q<sub>sug</sub></code>, por orden. Se calcula sola, no requiere una encuesta, y es la única métrica de producto que miramos todos los lunes. Si sube tres semanas seguidas en una cuenta, esa cuenta recibe una llamada — no un correo automático.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBABILIDAD ============ -->
+<section class="seccion seccion-tinta">
+  <div class="container">
+    <span class="sello" style="color:#8f8877">Honestidad</span>
+    <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Probabilidad de éxito</h2>
+    <p style="color: #cfc7b4; max-width: 62ch; margin-bottom: var(--sp-l);">Antes del número hay que decir qué significa «éxito», porque si no, la cifra no quiere decir nada.</p>
+
+    <div class="rejilla rejilla-2" style="gap: var(--sp-l);">
+      <div>
+        <div class="ficha" style="background: #211e17; border-color: #3a352a;">
+          <div class="ficha-titulo" style="color:#8f8877">Definición de éxito</div>
+          <p style="color: #cfc7b4; font-size: var(--step--1); margin:0;">Llegar al <b style="color:var(--papel)">mes 36</b> con más de <b style="color:var(--papel)">US$1M de ARR</b>, churn bajo 5%, y la opción real de levantar una Serie A <em>o</em> de operar con caja propia. No es «unicornio». No es «exit». Es «la empresa existe, crece y no depende de la próxima ronda para pagar sueldos».</p>
+        </div>
+
+        <div class="ficha" style="background: #211e17; border-color: #3a352a; margin-top: var(--sp-s);">
+          <div class="ficha-titulo" style="color:#8f8877">Clase de referencia — declarada</div>
+          <p style="color: #cfc7b4; font-size: var(--step--1);">SaaS B2B vertical, pyme, LatAm, con financiamiento pre-seed. <b class="acento" style="color:#e8a892">No conocemos una tasa base citable para esta clase exacta.</b> La cifra que se repite para EE.UU. —que del orden de 15–25% de las startups con seed llegan a Serie A— no es trasladable a Chile: hay menos fondos, menos rondas puente y un mercado interno chico. Así que en vez de fingir una fuente, declaramos el rango que usamos como <b style="color:var(--papel)">juicio</b>: <b style="color:var(--papel)">10%–20%</b> de las que levantan pre-seed en LatAm llegan a US$1M de ARR. Si tienes un dato mejor, cámbialo — el resto del cálculo sigue funcionando.</p>
+        </div>
+      </div>
+
+      <div class="ficha" style="background: #211e17; border-color: #3a352a;">
+        <div class="ficha-titulo" style="color:#8f8877">Derivación multiplicativa — y por qué no le creemos del todo</div>
+        <div class="calculo" style="background: #17150f; border-color: #3a352a; color: #cfc7b4;">
+          <div>P(el dato del SII alcanza) &nbsp;<b style="color:var(--papel)">0,70</b></div>
+          <div>P(el modelo le gana al dueño) &nbsp;<b style="color:var(--papel)">0,80</b></div>
+          <div>P(el dueño <b>cambia de conducta</b>) &nbsp;<b class="acento" style="color:#e8a892">0,45</b></div>
+          <div>P(hay canal POS antes del mes 12) &nbsp;<b style="color:var(--papel)">0,50</b></div>
+          <div>P(churn se queda bajo 6%) &nbsp;<b style="color:var(--papel)">0,60</b></div>
+          <div>P(nadie nos mata antes del mes 24) &nbsp;<b style="color:var(--papel)">0,75</b></div>
+          <hr style="border-color:#3a352a">
+          <div>Producto = 0,70 × 0,80 × 0,45 × 0,50 × 0,60 × 0,75</div>
+          <div>= <span class="res" style="color:#e8a892">5,7%</span></div>
+        </div>
+        <p style="color: #cfc7b4; font-size: var(--step--1); margin-top: var(--sp-s);"><b style="color:var(--papel)">El 5,7% está mal por lo bajo, y sabemos por qué.</b> Multiplicar seis probabilidades como si fueran independientes es un error: <b>no lo son</b>. Si el dueño cambia de conducta, el churn baja solo, y con casos de éxito reales el POS firma más fácil. Los factores están correlacionados hacia arriba, y la multiplicación independiente castiga dos y tres veces la misma incertidumbre.</p>
+      </div>
+    </div>
+
+    <div class="ficha" style="background: #211e17; border-color: #3a352a; margin-top: var(--sp-l);">
+      <div class="ficha-titulo" style="color:#8f8877">El número que usamos</div>
+      <div class="prob-barra" style="background:#17150f; border-color:#3a352a;">
+        <div class="prob-rango" style="left: 6%; width: 9%;"></div>
+      </div>
+      <div class="prob-esc"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+      <p style="color: var(--papel); font-size: var(--step-2); font-family: var(--serif); margin: var(--sp-s) 0 var(--sp-xs);">Entre <b>6% y 15%</b>. Centrado en <b>10%</b>.</p>
+      <p style="color: #cfc7b4; font-size: var(--step--1); max-width: 68ch;">El piso (6%) es la cadena multiplicativa, que sabemos que sub-estima. El techo (15%) es el extremo optimista de la clase de referencia declarada, que sabemos que no está medida en Chile. Los dos métodos discrepan y <b style="color:var(--papel)">preferimos mostrar la discrepancia antes que elegir el que nos conviene</b>. El punto medio de 10% no es una medición: es un juicio, y está escrito así.</p>
+      <hr class="regla" style="border-color:#3a352a; margin: var(--sp-s) 0;">
+      <p style="color: #cfc7b4; font-size: var(--step--1); max-width: 68ch; margin:0;"><b style="color:var(--papel)">Cuál es la palanca.</b> Un solo factor domina: <b class="acento" style="color:#e8a892">P(el dueño cambia de conducta) = 0,45</b>. Si eso subiera a 0,70 —y se puede subir, con producto: el error a la vista, un solo SKU al principio, el nivel de servicio en sus manos— la cadena pasa de 5,7% a <b style="color:var(--papel)">8,8%</b> y el rango completo se mueve a 9%–22%. <b style="color:var(--papel)">Ese es el trabajo.</b> No es el modelo: el modelo ya funciona. Es que alguien le crea al modelo a las 6 de la mañana, con el proveedor esperando el WhatsApp.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <div class="marca" style="margin-bottom: 6px;">Merma<span class="marca-pt">ta</span></div>
+      <p class="tenue" style="font-size: var(--step--1); max-width: 40ch;">Compra lo que vas a vender. Prototipo — Santiago de Chile, 2026.</p>
+    </div>
+    <nav class="nav-lista" style="display:flex; flex-wrap:wrap; gap: var(--sp-s);" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="mermata.js"></script>
+<script>
+/* =========================================================================
+   Modelo mensual — una sola fuente de verdad para los cuatro gráficos.
+   ========================================================================= */
+var ARPU = 85000, USD = 960;
+var ADDS = {
+  pes:  [0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11],
+  base: [0,0,3,3,4,5,7,9,11,13,15,18,21,24,27,29,31,32,33,34,35,36,37,38],
+  opt:  [0,0,4,5,7,9,12,15,19,23,28,33,39,45,52,59,66,73,80,87,94,100,106,112]
+};
+var CHURN = { pes: 0.055, base: 0.040, opt: 0.030 };
+var HC = [2,2,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,10,11,11,11];
+var COGS_CTA = 12600, CHC = 2400000;
+
+function serie(k) {
+  var L = 0, out = [];
+  for (var m = 1; m <= 24; m++) { L = L * (1 - CHURN[k]) + ADDS[k][m - 1]; out.push({ m: m, L: L, mrr: L * ARPU }); }
+  return out;
+}
+var SP = serie('pes'), SB = serie('base'), SO = serie('opt');
+
+var CAJA = (function () {
+  var caja = 30000000, f = [];
+  for (var m = 1; m <= 24; m++) {
+    var ing = SB[m - 1].mrr;
+    var sm = ADDS.base[m - 1] * 420000 * (m < 15 ? 1.43 : 1);
+    var eg = sm + SB[m - 1].L * COGS_CTA + HC[m - 1] * CHC + (1200000 + HC[m - 1] * 150000);
+    var raise = m === 5 ? 350000 * USD : (m === 15 ? 450000 * USD : 0);
+    caja += ing - eg + raise;
+    f.push({ m: m, ing: ing, eg: eg, caja: caja, raise: raise });
+  }
+  return f;
+})();
+
+/* ---------- utilidades ---------- */
+function miles(n) { var s = String(Math.round(Math.abs(n))), o = '', c = 0;
+  for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; }
+  return (n < 0 ? '−' : '') + o; }
+function clp(n) { return (n < 0 ? '−$' : '$') + miles(Math.abs(n)); }
+function mm(n) { return (n < 0 ? '−' : '') + '$' + (Math.abs(n) / 1e6).toFixed(1).replace('.', ',') + 'M'; }
+function ticks(max, n) {
+  var paso = Math.pow(10, Math.floor(Math.log(max / n) / Math.LN10)), r = max / n / paso;
+  paso *= (r <= 1 ? 1 : r <= 2 ? 2 : r <= 5 ? 5 : 10);
+  var t = []; for (var v = 0; v <= max + 1e-9; v += paso) t.push(v);
+  if (t[t.length - 1] < max) t.push(t[t.length - 1] + paso);
+  return t;
+}
+function tipDe(host) { var t = document.createElement('div'); t.className = 'tip'; host.style.position = 'relative'; host.appendChild(t); return t; }
+function poner(tip, host, ev, html) {
+  var b = host.getBoundingClientRect();
+  var px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - b.left;
+  var py = (ev.touches ? ev.touches[0].clientY : ev.clientY) - b.top;
+  tip.innerHTML = html; tip.classList.add('on');
+  tip.style.left = Math.max(2, Math.min(px + 12, host.clientWidth - tip.offsetWidth - 4)) + 'px';
+  tip.style.top = Math.max(2, py - tip.offsetHeight - 10) + 'px';
+}
+function redibujable(host, fn) {
+  function ir() { Array.prototype.forEach.call(host.querySelectorAll('svg'), function (s) { s.remove(); }); fn(); }
+  ir(); var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(ir, 140); });
+}
+
+/* =========================================================================
+   GRÁFICO 1 — MRR, 3 escenarios. Categorías ORDENADAS ⇒ rampa ordinal.
+   ========================================================================= */
+(function () {
+  var host = document.getElementById('g-mrr'), tip = tipDe(host);
+  var SER = [
+    { k: 'pes', n: 'Pesimista', c: '#7dabc6', d: SP },
+    { k: 'base', n: 'Base', c: '#1f6f99', d: SB },
+    { k: 'opt', n: 'Optimista', c: '#08374f', d: SO }
+  ];
+  redibujable(host, function () {
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 560;
+    var H = chico ? 250 : 330, m = { t: 20, r: chico ? 44 : 78, b: 40, l: chico ? 42 : 54 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var max = 0; SER.forEach(function (s) { s.d.forEach(function (p) { max = Math.max(max, p.mrr); }); });
+    var tk = ticks(max * 1.06, 4); max = tk[tk.length - 1];
+    var X = function (mo) { return m.l + (mo - 1) * pw / 23; };
+    var Y = function (v) { return m.t + ph - (v / max) * ph; };
+    var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="MRR mensual en tres escenarios, meses 1 a 24">'];
+
+    tk.forEach(function (v) {
+      var y = Y(v);
+      g.push('<line class="grid" x1="' + m.l + '" y1="' + y.toFixed(1) + '" x2="' + (m.l + pw) + '" y2="' + y.toFixed(1) + '"/>');
+      g.push('<text class="eje" x="' + (m.l - 7) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + (v === 0 ? '0' : '$' + Math.round(v / 1e6) + 'M') + '</text>');
+    });
+    SER.forEach(function (s) {
+      var d = ''; s.d.forEach(function (p, i) { d += (i ? ' L' : 'M') + X(p.m).toFixed(1) + ' ' + Y(p.mrr).toFixed(1); });
+      g.push('<path d="' + d + '" fill="none" stroke="' + s.c + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+    });
+    // marcadores + etiqueta directa solo al final
+    SER.forEach(function (s, i) {
+      var p = s.d[23], y = Y(p.mrr);
+      g.push('<circle cx="' + X(24).toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.5" fill="' + s.c + '" stroke="#f7f3ea" stroke-width="2"/>');
+      if (!chico) g.push('<text class="etiq" x="' + (X(24) + 9) + '" y="' + (y + 4).toFixed(1) + '">' + mm(p.mrr) + '</text>');
+      else if (i === 1 || i === 2) g.push('<text class="etiq" x="' + (X(24) + 7) + '" y="' + (y + (i === 1 ? 12 : 0)).toFixed(1) + '" text-anchor="end">' + mm(p.mrr) + '</text>');
+    });
+    g.push('<line class="base" x1="' + m.l + '" y1="' + (m.t + ph) + '" x2="' + (m.l + pw) + '" y2="' + (m.t + ph) + '"/>');
+    var pasos = chico ? [1, 6, 12, 18, 24] : [1, 3, 6, 9, 12, 15, 18, 21, 24];
+    pasos.forEach(function (mo) { g.push('<text class="eje" x="' + X(mo).toFixed(1) + '" y="' + (m.t + ph + 17) + '" text-anchor="middle">m' + mo + '</text>'); });
+    g.push('<text class="eje" x="' + m.l + '" y="' + (H - 6) + '" style="font-family:var(--sans)">Mes desde el arranque (m1 = jul 2026)</text>');
+    // capa de hover
+    for (var mo = 1; mo <= 24; mo++) {
+      g.push('<rect class="hit" data-m="' + mo + '" x="' + (X(mo) - pw / 46).toFixed(1) + '" y="' + m.t + '" width="' + (pw / 23).toFixed(1) + '" height="' + ph + '" fill="transparent"/>');
+    }
+    g.push('</svg>');
+    host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
+
+    var cruz = null;
+    Array.prototype.forEach.call(host.querySelectorAll('.hit'), function (r) {
+      function on(ev) {
+        var mo = +r.dataset.m;
+        var h = '<span class="t-f">Mes ' + mo + '</span>';
+        SER.forEach(function (s) {
+          h += '<span class="t-l"><i class="llave" style="background:' + s.c + '"></i> ' + s.n + ' <b>' + mm(s.d[mo - 1].mrr) + '</b> <span style="color:#8f8877">· ' + Math.round(s.d[mo - 1].L) + ' loc.</span></span>';
+        });
+        poner(tip, host, ev, h);
+        var svg = host.querySelector('svg');
+        if (cruz) cruz.remove();
+        cruz = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        cruz.setAttribute('x1', X(mo)); cruz.setAttribute('x2', X(mo));
+        cruz.setAttribute('y1', m.t); cruz.setAttribute('y2', m.t + ph);
+        cruz.setAttribute('stroke', '#c9bfa8'); cruz.setAttribute('stroke-width', '1');
+        svg.insertBefore(cruz, svg.firstChild);
+      }
+      r.addEventListener('mousemove', on);
+      r.addEventListener('touchstart', on, { passive: true });
+      r.addEventListener('mouseleave', function () { tip.classList.remove('on'); if (cruz) { cruz.remove(); cruz = null; } });
+    });
+  });
+
+  var tb = document.getElementById('tb-mrr'), h = '';
+  for (var i = 0; i < 24; i++) {
+    h += '<tr><th scope="row">m' + (i + 1) + '</th><td class="num">' + mm(SP[i].mrr) + '</td><td class="num">' + mm(SB[i].mrr) + '</td><td class="num">' + mm(SO[i].mrr) + '</td></tr>';
+  }
+  tb.innerHTML = h;
+})();
+
+/* =========================================================================
+   GRÁFICO 2 — Ingresos vs egresos. 2 series categóricas, UN eje.
+   ========================================================================= */
+(function () {
+  var host = document.getElementById('g-caja'), tip = tipDe(host);
+  redibujable(host, function () {
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 560;
+    var H = chico ? 250 : 330, m = { t: 26, r: chico ? 12 : 68, b: 42, l: chico ? 42 : 54 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var max = 0; CAJA.forEach(function (f) { max = Math.max(max, f.ing, f.eg); });
+    var tk = ticks(max * 1.08, 4); max = tk[tk.length - 1];
+    var X = function (mo) { return m.l + (mo - 1) * pw / 23; };
+    var Y = function (v) { return m.t + ph - (v / max) * ph; };
+    var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Ingresos y egresos mensuales, meses 1 a 24, con el valle de caja en el mes 14">'];
+
+    tk.forEach(function (v) {
+      var y = Y(v);
+      g.push('<line class="grid" x1="' + m.l + '" y1="' + y.toFixed(1) + '" x2="' + (m.l + pw) + '" y2="' + y.toFixed(1) + '"/>');
+      g.push('<text class="eje" x="' + (m.l - 7) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + (v === 0 ? '0' : '$' + Math.round(v / 1e6) + 'M') + '</text>');
+    });
+    // levantamientos: regla vertical de tinta
+    [5, 15].forEach(function (mo) {
+      g.push('<line x1="' + X(mo).toFixed(1) + '" y1="' + (m.t - 8) + '" x2="' + X(mo).toFixed(1) + '" y2="' + (m.t + ph) + '" stroke="#17150f" stroke-width="1"/>');
+      g.push('<text class="etiq" x="' + (X(mo) + 4).toFixed(1) + '" y="' + (m.t - 12) + '">' + (mo === 5 ? 'pre-seed' : 'seed') + '</text>');
+    });
+    // valle de caja: mes 14
+    g.push('<rect x="' + (X(14) - pw / 46).toFixed(1) + '" y="' + m.t + '" width="' + (pw / 23).toFixed(1) + '" height="' + ph + '" fill="#f2e2dc"/>');
+    g.push('<text class="etiq" x="' + X(14).toFixed(1) + '" y="' + (m.t + ph + 30) + '" text-anchor="middle" fill="#9c3520">valle</text>');
+
+    var dI = '', dE = '';
+    CAJA.forEach(function (f, i) {
+      dI += (i ? ' L' : 'M') + X(f.m).toFixed(1) + ' ' + Y(f.ing).toFixed(1);
+      dE += (i ? ' L' : 'M') + X(f.m).toFixed(1) + ' ' + Y(f.eg).toFixed(1);
+    });
+    g.push('<path d="' + dE + '" fill="none" stroke="#b8452b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+    g.push('<path d="' + dI + '" fill="none" stroke="#0a6296" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>');
+    var f24 = CAJA[23];
+    g.push('<circle cx="' + X(24).toFixed(1) + '" cy="' + Y(f24.eg).toFixed(1) + '" r="4.5" fill="#b8452b" stroke="#f7f3ea" stroke-width="2"/>');
+    g.push('<circle cx="' + X(24).toFixed(1) + '" cy="' + Y(f24.ing).toFixed(1) + '" r="4.5" fill="#0a6296" stroke="#f7f3ea" stroke-width="2"/>');
+    if (!chico) {
+      g.push('<text class="etiq" x="' + (X(24) + 9) + '" y="' + (Y(f24.eg) + 4).toFixed(1) + '">' + mm(f24.eg) + '</text>');
+      g.push('<text class="etiq" x="' + (X(24) + 9) + '" y="' + (Y(f24.ing) + 4).toFixed(1) + '">' + mm(f24.ing) + '</text>');
+    }
+    g.push('<line class="base" x1="' + m.l + '" y1="' + (m.t + ph) + '" x2="' + (m.l + pw) + '" y2="' + (m.t + ph) + '"/>');
+    (chico ? [1, 6, 12, 18, 24] : [1, 3, 6, 9, 12, 15, 18, 21, 24]).forEach(function (mo) {
+      g.push('<text class="eje" x="' + X(mo).toFixed(1) + '" y="' + (m.t + ph + 17) + '" text-anchor="middle">m' + mo + '</text>');
+    });
+    for (var mo = 1; mo <= 24; mo++) {
+      g.push('<rect class="hit" data-m="' + mo + '" x="' + (X(mo) - pw / 46).toFixed(1) + '" y="' + m.t + '" width="' + (pw / 23).toFixed(1) + '" height="' + ph + '" fill="transparent"/>');
+    }
+    g.push('</svg>');
+    host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
+
+    Array.prototype.forEach.call(host.querySelectorAll('.hit'), function (r) {
+      function on(ev) {
+        var f = CAJA[+r.dataset.m - 1];
+        var h = '<span class="t-f">Mes ' + f.m + (f.raise ? ' · levantamiento' : '') + '</span>'
+          + '<span class="t-l"><i class="llave" style="background:#0a6296"></i> Ingresos <b>' + mm(f.ing) + '</b></span>'
+          + '<span class="t-l"><i class="llave" style="background:#b8452b"></i> Egresos <b>' + mm(f.eg) + '</b></span>'
+          + '<span class="t-l" style="border-top:1px solid #3a352a;padding-top:3px;margin-top:2px">Caja en banco <b>' + mm(f.caja) + '</b></span>';
+        poner(tip, host, ev, h);
+      }
+      r.addEventListener('mousemove', on);
+      r.addEventListener('touchstart', on, { passive: true });
+      r.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+    });
+  });
+
+  var tb = document.getElementById('tb-caja'), h = '';
+  CAJA.forEach(function (f) {
+    h += '<tr' + (f.m === 14 ? ' style="background:#f2e2dc"' : '') + '><th scope="row">m' + f.m + (f.raise ? ' ·' : '') + '</th>'
+      + '<td class="num">' + mm(f.ing) + '</td><td class="num">' + mm(f.eg) + '</td>'
+      + '<td class="num" style="color:' + (f.ing - f.eg < 0 ? 'var(--riesgo)' : 'var(--bien)') + '">' + mm(f.ing - f.eg) + '</td>'
+      + '<td class="num"><b>' + mm(f.caja) + '</b></td></tr>';
+  });
+  tb.innerHTML = h;
+})();
+
+/* =========================================================================
+   GRÁFICO 3 — Embudo de activación. Etapas ORDENADAS ⇒ rampa ordinal.
+   ========================================================================= */
+(function () {
+  var E = [
+    { n: 'Conecta el SII', c: 100, col: '#7dabc6', por: '—' },
+    { n: 'Firma y paga', c: 34, col: '#4a8cb0', por: 'El diagnóstico no le dolió lo suficiente, o su POS no tiene detalle por producto.' },
+    { n: 'Termina el mapeo de recetas', c: 29, col: '#1f6f99', por: 'Se aburre. Son 2 horas con el que cocina, y el que cocina no tiene 2 horas.' },
+    { n: 'Manda su 1ª orden al proveedor', c: 19, col: '#0d5479', por: 'Mira la orden, desconfía, y prefiere pedir como siempre. Aquí se pierde un tercio.' },
+    { n: 'ACTIVADO: 4 semanas pidiendo con &lt;20% de edición', c: 11, col: '#08374f', por: 'Manda la orden, pero la reescribe entera. Paga y no usa. Va a churnear y no lo vamos a ver venir.' }
+  ];
+  var host = document.getElementById('g-embudo'), tip = tipDe(host);
+  redibujable(host, function () {
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 620;
+    var m = { t: 10, r: 46, b: 8, l: chico ? 8 : 8 };
+    var fila = chico ? 62 : 46, H = m.t + E.length * fila + m.b;
+    var pw = W - m.l - m.r;
+    var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Embudo de activación: de 100 locales que conectan el SII, 11 quedan activados">'];
+    E.forEach(function (e, i) {
+      var y = m.t + i * fila;
+      var an = Math.max(3, (e.c / 100) * pw), h = 16;
+      var yb = chico ? y + 24 : y + (fila - h) / 2;
+      g.push('<rect class="hitr" data-i="' + i + '" x="0" y="' + y + '" width="' + W + '" height="' + fila + '" fill="transparent"/>');
+      g.push('<text class="eje" x="' + m.l + '" y="' + (chico ? y + 14 : yb - 6) + '" style="font-family:var(--sans);fill:var(--tinta-2)">' + (i + 1) + '. ' + e.n + '</text>');
+      g.push('<path d="M' + m.l + ' ' + yb + ' H' + (m.l + an - 4) + ' a4,4 0 0 1 4,4 v' + (h - 8) + ' a4,4 0 0 1 -4,4 H' + m.l + ' Z" fill="' + e.col + '"/>');
+      g.push('<text class="etiq" x="' + (m.l + an + 8) + '" y="' + (yb + h / 2 + 4) + '">' + e.c + '</text>');
+      if (i > 0) {
+        var caida = E[i - 1].c - e.c;
+        var pct = Math.round(caida / E[i - 1].c * 100);
+        var col = (i === 3) ? '#9c3520' : 'var(--tinta-3)';
+        g.push('<text class="eje" x="' + (m.l + an + 8) + '" y="' + (yb + h / 2 + 18) + '" style="fill:' + col + '">−' + caida + ' (−' + pct + '%)</text>');
+      }
+    });
+    g.push('<line class="base" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (m.t + E.length * fila - 6) + '"/>');
+    g.push('</svg>');
+    host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
+    Array.prototype.forEach.call(host.querySelectorAll('.hitr'), function (r) {
+      function on(ev) {
+        var e = E[+r.dataset.i];
+        poner(tip, host, ev, '<span class="t-f">' + e.n + '</span><span class="t-l">Llegan <b>' + e.c + '</b> de 100</span>' + (e.por !== '—' ? '<span class="t-l" style="max-width:24ch;display:block">' + e.por + '</span>' : ''));
+      }
+      r.addEventListener('mousemove', on);
+      r.addEventListener('touchstart', on, { passive: true });
+      r.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+    });
+  });
+
+  var tb = document.getElementById('tb-emb'), h = '';
+  E.forEach(function (e, i) {
+    var caida = i ? E[i - 1].c - e.c : 0;
+    h += '<tr' + (i === 3 ? ' style="background:#f2e2dc"' : '') + '><th scope="row">' + (i + 1) + '. ' + e.n + '</th><td class="num">' + e.c + '</td><td class="num">' + (i ? '−' + caida : '—') + '</td><td style="font-size:var(--step--1)">' + e.por + '</td></tr>';
+  });
+  tb.innerHTML = h;
+})();
+
+/* =========================================================================
+   GRÁFICO 4 — Línea de tiempo de hitos. Serie única + marcador de estado.
+   ========================================================================= */
+(function () {
+  var H6 = [
+    { id: 'H1', n: 'La señal existe',            ini: 0,  fin: 2,  muerte: 2 },
+    { id: 'H2', n: 'Alguien paga',               ini: 2,  fin: 4,  muerte: 4 },
+    { id: 'H3', n: 'El modelo le gana al dueño', ini: 4,  fin: 6,  muerte: 6 },
+    { id: 'H4', n: 'Un POS nos distribuye',      ini: 6,  fin: 10, muerte: 12 },
+    { id: 'H5', n: 'El dueño cambia de conducta',ini: 7,  fin: 15, muerte: 15 },
+    { id: 'H6', n: 'Máquina + prueba fuera de Chile', ini: 15, fin: 24, muerte: 24 }
+  ];
+  var host = document.getElementById('g-tiempo'), tip = tipDe(host);
+  redibujable(host, function () {
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 620;
+    var m = { t: chico ? 12 : 14, r: 18, b: 40, l: chico ? 30 : 40 };
+    var fila = chico ? 52 : 44, H = m.t + H6.length * fila + m.b;
+    var pw = W - m.l - m.r;
+    var X = function (mo) { return m.l + (mo / 24) * pw; };
+    var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Línea de tiempo de los seis hitos, del mes 0 al 24, con los criterios de muerte marcados">'];
+
+    [0, 6, 12, 18, 24].forEach(function (mo) {
+      g.push('<line class="grid" x1="' + X(mo).toFixed(1) + '" y1="' + m.t + '" x2="' + X(mo).toFixed(1) + '" y2="' + (m.t + H6.length * fila) + '"/>');
+      g.push('<text class="eje" x="' + X(mo).toFixed(1) + '" y="' + (m.t + H6.length * fila + 17) + '" text-anchor="middle">m' + mo + '</text>');
+    });
+    // levantamientos
+    [{ mo: 5, l: 'pre-seed' }, { mo: 15, l: 'seed' }].forEach(function (r) {
+      g.push('<line x1="' + X(r.mo).toFixed(1) + '" y1="' + m.t + '" x2="' + X(r.mo).toFixed(1) + '" y2="' + (m.t + H6.length * fila) + '" stroke="#17150f" stroke-width="2"/>');
+      if (!chico) g.push('<text class="etiq" x="' + (X(r.mo) + 5).toFixed(1) + '" y="' + (m.t + H6.length * fila + 31) + '">' + r.l + '</text>');
+    });
+
+    H6.forEach(function (h, i) {
+      var y = m.t + i * fila, hb = 14;
+      var yb = chico ? y + 26 : y + 22;
+      var x0 = X(h.ini), x1 = X(h.fin), an = Math.max(10, x1 - x0);
+      g.push('<rect class="hitr" data-i="' + i + '" x="0" y="' + y + '" width="' + W + '" height="' + fila + '" fill="transparent"/>');
+      g.push('<text class="eje" x="' + m.l + '" y="' + (y + (chico ? 13 : 13)) + '" style="font-family:var(--sans);fill:var(--tinta-2)"><tspan style="font-family:var(--mono);fill:var(--acento-osc)">' + h.id + '</tspan> · ' + h.n + '</text>');
+      g.push('<path d="M' + x0.toFixed(1) + ' ' + yb + ' H' + (x0 + an - 4).toFixed(1) + ' a4,4 0 0 1 4,4 v' + (hb - 8) + ' a4,4 0 0 1 -4,4 H' + x0.toFixed(1) + ' Z" fill="#0a6296"/>');
+      // criterio de muerte: rombo de estado (color reservado + icono + etiqueta en la leyenda)
+      var xm = X(h.muerte), ym = yb + hb / 2;
+      g.push('<path d="M' + xm.toFixed(1) + ' ' + (ym - 6) + 'L' + (xm + 6).toFixed(1) + ' ' + ym + 'L' + xm.toFixed(1) + ' ' + (ym + 6) + 'L' + (xm - 6).toFixed(1) + ' ' + ym + 'Z" fill="#9b1c1c" stroke="#f7f3ea" stroke-width="2"/>');
+    });
+    g.push('<line class="base" x1="' + m.l + '" y1="' + (m.t + H6.length * fila) + '" x2="' + (m.l + pw) + '" y2="' + (m.t + H6.length * fila) + '"/>');
+    g.push('</svg>');
+    host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
+
+    Array.prototype.forEach.call(host.querySelectorAll('.hitr'), function (r) {
+      function on(ev) {
+        var h = H6[+r.dataset.i];
+        poner(tip, host, ev, '<span class="t-f">' + h.id + ' · ' + h.n + '</span>'
+          + '<span class="t-l">Ventana <b>mes ' + h.ini + ' → ' + h.fin + '</b></span>'
+          + '<span class="t-l" style="color:#e8a892">◆ Criterio de muerte se evalúa el <b>mes ' + h.muerte + '</b></span>');
+      }
+      r.addEventListener('mousemove', on);
+      r.addEventListener('touchstart', on, { passive: true });
+      r.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+    });
+  });
+})();
+
+/* ---------- Alternar tabla en los tres gráficos que la tienen ---------- */
+Array.prototype.forEach.call(document.querySelectorAll('[data-tabla]'), function (b) {
+  var tabla = document.getElementById(b.dataset.tabla);
+  var gfx = b.closest('.envoltura-gfx').querySelector('[id^="g-"]');
+  var leyenda = b.closest('.envoltura-gfx').querySelector('.leyenda');
+  b.addEventListener('click', function () {
+    var on = b.getAttribute('aria-pressed') === 'true';
+    b.setAttribute('aria-pressed', !on);
+    tabla.hidden = on;
+    gfx.hidden = !on;
+    if (leyenda) leyenda.hidden = !on;
+    b.textContent = on ? 'Ver como tabla' : 'Ver el gráfico';
+  });
+});
+</script>
+</body>
+</html>

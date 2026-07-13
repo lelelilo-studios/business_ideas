@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Conserjo</title>
+<meta name="description" content="ICP, TAM/SAM/SOM con la aritmética a la vista, competencia real con nombre, economía unitaria y canales de adquisición.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  .indice { border: var(--borde); background: var(--papel-2); padding: var(--sp-s); }
+  .indice ol { list-style: none; counter-reset: i; columns: 1; }
+  @media (min-width: 40em) { .indice ol { columns: 2; } }
+  @media (min-width: 60em) { .indice ol { columns: 3; } }
+  .indice li { counter-increment: i; padding: .3rem 0; break-inside: avoid; }
+  .indice li::before {
+    content: counter(i, decimal-leading-zero) " ";
+    font-family: var(--mono); font-size: .72rem; color: var(--teja); font-weight: 600; margin-right: .4rem;
+  }
+  .indice a { text-decoration: none; font-size: .9rem; }
+  .indice a:hover { text-decoration: underline; }
+
+  .canal { display: grid; grid-template-columns: 2.2rem 1fr; gap: var(--sp-s); padding: var(--sp-s) 0; border-bottom: var(--hairline); }
+  .canal .r { font-family: var(--mono); font-size: 1.3rem; font-weight: 600; color: var(--teja); line-height: 1; }
+  .canal h3 { font-size: var(--step-0); }
+  .canal p { font-size: .88rem; color: var(--tinta-2); margin-top: .3rem; }
+  .canal .cpl { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); margin-top: .35rem; display: block; }
+  .canal.descartado .r { color: var(--tinta-3); }
+  .canal.descartado h3 { color: var(--tinta-3); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+  .semana { border-left: 2px solid var(--papel-3); padding: 0 0 var(--sp-m) var(--sp-m); position: relative; }
+  .semana:last-child { padding-bottom: 0; }
+  .semana::before {
+    content: ""; position: absolute; left: -6px; top: .35rem;
+    width: 10px; height: 10px; background: var(--teja); border: 2px solid var(--papel);
+  }
+  .semana .s { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; color: var(--teja); font-weight: 600; }
+  .semana h3 { font-size: var(--step-0); margin-top: .2rem; }
+  .semana p { font-size: .88rem; color: var(--tinta-2); margin-top: .25rem; }
+  .semana .meta { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); margin-top: .35rem; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><path d="M10 10l10 10M17 17l2-2M14 14l2-2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 20h20L12 3z"/><path d="M12 9v5M12 17.5v.01"/></symbol>
+</svg>
+
+<header class="marca-bar">
+  <nav class="container" aria-label="Principal">
+    <a class="logo" href="index.html"><svg width="22" height="22" aria-hidden="true"><use href="#i-llave"/></svg> Conserjo</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-menu"/></svg>
+      <span class="visually-hidden">Abrir menú</span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="container">
+
+  <header style="margin-bottom:var(--sp-l)">
+    <p class="kicker">Plan de negocio y go-to-market</p>
+    <h1 style="margin-block:var(--sp-2xs) var(--sp-s)">A quién le vendemos, cuánto vale y cómo llegamos.</h1>
+    <p class="lead" style="max-width:56ch">
+      Toda cifra de esta página está citada o etiquetada como estimación con su aritmética
+      a la vista. Si un número no tiene derivación, es porque no lo sabemos — y lo decimos.
+    </p>
+  </header>
+
+  <nav class="indice" aria-label="Índice">
+    <ol>
+      <li><a href="#icp">Cliente objetivo</a></li>
+      <li><a href="#mercado">Tamaño de mercado</a></li>
+      <li><a href="#cunia">Posicionamiento y cuña</a></li>
+      <li><a href="#competencia">Competencia</a></li>
+      <li><a href="#precio">Precio y economía unitaria</a></li>
+      <li><a href="#canales">Canales</a></li>
+      <li><a href="#ia">IA en el marketing</a></li>
+      <li><a href="#dias">Primeros 90 días</a></li>
+      <li><a href="#muerte">Qué mataría esto</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ ICP ============ -->
+  <section id="icp">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">01</p>
+      <h2>Cliente objetivo</h2>
+    </div>
+
+    <div class="grid g2">
+      <div class="ficha ficha--acento">
+        <span class="ficha-num">ICP PRIMARIO</span>
+        <h3>La corredora chica</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          1 a 4 personas, administra entre 20 y 80 unidades de terceros. Cobra 5–8% del
+          arriendo por administrar más medio mes por corretaje. Su margen se lo come la
+          pega operativa: cobrar, conciliar, coordinar maestros y rendirle cuentas a cada
+          propietario.
+        </p>
+        <hr class="regla-fina">
+        <dl class="small" style="display:grid;grid-template-columns:auto 1fr;gap:.35rem .8rem">
+          <dt class="muted num">Firma</dt><dd>El dueño de la corredora. Es también quien la usa.</dd>
+          <dt class="muted num">Usa</dt><dd>La asistente administrativa, todos los días.</dd>
+          <dt class="muted num">Hoy usa</dt><dd>Excel + WhatsApp + carpetas en Drive. Algunas, Kastor.</dd>
+          <dt class="muted num">Dónde está</dt><dd>Portal Inmobiliario, grupos de WhatsApp de corredores, COPROCH.</dd>
+          <dt class="muted num">Ticket</dt><dd class="clp">$78.000 – $310.000 / mes</dd>
+        </dl>
+        <p class="small mt-m" style="color:var(--teja)">
+          <b>Por qué este primero:</b> una corredora trae 20–80 unidades de una sola venta.
+          La densidad de unidades por conversación es 10× la del dueño individual.
+        </p>
+      </div>
+
+      <div class="ficha">
+        <span class="ficha-num">ICP SECUNDARIO</span>
+        <h3>El inversionista hormiga</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          Profesional de 35 a 55, compró de 2 a 15 departamentos con crédito hipotecario para
+          arrendar — típicamente en Estación Central, Independencia, Santiago Centro o Ñuñoa.
+          Administrar es su segunda jornada: le quita entre 8 y 12 horas al mes y le da rabia.
+        </p>
+        <hr class="regla-fina">
+        <dl class="small" style="display:grid;grid-template-columns:auto 1fr;gap:.35rem .8rem">
+          <dt class="muted num">Firma</dt><dd>Él mismo. Es una compra personal, con su tarjeta.</dd>
+          <dt class="muted num">Usa</dt><dd>Él mismo, y a veces su pareja.</dd>
+          <dt class="muted num">Hoy usa</dt><dd>Excel, WhatsApp y la app del banco. En serio.</dd>
+          <dt class="muted num">Dónde está</dt><dd>Grupos de Facebook de inversión inmobiliaria, YouTube, Portal Inmobiliario.</dd>
+          <dt class="muted num">Ticket</dt><dd class="clp">$15.800 – $88.500 / mes</dd>
+        </dl>
+        <p class="small mt-m muted">
+          <b>Es el que más sufre, pero no el mejor cliente:</b> paga menos, tiene menos
+          frecuencia de uso y churnea cuando vende el depto. Lo atendemos con autoservicio
+          y SEO, no con vendedores.
+        </p>
+      </div>
+    </div>
+
+    <p class="nota mt-l">
+      <b>No es nuestro cliente:</b> Assetplan, Greystar o cualquiera que administre edificios
+      completos de renta residencial. Tienen software propio, equipo interno y un problema
+      distinto (ocupación y rotación a escala, no “se me filtró el 802”).
+    </p>
+  </section>
+
+  <!-- ============ MERCADO ============ -->
+  <section id="mercado">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">02</p>
+      <h2>Tamaño de mercado — Chile</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        Spoiler: el mercado chileno es <b>chico</b>. Unos USD 43 millones al año si nos
+        quedáramos con absolutamente todo. Eso condiciona todo el resto del plan y lo
+        decimos aquí arriba, no escondido en una nota al pie.
+      </p>
+    </div>
+
+    <div class="aritmetica">
+<span class="cmt"># — TAM: todo el gasto anual posible en Chile ————————————</span>
+
+Hogares en Chile                          6.300.000   <span class="cmt">CASEN 2022 (Min. Desarrollo Social)</span>
+Tenencia "arrendada"                          24,6%   <span class="cmt">CASEN 2022</span>
+<b>Viviendas en arriendo</b>                     <b>1.549.800</b>   <span class="cmt">= 6.300.000 × 0,246</span>
+
+<span class="cmt"># El supuesto más frágil de todo el cálculo, y va declarado:</span>
+<span class="cmt"># ¿qué fracción de ese stock está en manos de dueños con 2+</span>
+<span class="cmt"># unidades o de corredoras chicas? NO tenemos una fuente. Usamos</span>
+<span class="cmt"># 35%: el resto es dueño de una sola unidad (no le vendemos) o</span>
+<span class="cmt"># multifamily institucional (tampoco). Si el número real fuera</span>
+<span class="cmt"># 20%, todo lo de abajo se reduce a la mitad.</span>
+Fracción direccionable <b>(SUPUESTO, no citado)</b>       35%
+<b>Unidades direccionables</b>                     <b>542.430</b>
+
+Precio medio ponderado por unidad/mes         $5.500   <span class="cmt">mezcla de los 3 planes</span>
+<b>TAM suscripción</b>            542.430 × 5.500 × 12 = <b>$35.800 millones CLP/año</b>
+                                             ≈ <b>USD 37,7 M</b>   <span class="cmt">a $950/USD</span>
+
+<span class="cmt"># Más el cobro por evento (informes de arrendatario):</span>
+Rotación anual de arrendatarios                  35%   <span class="cmt">estimación</span>
+Postulantes evaluados por arriendo                3,5
+Precio del informe                            $6.900
+<b>TAM informes</b>   542.430 × 0,35 × 3,5 × 6.900 = <b>$4.585 millones/año</b>
+                                             ≈ <b>USD 4,8 M</b>
+
+<b>TAM CHILE ≈ USD 42,5 M / año</b>
+    </div>
+
+    <div class="grid g2 mt-l">
+      <div class="aritmetica">
+<span class="cmt"># — SAM: lo que podríamos alcanzar en 5 años ——————</span>
+
+Dueños/corredoras digitalizados, en RM
+y las 5 regiones más grandes, que ya publican
+online y usan software para algo         <b>30% del TAM</b>
+<span class="cmt">(estimación: es la fracción que ya paga por Portal</span>
+<span class="cmt"> Inmobiliario o por un ERP cualquiera)</span>
+
+Unidades                                     162.700
+<b>SAM ≈ USD 12,7 M / año</b>
+      </div>
+      <div class="aritmetica">
+<span class="cmt"># — SOM: 36 meses, con nuestro canal ——————————</span>
+
+Penetración del SAM al mes 36                    <b>5%</b>
+<span class="cmt">(no es humildad: es lo que da nuestro embudo,</span>
+<span class="cmt"> ver roadmap.html)</span>
+
+Unidades bajo administración                   8.135
+Cuentas (≈7 unidades promedio)                 ~1.150
+<b>SOM ≈ $538 M CLP/año ≈ USD 566 k ARR</b>
+      </div>
+    </div>
+
+    <div class="ficha ficha--acento mt-l">
+      <h3>La extensión global, y por qué es obligatoria</h3>
+      <p class="small mt-s" style="color:var(--tinta-2)">
+        Con un TAM de USD 42 M, Chile no sostiene un negocio de venture. Sostiene un negocio
+        rentable de 5 a 10 personas — que es una respuesta legítima, y está en el roadmap.
+        Si la tesis es más grande, la expansión regional no es un “bonus”: es la tesis.
+      </p>
+      <div class="scroll-x mt-m">
+        <table class="tabla">
+          <thead><tr><th>Mercado</th><th class="der num">Hogares arrendatarios</th><th>Por qué el producto sirve casi igual</th></tr></thead>
+          <tbody>
+            <tr><td><b>México</b></td><td class="der num">~5.900.000</td><td>Buró de Crédito ≈ DICOM. Pago por transferencia (SPEI). Arrendamiento con juicio lento. El mismo producto con otro proveedor de scoring.</td></tr>
+            <tr><td><b>Colombia</b></td><td class="der num">~3.600.000</td><td>DataCrédito. Pero ojo: el mercado ya tiene aseguradoras de arriendo fuertes (Arrendamientos Nacionales, La Equidad) que compiten de otra manera.</td></tr>
+            <tr><td><b>Perú</b></td><td class="der num">~1.400.000</td><td>Infocorp/Equifax. Mercado informal, poca digitalización. Más difícil, no más fácil.</td></tr>
+            <tr><td><b>España</b></td><td class="der num">~4.400.000</td><td>ASNEF + fichero de inquilinos morosos. Ley de vivienda de 2023 hace el desalojo aún más lento — el filtro de entrada vale <em>más</em>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted mt-m">
+        <b>Estimaciones, no citas.</b> Las cifras de hogares arrendatarios están derivadas
+        de censos nacionales aplicando la tasa de tenencia en arriendo de cada país; son
+        órdenes de magnitud, no números para un board. La conclusión que sí aguanta:
+        <b>LatAm + España es entre 10× y 15× Chile</b>, y el producto es casi el mismo
+        salvo el proveedor de scoring crediticio.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ CUÑA ============ -->
+  <section id="cunia">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">03</p>
+      <h2>Posicionamiento y cuña</h2>
+    </div>
+
+    <blockquote class="voz mb-l" style="max-width:44ch">
+      Conserjo es el conserje digital del dueño que no quiere entregarle su 8% a una corredora.
+    </blockquote>
+
+    <div class="grid g2">
+      <div>
+        <h3>La cabeza de playa: el filtro de arrendatario</h3>
+        <p class="mt-s" style="color:var(--tinta-2)">
+          De las tres pegas, entramos por la del <b>filtro</b>, y no por gusto:
+        </p>
+        <ul class="lista mt-s" role="list">
+          <li><b>Es el momento de dolor agudo.</b> El dueño está mirando cuatro PDF a las once de la noche y no sabe cuál lo va a arruinar.</li>
+          <li><b>Ya hay presupuesto.</b> Hoy paga (o le hace pagar al postulante) por un informe DICOM. No estamos creando una línea de gasto nueva: estamos ocupando una que existe.</li>
+          <li><b>Es un evento con fecha.</b> No requiere que cambie su forma de trabajar: requiere que use algo una vez, hoy.</li>
+          <li><b>Es donde el error cuesta millones.</b> En Chile el desalojo por no pago se demora entre 8 y 18 meses en la práctica. Un mal arrendatario cuesta 100× lo que cuesta el informe.</li>
+        </ul>
+        <p class="mt-m" style="color:var(--tinta-2)">
+          El informe de $6.900 es el caballo de Troya. Una vez que la unidad y el contrato viven
+          adentro, el cobro y la mantención se activan solos — y ahí empieza la suscripción.
+        </p>
+      </div>
+
+      <div class="ficha ficha--hundida">
+        <h3 style="font-size:var(--step-0)">Lo que NO decimos</h3>
+        <ul class="lista lista--x small mt-s" role="list">
+          <li>“Te garantizamos el arriendo.” No somos una aseguradora y no vamos a fingir que lo somos. Houm y las aseguradoras de arriendo hacen eso; es otro negocio, con otro balance.</li>
+          <li>“Evitamos el juicio.” No lo evitamos. Lo hacemos menos probable en la entrada y armamos la carpeta si llega.</li>
+          <li>“La IA elige al arrendatario.” Recomienda, muestra las razones, y la decisión queda a tu nombre.</li>
+          <li>“Automatizamos todo.” La conciliación difícil, el maestro que no llega y el arrendatario que no contesta siguen necesitando a un humano. Le sacamos la pega repetitiva, no el criterio.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPETENCIA ============ -->
+  <section id="competencia">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">04</p>
+      <h2>Competencia</h2>
+      <p class="lead mt-s" style="max-width:52ch">
+        El titular del puesto no es una empresa. Es una planilla.
+      </p>
+    </div>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th style="min-width:11rem">Quién</th>
+            <th style="min-width:16rem">Qué hace</th>
+            <th style="min-width:18rem">Diferenciación honesta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Excel + WhatsApp + la libreta</b><br><span class="small muted">~80% del segmento</span></td>
+            <td>Gratis. Funciona. El dueño lo domina.</td>
+            <td>Este es el competidor real y el más difícil de derrotar. No perdemos contra Kastor: perdemos contra “ya, después lo veo”. La única forma de ganarle es que el primer uso resuelva algo <em>hoy</em> — por eso entramos por el informe de arrendatario, no por “migra tu portafolio”.</td>
+          </tr>
+          <tr>
+            <td><b>Houm</b><br><span class="small muted">Proptech chilena, con capital de riesgo</span></td>
+            <td>Servicio administrado completo: publica, muestra, filtra, garantiza el arriendo y cobra. Se lleva parte del primer mes más una comisión mensual.</td>
+            <td>Houm reemplaza al corredor. Nosotros armamos al dueño que <em>no quiere</em> ceder ese porcentaje. Si prefieres que otro lo haga todo y no ver nada, anda a Houm — lo decimos en nuestra propia FAQ. <b>Riesgo real:</b> si Houm lanza un plan autoservicio gratis como embudo hacia su servicio pagado, nos come el canal y el precio.</td>
+          </tr>
+          <tr>
+            <td><b>Kastor</b><br><span class="small muted">Software chileno de administración de arriendos</span></td>
+            <td>ERP para corredoras: cargos, liquidaciones al propietario, contabilidad.</td>
+            <td>Competidor directo en nuestro ICP primario. <b>Honestidad:</b> el día 1 ellos están más maduros que nosotros en liquidaciones y contabilidad. Nosotros tenemos lo que ellos no: triage de mantención por foto, scoring de arrendatario y conciliación automática de cartola. Ganamos por producto nuevo, no por paridad de features.</td>
+          </tr>
+          <tr>
+            <td><b>Assetplan</b><br><span class="small muted">El más grande en renta residencial en Chile</span></td>
+            <td>Administra edificios completos de multifamily.</td>
+            <td>No competimos. Su cliente es el fondo dueño del edificio; el nuestro tiene 6 deptos dispersos en 3 comunas. Si algún día quieren bajar a ese segmento, tienen todo para hacerlo — y no tienen ninguna razón para querer.</td>
+          </tr>
+          <tr>
+            <td><b>Portal Inmobiliario, Yapo, Toctoc</b></td>
+            <td>Captación y publicación.</td>
+            <td>No son competencia: son <b>canal</b>. El dueño publica ahí y ahí es donde lo interceptamos. (Portal Inmobiliario es de Mercado Libre, así que un partnership formal es poco probable — el juego es retargeting y SEO, no acuerdos.)</td>
+          </tr>
+          <tr>
+            <td><b>Buildium, AppFolio, TenantCloud, Avail</b><br><span class="small muted">EE.UU., maduros</span></td>
+            <td>Property management de verdad, con 20 años de producto.</td>
+            <td>No operan Chile y adaptarse les cuesta más de lo que el mercado vale: no tienen DICOM, no tienen UF, no tienen conciliación de transferencias en CLP y no conocen la Ley 18.101. La localización profunda <em>es</em> el foso — y es un foso angosto: nos protege de ellos, no de un chileno con buen producto.</td>
+          </tr>
+          <tr>
+            <td><b>El abogado de arriendos</b></td>
+            <td>Te lleva el juicio de término de contrato.</td>
+            <td>Es lo que compras cuando el filtro falló. Es nuestro mejor argumento de venta y, a la vez, un aliado de canal: los estudios chicos que ven 30 juicios al año saben mejor que nadie que el problema se resuelve en la entrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ PRECIO ============ -->
+  <section id="precio">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">05</p>
+      <h2>Precio y economía unitaria</h2>
+    </div>
+
+    <div class="scroll-x mb-l">
+      <table class="tabla">
+        <thead><tr><th>Plan</th><th>Unidades</th><th class="der">Precio / unidad</th><th class="der">Cuenta típica</th><th>Cómo se cobra</th></tr></thead>
+        <tbody>
+          <tr><td><b>Llavero</b></td><td class="num">2 – 4</td><td class="der clp">$7.900</td><td class="der clp">$23.700 <span class="muted small">(3 u)</span></td><td class="small">Tarjeta, mensual</td></tr>
+          <tr><td><b>Portafolio</b></td><td class="num">5 – 15</td><td class="der clp">$5.900</td><td class="der clp">$41.300 <span class="muted small">(7 u)</span></td><td class="small">Tarjeta, mensual</td></tr>
+          <tr><td><b>Corredora</b></td><td class="num">16 +</td><td class="der clp">$3.900</td><td class="der clp">$117.000 <span class="muted small">(30 u)</span></td><td class="small">Transferencia, mínimo $69.000</td></tr>
+          <tr><td><b>Informe de arrendatario</b></td><td class="small">por evento</td><td class="der clp">$6.900</td><td class="der small muted">no recurrente</td><td class="small">Lo paga el dueño o el postulante</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Costo de servir una cuenta media (7 unidades, plan Portafolio)</h3>
+    <p class="small muted mt-s mb-m">
+      Estos números son los mismos de <a href="stack.html">Arquitectura</a>. Si no cuadraran,
+      uno de los dos documentos estaría mintiendo.
+    </p>
+
+    <div class="aritmetica">
+<span class="cmt"># — INGRESO ————————————————————————————————</span>
+Suscripción       7 unidades × $5.900                 <b>$41.300 /mes</b>
+<span class="cmt"># Usamos $34.000 como ARPA en el roadmap (mezcla real con</span>
+<span class="cmt"># cuentas Llavero chicas). Acá va la cuenta media del plan.</span>
+
+<span class="cmt"># — COSTO DE SERVIR ————————————————————————</span>
+Inferencia de IA (los 4 agentes)                        $340   <span class="cmt">ver stack.html</span>
+WhatsApp Business API   ~35 conversaciones × $40         $1.400
+Fintoc (lectura de cartola)   4 consultas × $225           $900
+Infra (Postgres, S3, cómputo)  prorrateado                 $760
+Equifax/DICOM   0,8 informes/mes × $1.200                  $960   <span class="cmt">recuperable</span>
+                                                     ─────────
+<b>COGS</b>                                                <b>$4.360 /mes</b>
+
+<b>Margen bruto = (41.300 − 4.360) / 41.300 = 89,4%</b>   →  usamos <b>89%</b>
+
+<span class="cmt"># La IA es el 8% del COGS. El costo real es WhatsApp y el</span>
+<span class="cmt"># banco. Cualquiera que te diga que "la IA es carísima" no ha</span>
+<span class="cmt"># hecho la cuenta.</span>
+    </div>
+
+    <div class="grid g2 mt-l">
+      <div class="aritmetica">
+<span class="cmt"># — CAC mezclado, año 1 ————————————————————</span>
+
+Meta Ads (dueños)
+  CPM en Chile                                  $3.500   <span class="cmt">estimación</span>
+  CTR                                             1,2%
+  Conversión de la landing                         8,0%
+  CPL = 3.500 / (1.000 × 0,012 × 0,08)          <b>$3.646</b>
+  Lead → prueba 30% · prueba → paga 40%
+  <b>CAC Meta = 3.646 / (0,30 × 0,40) = $30.400</b>
+
+Outbound a corredoras (humano)
+  1 vendedor cargado                        $1.400.000 /mes
+  Cierres al mes                                     6
+  <b>CAC outbound = $233.000</b>  <span class="cmt">pero ticket 3× mayor</span>
+
+SEO long-tail + herramienta gratis
+  <b>CAC ≈ $12.000</b>  <span class="cmt">al año 2; al año 1 casi no aporta</span>
+
+<b>CAC MEZCLADO AÑO 1 = $95.000</b>
+      </div>
+
+      <div class="aritmetica">
+<span class="cmt"># — LTV y payback ——————————————————————————</span>
+
+ARPA (mezcla real de planes)                <b>$34.000 /mes</b>
+Margen bruto                                        89%
+Contribución mensual                        <b>$30.260</b>
+
+Churn mensual                                       <b>3%</b>
+<span class="cmt"># Supuesto, no cita. Micro-PYME chilena suele estar entre</span>
+<span class="cmt"># 3% y 5% mensual. 3% es optimista y lo sabemos: el dueño</span>
+<span class="cmt"># de 2 deptos churnea cuando vende. La corredora, no.</span>
+
+Vida esperada = 1 / 0,03                     33 meses
+<b>LTV = 30.260 × 33 = $999.000</b>
+
+<b>LTV / CAC = 999.000 / 95.000 = 10,5×</b>
+<b>Payback  = 95.000 / 30.260 = 3,1 meses</b>
+
+<span class="cmt"># A 5% de churn (el escenario pesimista):</span>
+<span class="cmt"># LTV = $605.000 → LTV/CAC = 6,4× → sigue siendo negocio.</span>
+<span class="cmt"># A 8% de churn: LTV/CAC = 4,0× y el negocio se pone flaco.</span>
+      </div>
+    </div>
+
+    <div class="ficha ficha--acento mt-l">
+      <h3>La regla de precio, en una línea</h3>
+      <p class="mt-s" style="color:var(--tinta-2)">
+        Una corredora cobra <b>5–8%</b> del arriendo por administrar. Sobre un arriendo de
+        $500.000 eso son <b class="clp">$25.000 – $40.000</b> por unidad al mes. Conserjo
+        cobra <b class="clp">$5.900</b> — un <b>1,2%</b>. No competimos por precio con la
+        corredora: competimos por control. Y a la corredora misma le vendemos el software
+        que le baja el costo de servir cada unidad.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ CANALES ============ -->
+  <section id="canales">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">06</p>
+      <h2>Canales de adquisición, rankeados</h2>
+    </div>
+
+    <div class="canal">
+      <span class="r">1</span>
+      <div>
+        <h3>Corredoras chicas — outbound directo</h3>
+        <p>
+          Es el canal de mayor densidad: una conversación puede traer 40 unidades. Se llega por
+          los grupos de WhatsApp de corredores (existen, son activos, y son cerrados: hay que
+          entrar por referencia), por el <b>COPROCH</b> (Colegio de Corredores de Propiedades)
+          y por listas armadas raspando quién publica más avisos en Portal Inmobiliario.
+        </p>
+        <span class="cpl">CAC $233.000 · ticket $117.000/mes · payback 2,2 meses · el mejor retorno de los tres</span>
+      </div>
+    </div>
+
+    <div class="canal">
+      <span class="r">2</span>
+      <div>
+        <h3>SEO long-tail en español + una herramienta gratis</h3>
+        <p>
+          Estas búsquedas existen, tienen intención altísima y hoy las cubre el blog de un
+          abogado: <em>“cómo saber si un arrendatario tiene DICOM”</em>, <em>“modelo de contrato
+          de arriendo Chile 2026”</em>, <em>“cómo desalojar a un arrendatario que no paga”</em>,
+          <em>“carta de aviso de término de contrato de arriendo”</em>, <em>“cómo se calcula el
+          reajuste de arriendo por UF”</em>. Encima ponemos un <b>generador de contrato de
+          arriendo gratis</b> que pide la dirección y el monto — y con eso ya tenemos una unidad
+          adentro del sistema.
+        </p>
+        <span class="cpl">CAC ≈ $12.000 al año 2 · lento, compuesto, y el único que baja el CAC con el tiempo</span>
+      </div>
+    </div>
+
+    <div class="canal">
+      <span class="r">3</span>
+      <div>
+        <h3>Meta Ads segmentado a inversionistas inmobiliarios</h3>
+        <p>
+          Grupos de Facebook de inversión inmobiliaria en Chile, y retargeting de quien visita
+          Portal Inmobiliario en modo “publicar”. El creativo que funciona no es el producto:
+          es el miedo. <em>“Le arrendé a alguien con DICOM y me demoré 14 meses en sacarlo”</em>.
+        </p>
+        <span class="cpl">CPL estimado $3.646 · CAC $30.400 · escala rápido, pero trae al cliente de ticket bajo</span>
+      </div>
+    </div>
+
+    <div class="canal">
+      <span class="r">4</span>
+      <div>
+        <h3>Contadores y estudios contables PYME</h3>
+        <p>
+          El dueño de 6 deptos declara la renta de arriendos y su contador ya ve todo el detalle.
+          Es un canal de referidos natural con incentivo claro (20% del primer año). También sirve
+          la integración con software PYME —<b>Nubox</b>, <b>Defontana</b>— para exportar la
+          cartilla de rentas de arriendo.
+        </p>
+        <span class="cpl">Barato pero lento de activar · vale para el año 2, no para los 90 días</span>
+      </div>
+    </div>
+
+    <div class="canal">
+      <span class="r">5</span>
+      <div>
+        <h3>Estudios jurídicos de arrendamiento</h3>
+        <p>
+          El abogado que ve 30 juicios de término de contrato al año sabe perfectamente que el
+          problema se resolvía en la entrada. Es un referidor con credibilidad enorme y cero
+          conflicto de interés (nosotros no le quitamos juicios: se los mejoramos, porque
+          llegan con la carpeta armada).
+        </p>
+        <span class="cpl">Volumen bajo, conversión altísima · vale la pena por credibilidad más que por leads</span>
+      </div>
+    </div>
+
+    <div class="canal descartado">
+      <span class="r">×</span>
+      <div>
+        <h3>Mercado Público</h3>
+        <p>
+          <b>Descartado y con razón.</b> El Estado no arrienda departamentos así. No hay
+          licitación que calce con este producto y perseguirlo sería teatro. Un canal descartado
+          explícitamente es más útil que una lista de canales donde están todos.
+        </p>
+      </div>
+    </div>
+
+    <div class="canal descartado">
+      <span class="r">×</span>
+      <div>
+        <h3>Ferias y gremios grandes (CChC, ExpoInmobiliaria)</h3>
+        <p>
+          <b>Descartado para los primeros 18 meses.</b> Son caros (un stand chico parte en
+          $2–4 millones), están llenos de inmobiliarias que venden proyectos nuevos —no de
+          administradores— y el ciclo de conversión es larguísimo. Es un canal de credibilidad
+          para cuando ya tengamos 200 clientes, no para conseguir los primeros 10.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IA EN EL MARKETING ============ -->
+  <section id="ia">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">07</p>
+      <h2>Dónde usamos IA en el marketing (y dónde no)</h2>
+      <p class="lead mt-s" style="max-width:52ch">
+        “IA en todo” no es una respuesta. Estas son las tres cosas donde de verdad ayuda y las
+        tres donde la sacamos del medio.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div>
+        <h3 style="color:var(--ok)">Sí, y con margen claro</h3>
+        <ul class="lista lista--check mt-s" role="list">
+          <li>
+            <b>Producir el long-tail de SEO.</b> Son ~200 páginas de intención de búsqueda,
+            cada una con su matiz legal. Un humano no las escribe. La IA sí — pero cada página
+            legal pasa por revisión de abogado antes de publicarse, y cita la norma. El costo:
+            unos USD 40 en inferencia, más 15 horas de revisión legal.
+          </li>
+          <li>
+            <b>Personalizar el primer mensaje a cada corredora.</b> Su cartera está publicada
+            en Portal Inmobiliario: cuántas unidades administra, en qué comunas, hace cuánto que
+            un aviso lleva publicado. Un mensaje que dice <em>“vi que el 1207 de Av. Ecuador lleva
+            41 días publicado”</em> convierte muchísimo más que uno genérico. Eso lo arma la IA
+            en segundos y un humano lo aprueba antes de enviarlo.
+          </li>
+          <li>
+            <b>Clasificar y priorizar los leads entrantes.</b> Cuántas unidades declara, en qué
+            comunas, si es corredora o dueño. Decide quién va a autoservicio y quién merece una
+            llamada. Es una tarea de clasificación barata y bien definida.
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 style="color:var(--teja)">No, y a propósito</h3>
+        <ul class="lista lista--x mt-s" role="list">
+          <li>
+            <b>La venta a corredoras.</b> Es una venta por confianza en un gremio chico donde
+            todos se conocen. Un mail que huele a IA te quema el nombre en el grupo de WhatsApp
+            el mismo día. Esta venta la hace una persona, mirando a los ojos.
+          </li>
+          <li>
+            <b>El contenido legal sin abogado.</b> Decir una barbaridad sobre la Ley 18.101 o
+            sobre los plazos de desalojo destruye la credibilidad de una, y con este público
+            no hay segunda oportunidad. La IA redacta el borrador; publica el abogado.
+          </li>
+          <li>
+            <b>Los testimonios y casos de éxito.</b> Se escriben con el cliente al teléfono o no
+            se escriben. Un testimonio generado es fraude, y en un mercado donde todos se
+            conocen se nota.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 90 DÍAS ============ -->
+  <section id="dias">
+    <div class="section-head">
+      <p class="kicker kicker--tinta">08</p>
+      <h2>Primeros 90 días</h2>
+    </div>
+
+    <div class="grid g2">
+      <div>
+        <div class="semana">
+          <p class="s">Semanas 1–2</p>
+          <h3>Entrevistas, y cerrar la lista de espera de Equifax</h3>
+          <p>
+            15 entrevistas: 8 dueños de 2–15 unidades, 5 corredoras chicas, 2 abogados de
+            arrendamiento. Objetivo: cerrar <b>3 design partners</b> que nos den acceso a su
+            cartera real. En paralelo —y esto es lo importante— <b>empezar el contrato con
+            Equifax el día 1</b>: es el cuello de botella de plazo de todo el plan (30 a 60
+            días de habilitación) y si esperamos, perdemos un mes entero después.
+          </p>
+          <p class="meta">Riesgo: si Equifax no habilita a una empresa nueva sin historial, hay que ir por un revendedor. Averiguarlo ahora, no en la semana 8.</p>
+        </div>
+
+        <div class="semana">
+          <p class="s">Semanas 3–6</p>
+          <h3>Construir solo dos cosas</h3>
+          <p>
+            El <b>triage de mantención por foto</b> y el <b>filtro de arrendatario</b>. Nada de
+            cobro todavía: el cobro necesita integración bancaria y esa es una pelea de dos meses.
+            Estas dos piezas se pueden mostrar en una reunión y hacen que a la persona se le
+            abran los ojos. El cobro impresiona a nadie hasta que ya eres cliente.
+          </p>
+          <p class="meta">Entregable: los 3 design partners usándolo con unidades reales.</p>
+        </div>
+
+        <div class="semana">
+          <p class="s">Semana 8</p>
+          <h3>Encender el SEO</h3>
+          <p>
+            Publicar las 12 páginas cabecera y el <b>generador de contrato de arriendo gratis</b>.
+            El SEO tarda de 4 a 6 meses en dar fruto: si lo enciendes en el mes 6, lo cosechas en
+            el mes 12. Se enciende ahora precisamente porque es lento.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div class="semana">
+          <p class="s">Semanas 7–10</p>
+          <h3>Producción con los design partners</h3>
+          <p>
+            Meta dura: <b>30 tickets de mantención triados</b> y <b>20 postulantes evaluados</b>
+            con unidades reales. Aquí es donde se descubre si el diagnóstico por foto sirve de
+            verdad o si alucina. Medimos una sola cosa: <em>¿cuántas veces el maestro que llegó
+            confirmó el diagnóstico?</em> Si es menos del 70%, el producto no está listo y hay que
+            decirlo.
+          </p>
+          <p class="meta">Es el número que decide si seguimos. No el NPS.</p>
+        </div>
+
+        <div class="semana">
+          <p class="s">Semanas 9–12</p>
+          <h3>Outbound a corredoras</h3>
+          <p>
+            Lista de 120 corredoras chicas de la RM armada desde los avisos de Portal
+            Inmobiliario. Primer mensaje personalizado con su propia cartera. Objetivo:
+            30 reuniones, 5 pruebas pagadas.
+          </p>
+        </div>
+
+        <div class="semana">
+          <p class="s">Semanas 11–13</p>
+          <h3>Los primeros que pagan</h3>
+          <p>
+            Precio real, tarjeta o transferencia, sin descuento de fundador (un descuento de
+            fundador te oculta si el precio está bien). <b>Criterio de éxito de los 90 días:
+            5 clientes pagando y ≥ 60 unidades bajo administración.</b>
+          </p>
+          <p class="meta" style="color:var(--teja)">Si a los 90 días hay 0 clientes pagando pero mucho “me encanta, avísame cuando esté listo”, el problema no es el producto: es que no duele lo suficiente. Ver la sección siguiente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUÉ MATARÍA ESTO ============ -->
+  <section id="muerte">
+    <div class="section-head">
+      <p class="kicker">09</p>
+      <h2>Qué mataría esto</h2>
+      <p class="lead mt-s" style="max-width:52ch">
+        No los riesgos genéricos. Los tres que de verdad terminan la empresa.
+      </p>
+    </div>
+
+    <div class="grid g3">
+      <div class="ficha ficha--acento">
+        <div class="flex gap-s mb-m" style="align-items:center">
+          <svg width="20" height="20" style="color:var(--teja);flex:none" aria-hidden="true"><use href="#i-alerta"/></svg>
+          <span class="ficha-num" style="margin:0">RIESGO 1 · EL MÁS PROBABLE</span>
+        </div>
+        <h3>El dueño chico nunca paga por software</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          Le encanta el demo, dice que es genial, y no pone la tarjeta. Es un gasto de $24.000
+          al mes contra un problema que “solo pasa a veces”. Si el churn a 6 meses supera el
+          <b>7% mensual</b> en el segmento Llavero, ese ICP no existe como negocio.
+        </p>
+        <p class="small mt-m"><b>Qué hacemos:</b> el ICP pasa a ser exclusivamente la corredora, el
+          plan Llavero se convierte en un producto de cobro por evento (solo informes) y el
+          negocio se hace más chico pero real. No es la muerte; es un pivote con dignidad.</p>
+      </div>
+
+      <div class="ficha">
+        <div class="flex gap-s mb-m" style="align-items:center">
+          <svg width="20" height="20" style="color:var(--media);flex:none" aria-hidden="true"><use href="#i-alerta"/></svg>
+          <span class="ficha-num" style="margin:0;color:var(--media)">RIESGO 2 · EL MÁS CARO</span>
+        </div>
+        <h3>Equifax nos cierra la puerta</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          Si Equifax no habilita a una startup sin historial, o pone un mínimo mensual de
+          millones, la cuña se muere: el filtro <em>es</em> la razón por la que el cliente
+          entra. Es un proveedor único con poder de monopolio sobre nuestro producto de entrada.
+        </p>
+        <p class="small mt-m"><b>Qué hacemos:</b> el score no puede depender solo de DICOM. Renta
+          verificada contra cotizaciones de AFP, verificación de identidad y, con el tiempo, el
+          historial de pago dentro de nuestra propia red — ese último es el único activo de datos
+          que nadie nos puede quitar. <b>Mitigación que empieza el día 1</b>, no cuando pase.</p>
+      </div>
+
+      <div class="ficha">
+        <div class="flex gap-s mb-m" style="align-items:center">
+          <svg width="20" height="20" style="color:var(--media);flex:none" aria-hidden="true"><use href="#i-alerta"/></svg>
+          <span class="ficha-num" style="margin:0;color:var(--media)">RIESGO 3 · EL QUE NO CONTROLAMOS</span>
+        </div>
+        <h3>Houm lanza el autoservicio gratis</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          Houm tiene marca, capital y el mindshare del “arriendo sin problemas”. Si sacan una
+          herramienta gratis para el dueño DIY como embudo hacia su servicio administrado,
+          nos igualan el canal y nos ponen el precio en cero. No podemos evitarlo.
+        </p>
+        <p class="small mt-m"><b>Qué hacemos:</b> lo único que no pueden copiar barato es la
+          corredora — que es exactamente su competidor. Houm no puede venderle software a la
+          corredora chica sin canibalizar su propio negocio. Ese conflicto es nuestro foso,
+          y es la razón de fondo por la que el ICP primario es la corredora y no el dueño.</p>
+      </div>
+    </div>
+
+    <div class="ficha ficha--hundida mt-l">
+      <h3>El criterio de muerte, escrito antes de empezar</h3>
+      <p class="mt-s" style="color:var(--tinta-2)">
+        Si al <b>mes 12</b> se dan las dos cosas a la vez —CAC pagado por encima de 6 meses de
+        margen bruto <b>y</b> churn sobre 5% mensual—, esto no es un SaaS: es un negocio de
+        servicios con una capa de software encima. En ese caso hay dos salidas honestas: convertirse
+        en administradora (margen mucho menor, negocio real) o cerrar y devolver lo que quede.
+        Lo que no vamos a hacer es levantar otra ronda para tapar el hoyo.
+      </p>
+      <p class="small muted mt-m">El detalle mes a mes, con los criterios de muerte de cada hito, está en <a href="roadmap.html">Roadmap</a>.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container flex entre wrap gap-m">
+    <p><b>Conserjo</b> · conserjo.com — prototipo.</p>
+    <p><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Ideas</a></p>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Conserjo</title>
+<meta name="description" content="Modelo de datos, los cuatro agentes con su modelo y su prompt, las APIs que hay que contratar en Chile, el costo real por cuenta y qué está fingido en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/marca.css">
+<style>
+  .agente { border: var(--borde); background: var(--papel); margin-bottom: var(--sp-m); }
+  .agente-h {
+    background: var(--papel-2); border-bottom: var(--borde);
+    padding: .7rem var(--sp-s);
+    display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  }
+  .agente-h svg { color: var(--teja); flex: none; }
+  .agente-h h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin: 0; flex: 1 1 auto; }
+  .modelo-tag {
+    font-family: var(--mono); font-size: .68rem; font-weight: 600;
+    background: var(--tinta); color: var(--papel);
+    padding: .22rem .5rem; letter-spacing: .02em; white-space: nowrap;
+  }
+  .agente-b { padding: var(--sp-s); }
+  .prompt {
+    font-family: var(--mono); font-size: .74rem; line-height: 1.65;
+    background: var(--tinta); color: #D9D3C6;
+    padding: var(--sp-s); margin-top: var(--sp-s);
+    white-space: pre-wrap; overflow-x: auto;
+    border-left: 3px solid var(--teja);
+  }
+  .prompt b { color: var(--papel); font-weight: 600; }
+  .prompt .c { color: #8A8478; }
+  .prompt .k { color: #D98A6B; }
+  .herr { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: var(--sp-s); }
+  .herr code {
+    font-family: var(--mono); font-size: .7rem;
+    background: var(--papel-3); border: var(--hairline);
+    padding: .2rem .45rem; white-space: nowrap;
+  }
+  .rot { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .09em; color: var(--tinta-3); font-weight: 600; }
+
+  .esquema {
+    font-family: var(--mono); font-size: .76rem; line-height: 1.7;
+    background: var(--papel-2); border: var(--hairline);
+    padding: var(--sp-s); overflow-x: auto; white-space: pre;
+  }
+  .esquema .t { color: var(--teja); font-weight: 600; }
+  .esquema .c { color: var(--tinta-3); }
+  .esquema .f { color: var(--tinta); }
+
+  .env {
+    font-family: var(--mono); font-size: .74rem; line-height: 1.9;
+    background: var(--tinta); color: #D9D3C6;
+    padding: var(--sp-s); overflow-x: auto; white-space: pre;
+  }
+  .env .k { color: #D98A6B; }
+  .env .c { color: #8A8478; }
+
+  .fingido { border-left: 3px solid var(--teja); padding-left: var(--sp-s); margin-bottom: var(--sp-m); }
+  .fingido h4 { font-family: var(--sans); font-size: .95rem; font-weight: 600; }
+  .fingido p { font-size: .87rem; color: var(--tinta-2); margin-top: .15rem; }
+  .fingido .real { font-size: .82rem; color: var(--tinta-3); margin-top: .3rem; }
+  .fingido .real b { color: var(--teja); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-llave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><path d="M10 10l10 10M17 17l2-2M14 14l2-2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-gota" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-billete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12"/><circle cx="12" cy="12" r="2.6"/><path d="M5 12h.5M18.5 12h.5"/></symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+</svg>
+
+<header class="marca-bar">
+  <nav class="container" aria-label="Principal">
+    <a class="logo" href="index.html"><svg width="22" height="22" aria-hidden="true"><use href="#i-llave"/></svg> Conserjo</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+      <svg width="22" height="22" aria-hidden="true"><use href="#i-menu"/></svg>
+      <span class="visually-hidden">Abrir menú</span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="../index.html">← Ideas</a></li>
+      <li><a href="index.html">Producto</a></li>
+      <li><a href="demo/index.html">Demo</a></li>
+      <li><a href="negocio.html">Negocio</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="container">
+
+  <header style="margin-bottom:var(--sp-xl)">
+    <p class="kicker">Cómo se construye esto de verdad</p>
+    <h1 style="margin-block:var(--sp-2xs) var(--sp-s)">Cuatro agentes, seis integraciones, y $4.360 de costo al mes por cuenta.</h1>
+    <p class="lead" style="max-width:56ch">
+      Esta página es para el que va a escribir el código. Modelo de datos, qué modelo de Claude
+      corre cada agente y por qué, qué hay que ir a firmar con Equifax y con Meta, cuánto cuesta
+      cada consulta, y —sin adornos— qué está fingido en el demo.
+    </p>
+  </header>
+
+  <!-- ============ MODELO DE DATOS ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">01</p>
+      <h2>Modelo de datos</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        Postgres. Nada exótico. La única decisión de diseño que importa es que
+        <b>el ticket de mantención y el diagnóstico son tablas distintas</b>: el diagnóstico es
+        una opinión de un modelo en un momento dado, y hay que poder tener varias, versionarlas
+        y compararlas contra lo que finalmente encontró el maestro. Ahí está el dataset.
+      </p>
+    </div>
+
+    <div class="scroll-x">
+      <pre class="esquema"><span class="t">cuenta</span>            <span class="c">— el que paga. Persona natural o corredora.</span>
+  id, rut, razon_social, plan, cuenta_bancaria_id, creada_en
+
+<span class="t">unidad</span>            <span class="c">— el departamento. La unidad de cobro también.</span>
+  id, cuenta_id, direccion, numero, comuna, rol_sii,
+  arriendo_clp, gastos_comunes_clp, reajuste (<span class="f">'uf' | 'ipc' | 'fijo'</span>),
+  estado (<span class="f">'ocupada' | 'vacante' | 'reparacion' | 'mora'</span>)
+
+<span class="t">persona</span>           <span class="c">— arrendatario, postulante, aval y maestro. Todos.</span>
+  id, rut, dv, nombre, fono_e164, email, es_maestro
+
+<span class="t">contrato</span>          <span class="c">— une unidad + persona + plata.</span>
+  id, unidad_id, arrendatario_id, aval_id,
+  inicio, termino, monto_clp, dia_vencimiento,
+  garantia_clp, doc_firmado_url, estado
+
+<span class="t">postulacion</span>       <span class="c">— el filtro de entrada. El momento en que tienes poder.</span>
+  id, unidad_id, persona_id, estado,
+  score (<span class="f">0-100</span>), veredicto (<span class="f">'aprobado'|'revisar'|'rechazado'</span>),
+  dicom_json, renta_declarada_clp, renta_verificada_clp,
+  ratio_renta_arriendo, banderas_json, informe_url
+
+<span class="t">ticket</span>            <span class="c">— lo que el arrendatario reporta. Crudo, sin interpretar.</span>
+  id, unidad_id, reportado_por, canal (<span class="f">'whatsapp'|'app'|'email'</span>),
+  texto, fotos[] (<span class="f">s3 keys</span>), creado_en, estado
+
+<span class="t">diagnostico</span>       <span class="c">— la OPINIÓN del agente. Versionada. Puede haber varias.</span>
+  id, ticket_id, modelo, prompt_version, creado_en,
+  gremio, causa_probable, urgencia (<span class="f">1-4</span>),
+  costo_min_clp, costo_max_clp, plazo_horas,
+  riesgo_escalamiento_texto, costo_si_espera_clp,
+  contencion_texto, confianza (<span class="f">0-1</span>)
+
+<span class="t">orden_trabajo</span>      <span class="c">— cuando el dueño aprueba. Aquí se cierra el loop.</span>
+  id, diagnostico_id, maestro_id, aprobada_en,
+  monto_cotizado_clp, monto_final_clp,
+  <span class="f">hallazgo_real_texto</span>   <span class="c">← ESTE campo es el producto a 3 años.</span>
+  <span class="c">   Es la etiqueta. Sin él solo tienes un LLM con un prompt bonito.</span>
+
+<span class="t">movimiento</span>        <span class="c">— cada línea de la cartola bancaria.</span>
+  id, cuenta_bancaria_id, fecha, monto_clp, glosa_banco,
+  rut_origen, conciliado_con (<span class="f">contrato_id | null</span>),
+  hipotesis_json, confianza, resuelto_por (<span class="f">'agente'|'humano'</span>)
+
+<span class="t">evento_cobranza</span>   <span class="c">— la bitácora. Sirve de prueba en juicio.</span>
+  id, contrato_id, tipo, canal, cuerpo, enviado_en, leido_en</pre>
+    </div>
+
+    <div class="nota mt-m">
+      <b>La tabla que hace la diferencia es <code>orden_trabajo.hallazgo_real_texto</code>.</b>
+      Cuando el maestro cierra la OT escribe qué era realmente y cuánto costó. Eso convierte
+      cada reparación en una etiqueta supervisada: <em>foto + texto → lo que era + lo que costó</em>.
+      A los dos años tenemos el único dataset chileno de daños de arriendo con su costo real
+      confirmado. <b>Ese es el foso, no el prompt.</b>
+    </div>
+  </section>
+
+  <!-- ============ LOS AGENTES ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">02</p>
+      <h2>Los cuatro agentes</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        Elección de modelo por tarea, no por moda. Vision y juicio de costo → Sonnet.
+        Parseo y clasificación repetitiva → Haiku. No corremos Opus en producción para esto:
+        no lo necesita, y el margen no lo aguanta.
+      </p>
+    </div>
+
+    <!-- Agente 1 -->
+    <article class="agente">
+      <div class="agente-h">
+        <svg width="20" height="20" aria-hidden="true"><use href="#i-gota"/></svg>
+        <h3>El Maestro — triage de mantención por foto</h3>
+        <span class="modelo-tag">claude-sonnet-5</span>
+      </div>
+      <div class="agente-b">
+        <p class="small" style="color:var(--tinta-2)">
+          Entra una foto de WhatsApp y un texto de tres palabras. Sale: qué es, cuán urgente,
+          cuánto cuesta, qué gremio, y qué pasa si esperas. <b>Es el agente que justifica el
+          producto entero</b>, y es el único que ve imágenes — por eso Sonnet y no Haiku:
+          la diferencia entre “humedad de condensación” y “filtración de la matriz del piso de
+          arriba” está en la textura del muro, y Haiku la falla.
+        </p>
+        <p class="rot mt-m">Prompt de sistema (extracto real, v4)</p>
+        <div class="prompt"><span class="c"># ROL</span>
+Eres un maestro con 20 años en Santiago. Has visto 5.000 filtraciones.
+Recibes la foto de un arrendatario asustado y un dueño que no está en el
+departamento. Los dos necesitan la verdad, no tranquilizarse.
+
+<span class="c"># REGLAS DURAS</span>
+1. <b>Si la foto no alcanza para diagnosticar, DILO.</b> Devuelve
+   confianza &lt; 0.5 y pide EXACTAMENTE la foto que te falta
+   ("necesito una foto del cielo del baño del piso de arriba").
+   Un diagnóstico inventado con confianza alta es peor que ninguno:
+   el dueño manda al gremio equivocado y paga la visita en vano.
+2. El costo va SIEMPRE como rango, en CLP, y sale de
+   `precios_comuna(comuna, gremio)`. Nunca de tu memoria.
+3. La urgencia se justifica por el DAÑO QUE SE ACUMULA, no por
+   cuán molesto es. Un enchufe tiznado es urgencia 4 aunque el
+   arrendatario diga "no es nada". Una llave que gotea es urgencia 2
+   aunque diga "es urgentísimo".
+4. Si hay riesgo eléctrico o de gas: urgencia 4, corta el suministro
+   en la instrucción de contención, y no negocies.
+
+<span class="c"># SALIDA</span>
+JSON estricto contra el schema `Diagnostico`. Incluye SIEMPRE
+`contencion`: qué hace el arrendatario en los próximos 20 minutos
+para que esto no crezca mientras llega el maestro.
+
+<span class="c"># LO QUE NO HACES</span>
+No apruebas gastos. No contactas al maestro. No hablas de plata con
+el arrendatario. Propones; el dueño decide.</div>
+        <p class="rot mt-m">Herramientas</p>
+        <div class="herr">
+          <code>precios_comuna(comuna, gremio)</code>
+          <code>historial_unidad(unidad_id)</code>
+          <code>maestros_disponibles(gremio, comuna, radio_km)</code>
+          <code>pedir_foto_adicional(ticket_id, que_foto)</code>
+        </div>
+        <p class="small muted mt-m">
+          <b>Structured output</b> contra el schema <code>Diagnostico</code>
+          (<code>output_config.format</code>), no parseo de texto libre — el diagnóstico se
+          escribe directo en la tabla. <b>Thinking adaptativo</b> encendido: distinguir causas
+          es exactamente el caso donde el modelo tiene que dudar un rato antes de comprometerse.
+        </p>
+      </div>
+    </article>
+
+    <!-- Agente 2 -->
+    <article class="agente">
+      <div class="agente-h">
+        <svg width="20" height="20" aria-hidden="true"><use href="#i-escudo"/></svg>
+        <h3>El Portero — evaluación de postulantes</h3>
+        <span class="modelo-tag">claude-sonnet-5</span>
+      </div>
+      <div class="agente-b">
+        <p class="small" style="color:var(--tinta-2)">
+          Lee las liquidaciones de sueldo (PDF, foto de celular torcida, captura de pantalla —
+          llega de todo), el informe de Equifax y el certificado de AFP. Verifica que la renta
+          <em>declarada</em> y la <em>verificable</em> sean la misma cosa. Devuelve un score, un
+          veredicto y —lo importante— <b>las banderas en texto plano</b>.
+        </p>
+        <p class="rot mt-m">Prompt de sistema (extracto real, v3)</p>
+        <div class="prompt"><span class="c"># CONTEXTO LEGAL (esto no es negociable, léelo dos veces)</span>
+En Chile, desalojar a un arrendatario que no paga toma de <b>8 a 18 meses</b>
+(Ley 18.101, juicio de arrendamiento). Durante ese tiempo el dueño no
+cobra y sigue pagando gastos comunes y contribuciones.
+
+<b>Consecuencia: el ÚNICO momento en que el dueño tiene poder es AHORA,
+antes de firmar.</b> Un falso positivo (aprobar a quien no paga) cuesta
+del orden de 10 meses de arriendo. Un falso negativo (rechazar a quien
+sí habría pagado) cuesta ~1 mes de vacancia.
+
+<b>La asimetría es de 10 a 1. Sé conservador. Cuando dudes, dilo.</b>
+
+<span class="c"># REGLAS DURAS</span>
+1. NO inventas. Si la liquidación no se lee, di "ilegible" y pide otra.
+   Jamás estimas una renta a partir del cargo o de la empresa.
+2. Renta VERIFICADA = la que puedes cruzar con AFP o con abonos en
+   cartola. Renta DECLARADA = la que él dice. Si difieren en más de
+   15%, es una BANDERA, no un promedio.
+3. Reportas DICOM tal cual viene: monto, cantidad de protestos y
+   antigüedad. Un protesto de $40.000 de hace 4 años NO es lo mismo
+   que $2.800.000 del mes pasado, y el dueño tiene derecho a esa
+   distinción en vez de un semáforo rojo.
+4. El score es aritmética transparente, no una vibra. Muestra la suma.
+
+<span class="c"># LO QUE NUNCA HACES</span>
+No decides. <b>Recomiendas.</b> La decisión de arrendar es del dueño y la
+ley lo hace responsable a él, no a ti. Y jamás usas nacionalidad,
+apellido, género, edad ni comuna de origen como señal — además de ser
+ilegal, no predice nada.</div>
+        <p class="rot mt-m">Herramientas</p>
+        <div class="herr">
+          <code>equifax_informe(rut)</code>
+          <code>leer_liquidacion(pdf_url)</code>
+          <code>verificar_afp(rut)</code>
+          <code>validar_rut(rut)</code>
+          <code>calcular_score(inputs)</code>
+        </div>
+      </div>
+    </article>
+
+    <!-- Agente 3 -->
+    <article class="agente">
+      <div class="agente-h">
+        <svg width="20" height="20" aria-hidden="true"><use href="#i-billete"/></svg>
+        <h3>El Cajero — conciliación de la cartola</h3>
+        <span class="modelo-tag">claude-haiku-4-5</span>
+      </div>
+      <div class="agente-b">
+        <p class="small" style="color:var(--tinta-2)">
+          Corre todos los días a las 07:00. Lee la cartola vía Fintoc y cruza cada abono contra
+          los contratos activos. Casos fáciles (RUT calza, monto calza, fecha calza) los cierra
+          solo. Los raros —el arriendo llegó desde el RUT de la polola, o llegaron $580.000 pero
+          eran dos meses de $290.000— los deja con una <b>hipótesis y un porcentaje de confianza</b>,
+          y el dueño confirma con un toque.
+        </p>
+        <p class="rot mt-m">Prompt de sistema (extracto real, v2)</p>
+        <div class="prompt"><span class="c"># ROL</span>
+Concilias abonos bancarios contra contratos de arriendo. En Chile
+la gente paga por transferencia, y la glosa del banco es un desastre.
+
+<span class="c"># REGLAS DURAS</span>
+1. Auto-concilias SOLO si: RUT del emisor == RUT del arrendatario
+   Y el monto calza exacto. Todo lo demás va a revisión humana.
+2. Cuando no calza, propones UNA hipótesis y la escribes en castellano:
+   "creo que es el arriendo del 802 porque el monto calza exacto y
+    Camila arrienda ahí, pero el RUT del emisor es otro — puede ser
+    su pareja". <b>El dueño necesita entender tu razonamiento para
+    poder corregirlo.</b>
+3. La confianza es honesta. Si es 60%, dices 60%. Un 95% falso hace
+   que el dueño deje de revisar, y ahí es cuando se cae todo.
+4. <b>Un pago mal conciliado es peor que un pago sin conciliar.</b> Marcar
+   como moroso a alguien que pagó destruye la relación arrendaticia
+   en un mensaje. Ante la duda: no concilies, pregunta.
+
+<span class="c"># PROHIBIDO</span>
+Nunca inicias cobranza por tu cuenta. Nunca mueves plata.
+Nunca marcas mora sin que un humano haya visto la cartola.</div>
+        <p class="rot mt-m">Herramientas</p>
+        <div class="herr">
+          <code>fintoc_movimientos(cuenta_id, desde)</code>
+          <code>contratos_activos(cuenta_id)</code>
+          <code>conciliar(movimiento_id, contrato_id)</code>
+          <code>marcar_para_revision(movimiento_id, hipotesis, confianza)</code>
+        </div>
+        <p class="small muted mt-m">
+          Haiku porque es una tarea de emparejamiento estructurado que corre 30 veces al mes por
+          cuenta. Es el agente de mayor volumen y el más barato. Los casos que Haiku marca con
+          confianza &lt; 0,5 <b>escalan a Sonnet</b> — que corre sobre menos del 5% de los movimientos.
+        </p>
+      </div>
+    </article>
+
+    <!-- Agente 4 -->
+    <article class="agente">
+      <div class="agente-h">
+        <svg width="20" height="20" aria-hidden="true"><use href="#i-reloj"/></svg>
+        <h3>El Cobrador — la conversación incómoda</h3>
+        <span class="modelo-tag">claude-haiku-4-5</span>
+      </div>
+      <div class="agente-b">
+        <p class="small" style="color:var(--tinta-2)">
+          Redacta el mensaje que el dueño no quiere escribir. Escala el tono según los días de
+          atraso y el historial: al día 3 es un recordatorio amable; al día 25 es una carta que
+          menciona el artículo 1977 del Código Civil y que sirve de prueba. <b>Nunca envía solo:
+          el dueño aprueba cada mensaje.</b>
+        </p>
+        <p class="rot mt-m">Prompt de sistema (extracto real, v2)</p>
+        <div class="prompt"><span class="c"># ROL</span>
+Escribes el mensaje de cobranza que el dueño va a enviar por WhatsApp.
+Él lo lee, lo edita si quiere, y lo manda. <b>Tú nunca mandas nada.</b>
+
+<span class="c"># EL TONO ES UNA FUNCIÓN DE DOS VARIABLES</span>
+  dias_atraso  ×  historial_del_arrendatario
+
+Camila lleva 3 años pagando el 2 de cada mes y hoy es 5:
+  → algo le pasó. Preguntas cómo está, no cobras.
+Rodrigo lleva 23 días y es la tercera vez este año:
+  → formal, con montos, con fecha límite y con la consecuencia legal
+    escrita. Sin insultos y sin amenazas vacías.
+
+<span class="c"># REGLAS DURAS</span>
+1. Nunca amenazas con algo que no vas a hacer.
+2. Nunca inventas el estado legal. Si mencionas el art. 1977 CC,
+   es porque el plazo efectivamente se cumplió.
+3. La mora se calcula, no se estima: `mora(dias, monto, tasa)`.
+   Muestras la aritmética en el mensaje.
+4. Español de Chile, de persona a persona. Nada de
+   "Estimado cliente, le informamos que su obligación...". Nadie
+   habla así, y ese registro hace que el arrendatario deje de leer.
+
+<span class="c"># LÍMITE ABSOLUTO</span>
+No hostigas. Máximo 1 mensaje cada 72 horas. Si el arrendatario pide
+que dejes de escribir, paras y avisas al dueño que el camino ahora
+es el judicial, no el WhatsApp.</div>
+        <p class="rot mt-m">Herramientas</p>
+        <div class="herr">
+          <code>historial_pagos(contrato_id)</code>
+          <code>calcular_mora(dias, monto, tasa)</code>
+          <code>plazos_legales(contrato_id)</code>
+          <code>borrador_whatsapp(contrato_id, cuerpo)</code>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ INTEGRACIONES ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">03</p>
+      <h2>Lo que hay que ir a firmar</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        Ninguna de estas es un <code>npm install</code>. Todas requieren un contrato, un RUT de
+        empresa y —dos de ellas— semanas de espera. Es el camino crítico del mes 1.
+      </p>
+    </div>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <thead>
+          <tr><th>Proveedor</th><th>Para qué</th><th>Cómo se contrata</th><th class="der">Espera</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Equifax Chile</b><br><span class="small muted">DICOM</span></td>
+            <td class="small">El informe comercial del postulante. <b>Es el corazón del filtro de entrada.</b></td>
+            <td class="small">Contrato B2B con RUT de empresa. Exigen justificar la finalidad (Ley 19.628 de datos personales) y firman un anexo de tratamiento. No hay self-service.</td>
+            <td class="der num">4–8 sem</td>
+          </tr>
+          <tr>
+            <td><b>Meta</b><br><span class="small muted">WhatsApp Business API</span></td>
+            <td class="small">El canal. El arrendatario reporta la filtración por WhatsApp porque es donde ya está.</td>
+            <td class="small">Vía BSP (Zenvia, 360dialog, Infobip). Verificación de negocio + plantillas aprobadas una por una.</td>
+            <td class="der num">2–4 sem</td>
+          </tr>
+          <tr>
+            <td><b>Fintoc</b><br><span class="small muted">alt. Floid</span></td>
+            <td class="small">Leer la cartola del banco del dueño. Sin esto, la conciliación es a mano.</td>
+            <td class="small">API key en días. El dueño conecta su banco con sus credenciales — y ese es el momento más frágil del onboarding entero.</td>
+            <td class="der num">1 sem</td>
+          </tr>
+          <tr>
+            <td><b>Anthropic</b></td>
+            <td class="small">Los cuatro agentes.</td>
+            <td class="small">Tarjeta. Diez minutos.</td>
+            <td class="der num">0</td>
+          </tr>
+          <tr>
+            <td><b>Firma electrónica</b><br><span class="small muted">FirmaVirtual / eSign</span></td>
+            <td class="small">Contrato de arriendo firmado sin que nadie se mueva.</td>
+            <td class="small">FEA (Firma Electrónica Avanzada) para que tenga mérito ejecutivo. Proveedor acreditado ante la Entidad Acreditadora.</td>
+            <td class="der num">2 sem</td>
+          </tr>
+          <tr>
+            <td><b>SII</b><br><span class="small muted">boleta / factura</span></td>
+            <td class="small">Emitir el documento tributario de nuestra propia suscripción.</td>
+            <td class="small">Certificado digital + software de facturación (o LibreDTE).</td>
+            <td class="der num">1–2 sem</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ficha ficha--acento mt-m">
+      <h3 style="font-size:var(--step-0)">El riesgo de proveedor único</h3>
+      <p class="small mt-s" style="color:var(--tinta-2)">
+        <b>Equifax es un punto único de falla.</b> Si nos cierran la API, suben el precio 5×, o
+        nos exigen un mínimo mensual que no podemos pagar con 10 clientes, el filtro de entrada
+        —nuestra cuña entera— deja de existir. Es el factor ×0,8 que aparece explícito en el
+        cálculo de probabilidad del <a href="roadmap.html">roadmap</a>.
+      </p>
+      <p class="small mt-m" style="color:var(--tinta-2)">
+        <b>Mitigación:</b> Sinacofi como segunda fuente desde el mes 6, y el score se construye
+        de modo que DICOM sea <em>una</em> señal entre cuatro (renta verificada vía AFP, historial
+        de pagos si viene de otro arriendo, consistencia documental) y no <em>la</em> señal. Si
+        Equifax se cae, el producto queda peor — pero sigue existiendo.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ ENV ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">04</p>
+      <h2>Variables de entorno</h2>
+    </div>
+    <div class="scroll-x">
+      <pre class="env"><span class="c"># — Modelos ————————————————————————————————————</span>
+<span class="k">ANTHROPIC_API_KEY</span>=sk-ant-...
+<span class="k">MODELO_TRIAGE</span>=claude-sonnet-5        <span class="c"># vision + juicio de costo</span>
+<span class="k">MODELO_SCREENING</span>=claude-sonnet-5     <span class="c"># lee liquidaciones (vision)</span>
+<span class="k">MODELO_CONCILIACION</span>=claude-haiku-4-5  <span class="c"># alto volumen, tarea acotada</span>
+<span class="k">MODELO_COBRANZA</span>=claude-haiku-4-5      <span class="c"># redacción corta</span>
+<span class="k">MODELO_ESCALAMIENTO</span>=claude-sonnet-5   <span class="c"># cuando Haiku duda (conf &lt; 0,5)</span>
+
+<span class="c"># — Buró de crédito ————————————————————————————</span>
+<span class="k">EQUIFAX_CLIENT_ID</span>=
+<span class="k">EQUIFAX_CLIENT_SECRET</span>=
+<span class="k">EQUIFAX_FINALIDAD</span>=evaluacion_arrendamiento  <span class="c"># exigido por Ley 19.628</span>
+<span class="k">SINACOFI_API_KEY</span>=                          <span class="c"># segunda fuente, desde M6</span>
+
+<span class="c"># — Banca ——————————————————————————————————————</span>
+<span class="k">FINTOC_SECRET_KEY</span>=sk_live_...
+<span class="k">FINTOC_WEBHOOK_SECRET</span>=
+<span class="k">CONCILIACION_CRON</span>=0 7 * * *              <span class="c"># 07:00 America/Santiago</span>
+
+<span class="c"># — WhatsApp ———————————————————————————————————</span>
+<span class="k">WHATSAPP_PHONE_NUMBER_ID</span>=
+<span class="k">WHATSAPP_TOKEN</span>=
+<span class="k">WHATSAPP_VERIFY_TOKEN</span>=
+<span class="k">WA_PLANTILLA_COBRANZA_SUAVE</span>=cobranza_dia3_v2
+<span class="k">WA_PLANTILLA_COBRANZA_FORMAL</span>=cobranza_dia20_v1
+<span class="k">WA_PLANTILLA_TICKET_RECIBIDO</span>=ticket_ok_v3
+
+<span class="c"># — Firma y tributario —————————————————————————</span>
+<span class="k">FIRMA_API_KEY</span>=
+<span class="k">SII_CERT_P12_B64</span>=
+<span class="k">SII_CERT_PASS</span>=
+
+<span class="c"># — Reglas de negocio (no hardcodear en el prompt) ——</span>
+<span class="k">UF_HOY</span>=39184                              <span class="c"># se refresca del BCCh a diario</span>
+<span class="k">TASA_MORA_MENSUAL</span>=0.01                    <span class="c"># 1% — tope legal usual en contrato</span>
+<span class="k">RATIO_RENTA_MINIMO</span>=3.0                    <span class="c"># default; el dueño lo mueve</span>
+<span class="k">UMBRAL_AUTO_CONCILIA</span>=1.0                  <span class="c"># RUT + monto exactos, o no va</span>
+<span class="k">UMBRAL_ESCALA_A_SONNET</span>=0.5
+<span class="k">COBRANZA_MIN_HORAS_ENTRE_MENSAJES</span>=72      <span class="c"># no hostigar. Es un límite duro.</span></pre>
+    </div>
+  </section>
+
+  <!-- ============ COSTO ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker">05</p>
+      <h2>Cuánto cuesta correr esto</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        Cuenta media = <b>7 unidades</b>, plan Cartera ($5.900/unidad) = <b>$41.300 de ingreso al mes</b>.
+        Todo lo de abajo es por cuenta, por mes, en CLP. Dólar a $950.
+      </p>
+    </div>
+
+    <div class="aritmetica">
+<span class="cmt"># ————— INFERENCIA: qué consume cada agente al mes —————</span>
+
+<b>El Maestro</b> · 4 tickets/mes · Sonnet 5 ($3 / $15 por MTok)
+  entrada: 1.600 tok (foto) + 1.400 tok (prompt + contexto) = 3.000
+  salida:    700 tok
+  3.000/1M × $3  +  700/1M × $15  =  $0,0090 + $0,0105 = <b>$0,0195</b>
+  × 4 tickets                                          = <b>USD 0,078</b>
+
+<b>El Portero</b> · 0,5 informes/mes · Sonnet 5
+  <span class="cmt">(rotación 20%/año × 7 unidades × 4 postulantes ÷ 12 ≈ 0,47)</span>
+  entrada: 8.000 tok (2 liquidaciones + DICOM + contexto)
+  salida:  1.200 tok
+  8.000/1M × $3  +  1.200/1M × $15  =  $0,024 + $0,018 = <b>$0,042</b>
+  × 0,5                                                = <b>USD 0,021</b>
+
+<b>El Cajero</b> · 30 corridas/mes · Haiku 4.5 ($1 / $5 por MTok)
+  entrada: 2.000 tok · salida: 400 tok
+  2.000/1M × $1  +  400/1M × $5  =  $0,002 + $0,002 = <b>$0,004</b>
+  × 30 días                                         = <b>USD 0,120</b>  ← el más caro
+
+<b>El Cobrador</b> · 6 mensajes/mes · Haiku 4.5
+  1.500 tok in + 300 tok out = $0,003 × 6           = <b>USD 0,018</b>
+                                                     ─────────
+                                        Subtotal      USD 0,237
+  × 1,5 <span class="cmt">(reintentos, re-diagnósticos que pide el dueño, escalamientos a Sonnet)</span>
+                                                    = USD 0,356
+  × $950                                            = <b>$338 CLP  → $340</b>
+
+<span class="cmt"># ————— COGS TOTAL POR CUENTA / MES —————</span>
+Inferencia Claude (los 4 agentes)                     $   340   <span class="cmt">8%</span>
+WhatsApp API <span class="cmt">(~25 conv. utilitarias × USD 0,055 + margen BSP)</span>  $ 1.400   <span class="cmt">32%</span>
+Fintoc <span class="cmt">(1 cuenta bancaria conectada, ~USD 0,95)</span>              $   900   <span class="cmt">21%</span>
+Consultas Equifax <span class="cmt">(0,5/mes × $1.040 mayorista)</span>            $   520   <span class="cmt">12%</span>
+Infra <span class="cmt">(Fly + Neon + S3 de fotos; $140k fijos ÷ 200 cuentas)</span>  $   700   <span class="cmt">16%</span>
+Firma electrónica <span class="cmt">(0,12 contratos/mes × $4.200)</span>           $   500   <span class="cmt">11%</span>
+                                                    ─────────
+                                          <b>COGS      $ 4.360</b>
+
+Ingreso por cuenta                                    $41.300
+COGS                                                 −$ 4.360
+                                                    ─────────
+Margen bruto                                          $36.940  =  <b>89,4%</b>
+      </div>
+
+    <div class="grid g2 mt-l">
+      <div class="ficha ficha--hundida">
+        <h3 style="font-size:var(--step-0)">La IA no es el costo</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          Los cuatro agentes juntos cuestan <b>$340 al mes por cuenta: el 8% del COGS</b>.
+          WhatsApp cuesta cuatro veces más que Claude. Y el ítem más caro de todos ni siquiera
+          aparece en esta tabla: <b>el soporte humano</b>, que en el año 1 es un fundador
+          contestando WhatsApps a las 11 de la noche.
+        </p>
+        <p class="small mt-m" style="color:var(--teja)">
+          Corolario incómodo: “optimizar el prompt para ahorrar tokens” es la actividad de mejor
+          apariencia y peor retorno disponible. La palanca real es que el 60% de los leads
+          conecten una unidad, no que el prompt tenga 200 tokens menos.
+        </p>
+      </div>
+      <div class="ficha ficha--hundida">
+        <h3 style="font-size:var(--step-0)">Dónde escala mal</h3>
+        <p class="small mt-s" style="color:var(--tinta-2)">
+          El Cajero corre 30 veces al mes por cuenta y es el 51% del gasto de inferencia. A 1.000
+          cuentas son 30.000 corridas mensuales. <b>La mitad de esas corridas no tienen ningún
+          movimiento nuevo que conciliar.</b>
+        </p>
+        <p class="small mt-m" style="color:var(--tinta-2)">
+          Arreglo obvio y barato: gatillar por webhook de Fintoc en vez de por cron, y no llamar
+          al modelo si la cartola no cambió. Baja el costo de inferencia <b>~40%</b> y es media
+          tarde de trabajo. No está hecho porque a 10 clientes no importa —
+          y decir eso en voz alta es más honesto que fingir que ya está optimizado.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUÉ ESTÁ FINGIDO ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker">06</p>
+      <h2>Qué está fingido en el demo</h2>
+      <p class="lead mt-s" style="max-width:54ch">
+        El <a href="demo/index.html">demo</a> es HTML y JavaScript en tu navegador. No hay
+        servidor, no hay base de datos y no hay ninguna llamada a un modelo. Esto es lo que
+        habría que enchufar para que fuera real.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div>
+        <div class="fingido">
+          <h4>El diagnóstico de la foto</h4>
+          <p>Los tres diagnósticos están escritos a mano en un objeto JS (<code>CASOS</code>).
+          Elegir una foto elige un texto. La “animación de análisis” es un <code>setTimeout</code>.</p>
+          <p class="real"><b>Real:</b> subir la imagen a S3, llamar a Sonnet 5 con la foto y el
+          contexto de la unidad, structured output contra el schema <code>Diagnostico</code>,
+          escribir en la tabla. <b>~1,8 s de latencia real</b> — el demo finge 2,4 s, que es
+          incluso pesimista.</p>
+        </div>
+        <div class="fingido">
+          <h4>Los rangos de costo</h4>
+          <p>“$80.000 – $180.000 para una filtración de matriz en Ñuñoa” es una cifra plausible
+          que escribimos nosotros. <b>No viene de ninguna base de datos.</b></p>
+          <p class="real"><b>Real:</b> es el problema del arranque en frío. Sin OTs cerradas no
+          hay tabla de precios. Se parte con 3 maestros que nos pasan su lista, y recién al
+          ticket ~300 la tabla es nuestra. <b>Este es el punto más débil del producto en el
+          día 1</b>, y quien lo compre debería saberlo.</p>
+        </div>
+        <div class="fingido">
+          <h4>DICOM y las liquidaciones</h4>
+          <p>Los cuatro postulantes tienen deudas y rentas inventadas. Nadie llamó a Equifax.</p>
+          <p class="real"><b>Real:</b> contrato con Equifax (4–8 semanas) + consentimiento
+          explícito del postulante por Ley 19.628 antes de cada consulta. Ese consentimiento es
+          una pantalla que el demo no tiene y el producto sí necesita.</p>
+        </div>
+      </div>
+      <div>
+        <div class="fingido">
+          <h4>La conciliación bancaria</h4>
+          <p>Los 8 movimientos son un array. Las “hipótesis con % de confianza” están escritas a
+          mano — incluida la de la pareja que transfiere desde otro RUT.</p>
+          <p class="real"><b>Real:</b> Fintoc con las credenciales bancarias del dueño. Y ahí
+          está el muro: <b>hay que pedirle a un señor de 58 años que entregue la clave de su
+          banco a una startup de la que supo hace 20 minutos.</b> Ninguna cantidad de IA arregla
+          eso — lo arregla un flujo de confianza, o no se arregla.</p>
+        </div>
+        <div class="fingido">
+          <h4>Los maestros</h4>
+          <p>Rubén Maldonado (gasfíter) y Héctor Sepúlveda (eléctrico, con su número SEC) no
+          existen. Sus ratings y su distancia son inventados.</p>
+          <p class="real"><b>Real:</b> reclutar y verificar maestros comuna por comuna, cruzando
+          el registro SEC para los eléctricos. <b>Es un negocio de marketplace adentro del SaaS</b>,
+          con su propio problema de gallina y huevo. Se parte manual: 10 maestros en 3 comunas,
+          agendados por teléfono por un fundador.</p>
+        </div>
+        <div class="fingido">
+          <h4>El WhatsApp</h4>
+          <p>La “vista arrendatario” es un <code>div</code> con borde redondeado que imita un
+          teléfono. El mensaje no se envía a ninguna parte.</p>
+          <p class="real"><b>Real:</b> WhatsApp Business API vía BSP, con cada plantilla aprobada
+          por Meta una por una — y la ventana de 24 horas, que obliga a que toda conversación que
+          nosotros iniciemos use una plantilla pre-aprobada. Eso restringe de verdad el diseño de
+          la cobranza.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="nota mt-l">
+      <b>Lo que el demo NO exagera:</b> la velocidad de la latencia (Sonnet 5 con una imagen
+      responde más rápido que los 2,4 s que finge la animación), la calidad del razonamiento
+      (los modelos actuales sí distinguen condensación de filtración con una foto decente), y
+      el precio ($5.900 por unidad al mes está lejos de ser caro para alguien que hoy pierde
+      $3,6M al año). Lo que el demo sí esconde es <b>todo el trabajo aburrido</b>: Equifax,
+      Meta, Fintoc, los maestros, el SII.
+    </div>
+  </section>
+
+  <!-- ============ DOMINIO ============ -->
+  <section>
+    <div class="section-head">
+      <p class="kicker kicker--tinta">07</p>
+      <h2>Evidencia del dominio</h2>
+    </div>
+    <p style="max-width:60ch;color:var(--tinta-2)">
+      Consultado con <code>_kit/check-domain.sh</code>, que pega a RDAP de Verisign
+      (<code>rdap.verisign.com/com/v1/domain/&lt;nombre&gt;.com</code>) y a NIC Chile.
+      <b>HTTP 404 = no existe el registro = disponible.</b> HTTP 200 = tomado.
+      Verificado el 12 de julio de 2026.
+    </p>
+    <div class="aritmetica mt-m">
+<b>conserjo</b>               .com AVAILABLE          (<b>http 404</b>)   .cl AVAILABLE  <span class="cmt">← elegido</span>
+arrindo                .com AVAILABLE          (http 404)   .cl AVAILABLE
+llavion                .com AVAILABLE          (http 404)   .cl AVAILABLE
+conserja               .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+<span class="cmt"># Descartados por estar tomados (http 200): llavin, llavia, llaveo, tejal,</span>
+<span class="cmt"># tejaro, arrendia, kavia, domio, quiltro, tejavana, umbral, dintel,</span>
+<span class="cmt"># pestillo, picaporte, zaguan, portalia, rentia, llavera, casera, arrendo.</span>
+    </div>
+    <p class="small muted mt-m" style="max-width:60ch">
+      <b>Por qué Conserjo:</b> se lee <em>conserje</em> a la primera —el tipo que en todo edificio
+      chileno filtra quién entra, recibe todo y arregla todo, que es literalmente el producto— y
+      de rebote suena a <em>consejo</em>. Se dicta por teléfono sin deletrear. Ese es todo el test.
+    </p>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container flex entre wrap gap-m">
+    <p><b>Conserjo</b> · conserjo.com — prototipo.</p>
+    <p><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="../index.html">← Ideas</a></p>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

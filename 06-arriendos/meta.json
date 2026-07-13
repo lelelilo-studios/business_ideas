@@ -1,0 +1,15 @@
+{
+  "folder": "06-arriendos",
+  "brand": "Conserjo",
+  "domain": "conserjo.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/conserjo.com -> HTTP 404 (disponible), 2026-07-12. conserjo.cl tambien disponible (NIC Chile).",
+  "alternates": ["arrindo.com", "llavion.com", "conserja.com"],
+  "tagline": "El conserje de tu cartera: filtra al que entra, cobra el arriendo y diagnostica la filtracion por foto.",
+  "category": "PropTech / SaaS vertical",
+  "market": "Chile → LatAm (México, Colombia, Perú) → España",
+  "icp": "Corredora chica que administra 20-80 unidades ajenas. Secundario: inversionista hormiga con 2-15 departamentos en arriendo.",
+  "price_clp": "Desde $7.900/unidad/mes (1-5 unidades) · $5.900 (6-15) · $3.900 (16+, mínimo $69.000/mes) · Informe de arrendatario suelto: $6.900",
+  "accent": "#B2432A",
+  "problem": "Administrar arriendos es un segundo trabajo: filtrar al arrendatario sin equivocarse (un mal inquilino son 8-18 meses de juicio en Chile), perseguir la transferencia todos los meses, y diagnosticar a las 11 de la noche una foto de una filtración que en tres semanas cuesta cinco veces más.",
+  "status": "prototipo"
+}

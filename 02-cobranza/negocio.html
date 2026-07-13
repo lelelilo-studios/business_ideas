@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinoria — negocio y go-to-market</title>
+<meta name="description" content="ICP, tamaño de mercado con la aritmética a la vista, competencia real, precios en CLP, economía unitaria y los primeros 90 días.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc { padding-block: var(--sp-xl); }
+  .doc h2 { margin-bottom: var(--sp-s); }
+  .doc p, .doc li { line-height: 1.7; }
+  .doc .prose p + p { margin-top: var(--sp-s); }
+
+  .indice { border-top: 1px solid var(--tinta); border-bottom: 1px solid var(--tinta); padding-block: var(--sp-s); margin-bottom: var(--sp-xl); }
+  .indice ol { list-style: none; counter-reset: i; display: grid; gap: 2px; }
+  @media (min-width: 48em) { .indice ol { grid-template-columns: 1fr 1fr; } }
+  .indice li { counter-increment: i; }
+  .indice a {
+    display: flex; gap: 10px; padding: 7px 0; min-height: 40px; align-items: center;
+    text-decoration: none; font-size: 0.9rem; color: var(--tinta-2);
+  }
+  .indice a::before { content: counter(i, decimal-leading-zero); font-family: var(--mono); font-size: 0.72rem; color: var(--rojo); }
+  .indice a:hover { color: var(--tinta); }
+
+  .bloque { padding-block: var(--sp-xl); border-top: 1px solid var(--filete); }
+  .bloque:first-of-type { border-top: 0; }
+
+  .tarjeta-icp { display: grid; gap: 1px; background: var(--filete-2); border: 1px solid var(--filete-2); margin-top: var(--sp-m); }
+  @media (min-width: 48em) { .tarjeta-icp { grid-template-columns: 1fr 1fr; } }
+  .tarjeta-icp > div { background: var(--papel); padding: var(--sp-m); }
+  .tarjeta-icp .etiqueta { display: block; margin-bottom: 6px; }
+  .tarjeta-icp p { font-size: 0.92rem; }
+
+  .mercado { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  @media (min-width: 62em) { .mercado { grid-template-columns: 1fr 1fr 1fr; } }
+  .mercado .ficha { border-top: 3px solid var(--rojo); }
+  .mercado .cifra { display: block; margin-block: 6px var(--sp-s); }
+
+  .comp { width: 100%; min-width: 720px; font-size: 0.88rem; }
+  .comp th { text-align: left; font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3); padding: 10px 12px; border-bottom: 1px solid var(--tinta); }
+  .comp td { padding: 14px 12px; border-bottom: 1px solid var(--filete); vertical-align: top; line-height: 1.5; }
+  .comp tr:nth-child(even) td { background: rgba(237,229,212,.35); }
+  .comp .quien { font-weight: 600; display: block; }
+  .comp .quien small { display: block; font-weight: 400; font-family: var(--mono); font-size: 0.68rem; color: var(--tinta-3); margin-top: 2px; }
+
+  .canales { display: grid; gap: 1px; background: var(--filete-2); border: 1px solid var(--filete-2); margin-top: var(--sp-m); }
+  .canal { background: var(--papel); padding: var(--sp-m); display: grid; grid-template-columns: 34px 1fr; gap: var(--sp-s); }
+  .canal__n { font-family: var(--mono); font-size: 0.85rem; color: var(--rojo); padding-top: 2px; }
+  .canal b { display: block; margin-bottom: 4px; }
+  .canal p { font-size: 0.9rem; color: var(--tinta-2); }
+  .canal .dato { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 0.72rem; background: var(--papel-2); border: 1px solid var(--filete); padding: 4px 8px; }
+
+  .dias { list-style: none; }
+  .dias li { display: grid; grid-template-columns: 88px 1fr; gap: var(--sp-s); padding-block: var(--sp-m); border-top: 1px solid var(--filete); }
+  .dias .rango { font-family: var(--mono); font-size: 0.75rem; color: var(--rojo); padding-top: 3px; }
+  .dias b { display: block; margin-bottom: 4px; }
+  .dias p { font-size: 0.92rem; color: var(--tinta-2); }
+
+  .mata { border: 1px solid var(--rojo); background: var(--rojo-tenue); padding: var(--sp-m); margin-top: var(--sp-m); }
+  .mata h3 { color: var(--rojo); margin-bottom: 8px; }
+  .mata p { font-size: 0.95rem; }
+
+  .si-no { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  @media (min-width: 48em) { .si-no { grid-template-columns: 1fr 1fr; } }
+  .si-no > div { border: 1px solid var(--filete-2); padding: var(--sp-m); }
+  .si-no h3 { font-size: var(--step-0); font-family: var(--sans); font-weight: 600; margin-bottom: var(--sp-s); }
+  .si-no ul { list-style: none; display: grid; gap: 10px; font-size: 0.9rem; }
+  .si-no li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; line-height: 1.55; }
+  .si-no .ico { margin-top: 3px; }
+  .si-no--si .ico { color: var(--verde); }
+  .si-no--no .ico { color: var(--rojo); }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container">
+    <div class="barra__fila">
+      <a class="marca" href="index.html"><span class="marca__timbre" aria-hidden="true">T</span>Tinoria</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">
+        Menú
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container doc">
+
+  <p class="epigrafe epigrafe--rojo">Negocio · go-to-market</p>
+  <h1 style="margin-bottom: var(--sp-m);">A quién le vendemos, cuánto vale y por qué ganamos.</h1>
+  <p class="bajada prose" style="margin-bottom: var(--sp-l);">
+    Una advertencia sobre los números de esta página: <b>todo lo que es una estimación está etiquetado
+    como estimación y trae la aritmética a la vista.</b> Donde no conozco la tasa base, lo digo en vez de
+    inventarla. Quien lea esto va a decidir si gasta dos años de su vida acá.
+  </p>
+
+  <nav class="indice" aria-label="Índice">
+    <ol>
+      <li><a href="#icp">Cliente objetivo</a></li>
+      <li><a href="#mercado">Tamaño de mercado</a></li>
+      <li><a href="#cuna">Posicionamiento y cuña</a></li>
+      <li><a href="#competencia">Competencia</a></li>
+      <li><a href="#precio">Precio y economía unitaria</a></li>
+      <li><a href="#canales">Canales de adquisición</a></li>
+      <li><a href="#ia">IA en el marketing</a></li>
+      <li><a href="#dias">Primeros 90 días</a></li>
+      <li><a href="#mata">Qué mataría esto</a></li>
+    </ol>
+  </nav>
+
+  <!-- ══════════ 1 · ICP ══════════ -->
+  <section class="bloque" id="icp">
+    <p class="epigrafe">01</p>
+    <h2>Cliente objetivo</h2>
+    <p class="prose" style="color:var(--tinta-2)">
+      No le vendemos a "PYMEs". Le vendemos a una persona específica que hoy hace este trabajo a mano
+      y lo detesta.
+    </p>
+
+    <div class="tarjeta-icp">
+      <div>
+        <span class="etiqueta">El segmento</span>
+        <p>
+          Empresa chilena B2B que <b>vende a crédito a otras empresas</b>: metalmecánica, servicios de
+          ingeniería, agencias, importadores y distribuidores, imprentas, transporte, servicios TI.
+          Ventas anuales entre <b>2.400 y 25.000 UF</b> (el tramo "pequeña" del SII) y el piso del tramo
+          mediano. En pesos de hoy: aproximadamente <b>$100 MM a $1.000 MM</b> de facturación anual.
+        </p>
+      </div>
+      <div>
+        <span class="etiqueta">Quién lo usa todos los días</span>
+        <p>
+          <b>La encargada de administración.</b> Es una sola persona, lleva años en la empresa, sabe todo,
+          y la cobranza es la parte de su trabajo que posterga. Entre 30 y 200 facturas abiertas. Hoy vive
+          en un Excel que ella misma armó y en su propia memoria.
+        </p>
+      </div>
+      <div>
+        <span class="etiqueta">Quién firma</span>
+        <p>
+          <b>El dueño o la dueña.</b> No compra software: compra caja. El argumento que lo convence no es
+          "ahorra tiempo", es <b>"tu DSO son 68 días y deberían ser 40; eso son $37 millones tuyos en el
+          bolsillo de otro"</b>. Decide en una reunión y paga con tarjeta.
+        </p>
+      </div>
+      <div>
+        <span class="etiqueta">Dónde ya está</span>
+        <p>
+          Emite DTE por obligación legal (SII). Casi siempre usa <b>Nubox, Bsale, Defontana, Softland o
+          Chipax</b> para facturar. Tiene contador externo. Está en WhatsApp todo el día. Probablemente ya
+          usó factoring alguna vez y le dolió el costo.
+        </p>
+      </div>
+    </div>
+
+    <div class="destacado prose" style="margin-top: var(--sp-l);">
+      La señal de compra más limpia: <em class="italica">la empresa usó factoring en los últimos 12 meses.</em>
+      Eso significa que ya está pagando —caro— por el problema que nosotros resolvemos más barato.
+    </div>
+  </section>
+
+  <!-- ══════════ 2 · MERCADO ══════════ -->
+  <section class="bloque" id="mercado">
+    <p class="epigrafe">02</p>
+    <h2>Tamaño de mercado — Chile</h2>
+    <p class="prose" style="color:var(--tinta-2); margin-bottom: var(--sp-m);">
+      Cada supuesto está declarado y cada número tiene su división a la vista. Si un supuesto te parece
+      mal, cámbialo y rehaz la multiplicación — para eso está escrita así.
+    </p>
+
+    <div class="calculo">
+<b>PUNTO DE PARTIDA · empresas formales en Chile por tamaño (SII, Estadísticas de Empresas)</b>
+  Micro     (0,01 – 2.400 UF)      ≈ 800.000    ← venta al contado, retail. Fuera.
+  Pequeña   (2.400 – 25.000 UF)    ≈ 180.000
+  Mediana   (25.000 – 100.000 UF)  ≈  25.000
+  Grande    (> 100.000 UF)         ≈  15.000    ← tiene ERP y área de cobranza. Fuera.
+  ────────────────────────────────────────────
+  Universo candidato (peq + med)   =  205.000
+  · Cifras de orden de magnitud del registro del SII. Verificar contra la
+    publicación vigente antes de usarlas en un pitch: bailan ±15% según el año
+    y según cómo se cuente al contribuyente sin ventas.
+
+<b>SUPUESTO 1 · ¿cuántas venden B2B a crédito?</b>
+  Una peluquería y un almacén no facturan a 30 días. Una metalmecánica sí.
+  Supuesto declarado: <b>45%</b> del tramo pequeña+mediana vende a crédito a otra empresa.
+  (Es un supuesto nuestro, no un dato. Es la primera cosa que hay que medir.)
+  205.000 × 45%  =  <b>92.250 empresas</b>
+
+<b>TAM · si todas pagaran el plan Cartera</b>
+  92.250 × $99.000 × 12   =  <b>$109.593.000.000 CLP / año</b>
+                          ≈  US$ 115 MM / año   (a $950 por dólar)
+
+<b>SAM · las que realmente podemos servir hoy</b>
+  Filtro 2: ya usa software de facturación en la nube (integrable)  → 55%
+  Filtro 3: tiene 25 o más facturas abiertas (bajo eso no duele)    → 65%
+  92.250 × 55% × 65%      =  <b>32.980 empresas</b>
+  32.980 × $99.000 × 12   =  <b>$39.180.240.000 CLP / año</b>
+                          ≈  US$ 41 MM / año
+
+<b>SOM · lo que aspiramos a tomar en 36 meses</b>
+  Supuesto: 1,8% del SAM. Es agresivo pero no fantasioso para un canal
+  de contadores que funcione (un contador ve 40 PYMEs).
+  32.980 × 1,8%           =  <b>594 clientes</b>
+  594 × $95.000 × 12      =  <b>$677.160.000 CLP / año</b>
+                          ≈  US$ 713 k de ARR
+  (ARPU mezclado de $95.000, no $99.000: hay clientes en el plan de $49.000.)
+    </div>
+
+    <div class="mercado">
+      <div class="ficha">
+        <span class="etiqueta">TAM Chile</span>
+        <span class="cifra">US$ 115 MM</span>
+        <p style="font-size:0.85rem; color:var(--tinta-2)">92.250 empresas que facturan a crédito. Techo teórico, no vendible.</p>
+      </div>
+      <div class="ficha">
+        <span class="etiqueta">SAM Chile</span>
+        <span class="cifra">US$ 41 MM</span>
+        <p style="font-size:0.85rem; color:var(--tinta-2)">32.980 empresas alcanzables con el producto tal como está.</p>
+      </div>
+      <div class="ficha">
+        <span class="etiqueta">SOM · 36 meses</span>
+        <span class="cifra cifra--rojo">US$ 713 k</span>
+        <p style="font-size:0.85rem; color:var(--tinta-2)">594 clientes. Esto es lo que hay que creerse.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top: var(--sp-xl); margin-bottom: var(--sp-s);">La extensión: LatAm</h3>
+    <p class="prose" style="color:var(--tinta-2)">
+      El producto vive de una condición: <b>que la factura electrónica sea obligatoria y estructurada</b>.
+      Eso no es cierto en todas partes, pero sí en los cuatro mercados grandes de la región: México
+      (CFDI), Brasil (NF-e), Colombia (DIAN) y Perú (SUNAT). Ahí el onboarding de once minutos se replica.
+    </p>
+    <div class="calculo" style="margin-top: var(--sp-m);">
+<b>EXTRAPOLACIÓN · estimación gruesa, marcada como tal</b>
+  Método: escalar el SAM chileno por número de PYMEs formales,
+  no por PIB (el PIB sobreestima: la informalidad es mayor afuera).
+  Factor PYMEs formales LatAm / PYMEs formales Chile  ≈  <b>12×</b>
+  Descuento por menor disposición a pagar en CLP-equivalente  ≈  <b>0,7×</b>
+  ────────────────────────────────────────────────────────────
+  SAM LatAm ≈ US$ 41 MM × 12 × 0,7  =  <b>≈ US$ 345 MM / año</b>
+
+  · Es una extrapolación, no un estudio. Vale para saber si el techo
+    es de US$40 MM o de US$400 MM (importa para decidir si esto se
+    levanta con capital de riesgo). No vale para nada más.
+    </div>
+  </section>
+
+  <!-- ══════════ 3 · CUÑA ══════════ -->
+  <section class="bloque" id="cuna">
+    <p class="epigrafe">03</p>
+    <h2>Posicionamiento y cuña</h2>
+
+    <p class="destacado prose">
+      Tinoria es el <em class="italica">tono</em>. Todos los demás son el recordatorio.
+    </p>
+
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-m)">
+      Hay una docena de productos que le mandan un correo automático a tu deudor. Ninguno resuelve el
+      problema real, que no es <em class="italica">mandar</em> el mensaje: es <em class="italica">saber
+      qué decir</em>. La administradora no posterga la cobranza porque le falte un botón. La posterga
+      porque no sabe cómo pedirle plata a alguien sin quedar mal, y porque cada deudor requiere una
+      respuesta distinta.
+    </p>
+
+    <h3 style="margin-top: var(--sp-l); margin-bottom: var(--sp-s);">La cabecera de playa</h3>
+    <p class="prose" style="color:var(--tinta-2)">
+      <b>Metalmecánica, servicios de ingeniería y proveedores de la construcción, de 10 a 60 trabajadores,
+      en la Región Metropolitana y el Biobío.</b> Ese segmento primero, y sólo ése, durante seis meses.
+    </p>
+    <ul class="lista-marcada prose" style="margin-top: var(--sp-m)">
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <span><b>Es donde el dolor es peor.</b> Les compran constructoras, que son notoriamente lentas para
+        pagar y que a su vez esperan el estado de pago de su mandante. La cadena de pago es larga y todos
+        financian al de más arriba.</span>
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <span><b>Tickets grandes y pocos deudores.</b> 30–80 facturas abiertas de $2 a $20 millones. Cada
+        factura cobrada 20 días antes se nota en la caja del mes. En cambio, cobrar 400 facturas de $30.000
+        es otro producto.</span>
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <span><b>Es un gremio que se habla.</b> ASIMET, y los proveedores de una misma obra se conocen. Un
+        buen caso se propaga solo. Diez clientes felices en Quilicura y Cerrillos valen más que cien
+        clientes dispersos.</span>
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <span><b>La relación comercial está en juego de verdad.</b> Tienen 8 clientes, no 800. Perder uno es
+        catastrófico — por eso el tono importa tanto, y por eso pagan por él.</span>
+      </li>
+    </ul>
+
+    <p class="prose" style="color:var(--tinta-2); margin-top: var(--sp-m)">
+      Lo que <em class="italica">no</em> hacemos en los primeros seis meses: retail, e-commerce, cobranza a
+      personas naturales, cobranza de deuda castigada, y cualquier cosa que huela a call center. Cada uno de
+      esos es un negocio distinto con un producto distinto y una regulación distinta.
+    </p>
+  </section>
+
+  <!-- ══════════ 4 · COMPETENCIA ══════════ -->
+  <section class="bloque" id="competencia">
+    <p class="epigrafe">04</p>
+    <h2>Competencia</h2>
+    <p class="prose" style="color:var(--tinta-2); margin-bottom: var(--sp-m)">
+      El titular del puesto no es un software. Es un Excel y el sentido del deber de una persona.
+    </p>
+
+    <div class="scroll-x">
+      <table class="comp">
+        <thead>
+          <tr>
+            <th scope="col">Quién</th>
+            <th scope="col">Qué hace</th>
+            <th scope="col">Qué cobra</th>
+            <th scope="col">Por qué le ganamos — y dónde no</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="quien">El Excel de Paulina<small>el verdadero titular del puesto</small></span></td>
+            <td>Una planilla con las facturas abiertas, coloreada a mano, y correos escritos de cero cada viernes.</td>
+            <td class="num">$0</td>
+            <td>Le ganamos porque el Excel no escribe, no insiste, no se acuerda y no aguanta que Paulina se enferme. <b>No le ganamos en precio ni en confianza:</b> es gratis y ella lo controla del todo. Nuestro trabajo es que ceder el control se sienta seguro, no eficiente.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Nubox · Bsale · Defontana · Softland<small>los ERP / facturadores</small></span></td>
+            <td>Emiten el DTE y tienen un reporte de cuentas por cobrar. Algunos mandan un recordatorio automático por correo.</td>
+            <td class="num">$25.000–$150.000/mes</td>
+            <td>Su reporte te dice <em>quién</em> debe. No te dice <em>qué decirle</em>, no conversa, no entiende la respuesta y no distingue a un deudor que colabora de uno que te está esquivando. <b>El riesgo real:</b> que uno de ellos construya esto como módulo y lo regale. Por eso queremos ser su integración, no su enemigo.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Chipax<small>Chile · conciliación y flujo de caja</small></span></td>
+            <td>Concilia el banco con la contabilidad y proyecta el flujo de caja. Tiene cobranza básica por correo.</td>
+            <td class="num">Desde ~$60.000/mes</td>
+            <td>Es el competidor chileno más cercano y el más peligroso, porque ya tiene la confianza del mismo comprador. Le ganamos en la profundidad de una sola cosa: la conversación de cobranza —tono, WhatsApp, planes de pago, escalamiento—. Ellos son anchos; nosotros somos hondos en el punto que más duele.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Toku<small>Chile · recaudación automatizada</small></span></td>
+            <td>Automatiza el cobro recurrente y los medios de pago. Fuerte en suscripción y en empresas con muchos clientes.</td>
+            <td class="num">% sobre recaudo</td>
+            <td>Juegan en pagos recurrentes de alto volumen (colegios, gimnasios, servicios). Nosotros jugamos en cuentas por cobrar B2B de bajo volumen y alto ticket, donde el problema no es el medio de pago sino la conversación. Solapamiento parcial y probablemente creciente.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Tanner · Factotal · BICE Factoring<small>factoring</small></span></td>
+            <td>Te compran la factura y te adelantan la plata.</td>
+            <td class="num">1,7%–2,4% mensual <small style="font-weight:400">rango de mercado observado, estimación</small></td>
+            <td>No compiten: <b>son nuestro mejor argumento de venta</b>. Si el cliente usa factoring, está pagando ~20% anual por un problema de cobranza. Nosotros cobramos $99.000 al mes. Le ganamos en costo por un orden de magnitud. <b>Donde no les ganamos:</b> ellos te dan la plata <em>hoy</em>. Nosotros no prestamos.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Estudios de cobranza<small>y sus cartas de abogado</small></span></td>
+            <td>Cobranza extrajudicial y judicial. Entran cuando ya todo se quebró.</td>
+            <td class="num">8%–15% de lo recuperado</td>
+            <td>No competimos: <b>los evitamos</b>. Ese es el pitch. Nuestro trabajo es que la factura nunca llegue a sus manos. Cuando llega, ya perdiste al cliente y probablemente igual pierdes la plata. Tinoria termina donde ellos empiezan.</td>
+          </tr>
+          <tr>
+            <td><span class="quien">Chaser · Upflow · Growfin · Paidnice<small>SaaS de AR, internacional</small></span></td>
+            <td>Exactamente esto, en inglés, para el mercado anglosajón.</td>
+            <td class="num">US$50–$500/mes</td>
+            <td>Producto maduro, y algunos son buenos. Pero: no leen el SII, no mandan WhatsApp (que es <em>el</em> canal en Chile), no saben qué es la Ley 21.131, no facturan en pesos y su IA no escribe como escribe una administradora de Quilicura. <b>La distancia cultural es la barrera, y es más alta de lo que parece — pero no es infinita.</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mata" style="border-color: var(--filete-2); background: var(--papel-2);">
+      <h3 style="color: var(--tinta)">La diferenciación honesta</h3>
+      <p style="color: var(--tinta-2)">
+        El software de Tinoria no es difícil de copiar. Un ERP con 20 ingenieros lo clona en dos trimestres.
+        Lo que no se copia rápido son dos cosas: <b>(1)</b> el corpus de qué mensaje, en qué tono, a qué hora
+        y por qué canal hace pagar a qué tipo de deudor chileno — eso se construye con datos propios y crece
+        con cada cliente; y <b>(2)</b> la confianza de que puedes soltarle el teclado a una máquina para
+        hablarle a tu mejor cliente. Lo primero es un foso. Lo segundo es una marca.
+        Si en 18 meses no tenemos ninguna de las dos, somos una feature y merecemos que nos coman.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ 5 · PRECIO ══════════ -->
+  <section class="bloque" id="precio">
+    <p class="epigrafe">05</p>
+    <h2>Precio y economía unitaria</h2>
+
+    <div class="scroll-x" style="margin-top: var(--sp-m)">
+      <table class="libro" style="min-width: 640px">
+        <thead>
+          <tr>
+            <th scope="col">Plan</th>
+            <th scope="col">Para quién</th>
+            <th scope="col" class="der">CLP/mes + IVA</th>
+            <th scope="col">Límite</th>
+            <th scope="col">WhatsApp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Libro</b></td>
+            <td>La dueña que cobra sola</td>
+            <td class="der num">$49.000</td>
+            <td class="num">60 facturas abiertas</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><b>Cartera</b> <span class="timbre timbre--vencido">el que se lleva</span></td>
+            <td>PYME de 10 a 60 personas</td>
+            <td class="der num">$99.000</td>
+            <td class="num">250 facturas abiertas</td>
+            <td>300 mensajes, luego $45 c/u</td>
+          </tr>
+          <tr>
+            <td><b>Cobranza</b></td>
+            <td>Mediana o holding, varios RUT</td>
+            <td class="der num">$229.000</td>
+            <td class="num">800 facturas abiertas</td>
+            <td>1.200 mensajes, luego $40 c/u</td>
+          </tr>
+          <tr>
+            <td><b>Resultado</b></td>
+            <td>El que no nos cree</td>
+            <td class="der num">$29.000 + 1,2%</td>
+            <td colspan="2">1,2% de lo recuperado sobre facturas con más de 45 días de mora</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top: var(--sp-xl); margin-bottom: var(--sp-s);">Por qué estos números y no otros</h3>
+    <p class="prose" style="color:var(--tinta-2)">
+      El ancla no es el software: es el factoring. Una PYME que financia $50 millones de hueco de caja al
+      1,9% mensual gasta <b>$950.000 al mes</b>. Cobrar $99.000 por reducir ese hueco es una décima parte,
+      y esa razón de 10× es la que hace que la venta se cierre en una reunión.
+      El techo, en cambio, lo pone el sueldo: si Tinoria costara más de $250.000 al mes, el dueño empieza a
+      pensar en contratar a alguien media jornada, y ahí perdemos.
+    </p>
+
+    <div class="calculo" style="margin-top: var(--sp-m)">
+<b>ECONOMÍA UNITARIA · por cliente, plan Cartera ($99.000/mes)</b>
+
+  Ingreso mensual                                      <b>$99.000</b>
+
+  COSTO DIRECTO (detalle completo en Arquitectura):
+    WhatsApp Business API (~110 mensajes/mes)           $ 4.200
+    Inferencia de IA (Sonnet 5 + Haiku 4.5 + Opus 4.8)  $ 3.800
+    Infraestructura AWS (prorrateada, 150 cuentas)      $ 2.500
+    Correo, conciliación bancaria, soporte L1           $ 1.500
+    ─────────────────────────────────────────────────
+    COGS por cuenta                                    <b>$12.000</b>
+
+  Margen bruto  = (99.000 − 12.000) / 99.000        =  <b>88%</b>
+  Contribución mensual por cliente                  =  <b>$87.000</b>
+
+<b>COGS POR PLAN</b> (los tres planes no cuestan lo mismo)
+  Libro     $ 4.500  → margen <b>91%</b>   (sin WhatsApp, pocos mensajes)
+  Cartera   $12.000  → margen <b>88%</b>
+  Cobranza  $32.000  → margen <b>86%</b>   (450 mensajes/mes, mucho WhatsApp)
+
+<b>ARPU MEZCLADO</b> (mezcla esperada 25% Libro / 60% Cartera / 15% Cobranza)
+  0,25×49.000 + 0,60×99.000 + 0,15×229.000  =  <b>$106.000</b>
+  Menos descuentos y planes Resultado, ARPU de trabajo:  <b>$95.000</b>
+
+  COGS mezclado:
+  0,25×4.500 + 0,60×12.000 + 0,15×32.000    =  <b>$13.125</b>
+  Contribución = 95.000 − 13.125            =  <b>$81.875/mes</b>
+  <b>Margen bruto mezclado = 86%</b>  ← el número que usa la curva de caja
+                                     del roadmap. Las dos páginas cuadran.
+
+<b>CAC · por canal (estimaciones, con la división a la vista)</b>
+  Outbound directo:  1 SDR $1.600.000/mes ÷ 5 cierres  =  <b>$320.000</b>
+  Contadores:        20% de comisión × 12 meses         =  <b>$237.600</b>
+  Google Ads:        CPL $28.000 ÷ 12% de conversión    =  <b>$233.000</b>
+  SEO y contenido:   $1.200.000/mes ÷ 8 clientes        =  <b>$150.000</b>
+  ──────────────────────────────────────────────────
+  <b>CAC mezclado de trabajo:  $260.000</b>
+
+<b>LTV Y RETORNO · con sensibilidad, porque el churn es el número que no sabemos</b>
+  Contribución $81.875/mes.  Vida = 1 / churn mensual.
+
+  churn 3%/mes  → 33 meses → LTV <b>$2.728.000</b>  → LTV/CAC <b>10,5×</b>  ← optimista
+  churn 4%/mes  → 25 meses → LTV <b>$2.047.000</b>  → LTV/CAC  <b>7,9×</b>  ← <b>caso base</b>
+  churn 6%/mes  → 17 meses → LTV <b>$1.364.000</b>  → LTV/CAC  <b>5,2×</b>  ← pesimista
+
+  Payback de CAC = $260.000 / $81.875  =  <b>3,2 meses</b>
+
+  · El churn es una <b>suposición, no un dato</b>. No tenemos clientes todavía.
+    Para SaaS de PYME chica, 4–6% mensual es lo que uno esperaría; por debajo
+    de 3% sería excepcional. Si el churn real resulta ser 8%, LTV/CAC cae a 4×
+    y el negocio sigue funcionando pero deja de ser interesante para capital
+    de riesgo. Esa medición es el hito M3 del roadmap.
+    </div>
+
+    <p class="fuente" style="margin-top: var(--sp-m)">
+      Los $12.000 de COGS salen íntegros de <a href="stack.html">Arquitectura</a>, donde está la aritmética
+      de tokens y de mensajes. Si ese número cambia, esta página cambia. Las dos tienen que cuadrar y cuadran.
+    </p>
+  </section>
+
+  <!-- ══════════ 6 · CANALES ══════════ -->
+  <section class="bloque" id="canales">
+    <p class="epigrafe">06</p>
+    <h2>Canales de adquisición, en orden</h2>
+
+    <div class="canales">
+      <div class="canal">
+        <span class="canal__n">01</span>
+        <div>
+          <b>Contadores y estudios contables — el canal que decide si esto escala</b>
+          <p>
+            Un contador externo atiende entre 20 y 60 PYMEs y ya tiene acceso a sus datos del SII. Es la
+            única persona a quien el dueño le cree cuando dice "esto te sirve". No queremos que nos revenda:
+            queremos que use Tinoria <em class="italica">para</em> sus clientes, con un panel multi-empresa,
+            y se lleve 20% recurrente de lo que factura cada uno.
+          </p>
+          <span class="dato">Meta: 15 contadores activos al mes 12 · 6 clientes cada uno = 90 clientes</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">02</span>
+        <div>
+          <b>Outbound directo con un gancho que no es un pitch</b>
+          <p>
+            LinkedIn y WhatsApp a la dueña o a la jefa de administración. El mensaje no ofrece software:
+            ofrece un <b>diagnóstico gratis de DSO</b> — nos mandas el Registro de Ventas (un CSV que baja
+            del SII en dos clics, sin darnos ninguna clave) y en 24 horas te devolvemos, en una página,
+            cuánto es tu DSO, cuánta plata tienes atrapada y quiénes son tus cinco peores pagadores.
+            <b>Ese informe es el producto de entrada</b>, y no se puede hacer sin nosotros.
+          </p>
+          <span class="dato">Estimación: 100 mensajes → 12 informes → 3 reuniones → 1 cliente</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">03</span>
+        <div>
+          <b>Integración en el software que ya usan</b>
+          <p>
+            Estar en el marketplace de Nubox, Bsale y Defontana. Es lento, es político y depende de que ellos
+            no quieran hacerlo solos. Pero un botón "Cobrar con Tinoria" dentro de Nubox vale más que todo el
+            presupuesto de Google Ads del año.
+          </p>
+          <span class="dato">Apuesta de largo plazo. Empezar las conversaciones el mes 4, no el mes 1.</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">04</span>
+        <div>
+          <b>SEO long-tail en español de Chile</b>
+          <p>
+            Nadie busca "software de cuentas por cobrar". Buscan <em class="italica">"carta de cobranza
+            modelo"</em>, <em class="italica">"cómo cobrar una factura vencida"</em>, <em class="italica">"ley
+            de pago a 30 días interés"</em>, <em class="italica">"calculadora interés por mora factura"</em>.
+            Ahí hay tráfico de gente que está sufriendo el problema <b>en ese mismo minuto</b>. Regalamos las
+            plantillas y la calculadora de interés de la Ley 21.131. El que la usa nos deja su correo.
+          </p>
+          <span class="dato">Barato, lento, compone. Es el único canal con CAC decreciente.</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">05</span>
+        <div>
+          <b>Gremios: ASIMET, ASECH, Cámara de Comercio de Santiago, CChC</b>
+          <p>
+            Charla de 40 minutos: <em class="italica">"Cómo cobrarle a tu cliente sin pelearte con él"</em>.
+            No es una charla de software. Es una charla de negocio, con el estudio de DSO real que publicamos.
+            De cada charla salen 3 o 4 reuniones.
+          </p>
+          <span class="dato">Costo casi cero. Requiere que el fundador sepa hablar en público.</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">06</span>
+        <div>
+          <b>Google Ads — y sólo Google, no Meta</b>
+          <p>
+            Intención de compra alta en un puñado de términos ("software cobranza pymes", "controlar cuentas
+            por cobrar"). Meta e Instagram no: nadie compra software de cobranza mientras mira reels. Ese
+            presupuesto se gasta mejor en el informe de DSO.
+          </p>
+          <span class="dato">CPL estimado $28.000 · conversión a pago 12% · CAC $233.000</span>
+        </div>
+      </div>
+
+      <div class="canal">
+        <span class="canal__n">07</span>
+        <div>
+          <b>Mercado Público — no, todavía</b>
+          <p>
+            Tentador y equivocado. Vender al Estado alarga el ciclo, obliga a certificaciones y nos saca del
+            segmento. Lo dejamos anotado para el año 3, cuando exista el producto para proveedores del Estado
+            (que sufren el problema al revés: les paga el Estado, y tarde).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 7 · IA EN MARKETING ══════════ -->
+  <section class="bloque" id="ia">
+    <p class="epigrafe">07</p>
+    <h2>Dónde usamos IA en el marketing — y dónde no</h2>
+    <p class="prose" style="color:var(--tinta-2)">
+      Vendemos un producto de IA que le escribe a los clientes de nuestros clientes. Si nuestro propio
+      marketing huele a texto generado, perdimos el argumento antes de empezar.
+    </p>
+
+    <div class="si-no">
+      <div class="si-no--si">
+        <h3>Sí, y de verdad ayuda</h3>
+        <ul>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            <span><b>El informe de DSO.</b> Leer el Registro de Ventas de un prospecto y escribir un
+            diagnóstico de una página, personalizado, con sus peores pagadores por nombre. Cien de esos a
+            mano son un mes de trabajo; con IA son una tarde. <em class="italica">Esto es marketing porque
+            es producto.</em></span>
+          </li>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            <span><b>Plantillas de cobranza por rubro.</b> 40 páginas SEO —constructora, imprenta, agro,
+            transporte— donde la variación entre una y otra es real y no relleno. Cada una la revisa un
+            humano antes de publicarse.</span>
+          </li>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            <span><b>Calificar leads entrantes.</b> Leer el sitio del prospecto y estimar si factura a
+            crédito y a qué tipo de cliente. Ahorra llamadas inútiles.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="si-no--no">
+        <h3>No, y es deliberado</h3>
+        <ul>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <span><b>Responder leads calientes.</b> Cuando una dueña escribe "me interesa", contesta un
+            humano en menos de 10 minutos. Estamos vendiendo <em class="italica">confianza para delegar
+            conversaciones difíciles</em>. Un bot en esa primera respuesta destruye exactamente lo que
+            venimos a construir.</span>
+          </li>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <span><b>300 artículos de blog.</b> El SEO por volumen ya no funciona y además nos delata.
+            Quince páginas buenas, escritas por alguien que entiende el problema, valen más.</span>
+          </li>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <span><b>Casos de éxito inventados o "clientes" que no existen.</b> Obvio, pero en este rubro
+            hay que decirlo: mostramos logos cuando tengamos logos, y no antes.</span>
+          </li>
+          <li>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <span><b>Outbound masivo automatizado.</b> 5.000 mensajes de LinkedIn generados quemarían el
+            único canal que tenemos y la reputación del dominio. 100 mensajes bien investigados por semana,
+            uno por uno.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 8 · 90 DÍAS ══════════ -->
+  <section class="bloque" id="dias">
+    <p class="epigrafe">08</p>
+    <h2>Los primeros 90 días</h2>
+
+    <ul class="dias">
+      <li>
+        <span class="rango">Día 1–15</span>
+        <div>
+          <b>Veinte conversaciones y cero código</b>
+          <p>
+            Tres contadores nos presentan a sus clientes. Veinte entrevistas con la persona que cobra.
+            La pregunta que importa no es "¿te sirve esto?" sino <b>"muéstrame el último correo de cobranza
+            que mandaste"</b>. Copiamos a mano 40 secuencias reales de cobranza. Ese corpus es el activo
+            fundacional del producto y no se puede comprar.
+          </p>
+        </div>
+      </li>
+      <li>
+        <span class="rango">Día 16–45</span>
+        <div>
+          <b>El núcleo, con el humano adentro</b>
+          <p>
+            Importar el CSV del SII, el tablero, el envejecimiento, el redactor con los tres tonos y la
+            aprobación humana. Cobranza por correo nada más. <b>El WhatsApp lo mandamos nosotros a mano,
+            copiando y pegando</b>, y no le decimos al cliente que es manual — le decimos que está en piloto.
+            Cinco design partners, gratis, a cambio de que nos dejen medir su DSO antes y después.
+          </p>
+        </div>
+      </li>
+      <li>
+        <span class="rango">Día 46–75</span>
+        <div>
+          <b>WhatsApp de verdad, y la primera factura nuestra</b>
+          <p>
+            WhatsApp Business API vía proveedor (360dialog o Twilio), verificación de negocio de Meta,
+            plantillas aprobadas. Y le cobramos a los cinco design partners: <b>$49.000</b>. Si ninguno de
+            los cinco paga, el problema no era tan caro como creíamos y hay que parar a pensar.
+          </p>
+        </div>
+      </li>
+      <li>
+        <span class="rango">Día 76–90</span>
+        <div>
+          <b>Diez clientes pagando y un estudio que da que hablar</b>
+          <p>
+            Publicamos <em class="italica">"El DSO real de 10 PYMEs chilenas"</em>: datos propios, anonimizados,
+            con la mediana, los peores rubros y cuánto capital de trabajo hay atrapado. Es el tipo de dato que
+            no existe publicado en Chile, le sirve a Diario Financiero y a Pulso, y nos posiciona como los que
+            saben del tema. <b>El contenido más caro de producir es el que nadie más puede copiar.</b>
+          </p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ══════════ 9 · QUÉ LO MATA ══════════ -->
+  <section class="bloque" id="mata">
+    <p class="epigrafe">09</p>
+    <h2>Qué mataría esto</h2>
+
+    <div class="mata">
+      <h3>1. Que no sea olvido. Que sea que no hay plata.</h3>
+      <p>
+        Todo el producto asume que una parte importante de la mora es <em class="italica">fricción</em>:
+        se olvidaron, se traspapeló, falta una orden de compra, nadie insistió. Si resulta que la mayoría
+        de los deudores no paga porque <b>no puede</b>, entonces ningún tono, ninguna cadencia y ninguna IA
+        mueve la aguja — y el techo del producto es un tablero bonito que no cambia el DSO.
+        <b>Ésta es la hipótesis central y hay que medirla con los design partners antes del día 60.</b>
+        La prueba: qué fracción de la cartera vencida se cobra sólo con recordatorios bien hechos.
+        Si es menos del 25%, hay que parar.
+      </p>
+    </div>
+
+    <div class="mata">
+      <h3>2. Que la administradora no suelte el teclado.</h3>
+      <p>
+        El miedo a que "el robot le escriba una tontera a mi mejor cliente" es completamente racional. Si ese
+        miedo hace que <em class="italica">todo</em> pase por aprobación manual, entonces no ahorramos tiempo:
+        agregamos un paso. El producto se vuelve un Excel más lindo y el churn se dispara al mes 3.
+        La señal de alarma: <b>si a los 60 días de uso menos del 60% de los mensajes sale automático</b>,
+        no estamos resolviendo el problema que dijimos.
+      </p>
+    </div>
+
+    <div class="mata">
+      <h3>3. Que Nubox lo incluya gratis.</h3>
+      <p>
+        Es lo que haría yo en su lugar. Tienen la distribución, tienen los datos y les cuesta un trimestre.
+        No podemos evitarlo; sólo podemos ser mejores en la única cosa que a ellos no les importa lo
+        suficiente (el tono, la conversación, el WhatsApp) y llegar antes a los contadores. Si a los 18 meses
+        la respuesta del mercado es "para qué, si Nubox ya lo trae", perdimos.
+      </p>
+    </div>
+
+    <div class="mata">
+      <h3>4. Que Meta nos corte WhatsApp.</h3>
+      <p>
+        WhatsApp es <em class="italica">el</em> canal en Chile y no lo controlamos. Meta tiene reglas cada vez
+        más estrictas sobre mensajería financiera y de cobranza; una política nueva, o un puñado de deudores
+        que reportan nuestros mensajes como spam, y el canal se cierra. Mitigación real: los mensajes salen
+        del número del <b>cliente</b>, no de un número nuestro, y siempre en respuesta a una relación comercial
+        existente. Pero el riesgo de plataforma no se elimina, sólo se reparte.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <div style="display:flex; flex-wrap:wrap; gap: var(--sp-s) var(--sp-l); justify-content:space-between;">
+      <p><b>Tinoria</b> — cobrar con tino. Prototipo, julio 2026.</p>
+      <p><a href="roadmap.html">Roadmap →</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('menuBtn'), n = document.getElementById('nav');
+  b.addEventListener('click', function () {
+    var a = n.classList.toggle('abierta');
+    b.setAttribute('aria-expanded', a ? 'true' : 'false');
+  });
+})();
+</script>
+</body>
+</html>

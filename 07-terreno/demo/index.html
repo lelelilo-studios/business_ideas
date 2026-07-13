@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Rutamo · despacho y terreno</title>
+<meta name="description" content="El producto funcionando: despacho con mapa de Santiago, ruta optimizada, app del técnico que aguanta estar sin señal, cotización firmada y link de pago.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/rutamo.css">
+<link rel="stylesheet" href="../assets/demo.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="../index.html">
+      <svg class="brand__mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" fill="none" stroke="#14161A" stroke-width="2"/>
+        <path d="M6 23 L12 9 L18 17 L24 7" fill="none" stroke="#14161A" stroke-width="2.4"/>
+        <circle cx="24" cy="7" r="3.4" fill="#D9F02B" stroke="#14161A" stroke-width="2"/>
+      </svg>
+      <span class="brand__name">Ruta<em>mo</em></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__back" href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Menú">Menú</summary>
+      <div class="menu__panel">
+        <a href="../../index.html">← Ideas</a>
+        <a href="../index.html">Producto</a>
+        <a href="index.html" aria-current="page">Demo</a>
+        <a href="../negocio.html">Negocio</a>
+        <a href="../roadmap.html">Roadmap</a>
+        <a href="../stack.html">Arquitectura</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<div class="switch">
+  <div class="container switch__in">
+    <div class="switch__seg" role="group" aria-label="Cambiar de vista">
+      <button id="btnDespacho" aria-pressed="true">Despacho</button>
+      <button id="btnTerreno" aria-pressed="false">Terreno</button>
+    </div>
+    <span class="tag" id="ctxLabel">Martes 14 de julio · Refrigeración Andes SpA · 76.543.210-K</span>
+    <span class="switch__spacer"></span>
+    <button class="btn btn--sm" id="btnReset">Reiniciar el día</button>
+  </div>
+</div>
+
+<main class="container" style="padding-block: var(--sp-m)">
+
+<!-- =========================================================== DESPACHO -->
+<section id="viewDespacho">
+  <div class="kpis">
+    <div class="kpi"><b id="kVisitas">–</b><span>visitas hoy</span></div>
+    <div class="kpi"><b id="kSin">–</b><span>sin asignar</span></div>
+    <div class="kpi"><b id="kKm">–</b><span>km del día</span></div>
+    <div class="kpi"><b id="kHoras">–</b><span>h en ruta</span></div>
+    <div class="kpi kpi--hi"><b id="kCobrado">$0</b><span>cobrado en terreno</span></div>
+  </div>
+
+  <div class="desk">
+    <!-- columna 1: bandeja -->
+    <div class="pane">
+      <div class="pane__h">
+        <h2>Bandeja de entrada</h2>
+        <span class="tag" id="sinCount">0</span>
+      </div>
+      <div class="pane__b" id="bandeja"></div>
+      <div style="padding:10px;border-top:1px solid var(--rule)">
+        <button class="btn btn--sm btn--hi" id="btnUrgencia" style="width:100%">Entra una urgencia</button>
+        <p class="src" style="margin-top:8px;border:0;padding:0">Simula el WhatsApp de un cliente a las 11:04.</p>
+      </div>
+    </div>
+
+    <!-- columna 2: mapa -->
+    <div class="pane">
+      <div class="pane__h">
+        <h2>Santiago · martes 14 de julio</h2>
+        <button class="btn btn--sm btn--hi" id="btnOptimizar">Optimizar rutas</button>
+      </div>
+      <div class="maptools" id="chips"></div>
+      <div class="mapbox">
+        <div class="saveflag" id="saveflag" role="status"></div>
+        <svg id="mapa" viewBox="0 0 800 660" role="img" aria-labelledby="mapTitle mapDesc">
+          <title id="mapTitle">Mapa esquemático de Santiago con las rutas del día</title>
+          <desc id="mapDesc">Comunas del Gran Santiago dibujadas a mano. Cada visita es un pin numerado con el color de su técnico. El detalle de cada ruta está en la lista de la derecha, en texto.</desc>
+          <rect width="800" height="660" fill="#FBFAF6"/>
+
+          <!-- comunas -->
+          <g fill="#EDE9DE" stroke="#C3BBA7" stroke-width="1.2">
+            <path d="M600 30 L780 22 L790 112 L700 142 L620 106 Z"/>            <!-- Lo Barnechea -->
+            <path d="M560 120 L620 106 L700 142 L680 192 L575 182 Z"/>          <!-- Vitacura -->
+            <path d="M575 182 L680 192 L732 252 L640 292 L580 256 Z"/>          <!-- Las Condes -->
+            <path d="M580 256 L640 292 L652 346 L576 352 L560 302 Z"/>          <!-- La Reina -->
+            <path d="M576 352 L652 346 L692 422 L602 452 L556 402 Z"/>          <!-- Peñalolén -->
+            <path d="M420 62 L560 50 L600 30 L620 106 L560 120 L470 132 Z"/>    <!-- Huechuraba -->
+            <path d="M230 56 L420 62 L470 132 L330 152 L246 136 Z"/>            <!-- Quilicura -->
+            <path d="M330 152 L470 132 L490 196 L372 212 L342 192 Z"/>          <!-- Conchalí -->
+            <path d="M470 132 L560 120 L575 182 L490 196 Z"/>                   <!-- Recoleta -->
+            <path d="M246 136 L330 152 L342 192 L356 236 L252 226 Z"/>          <!-- Renca -->
+            <path d="M80 152 L246 136 L252 226 L232 302 L92 272 Z"/>            <!-- Pudahuel -->
+            <path d="M252 226 L356 236 L362 292 L246 296 Z"/>                   <!-- Cerro Navia -->
+            <path d="M372 212 L490 196 L490 266 L456 302 L382 282 Z"/>          <!-- Santiago -->
+            <path d="M490 196 L575 182 L580 256 L556 292 L490 266 Z"/>          <!-- Providencia -->
+            <path d="M490 266 L556 292 L560 302 L576 352 L496 362 L470 306 Z"/> <!-- Ñuñoa -->
+            <path d="M470 306 L496 362 L502 416 L432 406 L422 342 Z"/>          <!-- Macul -->
+            <path d="M362 292 L382 282 L456 302 L422 342 L352 336 Z"/>          <!-- Estación Central -->
+            <path d="M92 272 L246 296 L256 392 L162 442 L86 382 Z"/>            <!-- Maipú -->
+            <path d="M246 296 L352 336 L356 402 L256 392 Z"/>                   <!-- Cerrillos -->
+            <path d="M356 402 L422 342 L432 406 L442 458 L362 458 Z"/>          <!-- San Miguel / PAC -->
+            <path d="M502 416 L602 452 L612 532 L506 522 Z"/>                   <!-- La Florida -->
+            <path d="M362 458 L442 458 L452 512 L372 518 Z"/>                   <!-- La Cisterna -->
+            <path d="M372 518 L452 512 L462 572 L382 582 Z"/>                   <!-- El Bosque -->
+            <path d="M272 532 L382 582 L366 642 L246 626 Z"/>                   <!-- San Bernardo -->
+            <path d="M506 522 L612 532 L642 622 L502 638 L472 572 Z"/>          <!-- Puente Alto -->
+          </g>
+
+          <!-- Río Mapocho -->
+          <path d="M782 96 C 690 130, 600 150, 500 172 C 400 194, 300 200, 200 205 C 140 208, 100 220, 60 240"
+                fill="none" stroke="#AFC4CE" stroke-width="6" opacity=".9"/>
+          <!-- Cerro San Cristóbal -->
+          <path d="M498 168 L520 150 L546 162 L534 184 L505 186 Z" fill="#D8D9C4" stroke="#B4B49C" stroke-width="1"/>
+          <!-- Américo Vespucio -->
+          <path d="M180 180 C 380 60, 640 130, 690 300 C 730 450, 520 590, 330 540 C 170 500, 110 300, 180 180"
+                fill="none" stroke="#C3BBA7" stroke-width="2" stroke-dasharray="8 6"/>
+
+          <g font-family="'IBM Plex Mono',monospace" font-size="10" fill="#6E6A61" letter-spacing=".06em">
+            <text x="672" y="76">LO BARNECHEA</text>
+            <text x="592" y="150">VITACURA</text>
+            <text x="608" y="240">LAS CONDES</text>
+            <text x="586" y="320">LA REINA</text>
+            <text x="586" y="400">PEÑALOLÉN</text>
+            <text x="466" y="92">HUECHURABA</text>
+            <text x="278" y="104">QUILICURA</text>
+            <text x="368" y="180">CONCHALÍ</text>
+            <text x="498" y="166">RECOLETA</text>
+            <text x="272" y="196">RENCA</text>
+            <text x="122" y="222">PUDAHUEL</text>
+            <text x="264" y="268">CERRO NAVIA</text>
+            <text x="398" y="252">SANTIAGO</text>
+            <text x="504" y="230">PROVIDENCIA</text>
+            <text x="502" y="332">ÑUÑOA</text>
+            <text x="440" y="378">MACUL</text>
+            <text x="368" y="322">EST. CENTRAL</text>
+            <text x="130" y="360">MAIPÚ</text>
+            <text x="272" y="368">CERRILLOS</text>
+            <text x="368" y="432">SAN MIGUEL</text>
+            <text x="520" y="482">LA FLORIDA</text>
+            <text x="376" y="496">LA CISTERNA</text>
+            <text x="386" y="556">EL BOSQUE</text>
+            <text x="256" y="596">SAN BERNARDO</text>
+            <text x="516" y="586">PUENTE ALTO</text>
+            <text x="700" y="640" fill="#B4AE9E">esquema · no está a escala</text>
+          </g>
+
+          <g id="routes"></g>
+          <g id="pins"></g>
+          <!-- bodega -->
+          <g>
+            <rect x="382" y="307" width="16" height="16" fill="#14161A"/>
+            <path d="M382 307 L390 299 L398 307" fill="#D9F02B" stroke="#14161A" stroke-width="1.5"/>
+            <text x="404" y="320" font-family="'IBM Plex Mono',monospace" font-size="10" font-weight="600" fill="#14161A">BODEGA 08:30</text>
+          </g>
+        </svg>
+      </div>
+      <div class="gantt" style="border-top:1px solid var(--ink)">
+        <div class="pane__h" style="border-top:0"><h3>Carga del día · viaje vs trabajo</h3><span class="tag">08:00 → 19:00</span></div>
+        <div style="padding:10px"><svg id="gantt" viewBox="0 0 720 200" role="img" aria-label="Franja horaria por técnico: bloques de viaje y bloques de trabajo entre las 8:00 y las 19:00"></svg></div>
+      </div>
+    </div>
+
+    <!-- columna 3: rutas -->
+    <div class="pane">
+      <div class="pane__h"><h2>Técnicos y sus rutas</h2><span class="tag">5 en terreno</span></div>
+      <div class="pane__b" style="padding:0" id="rutas"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ TERRENO -->
+<section id="viewTerreno" hidden>
+  <div class="field-wrap">
+    <div class="notes">
+      <span class="eyebrow">Lo que estás mirando</span>
+      <h3>El teléfono del técnico, con guantes puestos.</h3>
+      <p>Esta pantalla se diseñó para una mano sucia, una pantalla al sol y un subterráneo sin señal.
+      Nada de menús: cuatro botones grandes y el trabajo del día.</p>
+      <ul>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span><b>Apaga la señal</b> arriba a la derecha y sigue usándola. Los cambios se apilan en una cola y se ven.</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span>Abre una visita, avanza los estados y prueba <b>«Falta un repuesto»</b>: la revisita aparece sola en la bandeja del despacho.</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7l3.5 3.5L12 3" fill="none" stroke="#14161A" stroke-width="2.2"/></svg><span><b>Cotiza, hazlo firmar con el dedo</b> y manda el link de pago. El KPI «cobrado en terreno» del despacho se mueve al instante.</span></li>
+      </ul>
+      <div style="margin-top:var(--sp-m)">
+        <p class="tag" style="margin-bottom:6px">¿De quién es el teléfono?</p>
+        <div id="tecChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="phone__bar">
+        <span id="phTec">RODRIGO F. · 09:41</span>
+        <button class="sig" id="btnSig" aria-pressed="false" style="min-height:32px">
+          <svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true" id="sigIcon">
+            <rect x="0" y="10" width="3" height="4" fill="#D9F02B"/>
+            <rect x="4.5" y="7" width="3" height="7" fill="#D9F02B"/>
+            <rect x="9" y="4" width="3" height="10" fill="#D9F02B"/>
+            <rect x="13.5" y="0" width="3" height="14" fill="#D9F02B"/>
+          </svg>
+          <b id="sigTxt">CON SEÑAL</b>
+        </button>
+      </div>
+      <div class="offbanner" id="offBanner" role="status"></div>
+      <div class="phone__body" id="phoneBody"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- modal urgencia -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalT">
+  <div class="modal__box">
+    <div class="modal__h">
+      <h3 id="modalT">Entró un WhatsApp · +56 9 8412 7730</h3>
+      <button id="modalX" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal__b">
+      <div class="wsp">
+        <small>Marcela Ibáñez — Santa Isabel Ñuñoa — 11:04</small>
+        oiga buenos dias, la camara de frio de los lacteos no esta enfriando, marca 12 grados y deberia estar en 4. estamos sacando todo a la otra camara pero no cabe. es urgente porfa, se nos echa a perder la mercaderia. la direccion es irarrazaval 3560, tenemos que entrar por atras por el estacionamiento
+      </div>
+      <button class="btn btn--sm btn--hi" id="btnParse" style="margin-top:var(--sp-s)">Estructurar con IA →</button>
+      <div class="parsed" id="parsed">
+        <div class="parsed__h">Orden de trabajo propuesta · Haiku 4.5 · 1,3 s</div>
+        <div><span>Cliente</span><span>Supermercado Santa Isabel — Ñuñoa</span></div>
+        <div><span>Dirección</span><span>Av. Irarrázaval 3560, acceso por estacionamiento trasero</span></div>
+        <div><span>Equipo</span><span>Cámara de frío lácteos (ficha: Bohn LET090BK, serie CF-2021-118)</span></div>
+        <div><span>Síntoma</span><span>No enfría — 12 °C vs 4 °C de consigna</span></div>
+        <div><span>Urgencia</span><span style="color:var(--critical)">ALTA — riesgo de pérdida de mercadería</span></div>
+        <div><span>Duración estimada</span><span>90 min</span></div>
+        <div><span>Especialidad</span><span>Refrigeración comercial</span></div>
+        <div><span>Antecedente</span><span>3ª falla del mismo equipo en 11 meses</span></div>
+      </div>
+      <div id="fitBox" style="margin-top:var(--sp-s);display:none">
+        <button class="btn btn--hi" id="btnFit" style="width:100%">Encajar en la ruta de hoy</button>
+      </div>
+      <div id="fitResult" style="margin-top:var(--sp-s)"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<footer class="foot">
+  <div class="container" style="display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;width:100%">
+    <span>Rutamo · demo con datos ficticios · estado en el navegador</span>
+    <span><a href="../stack.html">Qué está falseado acá →</a></span>
+  </div>
+</footer>
+
+<script src="../assets/demo.js"></script>
+</body>
+</html>

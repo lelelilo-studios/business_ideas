@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adjudate — Negocio y go-to-market</title>
+<meta name="description" content="ICP, tamaño de mercado con la aritmética a la vista, competencia real, economía unitaria, canales y los primeros 90 días.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .fuente { font-family: var(--mono); font-size: .68rem; color: var(--muted); line-height: 1.6; border-left: 2px solid var(--rule-fuerte); padding-left: .7rem; margin-top: var(--sp-s); }
+  .fuente b { color: var(--acento); font-weight: 500; }
+  .calc { font-family: var(--mono); font-size: .78rem; background: var(--papel-bajo); border: 1px solid var(--rule-fuerte); padding: var(--sp-s); line-height: 1.9; overflow-x: auto; }
+  .calc .eq { color: var(--acento); }
+  .calc .res { color: var(--ink); font-weight: 600; }
+  .sup { display: grid; grid-template-columns: auto 1fr; gap: .3rem .7rem; font-family: var(--mono); font-size: .74rem; margin-top: var(--sp-s); }
+  .sup dt { color: var(--acento); white-space: nowrap; }
+  .sup dd { color: var(--ink-2); }
+  h3 { margin-top: var(--sp-l); margin-bottom: var(--sp-s); }
+  section p.prose { color: var(--ink-2); }
+  section p.prose + p.prose { margin-top: var(--sp-s); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-in">
+      <a class="marca" href="index.html"><i></i>ADJUDATE <span>Mercado Público</span></a>
+      <ul class="nav-links">
+        <li><a class="volver" href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+      <button class="nav-btn" id="navBtn" aria-expanded="false" aria-controls="navMob">Menú</button>
+    </div>
+  </div>
+  <div class="nav-mob" id="navMob">
+    <div class="container">
+      <ul>
+        <li><a href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header style="padding-block: var(--sp-xl) var(--sp-l)">
+  <div class="container">
+    <p class="folio"><b>Negocio</b> · Go-to-market</p>
+    <h1 style="font-size:var(--step-3)">A quién le vendemos, cuánto vale, y cómo llegamos.</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Regla de esta página: <strong>todo número está citado, o está etiquetado como estimación con su aritmética a la vista.</strong> Si no sabemos algo, lo decimos.</p>
+  </div>
+</header>
+
+<!-- ===================== ICP ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>01</b> · Cliente objetivo</p>
+    <h2>La PYME que ya juega, y pierde por el papeleo.</h2>
+
+    <div class="grid g2" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <p class="ficha-h">Perfil exacto</p>
+        <dl class="kv" style="font-size:.82rem">
+          <dt>Segmento</dt><dd>Servicios generales al Estado: aseo industrial, áreas verdes, mantención de infraestructura</dd>
+          <dt>Tamaño</dt><dd>10 a 80 trabajadores</dd>
+          <dt>Ventas anuales</dt><dd>$200M – $2.000M CLP</dd>
+          <dt>Señal de calificación</dt><dd>Se adjudicó ≥1 licitación en los últimos 24 meses</dd>
+          <dt>Ubicación</dt><dd>RM y Valparaíso primero</dd>
+        </dl>
+      </div>
+      <div class="ficha">
+        <p class="ficha-h">Quién firma, quién usa</p>
+        <p style="color:var(--ink-2); font-size:.92rem"><strong>Firma:</strong> el dueño o socio (Rodrigo, 45-60 años). Decide solo, en una reunión, y le importa una cosa: cuántos contratos más se puede adjudicar este año. No compra software, compra pega.</p>
+        <p style="color:var(--ink-2); font-size:.92rem; margin-top:var(--sp-s)"><strong>Usa:</strong> la jefa de operaciones o administración (Marcela, 30-45). Es quien hoy revisa Mercado Público a mano los lunes, arma las carpetas y persigue la boleta de garantía. <strong>Ella es la que sufre.</strong> Si no le encanta el producto en la primera semana, el dueño lo cancela al segundo mes.</p>
+        <p style="color:var(--ink-2); font-size:.92rem; margin-top:var(--sp-s)"><strong>Dónde ya está:</strong> en Mercado Público (públicamente identificable), en el Registro de Proveedores, en gremios como ASECH, y en el WhatsApp de su contador.</p>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m); border-color:var(--acento)">
+      <p class="ficha-h" style="color:var(--acento)">La ventaja injusta de este ICP</p>
+      <p class="prose"><strong>Sabemos exactamente quiénes son, uno por uno, con nombre y RUT.</strong> Los oferentes de cada licitación son información pública en Mercado Público. Podemos listar hoy, sin pedirle permiso a nadie, a todas las empresas que postularon y perdieron en los últimos 12 meses, contra quién perdieron y por cuánta plata. No existe un ICP mejor documentado en Chile.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MERCADO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>02</b> · Tamaño de mercado</p>
+    <h2>Chile es chico. Hay que decirlo antes de gastar dos años.</h2>
+
+    <h3>TAM — Chile</h3>
+    <div class="calc">
+      Empresas que postulan a <b>licitaciones</b> en Mercado Público al año  <span class="eq">≈</span> <span class="res">30.000</span><br>
+      × Precio anual promedio si todas pagaran ($95.000 × 12)  <span class="eq">=</span> <span class="res">$1.140.000</span><br>
+      <span class="eq">──────────────────────────────────────────────────</span><br>
+      TAM Chile <span class="eq">=</span> <span class="res">$34.200 millones CLP / año  ≈  US$35,6M ARR</span>
+    </div>
+    <dl class="sup">
+      <dt>Supuesto A</dt><dd>ChileCompra transacciona del orden de <b>US$15.000+ millones</b> al año y tiene ~1 millón de proveedores inscritos. <b>Dato de dominio público de su memoria anual — verificar contra la memoria del año en curso antes de tomar cualquier decisión con esto.</b></dd>
+      <dt>Supuesto B</dt><dd>La gran mayoría de esos proveedores transan por <em>Compra Ágil</em> o <em>Convenio Marco</em>, no por licitación. Estimamos que <b>30.000</b> empresas participan de procesos de licitación propiamente tal. <b>Es una estimación nuestra</b>, no un dato publicado: no encontramos una cifra oficial de "oferentes únicos en licitaciones/año".</dd>
+      <dt>Supuesto C</dt><dd>Precio: ARPU mezclado de $95.000/mes (ver economía unitaria abajo).</dd>
+    </dl>
+
+    <h3>SAM — a quién le podemos vender de verdad</h3>
+    <div class="calc">
+      De esas 30.000, las que postulan <b>≥ 6 veces al año</b> y facturan &gt; $200M<br>
+      (o sea: para quienes esto es un canal de venta, no un accidente)  <span class="eq">≈</span> <span class="res">9.000 empresas</span><br>
+      × $1.140.000 / año<br>
+      <span class="eq">──────────────────────────────────────────────────</span><br>
+      SAM Chile <span class="eq">=</span> <span class="res">$10.260 millones CLP / año  ≈  US$10,7M ARR</span>
+    </div>
+    <dl class="sup">
+      <dt>Supuesto D</dt><dd>El 30% de los oferentes concentra la mayoría de las postulaciones. Es el patrón típico de mercados de compras públicas (SAM.gov, TED). <b>Estimación por analogía, no medida en Chile.</b> Se puede verificar en un fin de semana con la API de ChileCompra — <b>y es lo primero que haríamos.</b></dd>
+    </dl>
+
+    <h3>SOM — 36 meses, honestamente</h3>
+    <div class="calc">
+      4% del SAM en 3 años  <span class="eq">=</span> <span class="res">360 clientes</span><br>
+      × $95.000 × 12  <span class="eq">=</span> <span class="res">$410 millones CLP ARR  ≈  US$427k</span>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m); border-color:var(--acento)">
+      <p class="ficha-h" style="color:var(--acento)">La conclusión incómoda</p>
+      <p class="prose"><strong>Chile solo es un negocio de estilo de vida, no una startup de riesgo.</strong> US$35M de TAM y US$10M de SAM significan que, aun ganando el mercado entero, esto no llega a ser una empresa grande. Un equipo de 5 personas puede vivir muy bien de US$400k de ARR. Un fondo no.</p>
+      <p class="prose">La tesis de escala <strong>exige LatAm</strong>, y la buena noticia es que la estructura se repite exacta: Perú (SEACE), Colombia (SECOP II), México (CompraNet), Argentina (COMPR.AR), Brasil (ComprasNet / PNCP). Todos con datos abiertos, todos con PYMEs que pierden por formalismos, todos con el mismo producto. <strong>Multiplicando por PIB, LatAm ≈ 8–10× Chile → SAM regional del orden de US$80–100M ARR.</strong> Esa es la única versión de esta idea que justifica levantar capital.</p>
+      <p class="fuente">Análogos globales que validan la categoría: <b>SAM.gov</b> (EE.UU.) y <b>TED</b> (UE) tienen ecosistemas completos de software sobre sus datos abiertos. En EE.UU. existe una ola de startups de respuesta a RFP con IA para GovCon (<b>GovDash</b>, <b>Sweetspot</b>) y de gestión de RFP en general (<b>Loopio</b>, <b>Responsive</b>). Nadie ha hecho la versión LatAm todavía. <b>No citamos cifras de financiamiento porque no las verificamos.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CUÑA ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>03</b> · Posicionamiento y cuña</p>
+    <h2>La cabeza de playa: servicios generales en la RM.</h2>
+
+    <div class="grid g2" style="margin-top:var(--sp-m)">
+      <div class="ficha">
+        <p class="ficha-h">Por qué ESE segmento y no otro</p>
+        <ol class="lista">
+          <li><span class="n">01</span><div><strong>Postulan seguido.</strong> Un contratista de aseo o áreas verdes ve 20-40 licitaciones al año que le calzan. Un proveedor de equipamiento médico ve 3. La frecuencia es lo que convierte esto en software de uso diario en vez de un trámite anual.</div></li>
+          <li><span class="n">02</span><div><strong>Las bases se repiten.</strong> Los municipios se copian las bases entre sí. Eso hace que la extracción con IA sea confiable rápido, con poca data, en vez de exigir un modelo distinto por rubro.</div></li>
+          <li><span class="n">03</span><div><strong>El histórico es denso.</strong> Municipios, servicios de salud y SLEP licitan lo mismo cada año. Hay 5+ años de adjudicaciones comparables → la probabilidad estimada es sólida desde el día uno.</div></li>
+          <li><span class="n">04</span><div><strong>Se conocen entre ellos.</strong> Compiten en las mismas licitaciones y se subcontratan. El boca a boca en este gremio es un canal real.</div></li>
+          <li><span class="n">05</span><div><strong>La barrera técnica es baja.</strong> Para ganar no necesitan un producto único: necesitan precio, experiencia y no equivocarse en el papeleo. Exactamente las tres cosas que movemos.</div></li>
+        </ol>
+      </div>
+      <div>
+        <div class="ficha">
+          <p class="ficha-h">Una frase</p>
+          <p style="font-size:var(--step-1); line-height:1.45">Adjudate es el <strong>copiloto de licitaciones</strong> de la PYME chilena: encuentra las que puedes ganar de verdad, lee las bases, arma la postulación y no te deja enviarla incompleta.</p>
+        </div>
+        <div class="ficha" style="margin-top:var(--sp-m)">
+          <p class="ficha-h">Después de la cuña</p>
+          <p style="color:var(--ink-2); font-size:.92rem">1. <strong>Construcción y obras menores</strong> (CChC como canal) — montos mayores, mismas bases.<br>
+          2. <strong>TI y consultoría</strong> — más propuesta técnica, menos precio; el redactor vale más.<br>
+          3. <strong>Suministro y equipamiento</strong> — Convenio Marco y Compra Ágil, otro producto.<br>
+          4. <strong>Perú y Colombia</strong> — mismo producto, otra API.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPETENCIA ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>04</b> · Competencia</p>
+    <h2>Contra quién peleamos de verdad.</h2>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table>
+        <caption>El titular del puesto no es una startup</caption>
+        <thead>
+          <tr><th>Competidor</th><th>Qué hace</th><th>Dónde gana</th><th>Nuestra diferencia honesta</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Excel + el correo de alertas de ChileCompra</strong><br><span style="color:var(--acento)">El verdadero titular</span></td>
+            <td>Alertas por rubro, gratis. Una planilla con fechas que alguien copió a mano.</td>
+            <td>Es gratis y ya está instalado. Cero fricción de adopción.</td>
+            <td>No hace match con capacidad, no lee bases, no arma nada, no valida nada. Nuestro trabajo es demostrar que el tiempo perdido cuesta más que $59.000.</td>
+          </tr>
+          <tr>
+            <td><strong>LicitaLAB</strong></td>
+            <td>Plataforma chilena de inteligencia y alertas de licitaciones. El actor conocido del mercado.</td>
+            <td>Marca instalada, buena cobertura de datos y búsqueda.</td>
+            <td>Están fuertes en <em>encontrar y analizar</em>. Nosotros metemos el cuchillo en <em>postular</em>: el taller que redacta y el chequeo que bloquea el envío. Pueden agregarlo — no es un foso. Nuestro foso real es el bucle de resultado: aprendemos qué postulaciones ganan.</td>
+          </tr>
+          <tr>
+            <td><strong>Gestores de licitaciones freelance</strong></td>
+            <td>Un profesional que te arma la postulación. Cobra entre <strong>$150.000 y $400.000 por postulación</strong>, a veces un % del monto adjudicado.</td>
+            <td>Funciona. Es humano, entiende matices, se hace cargo.</td>
+            <td>No escala, es caro por unidad, y no deja capacidad instalada en la empresa. <strong>Este es el presupuesto que capturamos</strong> — el cliente ya está gastando esta plata. También son partners potenciales: les damos la herramienta y traen su cartera.</td>
+          </tr>
+          <tr>
+            <td><strong>Estudios jurídicos y asesorías en compras públicas</strong></td>
+            <td>Asesoría legal, impugnaciones, reclamos ante el Tribunal de Contratación Pública.</td>
+            <td>Autoridad y respaldo legal real.</td>
+            <td>Juegan arriba (montos grandes, conflictos). No compiten por la PYME que postula a $30 millones. Son canal de referidos, no rivales.</td>
+          </tr>
+          <tr>
+            <td><strong>ChileCompra mismo</strong></td>
+            <td>El buscador y las alertas del portal. Capacitaciones gratuitas a proveedores.</td>
+            <td>Tiene los datos, el canal, la confianza y el mandato explícito de apoyar a las PYMEs.</td>
+            <td><strong>Es el riesgo existencial, no un competidor cualquiera.</strong> Ver "qué nos mataría".</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fuente">Los rangos de precio de gestores freelance son <b>estimaciones de mercado</b> a partir de práctica conocida del rubro, no de una encuesta formal. <b>Validar en las 40 entrevistas de los primeros 15 días</b> — si el número real es $50.000, nuestro precio está mal.</p>
+  </div>
+</section>
+
+<!-- ===================== ECONOMÍA UNITARIA ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>05</b> · Precio y economía unitaria</p>
+    <h2>Los números tienen que cuadrar con Arquitectura.</h2>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m); margin-bottom:var(--sp-m)">
+      <table>
+        <caption>Tramos, en CLP netos por mes</caption>
+        <thead><tr><th>Plan</th><th class="num">Precio</th><th>Para quién</th><th class="num">Mix estimado</th></tr></thead>
+        <tbody>
+          <tr><td>Alerta</td><td class="num">$0</td><td>Adquisición. Feed + 3 análisis/mes.</td><td class="num">—</td></tr>
+          <tr><td>Postulante</td><td class="num">$59.000</td><td>Postula ocasionalmente.</td><td class="num">65%</td></tr>
+          <tr><td><strong>Adjudica</strong></td><td class="num"><strong>$149.000</strong></td><td>El Estado es un canal de venta.</td><td class="num">30%</td></tr>
+          <tr><td>Consorcio</td><td class="num">$390.000</td><td>Multi-RUT, alto volumen.</td><td class="num">5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>ARPU mezclado</h3>
+    <div class="calc">
+      0,65 × $59.000  <span class="eq">=</span> $38.350<br>
+      0,30 × $149.000 <span class="eq">=</span> $44.700<br>
+      0,05 × $390.000 <span class="eq">=</span> $19.500<br>
+      <span class="eq">──────────────────────</span><br>
+      Bruto <span class="eq">=</span> $102.550 &nbsp;→&nbsp; menos descuento anual (2 meses gratis a ~la mitad de la base)<br>
+      <span class="res">ARPU = $95.000 / mes</span>
+    </div>
+
+    <h3>Costo de servir un cliente (COGS)</h3>
+    <div class="calc">
+      Inferencia de IA (derivada en <b>Arquitectura</b>, USD 6,73 × $960)  <span class="eq">=</span> <span class="res">$6.500</span><br>
+      Infraestructura (USD 215/mes fijo ÷ 100 clientes × $960)             <span class="eq">=</span> <span class="res">$2.100</span><br>
+      Soporte y éxito del cliente (1 especialista / 200 clientes)          <span class="eq">=</span> <span class="res">$8.000</span><br>
+      <span class="eq">──────────────────────────────────────────────</span><br>
+      COGS total  <span class="eq">=</span> <span class="res">$16.600 / cliente / mes</span><br><br>
+      Margen bruto <span class="eq">=</span> ($95.000 − $16.600) / $95.000 <span class="eq">=</span> <span class="res">82,5%</span>
+    </div>
+    <p class="fuente">El costo de IA está derivado con su aritmética completa en <a href="stack.html">Arquitectura</a>. <b>Las dos páginas usan el mismo número.</b> Tipo de cambio supuesto: <b>USD 1 = $960 CLP</b>. El costo de soporte es real y no lo escondemos: prometemos que la postulación queda bien, y eso obliga a tener a alguien que sepa de licitaciones revisando.</p>
+
+    <h3>CAC, LTV, payback</h3>
+    <div class="calc">
+      Churn supuesto  <span class="eq">=</span> 4% / mes  →  Vida media <span class="eq">=</span> 1 / 0,04 <span class="eq">=</span> <span class="res">25 meses</span><br><br>
+      LTV <span class="eq">=</span> $95.000 × 82,5% × 25 meses  <span class="eq">=</span> <span class="res">$1.959.375</span><br>
+      CAC mezclado estimado  <span class="eq">=</span> <span class="res">$260.000</span><br><br>
+      LTV / CAC  <span class="eq">=</span> $1.959.375 / $260.000  <span class="eq">=</span> <span class="res">7,5×</span><br>
+      Payback  <span class="eq">=</span> $260.000 / ($95.000 × 82,5%)  <span class="eq">=</span> <span class="res">3,3 meses</span>
+    </div>
+    <dl class="sup">
+      <dt>CAC</dt><dd>Mezcla de outbound (trabajo humano, ~$120k), gremios y referidos (~$90k) y pago (~$450k). Al inicio será menor porque los fundadores venden gratis; al escalar sube. <b>Estimación.</b></dd>
+      <dt>Churn 4%</dt><dd><b>Es el supuesto más frágil de todo el modelo</b> y lo sabemos. Ver la curva de retención por cohorte en <a href="roadmap.html">Roadmap</a>: el cliente que <em>no se adjudica nada</em> en 90 días se va, y eso no lo controlamos del todo.</dd>
+    </dl>
+
+    <div class="ficha" style="margin-top:var(--sp-m)">
+      <p class="ficha-h">Lo que decidimos NO cobrar</p>
+      <p class="prose"><strong>Nada de comisión por adjudicación (success fee).</strong> Suena tentador — 1% de un contrato de $50 millones son $500.000 — pero: (a) crea el incentivo perverso de empujarte a postular a todo; (b) a los organismos compradores les incomoda un tercero con interés económico en la adjudicación; (c) el flujo de caja llega meses después. Suscripción pura, y punto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CANALES ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>06</b> · Canales de adquisición</p>
+    <h2>Rankeados por lo que creemos que va a funcionar.</h2>
+
+    <ol class="lista" style="margin-top:var(--sp-m)">
+      <li><span class="n">01</span><div>
+        <h3 style="margin-top:0">Outbound quirúrgico sobre el dato público</h3>
+        <p style="color:var(--ink-2)"><strong>Este canal es casi desleal de bueno y es la razón por la que esta idea es construible.</strong> Los oferentes de cada licitación son públicos. Sabemos quién postuló, quién perdió, contra quién y por cuánta plata. El mensaje se escribe solo:</p>
+        <p class="calc" style="margin-top:var(--sp-s); font-family:var(--serif); font-size:.92rem; line-height:1.6">
+          &ldquo;Don Rodrigo: en marzo su empresa perdió la licitación 2359-45-LE26 del Hospital de Talca. Ofertó $2.147.000 sobre el ganador, que se la llevó con 4 oferentes. Le mando gratis el desglose de lo que ofertaron los otros y qué le habría bastado para quedar primero. Si le sirve, conversamos.&rdquo;
+        </p>
+        <p style="color:var(--ink-2); margin-top:var(--sp-s)">Canal: WhatsApp y correo. CPL ≈ $0 (sólo trabajo). Es <em>outbound con dato duro</em>, no spam. Meta: 30 mensajes/día por vendedor, 20% de respuesta.</p>
+      </div></li>
+
+      <li><span class="n">02</span><div>
+        <h3 style="margin-top:0">Gremios</h3>
+        <p style="color:var(--ink-2)"><strong>ASECH</strong> (Asoc. de Emprendedores de Chile), <strong>Cámara Nacional de Comercio</strong>, <strong>CChC</strong> para cuando entremos a obras. Formato: charla gratis de 40 minutos ("cómo leer una base de licitación sin perder plata") + convenio de socios con descuento. No es escala, pero da credibilidad y la primera tanda de clientes.</p>
+      </div></li>
+
+      <li><span class="n">03</span><div>
+        <h3 style="margin-top:0">Contadores y software PYME como distribución</h3>
+        <p style="color:var(--ink-2)">El contador sabe exactamente quién de su cartera le factura al Estado — lo ve en los DTE. Es el canal de distribución más subestimado de Chile. Integración y programa de referidos con <strong>Nubox</strong>, <strong>Defontana</strong> y <strong>Bsale</strong>; comisión de 20% recurrente el primer año al contador que trae al cliente. Es el canal con mejor CAC potencial y el de ciclo más largo para construir.</p>
+      </div></li>
+
+      <li><span class="n">04</span><div>
+        <h3 style="margin-top:0">SEO long-tail en español de Chile</h3>
+        <p style="color:var(--ink-2)">Las PYMEs buscan literalmente esto en Google: <em>"cómo postular a una licitación en Mercado Público"</em>, <em>"qué es la garantía de seriedad de la oferta"</em>, <em>"anexo declaración jurada 19.886"</em>, <em>"por qué me declararon inadmisible"</em>. Volumen alto, competencia baja, intención comprobada. Meta: 200 páginas útiles en 6 meses.</p>
+      </div></li>
+
+      <li><span class="n">05</span><div>
+        <h3 style="margin-top:0">Google Ads sobre intención</h3>
+        <p style="color:var(--ink-2)">Términos: "licitaciones públicas chile", "software licitaciones", "postular mercado público". <strong>CPL estimado $9.000–$15.000</strong>; con 12% de conversión a pago → <strong>CAC $75.000–$125.000</strong>. <em>Estimación, no medida.</em> Es el canal que se prueba con $500.000 y se apaga si no rinde. Meta no es que sea el motor: es tener un piso comprable.</p>
+      </div></li>
+
+      <li><span class="n">06</span><div>
+        <h3 style="margin-top:0">Los gestores de licitaciones como revendedores</h3>
+        <p style="color:var(--ink-2)">En vez de matarlos, armarlos. Un gestor que hoy hace 4 postulaciones al mes a mano podría hacer 15 con Adjudate. Plan "Consorcio" multi-RUT + margen. Cada gestor trae 5-15 empresas.</p>
+      </div></li>
+
+      <li><span class="n">07</span><div>
+        <h3 style="margin-top:0">Capacitaciones de ChileCompra</h3>
+        <p style="color:var(--ink-2)">ChileCompra capacita proveedores. Ahí está el ICP, sentado en una sala, con el problema en la cabeza. Ir, escuchar, y hablar con la gente al final. No escala. Sirve para las primeras 40 entrevistas.</p>
+      </div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== IA EN MARKETING ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>07</b> · IA en el marketing mismo</p>
+    <h2>Dónde ayuda de verdad y dónde no.</h2>
+    <p class="prose" style="margin-bottom:var(--sp-m)">"IA en todo" no es una respuesta. Estas son nuestras tres apuestas y nuestros tres rechazos.</p>
+
+    <div class="grid g2">
+      <div class="ficha" style="border-color:var(--ok)">
+        <p class="ficha-h" style="color:var(--ok)">Sí — y es donde está la ventaja</p>
+        <ol class="lista">
+          <li><span class="n">01</span><div><strong>Personalización 1:1 del outbound.</strong> Un modelo lee el historial público de la empresa (licitaciones perdidas, precios, competidores) y escribe un mensaje con datos reales y específicos de ESA empresa. 500 mensajes distintos y verdaderos al día, cosa imposible a mano. <strong>Este es el uso que hace viable todo el canal #1.</strong></div></li>
+          <li><span class="n">02</span><div><strong>SEO long-tail masivo.</strong> Cientos de páginas explicando trámites reales del sistema de compras públicas chileno. Generadas con IA, <strong>revisadas por un especialista</strong> antes de publicar. Si publicamos una explicación errada de un trámite legal, el daño reputacional es peor que el tráfico ganado.</div></li>
+          <li><span class="n">03</span><div><strong>Lead magnet automatizado.</strong> Un informe semanal por rubro: "las 12 licitaciones de áreas verdes que abrieron esta semana y quién ganó las 12 anteriores". Se genera solo. Es útil aunque no compres. Es el gancho para el correo.</div></li>
+        </ol>
+      </div>
+      <div class="ficha" style="border-color:var(--acento)">
+        <p class="ficha-h" style="color:var(--acento)">No — y por qué</p>
+        <ol class="lista">
+          <li><span class="n">01</span><div><strong>Soporte automatizado con chatbot.</strong> Nuestro cliente nos paga para no equivocarse en un trámite legal. Un bot que alucina sobre una garantía de seriedad le cuesta un contrato de $40 millones. <strong>El soporte lo hace un humano que sabe de licitaciones.</strong> Está presupuestado en el COGS a propósito.</div></li>
+          <li><span class="n">02</span><div><strong>Llamadas en frío con voz sintética.</strong> El ICP es un dueño de PYME de 50 años que ya desconfía. Una voz de IA llamándolo destruye la confianza de todo el canal, no sólo de esa llamada.</div></li>
+          <li><span class="n">03</span><div><strong>Contenido de marca genérico.</strong> "5 tips para hacer crecer tu PYME." No aporta nada, nadie lo lee, y nos hace ver como todos los demás. Si no tenemos un dato duro que decir, nos callamos.</div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 90 DÍAS ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>08</b> · Primeros 90 días</p>
+    <h2>La secuencia concreta.</h2>
+
+    <div class="scroll-x" style="margin-top:var(--sp-m)">
+      <table>
+        <thead><tr><th>Días</th><th>Qué hacemos</th><th>Qué tiene que ser cierto al final</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>1&ndash;15</strong></td>
+            <td>Descargar la API de ChileCompra y construir la lista de empresas que <strong>perdieron</strong> licitaciones en 12 meses. <strong>40 entrevistas</strong> con esas empresas. Reconstruir 20 postulaciones perdidas y encontrar por qué perdieron de verdad.</td>
+            <td>Sabemos si la causa real es el formalismo, el precio o la relación. <strong>Si es la relación, esta idea se muere acá</strong> y nos ahorramos dos años.</td>
+          </tr>
+          <tr>
+            <td><strong>16&ndash;40</strong></td>
+            <td>Ingesta de la API + histórico de adjudicaciones. Feed con match y lector de bases funcionando <strong>para un solo rubro</strong> (servicios generales). Nada más.</td>
+            <td>El lector extrae correctamente ≥ 90% de los requisitos de 50 bases reales, verificado a mano.</td>
+          </tr>
+          <tr>
+            <td><strong>41&ndash;60</strong></td>
+            <td><strong>8 design partners gratis.</strong> Postular CON ellos, sentados al lado, no mandándoles un link. Meta: 25 postulaciones reales enviadas.</td>
+            <td>Al menos 6 de los 8 dicen que no volverían a postular sin esto. Medimos horas ahorradas por postulación.</td>
+          </tr>
+          <tr>
+            <td><strong>61&ndash;90</strong></td>
+            <td>Cobrar. Convertir design partners y correr el canal de outbound quirúrgico en serio.</td>
+            <td><strong>10 clientes pagando</strong> ($59k–$149k). El primer resultado de adjudicación llega y se convierte en el primer caso real.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUÉ MATA ESTO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>09</b> · Qué mataría esto</p>
+    <h2 style="color:var(--acento)">Los tres riesgos honestos.</h2>
+
+    <div class="grid g3" style="margin-top:var(--sp-m)">
+      <div class="ficha" style="border-color:var(--acento)">
+        <p class="ficha-h" style="color:var(--acento)">Riesgo 1 — El Estado lo hace gratis</p>
+        <p style="color:var(--ink-2); font-size:.92rem">ChileCompra lanza un asistente de postulación con IA dentro de Mercado Público. Tiene los datos, el canal, la confianza y un mandato explícito de apoyar a las PYMEs. Nos deja sin producto en un anuncio.</p>
+        <p style="color:var(--ink-2); font-size:.92rem; margin-top:var(--sp-s)"><strong>Nuestra apuesta:</strong> el Estado puede mejorar la <em>información</em>, pero difícilmente va a redactar la oferta de un privado que compite contra otro privado — sería juez y parte. Si lo hacen igual, se acabó. <strong>No tenemos un plan B para esto y no vamos a fingir que sí.</strong></p>
+      </div>
+      <div class="ficha" style="border-color:var(--acento)">
+        <p class="ficha-h" style="color:var(--acento)">Riesgo 2 — El papeleo no era el problema</p>
+        <p style="color:var(--ink-2); font-size:.92rem">Que las licitaciones se ganen por precio y relaciones, y que el formalismo sea sólo el pretexto visible. Si es así, ahorramos horas pero no movemos la aguja de <em>ganar</em>, y el precio se derrumba de $149.000 a $20.000 — el precio de una herramienta de productividad, no de una de ingresos.</p>
+        <p style="color:var(--ink-2); font-size:.92rem; margin-top:var(--sp-s)"><strong>Se detecta en los primeros 15 días</strong>, en las 40 entrevistas. Es literalmente la primera pregunta.</p>
+      </div>
+      <div class="ficha" style="border-color:var(--acento)">
+        <p class="ficha-h" style="color:var(--acento)">Riesgo 3 — Churn atado a un resultado que no controlamos</p>
+        <p style="color:var(--ink-2); font-size:.92rem">El cliente paga para ganar licitaciones. Si en 90 días no se adjudica nada — porque su oferta no era competitiva, no porque nuestro software falló — se va igual. <strong>Nuestra retención depende de un resultado que sólo controlamos a medias.</strong></p>
+        <p style="color:var(--ink-2); font-size:.92rem; margin-top:var(--sp-s)"><strong>Mitigación:</strong> calificar duro en la venta (no vender a quien no puede ganar), y vender también el ahorro de horas, que sí controlamos al 100%. Ver la curva de cohortes en <a href="roadmap.html">Roadmap</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong style="font-family:var(--mono); color:var(--ink)">ADJUDATE</strong> &mdash; adjudate.com · Prototipo.</p>
+    <p><a href="../index.html">&larr; Ideas</a> · <a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('navBtn'), m = document.getElementById('navMob');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.textContent = open ? 'Cerrar' : 'Menú';
+  });
+})();
+</script>
+</body>
+</html>

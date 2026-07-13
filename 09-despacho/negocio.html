@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Kilonauta</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, competencia con nombre y apellido, economía unitaria, canales y los primeros 90 días.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="kilonauta.css">
+<style>
+  .doc { display: grid; gap: var(--sp-xl); }
+  .doc > section { padding-block: 0; scroll-margin-top: 5rem; }
+  .h-num {
+    font-family: var(--mono); font-size: .8rem; color: var(--accent-deep);
+    display: block; margin-bottom: .2rem;
+  }
+
+  /* índice */
+  .toc { border: 1px solid var(--rule-2); background: var(--card); padding: var(--sp-s); }
+  .toc ol { list-style: none; counter-reset: t; display: grid; gap: .1rem; }
+  .toc li { counter-increment: t; }
+  .toc a {
+    display: flex; align-items: baseline; gap: .5rem;
+    min-height: 40px; text-decoration: none; font-size: .92rem; color: var(--ink-2);
+    border-bottom: 1px dashed var(--rule);
+  }
+  .toc li:last-child a { border-bottom: 0; }
+  .toc a::before {
+    content: "0" counter(t);
+    font-family: var(--mono); font-size: .74rem; color: var(--accent-deep); flex: none;
+  }
+  .toc a:hover { color: var(--ink); }
+  @media (min-width: 72em) {
+    .layout { display: grid; grid-template-columns: 14rem 1fr; gap: var(--sp-xl); align-items: start; }
+    .toc { position: sticky; top: 5rem; }
+  }
+
+  /* aritmética a la vista */
+  .math {
+    background: var(--night); color: var(--on-night);
+    padding: var(--sp-s); font-family: var(--mono); font-size: .82rem;
+    line-height: 1.75; overflow-x: auto;
+  }
+  .math b { color: #F5A882; font-weight: 600; }
+  .math .c { color: var(--on-night-2); }
+  .math .eq { color: #8FC9A8; }
+  .math hr { border: 0; border-top: 1px dashed #4A453D; margin: .5rem 0; }
+
+  .assump { display: grid; gap: .3rem; }
+  .assump li {
+    display: grid; grid-template-columns: 1fr auto; gap: .75rem;
+    font-size: .86rem; padding: .35rem 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .assump li b { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .assump li span.q { color: var(--ink-2); }
+  .assump li em {
+    font-style: normal; font-size: .72rem; color: var(--warn);
+    display: block; font-family: var(--sans);
+  }
+
+  .cards-h { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .cards-h { grid-template-columns: repeat(3, 1fr); } }
+
+  .kpi { border: 1px solid var(--rule-2); background: var(--card); padding: var(--sp-s); }
+  .kpi span { display: block; font-family: var(--display); font-weight: 700; font-stretch: 82%; text-transform: uppercase; letter-spacing: .09em; font-size: .66rem; color: var(--ink-3); }
+  .kpi b { display: block; font-family: var(--mono); font-weight: 600; font-size: 1.5rem; font-variant-numeric: tabular-nums; margin: .15rem 0; }
+  .kpi[data-hi] b { color: var(--accent-deep); }
+  .kpi small { font-size: .76rem; color: var(--ink-3); }
+
+  .verdict-box {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-tint);
+    padding: var(--sp-s);
+  }
+  .verdict-box p + p { margin-top: .5rem; }
+
+  .kill { border: 2px solid var(--bad); background: var(--bad-soft); padding: var(--sp-s); }
+  .kill h3 { color: var(--bad); }
+
+  .comp-tbl td:first-child { font-weight: 600; }
+  .comp-tbl .who { font-size: .74rem; color: var(--ink-3); font-weight: 400; display: block; }
+
+  .rank { list-style: none; counter-reset: r; display: grid; gap: .6rem; }
+  .rank > li {
+    counter-increment: r;
+    display: grid; grid-template-columns: 2rem 1fr; gap: .75rem;
+    border-bottom: 1px dashed var(--rule-2); padding-bottom: .6rem;
+  }
+  .rank > li::before {
+    content: counter(r);
+    font-family: var(--display); font-weight: 900; font-stretch: 76%;
+    font-size: 1.3rem; color: var(--accent); line-height: 1;
+  }
+  .rank h4 { font-family: var(--display); font-weight: 800; font-stretch: 88%; font-size: 1rem; margin-bottom: .15rem; }
+  .rank p { font-size: .88rem; color: var(--ink-2); }
+  .rank .cost { font-family: var(--mono); font-size: .76rem; color: var(--accent-deep); display: block; margin-top: .2rem; }
+
+  .yes-no { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .yes-no { grid-template-columns: 1fr 1fr; } }
+  .yes-no > div { padding: var(--sp-s); border: 1px solid var(--rule-2); background: var(--card); }
+  .yes-no h4 { font-family: var(--display); font-weight: 800; font-stretch: 88%; margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem; }
+  .yes-no ul { list-style: none; display: grid; gap: .5rem; font-size: .88rem; color: var(--ink-2); }
+  .yes-no li { border-bottom: 1px dashed var(--rule); padding-bottom: .5rem; }
+  .yes-no li:last-child { border-bottom: 0; }
+  .yes-no li b { color: var(--ink); }
+
+  .days { display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .days { grid-template-columns: repeat(3, 1fr); } }
+  .day { border-top: 3px solid var(--ink); padding-top: var(--sp-2xs); }
+  .day .stencil { color: var(--accent-deep); }
+  .day ul { list-style: none; display: grid; gap: .45rem; margin-top: .5rem; font-size: .88rem; color: var(--ink-2); }
+  .day li { display: grid; grid-template-columns: .8rem 1fr; gap: .45rem; }
+  .day li::before { content: "·"; color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="wordmark" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#D8461B" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav" id="navBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      Menú
+    </button>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top:var(--sp-l)">
+
+  <p class="stencil stencil--accent">Plan de negocio</p>
+  <h1 style="margin:.3rem 0 var(--sp-s)">Vendemos flete, no software.</h1>
+  <p class="lead prose" style="margin-bottom:var(--sp-xl)">
+    La decisión que define esta empresa entera se toma en la sección 05, y la tomamos así:
+    <b>margen sobre la tarifa negociada, no SaaS.</b> Todo lo demás —producto, precio, canal,
+    equipo— es consecuencia de eso.
+  </p>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p class="stencil" style="margin-bottom:.5rem">Índice</p>
+      <ol>
+        <li><a href="#icp">Cliente objetivo</a></li>
+        <li><a href="#dolor">Cuánto le cuesta hoy</a></li>
+        <li><a href="#mercado">Mercado (TAM/SAM/SOM)</a></li>
+        <li><a href="#cuna">Posicionamiento y cuña</a></li>
+        <li><a href="#modelo">SaaS vs. margen</a></li>
+        <li><a href="#competencia">Competencia</a></li>
+        <li><a href="#unit">Economía unitaria</a></li>
+        <li><a href="#canales">Canales</a></li>
+        <li><a href="#ia">IA en el marketing</a></li>
+        <li><a href="#dias">Primeros 90 días</a></li>
+        <li><a href="#muerte">Qué mataría esto</a></li>
+      </ol>
+    </nav>
+
+    <div class="doc">
+
+      <!-- ═══════════════════════════════════════════════════ ICP ═══ -->
+      <section id="icp">
+        <span class="h-num">01</span>
+        <h2>Cliente objetivo</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          No es “PYME chilena”. Es una persona específica, y la conocemos.
+        </p>
+
+        <div class="cards-h">
+          <div class="card">
+            <p class="stencil" style="margin-bottom:.4rem">Quién es</p>
+            <p style="font-size:.9rem;color:var(--ink-2)">
+              Dueña-operadora de una tienda online de productos físicos. Entre <b>1 y 6 personas</b>.
+              Factura entre <b class="clp">$8M</b> y <b class="clp">$60M</b> al mes. Vende por su
+              propio sitio (Jumpseller, Shopify, WooCommerce) <em>y</em> por Instagram <em>y</em> por
+              Mercado Libre.
+            </p>
+          </div>
+          <div class="card">
+            <p class="stencil" style="margin-bottom:.4rem">Quién firma / quién lo usa</p>
+            <p style="font-size:.9rem;color:var(--ink-2)">
+              <b>La misma persona.</b> No hay comité, no hay compras, no hay TI. Eso hace el ciclo
+              de venta cortísimo (días, no meses) y es la razón por la que el canal de autoservicio
+              funciona. Si en tu venta B2B chilena aparece un comité, no es este cliente.
+            </p>
+          </div>
+          <div class="card">
+            <p class="stencil" style="margin-bottom:.4rem">Dónde ya está</p>
+            <p style="font-size:.9rem;color:var(--ink-2)">
+              En el marketplace de apps de Jumpseller. En grupos de WhatsApp de vendedores de
+              Mercado Libre. En los cursos de e-commerce de la CCS. Y físicamente: en la fila
+              de la sucursal de Chilexpress, un martes a las 6 de la tarde.
+            </p>
+          </div>
+        </div>
+
+        <div class="verdict-box" style="margin-top:var(--sp-s)">
+          <p><b>El filtro duro que usamos para calificar:</b></p>
+          <p>
+            <b>100 – 900 envíos/mes</b>, y <b>más del 30% sale de la Región Metropolitana</b>.
+            Bajo 100 envíos el dolor no justifica cambiar de hábito. Sobre 900 ya negocia su propia
+            tarifa y no nos necesita. Y si despacha sólo dentro de Santiago, el arbitraje es de un
+            5% y le estaríamos vendiendo humo.
+          </p>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════ EL DOLOR ═══ -->
+      <section id="dolor">
+        <span class="h-num">02</span>
+        <h2>Cuánto le cuesta el despacho hoy</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Tienda de referencia: <b>400 envíos/mes</b>. Cada supuesto está declarado. Cámbialos y
+          cambia el resultado — no hay ningún número escondido acá.
+        </p>
+
+        <ul class="assump" style="margin-bottom:var(--sp-s)">
+          <li><span class="q">Envíos al mes</span><b>400</b></li>
+          <li><span class="q">Flete promedio que paga hoy (Chilexpress a lista, con un descuento PYME chico)</span><b>$6.000</b></li>
+          <li>
+            <span class="q">Ahorro alcanzable eligiendo bien el courier
+              <em>Supuesto blando. El motor de tarifas del demo da 17%; usamos 15% porque ninguna tienda re-rutea el 100% de sus envíos.</em>
+            </span><b>15%</b>
+          </li>
+          <li><span class="q">Minutos por envío copiando dirección, cotizando e imprimiendo</span><b>4 min</b></li>
+          <li><span class="q">Valor de la hora de la dueña (costo de oportunidad)</span><b>$6.000</b></li>
+          <li><span class="q">Consultas “¿dónde está mi pedido?” por cada 100 envíos</span><b>25</b></li>
+          <li>
+            <span class="q">Tasa de paquetes perdidos o irrecuperablemente atrasados
+              <em>Rango observado en paquetería doméstica: 0,2%–0,8%. Usamos el punto medio.</em>
+            </span><b>0,45%</b>
+          </li>
+          <li><span class="q">Valor promedio de la mercadería perdida</span><b>$47.000</b></li>
+        </ul>
+
+        <div class="math">
+<span class="c">// 1 · sobrepago de flete</span>
+400 envíos × $6.000 × 15% × 12 meses <span class="eq">=</span> <b>$4.320.000</b>
+<hr>
+<span class="c">// 2 · el tiempo de la dueña</span>
+400 × 4 min <span class="eq">=</span> 1.600 min/mes <span class="eq">=</span> 26,7 h/mes
+26,7 h × $6.000 × 12 <span class="eq">=</span> <b>$1.920.000</b>
+<hr>
+<span class="c">// 3 · paquetes perdidos que nunca reclamó</span>
+400 × 0,45% <span class="eq">=</span> 1,8 paquetes/mes
+1,8 × $47.000 × 12 <span class="eq">=</span> <b>$1.015.200</b> <span class="c">≈ $1.008.000</span>
+<span class="c">// (el reclamo existe, pero exige evidencia y plazo de 7 días. Casi nadie lo presenta.)</span>
+<hr>
+<span class="c">// 4 · el “¿dónde está mi pedido?”</span>
+400 × 25% <span class="eq">=</span> 100 consultas/mes × 3 min <span class="eq">=</span> 5 h/mes
+5 h × $6.000 × 12 <span class="eq">=</span> <b>$360.000</b>
+<hr>
+<span class="c">// total</span>
+<b>$7.608.000 / año</b> <span class="c">≈ US$8.000</span>
+        </div>
+
+        <p class="src" style="margin-top:var(--sp-s)">
+          <b>Esto es una estimación construida, no un estudio.</b> El número que más nos importa
+          defender no es el total: es que <b>el 57% del dolor es plata que se va en flete</b>, no
+          tiempo perdido. Por eso el producto no puede ser sólo software: tiene que tocar la tarifa.
+        </p>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════ MERCADO ═══ -->
+      <section id="mercado">
+        <span class="h-num">03</span>
+        <h2>Mercado</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Vamos a hacer algo poco común acá: <b>llegar a un número chico y no maquillarlo.</b>
+          El pozo de ingreso real de este negocio en Chile es de unos <b>US$39M al año</b>. Eso
+          define qué clase de empresa puede ser esto, y lo decimos antes de que lo descubras tú.
+        </p>
+
+        <h3 style="margin-top:var(--sp-m)">TAM — el gasto en flete de e-commerce en Chile</h3>
+        <div class="math" style="margin-top:.5rem">
+<span class="c">// paquetes de e-commerce al año</span>
+20,0M habitantes <span class="c">(INE, proyección 2024)</span>
+  × 62% compradores online <span class="c">(supuesto — penetración de compra online)</span>
+  <span class="eq">=</span> 12,4M compradores
+  × 15,3 paquetes/comprador/año <span class="c">(SUPUESTO BLANDO — ver abajo)</span>
+  <span class="eq">=</span> <b>190M paquetes/año</b>
+<hr>
+<span class="c">// gasto en flete</span>
+190M × $4.400 <span class="c">(flete promedio efectivamente pagado en todo el mercado,</span>
+<span class="c">           incluyendo a los grandes con tarifa negociada muy baja)</span>
+  <span class="eq">=</span> <b>$836.000M CLP/año ≈ US$880M</b>
+        </div>
+        <p class="src" style="margin-top:.5rem">
+          <b>El supuesto que puede estar malo:</b> los 15,3 paquetes por comprador al año.
+          En EE.UU. ronda los 30; en México, los 8. Si el real chileno fuera 12, el TAM cae a
+          US$690M; si fuera 20, sube a US$1.150M. <b>No conocemos el dato censal y no lo vamos
+          a inventar.</b> Es la primera cifra que hay que salir a validar.
+        </p>
+
+        <h3 style="margin-top:var(--sp-l)">SAM — lo que un agregador puede realmente tocar</h3>
+        <div class="math" style="margin-top:.5rem">
+<span class="c">// los grandes no son clientes: tienen contrato directo o flota propia</span>
+Supuesto: Falabella, Ripley, Paris, Sodimac, Mercado Libre Full y el resto
+del top-20 concentran el <b>72%</b> de los paquetes.
+<hr>
+28% × 190M <span class="eq">=</span> <b>53,2M paquetes/año</b> en manos de tiendas chicas y medianas
+<hr>
+<span class="c">// estas tiendas pagan cerca de LISTA, no tarifa negociada</span>
+53,2M × $6.900 <span class="c">(lista promedio ponderada por destino — la calcula el motor del demo)</span>
+  <span class="eq">=</span> $367.080M CLP <span class="eq">=</span> US$386M de GMV de flete
+<hr>
+<span class="c">// ⚠ PERO NUESTRO INGRESO NO ES EL GMV. ES EL SPREAD.</span>
+Spread promedio ponderado por plan <span class="eq">=</span> 7,98% de la lista <span class="eq">=</span> <b>$550/paquete</b>
+53,2M × $550 <span class="eq">=</span> $29.260M CLP <span class="eq">=</span> <b>US$30,8M/año</b>
+  + suscripciones <span class="c">(≈35.000 tiendas × 45% pagando × $40.000 × 12)</span> <span class="eq">=</span> US$8,0M
+<hr>
+<b>SAM de ingreso neto ≈ US$39M/año</b>
+        </div>
+
+        <div class="verdict-box" style="margin-top:var(--sp-s)">
+          <p>
+            <b>La lectura honesta de ese número:</b> si capturáramos el <b>10% del SAM</b> —una
+            cuota gigantesca, líder absoluto de la categoría en Chile— seríamos una empresa de
+            <b>US$3,9M de ingreso neto al año</b>. Buena empresa. No un unicornio.
+          </p>
+          <p>
+            Quien invierta acá tiene que estar cómodo con eso, o financiar desde el día 1 la
+            expansión a Perú y Colombia. <b>Preferimos que decidas eso ahora y no en el mes 30.</b>
+          </p>
+        </div>
+
+        <h3 style="margin-top:var(--sp-l)">SOM — lo que creemos que podemos tomar en 36 meses</h3>
+        <div class="math" style="margin-top:.5rem">
+900 tiendas activas × 220 envíos/mes × 12 <span class="eq">=</span> 2,38M paquetes/año
+  <span class="c">(4,5% de los paquetes del SAM)</span>
+<hr>
+2,38M × $550 de spread              <span class="eq">=</span> $1.309M CLP
+900 tiendas × $23.500 de susc. × 12 <span class="eq">=</span> $253,8M CLP
+<hr>
+<b>≈ $1.563M CLP/año ≈ US$1,65M de ingreso neto</b> <span class="c">al mes 36</span>
+        </div>
+
+        <h3 style="margin-top:var(--sp-l)">Extensión regional</h3>
+        <p style="margin-top:.5rem">
+          El mismo problema, con otros nombres, existe en toda la región. Pero
+          <b>los mercados grandes ya están ocupados</b> y hay que decirlo: México tiene a Skydropx
+          y Envia.com, Brasil a Melhor Envio, Argentina a Enviopack y Zippin. La ruta realista no
+          pasa por ahí.
+        </p>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead>
+              <tr><th>Mercado</th><th>Couriers fragmentados</th><th class="n">Ingreso neto estimado</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Chile</td><td>Chilexpress, Starken, Blue Express, Correos</td><td class="n">US$39M</td><td><span class="chip chip--accent">Cabecera</span></td></tr>
+              <tr><td>Perú</td><td>Olva, Shalom, Marvisur</td><td class="n">US$30M</td><td><span class="chip chip--ok">Libre</span></td></tr>
+              <tr><td>Colombia</td><td>Servientrega, Coordinadora, Interrapidísimo</td><td class="n">US$55M</td><td><span class="chip chip--warn">Semi-ocupado</span></td></tr>
+              <tr><td>Uruguay</td><td>DAC, UES</td><td class="n">US$5M</td><td><span class="chip chip--ok">Libre</span></td></tr>
+              <tr><td>México / Brasil / Argentina</td><td>—</td><td class="n">—</td><td><span class="chip chip--bad">Ocupado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src" style="margin-top:.5rem">
+          <b>Estimaciones por analogía</b>, escaladas desde Chile por volumen de paquetes y
+          corregidas por ticket promedio (más bajo en Perú y Colombia). No son estudios de mercado.
+          <b>Total LatAm accesible ≈ US$130M de ingreso neto/año.</b>
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════ CUÑA ═══ -->
+      <section id="cuna">
+        <span class="h-num">04</span>
+        <h2>Posicionamiento y cuña</h2>
+
+        <div class="verdict-box" style="margin:var(--sp-s) 0">
+          <p style="font-size:var(--step-1);line-height:1.4">
+            <b>Kilonauta es el despacho de las tiendas que le venden a Chile entero,
+            no sólo a Santiago.</b>
+          </p>
+        </div>
+
+        <p class="prose">
+          La cabecera de playa no es un vertical ni un tamaño: es una <b>geografía</b>. Atacamos
+          primero a las tiendas cuyo despacho a regiones supera el 30% de sus pedidos.
+        </p>
+
+        <div class="yes-no" style="margin-top:var(--sp-s)">
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--ok)" stroke-width="2" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"/></svg>
+              Por qué ésa
+            </h4>
+            <ul>
+              <li><b>El ahorro es de dos dígitos altos.</b> 40%–83% de dispersión entre couriers fuera de la RM, contra un 5% adentro. La demo lo prueba en vivo.</li>
+              <li><b>Nadie las atiende.</b> Los agregadores existentes optimizan el volumen, y el volumen está en Santiago.</li>
+              <li><b>El dolor del reclamo se concentra ahí.</b> Un paquete se pierde mucho más en el tramo Coyhaique que en el tramo Providencia.</li>
+              <li><b>Son evangelistas.</b> La tienda que descubre que estaba pagando $19.300 por algo que cuesta $9.170 lo cuenta en su grupo de WhatsApp esa misma tarde.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--bad)" stroke-width="2" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+              Por qué NO empezamos por la otra
+            </h4>
+            <ul>
+              <li><b>Tiendas 100% Santiago:</b> el arbitraje es 5%. Les venderíamos una comodidad, no un ahorro. Se van al primer mes.</li>
+              <li><b>Retail mediano (Envíame ya está ahí):</b> tienen desarrollador, quieren API, negocian su propia tarifa. Nuestro spread se evapora.</li>
+              <li><b>Marketplaces puros (vendedor 100% Mercado Libre Full):</b> Mercado Libre ya les despacha. No hay problema que resolver.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════ MODELO ═══ -->
+      <section id="modelo">
+        <span class="h-num">05</span>
+        <h2>SaaS vs. margen sobre la tarifa</h2>
+        <p class="lead prose" style="margin:var(--sp-s) 0">
+          Ésta es <em>la</em> decisión. Elegimos <b>margen sobre la tarifa negociada</b>, con un
+          piso de suscripción opcional. Acá está el razonamiento completo, incluyendo lo que
+          perdemos al elegirlo.
+        </p>
+
+        <div class="yes-no">
+          <div style="border:2px solid var(--rule-2)">
+            <h4>La opción que descartamos: SaaS puro</h4>
+            <ul>
+              <li><b>Lo bueno:</b> ingreso recurrente predecible, 85% de margen bruto, cero riesgo de crédito, cero riesgo de siniestro, balance limpio. Un inversionista lo entiende en 10 segundos.</li>
+              <li><b>Lo que lo mata:</b> le estaríamos vendiendo <em>orden</em> a una clienta cuyo problema #1 es el <em>precio del flete</em>. El 57% de su dolor es plata, no tiempo.</li>
+              <li><b>Y el techo:</b> la disposición a pagar por “software para despachar” en una tienda de 400 envíos es de $30.000–$50.000/mes. Con 900 tiendas eso son <b class="clp">$36M/mes</b> — cuatro veces menos que el modelo de margen.</li>
+              <li><b>Y es indefendible:</b> cualquier competidor que llegue con tarifa negociada nos pone el software en $0 y se lleva a todos nuestros clientes en un trimestre.</li>
+            </ul>
+          </div>
+          <div style="border:2px solid var(--accent);background:var(--accent-tint)">
+            <h4>Lo que elegimos: margen sobre tarifa</h4>
+            <ul>
+              <li><b>Toca la plata.</b> Le bajamos el costo real. El producto se paga solo en el primer envío, y eso hace que el plan gratis sea viable como cuña.</li>
+              <li><b>Nos hace dueños del reclamo.</b> Si tenemos el contrato, el courier nos responde a nosotros. <b>Un SaaS puro no puede ofrecer esto ni queriendo</b> — no tiene legitimación. Es nuestra única ventaja estructural.</li>
+              <li><b>Alinea incentivos.</b> Cobramos cuando despachan. En enero, cuando no vende nadie, no le cobramos. En CyberDay, ganamos los dos.</li>
+              <li><b>Genera float, no lo consume.</b> Cobramos por adelantado y pagamos al courier a 30 días.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 style="margin-top:var(--sp-l)">Lo que nos cuesta esta decisión, y lo asumimos</h3>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead><tr><th>El costo</th><th>Cómo lo manejamos</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>El margen bruto se ve feo</td>
+                <td>Sobre GMV somos un 7,8%. Sobre ingreso neto, un <b>59%</b>. <b>Reportamos ingreso neto siempre.</b> El GMV es una cifra de vanidad y no la vamos a usar ni en una lámina.</td>
+              </tr>
+              <tr>
+                <td>Riesgo de crédito</td>
+                <td>Eliminado por diseño: <b>saldo prepago</b>. Nadie despacha con plata que no tiene. Si damos crédito nos convertimos en un banco malo — está en los criterios de muerte.</td>
+              </tr>
+              <tr>
+                <td>Riesgo de siniestro (el paquete perdido lo pagamos nosotros)</td>
+                <td>Provisionado: <b class="clp">$20.300</b>/tienda/mes. Se lleva el 15% del ingreso neto. <b>Es caro y es el punto</b>: es lo que compra la retención.</td>
+              </tr>
+              <tr>
+                <td>Boletas de garantía a los couriers</td>
+                <td>El costo escondido de este modelo. Cada courier exige garantía por ~30 días de facturación. Al mes 24 son <b class="clp">~$556M</b> de colateral. Se financia con línea bancaria (~2,5%/año), <b>no con el saldo de los clientes</b> — esa plata va en cuenta separada, y esa regla no se negocia.</td>
+              </tr>
+              <tr>
+                <td>Dependemos de 4 proveedores que podrían cortarnos</td>
+                <td>No tiene mitigación completa. Repartimos volumen (ninguno sobre el 40%) y les llevamos demanda nueva. Ver <a href="#muerte">§11</a>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-top:var(--sp-l)">Cómo se traduce en los tres planes</h3>
+        <p style="margin:.5rem 0" class="prose">
+          El truco del diseño: <b>a más suscripción, menos margen por etiqueta.</b> El cliente que
+          crece nos paga más fijo y menos variable, y eso lo hace quedarse.
+        </p>
+        <div class="scroll-x">
+          <table>
+            <thead>
+              <tr><th>Plan</th><th class="n">Fijo/mes</th><th>Precio de la etiqueta</th><th class="n">Dto. efectivo vs. lista</th><th class="n">Spread para nosotros</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nauta<span class="who">hasta 150 envíos/mes</span></td>
+                <td class="n">$0</td>
+                <td>lista − 62% del descuento mayorista</td>
+                <td class="n">22,3%</td>
+                <td class="n">13,6% de lista</td>
+              </tr>
+              <tr>
+                <td>Bodega<span class="who">desde 150 envíos/mes</span></td>
+                <td class="n">$34.900</td>
+                <td>lista − 80% del descuento mayorista</td>
+                <td class="n">28,8%</td>
+                <td class="n">7,2% de lista</td>
+              </tr>
+              <tr>
+                <td>Cordillera<span class="who">desde 600 envíos/mes</span></td>
+                <td class="n">$99.900</td>
+                <td><b>costo + 7%</b>, con la factura del courier a la vista</td>
+                <td class="n">31,5%</td>
+                <td class="n">4,5% de lista</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="src" style="margin-top:.5rem">
+          Descuento mayorista supuesto: <b>38% Chilexpress · 42% Starken · 34% Blue Express ·
+          30% Correos</b>. Estos cuatro números son <b>el activo más importante de la empresa</b> y
+          hoy no los tenemos: se consiguen firmando, y por eso el hito M2 del roadmap es el que
+          decide si esto existe o no.
+        </p>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ COMPETENCIA ═══ -->
+      <section id="competencia">
+        <span class="h-num">06</span>
+        <h2>Competencia</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Esta categoría <b>existe en Chile desde hace años</b>. No estamos descubriendo nada y
+          sería una señal de alerta que dijéramos lo contrario.
+        </p>
+
+        <div class="scroll-x">
+          <table class="comp-tbl">
+            <thead>
+              <tr><th>Quién</th><th>Qué hace bien</th><th>Dónde no llega</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>El portal de cada courier<span class="who">Chilexpress, Starken, Blue Express, Correos</span></td>
+                <td>Gratis, oficial, tarifa directa. <b>Es el titular real del puesto.</b></td>
+                <td>Son cuatro. La comparación tienes que hacerla tú, a mano, en cuatro pestañas. Y ninguno te va a decir que el vecino está más barato.</td>
+              </tr>
+              <tr>
+                <td>Excel + un cuaderno<span class="who">el competidor que más veces nos va a ganar</span></td>
+                <td>Cero costo, cero curva de aprendizaje, control total. Funciona.</td>
+                <td>No escala más allá de ~150 envíos/mes sin que la dueña deje de dormir. Y no consigue tarifa.</td>
+              </tr>
+              <tr>
+                <td>Shipit<span class="who">shipit.cl · chilena · el competidor más directo</span></td>
+                <td>Agregador con tarifas negociadas para tiendas chicas. Integraciones. Llevan años. <b>Hacen básicamente lo que nosotros.</b></td>
+                <td>Foco en el volumen de Santiago. El reclamo sigue siendo tuyo: te ayudan a gestionarlo, no lo asumen. Y no exponen el arbitraje geográfico como decisión de compra.</td>
+              </tr>
+              <tr>
+                <td>Envíame<span class="who">enviame.io · chilena</span></td>
+                <td>Excelente capa de API multi-courier. Retail mediano y grande. Ingeniería seria.</td>
+                <td>Requiere desarrollador. Su cliente tiene tarifa propia. La dueña de la tienda de suplementos no es su cliente y no quieren que lo sea.</td>
+              </tr>
+              <tr>
+                <td>Shopify Shipping</td>
+                <td>Resuelve exactamente esto… en EE.UU., Canadá, Reino Unido y la UE.</td>
+                <td><b>No opera con tarifas negociadas en Chile.</b> Ése es el hueco por el que entramos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="verdict-box" style="margin-top:var(--sp-s)">
+          <p><b>Nuestra diferenciación honesta, en tres puntos, y ninguno es “mejor UX”:</b></p>
+          <p>
+            <b>1. El reclamo con plata de por medio.</b> No “te ayudamos a reclamar”: te pagamos
+            hasta <span class="clp">$60.000</span> + flete y después nos peleamos nosotros con el
+            courier. Es un costo real en nuestro P&amp;L (<a href="#unit">§07</a>), y es la única
+            cosa que un competidor no puede copiar sin asumir el mismo costo.
+          </p>
+          <p>
+            <b>2. El arbitraje geográfico, expuesto.</b> El producto te muestra la dispersión por
+            comuna. Eso convierte una decisión invisible en una decisión de compra.
+          </p>
+          <p>
+            <b>3. Ranking transparente, no caja negra.</b> Puntaje reproducible en una servilleta.
+            Nadie confía una caja de <span class="clp">$80.000</span> a un modelo que no explica.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════ UNIT ═══ -->
+      <section id="unit">
+        <span class="h-num">07</span>
+        <h2>Economía unitaria</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          Tienda promedio de la cartera: <b>200 envíos/mes</b>. Mezcla de planes por número de
+          tiendas: 55% Nauta · 33% Bodega · 12% Cordillera. El costo de IA sale de
+          <a href="stack.html#costos">stack.html</a> y es exactamente el mismo número.
+        </p>
+
+        <div class="math">
+<span class="c">// INGRESO NETO (lo que de verdad entra: el spread, no el GMV)</span>
+Spread promedio ponderado por plan y courier <span class="eq">=</span> $550/envío
+200 envíos × $550                       <span class="eq">=</span> $110.000
+Suscripción promedio por tienda
+  (0,33 × $34.900) + (0,12 × $99.900)   <span class="eq">=</span> $ 23.500
+                                           <span class="eq">──────────</span>
+<b>INGRESO NETO / tienda / mes            = $133.500</b>
+
+<span class="c">// (el GMV de flete que pasa por la caja es $994.000. No es ingreso. No lo reportamos.)</span>
+<hr>
+<span class="c">// COSTOS VARIABLES</span>
+Inferencia de IA <span class="c">(stack.html §costos)</span>         $    450
+Avisos WhatsApp <span class="c">(200 × 0,7 × US$0,015)</span>        $  2.000
+Transbank <span class="c">(1,77% sobre los $994.000 cobrados)</span> $ 17.600
+Provisión de reclamos <span class="c">(ver abajo)</span>             $ 20.300
+Soporte humano prorrateado                  $ 14.000
+                                           <span class="eq">──────────</span>
+                                            $ 54.350
+<hr>
+<b>CONTRIBUCIÓN = $133.500 − $54.350 = $79.150/mes  (59,3%)</b>
+        </div>
+
+        <p class="src" style="margin-top:var(--sp-s)">
+          <b>La provisión de reclamos, desglosada</b>, porque es la línea que nadie muestra:<br>
+          200 envíos × 0,45% = 0,9 siniestros/mes.
+          Pago al cliente: <span class="clp">$47.000</span> de mercadería (tope
+          <span class="clp">$60.000</span>) + <span class="clp">$5.000</span> de flete =
+          <span class="clp">$52.000</span>. Recuperamos del courier el 55% ⇒ costo neto
+          <span class="clp">$23.400</span> × 0,9 = <b class="clp">$21.060</b>, redondeado a
+          <b class="clp">$20.300</b> por el mix de siniestros menores.
+          <b>Se come el 15% del ingreso neto.</b> Es el precio de la única ventaja que tenemos.
+        </p>
+
+        <div class="cards-h" style="margin-top:var(--sp-m)">
+          <div class="kpi"><span>CAC combinado</span><b>$145.000</b><small>mezcla de partners, outbound, Meta y contenido</small></div>
+          <div class="kpi"><span>Churn mensual</span><b>4,2%</b><small>vida media 23,8 meses. Las tiendas chicas mueren.</small></div>
+          <div class="kpi" data-hi><span>Payback</span><b>1,8 meses</b><small>$145.000 ÷ $79.150</small></div>
+          <div class="kpi"><span>LTV</span><b>$1.883.000</b><small>$79.150 × 23,8 meses</small></div>
+          <div class="kpi" data-hi><span>LTV / CAC</span><b>13,0×</b><small>alto — y por eso desconfiamos, ver abajo</small></div>
+          <div class="kpi"><span>Margen sobre GMV</span><b>7,8%</b><small>el número feo, dicho de frente</small></div>
+        </div>
+
+        <div class="kill" style="margin-top:var(--sp-m);border-color:var(--warn);background:var(--warn-soft)">
+          <h3 style="color:var(--warn)">Un LTV/CAC de 13× debería darte desconfianza. A nosotros nos la da.</h3>
+          <p style="margin-top:.5rem;font-size:.92rem">
+            Es alto porque no hay licencia que vender y el cliente paga desde el primer envío. Pero
+            hay dos razones para no creérselo:
+          </p>
+          <p style="margin-top:.5rem;font-size:.92rem">
+            <b>1. El CAC va a subir.</b> Los primeros 200 clientes salen del marketplace de
+            Jumpseller a <span class="clp">$40.000</span> cada uno. Los siguientes 700 hay que ir
+            a buscarlos. Modelamos <span class="clp">$145.000</span> combinado, pero a escala se
+            parece más a <span class="clp">$220.000</span>. LTV/CAC realista a escala:
+            <b>8×–9×</b>.
+          </p>
+          <p style="margin-top:.5rem;font-size:.92rem">
+            <b>2. El número que de verdad manda no es éste.</b> Es el <b>descuento mayorista</b>.
+            Si en vez de 38% conseguimos 25%, el spread cae de <span class="clp">$550</span> a
+            <span class="clp">$310</span>, la contribución baja a <b class="clp">$31.150</b> y el
+            LTV/CAC se desploma a <b>3,4×</b>. <b>Este negocio no se gana vendiendo: se gana
+            negociando.</b>
+          </p>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════ CANALES ═══ -->
+      <section id="canales">
+        <span class="h-num">08</span>
+        <h2>Canales de adquisición</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">Rankeados por CAC real, no por lo que suena bien en una lámina.</p>
+
+        <ol class="rank">
+          <li>
+            <div>
+              <h4>Marketplace de apps de Jumpseller y Bsale</h4>
+              <p>
+                Jumpseller es chilena, tiene miles de tiendas y un directorio de apps donde el
+                cliente instala con un click. El incentivo está alineado: una tienda que despacha
+                mejor factura más, y ellos cobran sobre eso. Negociamos rev-share del 10% del
+                ingreso neto del primer año. <b>Es el canal #1 y es el que hay que ganar primero.</b>
+              </p>
+              <span class="cost">CAC estimado $40.000 · ~35% de los clientes del año 1</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h4>SEO long-tail sobre el momento de dolor</h4>
+              <p>
+                Un comparador de tarifas <b>público, gratis y sin login</b> — el mismo motor del
+                demo. Páginas para “cuánto cuesta enviar un paquete a Punta Arenas”,
+                “Chilexpress vs Starken precio”, y la joya:
+                <b>“cómo hacer un reclamo a Chilexpress”</b>. Quien busca eso está en el peor día
+                de su vida logística y es nuestro cliente perfecto.
+              </p>
+              <span class="cost">CAC estimado $25.000 · lento (6-9 meses) pero compone</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h4>Outbound por Instagram DM y WhatsApp</h4>
+              <p>
+                Las tiendas se autoidentifican: ponen “despachos a todo Chile” en su bio. Se
+                pueden listar por hashtag y comuna. El mensaje no es un pitch: es una captura de
+                pantalla de <em>su</em> producto cotizado en Kilonauta, con el ahorro marcado.
+              </p>
+              <span class="cost">CAC estimado $160.000 · 1 SDR = ~8 clientes/mes</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h4>Contadores y software PYME como distribución</h4>
+              <p>
+                Defontana, Nubox y Bsale ya venden a este cliente y el contador ya le revisa las
+                facturas — cuatro facturas de cuatro couriers al mes. Kilonauta le entrega
+                <b>una sola factura con el detalle envío por envío</b>. Ese es el pitch al contador,
+                y el contador tiene 40 tiendas.
+              </p>
+              <span class="cost">CAC estimado $70.000 · ciclo largo, alto LTV</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h4>Comunidad: grupos de Mercado Libre, CCS, ASECH</h4>
+              <p>
+                Los grupos de WhatsApp y Facebook de vendedores de Mercado Libre chilenos son
+                densos y hostiles al marketing — pero adoran un dato. Publicamos el
+                <b>índice mensual de tarifas por comuna</b>, gratis. Es contenido, no anuncio.
+                La Cámara de Comercio de Santiago tiene comité de e-commerce y hace el CyberDay.
+              </p>
+              <span class="cost">CAC estimado $55.000 · no escala, pero da los primeros 30</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h4>Meta Ads (Instagram/Facebook)</h4>
+              <p>
+                Sirve, pero es el más caro y lo ponemos último a propósito. Creativo: no un logo,
+                sino el número. “A Punta Arenas: $19.300 o $9.170.” CPL de lead de e-commerce en
+                Chile: ~<span class="clp">$3.500</span>. Conversión lead→cliente pagando: ~5,5%.
+              </p>
+              <span class="cost">CAC estimado $64.000 + costo de venta · escala con plata, no con ingenio</span>
+            </div>
+          </li>
+        </ol>
+
+        <p class="src" style="margin-top:var(--sp-s)">
+          <b>Mercado Público / ChileCompra: descartado</b>, y vale la pena decir por qué. El Estado
+          no es nuestro cliente; nuestro cliente le vende al consumidor final. Meterse ahí sería
+          perseguir un canal porque existe, no porque sirva.
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════ IA ═══ -->
+      <section id="ia">
+        <span class="h-num">09</span>
+        <h2>IA en el marketing (y dónde no)</h2>
+        <p class="prose" style="margin:var(--sp-s) 0">
+          “IA en todo” no es una respuesta. Acá está dónde sí y dónde no, con el motivo.
+        </p>
+
+        <div class="yes-no">
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--ok)" stroke-width="2" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4"/></svg>
+              Donde sí, y se nota
+            </h4>
+            <ul>
+              <li>
+                <b>Las 340 páginas del comparador público.</b> Una por comuna relevante. El
+                <em>dato</em> lo pone el motor de tarifas (real, verificable); la IA sólo escribe
+                la prosa alrededor y adapta el contexto local. Sin el dato, serían 340 páginas de
+                basura y Google las trataría como tal.
+              </li>
+              <li>
+                <b>Personalizar el outbound con el catálogo del prospecto.</b> Leemos su tienda,
+                sacamos un producto real, lo cotizamos a tres destinos y le mandamos <em>su</em>
+                ahorro. Eso no se puede hacer a mano para 200 tiendas al mes. Es el único uso de
+                IA que sube la tasa de respuesta de verdad.
+              </li>
+              <li>
+                <b>Clasificar leads entrantes por potencial.</b> Con la comuna de sus clientes y
+                su volumen aparente, priorizamos a quién llamar. Un modelo simple basta.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--bad)" stroke-width="2" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+              Donde no, y es a propósito
+            </h4>
+            <ul>
+              <li>
+                <b>Contenido de blog a granel.</b> Nuestro canal es integración y comunidad. 200
+                artículos genéricos no mueven ninguna aguja y ensucian la marca en un nicho donde
+                la gente se conoce.
+              </li>
+              <li>
+                <b>Chatbot para el comprador final.</b> Él quiere su paquete, no conversar. Un
+                aviso proactivo bien escrito vale más que cien chatbots.
+              </li>
+              <li>
+                <b>Elegir el courier por el cliente.</b> El ranking es una fórmula visible.
+                La confianza <em>es</em> el producto: una caja negra la destruye.
+              </li>
+              <li>
+                <b>Fijar precios dinámicamente.</b> Tentador, y venenoso. Si el cliente descubre
+                que el precio cambia según quién es, perdemos lo único que no se compra.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════ 90 DÍAS ═══ -->
+      <section id="dias">
+        <span class="h-num">10</span>
+        <h2>Primeros 90 días</h2>
+
+        <div class="days" style="margin-top:var(--sp-s)">
+          <div class="day">
+            <p class="stencil">Días 1–30 · Probar que el arbitraje existe</p>
+            <ul>
+              <li>Abrir cuenta empresa <b>estándar</b> (sin negociar) en los 4 couriers. Se puede en una semana.</li>
+              <li>Reclutar <b>8 design partners</b> de la comunidad de Jumpseller y grupos de Mercado Libre. Filtro: 100+ envíos/mes, 30%+ a regiones.</li>
+              <li>Auditar sus últimos <b>500 envíos reales</b> y calcular, con facturas en la mano, cuánto habrían ahorrado. <b>Éste es el experimento entero.</b></li>
+              <li>Comparador público en línea. Sin login. Empieza el reloj del SEO.</li>
+            </ul>
+          </div>
+          <div class="day">
+            <p class="stencil">Días 31–60 · Que despachen de verdad</p>
+            <ul>
+              <li>Producto mínimo: cotizador + etiqueta + tracking. <b>Sin integraciones todavía</b> — se pega el pedido a mano.</li>
+              <li>Los 8 partners despachan por Kilonauta con <b>nuestras cuentas estándar</b>. Perdemos plata en cada etiqueta. Da lo mismo: estamos comprando la evidencia de volumen.</li>
+              <li>Primera reunión con ejecutivos de cuenta de Starken y Correos. Llevamos el volumen agregado proyectado, no un pitch.</li>
+              <li>Gestionar el primer reclamo real, a mano, sufriéndolo. Ahí se diseña el producto de reclamos.</li>
+            </ul>
+          </div>
+          <div class="day">
+            <p class="stencil">Días 61–90 · La firma</p>
+            <ul>
+              <li><b>Cerrar el primer contrato mayorista.</b> Empezamos por Starken y Correos: son los que más ganan con volumen incremental y los que menos tienen que perder.</li>
+              <li>Publicar la app en el marketplace de Jumpseller.</li>
+              <li>Cobrar la primera suscripción Bodega.</li>
+              <li><b>Decisión de M1:</b> si el ahorro medido sobre envíos reales es &lt;8%, se para. No se pivota, no se insiste. Se para.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════ LA MUERTE ═══ -->
+      <section id="muerte">
+        <span class="h-num">11</span>
+        <h2>Qué mataría esto</h2>
+
+        <div class="kill">
+          <h3>El riesgo que mata el negocio: el proveedor es el titular.</h3>
+          <p style="margin-top:.6rem">
+            Kilonauta se para entre la tienda y el courier, y le quita al courier la relación con
+            el cliente. <b>Eso es exactamente lo que un courier no quiere.</b> Chilexpress puede
+            despertar un martes, decidir que no le gusta el intermediario, y no renovarnos el
+            contrato mayorista. No sería una represalia extraña: sería una decisión comercial
+            perfectamente racional.
+          </p>
+          <p style="margin-top:.6rem">
+            Si perdemos a dos de los cuatro, el comparador pierde sentido y el spread se evapora.
+            <b>No hay mitigación completa.</b> Sólo hay tres cosas que ayudan, y las tres son
+            parciales:
+          </p>
+          <ul style="list-style:none;display:grid;gap:.5rem;margin-top:.6rem;font-size:.92rem">
+            <li><b>1.</b> Repartir el volumen: ningún courier sobre el 40%. Nos hace menos rentables y más difíciles de matar.</li>
+            <li><b>2.</b> Llevarles demanda <em>nueva</em>: envíos que hoy se van a la competencia. Somos canal, no parásito. Hay que poder demostrarlo con datos.</li>
+            <li><b>3.</b> Correos de Chile es estatal y tiene obligación de servicio universal: es el más difícil de perder, y es justo el que sostiene el arbitraje de zona extrema.</li>
+          </ul>
+        </div>
+
+        <h3 style="margin-top:var(--sp-l)">Los otros tres, en orden de probabilidad</h3>
+        <div class="scroll-x" style="margin-top:var(--sp-s)">
+          <table>
+            <thead><tr><th>Riesgo</th><th>Qué pasaría</th><th>Señal temprana</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>Shipit baja el precio</b></td>
+                <td>Guerra de spread. El margen por etiqueta cae de $550 a $310 y la contribución se parte a la mitad. Sobrevive el que tenga mejor contrato mayorista, no el que tenga mejor producto.</td>
+                <td>Cualquier cambio de tarifa pública de Shipit. Se monitorea semanal.</td>
+              </tr>
+              <tr>
+                <td><b>Nunca conseguimos el descuento</b></td>
+                <td>Sin ≥30% bajo lista, el modelo de margen no existe. Habría que replegarse a SaaS puro con techo de <span class="clp">$40.000</span>/mes — un negocio mucho peor, pero un negocio.</td>
+                <td>Mes 9. Es un criterio de muerte formal en el roadmap (M2).</td>
+              </tr>
+              <tr>
+                <td><b>Las tiendas no cambian de hábito</b></td>
+                <td>Se registran, cotizan una vez, y vuelven a Chilexpress porque “ya conozco al de la sucursal”. El churn se va sobre el 8%.</td>
+                <td>Envíos por tienda en el mes 1. Si no llega a 50, no activó y no se va a quedar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="verdict-box" style="margin-top:var(--sp-m)">
+          <p>
+            <b>Lo que NO nos preocupa, y que quizás debería:</b> que Chilexpress lance su propio
+            agregador. No lo va a hacer — significaría mostrarle al cliente que Starken está más
+            barato. <b>La ventaja estructural de un agregador es que ningún courier puede ser uno.</b>
+            Si nos equivocamos en esto, nos equivocamos en todo.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="foot" style="margin-top:var(--sp-2xl)">
+  <div class="container" style="display:grid;gap:var(--sp-2xs)">
+    <a class="wordmark" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#F08A5F" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <p style="max-width:56ch">
+      Toda cifra de esta página está citada o etiquetada como estimación con su aritmética a la
+      vista. Si encuentras una que no lo esté, es un error y hay que corregirlo.
+    </p>
+    <p class="mono tiny">kilonauta.com · disponible · rdap.verisign.com → HTTP 404 · 2026-07-12</p>
+  </div>
+</footer>
+
+<script>
+  const btn = document.getElementById('navBtn');
+  const nav = document.getElementById('nav');
+  btn.addEventListener('click', () => {
+    const open = nav.dataset.open === 'true';
+    nav.dataset.open = String(!open);
+    btn.setAttribute('aria-expanded', String(!open));
+  });
+</script>
+</body>
+</html>

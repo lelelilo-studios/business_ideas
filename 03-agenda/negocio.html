@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Zurcia</title>
+<meta name="description" content="A quién le vendemos, cuánto vale el mercado, cuánto cobramos, cuánto nos cuesta la IA y Meta, por dónde entramos y qué nos mataría.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Petrona:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  .precios { display: grid; gap: var(--sp-m); margin-block-start: var(--sp-l); }
+  @media (min-width: 48em) { .precios { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+  .plan { border: 1.5px solid var(--pauta-duro); background: var(--papel-alto); padding: var(--sp-m); display: flex; flex-direction: column; gap: var(--sp-xs); }
+  .plan--elegido { border: 2.5px solid var(--tinta); box-shadow: 5px 5px 0 var(--pauta); }
+  .plan__nom { font-family: var(--mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tinta-suave); }
+  .plan--elegido .plan__nom { color: var(--sello); }
+  .plan__p { font-family: var(--serif); font-size: var(--step-3); line-height: 1; letter-spacing: -.02em; }
+  .plan__p small { font-family: var(--sans); font-size: .8rem; font-weight: 400; color: var(--tinta-suave); letter-spacing: 0; }
+  .plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: .9rem; color: var(--tinta-med); }
+  .plan li { padding-left: 1.1em; position: relative; }
+  .plan li::before { content: '·'; position: absolute; left: 0; color: var(--sello); font-weight: 700; }
+  .cronograma { display: grid; gap: 0; margin-block-start: var(--sp-m); }
+  .semana { display: grid; gap: var(--sp-2xs); border-top: 1.5px solid var(--pauta-duro); padding-block: var(--sp-s); }
+  @media (min-width: 44em) { .semana { grid-template-columns: 7.5rem 1fr; gap: var(--sp-m); align-items: baseline; } }
+  .semana b { font-family: var(--mono); font-size: .8rem; color: var(--sello); text-transform: uppercase; letter-spacing: .06em; }
+  .semana p { font-size: .95rem; color: var(--tinta-med); }
+  .mata { border-left: 4px solid var(--ladrillo); padding-left: var(--sp-s); margin-block: var(--sp-m); }
+  .mata h3 { font-size: 1.05rem; }
+  .mata p { color: var(--tinta-med); font-size: .95rem; margin-top: 4px; }
+  .mata .resp { font-size: .9rem; color: var(--tinta); margin-top: var(--sp-2xs); }
+  .mata .resp strong { color: var(--sello); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="16" /><path d="M2.5 9.5h19M7.5 2.5v4M16.5 2.5v4" />
+          <path d="M4.5 16.5l3-2.6 3 2.6 3-2.6 3 2.6 3-2.6" />
+        </svg>
+        Zurcia
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span data-label>Menú</span></button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul role="list">
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <section>
+    <p class="eyebrow">Negocio</p>
+    <h1>Le vendemos a la persona que hoy contesta WhatsApp con las manos mojadas.</h1>
+    <p class="lede" style="margin-block-start: var(--sp-s);">No es una metáfora. Es literalmente lo que pasa en una peluquería: la dueña está aplicando color, suena el teléfono, se seca las manos, contesta, revisa el cuaderno, agenda mal, vuelve al color. Doce veces al día.</p>
+  </section>
+
+  <!-- ================= ICP ================= -->
+  <section id="icp">
+    <p class="eyebrow eyebrow--tinta">01 · A quién exactamente</p>
+    <h2>El cliente ideal cabe en una ficha.</h2>
+
+    <div class="grid grid--sidebar" style="margin-block-start: var(--sp-m);">
+      <div class="ficha ficha--marcada">
+        <p class="eyebrow">Cliente ideal</p>
+        <h3 style="font-size: var(--step-1); margin-block: var(--sp-2xs) var(--sp-s);">Peluquería o barbería de 2 a 5 sillas, en una comuna urbana de clase media, con dueña presente.</h3>
+        <div class="scroll-x">
+          <table class="tabla">
+            <tbody>
+              <tr><td>Dónde</td><td>Ñuñoa, Providencia, La Florida, Maipú, Viña, Concepción. Sobre un eje comercial.</td></tr>
+              <tr><td>Tamaño</td><td>3 profesionales, <span class="mono">$9–14M</span> de venta al mes.</td></tr>
+              <tr><td>Quién decide</td><td>La dueña. Ella misma corta. No hay comité, no hay TI, no hay gerente.</td></tr>
+              <tr><td>Cómo reserva hoy</td><td>WhatsApp (80%), Instagram DM (15%), teléfono (5%). Anota en un cuaderno o en Google Calendar.</td></tr>
+              <tr><td>Qué ya paga</td><td><span class="mono">$0</span> (cuaderno) o <span class="mono">$30.000–$60.000</span>/mes a AgendaPro o Reservo por un calendario que igual hay que llenar a mano.</td></tr>
+              <tr><td>Su dolor #1</td><td>Los no-show y las horas que se caen el mismo día. Lo dice sin que uno le pregunte.</td></tr>
+              <tr><td>Su miedo #1</td><td>Que un robot le hable mal a sus clientas. Esta clienta lleva ocho años viniendo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="ficha ficha--alerta">
+          <p class="eyebrow" style="color: var(--ladrillo);">Lo que le cuesta al año</p>
+          <div class="calculo">Capacidad  3 sillas × 7 h × 24 días = 504 bloques/mes
+Ocupación  70%                    → 353 reservas/mes
+Ticket medio                        $25.000
+Facturación 353 × $25.000         = $8.825.000/mes
+
+NO-SHOWS   353 × 14%              = 49 horas muertas
+           49 × $25.000           = $1.235.000/mes
+
+HUECOS     cancela <24 h: 353 × 8% = 28 horas
+           hoy rellena a mano el 20% → 22 se pierden
+           22 × $25.000           = $550.000/mes
+           ───────────────────────────────────────
+           AGUJERO MENSUAL          $1.785.000
+           AGUJERO ANUAL           $21.420.000</div>
+          <p class="fuente" style="margin-top: var(--sp-s);"><strong>Estimación, no medición.</strong> Es la misma aritmética que está en la <a href="index.html">portada</a>, con los mismos supuestos: ocupación 70%, ticket $25.000, no-show 14%. Los tres son estimaciones nuestras, calibradas con entrevistas en Ñuñoa y Providencia, no un censo. La literatura de servicios con hora agendada reporta no-shows entre 10% y 30% según rubro. Si la tasa real fuera 8%, la fuga baja a <span class="mono">$13,0M</span> al año y el producto <em>igual</em> se paga siete veces. La primera pregunta de cada demo es "¿cuántas se te cayeron esta semana?", justamente para reemplazar el supuesto por un dato.</p>
+        </div>
+
+        <div class="ficha" style="margin-block-start: var(--sp-m);">
+          <p class="eyebrow eyebrow--tinta">Qué hace hoy en vez de esto</p>
+          <ul class="lista">
+            <li><strong>Nada.</strong> Lo asume como costo del rubro. Es la respuesta más común, y es contra ella que competimos.</li>
+            <li><strong>Cobra abono.</strong> Funciona, y espanta clientas. Casi nadie lo sostiene más de dos meses.</li>
+            <li><strong>Manda recordatorios a mano</strong> el día antes. Reduce el no-show, pero se le olvida los días con pega, que son justo los días con más horas.</li>
+            <li><strong>Publica el hueco en su historia de Instagram.</strong> Lo ve el 4% de sus seguidoras y ninguna está mirando el celular a las 8:40 de la mañana.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-block-start: var(--sp-m);">
+      <p class="eyebrow eyebrow--tinta">A quién NO le vendemos (todavía)</p>
+      <p style="color: var(--tinta-med);">Locales de una silla (no hay suficiente plata en juego: la fuga es de $7M/año y el pago se siente caro). Cadenas de más de 20 locales (compran ERP, tienen TI, el ciclo es de nueve meses y nos matan de hambre en el intertanto). Clínicas dentales grandes (agenda con box, sillón e insumos: es otro producto). Restaurantes (la reserva no es una hora con un profesional; es otra mecánica y ahí ya está Fudo).</p>
+    </div>
+  </section>
+
+  <!-- ================= MERCADO ================= -->
+  <section id="mercado">
+    <p class="eyebrow eyebrow--tinta">02 · Cuánto mercado hay</p>
+    <h2>TAM, SAM y SOM, con la aritmética a la vista.</h2>
+    <p style="color: var(--tinta-med); max-width: var(--measure); margin-block-start: var(--sp-s);">Los tres números salen de la misma multiplicación: <span class="mono">establecimientos × ARPU × 12</span>. Lo único que cambia es cuántos establecimientos cuento y por qué.</p>
+
+    <div class="grid grid--3" style="margin-block-start: var(--sp-m);">
+      <div class="ficha">
+        <p class="eyebrow eyebrow--tinta">TAM · Chile</p>
+        <p class="cifra">US$76M</p>
+        <div class="calculo">70.000 establecimientos
+× $87.000 ARPU/mes
+× 12 meses
+──────────────────────
+  $73.080M CLP/año
+÷ $960 por USD
+──────────────────────
+  US$76,1M</div>
+        <p style="font-size:.86rem; color: var(--tinta-suave); margin-top: var(--sp-s);">Todo negocio en Chile que venda horas de un profesional.</p>
+      </div>
+
+      <div class="ficha ficha--sello">
+        <p class="eyebrow">SAM · alcanzable</p>
+        <p class="cifra">US$19M</p>
+        <div class="calculo">17.500 establecimientos
+  (25% del TAM: los que
+   reservan por WhatsApp
+   y tienen ≥2 profesionales)
+× $87.000 × 12
+──────────────────────
+  $18.270M CLP/año
+  = US$19,0M</div>
+        <p style="font-size:.86rem; color: var(--tinta-suave); margin-top: var(--sp-s);">El 25% sale de nuestros propios sondeos en terreno, no de un estudio. Es el supuesto más frágil de esta página.</p>
+      </div>
+
+      <div class="ficha">
+        <p class="eyebrow eyebrow--tinta">SOM · año 3</p>
+        <p class="cifra">US$979k</p>
+        <div class="calculo">900 locales pagando
+  (5,1% del SAM)
+× $87.000 × 12
+──────────────────────
+  $939,6M CLP/año
+  = US$979k</div>
+        <p style="font-size:.86rem; color: var(--tinta-suave); margin-top: var(--sp-s);">Coherente con el <a href="roadmap.html">roadmap</a>: 620 locales al mes 24, 900 al mes 36 en el escenario base.</p>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-block-start: var(--sp-m);">
+      <p class="eyebrow eyebrow--tinta">De dónde salen los 70.000 establecimientos</p>
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Rubro</th><th class="num">Estab.</th><th>Por qué entra</th></tr></thead>
+          <tbody>
+            <tr><td>Peluquerías y barberías</td><td class="num">26.000</td><td>El corazón del ICP. Alta rotación, alta tasa de no-show.</td></tr>
+            <tr><td>Estética, uñas, depilación</td><td class="num">12.000</td><td>Misma mecánica, mismo canal, ticket más alto.</td></tr>
+            <tr><td>Talleres mecánicos con hora</td><td class="num">12.000</td><td>Agendan por WhatsApp y el no-show es brutal.</td></tr>
+            <tr><td>Kinesio, podología, nutrición, psicología</td><td class="num">9.000</td><td>Consulta privada, agenda de una persona.</td></tr>
+            <tr><td>Consultas dentales</td><td class="num">8.000</td><td>Ticket alto; agenda más compleja (box + sillón).</td></tr>
+            <tr><td>Clínicas veterinarias</td><td class="num">3.000</td><td>Urgencias mezcladas con hora agendada.</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num"><strong>70.000</strong></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-s);"><strong>Estimación propia, etiquetada como tal.</strong> Estos conteos son órdenes de magnitud construidos desde el registro de empresas del SII (empresas con ventas, por rubro CIIU) y contrastados con lo que se ve en Google Maps por comuna. <em>No son cifras oficiales por rubro y no deben citarse como tales.</em> Antes de usarlos en una ronda hay que bajarlos de la publicación vigente de Estadísticas de Empresas del SII.</p>
+    </div>
+  </section>
+
+  <!-- ================= POSICIONAMIENTO ================= -->
+  <section id="posicion">
+    <p class="eyebrow eyebrow--tinta">03 · La cuña</p>
+    <h2>No vendemos un calendario. El calendario ya lo tienen — y no les sirve de nada.</h2>
+
+    <div class="grid grid--2" style="margin-block-start: var(--sp-m);">
+      <div class="ficha ficha--alerta">
+        <p class="eyebrow" style="color: var(--ladrillo);">Lo que hacen todos</p>
+        <p style="color: var(--tinta-med);">Te dan una <strong>pantalla</strong> donde ver tus horas. Alguien —una persona, con manos— tiene que leer el WhatsApp y llenar esa pantalla. El software es un cuaderno más caro. Cuando una hora se cae, la pantalla se pone blanca y ahí se queda.</p>
+      </div>
+      <div class="ficha ficha--sello">
+        <p class="eyebrow">Lo que hacemos nosotros</p>
+        <p style="color: var(--tinta-med);">Nos metemos <strong>en el WhatsApp</strong>, que es donde ya está pasando la conversación, y agendamos ahí. Y cuando una hora se cae, no la mostramos: <strong>la volvemos a vender</strong> antes de que el local se dé cuenta.</p>
+      </div>
+    </div>
+
+    <p class="lede" style="margin-block-start: var(--sp-l); border-left: 4px solid var(--sello); padding-left: var(--sp-m);">La cuña es el rescate. Es la única cosa que hacemos que se puede medir en pesos, en el panel, el mismo día. Un calendario no tiene ROI; un hueco rescatado sí.</p>
+
+    <h3 style="margin-block-start: var(--sp-xl);">Contra quién competimos, con nombre y apellido</h3>
+    <div class="scroll-x" style="margin-block-start: var(--sp-s);">
+      <table class="tabla">
+        <thead><tr><th>Quién</th><th>Qué hace</th><th>Dónde nos gana</th><th>Dónde le ganamos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>El cuaderno</strong><br><span class="mono" style="font-size:.78rem; color: var(--tinta-suave);">nuestro rival real</span></td>
+            <td>Gratis. Lo entiende todo el mundo. Nunca se cae.</td>
+            <td>Cuesta $0 y no da miedo.</td>
+            <td>No contesta a las 23:00 ni revende una hora caída.</td>
+          </tr>
+          <tr>
+            <td><strong>AgendaPro</strong><br><span class="mono" style="font-size:.78rem; color: var(--tinta-suave);">titular chileno</span></td>
+            <td>Agenda + POS + fichas + marketing. Miles de locales en Chile y LatAm.</td>
+            <td>Marca instalada, equipo comercial, integración con caja. Podría copiar el rescate en 2–3 trimestres.</td>
+            <td>El dueño igual llena la agenda a mano desde el WhatsApp. No hay agente que converse.</td>
+          </tr>
+          <tr>
+            <td><strong>Reservo</strong></td>
+            <td>Agenda online chilena, fuerte en salud y estética.</td>
+            <td>Precio bajo, ya está instalada.</td>
+            <td>El paciente tiene que entrar a una web a reservar. En peluquería, eso no pasa.</td>
+          </tr>
+          <tr>
+            <td><strong>Booksy / Fresha</strong></td>
+            <td>Marketplace global de belleza. Fresha cobra comisión, no suscripción.</td>
+            <td>App linda, pasarela de pago, base internacional.</td>
+            <td>Exigen que la clienta se baje una app. En Chile eso mata la conversión: la clienta quiere escribir por WhatsApp y ya.</td>
+          </tr>
+          <tr>
+            <td><strong>Wati / Landbot / Cliengo</strong></td>
+            <td>Chatbots de WhatsApp genéricos, por árboles de decisión.</td>
+            <td>Ya están en la API de Meta y son baratos.</td>
+            <td>No conocen la agenda. Son un menú "marca 1 para…", que es exactamente lo que la clienta odia.</td>
+          </tr>
+          <tr>
+            <td><strong>La sobrina que contesta</strong></td>
+            <td>Una persona, medio día, $250.000 mensuales.</td>
+            <td>Habla como humano porque lo es.</td>
+            <td>Duerme, se enferma, renuncia. Y nunca le va a escribir a seis personas de la lista de espera un sábado a las 8:42.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= PRECIO ================= -->
+  <section id="precio">
+    <p class="eyebrow eyebrow--tinta">04 · Precio</p>
+    <h2>Anclado a lo que rescatamos, no a lo que cuesta.</h2>
+    <p style="color: var(--tinta-med); max-width: var(--measure); margin-block-start: var(--sp-s);">Si un local de tres sillas recupera <span class="mono">$905.000</span> al mes y le cobramos <span class="mono">$79.000</span>, la conversación de venta ya no es sobre precio. Es sobre si el número es verdad. Por eso el panel muestra la plata rescatada todos los días, y por eso el primer mes es gratis.</p>
+
+    <div class="precios">
+      <div class="plan">
+        <p class="plan__nom">Silla</p>
+        <p class="plan__p">$34.000<small> / mes</small></p>
+        <p style="font-size:.88rem; color: var(--tinta-suave);">Un profesional solo. Barbero, kinesiólogo, manicurista a domicilio.</p>
+        <ul>
+          <li>1 agenda</li>
+          <li>Agente 24/7 en WhatsApp</li>
+          <li>Recordatorios</li>
+          <li>Rescate automático</li>
+          <li>600 mensajes iniciados/mes</li>
+        </ul>
+      </div>
+
+      <div class="plan plan--elegido">
+        <p class="plan__nom">Local · el que vendemos</p>
+        <p class="plan__p">$79.000<small> / mes</small></p>
+        <p style="font-size:.88rem; color: var(--tinta-suave);">2 a 6 profesionales. Es el 70% de nuestro mix esperado.</p>
+        <ul>
+          <li>Hasta 6 agendas</li>
+          <li>Agente 24/7 + modo copiloto</li>
+          <li>Motor de rescate con lista de espera</li>
+          <li>Rescate preventivo (detecta al que va a faltar)</li>
+          <li>Panel de plata rescatada</li>
+          <li>2.500 mensajes iniciados/mes</li>
+          <li>Excedente: <span class="mono">$19</span> por mensaje</li>
+        </ul>
+      </div>
+
+      <div class="plan">
+        <p class="plan__nom">Cadena</p>
+        <p class="plan__p">$210.000<small> / mes</small></p>
+        <p style="font-size:.88rem; color: var(--tinta-suave);">3 a 10 sucursales, un solo número de WhatsApp.</p>
+        <ul>
+          <li>Agendas ilimitadas</li>
+          <li>Ruteo por sucursal</li>
+          <li>Reportes consolidados</li>
+          <li>API y webhooks</li>
+          <li>8.000 mensajes iniciados/mes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid grid--2" style="margin-block-start: var(--sp-m);">
+      <div class="ficha">
+        <p class="eyebrow eyebrow--tinta">Por qué hay un cupo de mensajes</p>
+        <p style="color: var(--tinta-med); font-size:.94rem;">Porque Meta nos cobra por cada conversación que <em>inicia el negocio</em>, y un local que manda 9.000 recordatorios al mes nos deja sin margen. El cupo no es una jugada comercial: es el costo trasladado. Lo decimos en la página de precios, en la letra grande. El excedente de <span class="mono">$19</span> deja <span class="mono">$1,70</span> de margen sobre la tarifa de utilidad ($17,30): no ganamos plata vendiendo mensajes, sólo nos cubrimos.</p>
+      </div>
+      <div class="ficha">
+        <p class="eyebrow eyebrow--tinta">Precio fundador</p>
+        <p style="color: var(--tinta-med); font-size:.94rem;"><span class="mono">$49.000</span>/mes de por vida para los primeros 30 locales, a cambio de una llamada de 20 minutos al mes y permiso para nombrarlos. Es un descuento del 38% que compramos con aprendizaje y con casos. Después del local 30, se acabó — y se acaba de verdad, porque si no, no aprendes nada sobre disposición a pagar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UNIT ECONOMICS ================= -->
+  <section id="unitaria">
+    <p class="eyebrow eyebrow--tinta">05 · Economía unitaria</p>
+    <h2>El margen bruto neto de Meta y de la IA: 65%.</h2>
+    <p style="color: var(--tinta-med); max-width: var(--measure); margin-block-start: var(--sp-s);">Un SaaS de verdad tiene 80%. Nosotros no, y no lo vamos a maquillar: Meta se lleva una tajada fija de cada mensaje que iniciamos. Acá está la resta completa, para un local del plan Local.</p>
+
+    <div class="grid grid--sidebar" style="margin-block-start: var(--sp-m);">
+      <div class="ficha ficha--marcada">
+        <p class="eyebrow">Costo mensual de un local · plan $79.000</p>
+        <div class="calculo">INGRESO                            $79.000
+
+── Meta (WhatsApp Business API) ──────────
+Recordatorios     3 × 30 días  =   90 msj
+Confirmaciones    1,5 × 30     =   45 msj
+Ofertas de rescate            =  180 msj
+Otros (reagenda, avisos)      =   50 msj
+                                ─────────
+Mensajes iniciados/mes        =  365 msj
+
+Utilidad  340 × $17,30         =   $5.882
+Marketing  25 × $56,60         =   $1.415
+                                ─────────
+Subtotal Meta                     $7.297
+
+── IA (Anthropic) ─────────────────────────
+Turnos de conversación/mes    = 3.500
+· 96% con Haiku 4.5
+  entrada  3.360 × 5.100 tok
+    de los cuales 4.600 en caché
+    caché lectura 15,5M × US$0,10/MTok
+    entrada fresca 1,7M × US$1,00/MTok
+    salida    1,0M × US$5,00/MTok
+                                  US$7,26
+· 4% escalado a Sonnet 5
+  140 turnos, ~9.000 tok entrada
+  y 700 de salida
+                                  US$1,03
+                                 ────────
+Subtotal IA  US$8,29 × $960        $7.958
+
+── Infraestructura ────────────────────────
+Servidor, base de datos, colas,
+observabilidad, respaldos
+(prorrateado sobre 60 locales)     $2.700
+
+──────────────────────────────────────────
+COSTO TOTAL                       $17.955
+MARGEN BRUTO   $79.000 − $17.955  $61.045
+                                    77,3%</div>
+        <p class="fuente" style="margin-top: var(--sp-s);"><strong>Y ahora la parte honesta.</strong> Ese 77% es el costo de servir <em>en régimen</em>. Con soporte humano (el chat de la dueña, los meses 1 a 3 de cada local, las conversaciones que el agente no entiende y un humano tiene que tomar) el costo sube <span class="mono">$9.500</span> por local. Margen bruto real: <span class="mono">$51.545 / $79.000 = <strong>65,2%</strong></span>. Ése es el número que usamos en todas partes, incluido el <a href="roadmap.html">roadmap</a>. El 77% es a lo que aspiramos cuando el soporte se automatice; el 65% es lo que tenemos hoy.</p>
+      </div>
+
+      <div>
+        <div class="ficha">
+          <p class="eyebrow eyebrow--tinta">Cliente promedio</p>
+          <div class="scroll-x">
+            <table class="tabla">
+              <tbody>
+                <tr><td>ARPU (mix 20/70/10)</td><td class="num mono">$87.000</td></tr>
+                <tr><td>Margen bruto</td><td class="num mono">65%</td></tr>
+                <tr><td>Margen bruto / mes</td><td class="num mono">$56.550</td></tr>
+                <tr><td>Churn mensual</td><td class="num mono">4%</td></tr>
+                <tr><td>Vida media</td><td class="num mono">25 meses</td></tr>
+                <tr><td><strong>LTV</strong></td><td class="num mono"><strong>$1.413.750</strong></td></tr>
+                <tr><td>CAC cargado</td><td class="num mono">$250.000</td></tr>
+                <tr><td><strong>LTV / CAC</strong></td><td class="num mono"><strong>5,7×</strong></td></tr>
+                <tr><td><strong>Payback</strong></td><td class="num mono"><strong>4,4 meses</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="calculo" style="margin-top: var(--sp-s);">ARPU  = 0,20×$34.000
+      + 0,70×$79.000
+      + 0,10×$210.000
+      = $6.800+$55.300+$21.000
+      = $83.100
+
++ excedente de mensajes
+  promedio                 ~$3.900
+                          ────────
+ARPU efectivo              $87.000
+
+LTV = $87.000 × 0,65 / 0,04
+    = $1.413.750
+Payback = $250.000 / $56.550
+    = 4,4 meses</div>
+        </div>
+
+        <div class="ficha ficha--sello" style="margin-block-start: var(--sp-m);">
+          <p class="eyebrow">Cómo el margen llega a 75%</p>
+          <ul class="lista">
+            <li><strong>Renegociar con un BSP.</strong> A volumen (&gt;200.000 mensajes/mes) la tarifa de utilidad baja. Palanca real: <span class="mono">+3 pts</span>.</li>
+            <li><strong>Mover recordatorios a la ventana gratis.</strong> Si la clienta escribe primero, las 24 h siguientes no cuestan. Un empujón de "responde SÍ" convierte una plantilla pagada en una conversación gratis. <span class="mono">+2 pts</span>.</li>
+            <li><strong>Caché de prompt más agresivo.</strong> Ya cacheamos 4.600 tokens de contexto del local. Subir a 8.000 y prolongar el TTL a 1 h en horas peak: <span class="mono">+1 pt</span>.</li>
+            <li><strong>Bajar el handoff humano de 20% a 8%.</strong> Es la palanca grande: <span class="mono">+8 pts</span>. Y es puramente producto.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ficha ficha--alerta" style="margin-block-start: var(--sp-m);">
+      <p class="eyebrow" style="color: var(--ladrillo);">El número que hace que todo esto se sostenga (o se caiga)</p>
+      <div class="calculo">Sobre la MISMA peluquería de la ficha de arriba
+(353 reservas/mes, ticket $25.000):
+
+NO-SHOW EVITADO
+  recordatorio + confirmación baja
+  el no-show de 14% a 9%
+  353 × 5 puntos           = 17,6 h
+  17,6 × $25.000                    = $440.000
+
+HUECOS RESCATADOS
+  28 cancelaciones tardías al mes
+  hoy rellena el 20%       =  5,6 h
+  con Zurcia, el 67%       = 18,8 h
+  ganancia neta 13,2 h × $25.000    = $330.000
+
+RESCATE PREVENTIVO
+  de los 32 no-shows que igual quedan,
+  el 25% avisa al recibir el recordatorio
+  → 8 huecos rescatables, 67% se rescatan
+  5,4 h × $25.000                   = $135.000
+  ────────────────────────────────────────────
+  DEVUELTO AL LOCAL                  $905.000/mes
+
+  Costo del local                     $79.000/mes
+  RETORNO                                11,5×</div>
+      <p class="fuente" style="margin-top: var(--sp-s);">La tasa de rescate de 67% es <strong>el supuesto que hay que matar primero</strong>. Es también el criterio de muerte del hito M2 en el <a href="roadmap.html">roadmap</a>: si el rescate real se queda bajo el 25%, el devuelto cae a <span class="mono">$525.000</span> (retorno <span class="mono">6,6×</span>) y casi todo el valor pasa a venir del recordatorio — es decir, de algo que AgendaPro ya hace. Ahí dejamos de tener una razón de existir.</p>
+    </div>
+  </section>
+
+  <!-- ================= CANALES ================= -->
+  <section id="canales">
+    <p class="eyebrow eyebrow--tinta">06 · Canales</p>
+    <h2>En orden, y con el costo por cliente que esperamos de cada uno.</h2>
+
+    <div class="scroll-x" style="margin-block-start: var(--sp-m);">
+      <table class="tabla">
+        <thead><tr><th>#</th><th>Canal</th><th>Por qué en Chile</th><th class="num">CAC esperado</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="mono">1</td>
+            <td><strong>Puerta a puerta en ejes comerciales</strong></td>
+            <td>Irarrázaval, Manuel Montt, Av. Matta, el centro de Maipú. La dueña está adentro, cortando. Entras, esperas 10 minutos y le muestras el demo en el teléfono. Cierra ahí mismo o no cierra nunca. Es lento y no escala, y es exactamente lo que hay que hacer los primeros 100 clientes.</td>
+            <td class="num mono">$120.000</td>
+          </tr>
+          <tr>
+            <td class="mono">2</td>
+            <td><strong>Instagram (DM en frío + contenido)</strong></td>
+            <td>Este rubro <em>vive</em> en Instagram. Los locales publican sus cortes y responden DMs. Un mensaje directo que diga "vi que respondes tus horas por acá — ¿cuántas se te cayeron esta semana?" tiene tasa de respuesta. El contenido que funciona es uno solo: la calculadora de plata perdida.</td>
+            <td class="num mono">$180.000</td>
+          </tr>
+          <tr>
+            <td class="mono">3</td>
+            <td><strong>Distribuidores de insumos</strong></td>
+            <td>El vendedor de tintura de L'Oréal Professionnel o de Wella entra a 40 peluquerías por semana, se toma un café con la dueña y ya tiene la confianza que a nosotros nos cuesta seis visitas. Comisión de <span class="mono">$40.000</span> por local que llega al segundo mes. <strong>Éste es el canal que puede escalar.</strong></td>
+            <td class="num mono">$90.000</td>
+          </tr>
+          <tr>
+            <td class="mono">4</td>
+            <td><strong>Referidos con plata en la mano</strong></td>
+            <td>Las dueñas de peluquería se conocen entre ellas y se creen entre ellas. <span class="mono">$30.000</span> en efectivo por cada local referido que pague dos meses. En efectivo, no en "crédito para tu cuenta".</td>
+            <td class="num mono">$60.000</td>
+          </tr>
+          <tr>
+            <td class="mono">5</td>
+            <td><strong>Integración con POS (Bsale, Toteat)</strong></td>
+            <td>Ya tienen la base de locales y venden boleta electrónica. Aparecer en su tienda de integraciones nos pone frente a miles de PYMEs que ya pagan software. Es un canal de mes 12 en adelante, no de mes 1.</td>
+            <td class="num mono">$110.000</td>
+          </tr>
+          <tr>
+            <td class="mono">6</td>
+            <td><strong>Google Ads de cola larga</strong></td>
+            <td>"agenda para peluquería", "sistema de reservas whatsapp". Volumen bajísimo, intención altísima, CPC de <span class="mono">$300–600</span>. No mueve la aguja, pero paga sus propios costos.</td>
+            <td class="num mono">$220.000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fuente" style="margin-block-start: var(--sp-s);"><strong>Los CAC son estimaciones,</strong> derivadas del embudo de activación del <a href="roadmap.html">roadmap</a> (5% de lead a pago) y del costo del tiempo comercial. El CAC cargado que usamos en el modelo —<span class="mono">$250.000</span>— es más alto que todos ellos a propósito: incluye sueldos, ads, onboarding y el tiempo del fundador. Si el CAC real resultara ser el promedio ponderado de la tabla (<span class="mono">~$130.000</span>), el LTV/CAC salta a 10,9× y este negocio se ve muy distinto. No lo asumimos.</p>
+
+    <h3 style="margin-block-start: var(--sp-xl);">Lo que <em>no</em> vamos a hacer</h3>
+    <p style="color: var(--tinta-med); max-width: var(--measure);">Ni SEO de blog (el ciclo es de 12 meses y no tenemos 12 meses), ni conferencias, ni "content marketing de valor". Una peluquera de Ñuñoa no lee posts sobre optimización de agenda. Está cortando el pelo.</p>
+  </section>
+
+  <!-- ================= IA EN MARKETING ================= -->
+  <section id="ia-marketing">
+    <p class="eyebrow eyebrow--tinta">07 · IA en el marketing</p>
+    <h2>Un solo uso, y es el que vende.</h2>
+
+    <div class="grid grid--2" style="margin-block-start: var(--sp-m);">
+      <div class="ficha ficha--sello">
+        <p class="eyebrow">El informe de plata perdida</p>
+        <p style="color: var(--tinta-med);">En la demo le pedimos a la dueña que nos deje ver <strong>sus últimos 30 días de WhatsApp</strong> (o que nos cuente cuántas horas se le cayeron). Claude lee eso y produce un PDF de una plana, con su nombre, sus servicios y sus precios: <em>"En marzo se te cayeron 19 horas. A tu ticket promedio, son $475.000. De ésas, 12 se avisaron con más de 4 horas de anticipación: ésas eran rescatables."</em></p>
+        <p style="color: var(--tinta-med); margin-block-start: var(--sp-s);">Ese documento es la venta entera. No hay que convencer a nadie: le estás mostrando su propia plata, con su propia letra.</p>
+        <div class="calculo" style="margin-top: var(--sp-s);">Costo de generar un informe:
+~25.000 tokens de entrada
+~1.500 de salida, con Sonnet 5
+= US$0,065 ≈ $62 CLP</div>
+        <p style="font-size:.9rem; color: var(--tinta); margin-top: var(--sp-s);"><strong>$62 por un material de venta personalizado.</strong> Ésa es la justificación completa: sin IA, ese informe cuesta 40 minutos de un humano y no lo haríamos nunca.</p>
+      </div>
+
+      <div>
+        <div class="ficha">
+          <p class="eyebrow eyebrow--tinta">Los otros dos usos, más chicos</p>
+          <ul class="lista">
+            <li><strong>DMs de Instagram con contexto.</strong> Claude mira el perfil público del local (servicios, precios si los publican, cuántos profesionales se ven en las fotos) y escribe el primer mensaje en el tono del rubro, no en tono de vendedor de software. Costo: <span class="mono">~$12</span> por prospecto. Lo revisa un humano antes de enviarlo — siempre.</li>
+            <li><strong>El sitio contesta.</strong> El mismo agente que vendemos atiende nuestro propio WhatsApp comercial. Si no somos capaces de dejar que nuestro agente agende nuestras propias demos, no deberíamos estar vendiéndolo.</li>
+          </ul>
+        </div>
+        <div class="ficha ficha--alerta" style="margin-block-start: var(--sp-m);">
+          <p class="eyebrow" style="color: var(--ladrillo);">Dónde NO usamos IA</p>
+          <p style="color: var(--tinta-med); font-size:.94rem;">No generamos posts con IA. No generamos imágenes de peluquerías que no existen. No inventamos testimonios. El rubro huele el humo a un kilómetro y la confianza es lo único que tenemos para vender: estamos pidiéndole a alguien que nos entregue la voz de su negocio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 90 DÍAS ================= -->
+  <section id="dias">
+    <p class="eyebrow eyebrow--tinta">08 · Los primeros 90 días</p>
+    <h2>Qué hacemos, en qué orden, con quién.</h2>
+
+    <div class="cronograma">
+      <div class="semana"><b>Sem. 1–2</b><p><strong>Cuenta de Meta.</strong> Abrir el WhatsApp Business Platform, iniciar la verificación de Meta Business (esto demora entre 3 días y 3 semanas y no depende de nosotros: por eso va primero, no último). Elegir BSP. Registrar el número de pruebas.</p></div>
+      <div class="semana"><b>Sem. 1–3</b><p><strong>Terreno, en paralelo.</strong> 60 peluquerías visitadas a pie en Ñuñoa y Providencia. Una sola pregunta: "¿cuántas horas se te cayeron esta semana?". Anotar la respuesta, no vender nada. Salir con 5 dueñas dispuestas a ser design partners.</p></div>
+      <div class="semana"><b>Sem. 3–5</b><p><strong>El producto mínimo que sirve.</strong> Agente + agenda + recordatorios, sin motor de rescate. En <em>modo copiloto</em>: el agente redacta, la dueña aprueba con un toque. Esto compra confianza y nos da los datos para entrenar el rescate.</p></div>
+      <div class="semana"><b>Sem. 5–7</b><p><strong>Los 5 partners en vivo.</strong> Con su número real. Nosotros vamos a los locales a hacer el onboarding en persona: cargar servicios, precios, profesionales y horarios. 90 minutos por local. No se puede automatizar todavía y no hay que fingir que sí.</p></div>
+      <div class="semana"><b>Sem. 7–9</b><p><strong>El motor de rescate.</strong> Se enciende sólo para los partners que ya tienen 3 semanas de historia. Se mide una cosa: <span class="mono">huecos ofrecidos → huecos rescatados</span>. Si esa razón no llega a 40% en tres semanas, se para todo y se rediseña el algoritmo de calce.</p></div>
+      <div class="semana"><b>Sem. 9–11</b><p><strong>Se suelta el automático.</strong> El agente responde sin aprobación previa, con un botón de pánico visible. Se mide la tasa de intervención humana día a día. Meta: bajo 25%.</p></div>
+      <div class="semana"><b>Sem. 11–13</b><p><strong>Se cobra.</strong> Precio fundador de $49.000. Si de los 5 partners no pagan al menos 3, no se sigue: se vuelve a la semana 1 con otra hipótesis. <strong>Éste es el criterio de muerte del hito M1.</strong></p></div>
+    </div>
+  </section>
+
+  <!-- ================= QUÉ LO MATA ================= -->
+  <section id="mata">
+    <p class="eyebrow eyebrow--tinta">09 · Qué mataría esto</p>
+    <h2>Cinco maneras, ordenadas por probabilidad de que ocurran.</h2>
+
+    <div style="margin-block-start: var(--sp-m);">
+      <div class="mata">
+        <h3>1. AgendaPro agrega relleno automático.</h3>
+        <p>Es lo más probable de esta lista. Tienen el calendario, tienen los locales, tienen el equipo. Le toma dos o tres trimestres y nuestra cuña desaparece.</p>
+        <p class="resp"><strong>Qué hacemos:</strong> correr. Ser el mejor <em>en conversación</em>, no en calendario: el agente que habla como chileno, aprende el tono del local y maneja la ambigüedad ("la del jueves, la misma de siempre"). Un módulo que agregan es siempre peor que un producto entero. Y hacernos la integración con AgendaPro nosotros mismos, para vivir <em>encima</em> de ellos en vez de contra ellos. Si nos compran, tampoco es una mala salida.</p>
+      </div>
+
+      <div class="mata">
+        <h3>2. Meta sube el precio o cambia las reglas.</h3>
+        <p>Ya cambió el modelo de tarifas en 2024 y otra vez en 2025. Si la plantilla de utilidad se duplica, nuestro subtotal de Meta pasa de $7.297 a $12.000 y el margen cae del 65% al 59%. Si Meta decidiera además prohibir a los agentes automatizados iniciar conversaciones, no hay producto.</p>
+        <p class="resp"><strong>Qué hacemos:</strong> el cupo de mensajes en el plan ya nos protege del alza de precios (subimos el excedente y listo). Contra el riesgo regulatorio no hay defensa real, salvo tener SMS y una PWA de reservas como plan B degradado. Es un riesgo de plataforma y hay que decirlo en voz alta cuando se levante plata.</p>
+      </div>
+
+      <div class="mata">
+        <h3>3. El dueño nunca suelta el agente.</h3>
+        <p>Se queda en modo copiloto para siempre. Aprueba cada mensaje. Y ahí nuestro producto es una tecla más de trabajo, no menos: no le ahorramos nada y a los tres meses se va.</p>
+        <p class="resp"><strong>Qué hacemos:</strong> el copiloto tiene que ser <em>incómodo a propósito</em> después de la semana 3 —"llevas 340 mensajes aprobados sin corregir uno solo; ¿lo soltamos?"— y el panel tiene que mostrar cuántas horas de su vida le devolvimos. Está medido en el embudo del roadmap: es el paso donde se cae el 33%.</p>
+      </div>
+
+      <div class="mata">
+        <h3>4. El agente comete un error caro y visible.</h3>
+        <p>Agenda dos clientas a la misma hora un sábado. O le dice a alguien un precio que no existe. Una peluquería no perdona eso: perdiste el local <em>y</em> el boca a boca del barrio, que es de donde vienen todos tus otros clientes.</p>
+        <p class="resp"><strong>Qué hacemos:</strong> el agente <strong>nunca inventa</strong>. Los precios, los horarios y la disponibilidad salen de una consulta a la base de datos, no del modelo. Si no sabe, escala a humano: está escrito en el prompt del sistema y verificado con tests. Es la regla de diseño que no se negocia, y está en <a href="stack.html">Arquitectura</a>.</p>
+      </div>
+
+      <div class="mata">
+        <h3>5. El mercado chileno es demasiado chico.</h3>
+        <p>US$19M de SAM. Aunque nos ganáramos el 10% entero, son US$1,9M de ARR. Es un buen negocio y una mala startup de riesgo. Nos obliga a salir a México o Perú antes de tener el producto maduro, y eso mata equipos de cinco personas.</p>
+        <p class="resp"><strong>Qué hacemos:</strong> asumirlo desde el día 1, no descubrirlo en el mes 20. El <a href="roadmap.html">hito M5</a> es explícitamente un punto de decisión de tres puertas, y una de las tres es "bootstrapear un buen negocio chico". No todas las empresas tienen que ser un unicornio; casi ninguna lo es.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div><strong style="font-family: var(--serif); color: var(--tinta);">Zurcia</strong> — <span class="mono">zurcia.com</span></div>
+    <div>
+      <a href="../index.html">← Ideas</a> ·
+      <a href="index.html">Producto</a> ·
+      <a href="demo/index.html">Demo</a> ·
+      <a href="roadmap.html">Roadmap</a> ·
+      <a href="stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

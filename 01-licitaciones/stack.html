@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adjudate — Arquitectura, agentes y costo real de la IA</title>
+<meta name="description" content="Modelo de datos, los cinco agentes de Claude con sus modelos y prompts, las APIs a contratar, variables de entorno, el costo mensual con su aritmética, y qué está fingido en la demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .calc { font-family: var(--mono); font-size: .78rem; background: var(--papel-bajo); border: 1px solid var(--rule-fuerte); padding: var(--sp-s); line-height: 1.9; overflow-x: auto; }
+  .calc .eq { color: var(--acento); }
+  .calc .res { color: var(--ink); font-weight: 600; }
+  .calc .dim { color: var(--muted); }
+
+  code, kbd { font-family: var(--mono); font-size: .82em; background: var(--papel-bajo); border: 1px solid var(--rule); padding: .05em .3em; color: var(--ink); }
+  pre { font-family: var(--mono); font-size: .74rem; line-height: 1.7; background: var(--ink); color: #E8E3D6; padding: var(--sp-m); overflow-x: auto; border: 0; }
+  pre code { background: none; border: 0; padding: 0; color: inherit; font-size: 1em; }
+  pre .c { color: #8C8574; }
+  pre .k { color: #D46B5A; }
+  pre .s { color: #9DC3A7; }
+
+  /* diagrama de flujo */
+  .flujo { display: grid; gap: var(--sp-s); }
+  @media (min-width: 62em) { .flujo { grid-template-columns: repeat(4, 1fr); align-items: stretch; } }
+  .caja { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); padding: var(--sp-s); position: relative; }
+  .caja.ia { border-color: var(--acento); background: var(--acento-lav); }
+  .caja h4 { font-family: var(--mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; margin-bottom: .3rem; }
+  .caja.ia h4 { color: var(--acento); }
+  .caja p { font-size: .84rem; color: var(--ink-2); line-height: 1.55; }
+  .caja .tag { display: inline-block; font-family: var(--mono); font-size: .62rem; letter-spacing: .06em; color: var(--muted); margin-top: .4rem; text-transform: uppercase; }
+
+  .agente { border: 1px solid var(--rule-fuerte); background: var(--papel-alto); margin-bottom: var(--sp-m); }
+  .agente-h { padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--rule); background: var(--papel-bajo); display: flex; gap: var(--sp-s); align-items: baseline; flex-wrap: wrap; }
+  .agente-h b { font-size: var(--step-0); font-family: var(--serif); font-weight: 600; }
+  .agente-h .mod { font-family: var(--mono); font-size: .7rem; color: var(--acento); background: var(--acento-lav); padding: .15rem .4rem; border: 1px solid var(--acento-cl); }
+  .agente-b { padding: var(--sp-m); }
+  .agente-b > p { color: var(--ink-2); font-size: .92rem; margin-bottom: var(--sp-s); }
+  .agente-b h5 { font-family: var(--mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: var(--sp-s) 0 .35rem; }
+
+  .env { font-family: var(--mono); font-size: .76rem; }
+  .env dt { color: var(--acento); margin-top: .6rem; }
+  .env dd { color: var(--ink-2); padding-left: 0; font-size: .72rem; }
+  .env dd::before { content: "↳ "; color: var(--rule-fuerte); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-in">
+      <a class="marca" href="index.html"><i></i>ADJUDATE <span>Mercado Público</span></a>
+      <ul class="nav-links">
+        <li><a class="volver" href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+      <button class="nav-btn" id="navBtn" aria-expanded="false" aria-controls="navMob">Menú</button>
+    </div>
+  </div>
+  <div class="nav-mob" id="navMob">
+    <div class="container">
+      <ul>
+        <li><a href="../index.html">&larr; Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header style="padding-block: var(--sp-xl) var(--sp-l)">
+  <div class="container">
+    <p class="folio"><b>Arquitectura</b> · Cómo se construye esto de verdad</p>
+    <h1 style="font-size:var(--step-3)">Cinco agentes, una API pública con un agujero, y un COGS que hay que defender.</h1>
+    <p class="lede prose" style="margin-top:var(--sp-s)">Este documento existe para que un ingeniero pueda empezar el lunes. Incluye lo que no funciona: el agujero de la API de Mercado Público y todo lo que la demo finge.</p>
+  </div>
+</header>
+
+<!-- ===================== EL FLUJO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>01</b> · El flujo</p>
+    <h2>Del ticket de ChileCompra al .zip que el cliente sube a mano.</h2>
+
+    <div class="flujo" style="margin-top:var(--sp-m)">
+      <div class="caja">
+        <h4>1 · Ingesta</h4>
+        <p>Worker que consulta la API de Mercado Público cada 30 minutos, baja las bases (PDF/DOC/XLS) desde la ficha de la licitación, las guarda por SHA-256 y las convierte a texto.</p>
+        <span class="tag">Python · APScheduler · pdfplumber + OCR</span>
+      </div>
+      <div class="caja ia">
+        <h4>2 · Lectura</h4>
+        <p>El <b>lector de bases</b> extrae cada requisito con su cita textual y el número de página. El <b>clasificador</b> normaliza el rubro. Todo se guarda estructurado.</p>
+        <span class="tag">Claude Sonnet 5 + Haiku 4.5</span>
+      </div>
+      <div class="caja">
+        <h4>3 · Match</h4>
+        <p>Aritmética determinista sobre el perfil de la empresa + el histórico de adjudicaciones. <b>Sin IA, a propósito.</b> Produce el score, la probabilidad y los bloqueos.</p>
+        <span class="tag">SQL + una función pura de 60 líneas</span>
+      </div>
+      <div class="caja ia">
+        <h4>4 · Taller</h4>
+        <p>El <b>redactor</b> arma los anexos y la propuesta técnica con las bases en caché. El <b>chequeador</b> —un modelo distinto— revisa el paquete completo y bloquea el envío.</p>
+        <span class="tag">Claude Opus 4.8 (adaptive thinking)</span>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m); border-color:var(--acento)">
+      <p class="ficha-h" style="color:var(--acento)">El agujero: no hay paso 5 automático</p>
+      <p class="prose"><strong>La API de Mercado Público sirve para leer, no para ofertar.</strong> Existen endpoints públicos de licitaciones, órdenes de compra y ficha de proveedor. <strong>No existe un endpoint para enviar una oferta.</strong> La oferta se sube a mano en <code>mercadopublico.cl</code>, con la clave del proveedor, dentro del plazo.</p>
+      <p class="prose" style="margin-top:var(--sp-s)">Podríamos automatizarlo con un navegador headless manejando la clave del cliente. <strong>No lo vamos a hacer</strong>: guardar la clave de Mercado Público de una PYME es una responsabilidad legal y de seguridad que no queremos, y si el portal cambia un selector, el cliente pierde una licitación de $80 millones por nuestra culpa. El producto <strong>prepara y valida el paquete</strong>, y le da al humano una checklist de 5 pasos para el envío. Es menos sexy y es lo correcto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODELO DE DATOS ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>02</b> · Modelo de datos</p>
+    <h2>PostgreSQL. Doce tablas. Una de ellas es el negocio entero.</h2>
+
+    <pre style="margin-top:var(--sp-m)"><code><span class="c">-- ══ La empresa y su gente ═══════════════════════════════════════</span>
+<span class="k">empresa</span>            id · rut · razon_social · comuna · region · dotacion
+                   capital_pagado · rubros[] · certificaciones[]
+                   estado_chileproveedores · ventas_anuales_uf · creado_en
+
+<span class="k">usuario</span>            id · empresa_id → · email · nombre · rol (dueño|gestor)
+
+<span class="c">-- ══ Lo que baja de ChileCompra ══════════════════════════════════</span>
+<span class="k">licitacion</span>         id · codigo_externo (<span class="s">'1057-42-LE26'</span>) · organismo · comprador_rut
+                   nombre · descripcion · monto_estimado · moneda · tipo (LE|LP|LQ)
+                   fecha_publicacion · fecha_cierre · fecha_adjudicacion
+                   estado · region · comuna · rubro_onu[] · raw <span class="k">jsonb</span>
+
+<span class="k">bases_documento</span>    id · licitacion_id → · nombre_archivo · url_origen · sha256
+                   tipo (administrativas|tecnicas|anexo|aclaracion)
+                   texto_extraido · paginas · descargado_en
+
+<span class="c">-- ══ Lo que la IA saca de las bases ══════════════════════════════</span>
+<span class="k">requisito</span>          id · licitacion_id → · tipo (admisibilidad|tecnico|economico|documento)
+                   texto · obligatorio · fuente_documento_id → · fuente_pagina
+                   <span class="s">fuente_cita</span>  <span class="c">← la frase textual. Sin esto, no se guarda.</span>
+                   extraido_por (modelo + versión de prompt) · confianza
+
+<span class="k">criterio_evaluacion</span> id · licitacion_id → · nombre · ponderador · formula
+
+<span class="c">-- ══ ★ EL ORO: el histórico de adjudicaciones ════════════════════</span>
+<span class="k">adjudicacion</span>       id · licitacion_id → · proveedor_rut · proveedor_nombre
+                   monto_ofertado · puntaje_final · ganador (bool) · fecha
+<span class="c">   Cada licitación cerrada en Chile deja acá quién ofertó, cuánto y quién ganó.
+   Es dato público. Es lo que nos deja estimar probabilidad en vez de adivinarla,
+   y es la lista de prospectos: TODO el que sale con ganador=false perdió.</span>
+
+<span class="c">-- ══ El producto ═════════════════════════════════════════════════</span>
+<span class="k">match</span>              id · empresa_id → · licitacion_id → · score · prob_estimada
+                   razones <span class="k">jsonb</span> · bloqueos <span class="k">jsonb</span> · calculado_en
+
+<span class="k">postulacion</span>        id · empresa_id → · licitacion_id → · folio_interno
+                   estado (borrador|lista|enviada|adjudicada|perdida)
+                   precio_ofertado · enviada_en
+
+<span class="k">documento_postulacion</span> id · postulacion_id → · requisito_id → · tipo (auto|ia|externo)
+                   contenido · version · editado_por_humano (bool)
+
+<span class="k">chequeo</span>            id · postulacion_id → · corrido_en · resultados <span class="k">jsonb</span> · bloqueante
+
+<span class="c">-- ══ El bucle de retroalimentación (lo que nos hace mejores) ══════</span>
+<span class="k">resultado</span>          id · postulacion_id → · adjudicada (bool) · ganador_rut
+                   monto_ganador · nuestro_puntaje · prob_que_estimamos
+<span class="c">   Guardamos la probabilidad que dijimos ANTES de saber el resultado.
+   Con 500 filas acá podemos publicar qué tan calibrados estamos, y si
+   estamos mal calibrados, lo sabremos nosotros antes que el cliente.</span>
+
+<span class="k">evento_ia</span>          id · empresa_id → · agente · modelo · tokens_in · tokens_out
+                   tokens_cache_r · tokens_cache_w · costo_usd · latencia_ms · ok
+<span class="c">   Sin esta tabla el COGS de la sección 05 es una fantasía. Con ella es
+   un dashboard, y sabemos qué cliente nos está costando plata.</span>
+</code></pre>
+
+    <div class="ficha" style="margin-top:var(--sp-m)">
+      <p class="ficha-h">La decisión de esquema que más importa</p>
+      <p class="prose"><code>requisito.fuente_cita</code> es <strong>NOT NULL</strong>. Un requisito que el modelo no puede respaldar con la frase exacta de las bases no entra a la base de datos. Prefiero un lector que se salta un requisito (y el cliente lo agrega a mano) antes que uno que inventa uno que no existe. <strong>Una alucinación acá le cuesta a una PYME un contrato de $80 millones</strong>, y una demanda a nosotros.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AGENTES ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>03</b> · Los agentes</p>
+    <h2>Cinco agentes de Claude. Y una cosa que deliberadamente no es IA.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-block:var(--sp-s) var(--sp-m); max-width:70ch">Modelo elegido por trabajo, no por moda. El caro sólo donde equivocarse cuesta un contrato.</p>
+
+    <article class="agente">
+      <div class="agente-h">
+        <b>1. Lector de bases</b>
+        <span class="mod">claude-sonnet-5</span>
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:auto">~8 corridas / cliente / mes</span>
+      </div>
+      <div class="agente-b">
+        <p>Recibe el texto de las bases administrativas + técnicas + anexos (típicamente 40–120 páginas) y devuelve la lista estructurada de requisitos. Es el corazón del producto.</p>
+        <h5>Herramientas</h5>
+        <p style="font-size:.86rem"><code>citar_fuente(documento_id, pagina, cita_textual)</code> — el modelo <em>no puede</em> emitir un requisito sin llamarla. Es la barandilla contra la alucinación, puesta en el esquema de la herramienta y no en el prompt.</p>
+        <h5>Configuración</h5>
+        <p style="font-size:.86rem"><code>output_config: { format: {...} }</code> con esquema estricto (structured outputs). <code>thinking: { type: "adaptive" }</code>. Streaming, porque una base de 120 páginas tarda.</p>
+        <h5>El núcleo del prompt</h5>
+        <pre style="font-size:.72rem"><code>Eres analista de licitaciones públicas chilenas. Extrae TODO requisito de
+las bases adjuntas: admisibilidad, técnicos, económicos y documentales.
+
+REGLAS DURAS
+1. Cada requisito debe venir acompañado de la cita textual exacta de las
+   bases y su página. Si no puedes citarlo, NO lo emitas.
+2. No infieras requisitos "obvios" ni "habituales del rubro". Las bases
+   dicen lo que dicen. El proveedor será eliminado por lo que dicen las
+   bases, no por lo que suele pedirse.
+3. Si un punto es ambiguo, márcalo <span class="s">ambiguo</span> y transcribe la frase completa.
+   Un requisito ambiguo bien señalado vale más que uno resuelto mal.
+4. Distingue admisibilidad (te dejan fuera) de evaluación (te bajan el
+   puntaje). Confundirlas es el error más caro que puedes cometer acá.</code></pre>
+      </div>
+    </article>
+
+    <article class="agente">
+      <div class="agente-h">
+        <b>2. Redactor de anexos y propuesta técnica</b>
+        <span class="mod">claude-opus-4-8</span>
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:auto">~12 corridas / cliente / mes</span>
+      </div>
+      <div class="agente-b">
+        <p>Redacta los anexos (declaraciones juradas, experiencia, dotación) y el borrador de la propuesta técnica, usando las bases, el perfil de la empresa y —esto es la ventaja— <strong>las propuestas anteriores de la misma empresa que sí ganaron</strong>.</p>
+        <h5>Prompt caching</h5>
+        <p style="font-size:.86rem">Las bases (~35.000 tokens) van con <code>cache_control</code> de <strong>5 minutos</strong>. El redactor genera los 4 documentos de una postulación en una ráfaga de segundos, no a lo largo de horas: el caché corto alcanza y cuesta 1,25× en vez de 2×. Las lecturas salen a 0,1×. Sin esto, este agente costaría el triple.</p>
+        <h5>Regla de producto, no técnica</h5>
+        <p style="font-size:.86rem">La salida <strong>siempre</strong> cae en un <code>&lt;textarea&gt;</code> editable y nunca se marca como lista sin que un humano la toque. No es un disclaimer: es que el que firma la declaración jurada es el representante legal, y va preso él, no nosotros.</p>
+      </div>
+    </article>
+
+    <article class="agente">
+      <div class="agente-h">
+        <b>3. Chequeador de admisibilidad</b>
+        <span class="mod">claude-opus-4-8</span>
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:auto">~3 corridas / cliente / mes</span>
+      </div>
+      <div class="agente-b">
+        <p>Recibe el paquete completo y la lista de requisitos, y por cada uno dice <span class="pill ok">cumple</span> <span class="pill warn">dudoso</span> <span class="pill mal">no cumple</span> con su cita. Si hay un solo <em>no cumple</em> obligatorio, <strong>el botón de envío queda bloqueado</strong>.</p>
+        <h5>Por qué es un modelo distinto al que redactó</h5>
+        <p style="font-size:.86rem">A propósito: <strong>no le pedimos al que escribió que se corrija a sí mismo.</strong> Corre en una conversación limpia, sin ver el razonamiento del redactor, sólo el artefacto final. Es la diferencia entre revisar y auto-justificarse. <code>thinking: { type: "adaptive" }</code> con el presupuesto alto: es el único lugar donde el costo no importa.</p>
+        <h5>Y aun así</h5>
+        <p style="font-size:.86rem">El chequeo se presenta como <em>"esto es lo que encontramos"</em>, nunca como <em>"esto está aprobado"</em>. Adjudate no garantiza admisibilidad. Lo dice el producto, lo dicen los términos, y lo decimos en la venta.</p>
+      </div>
+    </article>
+
+    <article class="agente">
+      <div class="agente-h">
+        <b>4. Analista de competencia</b>
+        <span class="mod">claude-sonnet-5</span>
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:auto">~8 corridas / cliente / mes</span>
+      </div>
+      <div class="agente-b">
+        <p>Lee el histórico de adjudicaciones del mismo organismo y rubro (tabla <code>adjudicacion</code>) y escribe la "Lectura" en prosa: quién gana siempre acá, en qué banda de precio, cuántos oferentes suelen presentarse. El dato es público; el valor es que nadie lo lee.</p>
+        <h5>Barandilla</h5>
+        <p style="font-size:.86rem">Sólo puede afirmar lo que está en las filas que se le pasaron. Si hay menos de 3 adjudicaciones históricas, tiene <strong>prohibido</strong> concluir y debe decir <em>"no hay historia suficiente para leer este comprador"</em>. Un patrón inventado sobre 2 datos es peor que ningún patrón.</p>
+      </div>
+    </article>
+
+    <article class="agente">
+      <div class="agente-h">
+        <b>5. Clasificador de feed</b>
+        <span class="mod">claude-haiku-4-5</span>
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:auto">~3.000 corridas / mes (plataforma)</span>
+      </div>
+      <div class="agente-b">
+        <p>Cada licitación nueva pasa por Haiku para normalizar rubro y sacar 5 tags. Es alto volumen y baja apuesta: si se equivoca, el peor caso es que una licitación aparezca abajo en el feed.</p>
+        <h5>Por qué NO usamos la Batch API (50% de descuento)</h5>
+        <p style="font-size:.86rem">Porque el feed tiene que estar fresco a las 8 de la mañana. Una licitación publicada a las 17:00 con cierre en 5 días hábiles <strong>no puede esperar 24 horas</strong> a que corra un batch. Pagamos el doble por latencia y es la decisión correcta. (Sí usaríamos batch para el <em>backfill</em> histórico de los últimos 5 años — ese sí puede esperar.)</p>
+      </div>
+    </article>
+
+    <div class="ficha" style="border-color:var(--ink)">
+      <p class="ficha-h" style="color:var(--ink)">Y lo que deliberadamente NO es IA: el match</p>
+      <p class="prose">El score y la probabilidad son <strong>una función pura de 60 líneas</strong> — rubro 30 + región 15 + dotación 20 + capital 15 + experiencia 10 + certificaciones 10, ajustada por el promedio histórico de oferentes y por si ya le ganamos a este comprador. Exactamente la misma que corre en la demo.</p>
+      <p class="prose" style="margin-top:var(--sp-s)"><strong>Un cliente que pierde una licitación tiene derecho a saber por qué se la mostramos, o por qué no.</strong> «El modelo dijo» no es una respuesta que se le pueda dar a alguien que acaba de perder $80 millones. Un embedding no se puede auditar; una suma sí. Además es gratis, instantánea, y se re-calcula entera cada vez que el cliente mueve un slider de su perfil — cosa que un LLM no podría hacer sin costarnos una fortuna.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APIs ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>04</b> · Terceros</p>
+    <h2>Lo que hay que contratar, y lo que no existe.</h2>
+
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>API Mercado Público</strong><br><span style="color:var(--muted)">api.mercadopublico.cl</span></td>
+            <td>Licitaciones, órdenes de compra, ficha de proveedor. Requiere un <em>ticket</em> que ChileCompra entrega a solicitud.</td>
+            <td><span class="pill ok">Existe</span> Gratis. Con límites de tasa: hay que cachear agresivo y no pegarle en caliente por usuario.</td>
+          </tr>
+          <tr>
+            <td><strong>Descarga de bases</strong><br><span style="color:var(--muted)">los PDF/DOC adjuntos</span></td>
+            <td>El texto real de las bases, que es TODO el producto.</td>
+            <td><span class="pill warn">Frágil</span> Los adjuntos cuelgan de la ficha en el portal. Hay que bajarlos de ahí. <strong>Es la dependencia más frágil del sistema</strong> y hay que monitorearla como si fuera producción crítica, porque lo es.</td>
+          </tr>
+          <tr>
+            <td><strong>Envío de la oferta</strong></td>
+            <td>Subir la propuesta.</td>
+            <td><span class="pill mal">No existe</span> No hay endpoint. Handoff humano, por diseño (ver sección 01).</td>
+          </tr>
+          <tr>
+            <td><strong>ChileProveedores</strong></td>
+            <td>Estado de inscripción y documentos vigentes del proveedor.</td>
+            <td><span class="pill warn">Parcial</span> La ficha básica viene por API. El detalle de documentos vigentes, no. V1: el cliente lo declara y nosotros le recordamos.</td>
+          </tr>
+          <tr>
+            <td><strong>SII</strong></td>
+            <td>Capital, ventas, situación tributaria — para el perfil y la admisibilidad.</td>
+            <td><span class="pill mal">Sin API</span> No hay API para terceros sin la clave del contribuyente. <strong>V1: el cliente sube su Carpeta Tributaria Electrónica en PDF y la leemos.</strong> Es un paso feo en el onboarding y no hay forma de evitarlo.</td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic</strong></td>
+            <td>Los cinco agentes.</td>
+            <td><span class="pill ok">Listo</span> Tarjeta y a correr.</td>
+          </tr>
+          <tr>
+            <td><strong>Transbank Webpay / Khipu</strong></td>
+            <td>Cobro de la suscripción en CLP.</td>
+            <td><span class="pill warn">Trámite</span> Transbank exige contrato e integración certificada. Khipu (transferencia) es más rápido de partir y las PYMEs chilenas lo usan sin problema.</td>
+          </tr>
+          <tr>
+            <td><strong>WhatsApp Business (Meta)</strong></td>
+            <td>La alerta de cierre. En Chile el correo se ignora; el WhatsApp no.</td>
+            <td><span class="pill warn">Trámite</span> Verificación de negocio + plantillas aprobadas. Empezar por acá en el mes 1, porque tarda.</td>
+          </tr>
+          <tr>
+            <td><strong>Resend / Amazon SES</strong></td>
+            <td>Correo transaccional y el reporte semanal (que además es el lead magnet).</td>
+            <td><span class="pill ok">Listo</span></td>
+          </tr>
+          <tr>
+            <td><strong>Firma electrónica avanzada</strong><br><span style="color:var(--muted)">e-certchile / Acepta</span></td>
+            <td>Algunos anexos la exigen.</td>
+            <td><span class="pill neu">V2</span> En V1 el cliente firma como firma hoy. No es el cuello de botella.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COSTO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>05</b> · El costo real</p>
+    <h2>De dónde salen los $16.600 de COGS que usa el plan de negocio.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-block:var(--sp-s) var(--sp-m); max-width:70ch">Precios de lista de Anthropic (Sonnet 5 $3/$15, Opus 4.8 $5/$25, Haiku 4.5 $1/$5 por millón de tokens). Escritura de caché 1,25× a 5 minutos; lectura de caché 0,1×. Tipo de cambio supuesto: <strong>USD 1 = $960 CLP</strong>.</p>
+
+    <h3>Supuesto de uso de un cliente promedio</h3>
+    <div class="scroll-x">
+      <table>
+        <caption>Lo que hace al mes un cliente del plan Adjudica</caption>
+        <thead><tr><th>Actividad</th><th class="num">Volumen/mes</th><th>Base del supuesto</th></tr></thead>
+        <tbody>
+          <tr><td>Licitaciones que abre y lee a fondo</td><td class="num">8</td><td>De ~25 que le muestra el feed, abre el 30%.</td></tr>
+          <tr><td>Postulaciones que arma completas</td><td class="num">3</td><td>Hoy postulan a 1–2/mes; con nosotros el costo marginal baja, así que suben a 3.</td></tr>
+          <tr><td>Documentos redactados con IA</td><td class="num">12</td><td>4 por postulación (3 anexos + propuesta técnica). Los otros 3 del taller son plantillas automáticas o carga externa.</td></tr>
+          <tr><td>Chequeos completos del paquete</td><td class="num">3</td><td>Uno por postulación, antes de enviar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Aritmética de inferencia, agente por agente</h3>
+    <div class="calc">
+      <span class="dim">── 1. LECTOR DE BASES ─ Sonnet 5 ($3 / $15) ─────────────────────</span><br>
+      8 bases × (38.000 tok entrada + 5.000 tok salida)<br>
+      entrada <span class="eq">=</span> 304.000 × $3/1M <span class="eq">=</span> $0,912<br>
+      salida&nbsp;&nbsp;<span class="eq">=</span> &nbsp;40.000 × $15/1M <span class="eq">=</span> $0,600<br>
+      <span class="eq">→</span> <span class="res">US$ 1,51</span><br><br>
+
+      <span class="dim">── 2. REDACTOR ─ Opus 4.8 ($5 / $25) + caché 5 min ──────────────</span><br>
+      3 escrituras de caché × 35.000 tok × $6,25/1M <span class="eq">=</span> $0,656<br>
+      <span class="dim">(una por postulación; $6,25 = $5 × 1,25)</span><br>
+      12 lecturas de caché × 35.000 tok × $0,50/1M <span class="eq">=</span> $0,210<br>
+      <span class="dim">($0,50 = $5 × 0,1 — el caché es lo que hace viable este agente)</span><br>
+      entrada fresca 12 × 6.000 <span class="eq">=</span> 72.000 × $5/1M <span class="eq">=</span> $0,360<br>
+      salida 12 × 3.000 <span class="eq">=</span> 36.000 × $25/1M <span class="eq">=</span> $0,900<br>
+      <span class="eq">→</span> <span class="res">US$ 2,13</span><br><br>
+
+      <span class="dim">── 3. CHEQUEADOR ─ Opus 4.8 ($5 / $25) ─────────────────────────</span><br>
+      3 chequeos × (45.000 tok entrada + 3.000 tok salida)<br>
+      entrada <span class="eq">=</span> 135.000 × $5/1M <span class="eq">=</span> $0,675<br>
+      salida&nbsp;&nbsp;<span class="eq">=</span> &nbsp;&nbsp;9.000 × $25/1M <span class="eq">=</span> $0,225<br>
+      <span class="eq">→</span> <span class="res">US$ 0,90</span><br><br>
+
+      <span class="dim">── 4. ANALISTA DE COMPETENCIA ─ Sonnet 5 ───────────────────────</span><br>
+      8 análisis × (20.000 tok entrada + 1.500 tok salida)<br>
+      <span class="eq">→</span> $0,480 + $0,180 <span class="eq">=</span> <span class="res">US$ 0,66</span><br><br>
+
+      <span class="dim">── 5. CLASIFICADOR ─ Haiku 4.5 ($1 / $5) ─ costo de plataforma ──</span><br>
+      3.000 licitaciones nuevas/mes × (2.500 tok entrada + 300 tok salida)<br>
+      7,5M × $1/1M <span class="eq">=</span> $7,50 &nbsp;+&nbsp; 0,9M × $5/1M <span class="eq">=</span> $4,50<br>
+      <span class="eq">=</span> $12,00/mes de plataforma ÷ 66 clientes <span class="dim">(base, mes 12)</span><br>
+      <span class="eq">→</span> <span class="res">US$ 0,18</span><br><br>
+
+      <span class="eq">════════════════════════════════════════════════════════════════</span><br>
+      Subtotal &nbsp;1,51 + 2,13 + 0,90 + 0,66 + 0,18 <span class="eq">=</span> <span class="res">US$ 5,38</span><br>
+      Reintentos, evaluaciones y desperdicio <span class="eq">+25%</span> <span class="eq">=</span> $1,35<br>
+      <span class="dim">(prompts que fallan, evals que corremos en producción, reprocesos)</span><br>
+      <span class="eq">════════════════════════════════════════════════════════════════</span><br>
+      <span class="eq">TOTAL IA</span> <span class="eq">=</span> <span class="res">US$ 6,73 / cliente / mes</span> <span class="eq">×</span> $960 <span class="eq">=</span> <span class="res">$6.460 ≈ $6.500 CLP</span>
+    </div>
+
+    <h3>Los otros dos componentes del COGS</h3>
+    <div class="calc">
+      <span class="dim">── INFRAESTRUCTURA ─ costo fijo, amortizado ────────────────────</span><br>
+      Postgres administrado (Neon / Supabase Pro, con pgvector)  <span class="eq">=</span> US$ 50<br>
+      App + 2 workers (Fly.io / Railway)                         <span class="eq">=</span> US$ 60<br>
+      Object storage: bases y documentos (Cloudflare R2)         <span class="eq">=</span> US$ 15<br>
+      Redis (cola de jobs de ingesta y de IA)                    <span class="eq">=</span> US$ 15<br>
+      Observabilidad (Sentry + logs) — crítica: si el scraper<br>
+      &nbsp;&nbsp;de bases se cae y no nos enteramos, el producto miente <span class="eq">=</span> US$ 30<br>
+      Correo transaccional + WhatsApp (Resend + Meta)            <span class="eq">=</span> US$ 30<br>
+      Staging y respaldos                                        <span class="eq">=</span> US$ 15<br>
+      <span class="eq">──────────────────────────────────────────────────────────────</span><br>
+      <span class="eq">=</span> <span class="res">US$ 215 / mes</span> ÷ 100 clientes × $960 <span class="eq">=</span> <span class="res">$2.064 ≈ $2.100 CLP</span><br><br>
+
+      <span class="dim">── SOPORTE ─ y por qué es humano ───────────────────────────────</span><br>
+      1 especialista en licitaciones (costo empresa ≈ $1.600.000/mes)<br>
+      atiende ~200 clientes<br>
+      <span class="eq">→</span> <span class="res">$8.000 CLP / cliente / mes</span><br>
+      <span class="dim">Una alucinación de un chatbot sobre una boleta de garantía le cuesta</span><br>
+      <span class="dim">al cliente un contrato de $40M. El soporte lo hace una persona que</span><br>
+      <span class="dim">sabe de licitaciones, y está presupuestado acá arriba, no escondido.</span><br><br>
+
+      <span class="eq">════════════════════════════════════════════════════════════════</span><br>
+      <span class="eq">COGS TOTAL</span> <span class="eq">=</span> 6.500 + 2.100 + 8.000 <span class="eq">=</span> <span class="res">$16.600 / cliente / mes</span><br>
+      Contra ARPU $95.000 <span class="eq">→</span> margen bruto <span class="eq">=</span> <span class="res">82,5%</span>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m)">
+      <p class="ficha-h">Dónde se rompe este número</p>
+      <p class="prose">Si un cliente arma <strong>10 postulaciones al mes en vez de 3</strong>, su costo de IA se va a ~US$18 (~$17.000 CLP) y el margen bruto de esa cuenta cae a ~73%. Sigue siendo un buen margen, pero por eso los planes tienen tope de postulaciones y por eso existe la tabla <code>evento_ia</code>: <strong>hay que poder ver, cliente por cliente, cuál nos está costando plata.</strong> El plan Consorcio de $390.000 existe precisamente para los que superan el tope.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ENV ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>06</b> · Variables de entorno</p>
+    <h2>Lo que hay que configurar el lunes.</h2>
+    <pre style="margin-top:var(--sp-m)"><code><span class="c"># ── IA ────────────────────────────────────────────────────────</span>
+<span class="k">ANTHROPIC_API_KEY</span>=sk-ant-...
+<span class="k">MODELO_LECTOR</span>=claude-sonnet-5
+<span class="k">MODELO_REDACTOR</span>=claude-opus-4-8
+<span class="k">MODELO_CHEQUEO</span>=claude-opus-4-8      <span class="c"># nunca degradar este. Nunca.</span>
+<span class="k">MODELO_CLASIFICADOR</span>=claude-haiku-4-5
+<span class="k">TOPE_USD_CLIENTE_MES</span>=25             <span class="c"># corta y avisa. sin esto, un cliente
+                                      # entusiasta se come el margen.</span>
+
+<span class="c"># ── Mercado Público ───────────────────────────────────────────</span>
+<span class="k">MP_TICKET</span>=...                        <span class="c"># lo entrega ChileCompra a solicitud</span>
+<span class="k">MP_BASE_URL</span>=https://api.mercadopublico.cl/servicios/v1/publico
+<span class="k">MP_INTERVALO_INGESTA_MIN</span>=30
+<span class="k">MP_ALERTA_SI_CERO_LICITACIONES_HORAS</span>=4   <span class="c"># si la API se cae y no nos
+                                           # enteramos, el feed miente</span>
+
+<span class="c"># ── Datos ─────────────────────────────────────────────────────</span>
+<span class="k">DATABASE_URL</span>=postgres://...
+<span class="k">REDIS_URL</span>=redis://...
+<span class="k">S3_BUCKET_BASES</span>=adjudate-bases       <span class="c"># bases originales, inmutables</span>
+<span class="k">S3_BUCKET_DOCS</span>=adjudate-docs         <span class="c"># documentos del cliente (cifrados)</span>
+
+<span class="c"># ── Cobro y avisos ────────────────────────────────────────────</span>
+<span class="k">KHIPU_ID</span> / <span class="k">KHIPU_SECRET</span>=...
+<span class="k">RESEND_API_KEY</span>=...
+<span class="k">WHATSAPP_TOKEN</span> / <span class="k">WHATSAPP_PHONE_ID</span>=...
+
+<span class="c"># ── Operación ─────────────────────────────────────────────────</span>
+<span class="k">SENTRY_DSN</span>=...
+<span class="k">HORAS_ANTES_CIERRE_ALERTA</span>=72,24,4    <span class="c"># los tres avisos que importan</span>
+<span class="k">FEATURE_ENVIO_AUTOMATICO</span>=false      <span class="c"># y se queda en false. ver sección 01.</span></code></pre>
+  </div>
+</section>
+
+<!-- ===================== LO FINGIDO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>07</b> · Honestidad</p>
+    <h2>Qué está fingido en la demo.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-block:var(--sp-s) var(--sp-m); max-width:70ch">La demo corre entera en tu navegador. No hay servidor, no hay base de datos, no hay una sola llamada a la API de Claude. Esto es lo que es real y lo que no.</p>
+
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Pieza de la demo</th><th>¿Real?</th><th>Qué pasa de verdad</th></tr></thead>
+        <tbody>
+          <tr><td>Las 12 licitaciones del feed</td><td><span class="pill mal">Inventadas</span></td><td>Escritas a mano con formato real (<code>1057-42-LE26</code>), organismos reales y montos plausibles. En producción bajan de la API cada 30 minutos.</td></tr>
+          <tr><td>El motor de match y la probabilidad</td><td><span class="pill ok">Real</span></td><td>Es <strong>exactamente la función que se enviaría a producción</strong>. Corre de verdad, en tu navegador, cada vez que mueves un slider. Los datos que le entran son inventados; la aritmética no.</td></tr>
+          <tr><td>La fórmula del simulador de precio</td><td><span class="pill ok">Real</span></td><td><code>(precio_menor / tu_precio) × ponderador</code> es la fórmula estándar de evaluación económica de Mercado Público. La misma que usa el comprador.</td></tr>
+          <tr><td>La extracción de requisitos de las bases</td><td><span class="pill mal">Pre-escrita</span></td><td>Están redactados a mano por licitación, con citas plausibles. En producción los extrae Sonnet 5 leyendo el PDF real.</td></tr>
+          <tr><td>"Redactar con IA" (el streaming)</td><td><span class="pill mal">Fingido</span></td><td>Una plantilla que se escribe palabra por palabra con <code>setTimeout</code>. La <em>plantilla</em> sí es realista (Ley 19.886, formato de declaración jurada). En producción es Opus 4.8.</td></tr>
+          <tr><td>El histórico de adjudicaciones</td><td><span class="pill warn">Formato real, datos inventados</span></td><td>Los nombres de proveedores, montos y fechas son inventados. La <strong>estructura</strong> —quién ofertó, cuánto, quién ganó— es exactamente lo que ChileCompra publica.</td></tr>
+          <tr><td>El chequeo que bloquea el envío</td><td><span class="pill ok">Real</span></td><td>La lógica de bloqueo corre de verdad. Si te falta un documento obligatorio, el botón se deshabilita. Es el comportamiento que se enviaría.</td></tr>
+          <tr><td>El envío a Mercado Público</td><td><span class="pill warn">Honestamente fingido</span></td><td>La demo genera el folio y el .zip y luego te dice que <strong>vayas a subirlo a mano al portal</strong>. Eso <em>es</em> lo que pasa en producción, porque no existe API de envío.</td></tr>
+          <tr><td>Login, pagos, persistencia</td><td><span class="pill mal">No existen</span></td><td>Recargar la página reinicia todo. Es una demo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DOMINIO ===================== -->
+<section>
+  <div class="container">
+    <p class="folio"><b>08</b> · Dominio</p>
+    <h2>adjudate.com — verificado, con la evidencia.</h2>
+
+    <p class="prose" style="color:var(--ink-2); margin-block:var(--sp-s) var(--sp-m); max-width:70ch">El nombre sale del verbo que la PYME chilena usa de verdad: <em>«nos adjudicamos la licitación»</em>. No de una metáfora de cohetes ni de un animal.</p>
+
+    <div class="calc">
+      $ ./_kit/check-domain.sh adjudate licitro certamia kompita<br><br>
+      <span class="dim">RDAP Verisign — HTTP 404 = LIBRE · HTTP 200 = TOMADO</span><br>
+      <span class="eq">──────────────────────────────────────────────────────────────</span><br>
+      adjudate&nbsp;&nbsp;&nbsp;.com <span class="res">AVAILABLE</span>  (http 404)&nbsp;&nbsp; .cl <span class="res">AVAILABLE</span>  <span class="eq">← elegido</span><br>
+      licitro&nbsp;&nbsp;&nbsp;&nbsp;.com <span class="res">AVAILABLE</span>  (http 404)&nbsp;&nbsp; .cl <span class="res">AVAILABLE</span><br>
+      certamia&nbsp;&nbsp;&nbsp;.com <span class="res">AVAILABLE</span>  (http 404)&nbsp;&nbsp; .cl <span class="res">AVAILABLE</span><br>
+      kompita&nbsp;&nbsp;&nbsp;&nbsp;.com <span class="res">AVAILABLE</span>  (http 404)&nbsp;&nbsp; .cl <span class="res">AVAILABLE</span><br><br>
+      <span class="dim">Verificado el 2026-07-12. Fuente autoritativa para .com: RDAP de</span><br>
+      <span class="dim">Verisign (el registro del TLD). Para .cl: whois de NIC Chile.</span>
+    </div>
+
+    <p class="nota" style="margin-top:var(--sp-s)"><b>Se registran los cuatro, y los dos TLD de cada uno.</b> Son ~US$60/año en total y evita la conversación incómoda del mes 14. <b>adjudate.cl</b> es el que la PYME chilena va a tipear; <b>adjudate.com</b> es el que hay que tener cuando esto salga a Perú y Colombia.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong style="font-family:var(--mono); color:var(--ink)">ADJUDATE</strong> &mdash; adjudate.com · Prototipo. La demo no llama a ninguna API: todo corre en tu navegador.</p>
+    <p><a href="../index.html">&larr; Ideas</a> · <a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('navBtn'), m = document.getElementById('navMob');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.textContent = open ? 'Cerrar' : 'Menú';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Zurcia</title>
+<meta name="description" content="Cómo se construye: modelo de datos, los tres agentes, las APIs de terceros, el costo real de Meta y de la IA, y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Petrona:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  pre.cod {
+    background: var(--tinta); color: #E8E2D2;
+    font-family: var(--mono); font-size: .78rem; line-height: 1.65;
+    padding: var(--sp-m); overflow-x: auto; margin-block: var(--sp-s);
+    border-left: 4px solid var(--sello-alto);
+  }
+  pre.cod b { color: var(--sello-alto); font-weight: 600; }
+  pre.cod i { color: var(--pauta-duro); font-style: normal; }
+  pre.cod u { color: #E8956F; text-decoration: none; }
+
+  .agente { border: 1.5px solid var(--pauta-duro); background: var(--papel-alto); padding: var(--sp-m); }
+  .agente + .agente { margin-block-start: var(--sp-m); }
+  .agente__cab { display: flex; flex-wrap: wrap; gap: var(--sp-xs); align-items: baseline; justify-content: space-between; }
+  .agente h3 { font-size: var(--step-1); }
+  .agente__mod { font-family: var(--mono); font-size: .76rem; background: var(--sello-tenue); color: var(--sello); padding: 3px 8px; }
+  .flujo { display: grid; gap: var(--sp-2xs); margin-block-start: var(--sp-s); }
+  .flujo div { display: grid; grid-template-columns: 1.6rem 1fr; gap: var(--sp-xs); font-size: .9rem; color: var(--tinta-med); align-items: start; }
+  .flujo b { font-family: var(--mono); color: var(--sello); font-size: .8rem; padding-top: 2px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="16" /><path d="M2.5 9.5h19M7.5 2.5v4M16.5 2.5v4" />
+          <path d="M4.5 16.5l3-2.6 3 2.6 3-2.6 3 2.6 3-2.6" />
+        </svg>
+        Zurcia
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span data-label>Menú</span></button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul role="list">
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <section>
+    <p class="eyebrow">Arquitectura</p>
+    <h1>Un webhook, tres agentes y una base de datos que nunca miente.</h1>
+    <p class="lede" style="margin-block-start: var(--sp-s);">La regla de diseño que no se negocia: <strong>el modelo nunca inventa disponibilidad, ni precios, ni horarios.</strong> Todo dato que sale por WhatsApp pasó antes por una consulta a Postgres. El modelo redacta y decide <em>qué</em> herramienta llamar; los hechos los pone la base.</p>
+  </section>
+
+  <!-- ================= FLUJO ================= -->
+  <section>
+    <p class="eyebrow eyebrow--tinta">01 · El camino de un mensaje</p>
+    <h2>Desde que la clienta escribe hasta que la agenda cambia.</h2>
+    <pre class="cod">  <b>Clienta</b> ──WhatsApp──▶ <b>Meta Cloud API</b>
+                              │
+                    POST /webhook/wa  (firma HMAC-SHA256, X-Hub-Signature-256)
+                              ▼
+                     <b>Fastify (Node 22)</b>
+                              │ verifica firma, responde 200 en &lt;5 s
+                              ▼
+                     <b>Cola BullMQ / Redis</b>   <i>(idempotente por wamid)</i>
+                              ▼
+                  ┌───── <b>Agente Conversación</b> ─────┐
+                  │  claude-haiku-4-5              │
+                  │  + prompt cacheado del local   │
+                  │  + herramientas (abajo)        │
+                  └────────────┬───────────────────┘
+                               │ tool_use
+             ┌─────────────────┼──────────────────┐
+             ▼                 ▼                  ▼
+   <u>ver_disponibilidad</u>  <u>crear_reserva</u>   <u>escalar_a_humano</u>
+             │                 │                  │
+             └───────▶ <b>Postgres</b> ◀──────┘           ▼
+                          │                   Panel web (SSE)
+        transacción con SELECT … FOR UPDATE
+        (dos clientas no pueden tomar el mismo bloque)
+                          │
+                          ▼
+              <i>evento: reserva.cancelada</i>
+                          ▼
+              ┌── <b>Agente Rescate</b> ───────────┐
+              │  no usa LLM para calzar:        │
+              │  el calce es SQL + puntaje      │
+              │  el LLM sólo redacta la oferta  │
+              └────────────┬────────────────────┘
+                           ▼
+              Plantilla aprobada por Meta ──▶ <b>Clienta en espera</b></pre>
+
+    <p class="fuente"><strong>Por qué el calce no lo hace el modelo.</strong> Elegir a quién ofrecerle un hueco es una consulta con un puntaje: mismo servicio, cabe en la duración, coincide la preferencia horaria, días esperando. Es determinista, auditable y cuesta $0. Meterle un LLM sería caro, lento y no lo haría mejor. El LLM entra sólo donde aporta: <em>redactar</em> la oferta en el tono del local.</p>
+  </section>
+
+  <!-- ================= DATOS ================= -->
+  <section>
+    <p class="eyebrow eyebrow--tinta">02 · Modelo de datos</p>
+    <h2>Nueve tablas. Ni una más.</h2>
+    <pre class="cod"><b>local</b>            id, rut, nombre, direccion, comuna, zona_horaria,
+                 wa_phone_number_id, wa_waba_id, plan, tono, estado
+<b>profesional</b>      id, local_id, nombre, color, activo
+<b>servicio</b>         id, local_id, nombre, duracion_min, precio_clp,
+                 profesionales[]  <i>-- quién lo puede hacer</i>
+<b>horario</b>          id, profesional_id, dia_semana, desde, hasta
+                 <i>-- + tabla `excepcion` para feriados y vacaciones</i>
+<b>cliente</b>          id, local_id, telefono_e164, nombre, notas,
+                 no_shows, visitas, ultimo_contacto_at
+                 <i>UNIQUE (local_id, telefono_e164)</i>
+<b>reserva</b>          id, local_id, cliente_id, profesional_id, servicio_id,
+                 inicio_at, fin_at, precio_clp,
+                 estado ∈ {pendiente, confirmada, cancelada,
+                           no_show, completada, rescatada},
+                 origen ∈ {agente, manual, rescate}, cancelada_at
+                 <i>EXCLUDE USING gist (profesional_id WITH =,
+                   tstzrange(inicio_at, fin_at) WITH &amp;&amp;)
+                   WHERE (estado NOT IN ('cancelada','no_show'))</i>
+                 <i>-- Postgres se encarga: dos reservas vivas NO pueden
+                    solaparse en el mismo profesional. No es lógica de
+                    aplicación, es una restricción de la base.</i>
+<b>espera</b>           id, local_id, cliente_id, servicio_id,
+                 preferencia ∈ {manana, tarde, cualquiera},
+                 desde_at, hasta_at, creada_at, estado
+<b>hueco</b>            id, reserva_origen_id, profesional_id, inicio_at,
+                 fin_at, estado ∈ {abierto, ofrecido, rescatado, vencido},
+                 rescatado_por_cliente_id, valor_clp
+<b>oferta</b>           id, hueco_id, cliente_id, puntaje, enviada_at,
+                 vence_at, estado ∈ {enviada, aceptada, rechazada,
+                                     sin_respuesta},
+                 costo_meta_clp   <i>-- sí, guardamos lo que nos costó</i>
+<b>mensaje</b>          id, local_id, cliente_id, wamid, direccion,
+                 cuerpo, plantilla, categoria_meta, costo_clp, at</pre>
+    <p class="fuente">La restricción <span class="mono">EXCLUDE … USING gist</span> es la pieza más importante del sistema. Es lo que hace imposible que el agente agende dos clientas a la misma hora con el mismo profesional — el riesgo #4 de la <a href="negocio.html#mata">lista de lo que nos mataría</a>. No confiamos en que el modelo no se equivoque: hacemos que la base lo rechace.</p>
+  </section>
+
+  <!-- ================= AGENTES ================= -->
+  <section>
+    <p class="eyebrow eyebrow--tinta">03 · Los tres agentes</p>
+    <h2>Cada uno con su modelo, su prompt y sus herramientas.</h2>
+
+    <div class="agente">
+      <div class="agente__cab">
+        <h3>1 · Agente de Conversación</h3>
+        <span class="agente__mod">claude-haiku-4-5</span>
+      </div>
+      <p style="color: var(--tinta-med); margin-block-start: var(--sp-s);">El que habla. Corre en cada mensaje entrante. Escala a Sonnet 5 cuando la conversación se pone rara (queja, reclamo de plata, ambigüedad que no resuelve en dos vueltas) — eso pasa en ~4% de los turnos.</p>
+
+      <div class="flujo">
+        <div><b>sys</b><span>Prompt de sistema con el contexto del local: nombre, dirección, profesionales, servicios con precio y duración, horarios, política de cancelación, tono declarado por la dueña, y las 6 reglas duras.</span></div>
+        <div><b>tool</b><span><span class="mono">ver_disponibilidad(servicio, desde, hasta, profesional?)</span> → bloques reales de Postgres.</span></div>
+        <div><b>tool</b><span><span class="mono">crear_reserva(cliente, servicio, profesional, inicio)</span> → transacción; si choca, la base la rechaza y el agente vuelve a ofrecer.</span></div>
+        <div><b>tool</b><span><span class="mono">cancelar_reserva(id, motivo)</span> → emite el evento que enciende el motor de rescate.</span></div>
+        <div><b>tool</b><span><span class="mono">reagendar(id, nuevo_inicio)</span> · <span class="mono">agregar_a_espera(cliente, servicio, preferencia)</span></span></div>
+        <div><b>tool</b><span><span class="mono">escalar_a_humano(motivo)</span> → marca el hilo, avisa al panel, y el agente deja de responder. <strong>No es un fallback: es una herramienta de primera clase.</strong></span></div>
+      </div>
+
+      <p class="eyebrow eyebrow--tinta" style="margin-block-start: var(--sp-m);">El corazón del prompt de sistema</p>
+      <pre class="cod">Eres el asistente de <b>{{local.nombre}}</b>, {{local.comuna}}.
+Hablas por WhatsApp con clientas. Escribes como chileno: directo,
+cálido, sin solemnidad. Frases cortas. Nunca "estimado cliente".
+
+<u>REGLAS DURAS — se cumplen siempre:</u>
+1. NUNCA inventes horas, precios ni servicios. Si no viene de una
+   herramienta, no existe. Ante la duda: llama a la herramienta.
+2. NUNCA confirmes una reserva antes de que crear_reserva devuelva ok.
+3. Si la clienta pide algo que no está en el catálogo, dilo y ofrece
+   escalar. No improvises un precio "aproximado".
+4. Si hay reclamo, plata de por medio, o algo que huela a conflicto:
+   escalar_a_humano de inmediato. No negocies, no ofrezcas descuentos.
+5. Ofrece máximo 3 horas por mensaje. Más que eso agobia.
+6. Si no entendiste después de dos intentos: escalar_a_humano.
+
+Hoy es {{ahora}}. El local {{abierto ? "está abierto" : "está cerrado"}}.
+
+<i>--- todo lo de arriba va con cache_control: ephemeral ---</i>
+<i>--- ≈4.600 tokens: sobre el mínimo de 4.096 de Haiku 4.5 ---</i></pre>
+      <p class="fuente"><strong>Un detalle que sí importa para el costo.</strong> El prefijo cacheable mínimo de Haiku 4.5 es de <span class="mono">4.096 tokens</span>. Un prompt de local chico se queda en ~3.200 y <em>no se cachearía</em>: pagaríamos precio completo en cada turno. Por eso el contexto del local se rellena a propósito hasta pasar los 4.600 (catálogo completo, ejemplos de tono, políticas). Suena a truco; es la diferencia entre pagar <span class="mono">US$1,00</span> y <span class="mono">US$0,10</span> por millón de tokens de entrada.</p>
+    </div>
+
+    <div class="agente">
+      <div class="agente__cab">
+        <h3>2 · Agente de Rescate</h3>
+        <span class="agente__mod">SQL + claude-haiku-4-5 (sólo redacción)</span>
+      </div>
+      <p style="color: var(--tinta-med); margin-block-start: var(--sp-s);">Se dispara con el evento <span class="mono">reserva.cancelada</span> o <span class="mono">reserva.no_show_probable</span>. El calce es determinista; el modelo sólo escribe.</p>
+      <pre class="cod"><i>-- el puntaje de calce, tal cual está en el demo</i>
+puntaje =   40  <i>si el servicio pedido es exactamente el del hueco</i>
+          + 18  <i>si el servicio cabe en la duración del hueco</i>
+          + 20  <i>si la duración calza justo (no desperdicia bloque)</i>
+          + 25  <i>si el hueco cae en su preferencia horaria</i>
+          + min(dias_esperando × 3, 15)  <i>antigüedad en la lista</i>
+
+<b>ofrecer()</b>: se ofrece de a uno, en orden de puntaje.
+          ventana de respuesta: 8 minutos (configurable).
+          si no contesta o rechaza → siguiente candidato.
+          máximo 3 candidatos por hueco (esto es un dial de COSTO:
+          cada oferta es una plantilla que Meta nos cobra).</pre>
+      <p class="fuente">El límite de 3 candidatos no es una decisión de producto: es una decisión de margen. Cada oferta cuesta <span class="mono">$17,30</span>. Rescatar un bloque de $25.000 con 3 ofertas cuesta <span class="mono">$51,90</span> — sigue siendo un negocio absurdamente bueno para el local, pero con 8 candidatos por hueco nuestro subtotal de Meta se dispara. El dial está expuesto en Ajustes del <a href="demo/index.html">demo</a>, con el costo recalculándose en vivo.</p>
+    </div>
+
+    <div class="agente">
+      <div class="agente__cab">
+        <h3>3 · Agente de Riesgo</h3>
+        <span class="agente__mod">sin LLM · regresión logística</span>
+      </div>
+      <p style="color: var(--tinta-med); margin-block-start: var(--sp-s);">Corre una vez al día, a las 09:00. Estima la probabilidad de que cada reserva del día no se presente, y con eso decide a quién le manda un recordatorio "duro" (que pide confirmación explícita) y qué huecos empieza a pre-ofrecer <em>antes</em> de que se caigan.</p>
+      <div class="flujo">
+        <div><b>in</b><span>No-shows previos del cliente · días desde que reservó · hora del día · si es primera visita · si confirmó el recordatorio · monto del servicio · si llueve (sí, importa)</span></div>
+        <div><b>out</b><span><span class="mono">p(no_show)</span>. Sobre 0,45 → recordatorio duro. Sobre 0,70 y sin confirmar a las 12:00 → se abre el hueco en modo "preventivo" y se empieza a ofrecer sin cancelar la reserva original.</span></div>
+      </div>
+      <p class="fuente"><strong>Esto es lo último que se construye, no lo primero.</strong> Los primeros 6 meses la "regresión" es una regla de tres líneas: si el cliente faltó antes, o es primera visita, o reservó hace más de 10 días → riesgo alto. Un modelo entrenado necesita datos que todavía no tenemos, y fingir que sí los tenemos sería exactamente el tipo de humo que este documento intenta evitar.</p>
+    </div>
+  </section>
+
+  <!-- ================= APIs ================= -->
+  <section>
+    <p class="eyebrow eyebrow--tinta">04 · Terceros y variables de entorno</p>
+    <h2>Todo lo que hay que contratar y configurar.</h2>
+
+    <div class="scroll-x">
+      <table class="tabla">
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Costo</th><th>Fricción de partida</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Meta WhatsApp Cloud API</strong></td><td>El canal entero. Sin esto no hay producto.</td><td>Por conversación iniciada por el negocio</td><td><strong>Alta.</strong> Verificación de Meta Business: entre 3 días y 3 semanas. Requiere documentos legales del local.</td></tr>
+          <tr><td><strong>Anthropic API</strong></td><td>Los agentes de conversación y redacción</td><td>Haiku 4.5 <span class="mono">US$1/US$5</span> por MTok · Sonnet 5 <span class="mono">US$3/US$15</span></td><td>Ninguna. Una API key.</td></tr>
+          <tr><td><strong>Neon / Supabase (Postgres 16)</strong></td><td>La base. Necesita la extensión <span class="mono">btree_gist</span>.</td><td><span class="mono">~US$70/mes</span> al inicio</td><td>Baja.</td></tr>
+          <tr><td><strong>Upstash Redis</strong></td><td>Cola de mensajes (BullMQ), idempotencia por <span class="mono">wamid</span>, ventana de ofertas</td><td><span class="mono">~US$20/mes</span></td><td>Baja.</td></tr>
+          <tr><td><strong>Fly.io</strong></td><td>La app (Node 22 + Fastify), 2 regiones, escala a cero de noche no — el agente contesta a las 3 AM</td><td><span class="mono">~US$60/mes</span></td><td>Baja.</td></tr>
+          <tr><td><strong>Flow o Transbank</strong></td><td>Cobrar la suscripción en CLP con tarjeta chilena</td><td><span class="mono">3,19% + IVA</span> por transacción (Flow)</td><td>Media. Necesita el RUT de la sociedad y cuenta corriente.</td></tr>
+          <tr><td><strong>Resend</strong></td><td>Correos transaccionales al dueño (resumen semanal de plata rescatada)</td><td><span class="mono">~US$20/mes</span></td><td>Ninguna.</td></tr>
+          <tr><td><strong>Sentry + Axiom</strong></td><td>Errores y trazas. Cada conversación queda auditable: qué dijo el modelo, qué herramienta llamó, qué devolvió.</td><td><span class="mono">~US$50/mes</span></td><td>Ninguna.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="cod" style="margin-block-start: var(--sp-m);"><i># .env — lo que hay que tener antes de la primera línea de código</i>
+<b>WHATSAPP_TOKEN</b>=              <i># token permanente del System User de Meta</i>
+<b>WHATSAPP_PHONE_NUMBER_ID</b>=    <i># uno por local</i>
+<b>WHATSAPP_WABA_ID</b>=            <i># la cuenta de WhatsApp Business</i>
+<b>WHATSAPP_VERIFY_TOKEN</b>=       <i># el que Meta te devuelve en el handshake</i>
+<b>WHATSAPP_APP_SECRET</b>=         <i># para validar la firma HMAC del webhook</i>
+
+<b>ANTHROPIC_API_KEY</b>=
+<b>MODELO_CONVERSACION</b>=claude-haiku-4-5
+<b>MODELO_ESCALADO</b>=claude-sonnet-5
+
+<b>DATABASE_URL</b>=postgres://…       <i># requiere btree_gist</i>
+<b>REDIS_URL</b>=rediss://…
+<b>FLOW_API_KEY</b>= / <b>FLOW_SECRET_KEY</b>=
+<b>SENTRY_DSN</b>= / <b>AXIOM_TOKEN</b>=
+
+<i># Diales de costo — se tocan en Ajustes y afectan la factura de Meta</i>
+<b>RESCATE_MAX_CANDIDATOS</b>=3
+<b>RESCATE_VENTANA_MIN</b>=8
+<b>RECORDATORIO_HORAS_ANTES</b>=24
+<b>UMBRAL_ESCALADO_A_SONNET</b>=0.35</pre>
+  </section>
+
+  <!-- ================= COSTOS ================= -->
+  <section id="costos">
+    <p class="eyebrow eyebrow--tinta">05 · Lo que cuesta servir un local</p>
+    <h2>La resta completa, con la aritmética a la vista.</h2>
+
+    <div class="grid grid--2" style="margin-block-start: var(--sp-m);">
+      <div class="ficha ficha--alerta">
+        <p class="eyebrow" style="color: var(--ladrillo);">Meta — el costo que nadie muestra</p>
+        <div class="calculo">Meta cobra por conversación INICIADA
+por el negocio. Lo que el agente responde
+dentro de las 24 h que abrió la clienta
+es GRATIS.
+
+Tarifas supuestas (Chile, 2026):
+  plantilla de utilidad   US$0,018  = $17,30
+  plantilla de marketing  US$0,059  = $56,60
+  (a $960 por dólar)
+
+Un local del plan Local, al mes:
+  recordatorios   3/día × 30    =  90
+  confirmaciones  1,5/día × 30  =  45
+  ofertas de rescate            = 180
+  reagendas y avisos            =  50
+                                 ────
+  iniciados/mes                 = 365
+
+  utilidad   340 × $17,30       = $5.882
+  marketing   25 × $56,60       = $1.415
+                                 ──────
+  SUBTOTAL META                   $7.297</div>
+        <p class="fuente" style="margin-top: var(--sp-s);"><strong>El supuesto frágil está acá.</strong> Clasificamos las ofertas de rescate como <em>plantilla de utilidad</em>, porque la clienta pidió explícitamente que la avisáramos si se soltaba una hora. Si Meta las reclasificara como <em>marketing</em>, esos 180 mensajes pasan de $3.114 a $10.188 y el subtotal salta a <span class="mono">$14.371</span>: el margen bruto cae del 65% al 56%. Es el riesgo de plataforma del que habla <a href="negocio.html#mata">Negocio</a>, con número. Las tarifas exactas hay que confirmarlas en la lista de precios vigente de Meta para Chile antes de comprometerse con un precio de lista.</p>
+      </div>
+
+      <div class="ficha ficha--sello">
+        <p class="eyebrow">Anthropic — el costo de la IA</p>
+        <div class="calculo">Turnos de conversación/mes  = 3.500
+  (≈ 120 conversaciones, 29 turnos c/u,
+   incluidos los del agente)
+
+96% con claude-haiku-4-5 (3.360 turnos)
+  entrada  5.100 tok/turno
+    · 4.600 cacheados  → 15,46 MTok
+      × US$0,10/MTok        = US$1,55
+    · 500 frescos      →  1,68 MTok
+      × US$1,00/MTok        = US$1,68
+    · escritura de caché
+      (1 vez cada 5 min, ~290/mes)
+      1,33 MTok × US$1,25   = US$1,67
+  salida   300 tok/turno →  1,01 MTok
+      × US$5,00/MTok        = US$5,04
+                              ────────
+                              US$9,94
+   ─ ajuste por reutilización real (×0,73)
+                              US$7,26
+
+4% escalado a claude-sonnet-5 (140 turnos)
+  entrada 9.000 tok, salida 700
+  1,26 MTok × US$3  = US$3,78 … pero
+  el 90% viene del caché (US$0,30/MTok)
+  → US$0,49  +  0,098 MTok × US$15 = US$1,47
+  … ajustado                  US$1,03
+                              ────────
+SUBTOTAL IA   US$8,29 × $960   = $7.958</div>
+        <p class="fuente" style="margin-top: var(--sp-s);">Precios de lista de Anthropic: Haiku 4.5 <span class="mono">US$1 / US$5</span> por MTok; Sonnet 5 <span class="mono">US$3 / US$15</span> (con precio de introducción de <span class="mono">US$2 / US$10</span> hasta el 31-08-2026, que <strong>no</strong> usamos en el modelo — preferimos que el número aguante cuando se acabe). Lectura de caché ≈ <span class="mono">0,1×</span> la entrada; escritura <span class="mono">1,25×</span> con TTL de 5 minutos.</p>
+      </div>
+    </div>
+
+    <div class="ficha ficha--marcada" style="margin-block-start: var(--sp-m);">
+      <p class="eyebrow">Total, y la parte que duele</p>
+      <div class="calculo">INGRESO plan Local                       $79.000
+
+  Meta                                    $7.297
+  IA (Anthropic)                          $7.958
+  Infra (prorrateada sobre 60 locales)    $2.700
+                                         ───────
+  Costo de servir EN RÉGIMEN             $17.955
+  Margen bruto en régimen                 77,3%
+
+  + Soporte humano real
+    (onboarding amortizado, el chat de la
+     dueña, el 20% de conversaciones que
+     el agente escala a una persona)       $9.500
+                                         ───────
+  COSTO TOTAL HOY                        $27.455
+  MARGEN BRUTO HOY             $51.545 =  65,2%</div>
+      <p class="fuente" style="margin-top: var(--sp-s);"><strong>65% es el número que usamos en todas partes</strong> — en <a href="negocio.html#unitaria">la economía unitaria</a> y en el <a href="roadmap.html">roadmap</a>. El 77% es a lo que llegamos cuando el handoff humano baje de 20% a 8%; es una promesa, no un dato, y por eso no la contamos como plata. Un SaaS puro tiene 80%+; nosotros no lo vamos a tener nunca, porque Meta cobra peaje. Eso hay que decirlo antes de que lo descubra el inversionista.</p>
+    </div>
+  </section>
+
+  <!-- ================= FALSO ================= -->
+  <section id="falso">
+    <p class="eyebrow eyebrow--tinta">06 · Qué está falseado en el demo</p>
+    <h2>Todo. Y acá está la lista, línea por línea.</h2>
+
+    <div class="scroll-x" style="margin-block-start: var(--sp-m);">
+      <table class="tabla">
+        <thead><tr><th>En el demo</th><th>En la realidad</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>El agente responde con un <strong>clasificador de ~40 reglas en JavaScript</strong>. No hay ningún modelo de lenguaje corriendo.</td>
+            <td>Es una llamada a <span class="mono">claude-haiku-4-5</span> con seis herramientas y el prompt de sistema cacheado. El demo es determinista a propósito: queremos que <em>tú</em> puedas romperlo y ver qué hace, no que improvise.</td>
+          </tr>
+          <tr>
+            <td>El <strong>reloj es simulado</strong>. Los botones <span class="mono">+30′</span> y <span class="mono">▶︎ día</span> mueven el tiempo a voluntad.</td>
+            <td>El tiempo pasa solo, y ése es justamente el problema del negocio: el hueco de las 16:00 se abre a las 8:40 de un sábado, cuando nadie está mirando.</td>
+          </tr>
+          <tr>
+            <td>Las clientas mock <strong>tienen una respuesta predeterminada</strong> (acepta / rechaza / no contesta) y un tiempo de reacción escrito en el código.</td>
+            <td>Contestan cuando quieren, o nunca. La ventana de 8 minutos existe justamente porque la mayoría no contesta.</td>
+          </tr>
+          <tr>
+            <td>Todo el estado vive en <strong>una variable de JavaScript</strong>. Recargas la página y se pierde.</td>
+            <td>Postgres, con la restricción de exclusión que impide el doble booking, y una cola que garantiza que un mensaje de Meta se procesa exactamente una vez.</td>
+          </tr>
+          <tr>
+            <td>El costo de Meta se <strong>calcula en vivo</strong> con las tarifas que están en el código.</td>
+            <td>Es una factura real de Meta, a fin de mes, en dólares, que hay que reconciliar mensaje por mensaje. La lógica del cálculo es idéntica; lo que cambia es que la plata sale de verdad.</td>
+          </tr>
+          <tr>
+            <td><strong>No hay verificación de Meta Business.</strong></td>
+            <td>Es el paso más lento de todo el onboarding: entre 3 días y 3 semanas, con documentos legales, y no depende de nosotros. En el <a href="roadmap.html">embudo de activación</a> es el escalón donde se cae el 40% de las pruebas.</td>
+          </tr>
+          <tr>
+            <td>Los datos son mock: <strong>Peluquería Marisol, RUT 76.412.905-K, Irarrázaval 3410</strong>.</td>
+            <td>El local no existe. El RUT no es válido. Los nombres, comunas y precios sí son realistas — están calibrados con locales reales de Ñuñoa.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= DOMINIO ================= -->
+  <section id="dominio">
+    <p class="eyebrow eyebrow--tinta">07 · El dominio</p>
+    <h2>Verificado, con el código HTTP en la mano.</h2>
+
+    <p style="color: var(--tinta-med); max-width: var(--measure); margin-block-start: var(--sp-s);"><strong>Zurcia</strong> viene de <em>zurcir</em>: coser el agujero de una prenda para que no se note. Es exactamente lo que hace el producto con la agenda. Verificado contra el RDAP de Verisign el <span class="mono">2026-07-12</span>; <span class="mono">404</span> = libre, <span class="mono">200</span> = tomado.</p>
+
+    <div class="scroll-x" style="margin-block-start: var(--sp-m);">
+      <table class="tabla">
+        <thead><tr><th>Dominio</th><th class="num">HTTP (RDAP)</th><th>.com</th><th>.cl</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr style="background: var(--sello-tenue);"><td><strong class="mono">zurcia</strong></td><td class="num mono">404</td><td><span class="tag tag--sello">LIBRE · elegido</span></td><td><span class="tag tag--sello">LIBRE</span></td><td>Corto, pronunciable en español, y el verbo <em>zurcir</em> cuenta la historia sin explicarla.</td></tr>
+          <tr><td class="mono">horaza</td><td class="num mono">404</td><td><span class="tag tag--sello">LIBRE</span></td><td><span class="tag tag--sello">LIBRE</span></td><td>Alternativa 1. "Hora" + aumentativo. Más literal, menos memorable.</td></tr>
+          <tr><td class="mono">horalta</td><td class="num mono">404</td><td><span class="tag tag--sello">LIBRE</span></td><td><span class="tag tag--sello">LIBRE</span></td><td>Alternativa 2. Se lee "hora alta"; ambiguo, pero disponible.</td></tr>
+          <tr><td class="mono">sillana</td><td class="num mono">404</td><td><span class="tag tag--sello">LIBRE</span></td><td><span class="tag tag--sello">LIBRE</span></td><td>Alternativa 3. Desde "silla", la unidad de capacidad del local.</td></tr>
+          <tr><td class="mono">zurcio</td><td class="num mono">404</td><td><span class="tag tag--sello">LIBRE</span></td><td><span class="tag tag--sello">LIBRE</span></td><td>Variante de respaldo, por si hay que defender la marca.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="cod" style="margin-block-start: var(--sp-m);"><i>$ ./_kit/check-domain.sh zurcia horaza horalta sillana zurcio</i>
+
+zurcia    .com <b>AVAILABLE</b>  (http <b>404</b>)   .cl <b>AVAILABLE</b>
+horaza    .com <b>AVAILABLE</b>  (http <b>404</b>)   .cl <b>AVAILABLE</b>
+horalta   .com <b>AVAILABLE</b>  (http <b>404</b>)   .cl <b>AVAILABLE</b>
+sillana   .com <b>AVAILABLE</b>  (http <b>404</b>)   .cl <b>AVAILABLE</b>
+zurcio    .com <b>AVAILABLE</b>  (http <b>404</b>)   .cl <b>AVAILABLE</b>
+
+<i># .com: RDAP de Verisign — 404 = sin registro = libre; 200 = tomado
+# .cl : consulta a NIC Chile, que tiene su propio registro</i></pre>
+
+    <p class="fuente"><strong>Lo honesto:</strong> el RDAP dice que <em>no hay registro</em>, no que el nombre esté a la venta a precio normal. Antes de gastar en marca hay que pasar por el registrador y por INAPI (marcas en Chile). El <span class="mono">.cl</span> también hay que revisarlo en NIC Chile, que tiene su propio registro y no responde al RDAP de Verisign.</p>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div><strong style="font-family: var(--serif); color: var(--tinta);">Zurcia</strong> — <span class="mono">zurcia.com</span></div>
+    <div>
+      <a href="../index.html">← Ideas</a> ·
+      <a href="index.html">Producto</a> ·
+      <a href="demo/index.html">Demo</a> ·
+      <a href="negocio.html">Negocio</a> ·
+      <a href="roadmap.html">Roadmap</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

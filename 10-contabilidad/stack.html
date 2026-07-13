@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura — Talonio</title>
+<meta name="description" content="Modelo de datos, agentes de IA, APIs a contratar, costo mensual con su aritmética y qué está falseado en el demo.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&display=swap">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .doc-hd { border-bottom: 3px double var(--linea-2); padding-block: var(--sp-m) var(--sp-s); }
+  .doc-hd h1 { font-size: var(--step-4); }
+  .doc-hd p { color: var(--tinta-2); margin-top: 6px; max-width: 62ch; }
+
+  h2.sec { font-size: var(--step-2); padding-top: var(--sp-xl); margin-bottom: var(--sp-2xs); display: flex; align-items: baseline; gap: 12px; }
+  h2.sec::before { content: attr(data-n); font-family: var(--f-doc); font-size: .8rem; color: var(--timbre); font-weight: 700; flex: none; }
+  h3.sub { font-size: var(--step-1); margin-top: var(--sp-m); margin-bottom: var(--sp-2xs); }
+  section > p { color: var(--tinta-2); max-width: var(--measure); line-height: 1.6; }
+  section > p + p { margin-top: var(--sp-s); }
+
+  /* Bloques de código: papel de listado de impresora */
+  .code {
+    background: var(--tinta); color: #E6E0D2; border-radius: var(--radio);
+    padding: var(--sp-s); overflow-x: auto; font-family: var(--f-doc); font-size: .8rem;
+    line-height: 1.65; margin-top: var(--sp-s); -webkit-overflow-scrolling: touch;
+  }
+  .code pre { margin: 0; }
+  .code .c { color: #9A907C; }         /* comentario */
+  .code .k { color: #F0836A; }         /* palabra clave / tabla */
+  .code .t { color: #8FC5DC; }         /* tipo */
+  .code .s { color: #C7D69C; }         /* string */
+
+  .tabla-datos { width: 100%; }
+  .tabla-datos caption {
+    text-align: left; font-family: var(--f-doc); font-size: .74rem; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--timbre); padding-bottom: 8px; font-weight: 700;
+  }
+
+  /* Agente */
+  .agente {
+    background: var(--papel-2); border: 1px solid var(--linea-2); border-radius: var(--radio);
+    padding: var(--sp-s); margin-top: var(--sp-s);
+  }
+  @media (min-width: 48em) { .agente { padding: var(--sp-m); } }
+  .agente-hd { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between; }
+  .agente h3 { font-size: var(--step-1); }
+  .modelo {
+    font-family: var(--f-doc); font-size: .74rem; background: var(--tinta); color: var(--papel);
+    padding: 3px 8px; border-radius: 2px; white-space: nowrap;
+  }
+  .agente > p { font-size: .92rem; color: var(--tinta-2); line-height: 1.55; margin-top: 8px; max-width: 62ch; }
+  .agente-meta { margin-top: var(--sp-s); border-top: 1px solid var(--linea); }
+  .agente-meta div {
+    display: grid; grid-template-columns: 92px 1fr; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--linea); font-size: .86rem; align-items: baseline;
+  }
+  .agente-meta div:last-child { border-bottom: 0; }
+  .agente-meta dt, .agente-meta > div > span:first-child {
+    font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-3);
+  }
+  .agente-meta code { background: var(--papel-3); padding: 1px 5px; border-radius: 2px; font-family: var(--f-doc); font-size: .84em; }
+
+  .regla-dura {
+    margin-top: var(--sp-s); background: var(--timbre-lav); border: 1px solid #E5B7A8;
+    border-radius: var(--radio); padding: 11px 13px; font-size: .87rem; color: #7E2110; line-height: 1.55;
+  }
+  .regla-dura b { display: block; font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+
+  /* Costos */
+  .calc { background: var(--papel-2); border: 1px solid var(--linea-2); border-left: 3px solid var(--timbre); border-radius: var(--radio); padding: var(--sp-s); margin-top: var(--sp-s); }
+  .calc-t { font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tinta-3); margin-bottom: 10px; }
+  .calc-f { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-s); align-items: baseline; padding: 7px 0; border-bottom: 1px dotted var(--linea); font-size: .88rem; }
+  .calc-f:last-of-type { border-bottom: 0; }
+  .calc-f > span:last-child { font-family: var(--f-doc); font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  .calc-f small { display: block; color: var(--tinta-3); font-size: .76rem; font-weight: 400; }
+  .calc-r { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-s); align-items: baseline; border-top: 3px double var(--linea-2); margin-top: 8px; padding-top: 11px; }
+  .calc-r b { font-size: .84rem; text-transform: uppercase; letter-spacing: .06em; }
+  .calc-r .cifra { font-size: var(--step-1); color: var(--timbre); font-weight: 700; }
+
+  .falso { border-top: 1px solid var(--linea-2); margin-top: var(--sp-s); }
+  .falso-f { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea); align-items: start; }
+  .falso-f svg { flex: none; margin-top: 3px; }
+  .falso-f b { display: block; font-size: .96rem; }
+  .falso-f p { font-size: .87rem; color: var(--tinta-2); line-height: 1.55; margin-top: 3px; }
+  .falso-f .real { display: block; margin-top: 5px; font-size: .84rem; color: var(--ok); }
+  .falso-f .real b { display: inline; font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+
+  .dominio {
+    background: var(--tinta); color: var(--papel); border-radius: var(--radio);
+    padding: var(--sp-m); margin-top: var(--sp-m);
+  }
+  .dominio h3 { color: var(--papel); font-size: var(--step-1); margin-bottom: var(--sp-2xs); }
+  .dominio .code { background: #000; margin-top: var(--sp-s); }
+  .dominio p { color: #C6BCA9; font-size: .9rem; line-height: 1.6; }
+  .dominio table { width: 100%; margin-top: var(--sp-s); font-size: .86rem; }
+  .dominio th { text-align: left; font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: #A79C88; padding: 7px 10px 7px 0; border-bottom: 1px solid rgba(255,255,255,.18); font-weight: 400; }
+  .dominio td { padding: 9px 10px 9px 0; border-bottom: 1px solid rgba(255,255,255,.1); font-family: var(--f-doc); }
+  .dominio .libre { color: #8FD293; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M4 2.5h11.5l3 3V19a.5.5 0 0 1-.76.43L16 18.2l-1.9 1.25a.5.5 0 0 1-.55 0L11.6 18.2 9.7 19.45a.5.5 0 0 1-.55 0L7.25 18.2l-1.9 1.25A.5.5 0 0 1 4.6 19V3.1a.6.6 0 0 1 .6-.6Z" stroke="#17140F" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7.6 7.4h7.2M7.6 10.6h7.2M7.6 13.8h4.2" stroke="#C1391C" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Talonio
+    </a>
+    <button class="nav-toggle" id="navBtn" aria-expanded="false" aria-controls="navLinks">
+      Menú
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1 3h11M1 6.5h11M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container doc-hd">
+  <p class="eyebrow eyebrow--timbre">Arquitectura</p>
+  <h1>Qué habría que configurar para que esto existiera de verdad.</h1>
+  <p>
+    Nada de esto está aprovisionado. Es la lista de compras honesta: qué base de datos, qué agentes,
+    qué hay que contratar, cuánto cuesta al mes — y qué está falseado en el demo.
+  </p>
+</div>
+
+<main class="container">
+
+<!-- 1. FORMA -->
+<section>
+  <h2 class="sec" data-n="01">La forma del sistema</h2>
+  <p>
+    Talonio es una PWA (no una app de tienda: nadie instala nada para probar un software de contabilidad) con
+    una <strong>cola de trabajo asíncrona</strong> detrás. Las fotos se sacan en la obra, donde la señal es
+    mala, así que la captura tiene que funcionar <strong>offline</strong> y subir sola cuando vuelve el internet.
+    Esa restricción — sacada de la realidad del cliente, no de una preferencia técnica — define media arquitectura.
+  </p>
+
+  <div class="code">
+<pre><span class="c">// El camino de una boleta, de punta a punta</span>
+
+<span class="k">[Teléfono]</span>  foto → IndexedDB (cola local, sobrevive sin señal)
+     │            service worker reintenta hasta subir
+     ▼
+<span class="k">[API]</span>       POST /documentos  → guarda imagen en R2 → encola job
+     │
+     ▼
+<span class="k">[Worker]</span>    1. normaliza imagen (deskew, recorte, máx 1568px lado largo)
+            2. <span class="t">agente extractor</span>   (Haiku 4.5, visión)   → JSON + confianza/campo
+            3. <span class="t">validador determinístico</span> (código, NO modelo):
+                 · dígito verificador del RUT (módulo 11)
+                 · neto + IVA == total   (tolerancia ±$1 por redondeo)
+                 · IVA == round(neto × 0,19)
+                 · fecha dentro del período tributario abierto
+               ↳ si algo no cuadra → estado = <span class="s">'en_duda'</span>, se pide confirmación
+            4. <span class="t">agente clasificador</span>  (Haiku 4.5, texto)   → cuenta contable
+            5. si tipo == boleta y proveedor factura → encola <span class="t">agente de rescate</span>
+     │
+     ▼
+<span class="k">[Conciliador]</span>  motor determinístico (monto ±$1, fecha ±5d, fuzzy del nombre)
+              ↳ el 12% que no resuelve → <span class="t">agente conciliador</span> (Sonnet 5)
+                 que <span class="s">PROPONE</span>, nunca decide. El humano confirma.
+     │
+     ▼
+<span class="k">[F29]</span>       aritmética pura en el servidor. Ni un número lo escribe un LLM.
+            <span class="t">agente revisor</span> (Sonnet 5) sólo levanta anomalías vs. los 6 meses previos.</pre>
+  </div>
+
+  <div class="regla-dura">
+    <b>La regla arquitectónica que hace esto creíble</b>
+    Un modelo de lenguaje <strong>lee papeles y propone hipótesis</strong>. No suma, no calcula el F29 y no
+    decide una conciliación. Toda cifra que termina en un formulario del SII sale de aritmética
+    determinística, auditable y con test unitario. Un producto contable que le pide a un LLM que sume
+    no es un producto contable: es una demanda esperando ocurrir.
+  </div>
+</section>
+
+<!-- 2. DATOS -->
+<section>
+  <h2 class="sec" data-n="02">Modelo de datos</h2>
+  <p>PostgreSQL. Las tablas que importan, con los campos que no son obvios.</p>
+
+  <div class="code">
+<pre><span class="k">contador</span>          id · rut · nombre · estudio · email · whatsapp
+                  plan · rut_activos · tarifa_tramo · stripe_customer_id
+
+<span class="k">empresa</span>           id · rut · razon_social · giro · comuna
+                  regimen_tributario  <span class="c">-- '14D3' | '14D8' | 'general'</span>
+                  contador_id → contador
+                  plan  <span class="c">-- 'estudio' | 'empresa'</span>
+                  sii_cert_ref  <span class="c">-- referencia al secreto, NUNCA el .p12 en la fila</span>
+
+<span class="k">usuario</span>           id · empresa_id | contador_id · rol · email · whatsapp
+                  <span class="c">-- rol: 'dueno' | 'contador' | 'asistente'</span>
+
+<span class="k">documento</span>         id · empresa_id · periodo  <span class="c">-- '2026-06'</span>
+                  tipo         <span class="c">-- factura_afecta | factura_exenta | boleta |</span>
+                               <span class="c">--   nota_credito | nota_debito | comprobante</span>
+                  folio · rut_emisor · razon_social_emisor · fecha_emision
+                  monto_neto · monto_exento · monto_iva · monto_total
+                  categoria · cuenta_contable
+                  origen       <span class="c">-- foto | whatsapp | email | sii_rcv | api_proveedor</span>
+                  estado       <span class="c">-- extraido | en_duda | confirmado | conciliado | rechazado</span>
+                  imagen_url · confianza_global · da_credito_fiscal <span class="t">bool</span>
+                  reemplaza_a  → documento  <span class="c">-- la factura que sustituyó a una boleta</span>
+
+<span class="k">documento_campo</span>   id · documento_id · campo · valor_ia · confianza
+                  valor_confirmado · confirmado_por → usuario · confirmado_at
+                  bbox  <span class="c">-- [x,y,w,h] del recorte, para mostrarle al humano QUÉ dudamos</span>
+                  <span class="c">-- ★ Esta tabla es el activo de la empresa: cada corrección humana</span>
+                  <span class="c">--   es una fila del set de evaluación. Sin ella, no se puede mejorar</span>
+                  <span class="c">--   el extractor ni demostrarle a nadie que funciona.</span>
+
+<span class="k">movimiento_banco</span>  id · empresa_id · banco · cuenta · fecha · descripcion
+                  cargo · abono · saldo
+                  hash_dedup   <span class="c">-- sha256(cuenta|fecha|monto|glosa): la cartola se</span>
+                               <span class="c">--   re-sube completa todos los meses. Sin esto, todo duplicado.</span>
+
+<span class="k">conciliacion</span>      id · movimiento_id · documento_ids <span class="t">uuid[]</span>
+                  tipo   <span class="c">-- uno_a_uno | agrupada | pago_parcial |</span>
+                         <span class="c">--   sin_documento | documento_sin_pago | pagado_por_socio</span>
+                  score · decidida_por  <span class="c">-- 'motor' | 'ia_propuso_humano_confirmo' | 'humano'</span>
+                  estado
+
+<span class="k">solicitud_factura</span> id · documento_id · proveedor_id
+                  canal  <span class="c">-- portal_web | email | api</span>
+                  estado · folio_resultante · iva_rescatado · intentos · ultimo_error
+
+<span class="k">proveedor</span>         id · rut · nombre · <span class="t">factura_si_le_pides</span> <span class="t">bool</span>
+                  canal_solicitud · plazo_dias · instructivo_url
+                  <span class="c">-- ★ El otro activo: el mapa de qué proveedor chileno factura,</span>
+                  <span class="c">--   cómo y en qué plazo. Se construye a mano, cliente a cliente.</span>
+                  <span class="c">--   Es feo, no escala solo, y por eso es el foso.</span>
+
+<span class="k">f29</span>               id · empresa_id · periodo
+                  cod_502 · cod_111 · cod_538 · cod_520 · cod_504 · cod_537
+                  cod_563 · cod_062 · cod_077 · cod_091
+                  aporte_talonio_iva · aporte_talonio_docs
+                  estado  <span class="c">-- borrador | revisado | presentado_por_contador</span>
+                  revisado_por → usuario · presentado_at
+
+<span class="k">fuga</span>              id · empresa_id · periodo · documento_id
+                  iva_no_recuperable · motivo · proveedor_facturable <span class="t">bool</span>
+                  <span class="c">-- alimenta el reporte que convierte "desorden" en "pesos"</span></pre>
+  </div>
+</section>
+
+<!-- 3. AGENTES -->
+<section>
+  <h2 class="sec" data-n="03">Los agentes de IA</h2>
+  <p>
+    Cinco, con responsabilidades estrechas a propósito. El modelo se elige por tarea, no por prestigio:
+    el 90% del volumen es extracción de una imagen chica, y eso lo hace Haiku a un décimo del costo.
+  </p>
+
+  <article class="agente">
+    <div class="agente-hd">
+      <h3>1 · Extractor</h3>
+      <span class="modelo">claude-haiku-4-5-20251001</span>
+    </div>
+    <p>
+      Lee la foto y devuelve JSON estructurado <strong>con una confianza por campo</strong>, no una confianza
+      global. Un total con 61% de confianza sobre un RUT con 96% son dos hechos distintos y hay que tratarlos
+      distinto.
+    </p>
+    <div class="agente-meta">
+      <div><span>Entrada</span><span>Imagen normalizada (máx 1568px lado largo) + prompt con el catálogo de tipos de DTE chilenos y ejemplos de boletas térmicas malas.</span></div>
+      <div><span>Salida</span><span><code>{ tipo, folio, rut_emisor, fecha, neto, iva, total, items[], confianza: {campo: 0-1}, bbox: {campo: [x,y,w,h]} }</code></span></div>
+      <div><span>Herramientas</span><span><code>validar_rut(rut)</code> · <code>buscar_proveedor(rut)</code> · <code>periodo_abierto(fecha)</code></span></div>
+      <div><span>Regla dura</span><span>Si la confianza de un campo monetario &lt; 0,85, <strong>no adivina</strong>: devuelve el <code>bbox</code> y marca <code>requiere_confirmacion: true</code>. Es la regla que produce el momento honesto del demo.</span></div>
+    </div>
+  </article>
+
+  <article class="agente">
+    <div class="agente-hd">
+      <h3>2 · Clasificador de gasto</h3>
+      <span class="modelo">claude-haiku-4-5-20251001</span>
+    </div>
+    <p>
+      Asigna cuenta contable y categoría tributaria (gasto necesario para producir la renta / no necesario /
+      activo fijo). Texto, no visión: corre sobre lo que el extractor ya sacó.
+    </p>
+    <div class="agente-meta">
+      <div><span>Herramientas</span><span><code>plan_de_cuentas(empresa_id)</code> · <code>historial_proveedor(rut_emisor)</code> — si a este proveedor ya lo clasificaste 6 veces igual, no hay nada que pensar.</span></div>
+      <div><span>Atajo</span><span>El 70% de los documentos son de un proveedor ya visto. Ésos se resuelven con una consulta a la base y <strong>ni siquiera llaman al modelo</strong>. Eso es lo que hace que el costo de IA sea de $1.114 y no de $3.000.</span></div>
+    </div>
+  </article>
+
+  <article class="agente">
+    <div class="agente-hd">
+      <h3>3 · Conciliador</h3>
+      <span class="modelo">claude-sonnet-5 · sólo para el 12% difícil</span>
+    </div>
+    <p>
+      Primero corre un <strong>motor determinístico</strong>: monto exacto (±$1), ventana de fecha ±5 días,
+      similitud del nombre del proveedor. Eso resuelve ~88% de los movimientos y <em>no cuesta un peso</em>.
+      El resto — agrupaciones, pagos parciales, abonos ambiguos — va a Sonnet.
+    </p>
+    <div class="agente-meta">
+      <div><span>Herramientas</span><span><code>buscar_documentos(filtros)</code> · <code>sumar_combinaciones(monto_objetivo, docs)</code> (subset-sum acotado a 15 elementos) · <code>historial_conciliacion(rut)</code></span></div>
+      <div><span>Regla dura</span><span>El agente <strong>propone; nunca decide</strong>. Cuando dos combinaciones dan el mismo monto — como el abono de $6.545.000 del demo, que puede ser una factura o la suma de dos — es <em>físicamente imposible</em> saberlo desde el dato. Fingir certeza ahí es el peor pecado que puede cometer este producto.</span></div>
+    </div>
+  </article>
+
+  <article class="agente">
+    <div class="agente-hd">
+      <h3>4 · Revisor de F29</h3>
+      <span class="modelo">claude-sonnet-5 · 1 llamada por empresa al mes</span>
+    </div>
+    <p>
+      <strong>No calcula el F29.</strong> Recibe el F29 ya calculado más los 6 períodos anteriores y busca
+      anomalías: "tu crédito fiscal cayó 40% contra tu promedio y tus ventas subieron — casi seguro te faltan
+      documentos", "esta factura de $4M de un proveedor nuevo en el último día del período merece una mirada".
+    </p>
+    <div class="agente-meta">
+      <div><span>Entrada</span><span>~45.000 tokens de contexto: el período actual, los 6 anteriores y el libro de compras.</span></div>
+      <div><span>Salida</span><span>Lista de observaciones para <em>el contador</em>, no para el dueño. Es él quien firma.</span></div>
+    </div>
+  </article>
+
+  <article class="agente">
+    <div class="agente-hd">
+      <h3>5 · Agente de rescate — el foso</h3>
+      <span class="modelo">claude-sonnet-5 + Playwright headless</span>
+    </div>
+    <p>
+      Le pide al proveedor la factura de reemplazo por una boleta. Cada cadena tiene su propio portal, su
+      formulario y su plazo: Sodimac uno, Copec otro, Líder otro. El agente navega el portal, llena el
+      formulario con el número de boleta y el RUT, y hace seguimiento hasta que la factura aparece en el RCV.
+    </p>
+    <div class="agente-meta">
+      <div><span>Herramientas</span><span><code>abrir_portal(proveedor)</code> · <code>llenar_formulario(campos)</code> · <code>enviar_email(plantilla)</code> para los proveedores chicos · <code>verificar_en_rcv(folio)</code></span></div>
+      <div><span>Lo honesto</span><span>Es el componente <strong>más frágil</strong> del sistema y el que más mantención va a pedir: cada cambio de portal lo rompe. También es <strong>lo único que no se copia en un trimestre</strong>, y por eso es el foso. Un competidor puede clonar el OCR en una tarde; clonar el mapa de 200 proveedores chilenos y sus procesos de facturación, no.</span></div>
+    </div>
+  </article>
+</section>
+
+<!-- 4. APIS -->
+<section>
+  <h2 class="sec" data-n="04">Lo que hay que contratar</h2>
+
+  <div class="scroll-x" style="margin-top:var(--sp-s)">
+    <table class="tabla">
+      <caption class="visually-hidden">Servicios de terceros que habría que contratar</caption>
+      <thead>
+        <tr><th scope="col">Servicio</th><th scope="col">Para qué</th><th scope="col">Costo</th><th scope="col">La decisión</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>SimpleAPI</b> u <b>OpenFactura</b> (Haulmer)</td>
+          <td>Bajar el Registro de Compras y Ventas (RCV) del SII, DTE recibidos y emitidos.</td>
+          <td class="num">≈ US$820/mes<br><span class="nota">a 4.100 RUT</span></td>
+          <td class="nota">
+            <strong>No scrapear el SII.</strong> El SII no expone una API REST pública para esto; el acceso es
+            con certificado digital y su portal cambia sin aviso. Un PAC autorizado envuelve eso, se hace cargo
+            del mantenimiento y da respaldo legal. Es más caro y es lo correcto.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Fintoc</b></td>
+          <td>Cartolas bancarias (Banco de Chile, Santander, BCI, Estado, Itaú), sólo lectura.</td>
+          <td class="num">≈ US$0,45<br>por cuenta/mes</td>
+          <td class="nota">
+            El costo variable más pesado del producto ($432/RUT). <strong>Chile aún no tiene finanzas abiertas
+            operativas</strong> — la Ley Fintec 21.521 lo mandata y la CMF está dictando la normativa por etapas.
+            Hasta entonces, agregador o CSV. <strong>La carga de CSV es gratis, funciona con todos los bancos y
+            es la opción por defecto.</strong>
+          </td>
+        </tr>
+        <tr>
+          <td><b>WhatsApp Business API</b><br><span class="nota">(Meta vía 360dialog o Twilio)</span></td>
+          <td>Recibir boletas por WhatsApp y empujar a los clientes del contador.</td>
+          <td class="num">≈ US$0,02<br>por conversación</td>
+          <td class="nota">
+            En Chile nadie instala una app nueva, pero todos tienen WhatsApp abierto. Es el canal de captura de
+            menor fricción que existe y hay que tenerlo desde el mes 1.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Flow</b> o <b>Khipu</b></td>
+          <td>Cobrar la suscripción (transferencia y tarjeta).</td>
+          <td class="num">≈ 2,95% + IVA</td>
+          <td class="nota">Más barato que Transbank directo para el volumen del año 1, y con integración de un día.</td>
+        </tr>
+        <tr>
+          <td><b>Anthropic API</b></td>
+          <td>Los cinco agentes.</td>
+          <td class="num">Ver §5</td>
+          <td class="nota">Haiku 4.5 para el volumen, Sonnet 5 para lo difícil. Ningún modelo toca la aritmética.</td>
+        </tr>
+        <tr>
+          <td><b>Firma electrónica avanzada</b></td>
+          <td>Presentar el F29 ante el SII.</td>
+          <td class="num">$0</td>
+          <td class="nota">
+            <strong>Decisión deliberada: no la tocamos.</strong> El contador ya la tiene y es él quien firma y
+            presenta. Nosotros generamos el borrador. Presentar un F29 mal declarado es responsabilidad legal
+            y no queremos ese riesgo — y además, no tomarlo es lo que hace que el contador nos deje entrar.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub">Variables de entorno</h3>
+  <div class="code">
+<pre><span class="c"># IA</span>
+ANTHROPIC_API_KEY=<span class="s">sk-ant-...</span>
+MODELO_EXTRACTOR=<span class="s">claude-haiku-4-5-20251001</span>
+MODELO_CLASIFICADOR=<span class="s">claude-haiku-4-5-20251001</span>
+MODELO_CONCILIADOR=<span class="s">claude-sonnet-5</span>
+MODELO_REVISOR=<span class="s">claude-sonnet-5</span>
+UMBRAL_CONFIANZA_CAMPO=<span class="s">0.85</span>          <span class="c"># bajo esto, se le pregunta al humano</span>
+
+<span class="c"># Datos</span>
+DATABASE_URL=<span class="s">postgres://...</span>
+REDIS_URL=<span class="s">rediss://...</span>              <span class="c"># cola de extracción (BullMQ)</span>
+R2_ACCESS_KEY_ID=<span class="s">...</span>
+R2_SECRET_ACCESS_KEY=<span class="s">...</span>
+R2_BUCKET=<span class="s">talonio-documentos</span>
+
+<span class="c"># SII (vía PAC — nunca el certificado en la base de datos)</span>
+SIMPLEAPI_TOKEN=<span class="s">...</span>
+SII_CERT_VAULT_URL=<span class="s">...</span>              <span class="c"># los .p12 viven en un vault, cifrados por empresa</span>
+SII_CERT_KMS_KEY=<span class="s">...</span>
+
+<span class="c"># Banco / mensajería / pagos</span>
+FINTOC_SECRET_KEY=<span class="s">sk_live_...</span>
+WHATSAPP_TOKEN=<span class="s">...</span>
+WHATSAPP_PHONE_ID=<span class="s">...</span>
+FLOW_API_KEY=<span class="s">...</span>
+FLOW_SECRET=<span class="s">...</span>
+
+<span class="c"># Operación</span>
+SENTRY_DSN=<span class="s">...</span>
+RESEND_API_KEY=<span class="s">...</span>
+APP_BASE_URL=<span class="s">https://app.talonio.com</span>
+JWT_SECRET=<span class="s">...</span></pre>
+  </div>
+</section>
+
+<!-- 5. COSTO -->
+<section>
+  <h2 class="sec" data-n="05">Costo mensual, con la aritmética</h2>
+  <p>
+    Éste es el número que <a href="negocio.html#precio">negocio.html</a> descuenta del margen. Si las dos
+    páginas no cuadran, una de las dos está mintiendo.
+  </p>
+
+  <h3 class="sub">Inferencia de IA, por RUT y por mes</h3>
+  <p>Supuesto base: <strong>115 documentos al mes</strong> por RUT activo. Precios de lista de la API de Anthropic.</p>
+
+  <div class="calc">
+    <p class="calc-t">Costo de IA · 1 RUT · 1 mes</p>
+    <div class="calc-f">
+      <span><strong>Extractor</strong> — Haiku 4.5, visión
+        <small>115 docs × (imagen ~1.400 tok + prompt 900 tok) = 264.500 tok in × US$1/MTok = US$0,265<br>
+        115 docs × 280 tok out = 32.200 tok × US$5/MTok = US$0,161 · +12% de reintentos</small></span>
+      <span>US$0,477</span>
+    </div>
+    <div class="calc-f">
+      <span><strong>Clasificador</strong> — Haiku 4.5, texto
+        <small>115 × (600 in + 60 out) → US$0,069 + US$0,035</small></span>
+      <span>US$0,104</span>
+    </div>
+    <div class="calc-f">
+      <span><strong>Conciliador</strong> — Sonnet 5, sólo el 12% dudoso
+        <small>14 llamadas × (4.000 in + 500 out) → in US$0,168 (US$3/MTok) + out US$0,105 (US$15/MTok)</small></span>
+      <span>US$0,273</span>
+    </div>
+    <div class="calc-f">
+      <span><strong>Revisor de F29</strong> — Sonnet 5, 1 vez al mes
+        <small>45.000 tok in (US$0,135) + 2.500 tok out (US$0,038)</small></span>
+      <span>US$0,173</span>
+    </div>
+    <div class="calc-f">
+      <span><strong>Evals y monitoreo</strong>
+        <small>Corrida semanal del set dorado (200 documentos etiquetados por humanos), prorrateada</small></span>
+      <span>US$0,135</span>
+    </div>
+    <div class="calc-r"><b>IA por RUT / mes · US$1,161 × $960</b><span class="cifra">$1.114 CLP</span></div>
+  </div>
+
+  <h3 class="sub">El costo total de servir, a dos escalas</h3>
+  <p>
+    Y aquí va lo incómodo: <strong>el margen bruto del mes 12 no es el del mes 24.</strong> Lo que lo aprieta
+    no es la IA, es el soporte humano — y sólo mejora con volumen.
+  </p>
+
+  <div class="scroll-x" style="margin-top:var(--sp-s)">
+    <table class="tabla">
+      <caption class="visually-hidden">COGS por RUT a dos escalas distintas</caption>
+      <thead>
+        <tr>
+          <th scope="col">COGS por RUT / mes</th>
+          <th scope="col" class="num">Mes 12 · 740 RUT</th>
+          <th scope="col" class="num">Mes 24 · 4.100 RUT</th>
+          <th scope="col">Por qué cambia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Inferencia de IA</td><td class="num">$1.114</td><td class="num">$1.114</td><td class="nota">Es por documento: no mejora con escala. Mejora con caché de proveedores conocidos, ya contabilizado.</td></tr>
+        <tr><td>APIs de terceros</td><td class="num">$896</td><td class="num">$854</td><td class="nota">Fintoc es por cuenta ($432, fijo). El plan del PAC del SII sí se diluye.</td></tr>
+        <tr><td>Infraestructura</td><td class="num">$285</td><td class="num">$119</td><td class="nota">Costo fijo (US$220 → US$509/mes) repartido entre muchos más RUT.</td></tr>
+        <tr><td>Soporte humano</td><td class="num" style="color:var(--malo);font-weight:700">$2.284</td><td class="num">$824</td><td class="nota">1 persona / 740 RUT vs. 2 personas / 4.100 RUT. <strong>Ésta es la línea que decide el margen.</strong></td></tr>
+        <tr><td><strong>Total COGS / RUT</strong></td><td class="num"><strong>$4.579</strong></td><td class="num"><strong>$2.911</strong></td><td></td></tr>
+        <tr><td>ARPU del período</td><td class="num">$13.108</td><td class="num">$12.510</td><td class="nota">Baja porque el mix se corre hacia el canal contador, que paga menos por RUT.</td></tr>
+        <tr>
+          <td><strong>Margen bruto</strong></td>
+          <td class="num" style="color:var(--duda);font-weight:700">65,1%</td>
+          <td class="num" style="color:var(--ok);font-weight:700">76,7%</td>
+          <td class="nota">Los dos son sanos. El del mes 12 no es una emergencia, pero tampoco es el 85% que le gusta poner a la gente en las láminas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="calc">
+    <p class="calc-t">Infraestructura fija · mes 24 (4.100 RUT)</p>
+    <div class="calc-f"><span>Fly.io — API + workers (región gru/scl)</span><span>US$190</span></div>
+    <div class="calc-f"><span>Neon — PostgreSQL</span><span>US$140</span></div>
+    <div class="calc-f"><span>Cloudflare R2 — imágenes<small>4.100 RUT × 115 fotos × 400 KB ≈ 190 GB/mes acumulables</small></span><span>US$55</span></div>
+    <div class="calc-f"><span>Upstash Redis — cola</span><span>US$40</span></div>
+    <div class="calc-f"><span>Sentry + logs</span><span>US$54</span></div>
+    <div class="calc-f"><span>Resend — correo transaccional</span><span>US$30</span></div>
+    <div class="calc-r"><b>Infra total · US$509 ÷ 4.100 RUT</b><span class="cifra">$119 / RUT</span></div>
+  </div>
+
+  <p style="margin-top:var(--sp-s)">
+    <strong>Total del gasto operacional variable al mes 24:</strong>
+    4.100 RUT × $2.911 = <span class="cifra">$11.935.100</span> al mes.
+    Contra un MRR de <span class="cifra">$51.290.000</span>. Es exactamente el número que
+    <a href="negocio.html#precio">negocio.html</a> usa para el margen bruto de 76,7%.
+  </p>
+</section>
+
+<!-- 6. FALSEADO -->
+<section>
+  <h2 class="sec" data-n="06">Qué está falseado en el demo</h2>
+  <p>Todo. Y conviene decir exactamente cómo.</p>
+
+  <div class="falso">
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>La extracción no existe</b>
+        <p>Los datos que "extrae la IA" en el demo están escritos a mano en el JavaScript. No hay ninguna
+           llamada a ningún modelo: es un <code>setInterval</code> de 340 ms con una animación de barrido.</p>
+        <span class="real"><b>Para que fuera real:</b> el agente extractor de §3, la cola, R2 y el validador
+          determinístico. Estimado: 3 semanas de una persona para la versión que funciona el 90% de las veces,
+          y luego un año entero para el 10% restante — que es donde se gana o se pierde la confianza del contador.</span>
+      </div>
+    </div>
+
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>Si sacas una foto de verdad con tu teléfono, no la leemos</b>
+        <p>El botón "Abrir la cámara" del demo usa <code>&lt;input capture="environment"&gt;</code> y sí abre tu
+           cámara real — pero la foto <strong>se queda en tu navegador</strong> y los datos que aparecen son
+           los del ejemplo de Copec. El demo lo dice en pantalla en vez de fingir que leyó tu papel: fingir eso
+           sería exactamente el pecado del que este producto se quiere diferenciar.</p>
+      </div>
+    </div>
+
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>La conciliación es una tabla de <code>if</code></b>
+        <p>El "conciliar automáticamente" recorre 12 movimientos escritos a mano y aplica reglas fijas.
+           No hay fuzzy matching, ni subset-sum, ni Sonnet.</p>
+        <span class="real"><b>Para que fuera real:</b> el motor determinístico (2 semanas) + el agente conciliador
+          (1 semana) + el ingestor de cartolas de los 5 bancos grandes, cada uno con su formato de CSV distinto,
+          lo que siempre toma el triple de lo estimado.</span>
+      </div>
+    </div>
+
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>El F29 está simplificado, pero la aritmética es real</b>
+        <p>El F29 real tiene más de 90 códigos. Mostramos los que mueven la aguja para una PYME de servicios en
+           Pro Pyme: 502, 111, 538, 520, 504, 537, 563, 062, 091. <strong>Los números sí cuadran</strong> —
+           el IVA es 19% exacto, débito menos crédito da el impuesto determinado, y el aporte de Talonio
+           ($194.343) es la suma de las cinco facturas rescatadas. Puedes revisarlo con una calculadora.</p>
+        <span class="real"><b>Para que fuera real:</b> los otros 80 códigos (retenciones, activo fijo, exportadores,
+          remanentes, cambio de sujeto), y la validación contra la propuesta del propio SII.</span>
+      </div>
+    </div>
+
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>El rescate de la factura de El Roble es teatro</b>
+        <p>En el demo, pides la factura y llega en 4 pasos animados. En la realidad es un agente navegando un
+           portal que se cae, un correo que nadie contesta, y un plazo del proveedor que a veces ya venció.</p>
+        <span class="real"><b>Para que fuera real:</b> el agente de rescate y — sobre todo — la tabla
+          <code>proveedor</code> llena a mano con los 200 proveedores más comunes de la PYME chilena, su canal
+          y su plazo. Ese trabajo sucio es el foso. No hay atajo.</span>
+      </div>
+    </div>
+
+    <div class="falso-f">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#B3261E" stroke-width="1.3"/><path d="M5.6 5.6l5.8 5.8M11.4 5.6l-5.8 5.8" stroke="#B3261E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <b>Las empresas y los RUT son ficticios</b>
+        <p>Maestranza Lircay, Ferretería El Roble, Inmobiliaria Santa Marta y el Estudio Vergara no existen.
+           Los RUT están bien formados pero son inventados, incluidos los de los proveedores conocidos: usamos
+           los <em>nombres</em> reales de Copec, Sodimac y Líder porque son los proveedores donde de verdad se
+           fuga el IVA de una PYME chilena, pero <strong>no afirmamos ningún dato real sobre esas empresas</strong>.
+           No hay ninguna relación comercial con ninguna de ellas.</p>
+      </div>
+    </div>
+
+    <div class="falso-f" style="border-bottom:0">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7" stroke="#2F6B33" stroke-width="1.3"/><path d="M5.4 8.6l2.2 2.2 4-4.6" stroke="#2F6B33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <b>Lo que NO está falseado</b>
+        <p>
+          El comportamiento del producto. Que la IA dude cuando el papel está desteñido, que se niegue a elegir
+          entre dos conciliaciones que dan el mismo monto, que te diga que la boleta no da crédito fiscal en
+          vez de simular que sí: <strong>eso es exactamente cómo tendría que comportarse el sistema real</strong>,
+          y está escrito así a propósito. Un producto contable que finge certeza absoluta no es creíble, y la
+          duda bien mostrada genera más confianza que la falsa perfección.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. DOMINIO -->
+<section>
+  <h2 class="sec" data-n="07">El dominio</h2>
+
+  <div class="dominio">
+    <h3>talonio.com — verificado libre</h3>
+    <p>
+      De <em>talonario</em>: el objeto donde vivía la contabilidad chilena antes de que existiera el software,
+      y donde todavía vive la mitad. Acuñado, tres sílabas, se escribe como suena.
+    </p>
+
+    <div class="code">
+<pre>$ ./_kit/check-domain.sh talonio
+
+talonio     .com AVAILABLE     (http 404)   .cl AVAILABLE
+
+$ curl -s -o /dev/null -w '%{http_code}' \
+    https://rdap.verisign.com/com/v1/domain/talonio.com
+404</pre>
+    </div>
+
+    <p style="margin-top:var(--sp-s)">
+      <strong>Evidencia:</strong> RDAP de Verisign (autoritativo para <code>.com</code>) responde
+      <strong>HTTP 404</strong> = el dominio no está registrado. NIC Chile no encuentra titular para
+      <code>talonio.cl</code>. Verificado el <strong>12 de julio de 2026</strong>.
+    </p>
+
+    <table>
+      <caption class="visually-hidden">Alternativas de marca verificadas</caption>
+      <thead>
+        <tr><th scope="col">Alternativa</th><th scope="col">.com</th><th scope="col">.cl</th><th scope="col">De dónde sale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>cuadraje.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "cuadrar" — que los números den.</td></tr>
+        <tr><td>foliario.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>De "folio" — el número del documento.</td></tr>
+        <tr><td>cerofuga.com</td><td class="libre">LIBRE · 404</td><td class="libre">LIBRE</td><td>Cero fuga de IVA. Descriptivo, menos marca.</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:var(--sp-s);font-size:.82rem">
+      Las tres verificadas con el mismo script y la misma fecha. <code>tirilio.com</code> también está libre
+      (404) y quedó de reserva.
+    </p>
+  </div>
+</section>
+
+<section>
+  <hr class="regla-doble">
+  <p style="margin-top:var(--sp-m)">
+    Vuelve al <a href="demo/index.html">demo</a> para ver lo que este stack tendría que producir, o al
+    <a href="negocio.html">negocio</a> para ver quién lo paga.
+  </p>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Talonio</strong> — talonio.com · Prototipo. Nada de esta infraestructura está aprovisionada.</p>
+    <p style="margin-top:6px"><a href="../index.html">← Volver a las 10 ideas</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById('navBtn'), l = document.getElementById('navLinks');
+  b.addEventListener('click', function () { b.setAttribute('aria-expanded', String(l.classList.toggle('abierto'))); });
+})();
+</script>
+</body>
+</html>

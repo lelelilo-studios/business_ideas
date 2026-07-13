@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermata — Negocio</title>
+<meta name="description" content="ICP, mercado, competencia, precio, unit economics, canales de adquisición, primeros 90 días y qué mataría a Mermata.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="mermata.css">
+<style>
+  .indice { position: sticky; top: 0; z-index: 5; background: var(--papel); border-bottom: 1px solid var(--regla); }
+  .indice-in { display: flex; gap: var(--sp-s); overflow-x: auto; padding: 10px 0; -webkit-overflow-scrolling: touch; }
+  .indice a { font-family: var(--mono); font-size: var(--step--1); color: var(--tinta-3); white-space: nowrap; text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; }
+  .indice a:hover { color: var(--acento-osc); border-bottom-color: var(--acento); }
+  h2 { scroll-margin-top: 120px; }
+  .cap { counter-reset: none; }
+  .cap-n { font-family: var(--mono); font-size: var(--step--1); color: var(--acento-osc); letter-spacing: .1em; }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="container barra-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="19" height="19" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 15.5L8.5 9.5L12 13L17 5.5" stroke="#b8452b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="5.5" r="1.9" fill="#b8452b"/>
+      </svg>
+      Merma<span class="marca-pt">ta</span>
+    </a>
+    <nav class="nav-lista" aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="navpanel">
+      <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true"><path d="M0 1h14M0 6h14M0 11h14" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-nav-txt>Menú</span>
+    </button>
+  </div>
+</header>
+<div class="nav-panel" id="navpanel" data-nav-panel>
+  <div class="container">
+    <nav class="nav-lista" aria-label="Principal móvil">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</div>
+
+<div class="indice">
+  <div class="container indice-in">
+    <a href="#icp">01 · Cliente</a>
+    <a href="#mercado">02 · Mercado</a>
+    <a href="#posicion">03 · Posición</a>
+    <a href="#competencia">04 · Competencia</a>
+    <a href="#precio">05 · Precio y economía</a>
+    <a href="#canales">06 · Canales</a>
+    <a href="#ia">07 · IA en marketing</a>
+    <a href="#dias">08 · Primeros 90 días</a>
+    <a href="#mata">09 · Qué mata esto</a>
+  </div>
+</div>
+
+<main>
+
+<section class="seccion container">
+  <span class="sello sello-acento">Plan de negocio</span>
+  <h1 style="margin: var(--sp-2xs) 0 var(--sp-s); max-width: 20ch;">La utilidad de un restaurante chileno está en el basurero.</h1>
+  <p class="prose" style="font-size: var(--step-1); color: var(--tinta-2);">Este documento tiene números. Todos los que no tienen fuente están marcados como <b>estimación</b> y muestran su aritmética. Si un supuesto te parece falso, muévelo: la conclusión que importa —que la merma se come el margen de un rubro que ya tiene margen de un dígito— aguanta supuestos bastante peores que los nuestros.</p>
+</section>
+
+<!-- ===================== 01 ICP ===================== -->
+<section class="seccion seccion-borde container cap" id="icp">
+  <span class="cap-n">01</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-m);">Quién sufre esto, exactamente</h2>
+
+  <div class="rejilla rejilla-2">
+    <div class="ficha">
+      <div class="ficha-titulo">El cliente ideal — retrato</div>
+      <p style="margin-bottom: var(--sp-s);"><b>Panadería-cafetería de barrio, 1 a 3 locales, Santiago.</b> Vende entre $25 y $60 millones al mes. Gasta 28%–34% de eso en insumos. El dueño está físicamente en el local, hace la compra él mismo, y es la misma persona que decide comprar software. Tiene POS (Bsale, Toteat, Fudo o Relbase) porque el SII lo obligó, no porque quisiera. Nunca ha medido su merma.</p>
+      <table class="tabla">
+        <tbody>
+          <tr><th scope="row">Quién decide</th><td>El dueño. Una sola persona, sin comité.</td></tr>
+          <tr><th scope="row">Quién usa</th><td>El dueño y el jefe de local. Dos usuarios, no veinte.</td></tr>
+          <tr><th scope="row">Dónde lo usa</th><td>En el celular, a las 6 de la mañana, antes de abrir.</td></tr>
+          <tr><th scope="row">Presupuesto de software</th><td>Ya paga POS ($30–60k), contador ($120–250k), y nada más.</td></tr>
+          <tr><th scope="row">Umbral de dolor</th><td>Gasto en insumos sobre <b>$4.000.000 al mes</b>. Bajo eso, la merma en pesos no paga el software.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="apilar">
+      <div class="ficha">
+        <div class="ficha-titulo">Qué hace hoy, en vez de nuestro producto</div>
+        <ol style="padding-left: 1.2em; color: var(--tinta-2);">
+          <li style="margin-bottom: 8px;"><b>Mira la bodega.</b> Literalmente: abre la puerta, mira, y estima.</li>
+          <li style="margin-bottom: 8px;"><b>Se acuerda de la semana pasada.</b> «El martes pasado se me acabó el jamón, pide más jamón».</li>
+          <li style="margin-bottom: 8px;"><b>Manda un WhatsApp.</b> «Hola Karen, mándame 6 sacos de harina y 2 de azúcar para el miércoles».</li>
+          <li style="margin-bottom: 8px;"><b>Redondea para arriba.</b> Porque quedarse sin producto duele más, hoy, que botar producto mañana. Este sesgo es racional y es exactamente el que produce la merma.</li>
+          <li><b>No mide nada.</b> Al final del mes el contador le dice cuánto gastó. No cuánto botó.</li>
+        </ol>
+      </div>
+      <div class="ficha nota">
+        <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">Quién NO es el cliente.</b> El local con menos de $4M de insumos al mes (el número no da). La cadena de más de 15 locales (ya tiene ERP y un jefe de compras, y nos va a pedir integraciones que no queremos hacer todavía). El local que emite boleta electrónica sin detalle por producto (no hay señal que pronosticar). Y el dark kitchen que solo vende por Rappi (su demanda la controla el algoritmo de Rappi, no el día de pago).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ficha" style="margin-top: var(--sp-s); border-left: 3px solid var(--acento);">
+    <div class="ficha-titulo">Cuánto le cuesta al año — un local tipo</div>
+    <div class="rejilla rejilla-2" style="align-items:start;">
+      <div class="calculo">
+        <div>Venta anual <b>$44.600.000 × 12</b> = <b>$535.200.000</b></div>
+        <div>Costo de insumos <b>× 26,6%</b> = <b>$142.500.000</b></div>
+        <hr>
+        <div>Merma <b>× 6,4%</b> del costo de insumos = <span class="res">$9.120.000</span></div>
+        <div>Quiebre: venta perdida <b>2%</b> × margen contribución <b>66%</b> = <span class="res">$7.060.000</span></div>
+        <hr>
+        <div>Total al año: <span class="res">$16.180.000</span></div>
+        <div>Utilidad neta del local (<b>6%</b> de la venta) = <b>$32.100.000</b></div>
+        <hr>
+        <div>La pérdida es el <span class="res">50% de la utilidad del año</span></div>
+      </div>
+      <div>
+        <p class="fuente" style="margin-bottom: var(--sp-xs);"><b>De dónde salen estos números.</b></p>
+        <ul style="list-style:none; padding:0; font-size: var(--step--1); color: var(--tinta-2);">
+          <li style="padding: 5px 0; border-bottom: 1px solid var(--regla);"><b>$44,6M/mes de venta y 26,6% de insumos</b> — es el local del demo (Panadería La Espiga). Construido, no medido: es <b class="acento">un caso de trabajo</b>, calibrado con las escalas típicas del rubro.</li>
+          <li style="padding: 5px 0; border-bottom: 1px solid var(--regla);"><b>Merma 6,4%</b> — <b class="acento">estimación</b>. El rango que se usa en food service va de 4% a 10% del costo de insumos. Tomamos un punto medio-bajo para no inflar el caso. Es exactamente el número que Mermata mide gratis en el diagnóstico, y el que puede tumbar la tesis entera si resulta ser 2%.</li>
+          <li style="padding: 5px 0; border-bottom: 1px solid var(--regla);"><b>Quiebre 2% de la venta</b> — <b class="acento">estimación</b>, y la más débil de todas: por definición nadie registra la venta que no ocurrió. Es el número que más nos gustaría medir bien y todavía no sabemos cómo.</li>
+          <li style="padding: 5px 0;"><b>Margen neto 6%</b> — <b class="acento">estimación</b>; el rango que se cita para restaurantes va de 3% a 9%. Si el margen fuera 9%, la pérdida sigue siendo un tercio de la utilidad.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 02 MERCADO ===================== -->
+<section class="seccion seccion-borde container cap" id="mercado">
+  <span class="cap-n">02</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Mercado: TAM, SAM y SOM</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">Cada línea de abajo es una multiplicación, y cada factor está declarado. No hay ningún número que venga de un informe que no leímos.</p>
+
+  <div class="rejilla rejilla-2" style="align-items: start;">
+    <div class="ficha">
+      <div class="ficha-titulo">TAM Chile — todos los locales de comida con boleta electrónica</div>
+      <div class="calculo">
+        <div>Restaurantes y cafeterías formales <b>≈ 42.000</b></div>
+        <div>Panaderías <b>≈ 11.000</b></div>
+        <div>Minimarkets y almacenes con POS <b>≈ 28.000</b></div>
+        <hr>
+        <div>Locales <b>81.000</b></div>
+        <div>× ARPU <b>$85.000/mes</b> × 12</div>
+        <hr>
+        <div>TAM = <span class="res">$82.620 millones/año</span> (~US$86M)</div>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);"><b>Estimación declarada.</b> Los tres conteos son órdenes de magnitud del universo de contribuyentes de los rubros 5610 / 5630 / 1071 / 4711. No están tomados de una fuente citable, y por eso el TAM no se usa para decidir nada: el número que decide es el SAM.</p>
+    </div>
+
+    <div class="ficha">
+      <div class="ficha-titulo">SAM — los que realmente podemos atender hoy</div>
+      <div class="calculo">
+        <div>Base <b>81.000 locales</b></div>
+        <div>× emite boleta con <b>detalle por producto</b> <b>55%</b></div>
+        <div class="tenue" style="padding-left:1em;">↳ sin esto no hay señal. Es el filtro duro.</div>
+        <div>× gasto en insumos <b>≥ $4M/mes</b> <b>40%</b></div>
+        <div class="tenue" style="padding-left:1em;">↳ bajo eso el ROI no paga el plan.</div>
+        <hr>
+        <div>Locales alcanzables <span class="res">17.820</span></div>
+        <div>× ARPU <b>$85.000</b> × 12</div>
+        <hr>
+        <div>SAM = <span class="res">$18.176 millones/año</span> (~US$19M)</div>
+      </div>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Los dos porcentajes son <b class="acento">supuestos nuestros</b>, y son los que más urge validar: se validan gratis, conectando 30 locales al SII en los primeros 60 días. Si el detalle por producto resulta ser 25% y no 55%, el SAM se parte a la mitad y hay que replantear el producto (habría que leer el POS, no el SII).</p>
+    </div>
+  </div>
+
+  <div class="ficha" style="margin-top: var(--sp-s);">
+    <div class="fila" style="justify-content: space-between; margin-bottom: var(--sp-xs);">
+      <div class="ficha-titulo" style="margin:0;">Del universo al objetivo — locales</div>
+      <button type="button" class="btn btn-fantasma btn-sm" id="t-tabla" aria-pressed="false">Ver como tabla</button>
+    </div>
+    <div id="embudo"></div>
+    <div id="embudo-tabla" hidden>
+      <table class="tabla">
+        <thead><tr><th scope="col">Etapa</th><th scope="col" style="text-align:right">Locales</th><th scope="col" style="text-align:right">Valor anual (CLP)</th><th scope="col">Filtro aplicado</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">TAM · universo</th><td class="num">81.000</td><td class="num">$82.620.000.000</td><td>—</td></tr>
+          <tr><th scope="row">Con detalle por producto</th><td class="num">44.550</td><td class="num">$45.441.000.000</td><td>× 55%</td></tr>
+          <tr><th scope="row">SAM · sobre $4M en insumos</th><td class="num">17.820</td><td class="num">$18.176.400.000</td><td>× 40%</td></tr>
+          <tr><th scope="row">SOM mes 24 (caso base)</th><td class="num">380</td><td class="num">$387.600.000</td><td>2,1% del SAM</td></tr>
+          <tr><th scope="row">SOM año 5 (ambición)</th><td class="num">1.500</td><td class="num">$1.530.000.000</td><td>8,4% del SAM</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pie-gfx">El SOM del mes 24 (380 locales) es el <b>caso base</b> del <a href="roadmap.html">roadmap</a>, y ahí está su derivación: tasa de cierre, ticket y churn declarados. El SOM de año 5 es una <b class="acento">ambición</b>, no un pronóstico.</p>
+  </div>
+
+  <div class="ficha nota nota-b" style="margin-top: var(--sp-s);">
+    <b style="color: var(--tinta)">Extensión global: la factura electrónica es la llave, y no es chilena.</b>
+    <p style="margin: 6px 0 0; font-size: var(--step--1);">Todo el producto se apoya en una cosa: que el Estado obligue al comercio a declarar sus ventas y compras <b>línea por línea, en formato estructurado</b>. Chile lo hace desde 2014 (DTE del SII), pero no es una rareza chilena: México (CFDI 4.0), Perú (SUNAT CPE), Colombia (DIAN), Brasil (NF-e) y Argentina (AFIP) tienen mandatos equivalentes, y la Unión Europea llega en 2030 con ViDA. En cada uno de esos países existe el mismo local, con el mismo cuaderno y la misma merma. El motor de pronóstico no cambia; cambia el conector y el calendario de feriados. México solo, con del orden de <b>600.000</b> establecimientos formales de comida, es un mercado 7 veces el chileno. <b class="acento">Chile no es el mercado: Chile es el laboratorio donde el producto se prueba barato y en español.</b></p>
+  </div>
+</section>
+
+<!-- ===================== 03 POSICIÓN ===================== -->
+<section class="seccion seccion-borde container cap" id="posicion">
+  <span class="cap-n">03</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-m);">Posicionamiento y cuña de entrada</h2>
+
+  <div class="rejilla rejilla-2">
+    <div>
+      <div class="ficha" style="border: 2px solid var(--tinta); margin-bottom: var(--sp-s);">
+        <div class="ficha-titulo">La frase</div>
+        <p style="font-family: var(--serif); font-size: var(--step-2); line-height: 1.25; margin: 0;">Tu POS te dice cuánto <em>tienes</em>. Mermata te dice cuánto vas a <em>necesitar</em>.</p>
+      </div>
+      <p class="prose">Toda la categoría de software de inventario para restaurantes está construida sobre el <b>pasado</b>: cuánto stock hay, cuánto entró, cuánto salió. Es contabilidad. Mermata es la única pieza que mira hacia <b>adelante</b>, y es la única que le pone un precio en pesos a lo que se botó. Esas dos cosas —el pronóstico y el número de la merma— son la posición completa.</p>
+      <p class="prose">No competimos con el POS. Nos <b>sentamos encima</b> del POS. Eso es deliberado: es más barato integrarse que reemplazar, y el POS es también nuestro mejor canal de venta.</p>
+    </div>
+
+    <div class="ficha">
+      <div class="ficha-titulo">La cuña: panaderías y cafeterías de barrio, Santiago</div>
+      <p style="font-size: var(--step--1); color: var(--tinta-2); margin-bottom: var(--sp-s);">Empezamos por el segmento más angosto posible, y hay cuatro razones concretas:</p>
+      <ol style="padding-left: 1.2em; font-size: var(--step--1); color: var(--tinta-2);">
+        <li style="margin-bottom: 8px;"><b>La merma es visible y duele.</b> El pan que sobra a las 8 de la noche no se puede vender mañana. El dueño lo ve, con los ojos, todos los días. No hay que convencerlo de que el problema existe.</li>
+        <li style="margin-bottom: 8px;"><b>La receta es simple y estable.</b> Harina, levadura, sal, margarina. Cinco insumos explican el 80% del costo. El mapeo del onboarding toma dos horas, no dos semanas.</li>
+        <li style="margin-bottom: 8px;"><b>La demanda es fuertemente predecible.</b> Día de la semana, día de pago, feriado, clima. Un modelo simple ya baja mucho el error — y eso importa porque el primer cliente tiene que ver el resultado rápido.</li>
+        <li><b>Hablan entre ellos.</b> El gremio panadero chileno (Fechipan, Indupan) es una red densa y real. Un caso de éxito en Ñuñoa se sabe en Maipú.</li>
+      </ol>
+      <hr class="regla" style="margin: var(--sp-s) 0;">
+      <p style="font-size: var(--step--1); color: var(--tinta-2); margin:0;"><b style="color:var(--tinta)">Después:</b> cafeterías → restaurantes de menú fijo → minimarkets → cadenas de 3–10 locales. En ese orden, porque en ese orden crece la complejidad de la receta y baja la frecuencia de compra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 04 COMPETENCIA ===================== -->
+<section class="seccion seccion-borde container cap" id="competencia">
+  <span class="cap-n">04</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Contra quién competimos de verdad</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">El competidor no es otro software. Es un cuaderno Torre de cuadro grande y la memoria de una persona que lleva doce años haciendo esto. Ese competidor es gratis, funciona razonablemente bien, y no requiere aprender nada. Cualquier análisis competitivo que empiece por MarketMan está mintiendo.</p>
+
+  <div class="scroll-x">
+    <table class="tabla tabla-caja" style="min-width: 720px;">
+      <thead>
+        <tr>
+          <th scope="col">Competidor</th>
+          <th scope="col">Qué es</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Por qué gana hoy</th>
+          <th scope="col">Dónde lo ganamos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">El cuaderno y la memoria<br><span class="chip chip-riesgo" style="margin-top:4px;"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1v5M5 8v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> El incumbente real</span></th>
+          <td>La forma en que compra ~85% del rubro.</td>
+          <td class="num">$0</td>
+          <td>Gratis, instantáneo, cero aprendizaje, y el dueño confía en él más que en cualquier pantalla.</td>
+          <td>No sabe cuánto botaste. Nunca te lo va a decir. Nosotros llegamos con el número, no con una app.</td>
+        </tr>
+        <tr>
+          <th scope="row">Excel</th>
+          <td>Una planilla que alguien armó en 2019 y ya nadie actualiza.</td>
+          <td class="num">$0</td>
+          <td>Flexible, familiar, es de él.</td>
+          <td>Requiere que alguien digite. Nadie digita. Muere en tres meses, siempre.</td>
+        </tr>
+        <tr>
+          <th scope="row">Bsale · Toteat · Fudo · Relbase</th>
+          <td>POS chilenos con módulo de inventario.</td>
+          <td class="num">$25k–$90k/mes</td>
+          <td>Ya están instalados, ya emiten la boleta, ya cobran. Cuentan el stock.</td>
+          <td>Cuentan el pasado. Ninguno pronostica, ninguno arma la orden, ninguno le pone precio a la merma. <b>Y los queremos de socios, no de rivales.</b></td>
+        </tr>
+        <tr>
+          <th scope="row">Defontana · Nubox · Softland</th>
+          <td>ERP contable chileno.</td>
+          <td class="num">$60k–$300k/mes</td>
+          <td>El contador ya los usa. Cierran el mes.</td>
+          <td>Son para el contador, no para el dueño. Nadie decide una compra de pan mirando un ERP a las 6 AM.</td>
+        </tr>
+        <tr>
+          <th scope="row">MarketMan · Crunchtime · Apicbase</th>
+          <td>Software de food-cost internacional, serio y bueno.</td>
+          <td class="num">US$250–500/mes</td>
+          <td>Producto maduro, con recetas y proveedores.</td>
+          <td>No hablan con el SII. No mandan WhatsApp. No saben qué es el día de pago chileno. Y cuestan 3–5× lo que este cliente paga por software, en total.</td>
+        </tr>
+        <tr>
+          <th scope="row">El contador</th>
+          <td>La persona que hoy responde «¿cuánto gasté?».</td>
+          <td class="num">$120k–$250k/mes</td>
+          <td>Confianza total. Es quien le dice al dueño cómo le fue.</td>
+          <td>Contesta 40 días tarde y hacia atrás. Pero <b>es nuestro mejor canal</b>: le damos una razón para llamar al cliente con una buena noticia.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ficha nota" style="margin-top: var(--sp-s);">
+    <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">El riesgo competitivo honesto.</b> Ninguno de los seis de arriba nos mata. El que nos mata es <b>Toteat o Bsale agregando pronóstico de demanda como feature incluida</b>, gratis, en el plan que el cliente ya paga. Técnicamente pueden: tienen el dato. Nuestra respuesta no es defenderse: es <b>llegar antes y venderles el motor</b>. Ver <a href="roadmap.html">hito 4 del roadmap</a>, donde esto es una decisión explícita y tiene fecha.</p>
+  </div>
+</section>
+
+<!-- ===================== 05 PRECIO ===================== -->
+<section class="seccion seccion-borde container cap" id="precio">
+  <span class="cap-n">05</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Precio y unit economics</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">Precio ancla: la merma que evitamos. Si el plan cuesta más que la plata que rescata, no hay negocio — y por eso el precio tiene un techo estructural que no depende de nuestras ganas.</p>
+
+  <div class="rejilla rejilla-3" style="margin-bottom: var(--sp-l);">
+    <div class="tile tile-s1">
+      <span class="rotulo">Plan Barrio</span>
+      <span class="valor heroe">$49.000</span>
+      <span class="delta">+ IVA / mes · 1 local · ≤120 SKU</span>
+    </div>
+    <div class="tile tile-acento">
+      <span class="rotulo">Plan Local · el ancla</span>
+      <span class="valor heroe">$99.000</span>
+      <span class="delta">+ IVA / mes · 1 local · SKU ilimitados</span>
+    </div>
+    <div class="tile tile-s1">
+      <span class="rotulo">Plan Cadena</span>
+      <span class="valor heroe">$79.000</span>
+      <span class="delta">+ IVA / mes <b>por local</b> · mínimo 3</span>
+    </div>
+  </div>
+
+  <div class="rejilla rejilla-2" style="align-items: start;">
+    <div class="ficha">
+      <div class="ficha-titulo">Por qué $99.000 y no otra cifra</div>
+      <div class="calculo">
+        <div>Merma evitada en un local tipo: <b>$392.000/mes</b></div>
+        <div class="tenue" style="padding-left:1em;">↳ (merma $760.000/mes × 50% recuperado + quiebre $588.000 × 40% ≈ $615.000; tomamos el escenario conservador del mes 4)</div>
+        <hr>
+        <div>Techo psicológico: el cliente paga a lo más <b>~25%</b> de lo que rescata</div>
+        <div>$392.000 × 25% = <span class="res">$98.000</span></div>
+        <hr>
+        <div>Piso: el POS que ya paga cuesta <b>$30–60k</b>. No podemos costar menos que el POS sin parecer un juguete, ni más de <b>2×</b> el POS sin gatillar un comité.</div>
+        <hr>
+        <div>Precio: <span class="res">$99.000 + IVA</span></div>
+      </div>
+      <p class="fuente" style="margin-top:var(--sp-xs);">El ARPU mezclado que usamos en todo el modelo es <b>$85.000</b>: mezcla esperada de 25% Barrio / 55% Local / 20% Cadena → (0,25×49.000) + (0,55×99.000) + (0,20×79.000) = <b>$82.550</b>, redondeado a $85.000 con los upsells (SKU extra, locales adicionales).</p>
+    </div>
+
+    <div class="apilar">
+      <div class="ficha" style="border-left: 3px solid var(--acento);">
+        <div class="ficha-titulo">Costo variable por cuenta, por mes</div>
+        <table class="tabla">
+          <tbody>
+            <tr><th scope="row">Inferencia Claude (extracción de facturas, normalización de catálogo, agente WhatsApp, resumen semanal)</th><td class="num">$2.100</td></tr>
+            <tr><th scope="row">Infraestructura (Postgres, workers, almacenamiento de DTE)</th><td class="num">$1.300</td></tr>
+            <tr><th scope="row">WhatsApp Business API vía BSP (~60 conversaciones de utilidad/mes)</th><td class="num">$700</td></tr>
+            <tr><th scope="row" style="color: var(--tinta)"><b>Subtotal técnico</b></th><td class="num"><b>$4.100</b></td></tr>
+            <tr><th scope="row">Soporte y éxito de cliente, prorrateado (1 CSM cada 120 cuentas, costo cargado $1.020.000/mes)</th><td class="num">$8.500</td></tr>
+            <tr style="border-top: 2px solid var(--tinta);"><th scope="row" style="color: var(--tinta)"><b>COGS total por cuenta</b></th><td class="num"><b>$12.600</b></td></tr>
+          </tbody>
+        </table>
+        <p class="fuente" style="margin-top: var(--sp-xs);">La aritmética completa del <b>$2.100 de IA</b> —token por token, modelo por modelo— está en <a href="stack.html#costos">arquitectura → costos</a>. Este es el mismo número, no una versión redondeada.</p>
+      </div>
+
+      <div class="ficha">
+        <div class="ficha-titulo">Márgenes y retorno</div>
+        <div class="calculo">
+          <div>ARPU <b>$85.000</b> − COGS <b>$12.600</b> = <b>$72.400</b></div>
+          <div>Margen bruto = <span class="res">85,2%</span></div>
+          <hr>
+          <div>Churn mensual supuesto <b>4,0%</b> → vida = 1/0,04 = <b>25 meses</b></div>
+          <div>LTV = $72.400 × 25 = <span class="res">$1.810.000</span></div>
+          <hr>
+          <div>CAC mezclado <b>$420.000</b> <span class="tenue">(ver canales)</span></div>
+          <div>LTV / CAC = <span class="res">4,3×</span></div>
+          <div>Payback = $420.000 / $72.400 = <span class="res">5,8 meses</span></div>
+        </div>
+        <p class="fuente" style="margin-top: var(--sp-xs);"><b>Churn 4%/mes es un supuesto y es el más frágil del modelo.</b> El rubro gastronómico tiene una mortalidad de empresas altísima: una fracción del churn no será insatisfacción, será que el local cerró. Si el churn real es 7%, la vida cae a 14 meses, el LTV a $1.014.000 y el LTV/CAC a <b class="acento">2,4×</b> — que es la frontera de lo financiable. Ese es el número que hay que vigilar desde el mes 1.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ficha nota nota-b" style="margin-top: var(--sp-s);">
+    <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">La puesta en marcha ($190.000) no es margen, es costo recuperado.</b> Levantar recetas y proveedores toma ~6 horas de una persona ($140.000 cargado) más ~$20.000 de inferencia intensiva en el primer procesamiento de 12 meses de DTE. Cobrarla al costo hace dos cosas: filtra al curioso que nunca iba a comprar, y nos deja el CAC más limpio. No la usamos para inflar el margen bruto.</p>
+  </div>
+</section>
+
+<!-- ===================== 06 CANALES ===================== -->
+<section class="seccion seccion-borde container cap" id="canales">
+  <span class="cap-n">06</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Canales de adquisición, en orden</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">Este cliente no está en LinkedIn, no lee newsletters y no hace clic en un anuncio de Google mientras amasa. Los canales que funcionan en Chile para este rubro son concretos, presenciales y de confianza prestada. Están ordenados por CAC esperado, del más barato al más caro.</p>
+
+  <div class="scroll-x">
+    <table class="tabla tabla-caja" style="min-width: 760px;">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Canal</th>
+          <th scope="col">Cómo funciona en concreto</th>
+          <th scope="col">CAC estimado</th>
+          <th scope="col">Techo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row" class="num">1</th>
+          <td><b>El POS como canal</b><br><span class="chip chip-bien" style="margin-top:4px;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 6.2l3 3L11 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> El apalancamiento</span></td>
+          <td>Bsale, Toteat, Fudo o Relbase ofrecen Mermata como módulo dentro de su propio panel. Ellos cobran, nosotros entregamos, revenue share <b>20%</b>. Ellos tienen miles de locales y ninguna razón para construir esto solos.</td>
+          <td class="num">$120.000</td>
+          <td>Alto — pero depende de un acuerdo que todavía no existe. Es el mayor riesgo de ejecución y el mayor premio.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="num">2</th>
+          <td><b>Contadores y estudios contables</b></td>
+          <td>El contador de pymes gastronómicas ya tiene la relación y ya ve el DTE. Le damos el diagnóstico de merma como herramienta suya, con su marca si quiere, y comisión del <b>15%</b> el primer año. Le sirve: le da algo bueno que decirle al cliente.</td>
+          <td class="num">$210.000</td>
+          <td>Medio. Un contador tiene 30–80 clientes; nos sirven 3–8 de ellos.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="num">3</th>
+          <td><b>Gremios: Fechipan, Indupan, Achiga</b></td>
+          <td>Charlas y el «Informe de merma del gremio»: un estudio agregado y anónimo con datos reales de los socios. El gremio panadero chileno es una red densa, presencial y con reuniones de verdad.</td>
+          <td class="num">$260.000</td>
+          <td>Medio-alto en la cuña, casi nulo fuera de ella.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="num">4</th>
+          <td><b>Terreno, barrio por barrio</b></td>
+          <td>Una persona, un mapa de Ñuñoa/Providencia/Maipú, y la conversación a las 15:00 (la única hora en que un dueño de restaurante puede hablar). Convierte porque el problema es evidente y el diagnóstico es gratis. No escala, pero valida.</td>
+          <td class="num">$480.000</td>
+          <td>Bajo. Es el canal del año 1, no del año 3.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="num">5</th>
+          <td><b>El «Índice Mermata»</b></td>
+          <td>Informe trimestral público con el precio real de 40 insumos de food service en Chile, sacado de facturas anonimizadas: cuánto subió la palta, cuánto la harina, quién está cobrando más caro. Es dato que nadie más tiene y la prensa económica lo va a publicar gratis.</td>
+          <td class="num">$300.000</td>
+          <td>Alto en marca, lento en conversión. Es una inversión a 18 meses.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="num">6</th>
+          <td><b>Mayoristas: Alvi, Central Mayorista</b></td>
+          <td>Co-marketing con el mayorista al que el local ya le compra. Su interés: un cliente que pide bien pide más seguido. Riesgo: su interés estructural es que compres <b>más</b>, no que compres <b>bien</b>. Hay que mirarlo con desconfianza.</td>
+          <td class="num">$340.000</td>
+          <td>Medio, con conflicto de interés incorporado.</td>
+        </tr>
+        <tr class="tenue">
+          <th scope="row" class="num">7</th>
+          <td><b>Publicidad digital</b></td>
+          <td>Meta e Instagram Ads. Lo probamos, lo medimos y probablemente lo apagamos. Está en la lista para poder decir que lo descartamos con datos, no con prejuicio.</td>
+          <td class="num">$900.000+</td>
+          <td>Muy bajo. La audiencia no es segmentable con precisión y el ticket no aguanta ese CAC.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ficha" style="margin-top: var(--sp-s);">
+    <div class="ficha-titulo">De dónde sale el CAC mezclado de $420.000</div>
+    <div class="calculo">
+      <div>Mezcla esperada al mes 18: POS <b>35%</b> · contadores <b>20%</b> · gremios <b>10%</b> · terreno <b>25%</b> · índice <b>10%</b></div>
+      <hr>
+      <div>(0,35 × 120.000) + (0,20 × 210.000) + (0,10 × 260.000) + (0,25 × 480.000) + (0,10 × 300.000)</div>
+      <div>= 42.000 + 42.000 + 26.000 + 120.000 + 30.000 = <span class="res">$260.000</span></div>
+      <hr>
+      <div>× <b>1,6</b> de sobrecarga de ventas <span class="tenue">(sueldo del AE, herramientas, viajes, y el hecho de que las mezclas nunca salen como uno las planifica)</span></div>
+      <div>CAC del modelo = <span class="res">$416.000 ≈ $420.000</span></div>
+    </div>
+    <p class="fuente" style="margin-top: var(--sp-xs);"><b>El año 1 el CAC real va a ser mucho peor</b>, cerca de $600.000, porque el canal POS todavía no existe y todo se cierra a terreno. El modelo de <a href="roadmap.html">roadmap</a> usa $600.000 en el año 1 y $420.000 desde el mes 15. No promediamos hacia abajo para que el gráfico se vea bien.</p>
+  </div>
+</section>
+
+<!-- ===================== 07 IA EN MARKETING ===================== -->
+<section class="seccion seccion-borde container cap" id="ia">
+  <span class="cap-n">07</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Dónde la IA ayuda de verdad en marketing, y dónde no</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">La respuesta fácil sería «IA para generar contenido». Es exactamente la respuesta equivocada para este cliente. Acá va la versión con criterio.</p>
+
+  <div class="rejilla rejilla-2">
+    <div class="ficha" style="border-left: 3px solid var(--bien);">
+      <div class="ficha-titulo" style="color: var(--bien);">Donde sí, y mucho</div>
+      <div style="border-bottom: 1px solid var(--regla); padding: var(--sp-xs) 0;">
+        <b>1. El diagnóstico gratis <em>es</em> el material de venta, y lo produce la IA.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">Un prospecto conecta el SII. Doce meses de DTE entran a un pipeline donde el modelo normaliza nombres de productos («HARINA PAN. 25K», «Harina panadera saco», «harina p/pan 25 kg» → un solo SKU), extrae líneas de factura y reconcilia compras contra ventas. Sale un informe con <b>su</b> merma, en <b>sus</b> pesos. Costo: ~$2.500 de inferencia. Eso antes requería un consultor de $800.000. <b class="acento">Ese es el arbitraje, y es todo el modelo de adquisición.</b></p>
+      </div>
+      <div style="border-bottom: 1px solid var(--regla); padding: var(--sp-xs) 0;">
+        <b>2. Calificación de prospectos desde datos públicos.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">Cruzar el registro público de contribuyentes con rubro, comuna y señales de tamaño para saber a qué puerta tocar. El vendedor de terreno llega a la calle correcta y no a la equivocada. Baja el CAC del canal más caro.</p>
+      </div>
+      <div style="padding: var(--sp-xs) 0;">
+        <b>3. El «Índice Mermata».</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">Convertir cientos de miles de líneas de factura anonimizadas en un informe trimestral de precios de insumos. Sin IA es un trabajo de un analista full-time; con IA es un job programado. Es contenido que <b>nadie más puede escribir</b>, porque nadie más tiene el dato.</p>
+      </div>
+    </div>
+
+    <div class="ficha" style="border-left: 3px solid var(--riesgo);">
+      <div class="ficha-titulo" style="color: var(--riesgo);">Donde no, y por qué</div>
+      <div style="border-bottom: 1px solid var(--regla); padding: var(--sp-xs) 0;">
+        <b>1. Contenido genérico en redes.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">«5 tips para reducir la merma en tu restaurante 🍽️». Nuestro cliente no lo va a leer, no lo va a compartir, y si lo lee va a saber en tres líneas que lo escribió una máquina. El costo real no es el tiempo perdido: es que <b>nos posiciona como los otros</b>, y toda la propuesta es que no somos los otros.</p>
+      </div>
+      <div style="border-bottom: 1px solid var(--regla); padding: var(--sp-xs) 0;">
+        <b>2. Correos fríos personalizados con IA.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">El dueño de una panadería no tiene bandeja de entrada corporativa. Tiene un WhatsApp con 400 mensajes sin leer y una cuenta de Gmail que abre para los papeles del SII. El canal está muerto antes de empezar. Escalar la personalización de un canal que no existe es escalar cero.</p>
+      </div>
+      <div style="border-bottom: 1px solid var(--regla); padding: var(--sp-xs) 0;">
+        <b>3. Chatbot de ventas en el sitio.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">Solo tenemos entre 5 y 15 conversaciones de venta a la semana en el año 1. A ese volumen, un humano contesta mejor, aprende más, y cada conversación es investigación de producto. Automatizar acá es tirar a la basura el dato más valioso que tenemos.</p>
+      </div>
+      <div style="padding: var(--sp-xs) 0;">
+        <b>4. WhatsApp de venta generado por IA.</b>
+        <p style="font-size: var(--step--1); color: var(--tinta-2); margin: 4px 0 0;">Este es el más tentador y el más peligroso. WhatsApp es el canal <b>íntimo</b> del cliente. Un mensaje comercial generado por máquina ahí adentro no es marketing: es una invasión, y quema la confianza que el producto entero necesita para funcionar. La IA puede leer al proveedor <b>después</b> de que el cliente nos contrató. Nunca antes, y nunca para vender.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ficha nota" style="margin-top: var(--sp-s);">
+    <p style="margin:0; font-size: var(--step--1);"><b style="color:var(--tinta)">La regla que resume todo esto:</b> la IA nos sirve para <b>producir el dato que nadie más tiene</b> — la merma de este local, el precio real de la harina en Chile. No nos sirve para <b>producir palabras que cualquiera podría escribir</b>. El primero es una ventaja competitiva; el segundo es ruido con costo marginal.</p>
+  </div>
+</section>
+
+<!-- ===================== 08 90 DÍAS ===================== -->
+<section class="seccion seccion-borde container cap" id="dias">
+  <span class="cap-n">08</span>
+  <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Los primeros 90 días</h2>
+  <p class="prose" style="margin-bottom: var(--sp-m);">Nada de lo que aparece acá es «construir el producto». Los primeros 90 días son para averiguar si el producto merece existir. El demo que ya viste es una hipótesis, no una conclusión.</p>
+
+  <div class="rejilla rejilla-3">
+    <div class="ficha">
+      <div class="ficha-titulo">Días 1–30 · Escuchar y medir</div>
+      <ul style="list-style:none; padding:0; font-size: var(--step--1); color: var(--tinta-2);">
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Entrevistar <b>20 locales</b> en terreno. No mostrar producto. Preguntar cómo compran y cuánto botan.</li>
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Conseguir que <b>6</b> den acceso de lectura al SII.</li>
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Construir solo el <b>lector de DTE</b> y el normalizador de catálogo. Nada de UI.</li>
+        <li style="padding:6px 0;"><b>Medir el filtro que decide el SAM:</b> de esos 6, ¿cuántos emiten boleta con detalle por producto?</li>
+      </ul>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Meta: <b>6 conexiones SII</b> y una respuesta dura a la pregunta del detalle por producto.</p>
+    </div>
+    <div class="ficha">
+      <div class="ficha-titulo">Días 31–60 · Vender el diagnóstico</div>
+      <ul style="list-style:none; padding:0; font-size: var(--step--1); color: var(--tinta-2);">
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Entregar los <b>6 informes de merma</b>, en persona. Ver la cara del dueño cuando lee el número. Esa cara es el dato.</li>
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Pedirles <b>$190.000</b> por el informe. Quién paga y quién no es la primera señal real de disposición a pagar.</li>
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Para 2 locales: pronóstico y orden de compra armados <b>a mano</b>, en planilla, entregados por WhatsApp. Modo concierge, sin producto.</li>
+        <li style="padding:6px 0;">Primera conversación con Bsale y Toteat. No para cerrar: para saber si les interesa o si lo van a construir ellos.</li>
+      </ul>
+      <p class="fuente" style="margin-top: var(--sp-xs);">Meta: <b>3 informes pagados</b> y 2 locales recibiendo órdenes hechas a mano.</p>
+    </div>
+    <div class="ficha" style="border: 2px solid var(--tinta);">
+      <div class="ficha-titulo">Días 61–90 · La única métrica que importa</div>
+      <ul style="list-style:none; padding:0; font-size: var(--step--1); color: var(--tinta-2);">
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);"><b>3 locales pagando $99.000/mes.</b> El producto sigue siendo medio a mano y no importa.</li>
+        <li style="padding:6px 0; border-bottom:1px solid var(--regla);">Automatizar solo lo que ya demostró que se usa. Probablemente sea el pronóstico y la orden. Probablemente no sea el dashboard.</li>
+        <li style="padding:6px 0;">Medir semana a semana la métrica de activación real.</li>
+      </ul>
+      <hr class="regla" style="margin: var(--sp-s) 0;">
+      <p style="margin:0; font-size: var(--step--1);"><b class="acento">La métrica:</b> ¿el dueño manda el pedido que le sugerimos <b>editando menos del 20%</b> de las cantidades? Si edita el 60%, no confía en el modelo, y un pronóstico en el que nadie confía vale exactamente cero. Todo lo demás —MRR, churn, NPS— es ruido al lado de esto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 09 QUÉ MATA ESTO ===================== -->
+<section class="seccion seccion-tinta" id="mata">
+  <div class="container cap">
+    <span class="cap-n" style="color:#e8a892">09</span>
+    <h2 style="margin: var(--sp-2xs) 0 var(--sp-2xs);">Qué mataría esto</h2>
+    <p style="color: #cfc7b4; max-width: 62ch; margin-bottom: var(--sp-l);">En orden de probabilidad, no de gravedad. Los cuatro son reales y ninguno es «que un competidor con más plata copie el producto», porque esa nunca es la forma en que mueren las empresas de este tamaño.</p>
+
+    <div class="rejilla rejilla-2" style="gap: var(--sp-l);">
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1);">1. El dueño no cambia de conducta</h3>
+        <p style="color: #cfc7b4; font-size: var(--step--1);">El riesgo más grande, el menos técnico y el que menos se discute en un pitch. El pronóstico puede tener un error de 6% y ser un prodigio de ingeniería, y el dueño va a seguir pidiendo lo mismo de siempre «porque yo igual sé». No se combate con más precisión: se combate poniendo el número de la merma en pesos, todos los lunes, en el mismo WhatsApp donde manda los pedidos. Si a los 3 meses la tasa de edición del pedido sigue sobre 40%, el producto no sirve y hay que decirlo.</p>
+      </div>
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1);">2. El POS lo incluye gratis</h3>
+        <p style="color: #cfc7b4; font-size: var(--step--1);">Toteat o Bsale agregan «sugerencia de compra» al plan que el cliente ya paga. Tienen el dato, tienen la relación y tienen el canal. Cobrar $99.000 por algo que viene incluido es insostenible. La única defensa que funciona no es defenderse: es <b style="color:var(--papel)">ser el motor que ellos integran</b> antes de que decidan construirlo. Es una carrera contra el reloj y está puesta como criterio de muerte del hito 4 del roadmap.</p>
+      </div>
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1);">3. El dato del SII no alcanza</h3>
+        <p style="color: #cfc7b4; font-size: var(--step--1);">Si resulta que la mayoría de los locales emite la boleta con una sola línea que dice «VENTA», no hay serie por producto y no hay nada que pronosticar. El SAM se derrumba y el producto tiene que apoyarse en integraciones POS una por una — que es un negocio mucho peor, más lento y más caro. <b style="color:var(--papel)">Esta es la incógnita que se responde en los primeros 30 días</b>, con 6 conexiones y cero código de producto. Es barata de responder y hay que responderla antes de levantar un peso.</p>
+      </div>
+      <div>
+        <h3 style="color: #e8a892; font-size: var(--step-1);">4. La merma es 2% y no 6%</h3>
+        <p style="color: #cfc7b4; font-size: var(--step--1);">Si el rubro chileno es más eficiente de lo que suponemos, la plata rescatable por local cae a ~$130.000/mes y el precio máximo defendible se desploma a ~$33.000. A ese precio, con onboarding humano de $190.000 y CAC de $420.000, el payback pasa de 6 a 20 meses y el negocio deja de cerrar. No es una hipótesis cómoda de mirar, y por eso el diagnóstico gratis mide <b style="color:var(--papel)">exactamente eso</b> y lo mide primero.</p>
+      </div>
+    </div>
+
+    <hr class="regla" style="border-color: #3a352a; margin: var(--sp-l) 0;">
+    <p style="color:#cfc7b4; max-width: 62ch;">La probabilidad de éxito, con su rango, su clase de referencia declarada y la derivación completa, está en el <a href="roadmap.html" style="color:#e8a892">roadmap</a>. No es un número bonito.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <div class="marca" style="margin-bottom: 6px;">Merma<span class="marca-pt">ta</span></div>
+      <p class="tenue" style="font-size: var(--step--1); max-width: 40ch;">Compra lo que vas a vender. Prototipo — Santiago de Chile, 2026.</p>
+    </div>
+    <nav class="nav-lista" style="display:flex; flex-wrap:wrap; gap: var(--sp-s);" aria-label="Pie">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="mermata.js"></script>
+<script>
+/* Embudo TAM → SAM → SOM. Categorías ORDENADAS ⇒ rampa ordinal de un solo tono. */
+(function () {
+  var ETAPAS = [
+    { n: 'TAM · universo',            v: 81000, c: '#7dabc6', nota: 'Locales de comida con boleta electrónica' },
+    { n: 'Con detalle por producto',  v: 44550, c: '#4a8cb0', nota: '× 55% — el filtro duro' },
+    { n: 'SAM · sobre $4M insumos',   v: 17820, c: '#1f6f99', nota: '× 40% — bajo eso el ROI no da' },
+    { n: 'SOM año 5 · ambición',      v:  1500, c: '#0d5479', nota: '8,4% del SAM' },
+    { n: 'SOM mes 24 · caso base',    v:   380, c: '#08374f', nota: '2,1% del SAM · ver roadmap' }
+  ];
+  function num(n) { var s = String(n), o = '', c = 0;
+    for (var i = s.length - 1; i >= 0; i--) { o = s[i] + o; if (++c % 3 === 0 && i > 0) o = '.' + o; } return o; }
+
+  var host = document.getElementById('embudo');
+  var tip = document.createElement('div'); tip.className = 'tip'; host.style.position = 'relative'; host.appendChild(tip);
+
+  function dibujar() {
+    var W = Math.max(300, host.clientWidth || 320), chico = W < 560;
+    var etL = chico ? 132 : 210, m = { t: 8, r: chico ? 8 : 12, b: 26, l: etL };
+    var alto = 34, H = m.t + ETAPAS.length * alto + m.b;
+    var pw = W - m.l - m.r;
+    var max = 81000;
+    var esc = function (v) { return Math.max(2, Math.pow(v / max, 0.42) * pw); }; // escala de potencia: 380 sobre 81.000 sería invisible en lineal
+    var g = ['<svg class="gfx" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Embudo de mercado: de 81.000 locales a 380">'];
+
+    ETAPAS.forEach(function (e, i) {
+      var y = m.t + i * alto, h = 16, an = esc(e.v);
+      g.push('<rect class="hitr" data-i="' + i + '" x="0" y="' + y + '" width="' + W + '" height="' + alto + '" fill="transparent"/>');
+      g.push('<text class="eje" x="' + (m.l - 10) + '" y="' + (y + h / 2 + 4) + '" text-anchor="end" style="font-family:var(--sans);fill:var(--tinta-2)">' + (chico ? e.n.split(' · ')[0] : e.n) + '</text>');
+      // barra: extremo de dato redondeado 4px, cuadrado en la línea base
+      g.push('<path d="M' + m.l + ' ' + y + ' H' + (m.l + an - 4) + ' a4,4 0 0 1 4,4 v' + (h - 8) + ' a4,4 0 0 1 -4,4 H' + m.l + ' Z" fill="' + e.c + '"/>');
+      g.push('<text class="etiq" x="' + (m.l + an + 8) + '" y="' + (y + h / 2 + 4) + '">' + num(e.v) + '</text>');
+    });
+    g.push('<line class="base" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (m.t + ETAPAS.length * alto - (alto - 16)) + '"/>');
+    g.push('<text class="eje" x="' + m.l + '" y="' + (H - 8) + '" style="font-family:var(--sans)">Escala de potencia (0,42) — si fuera lineal, los 380 del caso base no se verían.</text>');
+    g.push('</svg>');
+    host.insertBefore(document.createRange().createContextualFragment(g.join('')), tip);
+
+    host.querySelectorAll('.hitr').forEach(function (r) {
+      function on(ev) {
+        var e = ETAPAS[+r.dataset.i], b = host.getBoundingClientRect();
+        var px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - b.left;
+        var py = (ev.touches ? ev.touches[0].clientY : ev.clientY) - b.top;
+        tip.innerHTML = '<span class="t-f">' + e.n + '</span><span class="t-l">' + e.nota + '</span><span class="t-l">Locales <b>' + num(e.v) + '</b></span>';
+        tip.classList.add('on');
+        tip.style.left = Math.min(px + 12, host.clientWidth - tip.offsetWidth - 6) + 'px';
+        tip.style.top = (py + 14) + 'px';
+      }
+      r.addEventListener('mousemove', on);
+      r.addEventListener('touchstart', on, { passive: true });
+      r.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+    });
+  }
+  function repintar() { host.querySelectorAll('svg').forEach(function (s) { s.remove(); }); dibujar(); }
+  repintar();
+  var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(repintar, 140); });
+
+  var bt = document.getElementById('t-tabla'), tb = document.getElementById('embudo-tabla');
+  bt.addEventListener('click', function () {
+    var on = bt.getAttribute('aria-pressed') === 'true';
+    bt.setAttribute('aria-pressed', !on);
+    tb.hidden = on;
+    host.hidden = !on;
+    bt.textContent = on ? 'Ver como tabla' : 'Ver el gráfico';
+  });
+})();
+</script>
+</body>
+</html>

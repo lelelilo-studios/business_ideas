@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo — Zurcia · Peluquería Marisol</title>
+<meta name="description" content="El producto funcionando: simulador de WhatsApp, agenda real y motor de relleno automático de huecos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Petrona:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__inner">
+      <a class="brand" href="../index.html">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="16" />
+          <path d="M2.5 9.5h19M7.5 2.5v4M16.5 2.5v4" />
+          <path d="M4.5 16.5l3-2.6 3 2.6 3-2.6 3 2.6 3-2.6" />
+        </svg>
+        Zurcia
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span data-label>Menú</span></button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul role="list">
+        <li><a href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= cabecera del local ================= -->
+<div class="local">
+  <div class="container">
+    <div class="local__fila">
+      <div class="local__id">
+        <div class="local__nom">Peluquería Marisol</div>
+        <div class="local__sub">76.412.905-K · Irarrázaval 3410, Ñuñoa · 3 sillas</div>
+      </div>
+      <div class="reloj">
+        <div>
+          <span class="reloj__t" id="rj-hora">08:35</span>
+          <span class="reloj__d" id="rj-dia">Sábado 18</span>
+        </div>
+        <button id="rj-30" title="Avanzar 30 minutos">+30′</button>
+        <button id="rj-dia-btn" title="Correr el día entero">▶︎ día</button>
+      </div>
+    </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+</div>
+
+<main class="container">
+  <!-- pestañas: en móvil van abajo, fijas; en escritorio arriba a la derecha -->
+  <div class="tabs" id="tabs" role="tablist" aria-label="Secciones del demo">
+    <button role="tab" data-tab="chat" aria-selected="true" aria-controls="p-chat">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 20.5l1.6-4.8A8.4 8.4 0 0 1 3.5 11 8.4 8.4 0 0 1 12 2.6a8.4 8.4 0 0 1 9 8.9z"/></svg>
+      WhatsApp<span class="pip" id="pip-chat" data-n="0">0</span>
+    </button>
+    <button role="tab" data-tab="agenda" aria-selected="false" aria-controls="p-agenda">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 2v5M16 2v5"/></svg>
+      Agenda
+    </button>
+    <button role="tab" data-tab="rescates" aria-selected="false" aria-controls="p-rescates">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 16l4-3.4 4 3.4 4-3.4 4 3.4"/><path d="M3 8.5l4-3.4 4 3.4 4-3.4 4 3.4"/></svg>
+      Rescates<span class="pip" id="pip-resc" data-n="0">0</span>
+    </button>
+    <button role="tab" data-tab="ajustes" aria-selected="false" aria-controls="p-ajustes">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+      Ajustes
+    </button>
+  </div>
+
+  <div class="cols">
+    <!-- ---------------- WhatsApp ---------------- -->
+    <section class="panel" id="p-chat" data-on="true" role="tabpanel" aria-label="Simulador de WhatsApp">
+      <div class="wa">
+        <div class="wa__barra">
+          <div class="wa__ini" id="wa-ini">C</div>
+          <div class="wa__quien">
+            <b id="wa-nom">Camila Reyes</b>
+            <span id="wa-tel">+56 9 8412 5507</span>
+          </div>
+          <span class="wa__estado" id="wa-modo">Automático</span>
+        </div>
+        <div class="wa__contactos" id="wa-contactos" role="group" aria-label="Conversaciones"></div>
+        <div class="wa__hilo" id="wa-hilo" aria-live="polite"></div>
+        <div class="wa__rapidas" id="wa-rapidas"></div>
+        <form class="wa__form" id="wa-form" autocomplete="off">
+          <label class="visually-hidden" for="wa-input">Escribe como si fueras la clienta</label>
+          <input id="wa-input" placeholder="Escribe como la clienta…" maxlength="180">
+          <button type="submit" aria-label="Enviar mensaje">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
+          </button>
+        </form>
+        <p class="wa__nota">Tú escribes como la <b>clienta</b>. El que responde es el agente del local.</p>
+      </div>
+    </section>
+
+    <div class="col-der">
+      <!-- ---------------- Agenda ---------------- -->
+      <section class="panel" id="p-agenda" role="tabpanel" aria-label="Agenda">
+        <div class="caja">
+          <div class="caja__cab">
+            <h2>Agenda</h2>
+            <span class="tag tag--tinta" id="ag-ocup">Ocupación —</span>
+          </div>
+          <div class="caja__cuerpo" style="padding-bottom: 8px;">
+            <div class="chips" id="ag-dias" role="group" aria-label="Día"></div>
+            <div class="chips" id="ag-pros" role="group" aria-label="Profesional" style="margin-top:6px;"></div>
+          </div>
+          <div id="ag-reja"></div>
+        </div>
+        <p class="fuente">Toca cualquier bloque para operarlo: cancelar, marcar que no llegó, o confirmar. Cancelar una hora <strong>abre un hueco</strong> y dispara el motor de rescate — anda a mirar la pestaña Rescates.</p>
+      </section>
+
+      <!-- ---------------- Rescates ---------------- -->
+      <section class="panel" id="p-rescates" role="tabpanel" aria-label="Rescates y lista de espera">
+        <div class="caja">
+          <div class="caja__cab">
+            <h2>Motor de rescate</h2>
+            <span class="tag tag--sello" id="rs-tasa">—</span>
+          </div>
+          <div class="caja__cuerpo" id="rs-lista">
+            <p style="color: var(--tinta-suave); font-size:.9rem;">No hay huecos abiertos. Cancela una hora en la Agenda y el motor se enciende solo.</p>
+          </div>
+        </div>
+
+        <div class="caja">
+          <div class="caja__cab">
+            <h2>Lista de espera</h2>
+            <span class="tag tag--tinta" id="es-n">0</span>
+          </div>
+          <div class="caja__cuerpo">
+            <div id="es-lista"></div>
+            <form class="form-espera" id="es-form" style="margin-top: var(--sp-s);">
+              <label class="visually-hidden" for="es-nombre">Nombre</label>
+              <input id="es-nombre" placeholder="Nombre de la clienta" maxlength="40" required>
+              <label class="visually-hidden" for="es-serv">Servicio</label>
+              <select id="es-serv"></select>
+              <label class="visually-hidden" for="es-pref">Preferencia</label>
+              <select id="es-pref">
+                <option value="manana">Prefiere la mañana</option>
+                <option value="tarde">Prefiere la tarde</option>
+                <option value="cualquiera">Le da lo mismo</option>
+              </select>
+              <button type="submit" class="btn" style="min-height:44px;">Agregar a la espera</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------- Ajustes ---------------- -->
+      <section class="panel" id="p-ajustes" role="tabpanel" aria-label="Ajustes">
+        <div class="caja">
+          <div class="caja__cab"><h2>El agente</h2></div>
+          <div class="caja__cuerpo" id="aj-agente"></div>
+        </div>
+        <div class="caja">
+          <div class="caja__cab"><h2>Recordatorios y rescate</h2></div>
+          <div class="caja__cuerpo" id="aj-reglas"></div>
+        </div>
+        <div class="caja">
+          <div class="caja__cab">
+            <h2>Lo que esto le cuesta a Meta (y a ti)</h2>
+          </div>
+          <div class="caja__cuerpo">
+            <div class="costo" id="aj-costo"></div>
+            <p class="fuente" style="margin-top: var(--sp-s);">
+              Meta cobra por cada conversación que <em>inicia el negocio</em>. Los mensajes que responde el agente dentro de la ventana de 24 h que abrió la clienta son gratis. Cada palanca de arriba mueve este número; por eso está acá y no escondido. Tarifas supuestas: <span class="mono">US$0,018</span> por plantilla de utilidad y <span class="mono">US$0,059</span> por plantilla de marketing, a <span class="mono">$960/USD</span>. Derivación completa en <a href="../stack.html#costos">Arquitectura</a>.
+            </p>
+          </div>
+        </div>
+        <div class="caja">
+          <div class="caja__cab"><h2>Reiniciar</h2></div>
+          <div class="caja__cuerpo">
+            <p style="font-size:.9rem; color: var(--tinta-med); margin-bottom: var(--sp-s);">Vuelve el sábado a las 08:35, con la agenda como estaba. Nada se guarda: todo el estado vive en esta pestaña del navegador.</p>
+            <button class="btn btn--fantasma" id="aj-reset">Reiniciar el día</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section style="margin-block-start: var(--sp-l);">
+    <div class="ficha ficha--sello">
+      <p class="eyebrow">Lo que está falseado acá</p>
+      <p style="font-size:.92rem; color: var(--tinta-med);">Todo el estado vive en tu navegador. No hay WhatsApp real ni un modelo de lenguaje detrás: las respuestas del agente salen de un clasificador de intenciones de ~40 reglas escrito en JavaScript, no de Claude. El reloj es simulado. Los datos son mock (nombres chilenos, comunas reales, precios de mercado). La lista completa de <a href="../stack.html#falso">qué está falseado y qué haría falta para que fuera real</a> está en Arquitectura — incluida la parte fea: la verificación de Meta Business y el costo por mensaje.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div><strong style="font-family: var(--serif); color: var(--tinta);">Zurcia</strong> — <span class="mono">zurcia.com</span></div>
+    <div>
+      <a href="../../index.html">← Ideas</a> ·
+      <a href="../index.html">Producto</a> ·
+      <a href="../negocio.html">Negocio</a> ·
+      <a href="../roadmap.html">Roadmap</a> ·
+      <a href="../stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/nav.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

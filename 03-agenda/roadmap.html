@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap — Zurcia</title>
+<meta name="description" content="Día 1 a mes 24: seis hitos, cada uno con su criterio de muerte. Trayectoria de MRR en tres escenarios, caja, embudo de activación y probabilidad de éxito como rango con derivación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Petrona:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  /* ---- gráficos: SVG a mano, sin librerías ----
+     Paleta categórica validada con el script de la skill dataviz contra la
+     superficie de papel (#F5F0E6): banda de luminosidad OK, croma OK,
+     separación CVD del par más cercano ΔE 23,3 (protan), contraste OK. */
+  :root {
+    --s-pes: #C0451F;   /* pesimista  */
+    --s-bas: #1B8A5F;   /* base       */
+    --s-opt: #3C6DB8;   /* optimista  */
+    --eje:   #B7AC90;
+    --grid:  #E4DCC8;
+  }
+  .grafico {
+    background: var(--papel-alto);
+    border: 1.5px solid var(--pauta-duro);
+    padding: var(--sp-s) 0 var(--sp-2xs);
+  }
+  .grafico > .scroll-x { border: 0; }
+  .grafico svg { max-width: none; }        /* que NO se encoja: scrollea en su caja */
+  .grafico__cab { padding-inline: var(--sp-s); margin-block-end: var(--sp-2xs); }
+  .grafico__cab h3 { font-size: 1.05rem; }
+  .grafico__cab p { font-size: .82rem; color: var(--tinta-suave); max-width: 60ch; margin-top: 2px; }
+  .grafico__pie { padding: var(--sp-2xs) var(--sp-s) 0; }
+
+  .leyenda { display: flex; flex-wrap: wrap; gap: var(--sp-s); padding: var(--sp-2xs) var(--sp-s) 0; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--tinta-med); font-family: var(--mono); }
+  .leyenda i { width: 16px; height: 3px; flex: none; }
+
+  .ejeT { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: #6E6650; }
+  .lblT { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; }
+  .notaT{ font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; fill: #4E4838; }
+
+  .tt {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: #1C1A15; color: #F5F0E6;
+    font-family: 'IBM Plex Mono', monospace; font-size: .72rem; line-height: 1.5;
+    padding: 6px 9px; white-space: pre; opacity: 0; transition: opacity .1s;
+    border: 1px solid #1C1A15;
+  }
+  .envoltura { position: relative; }
+
+  details.tabla-alt { margin-top: var(--sp-xs); padding-inline: var(--sp-s); }
+  details.tabla-alt summary {
+    cursor: pointer; font-family: var(--mono); font-size: .72rem;
+    text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-suave);
+    min-height: 34px; display: flex; align-items: center;
+  }
+
+  /* ---- hitos ---- */
+  .hito {
+    display: grid; gap: var(--sp-s);
+    border-top: 2px solid var(--tinta);
+    padding-block: var(--sp-m);
+  }
+  @media (min-width: 56em) { .hito { grid-template-columns: 9rem 1fr 20rem; gap: var(--sp-m); } }
+  .hito__id { font-family: var(--mono); }
+  .hito__id b { display: block; font-size: 1.5rem; color: var(--sello); letter-spacing: -.02em; }
+  .hito__id span { display: block; font-size: .74rem; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .08em; }
+  .hito h3 { margin-block-end: var(--sp-2xs); }
+  .hito__meta { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-block-start: var(--sp-s); }
+  .hito__meta span { font-family: var(--mono); font-size: .74rem; color: var(--tinta-suave); }
+  .hito__meta b { color: var(--tinta); }
+  .muerte {
+    border: 2px solid var(--ladrillo);
+    background: var(--ladrillo-tenue);
+    padding: var(--sp-s);
+  }
+  .muerte p.eyebrow { color: var(--ladrillo); }
+  .muerte p { font-size: .88rem; color: var(--tinta-med); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="16" /><path d="M2.5 9.5h19M7.5 2.5v4M16.5 2.5v4" />
+          <path d="M4.5 16.5l3-2.6 3 2.6 3-2.6 3 2.6 3-2.6" />
+        </svg>
+        Zurcia
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav"><span data-label>Menú</span></button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul role="list">
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section>
+    <p class="eyebrow">Roadmap · Día 1 → Mes 24</p>
+    <h1>Seis hitos. Seis maneras de darse cuenta a tiempo de que hay que parar.</h1>
+    <p class="lede" style="margin-block-start: var(--sp-s);">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de acá abajo trae el suyo: la observación concreta que, si aparece, debería hacernos cerrar en vez de seguir levantando plata.</p>
+  </section>
+
+  <!-- ============ MRR ============ -->
+  <section>
+    <div class="grafico envoltura">
+      <div class="grafico__cab">
+        <h3>MRR a 24 meses · tres escenarios</h3>
+        <p>Cada escenario está movido por tres supuestos declarados: tasa de cierre sobre demo, ticket promedio y churn mensual. No hay un cuarto supuesto escondido.</p>
+      </div>
+      <div class="leyenda">
+        <span><i style="background: var(--s-opt)"></i> Optimista · cierre 22% · ticket $95.000 · churn 2,5%</span>
+        <span><i style="background: var(--s-bas)"></i> Base · cierre 15% · ticket $87.000 · churn 4%</span>
+        <span><i style="background: var(--s-pes)"></i> Pesimista · cierre 8% · ticket $72.000 · churn 6%</span>
+      </div>
+      <div class="scroll-x">
+        <svg id="g-mrr" width="680" height="330" viewBox="0 0 680 330" role="img" aria-label="Trayectoria de MRR mensual a 24 meses en tres escenarios. En el mes 24 el escenario base llega a 53,9 millones de pesos de MRR; el optimista a 99,8; el pesimista a 17,3.">
+          <g id="g-mrr-fondo"></g>
+          <g id="g-mrr-series"></g>
+          <g id="g-mrr-hover" style="pointer-events:none"></g>
+          <rect id="g-mrr-cap" x="52" y="14" width="600" height="256" fill="transparent" style="cursor: crosshair"></rect>
+        </svg>
+      </div>
+      <div class="grafico__pie">
+        <p class="fuente"><strong>Aritmética.</strong> MRR = locales pagando × ticket promedio. Mes 24: base <span class="mono">620 × $87.000 = $53,9M</span> → ARR <span class="mono">$647M ≈ US$674k</span>. Optimista <span class="mono">1.050 × $95.000 = $99,8M</span> → ARR <span class="mono">US$1,25M</span>. Pesimista <span class="mono">240 × $72.000 = $17,3M</span> → ARR <span class="mono">US$216k</span>. Tipo de cambio supuesto: <span class="mono">$960/USD</span>. El ticket promedio sale del mix de planes declarado en <a href="negocio.html#unitaria">Negocio</a>.</p>
+      </div>
+      <details class="tabla-alt">
+        <summary>Ver los datos en tabla</summary>
+        <div class="scroll-x"><table class="tabla" id="t-mrr"></table></div>
+      </details>
+      <div class="tt" id="tt-mrr"></div>
+    </div>
+  </section>
+
+  <!-- ============ CAJA ============ -->
+  <section>
+    <div class="grid grid--2">
+      <div class="grafico envoltura">
+        <div class="grafico__cab">
+          <h3>Ingresos vs. egresos mensuales</h3>
+          <p>Escenario base. Egresos = costos fijos (equipo, ads, oficina) + costo variable (34% del MRR: Meta, IA e infra).</p>
+        </div>
+        <div class="leyenda">
+          <span><i style="background: var(--s-bas)"></i> Ingresos (MRR)</span>
+          <span><i style="background: var(--s-pes)"></i> Egresos totales</span>
+        </div>
+        <div class="scroll-x">
+          <svg id="g-flujo" width="600" height="300" viewBox="0 0 600 300" role="img" aria-label="Ingresos mensuales contra egresos mensuales, escenario base. Los ingresos cruzan a los egresos en el mes 24.">
+            <g id="g-flujo-fondo"></g>
+            <g id="g-flujo-series"></g>
+            <g id="g-flujo-hover" style="pointer-events:none"></g>
+            <rect id="g-flujo-cap" x="52" y="14" width="520" height="226" fill="transparent" style="cursor: crosshair"></rect>
+          </svg>
+        </div>
+        <div class="grafico__pie">
+          <p class="fuente">El cruce ocurre en el <strong>mes 24</strong>: ingresos <span class="mono">$53,9M</span> contra egresos <span class="mono">$52,3M</span>. Ése es el break-even operacional, y llega con el estanque casi vacío.</p>
+        </div>
+      </div>
+
+      <div class="grafico envoltura">
+        <div class="grafico__cab">
+          <h3>Caja al cierre de mes · el valle de runway</h3>
+          <p>Pre-seed de $250M CLP (≈ US$260k) levantado en el mes 0. Escenario base.</p>
+        </div>
+        <div class="scroll-x">
+          <svg id="g-caja" width="600" height="300" viewBox="0 0 600 300" role="img" aria-label="Caja al cierre de cada mes. Cae desde 250 millones hasta un valle de 30,5 millones en el mes 23, y vuelve a subir en el mes 24.">
+            <g id="g-caja-fondo"></g>
+            <g id="g-caja-series"></g>
+            <g id="g-caja-hover" style="pointer-events:none"></g>
+            <rect id="g-caja-cap" x="52" y="14" width="520" height="226" fill="transparent" style="cursor: crosshair"></rect>
+          </svg>
+        </div>
+        <div class="grafico__pie">
+          <p class="fuente"><strong>El valle es el mes 23: quedan $30,5M contra un gasto fijo de $34M al mes.</strong> Es decir, menos de un mes de colchón. No lo maquillamos: si en el mes 18 el MRR viene 20% bajo el plan, se congela la contratación y el valle se corre a ~$60M. Ésa es la decisión, y hay que tomarla en el mes 18, no en el 23.</p>
+        </div>
+        <details class="tabla-alt">
+          <summary>Ver los datos en tabla</summary>
+          <div class="scroll-x"><table class="tabla" id="t-caja"></table></div>
+        </details>
+        <div class="tt" id="tt-caja"></div>
+      </div>
+    </div>
+    <div class="tt" id="tt-flujo"></div>
+  </section>
+
+  <!-- ============ EMBUDO ============ -->
+  <section>
+    <div class="grafico">
+      <div class="grafico__cab">
+        <h3>Embudo de activación — la restricción real de este producto</h3>
+        <p>La restricción no es conseguir la reunión. Es que el dueño <em>suelte</em> el agente. Dos pasos se comen el embudo, y ninguno de los dos es "vender": la verificación de Meta Business (que no depende de nosotros) y el salto de copiloto a automático (que es puro miedo, y se cura con datos).</p>
+      </div>
+      <div class="scroll-x">
+        <svg id="g-embudo" width="680" height="290" viewBox="0 0 680 290" role="img" aria-label="Embudo de activación: de 100 dueños contactados, 42 agendan demo, 15 parten prueba, 9 completan la verificación de Meta, 6 dejan el agente en automático y 5 pagan.">
+        </svg>
+      </div>
+      <div class="grafico__pie">
+        <p class="fuente"><strong>Estimación de los pilotos, no un censo.</strong> Conversión total lead → cliente pagando: <span class="mono">5%</span>. Con un SDR haciendo 60 contactos al día y un sueldo cargado de <span class="mono">$1.100.000</span>, eso implica <span class="mono">$1.100.000 / (60 × 22 × 5%) = $16.700</span> de costo de venta por cliente… si el embudo se mantuviera. En la práctica el CAC cargado nos da <span class="mono">$250.000</span> (ver <a href="negocio.html#unitaria">economía unitaria</a>), porque hay onboarding, ads y tiempo de fundador metidos ahí.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HITOS ============ -->
+  <section>
+    <p class="eyebrow">Los seis hitos</p>
+    <h2>Con fecha, con caja, con headcount y con la puerta de salida.</h2>
+
+    <div class="grafico" style="margin-block-start: var(--sp-l);">
+      <div class="grafico__cab"><h3>Línea de tiempo · con los criterios de muerte marcados</h3></div>
+      <div class="scroll-x">
+        <svg id="g-linea" width="680" height="200" viewBox="0 0 680 200" role="img" aria-label="Línea de tiempo de seis hitos entre el mes 0 y el mes 24, cada uno con su criterio de muerte marcado en rojo ladrillo."></svg>
+      </div>
+    </div>
+
+    <div style="margin-block-start: var(--sp-l);">
+      <!-- M0 -->
+      <article class="hito">
+        <div class="hito__id"><b>M0</b><span>Día 1 – 45</span></div>
+        <div>
+          <h3>Cinco design partners con el WhatsApp real conectado.</h3>
+          <p style="color: var(--tinta-med);">Cinco peluquerías y barberías de Ñuñoa y Providencia usando Zurcia gratis, en modo copiloto, con su número de WhatsApp conectado de verdad. No queremos cartas de intención: queremos conversaciones reales pasando por el agente.</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> ≥5 locales conectados, ≥300 conversaciones gestionadas, ≥1 hueco rescatado real con plata de verdad.</p>
+          <div class="hito__meta">
+            <span>Caja quemada: <b>$18M</b></span>
+            <span>Headcount: <b>2 fundadores</b></span>
+            <span>MRR: <b>$0</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">Criterio de muerte</p>
+          <p>Si a los 45 días <strong>ninguno</strong> de los cinco deja al agente responder sin revisar cada mensaje, el producto no es confiable — y no se vuelve confiable agregando features. Se para.</p>
+        </div>
+      </article>
+
+      <!-- M1 -->
+      <article class="hito">
+        <div class="hito__id"><b>M1</b><span>Mes 3</span></div>
+        <div>
+          <h3>El primer local que saca la tarjeta.</h3>
+          <p style="color: var(--tinta-med);">Tres locales pagando $49.000 (precio fundador) después de haber usado el producto gratis. La transacción importa más que el monto: separa "me cae bien el emprendedor" de "esto me devuelve plata".</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> ≥3 pagan, la tasa de intervención humana está bajo 25%, y el dueño le puede explicar a otro dueño qué hace Zurcia sin que lo ayudemos.</p>
+          <div class="hito__meta">
+            <span>Caja quemada: <b>$32M</b></span>
+            <span>Headcount: <b>2</b></span>
+            <span>MRR: <b>$150k</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">Criterio de muerte</p>
+          <p>Si un local gestionó más de 100 reservas por el agente y aun así no paga, el dolor no duele lo suficiente. No es un problema de precio: es que el problema no es el problema.</p>
+        </div>
+      </article>
+
+      <!-- M2 -->
+      <article class="hito">
+        <div class="hito__id"><b>M2</b><span>Mes 6</span></div>
+        <div>
+          <h3>Diez locales pagando y el motor de rescate probado.</h3>
+          <p style="color: var(--tinta-med);">MRR de $870.000. Churn cero en los primeros seis. Y —lo que de verdad importa— el motor de rescate rellenando huecos de forma medible, no anecdótica.</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> ≥10 pagando, churn 0 entre los fundadores, y <strong>≥50% de los huecos ofrecidos con &gt;4 h de anticipación terminan rescatados</strong>.</p>
+          <div class="hito__meta">
+            <span>Caja quemada: <b>$62M</b></span>
+            <span>Headcount: <b>3</b></span>
+            <span>MRR: <b>$870k</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">Criterio de muerte</p>
+          <p>Si la tasa de rescate se queda bajo <strong>25%</strong>, el motor de relleno —la única razón por la que existimos y no somos un chatbot más— no funciona. Sin eso, competimos con AgendaPro en su cancha y perdemos.</p>
+        </div>
+      </article>
+
+      <!-- M3 -->
+      <article class="hito">
+        <div class="hito__id"><b>M3</b><span>Mes 12</span></div>
+        <div>
+          <h3>Venta repetible: cierra alguien que no es fundador.</h3>
+          <p style="color: var(--tinta-med);">80 locales pagando, MRR $7,1M. Un vendedor contratado —no un fundador con carisma— cierra 6 locales al mes siguiendo un guion escrito.</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> 80 pagando, CAC &lt; $300.000, churn &lt; 5%/mes, y el vendedor #1 llega a cuota dos meses seguidos.</p>
+          <div class="hito__meta">
+            <span>Caja quemada: <b>$121M</b></span>
+            <span>Headcount: <b>5</b></span>
+            <span>MRR: <b>$7,1M</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">Criterio de muerte</p>
+          <p>Dos gatillos, cualquiera de los dos: <strong>(a)</strong> más del 20% de las conversaciones sigue requiriendo intervención humana a los 12 meses — el agente no escala y el soporte se come el margen; <strong>(b)</strong> AgendaPro lanza relleno automático y nuestro win-rate en competencia directa cae bajo 20%.</p>
+        </div>
+      </article>
+
+      <!-- M4 -->
+      <article class="hito">
+        <div class="hito__id"><b>M4</b><span>Mes 18</span></div>
+        <div>
+          <h3>El canal empieza a vender por nosotros.</h3>
+          <p style="color: var(--tinta-med);">290 locales, MRR $25,2M. Los distribuidores de insumos y Bsale traen altas sin que nosotros toquemos la puerta. Y el margen bruto sube: renegociamos la tarifa de mensajería con un BSP.</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> ≥30% de las altas del mes vienen de partners, y el margen bruto llega a <strong>70%</strong>.</p>
+          <div class="hito__meta">
+            <span>Caja quemada: <b>$191M</b></span>
+            <span>Headcount: <b>8</b></span>
+            <span>MRR: <b>$25,2M</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">Criterio de muerte</p>
+          <p>Si el margen bruto no sube de <strong>65%</strong> —porque Meta se come todo lo que cobramos— entonces esto no es un SaaS: es reventa de mensajería con un disfraz. Se corta el gasto y se bootstrapea, o se cierra.</p>
+        </div>
+      </article>
+
+      <!-- M5 -->
+      <article class="hito">
+        <div class="hito__id"><b>M5</b><span>Mes 24</span></div>
+        <div>
+          <h3>Punto de decisión: levantar, bootstrapear o matar.</h3>
+          <p style="color: var(--tinta-med);">620 locales, MRR $53,9M (ARR ≈ US$674k), break-even operacional, caja $30M. Un segundo mercado (México o Perú) con al menos 10 locales pagando.</p>
+          <p style="margin-block-start: var(--sp-2xs); font-size:.92rem;"><strong>Es cierto si:</strong> break-even, NRR ≥ 100%, y el primer mercado fuera de Chile factura.</p>
+          <div class="hito__meta">
+            <span>Caja: <b>$30M</b></span>
+            <span>Headcount: <b>10</b></span>
+            <span>MRR: <b>$53,9M</b></span>
+          </div>
+        </div>
+        <div class="muerte">
+          <p class="eyebrow">La decisión, escrita hoy</p>
+          <p><strong>Levantar Serie A</strong> si ARR &gt; US$700k con NRR &gt; 110% y crecimiento &gt; 10%/mes.<br>
+          <strong>Bootstrapear</strong> a 4 personas si ARR está entre US$400k y US$700k y el negocio es rentable — un buen negocio chico es un buen negocio.<br>
+          <strong>Matar</strong> si ARR &lt; US$400k con crecimiento bajo 8%/mes: dos años, sin tracción y con un titular local encima. No hay una tercera vuelta.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PROBABILIDAD ============ -->
+  <section>
+    <p class="eyebrow">Probabilidad de éxito</p>
+    <h2>No hay un número. Hay una clase de referencia, unos ajustes y un rango.</h2>
+
+    <div class="grid grid--sidebar" style="margin-block-start: var(--sp-l);">
+      <div>
+        <div class="ficha">
+          <p class="eyebrow eyebrow--tinta">1 · La clase de referencia</p>
+          <p style="color: var(--tinta-med); font-size:.94rem;">Dos tasas base, y ambas con su asterisco:</p>
+          <ul class="lista" style="margin-block-start: var(--sp-s);">
+            <li><strong>~4% de las startups de software llegan a US$1M de ARR.</strong> Es la cifra que popularizó Christoph Janz (Point Nine) y que se repite en la industria. <em>No es un censo</em>: es una estimación de orden de magnitud a partir de cohortes de fondos. La usamos como orden de magnitud, no como dato duro.</li>
+            <li><strong>Alrededor de la mitad de las empresas nuevas en Chile sobrevive tres años.</strong> Aproximación a partir de los boletines de empresas del Ministerio de Economía, construidos sobre el registro del SII. La cifra exacta varía por rubro y por año, y habría que verificarla contra la publicación vigente antes de citarla en un documento de inversión.</li>
+            <li><strong>Lo que honestamente no sabemos:</strong> qué fracción de las startups B2B chilenas de software para PYME llega a US$1M de ARR sin levantar afuera. No encontramos una tasa base publicada. No la vamos a inventar.</li>
+          </ul>
+        </div>
+
+        <div class="ficha" style="margin-block-start: var(--sp-m);">
+          <p class="eyebrow eyebrow--tinta">2 · Los ajustes, con su signo</p>
+          <div class="scroll-x">
+            <table class="tabla">
+              <thead><tr><th>Ajuste</th><th>Signo</th><th>Por qué</th></tr></thead>
+              <tbody>
+                <tr><td>Presupuesto que ya existe</td><td style="color: var(--sello); font-weight:600;">↑</td><td>El ICP ya le paga $30.000–$60.000/mes a AgendaPro o Reservo. No hay que crear la categoría, hay que ganarle a un renglón que ya está en el gasto.</td></tr>
+                <tr><td>Canal sin fricción</td><td style="color: var(--sello); font-weight:600;">↑</td><td>El cliente final no cambia absolutamente nada. La adopción no depende de él, y ésa es la muerte de casi todo el software para PYME.</td></tr>
+                <tr><td>Dolor auditable</td><td style="color: var(--sello); font-weight:600;">↑</td><td>Podemos mostrar en pesos lo que rescatamos. Un ROI que se ve en el panel vende solo y baja el churn.</td></tr>
+                <tr><td>Ciclo de venta corto</td><td style="color: var(--sello); font-weight:600;">↑</td><td>Decide el dueño, en una reunión. No hay comité, no hay licitación, no hay TI.</td></tr>
+                <tr><td>Dependencia de Meta</td><td style="color: var(--ladrillo); font-weight:600;">↓</td><td>Meta cambió el modelo de precios de WhatsApp en 2024 y otra vez en 2025. Puede volver a hacerlo y ahí se mueve nuestro margen entero. No tenemos ninguna palanca sobre eso.</td></tr>
+                <tr><td>El titular puede copiarnos</td><td style="color: var(--ladrillo); font-weight:600;">↓</td><td>AgendaPro es chileno, tiene el calendario instalado en miles de locales y no necesita conquistar nada para agregar relleno automático. Le tomaría 2–3 trimestres.</td></tr>
+                <tr><td>Churn de PYME</td><td style="color: var(--ladrillo); font-weight:600;">↓</td><td>Las peluquerías cierran. El 4%/mes del escenario base es optimista para el rubro.</td></tr>
+                <tr><td>TAM chileno chico</td><td style="color: var(--ladrillo); font-weight:600;">↓</td><td>US$73M de TAM total obliga a salir a LatAm antes de tener el producto maduro. Salir temprano mata equipos.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ficha ficha--marcada">
+          <p class="eyebrow">3 · El resultado, como rango</p>
+          <p style="font-family: var(--serif); font-size: var(--step-2); line-height:1.15; margin-block: var(--sp-s);">
+            <strong>10 – 18%</strong> de llegar a <span class="mono" style="font-size:.8em;">US$1M</span> de ARR en 30 meses.
+          </p>
+          <p style="font-size:.9rem; color: var(--tinta-med);"><strong>Condicional a cumplir M3</strong> (80 locales pagando, venta repetible) en el mes 12. Si M3 no se cumple, la probabilidad cae bajo <strong>5%</strong> y el escenario razonable pasa a ser el cierre.</p>
+          <hr class="rule rule--fino">
+          <p style="font-family: var(--serif); font-size: var(--step-1); line-height:1.2;">
+            <strong>35 – 45%</strong> de terminar como un negocio chico y rentable.
+          </p>
+          <p style="font-size:.9rem; color: var(--tinta-med);">US$300k–500k de ARR, cuatro personas, sin levantar. Éste es el <strong>resultado modal</strong> — el más probable de todos. No es el titular de un pitch, pero es la verdad.</p>
+          <hr class="rule rule--fino">
+          <p class="fuente" style="border:0; padding:0;"><strong>Derivación.</strong> Partimos de la tasa base de ~4%. Los cuatro ajustes al alza (presupuesto existente, canal sin fricción, dolor auditable, ciclo corto) son sustantivos y, juntos, multiplican por ~4 respecto de una startup de software cualquiera: <span class="mono">4% × 4 ≈ 16%</span>. Los cuatro ajustes a la baja no son cosméticos —el riesgo de plataforma y el titular local son reales— y recortan aproximadamente un tercio: <span class="mono">16% × 0,7 ≈ 11%</span>. El rango <span class="mono">10–18%</span> refleja que esos multiplicadores son juicios, no mediciones. Quien lea esto y crea que el titular reacciona más rápido, debería quedarse con el piso del rango.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="container pie__grid">
+    <div><strong style="font-family: var(--serif); color: var(--tinta);">Zurcia</strong> — <span class="mono">zurcia.com</span></div>
+    <div>
+      <a href="../index.html">← Ideas</a> ·
+      <a href="index.html">Producto</a> ·
+      <a href="demo/index.html">Demo</a> ·
+      <a href="negocio.html">Negocio</a> ·
+      <a href="stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+<script>
+/* ===========================================================================
+   Gráficos: SVG inline, escrito a mano. Sin librerías, sin CDN.
+   Los datos están acá arriba a la vista y son los mismos que salen en las
+   tablas alternativas y en el texto.
+   =========================================================================== */
+(function () {
+  'use strict';
+  var LENTO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  /* --- datos (millones de CLP) --- */
+  var MRR = {
+    base: [0,0,0,0.09,0.26,0.52,0.87,1.39,2.09,3.05,4.18,5.48,7.13,9.14,11.48,14.18,17.40,21.05,25.23,29.58,34.37,39.32,44.37,49.24,53.94],
+    pes:  [0,0,0,0.07,0.14,0.29,0.43,0.65,0.94,1.30,1.73,2.23,2.81,3.46,4.18,5.00,5.90,6.90,8.00,9.20,10.50,11.90,13.40,15.20,17.28],
+    opt:  [0,0,0.09,0.29,0.67,1.24,2.01,3.05,4.42,6.17,8.36,11.04,14.26,18.08,22.55,27.72,33.65,40.39,47.99,56.50,65.97,76.45,87.99,94.50,99.75]
+  };
+  var FIJOS = [0,6,6,6,10,10,10,13,13,13,17,17,17,20,20,20,25,25,25,30,30,30,34,34,34];
+  var EGRESOS = FIJOS.map(function (f, i) { return i === 0 ? 0 : +(f + 0.34 * MRR.base[i]).toFixed(2); });
+  var CAJA = [250.0,244.0,238.0,232.1,222.2,212.6,203.1,191.1,179.4,168.5,154.2,140.8,128.5,114.6,102.2,91.5,78.0,66.9,58.5,48.1,40.7,36.7,32.0,30.5,32.1];
+
+  var COL = { pes:'#C0451F', bas:'#1B8A5F', opt:'#3C6DB8', eje:'#B7AC90', grid:'#E4DCC8', tinta:'#1C1A15', suave:'#6E6650' };
+
+  function el(t, a) {
+    var e = document.createElementNS(NS, t);
+    for (var k in a) e.setAttribute(k, a[k]);
+    return e;
+  }
+  function fmt(v) { return v.toFixed(v < 10 ? 1 : 0).replace('.', ','); }
+
+  /* ---------- motor de líneas ---------- */
+  function lineas(cfg) {
+    var svg = document.getElementById(cfg.id);
+    var fondo = document.getElementById(cfg.id + '-fondo');
+    var gs = document.getElementById(cfg.id + '-series');
+    var gh = document.getElementById(cfg.id + '-hover');
+    var cap = document.getElementById(cfg.id + '-cap');
+    var tt = document.getElementById(cfg.tt);
+    var L = cfg.L, R = cfg.R, T = cfg.T, B = cfg.B, W = cfg.W, H = cfg.H;
+    var x = function (i) { return L + i / 24 * (W - L - R); };
+    var y = function (v) { return H - B - (v / cfg.max) * (H - T - B); };
+
+    // grilla + eje Y
+    cfg.ticks.forEach(function (v) {
+      fondo.appendChild(el('line', { x1: L, y1: y(v), x2: W - R, y2: y(v), stroke: v === 0 ? COL.eje : COL.grid, 'stroke-width': v === 0 ? 1.5 : 1 }));
+      var t = el('text', { x: L - 8, y: y(v) + 4, 'text-anchor': 'end', class: 'ejeT' });
+      t.textContent = fmt(v);
+      fondo.appendChild(t);
+    });
+    var yl = el('text', { x: L - 8, y: T - 4, 'text-anchor': 'end', class: 'ejeT' });
+    yl.textContent = 'M$';
+    fondo.appendChild(yl);
+    // eje X
+    [0, 6, 12, 18, 24].forEach(function (m) {
+      fondo.appendChild(el('line', { x1: x(m), y1: H - B, x2: x(m), y2: H - B + 4, stroke: COL.eje, 'stroke-width': 1 }));
+      var t = el('text', { x: x(m), y: H - B + 18, 'text-anchor': 'middle', class: 'ejeT' });
+      t.textContent = 'mes ' + m;
+      fondo.appendChild(t);
+    });
+
+    // series
+    cfg.series.forEach(function (s) {
+      var d = s.datos.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+      if (s.area) {
+        gs.appendChild(el('path', {
+          d: d + ' L' + x(24) + ' ' + y(0) + ' L' + x(0) + ' ' + y(0) + ' Z',
+          fill: s.color, opacity: 0.10
+        }));
+      }
+      var p = el('path', { d: d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+      gs.appendChild(p);
+      // punta + etiqueta directa
+      gs.appendChild(el('circle', { cx: x(24), cy: y(s.datos[24]), r: 4, fill: s.color, stroke: '#FCFAF4', 'stroke-width': 2 }));
+      if (s.etiqueta) {
+        var lb = el('text', { x: x(24) - 4, y: y(s.datos[24]) + (s.dy || -10), 'text-anchor': 'end', class: 'lblT', fill: s.color });
+        lb.textContent = s.etiqueta;
+        gs.appendChild(lb);
+      }
+    });
+
+    // anotaciones
+    (cfg.notas || []).forEach(function (n) {
+      if (n.linea) {
+        gs.appendChild(el('line', { x1: x(n.m), y1: T, x2: x(n.m), y2: H - B, stroke: COL.tinta, 'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+      }
+      if (n.punto !== undefined) {
+        gs.appendChild(el('circle', { cx: x(n.m), cy: y(n.punto), r: 5.5, fill: 'none', stroke: COL.tinta, 'stroke-width': 1.6 }));
+      }
+      var t = el('text', { x: n.tx !== undefined ? n.tx : x(n.m), y: n.ty, 'text-anchor': n.anchor || 'middle', class: 'notaT' });
+      t.textContent = n.txt;
+      gs.appendChild(t);
+    });
+
+    // hover: cruz + tooltip
+    var cruz = el('line', { y1: T, y2: H - B, stroke: COL.tinta, 'stroke-width': 1, opacity: 0 });
+    gh.appendChild(cruz);
+    var puntos = cfg.series.map(function (s) {
+      var c = el('circle', { r: 5, fill: s.color, stroke: '#FCFAF4', 'stroke-width': 2, opacity: 0 });
+      gh.appendChild(c);
+      return c;
+    });
+    function mueve(ev) {
+      var r = svg.getBoundingClientRect();
+      var px = (ev.clientX !== undefined ? ev.clientX : ev.touches[0].clientX) - r.left;
+      var sx = px / r.width * W;
+      var i = Math.max(0, Math.min(24, Math.round((sx - L) / (W - L - R) * 24)));
+      cruz.setAttribute('x1', x(i)); cruz.setAttribute('x2', x(i)); cruz.setAttribute('opacity', 1);
+      var txt = 'Mes ' + i;
+      cfg.series.forEach(function (s, k) {
+        puntos[k].setAttribute('cx', x(i)); puntos[k].setAttribute('cy', y(s.datos[i])); puntos[k].setAttribute('opacity', 1);
+        txt += '\n' + s.nombre + ': $' + fmt(s.datos[i]) + 'M';
+      });
+      tt.textContent = txt;
+      tt.style.opacity = 1;
+      var caja = svg.parentNode.parentNode.getBoundingClientRect();
+      tt.style.left = Math.min(px / W * r.width * (W / W) + 14, caja.width - 150) + 'px';
+      tt.style.top = 34 + 'px';
+    }
+    cap.addEventListener('mousemove', mueve);
+    cap.addEventListener('touchmove', function (e) { mueve(e); e.preventDefault(); }, { passive: false });
+    cap.addEventListener('mouseleave', function () {
+      cruz.setAttribute('opacity', 0);
+      puntos.forEach(function (p) { p.setAttribute('opacity', 0); });
+      tt.style.opacity = 0;
+    });
+  }
+
+  lineas({
+    id: 'g-mrr', tt: 'tt-mrr', W: 680, H: 330, L: 52, R: 28, T: 14, B: 60, max: 100,
+    ticks: [0, 25, 50, 75, 100],
+    series: [
+      { nombre: 'Optimista', datos: MRR.opt,  color: COL.opt, etiqueta: '$99,8M', dy: -12 },
+      { nombre: 'Base',      datos: MRR.base, color: COL.bas, etiqueta: '$53,9M', dy: -12 },
+      { nombre: 'Pesimista', datos: MRR.pes,  color: COL.pes, etiqueta: '$17,3M', dy: 18 }
+    ],
+    notas: [
+      { m: 12, linea: true, txt: 'M3 · venta repetible', ty: 296, tx: 52 + 12 / 24 * 600, anchor: 'middle' },
+      { m: 18, linea: true, txt: 'M4 · canal', ty: 312, tx: 52 + 18 / 24 * 600, anchor: 'middle' }
+    ]
+  });
+
+  lineas({
+    id: 'g-flujo', tt: 'tt-flujo', W: 600, H: 300, L: 52, R: 28, T: 14, B: 60, max: 60,
+    ticks: [0, 15, 30, 45, 60],
+    series: [
+      { nombre: 'Egresos',  datos: EGRESOS,  color: COL.pes, etiqueta: '$52,3M', dy: 20 },
+      { nombre: 'Ingresos', datos: MRR.base, color: COL.bas, etiqueta: '$53,9M', dy: -12 }
+    ],
+    notas: [{ m: 24, txt: 'break-even', ty: 266, tx: 540, anchor: 'end' }]
+  });
+
+  lineas({
+    id: 'g-caja', tt: 'tt-caja', W: 600, H: 300, L: 52, R: 28, T: 14, B: 60, max: 260,
+    ticks: [0, 65, 130, 195, 260],
+    series: [
+      { nombre: 'Caja', datos: CAJA, color: COL.bas, area: true, etiqueta: '$32M', dy: -14 }
+    ],
+    notas: [
+      { m: 23, punto: 30.5, txt: 'valle: $30,5M en el mes 23', ty: 268, tx: 545, anchor: 'end' }
+    ]
+  });
+
+  /* ---------- tablas alternativas ---------- */
+  function tabla(id, cols, filas) {
+    var t = document.getElementById(id);
+    t.innerHTML = '<thead><tr>' + cols.map(function (c, i) { return '<th' + (i ? ' class="num"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      filas.map(function (f) {
+        return '<tr>' + f.map(function (v, i) { return '<td' + (i ? ' class="num"' : '') + '>' + v + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody>';
+  }
+  var meses = [0, 3, 6, 9, 12, 15, 18, 21, 24];
+  tabla('t-mrr', ['Mes', 'Pesimista', 'Base', 'Optimista'], meses.map(function (m) {
+    return ['Mes ' + m, '$' + fmt(MRR.pes[m]) + 'M', '$' + fmt(MRR.base[m]) + 'M', '$' + fmt(MRR.opt[m]) + 'M'];
+  }));
+  tabla('t-caja', ['Mes', 'Ingresos', 'Egresos', 'Caja'], meses.map(function (m) {
+    return ['Mes ' + m, '$' + fmt(MRR.base[m]) + 'M', '$' + fmt(EGRESOS[m]) + 'M', '$' + fmt(CAJA[m]) + 'M'];
+  }));
+
+  /* ---------- embudo ---------- */
+  (function () {
+    var svg = document.getElementById('g-embudo');
+    var pasos = [
+      { l: 'Dueños contactados (WhatsApp / IG / puerta)', v: 100, c: '#1B8A5F' },
+      { l: 'Agendan demo', v: 42, c: '#1B8A5F' },
+      { l: 'Parten prueba de 14 días', v: 15, c: '#1B8A5F' },
+      { l: 'Completan la verificación de Meta Business', v: 9, c: '#C0451F', nota: 'cuello real · no depende de nosotros' },
+      { l: 'Sueltan el agente en automático', v: 6, c: '#C0451F', nota: 'cuello real · es miedo, se cura con datos' },
+      { l: 'Pagan al día 15', v: 5, c: '#1B8A5F' }
+    ];
+    var L = 260, W = 680, alto = 30, gap = 14, top = 22;
+    pasos.forEach(function (p, i) {
+      var yy = top + i * (alto + gap);
+      var ancho = p.v / 100 * (W - L - 90);
+      var t = el('text', { x: L - 12, y: yy + alto / 2 + 4, 'text-anchor': 'end', class: 'notaT' });
+      t.textContent = p.l;
+      svg.appendChild(t);
+      svg.appendChild(el('rect', { x: L, y: yy, width: Math.max(ancho, 2), height: alto, fill: p.c, rx: 2 }));
+      var v = el('text', { x: L + Math.max(ancho, 2) + 8, y: yy + alto / 2 + 4, class: 'lblT', fill: '#1C1A15' });
+      v.textContent = p.v;
+      svg.appendChild(v);
+      if (p.nota) {
+        var n = el('text', { x: L + Math.max(ancho, 2) + 30, y: yy + alto / 2 + 4, class: 'notaT', fill: '#C0451F' });
+        n.textContent = p.nota;
+        svg.appendChild(n);
+      }
+      if (i < pasos.length - 1) {
+        var caida = Math.round((1 - pasos[i + 1].v / p.v) * 100);
+        var c = el('text', { x: L - 12, y: yy + alto + gap / 2 + 4, 'text-anchor': 'end', class: 'ejeT', fill: '#C0451F' });
+        c.textContent = '↓ se cae el ' + caida + '%';
+        svg.appendChild(c);
+      }
+    });
+    var pie = el('text', { x: L, y: top + pasos.length * (alto + gap) + 14, class: 'lblT', fill: '#1B8A5F' });
+    pie.textContent = 'Lead → cliente pagando: 5%';
+    svg.appendChild(pie);
+  })();
+
+  /* ---------- línea de tiempo de hitos ---------- */
+  (function () {
+    var svg = document.getElementById('g-linea');
+    var H = [
+      { m: 0,  k: 'M0', t: '5 design partners',   d: 'nadie lo suelta' },
+      { m: 3,  k: 'M1', t: 'primer pago',         d: 'nadie paga' },
+      { m: 6,  k: 'M2', t: '10 locales',          d: 'rescate < 25%' },
+      { m: 12, k: 'M3', t: 'venta repetible',     d: 'handoff > 20%' },
+      { m: 18, k: 'M4', t: 'canal andando',       d: 'margen < 65%' },
+      { m: 24, k: 'M5', t: 'decisión',            d: 'ARR < US$400k' }
+    ];
+    var L = 40, R = 40, W = 680, ejeY = 82;
+    var x = function (m) { return L + m / 24 * (W - L - R); };
+    svg.appendChild(el('line', { x1: L, y1: ejeY, x2: W - R, y2: ejeY, stroke: '#1C1A15', 'stroke-width': 2 }));
+    H.forEach(function (h, i) {
+      var xx = x(h.m);
+      svg.appendChild(el('line', { x1: xx, y1: ejeY - 7, x2: xx, y2: ejeY + 7, stroke: '#1C1A15', 'stroke-width': 2 }));
+      svg.appendChild(el('circle', { cx: xx, cy: ejeY, r: 5, fill: '#1B8A5F', stroke: '#FCFAF4', 'stroke-width': 2 }));
+      var an = i === 0 ? 'start' : (i === H.length - 1 ? 'end' : 'middle');
+      var k = el('text', { x: xx, y: ejeY - 34, 'text-anchor': an, class: 'lblT', fill: '#1B8A5F' });
+      k.textContent = h.k;
+      svg.appendChild(k);
+      var t = el('text', { x: xx, y: ejeY - 18, 'text-anchor': an, class: 'notaT' });
+      t.textContent = h.t;
+      svg.appendChild(t);
+      var mm = el('text', { x: xx, y: ejeY + 22, 'text-anchor': an, class: 'ejeT' });
+      mm.textContent = 'mes ' + h.m;
+      svg.appendChild(mm);
+      // criterio de muerte, colgando abajo
+      svg.appendChild(el('line', { x1: xx, y1: ejeY + 30, x2: xx, y2: ejeY + 44, stroke: '#C0451F', 'stroke-width': 1, 'stroke-dasharray': '2 2' }));
+      svg.appendChild(el('rect', { x: xx - 4, y: ejeY + 44, width: 8, height: 8, fill: '#C0451F' }));
+      var d = el('text', { x: xx, y: ejeY + 68, 'text-anchor': an, class: 'ejeT', fill: '#C0451F' });
+      d.textContent = h.d;
+      svg.appendChild(d);
+    });
+    var leg = el('text', { x: L, y: 186, class: 'ejeT', fill: '#C0451F' });
+    leg.textContent = '■ criterio de muerte: si esto se observa, se para.';
+    svg.appendChild(leg);
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adjudate — Demo del producto</title>
+<meta name="description" content="El producto funcionando: perfil de capacidad, feed de licitaciones con match, lectura de bases con IA, taller de postulación, simulador de precio y chequeo de formalismos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* ===== Demo: chrome de aplicación ===== */
+  body { padding-bottom: 84px; } /* espacio para la barra de acción móvil */
+  @media (min-width: 62em) { body { padding-bottom: 0; } }
+
+  .app-bar {
+    background: var(--ink); color: var(--papel);
+    border-bottom: 1px solid var(--ink);
+  }
+  .app-bar-in { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s); min-height: 52px; }
+  .empresa { font-family: var(--mono); font-size: 0.72rem; line-height: 1.35; }
+  .empresa b { display: block; font-weight: 500; font-size: 0.8rem; }
+  .empresa span { color: #A8A190; }
+  .app-bar button {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--papel); border: 1px solid #4A463C; padding: 0 .7rem; min-height: 44px; background: transparent;
+  }
+  .app-bar button:hover { border-color: var(--papel); }
+
+  /* Pasos */
+  .pasos { border-bottom: 1px solid var(--rule-fuerte); background: var(--papel-bajo); }
+  .pasos ol { list-style: none; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pasos li { flex: none; }
+  .pasos button {
+    display: flex; align-items: center; gap: .45rem;
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); background: none; padding: 0 .8rem; min-height: 46px;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+  }
+  .pasos button em { font-style: normal; width: 18px; height: 18px; flex: none; display: grid; place-items: center;
+    border: 1px solid currentColor; font-size: .6rem; }
+  .pasos button[aria-current="true"] { color: var(--acento); border-bottom-color: var(--acento); }
+  .pasos button.hecho { color: var(--ok); }
+  .pasos button:disabled { opacity: .45; cursor: not-allowed; }
+
+  .vista { display: none; padding-block: var(--sp-l) var(--sp-xl); }
+  .vista.on { display: block; }
+
+  /* ===== Perfil ===== */
+  .campo { margin-bottom: var(--sp-m); }
+  .campo > label, .campo > p.lbl {
+    display: block; font-family: var(--mono); font-size: .72rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: .5rem;
+  }
+  .campo .hint { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-top: .4rem; line-height: 1.5; }
+  input[type="range"] { width: 100%; accent-color: var(--acento); height: 44px; }
+  .valor { font-family: var(--mono); font-size: var(--step-1); font-weight: 600; color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip {
+    font-family: var(--mono); font-size: .74rem; padding: .55rem .7rem; min-height: 44px;
+    border: 1px solid var(--rule-fuerte); background: var(--papel-alto); color: var(--ink-2);
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--papel); border-color: var(--ink); }
+  .chip[aria-pressed="true"]::before { content: "✓"; }
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%; font-family: var(--mono); font-size: .85rem;
+    border: 1px solid var(--rule-fuerte); background: var(--papel-alto); color: var(--ink);
+    padding: .7rem; min-height: 44px;
+  }
+  textarea { line-height: 1.6; resize: vertical; }
+  select { min-height: 44px; }
+
+  /* ===== Feed ===== */
+  .filtros { display: grid; gap: .6rem; margin-bottom: var(--sp-m); }
+  @media (min-width: 48em) { .filtros { grid-template-columns: 2fr 1fr 1fr 1fr; align-items: end; } }
+  .filtros .f label { display:block; font-family: var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color: var(--muted); margin-bottom:.3rem; }
+  .feed-meta { display:flex; flex-wrap:wrap; gap: var(--sp-s); align-items:center; justify-content:space-between; margin-bottom: var(--sp-s); }
+
+  .lic {
+    display: block; width: 100%; text-align: left; background: var(--papel-alto);
+    border: 1px solid var(--rule-fuerte); border-left: 4px solid var(--rule-fuerte);
+    padding: var(--sp-s); margin-bottom: .6rem; min-height: 44px;
+  }
+  .lic:hover, .lic:focus-visible { border-color: var(--ink); }
+  .lic.alto { border-left-color: var(--ok); }
+  .lic.medio { border-left-color: var(--alerta); }
+  .lic.bajo { border-left-color: var(--rule-fuerte); opacity: .78; }
+  .lic-top { display:flex; justify-content:space-between; gap: var(--sp-s); align-items:flex-start; }
+  .lic-id { font-family: var(--mono); font-size: .68rem; color: var(--acento); }
+  .lic-t { font-size: 1rem; line-height: 1.3; margin: .25rem 0; font-weight: 500; }
+  .lic-o { font-family: var(--mono); font-size: .7rem; color: var(--muted); }
+  .lic-b { display:flex; flex-wrap:wrap; gap:.35rem; margin-top: .6rem; align-items:center; }
+  .match { font-family: var(--mono); text-align:right; flex:none; }
+  .match b { display:block; font-size: 1.25rem; font-weight:600; line-height:1; }
+  .match span { font-size: .6rem; letter-spacing:.06em; text-transform:uppercase; color: var(--muted); }
+  .match.alto b { color: var(--ok); } .match.medio b { color: var(--alerta); } .match.bajo b { color: var(--muted); }
+  .razon { font-family: var(--mono); font-size: .64rem; padding: .2rem .4rem; border: 1px solid var(--rule-fuerte); background: var(--papel-bajo); color: var(--ink-2); }
+  .lic-acc { display:flex; gap:.4rem; margin-top:.6rem; }
+  .mini {
+    font-family: var(--mono); font-size:.66rem; letter-spacing:.05em; text-transform:uppercase;
+    border:1px solid var(--rule-fuerte); background: var(--papel); color: var(--ink-2);
+    padding: 0 .6rem; min-height: 44px; min-width: 44px;
+  }
+  .mini:hover { border-color: var(--ink); color: var(--ink); }
+  .mini.on { background: var(--ink); color: var(--papel); border-color: var(--ink); }
+
+  /* ===== Detalle ===== */
+  .tabs { display:flex; overflow-x:auto; border-bottom:1px solid var(--rule-fuerte); margin-bottom: var(--sp-m); }
+  .tabs button {
+    flex:none; font-family: var(--mono); font-size:.72rem; letter-spacing:.05em; text-transform:uppercase;
+    color: var(--muted); padding: 0 .9rem; min-height:46px; border-bottom:2px solid transparent; background:none;
+  }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--acento); }
+  .panel { display:none; } .panel.on { display:block; }
+
+  .kv { display:grid; grid-template-columns: auto 1fr; gap:.45rem var(--sp-s); font-family: var(--mono); font-size:.78rem; }
+  .kv dt { color: var(--muted); white-space:nowrap; }
+  .kv dd { color: var(--ink); text-align:right; }
+
+  /* Simulador */
+  .sim-bar { display:grid; grid-template-columns: 120px 1fr 54px; gap:.5rem; align-items:center; margin-bottom:.45rem; font-family:var(--mono); font-size:.72rem; }
+  .sim-bar .n { color: var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sim-bar .t { height:22px; background: var(--papel-bajo); border:1px solid var(--rule-fuerte); position:relative; }
+  .sim-bar .t i { display:block; height:100%; background: var(--rule-fuerte); transition: width .3s ease; }
+  .sim-bar.yo .t i { background: var(--acento); }
+  .sim-bar .p { text-align:right; font-weight:600; }
+  .sim-bar.yo .p { color: var(--acento); }
+
+  /* ===== Taller ===== */
+  .doc { border:1px solid var(--rule-fuerte); background: var(--papel-alto); margin-bottom:.6rem; }
+  .doc-h { display:flex; justify-content:space-between; gap:var(--sp-s); align-items:center; padding: var(--sp-s); flex-wrap:wrap; }
+  .doc-n { font-family: var(--mono); font-size:.78rem; color: var(--ink); }
+  .doc-n em { font-style:normal; display:block; font-size:.66rem; color: var(--muted); margin-top:.15rem; }
+  .doc-c { border-top:1px solid var(--rule); padding: var(--sp-s); display:none; }
+  .doc.abierto .doc-c { display:block; }
+  .doc-acc { display:flex; gap:.4rem; align-items:center; flex-wrap:wrap; }
+
+  /* ===== Chequeo ===== */
+  .check { display:grid; grid-template-columns: 20px 1fr auto; gap:var(--sp-s); align-items:center; padding:.75rem 0; border-bottom:1px dotted var(--rule-fuerte); }
+  .check:last-child { border-bottom:0; }
+  .check svg { width:18px; height:18px; }
+  .check p { font-size:.9rem; line-height:1.35; }
+  .check p em { font-style:normal; display:block; font-family:var(--mono); font-size:.68rem; color:var(--muted); margin-top:.15rem; }
+
+  /* Barra de acción fija (móvil) */
+  .accion {
+    position: fixed; left:0; right:0; bottom:0; z-index: 40;
+    background: var(--papel-alto); border-top: 1px solid var(--rule-fuerte);
+    padding: .6rem var(--gutter); display:none; gap:.5rem; align-items:center;
+    box-shadow: 0 -1px 0 rgba(0,0,0,.03);
+  }
+  .accion.on { display:flex; }
+  .accion .info { flex:1; font-family: var(--mono); font-size:.68rem; color:var(--muted); line-height:1.35; }
+  .accion .btn { padding: .7rem 1rem; }
+
+  /* Toast */
+  #toast {
+    position: fixed; left: 50%; transform: translateX(-50%) translateY(140%);
+    bottom: 100px; z-index: 60; max-width: 92vw;
+    background: var(--ink); color: var(--papel);
+    font-family: var(--mono); font-size:.75rem; line-height:1.4;
+    padding: .7rem .9rem; border-left: 3px solid var(--acento);
+    transition: transform .25s ease;
+  }
+  #toast.on { transform: translateX(-50%) translateY(0); }
+  @media (min-width: 62em) { #toast { bottom: 24px; } }
+
+  .vacio { text-align:center; padding: var(--sp-2xl) var(--sp-s); color: var(--muted); font-family: var(--mono); font-size:.8rem; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-in">
+      <a class="marca" href="../index.html"><i></i>ADJUDATE <span>Mercado Público</span></a>
+      <ul class="nav-links">
+        <li><a class="volver" href="../../index.html">&larr; Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+      <button class="nav-btn" id="navBtn" aria-expanded="false" aria-controls="navMob">Menú</button>
+    </div>
+  </div>
+  <div class="nav-mob" id="navMob">
+    <div class="container">
+      <ul>
+        <li><a href="../../index.html">&larr; Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Barra de aplicación -->
+<div class="app-bar">
+  <div class="container">
+    <div class="app-bar-in">
+      <div class="empresa">
+        <b>Aliwén Servicios SpA</b>
+        <span>RUT 76.543.210-K · Maipú, RM · <em style="font-style:normal" id="abTrab">34</em> trabajadores</span>
+      </div>
+      <button id="btnReset">Reiniciar demo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pasos -->
+<div class="pasos">
+  <div class="container">
+    <ol id="pasos">
+      <li><button data-v="perfil"><em>1</em> Perfil</button></li>
+      <li><button data-v="feed"><em>2</em> Feed</button></li>
+      <li><button data-v="lic" disabled><em>3</em> Bases</button></li>
+      <li><button data-v="taller" disabled><em>4</em> Taller</button></li>
+      <li><button data-v="chequeo" disabled><em>5</em> Chequeo</button></li>
+      <li><button data-v="envio" disabled><em>6</em> Envío</button></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===================== 1. PERFIL ===================== -->
+<main class="vista on" id="v-perfil">
+  <div class="container">
+    <p class="folio"><b>Paso 1</b> · Perfil de capacidad</p>
+    <h2 style="margin-bottom:.5rem">Qué puede hacer tu empresa de verdad.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-bottom:var(--sp-l)">Esto no es tu rubro en ChileProveedores. Es tu capacidad de ejecución, y es lo único que decide si te puedes adjudicar algo. <strong>Mueve los controles y mira cómo cambia el feed.</strong></p>
+
+    <div class="grid g2">
+      <div class="ficha">
+        <p class="ficha-h">Capacidad operacional</p>
+
+        <div class="campo">
+          <label for="trab">Trabajadores en planilla</label>
+          <p class="valor" id="trabVal">34</p>
+          <input type="range" id="trab" min="4" max="120" step="1" value="34">
+          <p class="hint">Los organismos exigen dotación mínima. Es el filtro que más elimina PYMEs.</p>
+        </div>
+
+        <div class="campo">
+          <label for="cap">Capital de trabajo acreditable</label>
+          <p class="valor" id="capVal">$31.500.000</p>
+          <input type="range" id="cap" min="0" max="200000000" step="500000" value="31500000">
+          <p class="hint">Sale de tu último balance. Define hasta qué monto de licitación te dejan entrar.</p>
+        </div>
+
+        <div class="campo">
+          <label for="contratos">Contratos públicos ya ejecutados</label>
+          <input type="number" id="contratos" min="0" max="60" value="11">
+          <p class="hint">Adjudate los importa de tu historial en Mercado Público. Sirven para acreditar experiencia.</p>
+        </div>
+      </div>
+
+      <div class="ficha">
+        <p class="ficha-h">Alcance y acreditaciones</p>
+
+        <div class="campo">
+          <p class="lbl">Rubros en los que ejecutas</p>
+          <div class="chips" id="rubros">
+            <button class="chip" data-k="areas" aria-pressed="true">Áreas verdes</button>
+            <button class="chip" data-k="aseo" aria-pressed="true">Aseo industrial</button>
+            <button class="chip" data-k="mantencion" aria-pressed="true">Mantención de infraestructura</button>
+            <button class="chip" data-k="obras" aria-pressed="false">Obras menores</button>
+          </div>
+        </div>
+
+        <div class="campo">
+          <p class="lbl">Regiones donde operas de verdad</p>
+          <div class="chips" id="regiones">
+            <button class="chip" data-k="RM" aria-pressed="true">Metropolitana</button>
+            <button class="chip" data-k="V" aria-pressed="false">Valparaíso</button>
+            <button class="chip" data-k="VI" aria-pressed="false">O'Higgins</button>
+            <button class="chip" data-k="VIII" aria-pressed="false">Biobío</button>
+          </div>
+        </div>
+
+        <div class="campo" style="margin-bottom:0">
+          <p class="lbl">Certificaciones vigentes</p>
+          <div class="chips" id="certs">
+            <button class="chip" data-k="iso9001" aria-pressed="true">ISO 9001</button>
+            <button class="chip" data-k="iso14001" aria-pressed="false">ISO 14001</button>
+            <button class="chip" data-k="iso45001" aria-pressed="false">ISO 45001</button>
+            <button class="chip" data-k="reas" aria-pressed="true">Protocolo REAS</button>
+          </div>
+          <p class="hint">Cada certificación que te falta es un bloque de puntos que regalas en la pauta de evaluación.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ficha" style="margin-top:var(--sp-m); border-color:var(--acento)">
+      <p class="ficha-h" style="color:var(--acento)">Con este perfil, hoy</p>
+      <div class="grid g3">
+        <div><span class="cifra" id="kpi1">0</span><span class="cifra-pie">licitaciones abiertas que te calzan (match &ge; 60)</span></div>
+        <div><span class="cifra rojo" id="kpi2">$0</span><span class="cifra-pie">monto total en juego en esas licitaciones</span></div>
+        <div><span class="cifra" id="kpi3">0</span><span class="cifra-pie">cierran en menos de 7 días &mdash; hay que moverse</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--sp-l); display:flex; gap:var(--sp-s); flex-wrap:wrap">
+      <button class="btn" id="irFeed">Ver mi feed &rarr;</button>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== 2. FEED ===================== -->
+<main class="vista" id="v-feed">
+  <div class="container">
+    <p class="folio"><b>Paso 2</b> · Feed de licitaciones</p>
+
+    <div class="filtros">
+      <div class="f">
+        <label for="q">Buscar</label>
+        <input type="text" id="q" placeholder="áreas verdes, hospital, Peñalolén…">
+      </div>
+      <div class="f">
+        <label for="fRubro">Rubro</label>
+        <select id="fRubro">
+          <option value="">Todos</option>
+          <option value="areas">Áreas verdes</option>
+          <option value="aseo">Aseo industrial</option>
+          <option value="mantencion">Mantención</option>
+        </select>
+      </div>
+      <div class="f">
+        <label for="fOrden">Ordenar por</label>
+        <select id="fOrden">
+          <option value="match">Match con mi empresa</option>
+          <option value="cierre">Cierra antes</option>
+          <option value="monto">Monto mayor</option>
+        </select>
+      </div>
+      <div class="f">
+        <label for="fVista">Mostrar</label>
+        <select id="fVista">
+          <option value="viables">Sólo viables (match ≥ 40)</option>
+          <option value="todas">Todas las abiertas</option>
+          <option value="guardadas">Guardadas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="feed-meta">
+      <p class="nota" id="feedCount">—</p>
+      <p class="nota">Fuente: <b>API Mercado Público</b> · actualizado hoy 08:15</p>
+    </div>
+
+    <div id="feedLista"></div>
+  </div>
+</main>
+
+<!-- ===================== 3. LICITACIÓN ===================== -->
+<main class="vista" id="v-lic">
+  <div class="container">
+    <button class="mini" id="volverFeed" style="margin-bottom:var(--sp-s)">&larr; Volver al feed</button>
+    <p class="lic-id mono" id="licId">—</p>
+    <h2 id="licTitulo" style="margin:.3rem 0 .4rem">—</h2>
+    <p class="lic-o mono" id="licOrg" style="margin-bottom:var(--sp-m)">—</p>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-p="resumen">Resumen</button>
+      <button role="tab" aria-selected="false" data-p="reqs">Requisitos</button>
+      <button role="tab" aria-selected="false" data-p="comp">Competencia</button>
+      <button role="tab" aria-selected="false" data-p="precio">Simulador de precio</button>
+    </div>
+
+    <div class="panel on" id="p-resumen"></div>
+    <div class="panel" id="p-reqs"></div>
+    <div class="panel" id="p-comp"></div>
+    <div class="panel" id="p-precio"></div>
+  </div>
+</main>
+
+<!-- ===================== 4. TALLER ===================== -->
+<main class="vista" id="v-taller">
+  <div class="container">
+    <p class="folio"><b>Paso 4</b> · Taller de postulación</p>
+    <h2 id="tallerTit" style="margin-bottom:.4rem">—</h2>
+    <p class="nota" id="tallerSub" style="margin-bottom:var(--sp-m)">—</p>
+
+    <div class="ficha" style="margin-bottom:var(--sp-m)">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.5rem">
+        <p class="ficha-h" style="border:0; margin:0; padding:0">Avance del expediente</p>
+        <p class="mono" style="font-size:.8rem; font-weight:600" id="avanceTxt">0 / 7</p>
+      </div>
+      <div class="medidor"><i id="avanceBar" style="width:0%"></i></div>
+    </div>
+
+    <div id="docs"></div>
+  </div>
+</main>
+
+<!-- ===================== 5. CHEQUEO ===================== -->
+<main class="vista" id="v-chequeo">
+  <div class="container">
+    <p class="folio"><b>Paso 5</b> · Chequeo de formalismos</p>
+    <h2 style="margin-bottom:.4rem">Lo que te dejaría fuera.</h2>
+    <p class="prose" style="color:var(--ink-2); margin-bottom:var(--sp-l)">Esta es la pantalla por la que existe Adjudate. Ninguna de estas cosas te hace mejor proveedor &mdash; pero cualquiera de ellas te elimina.</p>
+    <div class="ficha">
+      <p class="ficha-h">Validación automática · <span id="chkResumen">—</span></p>
+      <div id="checks"></div>
+    </div>
+    <div id="chkAyuda" style="margin-top:var(--sp-m)"></div>
+  </div>
+</main>
+
+<!-- ===================== 6. ENVÍO ===================== -->
+<main class="vista" id="v-envio">
+  <div class="container" id="envioCont"></div>
+</main>
+
+<!-- Barra de acción fija -->
+<div class="accion" id="accion">
+  <p class="info" id="accionInfo">—</p>
+  <button class="btn" id="accionBtn">—</button>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<footer>
+  <div class="container">
+    <p><strong style="font-family:var(--mono); color:var(--ink)">ADJUDATE</strong> &mdash; demo con datos ficticios en formato real de Mercado Público. Nada se envía a ninguna parte.</p>
+    <p><a href="../index.html">&larr; Producto</a> · <a href="../stack.html">Qué está falseado en este demo</a></p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================================
+   ADJUDATE — demo. Estado en el cliente, sin backend, sin dependencias.
+   ========================================================================== */
+
+/* ---------- Menú móvil ---------- */
+(function () {
+  var b = document.getElementById('navBtn'), m = document.getElementById('navMob');
+  b.addEventListener('click', function () {
+    var open = m.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.textContent = open ? 'Cerrar' : 'Menú';
+  });
+})();
+
+/* ---------- Utilidades ---------- */
+var CLP = function (n) { return '$' + Math.round(n).toLocaleString('es-CL'); };
+var UF = 39250; // valor de referencia usado en el demo
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.innerHTML = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('on'); }, 3800);
+}
+
+/* ---------- Datos mock (formato real de Mercado Público) ---------- */
+var LICITACIONES = [
+  { id:'1057-42-LE26', t:'Servicio de mantención de áreas verdes y arbolado urbano', org:'I. Municipalidad de Peñalolén', comuna:'Peñalolén', reg:'RM',
+    monto:48600000, rubro:'areas', cierre:3, minTrab:12, minCap:5000000, minCon:3, certs:['iso14001'],
+    pauta:[['Precio',45],['Experiencia',25],['Cumplimiento medioambiental',20],['Plazo de respuesta',10]],
+    hist:[{e:'Vivero y Paisajismo Quilhuén Ltda.', m:44200000, o:6, f:'mar 2025'},
+          {e:'Servicios Génesis Ltda.', m:46800000, o:5, f:'ene 2024'},
+          {e:'Aliwén Servicios SpA', m:41900000, o:4, f:'jun 2023', yo:true}] },
+
+  { id:'2359-45-LP26', t:'Servicio integral de aseo para recintos hospitalarios', org:'Servicio de Salud Metropolitano Sur', comuna:'San Miguel', reg:'RM',
+    monto:127400000, rubro:'aseo', cierre:11, minTrab:45, minCap:60000000, minCon:2, certs:['iso9001','reas'],
+    pauta:[['Precio',40],['Experiencia en salud',30],['Dotación y capacitación',20],['Plazo',10]],
+    hist:[{e:'Servicios Génesis Ltda.', m:119800000, o:7, f:'abr 2025'},
+          {e:'Servicios Génesis Ltda.', m:124300000, o:5, f:'may 2024'},
+          {e:'Limpia Austral SpA', m:121500000, o:6, f:'feb 2023'}] },
+
+  { id:'4180-11-LE26', t:'Mantención correctiva de infraestructura en establecimientos educacionales', org:'SLEP Barrancas', comuna:'Pudahuel', reg:'RM',
+    monto:34900000, rubro:'mantencion', cierre:6, minTrab:8, minCap:4000000, minCon:2, certs:[],
+    pauta:[['Precio',50],['Experiencia',25],['Tiempo de respuesta',15],['Sustentabilidad',10]],
+    hist:[{e:'Constructora Antumapu Ltda.', m:31400000, o:4, f:'jul 2025'},
+          {e:'Aliwén Servicios SpA', m:29900000, o:5, f:'sep 2024', yo:true},
+          {e:'Mantenciones del Sur SpA', m:32800000, o:4, f:'nov 2023'}] },
+
+  { id:'892-17-LE26', t:'Servicio de aseo y mantención del Edificio Consistorial', org:'I. Municipalidad de Maipú', comuna:'Maipú', reg:'RM',
+    monto:19800000, rubro:'aseo', cierre:9, minTrab:6, minCap:2000000, minCon:1, certs:[],
+    pauta:[['Precio',55],['Experiencia',25],['Plazo',20]],
+    hist:[{e:'Aliwén Servicios SpA', m:18100000, o:3, f:'oct 2024', yo:true},
+          {e:'Brillo Total Ltda.', m:19200000, o:4, f:'oct 2023'}] },
+
+  { id:'1509-88-LQ26', t:'Conservación mayor de áreas verdes del Parque Metropolitano', org:'PARQUEMET · MINVU', comuna:'Recoleta', reg:'RM',
+    monto:215000000, rubro:'areas', cierre:18, minTrab:60, minCap:90000000, minCon:5, certs:['iso9001','iso14001'],
+    pauta:[['Precio',35],['Experiencia',30],['Plan de manejo ambiental',25],['Plazo',10]],
+    hist:[{e:'Paisajismo Cordillera S.A.', m:203700000, o:5, f:'ene 2025'},
+          {e:'Paisajismo Cordillera S.A.', m:198400000, o:4, f:'dic 2022'}] },
+
+  { id:'3376-22-LE26', t:'Mantención de recintos deportivos municipales', org:'I. Municipalidad de Puente Alto', comuna:'Puente Alto', reg:'RM',
+    monto:41200000, rubro:'mantencion', cierre:5, minTrab:10, minCap:6000000, minCon:3, certs:[],
+    pauta:[['Precio',45],['Experiencia',30],['Plazo',25]],
+    hist:[{e:'Mantenciones del Sur SpA', m:38600000, o:5, f:'jun 2025'},
+          {e:'Constructora Antumapu Ltda.', m:39900000, o:6, f:'ago 2024'}] },
+
+  { id:'2044-63-LE26', t:'Poda y retiro de árboles en riesgo de caída', org:'I. Municipalidad de La Florida', comuna:'La Florida', reg:'RM',
+    monto:27500000, rubro:'areas', cierre:2, minTrab:8, minCap:3000000, minCon:2, certs:[],
+    pauta:[['Precio',50],['Experiencia',30],['Plazo de ejecución',20]],
+    hist:[{e:'Vivero y Paisajismo Quilhuén Ltda.', m:25100000, o:4, f:'may 2025'},
+          {e:'Aliwén Servicios SpA', m:24800000, o:3, f:'ago 2024', yo:true}] },
+
+  { id:'5231-9-LE26', t:'Aseo y sanitización de CESFAM y postas rurales', org:'Servicio de Salud Viña del Mar-Quillota', comuna:'Quillota', reg:'V',
+    monto:38700000, rubro:'aseo', cierre:8, minTrab:15, minCap:8000000, minCon:2, certs:['reas'],
+    pauta:[['Precio',45],['Experiencia en salud',30],['Dotación',25]],
+    hist:[{e:'Limpia Austral SpA', m:36200000, o:5, f:'mar 2025'},
+          {e:'Aseo Integral Aconcagua Ltda.', m:37400000, o:4, f:'abr 2024'}] },
+
+  { id:'771-104-LP26', t:'Mantención preventiva y correctiva de alumbrado público', org:'I. Municipalidad de San Bernardo', comuna:'San Bernardo', reg:'RM',
+    monto:96300000, rubro:'mantencion', cierre:14, minTrab:25, minCap:35000000, minCon:4, certs:['iso45001'],
+    pauta:[['Precio',40],['Experiencia',25],['Seguridad laboral',25],['Plazo',10]],
+    hist:[{e:'Electro Servicios Maipo S.A.', m:91800000, o:4, f:'feb 2025'},
+          {e:'Electro Servicios Maipo S.A.', m:94100000, o:3, f:'mar 2023'}] },
+
+  { id:'4602-31-LE26', t:'Servicio de jardinería y mantención Campus Juan Gómez Millas', org:'Universidad de Chile', comuna:'Ñuñoa', reg:'RM',
+    monto:22400000, rubro:'areas', cierre:4, minTrab:6, minCap:2000000, minCon:1, certs:[],
+    pauta:[['Precio',50],['Experiencia',30],['Sustentabilidad',20]],
+    hist:[{e:'Vivero y Paisajismo Quilhuén Ltda.', m:20900000, o:6, f:'abr 2025'},
+          {e:'Jardines del Valle Ltda.', m:21600000, o:5, f:'may 2024'}] },
+
+  { id:'1188-55-LE26', t:'Habilitación y mantención de jardines infantiles', org:'JUNJI Región Metropolitana', comuna:'Santiago', reg:'RM',
+    monto:53100000, rubro:'mantencion', cierre:12, minTrab:14, minCap:10000000, minCon:3, certs:['iso9001'],
+    pauta:[['Precio',40],['Experiencia',30],['Plan de trabajo',20],['Plazo',10]],
+    hist:[{e:'Constructora Antumapu Ltda.', m:49700000, o:6, f:'jun 2025'},
+          {e:'Mantenciones del Sur SpA', m:51200000, o:5, f:'jul 2024'}] },
+
+  { id:'6015-2-LE26', t:'Retiro de escombros y aseo de sitios eriazos', org:'I. Municipalidad de Cerro Navia', comuna:'Cerro Navia', reg:'RM',
+    monto:15600000, rubro:'aseo', cierre:7, minTrab:5, minCap:1500000, minCon:1, certs:[],
+    pauta:[['Precio',60],['Experiencia',20],['Plazo',20]],
+    hist:[{e:'Aliwén Servicios SpA', m:14300000, o:4, f:'nov 2024', yo:true},
+          {e:'Brillo Total Ltda.', m:15000000, o:5, f:'dic 2023'}] }
+];
+
+var NOM_CERT = { iso9001:'ISO 9001', iso14001:'ISO 14001', iso45001:'ISO 45001', reas:'Protocolo REAS' };
+var NOM_RUBRO = { areas:'Áreas verdes', aseo:'Aseo industrial', mantencion:'Mantención', obras:'Obras menores' };
+var NOM_REG = { RM:'Metropolitana', V:'Valparaíso', VI:"O'Higgins", VIII:'Biobío' };
+
+/* ---------- Estado ---------- */
+var S = {
+  perfil: { trab:34, cap:31500000, con:11, rubros:['areas','aseo','mantencion'], regiones:['RM'], certs:['iso9001','reas'] },
+  guardadas: [], descartadas: [],
+  activa: null,          // id de licitación en curso
+  oferta: null,          // monto ofertado
+  docs: {},              // estado de documentos del expediente
+  enviada: false,
+  folio: null
+};
+
+/* ---------- Motor de match ---------- */
+/* El score no es un adjetivo: es la suma de las restricciones duras de las bases
+   contra la capacidad declarada. Cada componente se puede auditar. */
+function score(L) {
+  var p = S.perfil, d = [];
+  var s = 0;
+
+  // Rubro (30) — si no lo ejecutas, no hay caso.
+  if (p.rubros.indexOf(L.rubro) >= 0) { s += 30; }
+  else { d.push('Rubro fuera de tu alcance'); }
+
+  // Región (15)
+  if (p.regiones.indexOf(L.reg) >= 0) { s += 15; }
+  else { d.push('Operas fuera de ' + NOM_REG[L.reg]); }
+
+  // Dotación (20)
+  if (p.trab >= L.minTrab) { s += 20; }
+  else { s += Math.max(0, Math.round(20 * p.trab / L.minTrab) - 6); d.push('Dotación: piden ' + L.minTrab + ', tienes ' + p.trab); }
+
+  // Capital de trabajo (15)
+  if (p.cap >= L.minCap) { s += 15; }
+  else { d.push('Capital: piden ' + CLP(L.minCap) + ', acreditas ' + CLP(p.cap)); }
+
+  // Experiencia (10)
+  if (p.con >= L.minCon) { s += 10; }
+  else { d.push('Experiencia: piden ' + L.minCon + ' contratos, tienes ' + p.con); }
+
+  // Certificaciones (10)
+  var falta = L.certs.filter(function (c) { return p.certs.indexOf(c) < 0; });
+  if (falta.length === 0) { s += 10; }
+  else { d.push('Te falta ' + falta.map(function (c) { return NOM_CERT[c]; }).join(' y ')); }
+
+  s = Math.max(0, Math.min(100, s));
+
+  // Probabilidad de adjudicación: el match acota el techo, la competencia histórica lo baja.
+  var ofPromedio = L.hist.reduce(function (a, h) { return a + h.o; }, 0) / L.hist.length;
+  var yaGanaste = L.hist.some(function (h) { return h.yo; });
+  var prob = s / 100 * (1 / Math.max(1, ofPromedio - 1.4)) * 100;
+  if (yaGanaste) prob *= 1.55;
+  if (falta.length) prob *= 0.45;
+  if (p.cap < L.minCap || p.trab < L.minTrab) prob *= 0.3;
+  prob = Math.max(1, Math.min(88, Math.round(prob)));
+
+  var razones = [];
+  if (p.rubros.indexOf(L.rubro) >= 0) razones.push('Tu rubro');
+  if (yaGanaste) razones.push('Ya ganaste una igual');
+  if (ofPromedio <= 4.2) razones.push('Poca competencia (' + ofPromedio.toFixed(1) + ' oferentes)');
+  if (L.monto <= p.cap * 2.2 && p.cap >= L.minCap) razones.push('Monto en tu rango');
+  if (L.cierre <= 3) razones.push('Cierra en ' + L.cierre + ' días');
+
+  return { s: s, prob: prob, faltantes: d, razones: razones, ofPromedio: ofPromedio, yaGanaste: yaGanaste, certFalta: falta };
+}
+function nivel(s) { return s >= 70 ? 'alto' : s >= 40 ? 'medio' : 'bajo'; }
+
+/* ---------- Navegación entre vistas ---------- */
+var VISTAS = ['perfil','feed','lic','taller','chequeo','envio'];
+var vistaActual = 'perfil';
+function ir(v) {
+  var btn = document.querySelector('#pasos button[data-v="' + v + '"]');
+  if (btn && btn.disabled) return;
+  vistaActual = v;
+  VISTAS.forEach(function (x) { document.getElementById('v-' + x).classList.toggle('on', x === v); });
+  document.querySelectorAll('#pasos button').forEach(function (b) {
+    b.setAttribute('aria-current', b.dataset.v === v ? 'true' : 'false');
+  });
+  window.scrollTo({ top: 0, behavior: 'auto' });
+  barraAccion();
+}
+function habilitar(v) { var b = document.querySelector('#pasos button[data-v="' + v + '"]'); if (b) b.disabled = false; }
+function marcarHecho(v) { var b = document.querySelector('#pasos button[data-v="' + v + '"]'); if (b) b.classList.add('hecho'); }
+document.querySelectorAll('#pasos button').forEach(function (b) {
+  b.addEventListener('click', function () { ir(b.dataset.v); });
+});
+
+/* ---------- Barra de acción contextual ---------- */
+function barraAccion() {
+  var a = document.getElementById('accion'), i = document.getElementById('accionInfo'), b = document.getElementById('accionBtn');
+  var L = S.activa ? LICITACIONES.find(function (x) { return x.id === S.activa; }) : null;
+
+  if (vistaActual === 'lic' && L) {
+    a.classList.add('on');
+    i.innerHTML = '<b>' + L.id + '</b><br>Cierra en ' + L.cierre + ' días';
+    b.textContent = 'Postular';
+    b.disabled = false;
+    b.onclick = function () { abrirTaller(L); };
+  } else if (vistaActual === 'taller') {
+    var listos = docsListos();
+    a.classList.add('on');
+    i.innerHTML = listos + ' de ' + DOCS_BASE.length + ' documentos listos';
+    b.textContent = 'Revisar antes de enviar';
+    b.disabled = false;
+    b.onclick = function () { ir('chequeo'); habilitar('chequeo'); renderChequeo(); };
+  } else if (vistaActual === 'chequeo') {
+    var r = correrChecks();
+    a.classList.add('on');
+    i.innerHTML = r.bloqueos.length ? '<b style="color:var(--acento)">' + r.bloqueos.length + ' bloqueo(s)</b><br>No puedes enviar así' : 'Sin bloqueos. Expediente en orden.';
+    b.textContent = r.bloqueos.length ? 'Bloqueado' : 'Generar paquete';
+    b.disabled = r.bloqueos.length > 0;
+    b.onclick = function () { enviar(); };
+  } else {
+    a.classList.remove('on');
+  }
+}
+
+/* ===================== PERFIL ===================== */
+function bindChips(id, key) {
+  document.querySelectorAll('#' + id + ' .chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      var on = c.getAttribute('aria-pressed') === 'true';
+      c.setAttribute('aria-pressed', on ? 'false' : 'true');
+      var k = c.dataset.k, arr = S.perfil[key];
+      if (on) { S.perfil[key] = arr.filter(function (x) { return x !== k; }); }
+      else if (arr.indexOf(k) < 0) { arr.push(k); }
+      actualizarPerfil();
+    });
+  });
+}
+bindChips('rubros', 'rubros');
+bindChips('regiones', 'regiones');
+bindChips('certs', 'certs');
+
+document.getElementById('trab').addEventListener('input', function (e) {
+  S.perfil.trab = +e.target.value;
+  document.getElementById('trabVal').textContent = S.perfil.trab;
+  document.getElementById('abTrab').textContent = S.perfil.trab;
+  actualizarPerfil();
+});
+document.getElementById('cap').addEventListener('input', function (e) {
+  S.perfil.cap = +e.target.value;
+  document.getElementById('capVal').textContent = CLP(S.perfil.cap);
+  actualizarPerfil();
+});
+document.getElementById('contratos').addEventListener('input', function (e) {
+  S.perfil.con = Math.max(0, +e.target.value || 0);
+  actualizarPerfil();
+});
+
+function actualizarPerfil() {
+  var calzan = LICITACIONES.filter(function (L) { return score(L).s >= 60; });
+  var monto = calzan.reduce(function (a, L) { return a + L.monto; }, 0);
+  var urgen = calzan.filter(function (L) { return L.cierre <= 7; }).length;
+  document.getElementById('kpi1').textContent = calzan.length;
+  document.getElementById('kpi2').textContent = CLP(monto);
+  document.getElementById('kpi3').textContent = urgen;
+  if (vistaActual === 'feed') renderFeed();
+}
+document.getElementById('irFeed').addEventListener('click', function () {
+  marcarHecho('perfil'); ir('feed'); renderFeed();
+});
+
+/* ===================== FEED ===================== */
+['q','fRubro','fOrden','fVista'].forEach(function (id) {
+  document.getElementById(id).addEventListener('input', renderFeed);
+});
+
+function renderFeed() {
+  var q = document.getElementById('q').value.trim().toLowerCase();
+  var fr = document.getElementById('fRubro').value;
+  var fo = document.getElementById('fOrden').value;
+  var fv = document.getElementById('fVista').value;
+
+  var lista = LICITACIONES.filter(function (L) {
+    if (S.descartadas.indexOf(L.id) >= 0 && fv !== 'todas') return false;
+    if (fv === 'guardadas' && S.guardadas.indexOf(L.id) < 0) return false;
+    if (fr && L.rubro !== fr) return false;
+    if (q && (L.t + ' ' + L.org + ' ' + L.comuna + ' ' + L.id).toLowerCase().indexOf(q) < 0) return false;
+    if (fv === 'viables' && score(L).s < 40) return false;
+    return true;
+  });
+
+  lista.sort(function (a, b) {
+    if (fo === 'cierre') return a.cierre - b.cierre;
+    if (fo === 'monto') return b.monto - a.monto;
+    return score(b).s - score(a).s;
+  });
+
+  var enJuego = lista.reduce(function (a, L) { return a + L.monto; }, 0);
+  document.getElementById('feedCount').innerHTML =
+    '<b>' + lista.length + '</b> licitación(es) · ' + CLP(enJuego) + ' en juego' +
+    (S.descartadas.length ? ' · ' + S.descartadas.length + ' descartada(s)' : '');
+
+  var cont = document.getElementById('feedLista');
+  if (!lista.length) {
+    cont.innerHTML = '<div class="vacio">Nada calza con estos filtros.<br>Prueba con &laquo;Todas las abiertas&raquo;, o vuelve al perfil y ensancha tu alcance.</div>';
+    return;
+  }
+
+  cont.innerHTML = lista.map(function (L) {
+    var m = score(L), n = nivel(m.s);
+    var guardada = S.guardadas.indexOf(L.id) >= 0;
+    return '' +
+    '<div class="lic ' + n + '">' +
+      '<div class="lic-top">' +
+        '<div style="min-width:0">' +
+          '<p class="lic-id">' + L.id + '</p>' +
+          '<p class="lic-t">' + L.t + '</p>' +
+          '<p class="lic-o">' + L.org + ' · ' + L.comuna + ' · ' + CLP(L.monto) + '</p>' +
+        '</div>' +
+        '<div class="match ' + n + '"><b>' + m.s + '</b><span>match</span></div>' +
+      '</div>' +
+      '<div class="lic-b">' +
+        '<span class="pill ' + (L.cierre <= 3 ? 'mal' : L.cierre <= 7 ? 'warn' : 'neu') + '">Cierra en ' + L.cierre + ' d</span>' +
+        '<span class="pill ' + (m.prob >= 40 ? 'ok' : m.prob >= 20 ? 'warn' : 'neu') + '">' + m.prob + '% adjudicación</span>' +
+        m.razones.slice(0, 3).map(function (r) { return '<span class="razon">' + r + '</span>'; }).join('') +
+      '</div>' +
+      (m.faltantes.length ? '<p class="nota" style="margin-top:.5rem;color:var(--acento)">⚠ ' + m.faltantes[0] + (m.faltantes.length > 1 ? ' · +' + (m.faltantes.length - 1) + ' más' : '') + '</p>' : '') +
+      '<div class="lic-acc">' +
+        '<button class="mini" data-ver="' + L.id + '" style="background:var(--ink);color:var(--papel);border-color:var(--ink)">Abrir bases</button>' +
+        '<button class="mini ' + (guardada ? 'on' : '') + '" data-guardar="' + L.id + '">' + (guardada ? 'Guardada' : 'Guardar') + '</button>' +
+        '<button class="mini" data-descartar="' + L.id + '">Descartar</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  cont.querySelectorAll('[data-ver]').forEach(function (b) {
+    b.addEventListener('click', function () { abrirLic(b.dataset.ver); });
+  });
+  cont.querySelectorAll('[data-guardar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.dataset.guardar, i = S.guardadas.indexOf(id);
+      if (i >= 0) { S.guardadas.splice(i, 1); toast('Quitada de guardadas.'); }
+      else { S.guardadas.push(id); toast('Guardada. La verás en el filtro «Guardadas».'); }
+      renderFeed();
+    });
+  });
+  cont.querySelectorAll('[data-descartar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.dataset.descartar;
+      if (S.descartadas.indexOf(id) < 0) S.descartadas.push(id);
+      toast('Descartada. Adjudate aprende: te mostraremos menos de este tipo.');
+      renderFeed();
+    });
+  });
+}
+
+/* ===================== DETALLE DE LICITACIÓN ===================== */
+document.getElementById('volverFeed').addEventListener('click', function () { ir('feed'); });
+document.querySelectorAll('.tabs button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.tabs button').forEach(function (o) { o.setAttribute('aria-selected', 'false'); });
+    b.setAttribute('aria-selected', 'true');
+    ['resumen','reqs','comp','precio'].forEach(function (p) {
+      document.getElementById('p-' + p).classList.toggle('on', p === b.dataset.p);
+    });
+  });
+});
+
+function abrirLic(id) {
+  S.activa = id;
+  var L = LICITACIONES.find(function (x) { return x.id === id; });
+  var m = score(L);
+
+  document.getElementById('licId').textContent = L.id;
+  document.getElementById('licTitulo').textContent = L.t;
+  document.getElementById('licOrg').textContent = L.org + ' · ' + L.comuna + ', ' + NOM_REG[L.reg];
+
+  /* --- Resumen --- */
+  document.getElementById('p-resumen').innerHTML =
+    '<div class="grid g2">' +
+      '<div class="ficha">' +
+        '<p class="ficha-h">Ficha de la licitación</p>' +
+        '<dl class="kv">' +
+          '<dt>Presupuesto disponible</dt><dd>' + CLP(L.monto) + '</dd>' +
+          '<dt>Equivalente en UF</dt><dd>' + Math.round(L.monto / UF).toLocaleString('es-CL') + ' UF</dd>' +
+          '<dt>Cierre de ofertas</dt><dd>en ' + L.cierre + ' días</dd>' +
+          '<dt>Garantía de seriedad</dt><dd>' + CLP(L.monto * 0.03) + ' (3%)</dd>' +
+          '<dt>Tipo</dt><dd>' + (L.id.indexOf('LP') > 0 ? 'LP (pública, ≥1.000 UTM)' : L.id.indexOf('LQ') > 0 ? 'LQ (pública, ≥2.000 UTM)' : 'LE (pública, 100–1.000 UTM)') + '</dd>' +
+          '<dt>Oferentes históricos</dt><dd>' + m.ofPromedio.toFixed(1) + ' en promedio</dd>' +
+        '</dl>' +
+      '</div>' +
+      '<div class="ficha" style="border-color:var(--acento)">' +
+        '<p class="ficha-h" style="color:var(--acento)">Veredicto de Adjudate</p>' +
+        '<div style="display:flex; gap:var(--sp-m); align-items:flex-start; flex-wrap:wrap">' +
+          '<div style="flex:none">' +
+            '<span class="cifra ' + (m.prob >= 40 ? '' : 'rojo') + '">' + m.prob + '%</span>' +
+            '<span class="cifra-pie">probabilidad<br>estimada</span>' +
+          '</div>' +
+          '<p style="flex:1 1 220px; color:var(--ink-2); font-size:.92rem">' + veredicto(L, m) + '</p>' +
+        '</div>' +
+        '<div style="margin-top:var(--sp-m)">' +
+          '<p class="nota" style="margin-bottom:.4rem">Match con tu capacidad: <b>' + m.s + '/100</b></p>' +
+          '<div class="medidor ' + (m.s >= 70 ? 'verde' : '') + '"><i style="width:' + m.s + '%"></i></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ficha" style="margin-top:var(--sp-m)">' +
+      '<p class="ficha-h">Pauta de evaluación (así se reparten los 100 puntos)</p>' +
+      L.pauta.map(function (p) {
+        return '<div class="sim-bar"><span class="n">' + p[0] + '</span>' +
+               '<span class="t"><i style="width:' + p[1] + '%; background: var(--ink-2)"></i></span>' +
+               '<span class="p">' + p[1] + '%</span></div>';
+      }).join('') +
+    '</div>';
+
+  /* --- Requisitos --- */
+  var reqs = construirRequisitos(L, m);
+  document.getElementById('p-reqs').innerHTML =
+    '<p class="nota" style="margin-bottom:var(--sp-s)">Extraídos por IA de las bases administrativas y técnicas (' + reqs.length + ' requisitos). Cada uno indica su origen: si no lo puedes verificar en las bases, no lo cumplas a ciegas.</p>' +
+    '<div class="ficha">' + reqs.map(function (r) {
+      return '<div class="check">' + ICO[r.e] +
+        '<p>' + r.t + '<em>' + r.f + '</em></p>' +
+        '<span class="pill ' + r.e + '">' + TXT[r.e] + '</span></div>';
+    }).join('') + '</div>';
+
+  /* --- Competencia --- */
+  document.getElementById('p-comp').innerHTML =
+    '<p class="nota" style="margin-bottom:var(--sp-s)">Adjudicaciones históricas de este organismo en procesos equivalentes. <b>Es información pública</b> &mdash; y es lo que separa una postulación a ciegas de una con precio calculado.</p>' +
+    '<div class="scroll-x"><table>' +
+      '<caption>Quién ganó, a cuánto, contra cuántos</caption>' +
+      '<thead><tr><th>Adjudicatario</th><th class="num">Monto</th><th class="num">Oferentes</th><th class="num">% del presup.</th><th>Fecha</th></tr></thead>' +
+      '<tbody>' + L.hist.map(function (h) {
+        return '<tr' + (h.yo ? ' style="background:var(--acento-lav)"' : '') + '>' +
+          '<td>' + h.e + (h.yo ? ' <span class="pill mal" style="margin-left:.3rem">Tú</span>' : '') + '</td>' +
+          '<td class="num">' + CLP(h.m) + '</td>' +
+          '<td class="num">' + h.o + '</td>' +
+          '<td class="num">' + Math.round(h.m / L.monto * 100) + '%</td>' +
+          '<td>' + h.f + '</td></tr>';
+      }).join('') + '</tbody>' +
+    '</table></div>' +
+    '<div class="ficha" style="margin-top:var(--sp-m)">' +
+      '<p class="ficha-h">Lectura</p>' +
+      '<p style="color:var(--ink-2)">El precio ganador ha estado entre el <b class="mono">' +
+        Math.min.apply(null, L.hist.map(function (h) { return Math.round(h.m / L.monto * 100); })) + '%</b> y el <b class="mono">' +
+        Math.max.apply(null, L.hist.map(function (h) { return Math.round(h.m / L.monto * 100); })) +
+        '%</b> del presupuesto, con <b class="mono">' + m.ofPromedio.toFixed(1) + '</b> oferentes en promedio. ' +
+        (m.yaGanaste ? 'Ya te adjudicaste una de estas: el organismo te conoce y eso pesa en experiencia.' :
+                       'Nunca te has adjudicado una de este organismo. No es descalificante, pero sube la barra.') +
+      '</p>' +
+    '</div>';
+
+  /* --- Simulador --- */
+  renderSimulador(L, m);
+
+  habilitar('lic');
+  marcarHecho('feed');
+  ir('lic');
+  document.querySelector('.tabs button[data-p="resumen"]').click();
+}
+
+function veredicto(L, m) {
+  if (m.s >= 70 && m.prob >= 40) {
+    return 'Esta es tuya. Cumples las restricciones duras y el organismo adjudica a precios que te dejan margen. Ponte a trabajar hoy: la garantía de seriedad tarda 48 hrs en el banco.';
+  }
+  if (m.certFalta.length) {
+    return 'Te falta ' + m.certFalta.map(function (c) { return NOM_CERT[c]; }).join(' y ') +
+      ', y eso son puntos que regalas completos en la pauta. Puedes postular igual, pero vas a competir cuesta arriba. Considera una unión temporal de proveedores con alguien que la tenga.';
+  }
+  if (S.perfil.cap < L.minCap || S.perfil.trab < L.minTrab) {
+    return 'No cumples una restricción de admisibilidad (dotación o capital de trabajo). Te van a declarar inadmisible antes de evaluar tu oferta. Te lo decimos ahora, no después de tres días armando carpetas.';
+  }
+  if (m.s < 40) {
+    return 'Fuera de tu alcance real. Si igual quieres ir, primero ensancha tu perfil (rubro o región) y vuelve a mirar el número.';
+  }
+  return 'Es postulable, pero peleada. Mira la pestaña de competencia y usa el simulador antes de decidir si vale las horas.';
+}
+
+var ICO = {
+  ok:   '<svg viewBox="0 0 20 20" fill="none" stroke="#1A7F52" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M6 10.5l2.5 2.5L14 7"/></svg>',
+  warn: '<svg viewBox="0 0 20 20" fill="none" stroke="#8A5B0B" stroke-width="2" aria-hidden="true"><path d="M10 2.5L18.5 17.5H1.5z"/><path d="M10 8v3.5"/><path d="M10 14.2v.1"/></svg>',
+  mal:  '<svg viewBox="0 0 20 20" fill="none" stroke="#C0362C" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M7 7l6 6M13 7l-6 6"/></svg>'
+};
+var TXT = { ok:'Cumples', warn:'Ojo', mal:'No cumples' };
+
+function construirRequisitos(L, m) {
+  var p = S.perfil, r = [];
+  r.push({ e:'ok', t:'Inscripción vigente en el Registro de Proveedores (ChileProveedores)', f:'Bases administrativas, punto 4.1 · Tu inscripción vence el 30/11/2026' });
+  r.push({ e: p.trab >= L.minTrab ? 'ok' : 'mal',
+           t:'Dotación mínima: ' + L.minTrab + ' trabajadores',
+           f:'Bases técnicas, punto 5.4 · Declaras ' + p.trab + (p.trab >= L.minTrab ? ' — cumples' : ' — INADMISIBLE') });
+  r.push({ e: p.cap >= L.minCap ? 'ok' : 'mal',
+           t:'Capital de trabajo acreditado ≥ ' + CLP(L.minCap),
+           f:'Bases administrativas, punto 6.3 · Acreditas ' + CLP(p.cap) + (p.cap >= L.minCap ? ' — cumples' : ' — INADMISIBLE') });
+  r.push({ e: p.con >= L.minCon ? 'ok' : 'warn',
+           t:'Experiencia: mínimo ' + L.minCon + ' contratos similares en los últimos 5 años',
+           f:'Bases técnicas, punto 7.2 · Tienes ' + p.con + ' contratos públicos ejecutados' });
+  L.certs.forEach(function (c) {
+    var tiene = p.certs.indexOf(c) >= 0;
+    r.push({ e: tiene ? 'ok' : 'mal',
+             t: NOM_CERT[c] + ' vigente',
+             f:'Bases técnicas, punto 7.7 · ' + (tiene ? 'Adjunta tu certificado' : 'NO la tienes — es puntaje que pierdes completo') });
+  });
+  r.push({ e:'warn',
+           t:'Garantía de seriedad de la oferta: ' + CLP(L.monto * 0.03) + ' (3% del presupuesto)',
+           f:'Bases administrativas, punto 9 · Boleta bancaria, póliza o vale vista. Pídela HOY: el banco demora 48 hrs.' });
+  r.push({ e:'ok', t:'Declaración jurada de no inhabilidad (Art. 4 Ley 19.886)', f:'Anexo N°2 · Adjudate lo genera y prellena con tu RUT' });
+  r.push({ e:'ok', t:'Certificado de antecedentes laborales y previsionales (F30-1)', f:'Bases administrativas, punto 5.2 · Se solicita en la Dirección del Trabajo' });
+  return r;
+}
+
+/* ---------- Simulador de precio ---------- */
+function renderSimulador(L, m) {
+  var pesoPrecio = L.pauta[0][1];
+  var refMin = Math.min.apply(null, L.hist.map(function (h) { return h.m; }));
+  var sugerido = Math.round(refMin * 0.985 / 100000) * 100000;
+  if (!S.oferta || S.oferta > L.monto * 1.05 || S.oferta < L.monto * 0.6) S.oferta = sugerido;
+
+  document.getElementById('p-precio').innerHTML =
+    '<p class="nota" style="margin-bottom:var(--sp-s)">Mueve tu oferta y mira el puntaje ponderado contra los competidores que históricamente se presentan. El puntaje de precio se calcula con la fórmula estándar de Mercado Público: <b class="mono">precio_menor / tu_precio × ' + pesoPrecio + '</b>.</p>' +
+    '<div class="grid g2">' +
+      '<div class="ficha">' +
+        '<p class="ficha-h">Tu oferta económica</p>' +
+        '<p class="valor" id="ofertaVal">' + CLP(S.oferta) + '</p>' +
+        '<p class="nota" id="ofertaPct" style="margin-bottom:.6rem"></p>' +
+        '<input type="range" id="ofertaRange" min="' + Math.round(L.monto * 0.65) + '" max="' + L.monto + '" step="100000" value="' + S.oferta + '">' +
+        '<div style="display:flex; justify-content:space-between" class="nota">' +
+          '<span>' + CLP(L.monto * 0.65) + '</span><span>presupuesto: ' + CLP(L.monto) + '</span>' +
+        '</div>' +
+        '<div style="margin-top:var(--sp-m); border-top:1px solid var(--rule); padding-top:var(--sp-s)">' +
+          '<p class="nota" id="ofertaMargen"></p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ficha">' +
+        '<p class="ficha-h">Puntaje ponderado estimado</p>' +
+        '<div id="simBarras"></div>' +
+        '<div style="margin-top:var(--sp-m); border-top:1px solid var(--rule); padding-top:var(--sp-s)">' +
+          '<p id="simVeredicto" class="nota"></p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var range = document.getElementById('ofertaRange');
+  range.addEventListener('input', function () { S.oferta = +range.value; calcularSim(L, m); });
+  calcularSim(L, m);
+}
+
+function calcularSim(L, m) {
+  var pesoPrecio = L.pauta[0][1];
+  var restoPeso = 100 - pesoPrecio;
+
+  // Competidores: los históricos, con su precio típico y su puntaje no-precio estimado.
+  var comps = L.hist.slice(0, 3).filter(function (h) { return !h.yo; }).map(function (h) {
+    return { n: h.e, precio: h.m, noPrecio: 0.82 };
+  });
+  if (comps.length < 2) comps.push({ n:'Oferente nuevo (estimado)', precio: Math.round(L.monto * 0.93), noPrecio: 0.7 });
+
+  // Mi puntaje no-precio sale del match: experiencia + certificaciones + dotación.
+  var miNoPrecio = Math.min(1, m.s / 100 + 0.08);
+
+  var todos = comps.concat([{ n:'Aliwén Servicios SpA (tú)', precio: S.oferta, noPrecio: miNoPrecio, yo:true }]);
+  var menor = Math.min.apply(null, todos.map(function (c) { return c.precio; }));
+
+  todos.forEach(function (c) {
+    c.pPrecio = menor / c.precio * pesoPrecio;
+    c.pResto = c.noPrecio * restoPeso;
+    c.total = c.pPrecio + c.pResto;
+  });
+  todos.sort(function (a, b) { return b.total - a.total; });
+
+  var yo = todos.find(function (c) { return c.yo; });
+  var pos = todos.indexOf(yo) + 1;
+  var maxTotal = todos[0].total;
+
+  document.getElementById('ofertaVal').textContent = CLP(S.oferta);
+  document.getElementById('ofertaPct').innerHTML = '<b>' + Math.round(S.oferta / L.monto * 100) + '%</b> del presupuesto disponible';
+
+  var costoEstimado = Math.round(L.monto * 0.72);
+  var margen = (S.oferta - costoEstimado) / S.oferta * 100;
+  document.getElementById('ofertaMargen').innerHTML =
+    'Con tu costo estimado de ' + CLP(costoEstimado) + ', este precio te deja un margen bruto de ' +
+    '<b style="color:' + (margen < 8 ? 'var(--acento)' : margen < 15 ? 'var(--alerta)' : 'var(--ok)') + '">' + margen.toFixed(1) + '%</b>. ' +
+    (margen < 8 ? 'Estás regalando la pega. Ganar así es peor que perder.' : margen < 15 ? 'Justo, pero viable.' : 'Margen sano.');
+
+  document.getElementById('simBarras').innerHTML = todos.map(function (c) {
+    return '<div class="sim-bar ' + (c.yo ? 'yo' : '') + '">' +
+      '<span class="n">' + c.n + '</span>' +
+      '<span class="t"><i style="width:' + (c.total / 100 * 100) + '%"></i></span>' +
+      '<span class="p">' + c.total.toFixed(1) + '</span></div>';
+  }).join('');
+
+  /* ¿Con cuánto precio alcanzo al líder? El puntaje de precio tiene techo: aunque
+     regale la pega, no puedo pasar de `pesoPrecio` puntos. Si el líder me saca más
+     que eso en los otros criterios, el descuento NO me alcanza y hay que decirlo. */
+  var msg;
+  if (pos === 1) {
+    msg = '<b style="color:var(--ok)">Quedas 1°</b> con ' + yo.total.toFixed(1) + ' puntos, ' +
+          (yo.total - todos[1].total).toFixed(1) + ' sobre el segundo.';
+  } else {
+    var precioNecesario = maxTotal - yo.pResto;       // puntos de precio que necesito
+    if (precioNecesario > pesoPrecio) {
+      msg = '<b style="color:var(--acento)">Quedas ' + pos + '°</b>, y <b>no lo puedes arreglar bajando el precio</b>: ' +
+            'aunque ofertaras $1, el precio sólo vale ' + pesoPrecio + ' puntos y te seguirían faltando ' +
+            (precioNecesario - pesoPrecio).toFixed(1) + '. Esta licitación se gana con experiencia y certificaciones, no con descuento.';
+    } else {
+      // menorRival = el precio más bajo entre los competidores
+      var menorRival = Math.min.apply(null, todos.filter(function (c) { return !c.yo; }).map(function (c) { return c.precio; }));
+      var objetivo = Math.floor(menorRival * pesoPrecio / precioNecesario / 100000) * 100000;
+      objetivo = Math.min(objetivo, menorRival);      // por debajo del rival más barato, el precio ya me da el máximo
+      msg = '<b style="color:var(--acento)">Quedas ' + pos + '°</b>. Te faltan ' + (maxTotal - yo.total).toFixed(1) + ' puntos. ' +
+            'Tendrías que ofertar <b>' + CLP(objetivo) + '</b> o menos para alcanzar al primero — ' +
+            'mueve el control y mira si el margen te lo permite.';
+    }
+  }
+  document.getElementById('simVeredicto').innerHTML = msg +
+    '<br><br>Tu puntaje no-precio es <b>' + yo.pResto.toFixed(1) + '/' + restoPeso + '</b>: eso lo suben la experiencia y las certificaciones, no el descuento.';
+}
+
+/* ===================== TALLER ===================== */
+var DOCS_BASE = [
+  { k:'anexo1', n:'Anexo N°1 — Identificación del oferente', d:'Prellenado con tu RUT, razón social y representante legal.', tipo:'auto' },
+  { k:'anexo2', n:'Anexo N°2 — Declaración jurada de no inhabilidad', d:'Art. 4 Ley 19.886. Se genera y va a firma electrónica.', tipo:'auto' },
+  { k:'anexo3', n:'Anexo N°3 — Experiencia del oferente', d:'Se arma con tus contratos ejecutados en Mercado Público.', tipo:'ia' },
+  { k:'tecnica', n:'Propuesta técnica', d:'El documento que realmente evalúan. Lo redacta la IA con tus datos.', tipo:'ia' },
+  { k:'anexo4', n:'Anexo N°4 — Oferta económica', d:'Toma el monto del simulador de precio.', tipo:'auto' },
+  { k:'garantia', n:'Boleta de garantía de seriedad', d:'La emite tu banco. Adjudate genera la solicitud.', tipo:'externo' },
+  { k:'f301', n:'Certificado F30-1 (Dirección del Trabajo)', d:'Antecedentes laborales y previsionales. Vigencia 30 días.', tipo:'externo' }
+];
+
+function abrirTaller(L) {
+  if (!S.docs[L.id]) {
+    S.docs[L.id] = {};
+    DOCS_BASE.forEach(function (d) { S.docs[L.id][d.k] = { estado:'pendiente', texto:'' }; });
+  }
+  document.getElementById('tallerTit').textContent = L.t;
+  document.getElementById('tallerSub').innerHTML = L.id + ' · ' + L.org + ' · Cierra en <b>' + L.cierre + ' días</b> · Oferta: <b>' + CLP(S.oferta || Math.round(L.monto * 0.9)) + '</b>';
+  if (!S.oferta) S.oferta = Math.round(L.monto * 0.9);
+  habilitar('taller'); marcarHecho('lic');
+  renderDocs(L);
+  ir('taller');
+}
+
+function docsListos() {
+  if (!S.activa || !S.docs[S.activa]) return 0;
+  var d = S.docs[S.activa];
+  return DOCS_BASE.filter(function (x) { return d[x.k].estado === 'listo'; }).length;
+}
+
+function renderDocs(L) {
+  var st = S.docs[L.id];
+  var cont = document.getElementById('docs');
+
+  cont.innerHTML = DOCS_BASE.map(function (d) {
+    var e = st[d.k].estado;
+    var pill = e === 'listo' ? '<span class="pill ok">Listo</span>'
+             : e === 'generando' ? '<span class="pill warn">Generando…</span>'
+             : '<span class="pill neu">Pendiente</span>';
+
+    var acc = '';
+    if (d.tipo === 'auto') {
+      acc = e === 'listo'
+        ? '<button class="mini" data-ver-doc="' + d.k + '">Ver</button>'
+        : '<button class="mini" data-gen="' + d.k + '" style="background:var(--ink);color:var(--papel);border-color:var(--ink)">Generar</button>';
+    } else if (d.tipo === 'ia') {
+      acc = '<button class="mini" data-gen="' + d.k + '" ' + (e === 'generando' ? 'disabled' : '') +
+            ' style="background:var(--acento);color:#fff;border-color:var(--acento)">' +
+            (e === 'listo' ? 'Regenerar con IA' : 'Redactar con IA') + '</button>' +
+            (e === 'listo' ? '<button class="mini" data-ver-doc="' + d.k + '">Editar</button>' : '');
+    } else {
+      acc = e === 'listo'
+        ? '<button class="mini on" data-quitar="' + d.k + '">Cargado ✓</button>'
+        : '<button class="mini" data-cargar="' + d.k + '">Marcar como obtenido</button>' +
+          (d.k === 'garantia' ? '<button class="mini" data-solicitar="1">Generar solicitud al banco</button>' : '');
+    }
+
+    return '' +
+    '<div class="doc' + (st[d.k].abierto ? ' abierto' : '') + '" id="doc-' + d.k + '">' +
+      '<div class="doc-h">' +
+        '<div class="doc-n">' + d.n + '<em>' + d.d + '</em></div>' +
+        '<div class="doc-acc">' + pill + acc + '</div>' +
+      '</div>' +
+      '<div class="doc-c">' +
+        '<textarea rows="10" data-texto="' + d.k + '" aria-label="Contenido de ' + d.n + '">' + (st[d.k].texto || '') + '</textarea>' +
+        '<p class="nota" style="margin-top:.5rem">Editable. Lo que escribas acá es lo que va al PDF. La IA redacta; tú firmas.</p>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var listos = docsListos();
+  document.getElementById('avanceTxt').textContent = listos + ' / ' + DOCS_BASE.length;
+  var bar = document.getElementById('avanceBar');
+  bar.style.width = (listos / DOCS_BASE.length * 100) + '%';
+  bar.parentElement.classList.toggle('verde', listos === DOCS_BASE.length);
+
+  cont.querySelectorAll('[data-gen]').forEach(function (b) {
+    b.addEventListener('click', function () { generar(L, b.dataset.gen); });
+  });
+  cont.querySelectorAll('[data-cargar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      st[b.dataset.cargar].estado = 'listo';
+      toast('Documento marcado como obtenido.');
+      renderDocs(L); barraAccion();
+    });
+  });
+  cont.querySelectorAll('[data-quitar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      st[b.dataset.quitar].estado = 'pendiente';
+      renderDocs(L); barraAccion();
+    });
+  });
+  cont.querySelectorAll('[data-ver-doc]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      st[b.dataset.verDoc].abierto = !st[b.dataset.verDoc].abierto;
+      renderDocs(L);
+    });
+  });
+  cont.querySelectorAll('[data-solicitar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      toast('Solicitud de boleta por ' + CLP(L.monto * 0.03) + ' generada.<br>Descárgala y llévala a tu ejecutivo. Demora ~48 hrs.');
+    });
+  });
+  cont.querySelectorAll('[data-texto]').forEach(function (t) {
+    t.addEventListener('input', function () { st[t.dataset.texto].texto = t.value; });
+  });
+}
+
+/* Redacción simulada: escribe token a token, como lo haría un stream real. */
+function generar(L, k) {
+  var st = S.docs[L.id];
+  var d = DOCS_BASE.find(function (x) { return x.k === k; });
+  var texto = plantilla(L, k);
+
+  st[k].estado = 'generando';
+  st[k].abierto = true;
+  st[k].texto = '';
+  renderDocs(L);
+
+  var ta = document.querySelector('[data-texto="' + k + '"]');
+  var palabras = texto.split(' ');
+  var i = 0;
+  var vel = d.tipo === 'ia' ? 22 : 6;
+
+  (function paso() {
+    if (i >= palabras.length) {
+      st[k].estado = 'listo';
+      renderDocs(L); barraAccion();
+      var listos = docsListos();
+      if (listos === DOCS_BASE.length) {
+        toast('Expediente completo. Ya puedes pasar al chequeo de formalismos.');
+        habilitar('chequeo');
+      } else {
+        toast(d.tipo === 'ia' ? 'Redactado. Revísalo y edítalo — es tu firma la que va.' : 'Documento generado.');
+      }
+      return;
+    }
+    st[k].texto += (i ? ' ' : '') + palabras[i];
+    if (ta) { ta.value = st[k].texto; ta.scrollTop = ta.scrollHeight; }
+    i += Math.random() < 0.4 ? 2 : 1;
+    setTimeout(paso, vel);
+  })();
+}
+
+function plantilla(L, k) {
+  var p = S.perfil;
+  var oferta = S.oferta || Math.round(L.monto * 0.9);
+  if (k === 'anexo1') {
+    return 'ANEXO N°1 — IDENTIFICACIÓN DEL OFERENTE\n\n' +
+      'Licitación: ' + L.id + '\nOrganismo: ' + L.org + '\n\n' +
+      'Razón social: Aliwén Servicios SpA\nRUT: 76.543.210-K\n' +
+      'Domicilio: Avenida Pajaritos 3540, Maipú, Región Metropolitana\n' +
+      'Representante legal: Rodrigo Sepúlveda Contreras, RUT 13.482.905-6\n' +
+      'Teléfono: +56 9 8432 1176\nCorreo: licitaciones@aliwenservicios.cl\n' +
+      'Tamaño de empresa: Pequeña (ventas anuales $780.000.000)\n' +
+      'Inscripción ChileProveedores: vigente hasta el 30/11/2026';
+  }
+  if (k === 'anexo2') {
+    return 'ANEXO N°2 — DECLARACIÓN JURADA SIMPLE DE NO INHABILIDAD\n\n' +
+      'Rodrigo Sepúlveda Contreras, RUT 13.482.905-6, en representación de Aliwén Servicios SpA, RUT 76.543.210-K, ' +
+      'declara bajo juramento que su representada NO se encuentra afecta a ninguna de las inhabilidades del artículo 4° de la Ley N°19.886 ' +
+      'de Bases sobre Contratos Administrativos de Suministro y Prestación de Servicios; que no ha sido condenada por prácticas antisindicales ' +
+      'ni infracción a los derechos fundamentales del trabajador dentro de los dos años anteriores; y que no registra saldos insolutos de ' +
+      'remuneraciones o cotizaciones de seguridad social con sus actuales trabajadores.\n\n' +
+      'Maipú, ' + new Date().toLocaleDateString('es-CL') + '.\n\n[Pendiente de firma electrónica avanzada]';
+  }
+  if (k === 'anexo4') {
+    return 'ANEXO N°4 — OFERTA ECONÓMICA\n\n' +
+      'Licitación: ' + L.id + '\n\n' +
+      'Valor total ofertado (neto, impuestos incluidos según bases): ' + CLP(oferta) + '\n' +
+      'Equivalente a ' + Math.round(oferta / L.monto * 100) + '% del presupuesto disponible (' + CLP(L.monto) + ').\n' +
+      'Plazo de validez de la oferta: 90 días corridos.\n' +
+      'La oferta incluye la totalidad de los servicios, insumos, personal, maquinaria, traslados y seguros exigidos en las bases técnicas, ' +
+      'sin costos adicionales para el mandante.';
+  }
+  if (k === 'anexo3') {
+    return 'ANEXO N°3 — EXPERIENCIA DEL OFERENTE\n\n' +
+      'Aliwén Servicios SpA acredita ' + p.con + ' contratos públicos ejecutados y recepcionados conforme en los últimos cinco años, ' +
+      'todos verificables en la plataforma de Mercado Público.\n\n' +
+      'CONTRATOS RELEVANTES PARA ESTA LICITACIÓN:\n\n' +
+      L.hist.filter(function (h) { return h.yo; }).map(function (h) {
+        return '· ' + L.org + ' — servicio equivalente, ' + CLP(h.m) + ', adjudicado en ' + h.f + '. Recepción conforme, sin multas.';
+      }).join('\n') +
+      '\n· I. Municipalidad de Maipú — mantención de recintos municipales, $18.100.000, oct 2024. Recepción conforme.\n' +
+      '· SLEP Barrancas — mantención correctiva de establecimientos, $29.900.000, sep 2024. Recepción conforme.\n' +
+      '· I. Municipalidad de Cerro Navia — aseo de sitios eriazos, $14.300.000, nov 2024. Recepción conforme.\n\n' +
+      'La empresa no registra multas, cobros de garantía ni términos anticipados de contrato en su historial como proveedora del Estado.';
+  }
+  // Propuesta técnica: el documento que de verdad se evalúa.
+  return 'PROPUESTA TÉCNICA\n' + L.t + '\nLicitación ' + L.id + ' — ' + L.org + '\n\n' +
+    '1. COMPRENSIÓN DEL SERVICIO REQUERIDO\n\n' +
+    'Aliwén Servicios SpA comprende que ' + L.org + ' requiere ' + L.t.toLowerCase() + ' en la comuna de ' + L.comuna +
+    ', con los estándares de calidad y los plazos de respuesta establecidos en las bases técnicas. ' +
+    'Nuestra propuesta se estructura sobre tres pilares: dotación permanente en terreno, supervisión con reporte verificable, ' +
+    'y capacidad de respuesta ante requerimientos de emergencia dentro del plazo comprometido.\n\n' +
+    '2. METODOLOGÍA DE TRABAJO\n\n' +
+    'Se dispondrá de una cuadrilla base de ' + Math.max(L.minTrab, Math.min(p.trab, L.minTrab + 4)) + ' personas, con un supervisor de turno con título técnico ' +
+    'y experiencia acreditada en servicios equivalentes. La programación de faenas se entregará mensualmente por adelantado y se ' +
+    'controlará mediante reporte fotográfico georreferenciado y registro digital de asistencia, disponible para la contraparte técnica ' +
+    'en línea y sin costo adicional.\n\n' +
+    '3. EQUIPAMIENTO Y RECURSOS COMPROMETIDOS\n\n' +
+    'La empresa dispone de equipamiento propio, sin dependencia de arriendos de terceros para la operación base, lo que permite ' +
+    'garantizar continuidad del servicio. El detalle del inventario, con año y estado de cada equipo, se adjunta como documento anexo.\n\n' +
+    '4. PLAN DE CONTINGENCIA\n\n' +
+    'Ante emergencias o requerimientos fuera de programa, Aliwén compromete presencia en terreno dentro de las horas hábiles establecidas ' +
+    'en las bases, con una cuadrilla de reemplazo disponible y un canal directo con el supervisor de contrato.\n\n' +
+    '5. EXPERIENCIA COMPROBABLE\n\n' +
+    'La empresa registra ' + p.con + ' contratos públicos ejecutados y recepcionados conforme, sin multas ni cobros de garantía. ' +
+    (L.hist.some(function (h) { return h.yo; })
+      ? 'Entre ellos, un contrato previo con este mismo organismo, ejecutado sin observaciones.'
+      : 'Toda la experiencia es verificable directamente en Mercado Público.') +
+    '\n\n— — —\nRedactado por Adjudate con los datos cargados por la empresa. ' +
+    'No se ha incorporado ninguna afirmación que no esté respaldada por un documento en tu biblioteca. Revisa, ajusta el tono y firma.';
+}
+
+/* ===================== CHEQUEO ===================== */
+function correrChecks() {
+  var L = LICITACIONES.find(function (x) { return x.id === S.activa; });
+  var m = score(L);
+  var st = S.docs[L.id] || {};
+  var p = S.perfil;
+  var checks = [], bloqueos = [];
+
+  DOCS_BASE.forEach(function (d) {
+    var listo = st[d.k] && st[d.k].estado === 'listo';
+    checks.push({ e: listo ? 'ok' : 'mal', t: d.n, f: listo ? 'Incluido en el expediente' : 'FALTA — sin esto la oferta se declara inadmisible' });
+    if (!listo) bloqueos.push(d.n);
+  });
+
+  var admisible = p.trab >= L.minTrab && p.cap >= L.minCap;
+  checks.push({
+    e: admisible ? 'ok' : 'mal',
+    t: 'Requisitos de admisibilidad (dotación y capital de trabajo)',
+    f: admisible ? 'Cumples las restricciones duras de las bases'
+                 : 'NO cumples: piden ' + L.minTrab + ' trabajadores y ' + CLP(L.minCap) + ' de capital. Te declaran inadmisible antes de evaluar.'
+  });
+  if (!admisible) bloqueos.push('Requisitos de admisibilidad');
+
+  checks.push({ e:'ok', t:'Inscripción vigente en ChileProveedores', f:'Vence el 30/11/2026 — vigente al cierre de esta licitación' });
+  checks.push({ e:'ok', t:'Sin sanciones vigentes en el Registro de Proveedores', f:'Consultado hoy: sin anotaciones' });
+
+  var ofertaOk = S.oferta && S.oferta <= L.monto;
+  checks.push({
+    e: ofertaOk ? 'ok' : 'mal',
+    t: 'Oferta económica dentro del presupuesto disponible',
+    f: ofertaOk ? CLP(S.oferta) + ' vs. presupuesto ' + CLP(L.monto) : 'Tu oferta supera el presupuesto: se rechaza automáticamente'
+  });
+  if (!ofertaOk) bloqueos.push('Oferta sobre el presupuesto');
+
+  checks.push({
+    e: L.cierre <= 2 ? 'warn' : 'ok',
+    t: 'Plazo: quedan ' + L.cierre + ' días para el cierre',
+    f: L.cierre <= 2 ? 'Muy justo. La boleta de garantía demora ~48 hrs en el banco.' : 'Alcanzas con holgura si empiezas hoy.'
+  });
+
+  if (m.certFalta.length) {
+    checks.push({
+      e:'warn',
+      t:'Te falta ' + m.certFalta.map(function (c) { return NOM_CERT[c]; }).join(' y '),
+      f:'No es causal de inadmisibilidad, pero pierdes el puntaje completo de ese criterio. Puedes enviar igual.'
+    });
+  }
+
+  return { checks: checks, bloqueos: bloqueos };
+}
+
+function renderChequeo() {
+  var r = correrChecks();
+  document.getElementById('chkResumen').innerHTML = r.bloqueos.length
+    ? '<b style="color:var(--acento)">' + r.bloqueos.length + ' bloqueo(s)</b>'
+    : '<b style="color:var(--ok)">Sin bloqueos</b>';
+
+  document.getElementById('checks').innerHTML = r.checks.map(function (c) {
+    return '<div class="check">' + ICO[c.e] + '<p>' + c.t + '<em>' + c.f + '</em></p>' +
+      '<span class="pill ' + c.e + '">' + (c.e === 'ok' ? 'OK' : c.e === 'warn' ? 'Ojo' : 'Bloquea') + '</span></div>';
+  }).join('');
+
+  document.getElementById('chkAyuda').innerHTML = r.bloqueos.length
+    ? '<div class="ficha" style="border-color:var(--acento)">' +
+        '<p class="ficha-h" style="color:var(--acento)">No te vamos a dejar enviar así</p>' +
+        '<p style="color:var(--ink-2)">Faltan: <b>' + r.bloqueos.join(', ') + '</b>. ' +
+        'Este es exactamente el momento en que una PYME chilena pierde una licitación que podía ganar. Vuelve al taller y ciérralo.</p>' +
+        '<button class="btn" id="volverTaller" style="margin-top:var(--sp-s)">&larr; Volver al taller</button>' +
+      '</div>'
+    : '<div class="ficha" style="border-color:var(--ok)">' +
+        '<p class="ficha-h" style="color:var(--ok)">Expediente en orden</p>' +
+        '<p style="color:var(--ink-2)">Todo lo que puede eliminarte por formalismo está resuelto. Genera el paquete y súbelo a Mercado Público.</p>' +
+        '<button class="btn" id="btnEnviar" style="margin-top:var(--sp-s)">Generar paquete &rarr;</button>' +
+      '</div>';
+
+  var vt = document.getElementById('volverTaller');
+  if (vt) vt.addEventListener('click', function () { ir('taller'); });
+  var be = document.getElementById('btnEnviar');
+  if (be) be.addEventListener('click', enviar);
+
+  barraAccion();
+}
+
+/* ===================== ENVÍO ===================== */
+function enviar() {
+  var L = LICITACIONES.find(function (x) { return x.id === S.activa; });
+  S.enviada = true;
+  S.folio = 'ADJ-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 8999);
+  habilitar('envio'); marcarHecho('chequeo'); marcarHecho('taller');
+
+  document.getElementById('envioCont').innerHTML =
+    '<p class="folio"><b>Paso 6</b> · Paquete listo</p>' +
+    '<div style="text-align:center; padding-block: var(--sp-l)">' +
+      '<span class="timbre" style="transform:rotate(-2deg); border-color:var(--ok); color:var(--ok)">Expediente completo</span>' +
+      '<h2 style="margin-block: var(--sp-m) .4rem">7 documentos, foliados y validados.</h2>' +
+      '<p class="nota">Folio interno <b>' + S.folio + '</b> · ' + L.id + ' · ' + CLP(S.oferta) + '</p>' +
+    '</div>' +
+
+    '<div class="ficha" style="border-color:var(--acento); margin-bottom:var(--sp-m)">' +
+      '<p class="ficha-h" style="color:var(--acento)">El último paso es tuyo, y es a propósito</p>' +
+      '<p style="color:var(--ink-2)">Mercado Público <b>no tiene API para enviar ofertas</b>. Nadie puede subirla por ti sin automatizar un navegador contra el portal del Estado, y eso no lo vamos a hacer. ' +
+      'Te dejamos el paquete perfecto y te acompañamos en la subida:</p>' +
+      '<ol class="lista" style="margin-top:var(--sp-s)">' +
+        '<li><span class="n">01</span><div>Descarga el <b>.zip</b> con los 7 documentos, nombrados y foliados según lo que piden las bases.</div></li>' +
+        '<li><span class="n">02</span><div>Entra a <b class="mono">mercadopublico.cl</b> con tu clave, ve a la licitación <b class="mono">' + L.id + '</b> y abre &laquo;Ofertar&raquo;.</div></li>' +
+        '<li><span class="n">03</span><div>Sube cada archivo en la pestaña que corresponde. Adjudate te dice cuál va en cuál.</div></li>' +
+        '<li><span class="n">04</span><div>Ingresa la oferta económica: <b class="mono">' + CLP(S.oferta) + '</b>. Revisa que el monto coincida con el Anexo N°4.</div></li>' +
+        '<li><span class="n">05</span><div>Envía. Guarda el comprobante y márcala como enviada acá abajo.</div></li>' +
+      '</ol>' +
+      '<div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:var(--sp-m)">' +
+        '<button class="btn" id="btnZip">Descargar paquete (.zip)</button>' +
+        '<button class="btn sec" id="btnMarcar">Ya la subí &mdash; marcar como enviada</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="seguimiento"></div>' +
+
+    '<div style="margin-top:var(--sp-l); display:flex; gap:.5rem; flex-wrap:wrap">' +
+      '<button class="btn sec" id="btnOtra">Buscar otra licitación &rarr;</button>' +
+    '</div>';
+
+  document.getElementById('btnZip').addEventListener('click', function () {
+    toast('Paquete <b>' + S.folio + '.zip</b> generado (7 archivos, 4,2 MB).<br>En el demo no se descarga nada real.');
+  });
+  document.getElementById('btnMarcar').addEventListener('click', function () {
+    document.getElementById('seguimiento').innerHTML =
+      '<div class="ficha">' +
+        '<p class="ficha-h">Seguimiento</p>' +
+        '<div class="check">' + ICO.ok + '<p>Oferta enviada<em>Hoy · comprobante Mercado Público registrado</em></p><span class="pill ok">Hecho</span></div>' +
+        '<div class="check">' + ICO.warn + '<p>Apertura de ofertas<em>En ' + L.cierre + ' días · Adjudate te avisa por WhatsApp cuántos oferentes se presentaron</em></p><span class="pill neu">Esperando</span></div>' +
+        '<div class="check">' + ICO.warn + '<p>Evaluación y adjudicación<em>Plazo estimado del organismo: 15 a 30 días corridos</em></p><span class="pill neu">Esperando</span></div>' +
+        '<div class="check">' + ICO.warn + '<p>Resultado<em>Ganes o pierdas, Adjudate guarda el precio ganador y con quién competiste. Eso mejora tu próxima postulación.</em></p><span class="pill neu">Esperando</span></div>' +
+      '</div>';
+    toast('Marcada como enviada. Te avisamos en la apertura.');
+    document.getElementById('seguimiento').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  });
+  document.getElementById('btnOtra').addEventListener('click', function () {
+    S.activa = null; S.oferta = null;
+    ir('feed'); renderFeed();
+  });
+
+  ir('envio');
+  toast('Paquete generado. Falta un paso humano: subirlo.');
+}
+
+/* ===================== Reset ===================== */
+document.getElementById('btnReset').addEventListener('click', function () {
+  if (!confirm('¿Reiniciar el demo con el perfil original?')) return;
+  location.reload();
+});
+
+/* ===================== Arranque ===================== */
+actualizarPerfil();
+renderFeed();
+</script>
+</body>
+</html>

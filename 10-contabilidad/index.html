@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talonio — La boleta que botaste era plata</title>
+<meta name="description" content="Foto de la boleta, la IA extrae los datos, se concilia con tu cartola y el F29 llega pre-armado. Talonio recupera el IVA crédito fiscal que tu PYME bota todos los meses.">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&display=swap">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* --- Hero: una hoja de papel con una boleta encima ---------------------- */
+  .hero { padding-top: var(--sp-l); padding-bottom: var(--sp-l); }
+  .hero-grid { display: grid; gap: var(--sp-l); align-items: center; }
+  .hero h1 { margin-bottom: var(--sp-s); }
+  .hero h1 em { font-style: normal; color: var(--timbre); }
+  .hero-bajada { font-size: var(--step-1); color: var(--tinta-2); line-height: 1.45; max-width: 34ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); margin-top: var(--sp-m); }
+  .hero-nota { margin-top: var(--sp-s); font-family: var(--f-doc); font-size: .78rem; color: var(--tinta-3); }
+
+  /* La escena del hero: boleta real + ficha extraída */
+  .escena { position: relative; display: grid; gap: var(--sp-s); grid-template-columns: 150px 1fr; align-items: start; }
+  .escena .boleta { width: 100%; transform: rotate(-1.6deg); }
+  .ficha {
+    background: var(--papel-2); border: 1px solid var(--linea-2); border-radius: var(--radio);
+    padding: 12px; box-shadow: var(--sombra);
+  }
+  .ficha-hd {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--linea); margin-bottom: 8px;
+  }
+  .ficha-hd b { font-family: var(--f-doc); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tinta-3); font-weight: 400; }
+  .ficha-fila { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: .82rem; border-bottom: 1px dotted var(--linea); }
+  .ficha-fila:last-child { border-bottom: 0; }
+  .ficha-fila > span:first-child { color: var(--tinta-3); }
+  .ficha-fila > span:last-child { font-family: var(--f-doc); font-variant-numeric: tabular-nums; text-align: right; }
+  .ficha-fila.destaca > span:last-child { color: var(--timbre); font-weight: 700; }
+  @media (min-width: 40em) { .escena { grid-template-columns: 180px 1fr; gap: var(--sp-m); } }
+  @media (min-width: 60em) {
+    .hero-grid { grid-template-columns: 1.05fr .95fr; gap: var(--sp-2xl); }
+    .hero { padding-top: var(--sp-2xl); }
+  }
+
+  /* --- La cuenta: el número del dolor ------------------------------------ */
+  .cuenta { background: var(--tinta); color: var(--papel); }
+  .cuenta h2 { color: var(--papel); }
+  .cuenta .eyebrow { color: #A79C88; }
+  .cuenta-grid { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  .calculo {
+    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.14);
+    border-radius: var(--radio); padding: var(--sp-s);
+  }
+  .calculo-fila {
+    display: flex; justify-content: space-between; gap: var(--sp-s); align-items: baseline;
+    padding: 9px 0; border-bottom: 1px dotted rgba(255,255,255,.18); font-size: .88rem;
+  }
+  .calculo-fila:last-of-type { border-bottom: 0; }
+  .calculo-fila span:last-child { font-family: var(--f-doc); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .calculo-tot {
+    display: flex; justify-content: space-between; gap: var(--sp-s); align-items: baseline;
+    border-top: 3px double rgba(255,255,255,.35); margin-top: 8px; padding-top: 12px;
+  }
+  .calculo-tot b { font-size: .82rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+  .calculo-tot .cifra { font-size: var(--step-2); color: #F0836A; font-weight: 700; }
+  .cuenta-nota { font-size: .84rem; color: #B8AE9B; margin-top: var(--sp-s); line-height: 1.55; }
+  .cuenta-nota b { color: var(--papel); }
+  @media (min-width: 60em) { .cuenta-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-xl); } }
+
+  /* --- Cómo funciona: 4 pasos como asientos de libro --------------------- */
+  .pasos { counter-reset: p; display: grid; gap: 0; margin-top: var(--sp-m); }
+  .paso {
+    counter-increment: p; display: grid; grid-template-columns: 40px 1fr; gap: var(--sp-s);
+    padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea-2); align-items: start;
+  }
+  .paso:first-child { border-top: 1px solid var(--linea-2); }
+  .paso::before {
+    content: counter(p, decimal-leading-zero);
+    font-family: var(--f-doc); font-size: .8rem; color: var(--timbre); font-weight: 700;
+    padding-top: 3px;
+  }
+  .paso h3 { margin-bottom: 4px; }
+  .paso p { color: var(--tinta-2); font-size: .92rem; }
+  @media (min-width: 48em) {
+    .paso { grid-template-columns: 56px 1.1fr 1fr; align-items: center; }
+    .paso-art { display: block; }
+  }
+  .paso-art { display: none; }
+
+  /* --- Bloque "en vivo" --------------------------------------------------- */
+  .vivo { background: var(--papel-2); border-block: 1px solid var(--linea-2); }
+  .vivo-caja {
+    display: grid; gap: var(--sp-s); margin-top: var(--sp-m);
+    border: 1px solid var(--linea-2); border-radius: var(--radio);
+    background: var(--papel); padding: var(--sp-s);
+  }
+  .vivo-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab {
+    min-height: 44px; padding: 0 12px; border: 1px solid var(--linea-2);
+    border-radius: var(--radio); background: var(--papel-2);
+    font-size: .82rem; font-weight: 600; color: var(--tinta-2);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .tab[aria-selected="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--papel-2); }
+  .tab:hover:not([aria-selected="true"]) { background: var(--papel-3); }
+  .vivo-panel { display: grid; gap: var(--sp-s); grid-template-columns: 132px 1fr; align-items: start; }
+  .vivo-panel .boleta { width: 100%; }
+  @media (min-width: 40em) { .vivo-panel { grid-template-columns: 170px 1fr; gap: var(--sp-m); } }
+  .barra-conf { height: 4px; background: var(--papel-3); border-radius: 999px; overflow: hidden; margin-top: 5px; }
+  .barra-conf i { display: block; height: 100%; background: var(--ok); border-radius: 999px; }
+  .barra-conf.baja i { background: var(--duda); }
+  .veredicto {
+    margin-top: 10px; padding: 10px 12px; border-radius: var(--radio);
+    font-size: .84rem; line-height: 1.5; display: flex; gap: 9px; align-items: flex-start;
+  }
+  .veredicto svg { flex: none; margin-top: 2px; }
+  .veredicto--ok   { background: var(--ok-lav);     color: #1F4A22; border: 1px solid #BFD3B8; }
+  .veredicto--duda { background: var(--duda-lav);   color: #5E3D04; border: 1px solid #E0C58B; }
+  .veredicto--malo { background: var(--timbre-lav); color: #7E2110; border: 1px solid #E5B7A8; }
+  .veredicto b { display: block; margin-bottom: 2px; }
+
+  /* --- Precios ------------------------------------------------------------ */
+  .precios { display: grid; gap: var(--sp-s); margin-top: var(--sp-m); }
+  @media (min-width: 52em) { .precios { grid-template-columns: 1fr 1fr; gap: var(--sp-m); } }
+  .plan { background: var(--papel-2); border: 1px solid var(--linea-2); border-radius: var(--radio); padding: var(--sp-m); display: flex; flex-direction: column; }
+  .plan--destaca { border: 2px solid var(--timbre); position: relative; }
+  .plan-tag {
+    position: absolute; top: -11px; left: var(--sp-m);
+    background: var(--timbre); color: #fff; font-family: var(--f-doc);
+    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+    padding: 3px 8px; border-radius: 2px;
+  }
+  .plan h3 { font-size: var(--step-1); }
+  .plan-quien { font-size: .84rem; color: var(--tinta-3); margin-top: 2px; margin-bottom: var(--sp-s); }
+  .plan-precio { font-family: var(--f-doc); font-size: var(--step-3); font-weight: 700; line-height: 1; }
+  .plan-precio small { font-family: var(--f-ui); font-size: .82rem; font-weight: 400; color: var(--tinta-3); display: block; margin-top: 6px; letter-spacing: 0; }
+  .plan-tramos { margin: var(--sp-s) 0; border-top: 1px solid var(--linea); }
+  .plan-tramos div { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--linea); font-size: .85rem; }
+  .plan-tramos span:last-child { font-family: var(--f-doc); font-weight: 700; }
+  .plan ul { margin-top: var(--sp-s); flex: 1; }
+  .plan .btn { margin-top: var(--sp-m); width: 100%; }
+
+  /* --- FAQ ---------------------------------------------------------------- */
+  .faq { border-top: 1px solid var(--linea-2); margin-top: var(--sp-m); }
+  .faq details { border-bottom: 1px solid var(--linea-2); }
+  .faq summary {
+    padding: var(--sp-s) 34px var(--sp-s) 0; cursor: pointer; position: relative;
+    font-weight: 600; font-size: 1rem; list-style: none; min-height: 44px;
+    display: flex; align-items: center;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: ""; position: absolute; right: 8px; top: 50%; width: 9px; height: 9px;
+    border-right: 2px solid var(--timbre); border-bottom: 2px solid var(--timbre);
+    transform: translateY(-70%) rotate(45deg); transition: transform .18s ease;
+  }
+  .faq details[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
+  .faq-r { padding: 0 0 var(--sp-s); color: var(--tinta-2); font-size: .94rem; line-height: 1.6; max-width: var(--measure); }
+  .faq-r p + p { margin-top: var(--sp-2xs); }
+
+  /* --- Cierre ------------------------------------------------------------- */
+  .cierre { background: var(--tinta); color: var(--papel); text-align: center; }
+  .cierre h2 { color: var(--papel); max-width: 20ch; margin-inline: auto; }
+  .cierre p { color: #B8AE9B; margin-top: var(--sp-s); max-width: 46ch; margin-inline: auto; }
+  .cierre .hero-cta { justify-content: center; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M4 2.5h11.5l3 3V19a.5.5 0 0 1-.76.43L16 18.2l-1.9 1.25a.5.5 0 0 1-.55 0L11.6 18.2 9.7 19.45a.5.5 0 0 1-.55 0L7.25 18.2l-1.9 1.25A.5.5 0 0 1 4.6 19V3.1a.6.6 0 0 1 .6-.6Z" stroke="#17140F" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7.6 7.4h7.2M7.6 10.6h7.2M7.6 13.8h4.2" stroke="#C1391C" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Talonio
+    </a>
+    <button class="nav-toggle" id="navBtn" aria-expanded="false" aria-controls="navLinks">
+      Menú
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1 3h11M1 6.5h11M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow eyebrow--timbre">Contabilidad PYME · Chile</p>
+        <h1>La boleta que botaste <em>era plata.</em></h1>
+        <p class="hero-bajada">
+          Le sacas una foto. Talonio lee el monto, el RUT y el IVA, la calza contra tu
+          cartola y la deja adentro del F29. Tu contador sólo revisa y presenta.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn--timbre" href="demo/index.html">
+            Ver el demo funcionando
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2 7.5h11M9 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--fant" href="#precios">Precios</a>
+        </div>
+        <p class="hero-nota">
+          Sin instalar nada. La foto se saca del teléfono, en el mesón, antes de que la boleta se pierda.
+        </p>
+      </div>
+
+      <div class="escena">
+        <!-- Boleta real, dibujada en HTML: papel térmico con corte dentado -->
+        <div class="boleta" aria-hidden="true">
+          <div class="boleta-hd">
+            <b>Ferretería El Roble</b>
+            SAN BERNARDO<br>
+            R.U.T. 76.112.884-5
+          </div>
+          <div class="boleta-sep"></div>
+          <div style="text-align:center;font-weight:700;letter-spacing:.08em">BOLETA ELECTRÓNICA<br>N° 0004512</div>
+          <div class="boleta-sep"></div>
+          <div class="boleta-fila"><span>Disco corte 7"</span><span>18.900</span></div>
+          <div class="boleta-fila"><span>Electrodo 6011 x5</span><span>24.500</span></div>
+          <div class="boleta-fila"><span>Guantes cabritilla</span><span>12.900</span></div>
+          <div class="boleta-fila"><span>Silicona ferret.</span><span>15.100</span></div>
+          <div class="boleta-sep"></div>
+          <div class="boleta-fila boleta-tot"><span>TOTAL</span><span>$ 71.400</span></div>
+          <div class="boleta-sep"></div>
+          <div style="text-align:center">09/06/2026 11:42<br>GRACIAS POR SU COMPRA</div>
+        </div>
+
+        <!-- Lo que Talonio extrae -->
+        <div class="ficha">
+          <div class="ficha-hd">
+            <b>Extraído</b>
+            <span class="pill pill--malo">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M5.5 1.2 10.2 9.5H.8L5.5 1.2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 4.4v2.1M5.5 7.9v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Es boleta
+            </span>
+          </div>
+          <div class="ficha-fila"><span>Proveedor</span><span>Ferretería El Roble</span></div>
+          <div class="ficha-fila"><span>RUT</span><span>76.112.884-5</span></div>
+          <div class="ficha-fila"><span>Fecha</span><span>09/06/2026</span></div>
+          <div class="ficha-fila"><span>Total</span><span>$71.400</span></div>
+          <div class="ficha-fila destaca"><span>IVA que pierdes</span><span>$11.400</span></div>
+          <div class="veredicto veredicto--malo">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 4.2v4M7.5 10.4v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>
+              <b>Una boleta no da crédito fiscal.</b>
+              El Roble sí factura. Le pedimos la factura de reemplazo por esta compra y
+              recuperas los $11.400. ¿Lo hacemos?
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LA CUENTA -->
+  <section class="cuenta">
+    <div class="container">
+      <p class="eyebrow">La cuenta que nadie te hizo</p>
+      <h2>No es desorden. Es plata que se va todos los meses.</h2>
+      <div class="cuenta-grid">
+        <div>
+          <div class="calculo">
+            <p style="font-family:var(--f-doc);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:#A79C88;margin-bottom:10px">
+              Maestranza de 14 personas · Quilicura · junio 2026
+            </p>
+            <div class="calculo-fila"><span>Gasto en terreno que se pagó con boleta o tarjeta personal</span><span>$1.355.530</span></div>
+            <div class="calculo-fila"><span>De eso, proveedores que <b>sí facturan</b> si les pides factura</span><span>$1.217.200</span></div>
+            <div class="calculo-fila"><span>IVA contenido en esas compras (19/119)</span><span>$194.343</span></div>
+            <div class="calculo-fila"><span>IVA que igual se pierde (proveedores que no facturan)</span><span>$22.086</span></div>
+            <div class="calculo-tot">
+              <b>IVA botado al año<br><span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:.78rem;color:#A79C88">($194.343 + $22.086) × 12</span></b>
+              <span class="cifra">$2.597.148</span>
+            </div>
+          </div>
+          <p class="cuenta-nota">
+            Estimación construida sobre el caso de un cliente tipo, con la aritmética a la vista.
+            El IVA no es un impuesto tuyo: lo pagas y lo descuentas. Pero sólo si tienes
+            <b>factura</b>. Con boleta, se lo regalaste al fisco.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="color:var(--papel);font-size:var(--step-1);margin-bottom:var(--sp-s)">Lo que hace hoy, en vez de Talonio</h3>
+          <ul style="list-style:none;display:grid;gap:14px">
+            <li style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="margin-top:2px;flex:none"><path d="M3.5 6.5h11l-1 8.5h-9l-1-8.5Z" stroke="#F0836A" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.5 6.5V4a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2.5" stroke="#F0836A" stroke-width="1.3"/></svg>
+              <span style="color:#D6CDBB;font-size:.94rem;line-height:1.5"><b style="color:var(--papel)">Una caja de zapatos</b>, o una carpeta de fotos en el teléfono con 90 boletas que nadie va a mirar.</span>
+            </li>
+            <li style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="margin-top:2px;flex:none"><path d="M2.5 4.5h13v9h-13z" stroke="#F0836A" stroke-width="1.3"/><path d="m2.5 5 6.5 5 6.5-5" stroke="#F0836A" stroke-width="1.3"/></svg>
+              <span style="color:#D6CDBB;font-size:.94rem;line-height:1.5"><b style="color:var(--papel)">Un WhatsApp al contador el día 18</b> con 40 fotos borrosas y un "ahí te mandé lo que encontré".</span>
+            </li>
+            <li style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="margin-top:2px;flex:none"><circle cx="9" cy="9" r="6.5" stroke="#F0836A" stroke-width="1.3"/><path d="M9 5v4.2l2.6 1.6" stroke="#F0836A" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="color:#D6CDBB;font-size:.94rem;line-height:1.5"><b style="color:var(--papel)">Saber cuánto ganó en marzo… en junio</b>, cuando el contador cierra. Tres meses decidiendo a ciegas.</span>
+            </li>
+            <li style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style="margin-top:2px;flex:none"><path d="M3 3h12v12H3z" stroke="#F0836A" stroke-width="1.3"/><path d="M6 6.5h6M6 9h6M6 11.5h3.5" stroke="#F0836A" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="color:#D6CDBB;font-size:.94rem;line-height:1.5"><b style="color:var(--papel)">Un F29 armado a la rápida</b>, con lo que alcanzó a llegar. Lo que no llegó, no existe.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section>
+    <div class="container">
+      <p class="eyebrow eyebrow--timbre">Cómo funciona</p>
+      <h2>Cuatro pasos. El único que haces tú es el primero.</h2>
+      <div class="pasos">
+        <div class="paso">
+          <div>
+            <h3>Le sacas la foto en el mesón</h3>
+            <p>Antes de guardar la boleta en el bolsillo, donde se va a perder. Funciona sin señal:
+               la foto se sube sola cuando vuelve el internet.</p>
+          </div>
+          <p class="paso-art nota">Cámara del teléfono · WhatsApp · correo a <span class="mono-sm">gastos@tuempresa.talonio.com</span></p>
+        </div>
+        <div class="paso">
+          <div>
+            <h3>La IA lee: monto, RUT, IVA, fecha, categoría</h3>
+            <p>Y cuando el papel está desteñido o el número es dudoso, <strong>lo dice</strong> y te muestra
+               el recorte ampliado para que confirmes. No inventa.</p>
+          </div>
+          <p class="paso-art nota">Extracción campo a campo con confianza declarada. La aritmética (neto + IVA = total) la verifica una máquina, no el modelo.</p>
+        </div>
+        <div class="paso">
+          <div>
+            <h3>Se calza contra la cartola del banco</h3>
+            <p>Cada cargo con su documento. Lo que no calza aparece arriba: un pago sin
+               boleta, una factura que pagaste con tu tarjeta personal y nadie te devolvió.</p>
+          </div>
+          <p class="paso-art nota">Banco de Chile, Santander, BCI, Estado, Itaú. O cartola en CSV, si prefieres no conectar nada.</p>
+        </div>
+        <div class="paso">
+          <div>
+            <h3>El F29 llega pre-armado y tu contador presenta</h3>
+            <p>Con los DTE que ya están en el SII <em>más</em> todo lo que estaba en tu bolsillo.
+               Él revisa, firma y presenta. Nosotros no presentamos nada: el que firma es él.</p>
+          </div>
+          <p class="paso-art nota">Códigos 502 · 111 · 538 · 520 · 537 · 077 · 062 · 091. Ningún número del F29 lo calcula un modelo de lenguaje.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EN VIVO -->
+  <section class="vivo">
+    <div class="container">
+      <p class="eyebrow eyebrow--timbre">En vivo, aquí mismo</p>
+      <h2>Tres boletas reales. Mira lo que hace con cada una.</h2>
+      <p class="nota" style="margin-top:var(--sp-2xs);max-width:60ch">
+        Toca cada una. Ninguna es un screenshot: es el mismo componente que corre en el producto.
+      </p>
+
+      <div class="vivo-caja">
+        <div class="vivo-tabs" role="tablist" aria-label="Ejemplos de boletas">
+          <button class="tab" role="tab" id="t0" aria-selected="true" aria-controls="p0">Copec — bencina</button>
+          <button class="tab" role="tab" id="t1" aria-selected="false" aria-controls="p0">Líder — boleta arrugada</button>
+          <button class="tab" role="tab" id="t2" aria-selected="false" aria-controls="p0">Sodimac — factura</button>
+        </div>
+        <div class="vivo-panel" id="p0" role="tabpanel" aria-labelledby="t0">
+          <div class="boleta" id="vBoleta"></div>
+          <div class="ficha">
+            <div class="ficha-hd">
+              <b>Extraído por Talonio</b>
+              <span id="vPill"></span>
+            </div>
+            <div id="vCampos"></div>
+            <div id="vVeredicto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRECIOS -->
+  <section id="precios">
+    <div class="container">
+      <p class="eyebrow eyebrow--timbre">Precios</p>
+      <h2>Le vendemos al contador. La usa el dueño.</h2>
+      <p class="nota" style="margin-top:var(--sp-2xs);max-width:62ch">
+        Un contador que lleva 40 PYMEs tiene el mismo problema 40 veces. Por eso el plan
+        principal es el suyo. Si tu contador todavía no está en Talonio, contrátalo tú
+        y él entra gratis.
+      </p>
+
+      <div class="precios">
+        <div class="plan plan--destaca">
+          <span class="plan-tag">Nuestro canal</span>
+          <h3>Estudio</h3>
+          <p class="plan-quien">Para el contador o el estudio contable. Precio por RUT activo, al mes.</p>
+          <div class="plan-precio">$7.900 <small>por RUT / mes desde el cliente 31 · valores + IVA</small></div>
+          <div class="plan-tramos">
+            <div><span>1 – 10 RUT</span><span>$12.900</span></div>
+            <div><span>11 – 30 RUT</span><span>$9.900</span></div>
+            <div><span>31 RUT o más</span><span>$7.900</span></div>
+          </div>
+          <ul class="lista-check">
+            <li>Cartera completa en una pantalla: quién ya mandó todo y quién no</li>
+            <li>Empujón automático por WhatsApp a los que faltan</li>
+            <li>F29 pre-armado de cada cliente, para revisar y presentar</li>
+            <li>Sólo lo dudoso llega a tu escritorio; lo obvio ya está resuelto</li>
+            <li>Piloto: 5 RUT gratis por 2 meses, sin tarjeta</li>
+          </ul>
+          <a class="btn btn--timbre" href="demo/index.html">Ver la vista del contador</a>
+        </div>
+
+        <div class="plan">
+          <h3>Empresa</h3>
+          <p class="plan-quien">Para la PYME que quiere ver sus números sin esperar el cierre.</p>
+          <div class="plan-precio">$34.900 <small>por RUT / mes · valores + IVA</small></div>
+          <div class="plan-tramos">
+            <div><span>Documentos al mes</span><span>Sin tope</span></div>
+            <div><span>Asiento para tu contador</span><span>Incluido</span></div>
+            <div><span>Pago anual</span><span>−2 meses</span></div>
+          </div>
+          <ul class="lista-check">
+            <li>Bandeja de gastos: foto, WhatsApp o correo</li>
+            <li>Conciliación con tu cartola bancaria</li>
+            <li>Libro de compras y ventas siempre al día</li>
+            <li>Reporte de fuga: cuánto IVA botaste este mes y con quién</li>
+            <li>Resultado del mes en curso, no dos meses después</li>
+          </ul>
+          <a class="btn btn--fant" href="demo/index.html">Ver el demo</a>
+        </div>
+      </div>
+
+      <p class="nota" style="margin-top:var(--sp-s)">
+        Referencia: la PYME del ejemplo recupera <span class="cifra">$194.343</span> de IVA al mes
+        y paga <span class="cifra">$34.900</span>. El producto se paga solo el día 3.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section style="background:var(--papel-2);border-top:1px solid var(--linea-2)">
+    <div class="container">
+      <p class="eyebrow eyebrow--timbre">Preguntas que nos hacen siempre</p>
+      <h2>Sin letra chica.</h2>
+      <div class="faq">
+        <details open>
+          <summary>Si el SII ya tiene mis facturas, ¿para qué sirve esto?</summary>
+          <div class="faq-r">
+            <p>Exacto: el SII ya tiene tus DTE. Nosotros los bajamos del Registro de Compras y Ventas
+              y no te cobramos por eso.</p>
+            <p><strong>El problema es lo que nunca fue DTE.</strong> La bencina que cargaste con tu tarjeta
+              y te dieron boleta. Los $71.400 de la ferretería. El almuerzo de la faena. Eso no está
+              en el SII, no da crédito fiscal, y son cientos de miles de pesos al año. Talonio lo
+              captura, y cuando el proveedor sí factura, le pide la factura antes de que se venza el plazo.</p>
+          </div>
+        </details>
+        <details>
+          <summary>¿Reemplaza a mi contador?</summary>
+          <div class="faq-r">
+            <p>No, y no queremos. Tu contador es el que firma el F29 y el que responde ante el SII.
+              Nosotros le llegamos con todo ordenado para que revise en 20 minutos en vez de
+              perseguirte tres semanas.</p>
+            <p>De hecho, lo más probable es que Talonio te lo haya recomendado él.</p>
+          </div>
+        </details>
+        <details>
+          <summary>¿Y si la IA se equivoca en un monto?</summary>
+          <div class="faq-r">
+            <p>Se equivoca. Por eso el sistema está diseñado para dudar en voz alta: cuando la
+              confianza de un campo baja de 85%, no adivina — te muestra el recorte ampliado del
+              papel y te pide que confirmes.</p>
+            <p>Además, la aritmética la revisa una máquina, no el modelo: si neto + IVA no da el
+              total, o si el IVA no es el 19% del neto, el documento queda marcado <em>antes</em>
+              de que lo veas. Y ningún número del F29 lo escribe un modelo de lenguaje: el F29 se
+              calcula sumando, como corresponde.</p>
+          </div>
+        </details>
+        <details>
+          <summary>¿Tengo que darles acceso a mi cuenta bancaria?</summary>
+          <div class="faq-r">
+            <p>No es obligatorio. Puedes subir la cartola en CSV o Excel — la que descargas del portal
+              de tu banco — y la conciliación funciona igual.</p>
+            <p>Si prefieres conectarla, usamos un agregador regulado y el acceso es de sólo lectura:
+              nadie puede mover plata desde Talonio, porque Talonio no sabe mover plata.</p>
+          </div>
+        </details>
+        <details>
+          <summary>¿Sirve si mi contabilidad la llevo en Nubox o Defontana?</summary>
+          <div class="faq-r">
+            <p>Sí. Talonio no es tu ERP: es la bandeja de entrada de lo que hoy no le llega a tu ERP.
+              Exportamos el libro de compras en el formato que tu software importa, o el CSV plano
+              que tu contador pega donde tenga que pegarlo.</p>
+          </div>
+        </details>
+        <details>
+          <summary>¿Puedo recuperar el IVA de una boleta?</summary>
+          <div class="faq-r">
+            <p>De la boleta en sí, no: la ley es clara y sólo la factura da derecho a crédito fiscal.</p>
+            <p>Lo que sí se puede es <strong>pedirle al proveedor que reemplace esa boleta por una factura</strong>,
+              dentro del plazo que él maneje. Sodimac, Copec, Líder, Easy y la mayoría de las cadenas
+              tienen ese proceso. Talonio lo detecta y lo hace por ti, que es distinto —
+              y es donde está la plata.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <section class="cierre">
+    <div class="container">
+      <h2>El F29 de junio vence el 20 de julio.</h2>
+      <p>Quedan 8 días. Recorre el demo y mira exactamente qué pasa entre la foto y el formulario.</p>
+      <div class="hero-cta">
+        <a class="btn btn--timbre" href="demo/index.html">Entrar al demo</a>
+        <a class="btn btn--fant" style="color:var(--papel);border-color:rgba(255,255,255,.3)" href="negocio.html">Ver el plan de negocio</a>
+      </div>
+      <p style="margin-top:var(--sp-m)"><span class="sello">Prototipo · datos de ejemplo</span></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><strong>Talonio</strong> — talonio.com · Prototipo construido para evaluar la idea. Los datos de todas las
+       pantallas son de ejemplo y las empresas del demo son ficticias.</p>
+    <p style="margin-top:6px"><a href="../index.html">← Volver a las 10 ideas</a></p>
+  </div>
+</footer>
+
+<script>
+// --- Menú móvil -------------------------------------------------------------
+(function () {
+  var b = document.getElementById('navBtn'), l = document.getElementById('navLinks');
+  b.addEventListener('click', function () {
+    var open = l.classList.toggle('abierto');
+    b.setAttribute('aria-expanded', String(open));
+  });
+})();
+
+// --- El componente "en vivo": tres boletas, tres comportamientos distintos ---
+(function () {
+  var CASOS = [
+    {
+      // 1. El caso limpio: factura, todo cuadra, confianza alta.
+      boleta: {
+        titulo: 'COPEC — QUILICURA',
+        sub: 'COMBUSTIBLES COPEC S.A.<br>R.U.T. 99.520.000-7',
+        doc: 'FACTURA ELECTRÓNICA<br>N° 0044012',
+        lineas: [
+          ['Diésel 218,4 L', '450.000'],
+          ['(6 cargas del mes)', '']
+        ],
+        neto: '450.000', iva: '85.500', total: '535.500',
+        pie: '30/06/2026 · Copec Empresas'
+      },
+      pill: ['ok', 'Factura'],
+      campos: [
+        ['Proveedor', 'Combustibles Copec S.A.', 99],
+        ['RUT', '99.520.000-7', 99],
+        ['Fecha', '30/06/2026', 98],
+        ['Neto', '$450.000', 97],
+        ['IVA 19%', '$85.500', 97, true],
+        ['Total', '$535.500', 99]
+      ],
+      veredicto: ['ok', 'Crédito fiscal a favor: $85.500',
+        'Cuadra: 450.000 × 19% = 85.500, y 450.000 + 85.500 = 535.500. Va directo al código 520 del F29.']
+    },
+    {
+      // 2. El caso honesto: la IA duda y lo dice.
+      boleta: {
+        titulo: 'LÍDER QUILICURA',
+        sub: 'WALMART CHILE COMERCIAL<br>R.U.T. 76.198.427-2',
+        doc: 'BOLETA ELECTRÓNICA<br>N° 8811204',
+        lineas: [
+          ['Café molido 1kg', '12.990'],
+          ['Azúcar 5kg', '6.490'],
+          ['Vasos térmicos x100', '8.510'],
+          ['Papel higiénico x24', '19.900']
+        ],
+        neto: '', iva: '', total: '47.8̶9̶0̶', borroso: true,
+        pie: '21/06/2026 · CAJA 07'
+      },
+      pill: ['duda', 'Necesita que confirmes'],
+      campos: [
+        ['Proveedor', 'Walmart Chile Comercial', 96],
+        ['RUT', '76.198.427-2', 94],
+        ['Fecha', '21/06/2026', 91],
+        ['Total', '$47.890 &nbsp;<span style="color:var(--duda)">o $47.390</span>', 61],
+        ['IVA contenido', '$7.646', 61, true]
+      ],
+      veredicto: ['duda', 'El papel está desteñido. No voy a adivinar.',
+        'El cuarto dígito puede ser un 8 o un 3. Confianza 61% — bajo mi umbral de 85%. ' +
+        'Te muestro el recorte ampliado y tú confirmas. <br><br>' +
+        'Y ojo: <strong>es boleta</strong>. Líder factura si presentas el RUT en caja. ' +
+        'Esos $7.646 se pierden.']
+    },
+    {
+      // 3. El caso que ya venía bien, y aun así hay algo que decir.
+      boleta: {
+        titulo: 'SODIMAC HOMECENTER',
+        sub: 'SODIMAC S.A.<br>R.U.T. 96.792.430-K',
+        doc: 'FACTURA ELECTRÓNICA<br>N° 8891142',
+        lineas: [
+          ['Perfil acero 50x50', '148.200'],
+          ['Pintura antióxido 4G', '76.400'],
+          ['Fierro estriado 12mm', '68.257']
+        ],
+        neto: '292.857', iva: '55.643', total: '348.500',
+        pie: '02/06/2026 · Sodimac Empresas'
+      },
+      pill: ['ok', 'Factura'],
+      campos: [
+        ['Proveedor', 'Sodimac S.A.', 99],
+        ['RUT', '96.792.430-K', 99],
+        ['Fecha', '02/06/2026', 99],
+        ['Neto', '$292.857', 96],
+        ['IVA 19%', '$55.643', 96, true],
+        ['Categoría', 'Materiales de obra', 88]
+      ],
+      veredicto: ['ok', 'Crédito fiscal a favor: $55.643',
+        'Esta llegó como factura porque tienes Sodimac Empresas configurado. ' +
+        'Las tres cadenas donde más compras ya están configuradas — por eso este mes ' +
+        'rescatamos $194.343 en vez de perderlos.']
+    }
+  ];
+
+  var ICO = {
+    ok: '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M1.6 5.8 4.2 8.4 9.4 2.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    duda: '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.6" stroke="currentColor" stroke-width="1.2"/><path d="M4.2 4.2a1.4 1.4 0 1 1 1.9 1.3v.9M5.5 8.4v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+    malo: '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M5.5 1.2 10.2 9.5H.8L5.5 1.2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 4.4v2.1M5.5 7.9v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+  };
+  var ICO_V = {
+    ok: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M4.8 7.6 6.7 9.5l3.6-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    duda: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M5.7 5.8a1.9 1.9 0 1 1 2.6 1.8v1.1M7.5 11v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+    malo: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 4.2v4M7.5 10.4v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+  };
+
+  var elB = document.getElementById('vBoleta'),
+      elP = document.getElementById('vPill'),
+      elC = document.getElementById('vCampos'),
+      elV = document.getElementById('vVeredicto'),
+      tabs = [].slice.call(document.querySelectorAll('.vivo-tabs .tab'));
+
+  function pintar(i) {
+    var c = CASOS[i], b = c.boleta;
+
+    var lin = b.lineas.map(function (l) {
+      return '<div class="boleta-fila"><span>' + l[0] + '</span><span>' + l[1] + '</span></div>';
+    }).join('');
+
+    var montos = '';
+    if (b.neto) {
+      montos = '<div class="boleta-fila"><span>NETO</span><span>' + b.neto + '</span></div>' +
+               '<div class="boleta-fila"><span>IVA 19%</span><span>' + b.iva + '</span></div>';
+    }
+    var totalTxt = b.borroso
+      ? '<span style="filter:blur(.6px);opacity:.75">$ 47.?90</span>'
+      : '$ ' + b.total;
+
+    elB.innerHTML =
+      '<div class="boleta-hd"><b>' + b.titulo + '</b>' + b.sub + '</div>' +
+      '<div class="boleta-sep"></div>' +
+      '<div style="text-align:center;font-weight:700;letter-spacing:.06em">' + b.doc + '</div>' +
+      '<div class="boleta-sep"></div>' + lin +
+      '<div class="boleta-sep"></div>' + montos +
+      '<div class="boleta-fila boleta-tot"><span>TOTAL</span><span>' + totalTxt + '</span></div>' +
+      '<div class="boleta-sep"></div>' +
+      '<div style="text-align:center">' + b.pie + '</div>';
+
+    elP.className = 'pill pill--' + c.pill[0];
+    elP.innerHTML = ICO[c.pill[0]] + c.pill[1];
+
+    elC.innerHTML = c.campos.map(function (f) {
+      var baja = f[2] < 85;
+      return '<div class="ficha-fila' + (f[3] ? ' destaca' : '') + '">' +
+        '<span>' + f[0] + '</span>' +
+        '<span>' + f[1] +
+          '<span class="barra-conf' + (baja ? ' baja' : '') + '" style="width:52px;display:inline-block;vertical-align:middle;margin-left:8px" ' +
+            'role="img" aria-label="confianza ' + f[2] + '%"><i style="width:' + f[2] + '%"></i></span>' +
+          '<span style="font-size:.68rem;color:' + (baja ? 'var(--duda)' : 'var(--tinta-3)') + ';margin-left:5px">' + f[2] + '%</span>' +
+        '</span></div>';
+    }).join('');
+
+    var v = c.veredicto;
+    elV.innerHTML = '<div class="veredicto veredicto--' + v[0] + '">' + ICO_V[v[0]] +
+      '<span><b>' + v[1] + '</b>' + v[2] + '</span></div>';
+
+    tabs.forEach(function (t, k) { t.setAttribute('aria-selected', String(k === i)); });
+  }
+
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { pintar(i); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var n = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[n].focus(); pintar(n);
+    });
+  });
+
+  pintar(0);
+})();
+</script>
+</body>
+</html>

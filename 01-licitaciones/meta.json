@@ -1,0 +1,15 @@
+{
+  "folder": "01-licitaciones",
+  "brand": "Adjudate",
+  "domain": "adjudate.com",
+  "domain_evidence": "rdap.verisign.com -> HTTP 404 (disponible), 2026-07-12; adjudate.cl libre en whois NIC Chile misma fecha",
+  "alternates": ["licitro.com", "certamia.com", "kompita.com"],
+  "tagline": "Deja de perder licitaciones por el Anexo N°4.",
+  "category": "SaaS vertical · Compras públicas",
+  "market": "Chile → LatAm (Perú, Colombia, México, Brasil)",
+  "icp": "PYME de servicios generales, 10-80 trabajadores, $200M-$2.000M en ventas, con al menos una adjudicación en Mercado Público en los últimos 24 meses",
+  "price_clp": "Desde $59.000/mes",
+  "accent": "#C0362C",
+  "problem": "Miles de licitaciones abiertas en Mercado Público, y la PYME que podría ganarlas ni las ve; cuando postula, la eliminan por un anexo que faltaba o un plazo que se le pasó.",
+  "status": "prototipo"
+}

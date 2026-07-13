@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kilonauta — un solo lugar para despachar a todo Chile</title>
+<meta name="description" content="Compara Chilexpress, Starken, Blue Express y Correos de Chile para cada envío, imprime la etiqueta desde un solo lugar, avisa al cliente sin que pregunte y deja el reclamo en nuestras manos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="kilonauta.css">
+<style>
+  /* ---- hero: la caja sobre el mesón ---- */
+  .hero { padding-top: var(--sp-l); padding-bottom: var(--sp-xl); }
+  .hero h1 { margin-bottom: var(--sp-s); }
+  .hero h1 mark {
+    background: linear-gradient(180deg, transparent 62%, var(--accent-soft) 62%);
+    color: inherit;
+    padding-inline: .1em;
+  }
+  .hero__quote {
+    border-left: 3px solid var(--accent);
+    padding: .1rem 0 .1rem var(--sp-s);
+    margin-bottom: var(--sp-m);
+    font-size: var(--step-0);
+    color: var(--ink-2);
+  }
+  .hero__quote cite {
+    display: block;
+    margin-top: .4rem;
+    font-style: normal;
+    font-size: .8rem;
+    color: var(--ink-3);
+    font-family: var(--mono);
+  }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-2xs); }
+
+  /* ---- el número grande ---- */
+  .hero__cost {
+    margin-top: var(--sp-l);
+    border: 1px solid var(--rule-2);
+    background: var(--card);
+    padding: var(--sp-s);
+    display: grid;
+    gap: var(--sp-2xs);
+  }
+  .hero__cost .big {
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 76%;
+    font-size: var(--step-4);
+    line-height: 1;
+    color: var(--accent-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 64em) {
+    .hero__grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: var(--sp-xl); align-items: start; }
+    .hero__cost { margin-top: 0; }
+  }
+
+  /* ---- comparador en vivo ---- */
+  .comp { border: 2px solid var(--ink); background: var(--card); }
+  .comp__head {
+    background: var(--night);
+    color: var(--on-night);
+    padding: .55rem var(--sp-s);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2xs);
+    flex-wrap: wrap;
+  }
+  .comp__head .stencil { color: #E8A88F; }
+  .comp__live {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--on-night-2);
+  }
+  .comp__live i { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .25 } }
+  .comp__body { padding: var(--sp-s); }
+  .comp__controls { display: grid; gap: var(--sp-xs); }
+  @media (min-width: 40em) { .comp__controls { grid-template-columns: 1.4fr 1fr; } }
+
+  .rate { border: 1px solid var(--rule-2); background: var(--card); padding: .6rem; display: grid; gap: .35rem; }
+  .rate + .rate { margin-top: .5rem; }
+  .rate[data-best="1"] { border: 2px solid var(--accent); background: var(--accent-tint); }
+  .rate[data-out="1"] { opacity: .55; background: var(--paper-2); }
+  .rate__top { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+  .rate__name { font-family: var(--display); font-weight: 800; font-stretch: 84%; text-transform: uppercase; letter-spacing: .04em; font-size: .95rem; }
+  .rate__price { font-family: var(--mono); font-weight: 600; font-size: 1.15rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rate__list { font-size: .74rem; color: var(--ink-3); text-decoration: line-through; font-family: var(--mono); }
+  .rate__meta { display: flex; gap: .75rem; flex-wrap: wrap; font-size: .76rem; color: var(--ink-2); font-family: var(--mono); }
+  .rate__bar { height: 8px; background: var(--paper-2); position: relative; }
+  .rate__bar i { position: absolute; inset: 0 auto 0 0; background: var(--s1); display: block; }
+  .rate[data-best="1"] .rate__bar i { background: var(--accent); }
+  .rate__flags { display: flex; gap: .3rem; flex-wrap: wrap; }
+
+  .verdict {
+    margin-top: var(--sp-s);
+    border: 1px dashed var(--accent);
+    background: var(--accent-tint);
+    padding: var(--sp-s);
+    display: flex; flex-direction: column; gap: .25rem;
+  }
+  .verdict b {
+    font-family: var(--display); font-weight: 900; font-stretch: 78%;
+    font-size: var(--step-2); line-height: 1; color: var(--accent-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- pasos ---- */
+  .steps { counter-reset: s; display: grid; gap: 0; border-top: 1px solid var(--rule-2); }
+  .step {
+    counter-increment: s;
+    display: grid;
+    grid-template-columns: 2.6rem 1fr;
+    gap: var(--sp-s);
+    padding: var(--sp-m) 0;
+    border-bottom: 1px dashed var(--rule-2);
+  }
+  .step__n {
+    font-family: var(--mono); font-weight: 600; font-size: .8rem;
+    color: var(--accent-deep);
+    border: 1px solid var(--accent); background: var(--accent-soft);
+    width: 2.1rem; height: 2.1rem;
+    display: grid; place-items: center;
+  }
+  .step__n::before { content: "0" counter(s); }
+  .step h3 { margin-bottom: .3rem; }
+  @media (min-width: 64em) {
+    .steps { grid-template-columns: repeat(4, 1fr); border-top: 0; gap: var(--sp-m); }
+    .step { border-bottom: 0; border-top: 2px solid var(--ink); grid-template-columns: 1fr; padding-top: var(--sp-s); }
+  }
+
+  /* ---- mapa de arbitraje ---- */
+  .arb { display: grid; gap: var(--sp-m); }
+  @media (min-width: 64em) { .arb { grid-template-columns: 22rem 1fr; align-items: center; } }
+  .chile { width: 100%; max-width: 15rem; margin-inline: auto; display: block; }
+  @media (min-width: 64em) { .chile { margin-inline: 0; } }
+
+  /* ---- precios ---- */
+  .plan { border: 1px solid var(--rule-2); background: var(--card); padding: var(--sp-s); display: flex; flex-direction: column; }
+  .plan[data-featured] { border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--accent); }
+  .plan__price { font-family: var(--display); font-weight: 900; font-stretch: 78%; font-size: var(--step-3); line-height: 1; margin: .3rem 0 .1rem; font-variant-numeric: tabular-nums; }
+  .plan ul { list-style: none; margin: var(--sp-s) 0; display: grid; gap: .45rem; font-size: .88rem; }
+  .plan li { display: grid; grid-template-columns: 1rem 1fr; gap: .5rem; align-items: start; color: var(--ink-2); }
+  .plan li svg { margin-top: .25rem; color: var(--accent-deep); }
+  .plan .btn { margin-top: auto; }
+
+  /* ---- FAQ ---- */
+  .faq details { border-bottom: 1px dashed var(--rule-2); }
+  .faq summary {
+    cursor: pointer; list-style: none;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+    min-height: 56px; padding: var(--sp-2xs) 0;
+    font-family: var(--display); font-weight: 700; font-stretch: 88%; font-size: 1.02rem;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); color: var(--accent-deep); font-size: 1.3rem; flex: none; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq details > div { padding-bottom: var(--sp-s); color: var(--ink-2); max-width: var(--measure); }
+
+  /* ---- cierre ---- */
+  .close { background: var(--night); color: var(--on-night); }
+  .close h2 { color: var(--on-night); }
+  .close p { color: var(--on-night-2); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="wordmark" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/>
+        <path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#D8461B" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav" id="navBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      Menú
+    </button>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        <li><a href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ HERO ═══ -->
+<section class="hero container">
+  <div class="hero__grid">
+    <div>
+      <p class="stencil stencil--accent" style="margin-bottom:.6rem">Despacho para e-commerce chico · Chile</p>
+      <h1>El mismo paquete a Puerto Montt cuesta <mark>$9.930 o $5.320</mark>. Depende de a quién le preguntes.</h1>
+      <p class="lead" style="margin:var(--sp-s) 0 var(--sp-m)">
+        Kilonauta cotiza los cuatro couriers para cada envío, te imprime la etiqueta desde
+        un solo lugar, le avisa al cliente antes de que pregunte y —cuando el paquete se
+        pierde— el reclamo lo hacemos nosotros.
+      </p>
+
+      <blockquote class="hero__quote">
+        “Tengo tres pestañas abiertas: Chilexpress, Starken y Blue. Copio la dirección a mano
+        en cada una para ver cuál sale más barato. Después imprimo de tres sistemas distintos.
+        Y si se pierde uno, prefiero regalar el producto antes que meterme al reclamo.”
+        <cite>— Constanza, tienda de suplementos en Providencia · 340 envíos/mes</cite>
+      </blockquote>
+
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="demo/index.html">
+          Ver el producto funcionando
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+        </a>
+        <a class="btn btn--ghost" href="#precios">Precios</a>
+      </div>
+    </div>
+
+    <div class="hero__cost">
+      <p class="stencil">Lo que te cuesta el despacho hoy</p>
+      <p class="big">$7.608.000</p>
+      <p class="tiny muted" style="margin-bottom:.4rem">al año, en una tienda de 400 envíos/mes</p>
+      <div class="scroll-x" style="border:0;background:none">
+        <table>
+          <tbody>
+            <tr><td>Sobrepago de flete (15% evitable)</td><td class="n">$4.320.000</td></tr>
+            <tr><td>26,7 h/mes copiando direcciones y etiquetas</td><td class="n">$1.920.000</td></tr>
+            <tr><td>Paquetes perdidos que nunca reclamaste</td><td class="n">$1.008.000</td></tr>
+            <tr><td>“¿Dónde está mi pedido?” × 100 al mes</td><td class="n">$360.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src" style="margin-top:.6rem">
+        <b>Estimación, no dato censal.</b> Supone flete promedio pagado de <b class="clp">$6.000</b>,
+        hora de la dueña a <b class="clp">$6.000</b> y 0,45% de paquetes perdidos. Aritmética
+        completa y cada supuesto declarado en <a href="negocio.html#dolor">negocio.html</a>.
+        Cambia los supuestos y cambia el número: eso es exactamente lo que queremos que hagas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ COMPARADOR EN VIVO ═══ -->
+<section class="container" id="comparador" style="padding-top:0">
+  <div class="eyebrow"><span class="stencil">El producto, aquí mismo</span></div>
+  <h2 style="margin-bottom:.4rem">Cotiza un envío de verdad. Ahora.</h2>
+  <p class="lead prose" style="margin-bottom:var(--sp-m)">
+    Esto no es una captura de pantalla: es el motor de tarifas corriendo en tu navegador.
+    Mueve el peso, cambia la comuna. Mira lo que pasa cuando el destino se va al sur.
+  </p>
+
+  <div class="comp">
+    <div class="comp__head">
+      <span class="stencil">Cotizador Kilonauta</span>
+      <span class="comp__live"><i></i> calculando en vivo</span>
+    </div>
+    <div class="comp__body">
+      <div class="comp__controls">
+        <label class="field">
+          <span>Destino</span>
+          <select id="hDest"></select>
+        </label>
+        <label class="field">
+          <span>Peso real — <b class="num" id="hKgOut">2,0</b> kg</span>
+          <input type="range" id="hKg" min="0.5" max="12" step="0.5" value="2">
+        </label>
+      </div>
+
+      <p class="tiny muted" style="margin:.5rem 0 var(--sp-s)">
+        Caja de 30 × 25 × 15 cm → peso volumétrico
+        <b class="num" id="hVol">2,81</b> kg.
+        Se cobra el mayor: <b class="num" id="hFact">3,0</b> kg facturables.
+        <span class="chip chip--info" style="margin-left:.3rem">así cobran todos</span>
+      </p>
+
+      <div id="hRates"></div>
+
+      <div class="verdict">
+        <span class="stencil stencil--accent">Ahorro en este envío</span>
+        <b id="hSave">$3.620</b>
+        <span class="tiny" id="hSaveTxt"></span>
+      </div>
+
+      <p class="tiny muted" style="margin-top:var(--sp-s)">
+        Precios Kilonauta = tarifa de lista menos el descuento del contrato mayorista, plan Nauta.
+        <a href="stack.html#falso">Qué está falseado en el demo →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ EL ARBITRAJE ═══ -->
+<section class="container">
+  <div class="eyebrow"><span class="stencil">La tesis</span></div>
+  <h2 style="margin-bottom:var(--sp-m)">Chile es largo. Ahí está la plata.</h2>
+
+  <div class="arb">
+    <svg class="chile" viewBox="0 0 120 340" role="img" aria-labelledby="chileT">
+      <title id="chileT">Dispersión de precio entre couriers según zona de Chile: casi nula en la Región Metropolitana, muy alta en zonas extremas</title>
+      <!-- silueta esquemática, dibujada a mano: Chile como una tira -->
+      <path d="M46 8 L62 8 L66 52 L62 96 L66 140 L60 168 L64 196 L56 226 L60 252 L50 278 L54 300 L44 332 L34 332 L40 300 L34 274 L44 248 L38 220 L46 192 L40 164 L48 136 L42 96 L46 52 Z"
+            fill="var(--paper-2)" stroke="var(--rule-2)" stroke-width="1"/>
+      <!-- bandas de dispersión -->
+      <g font-family="var(--mono)" font-size="7.5">
+        <rect x="30" y="14" width="42" height="26" fill="#C0400F" opacity=".22"/>
+        <line x1="72" y1="27" x2="88" y2="27" stroke="var(--rule-2)"/>
+        <circle cx="52" cy="27" r="2.6" fill="var(--accent)"/>
+        <text x="90" y="24" fill="var(--ink)">Arica</text>
+        <text x="90" y="34" fill="var(--accent-deep)" font-weight="600">+83%</text>
+
+        <rect x="30" y="56" width="42" height="22" fill="#C0400F" opacity=".13"/>
+        <circle cx="52" cy="66" r="2.6" fill="var(--accent)"/>
+        <line x1="70" y1="66" x2="88" y2="66" stroke="var(--rule-2)"/>
+        <text x="90" y="63" fill="var(--ink)">Antofagasta</text>
+        <text x="90" y="73" fill="var(--accent-deep)" font-weight="600">+40%</text>
+
+        <rect x="30" y="112" width="42" height="18" fill="#C0400F" opacity=".04"/>
+        <circle cx="52" cy="120" r="2.6" fill="var(--ink-3)"/>
+        <line x1="68" y1="120" x2="88" y2="120" stroke="var(--rule-2)"/>
+        <text x="90" y="117" fill="var(--ink)">Ñuñoa</text>
+        <text x="90" y="127" fill="var(--ink-3)" font-weight="600">+5%</text>
+
+        <rect x="30" y="186" width="42" height="22" fill="#C0400F" opacity=".14"/>
+        <circle cx="52" cy="196" r="2.6" fill="var(--accent)"/>
+        <line x1="66" y1="196" x2="88" y2="196" stroke="var(--rule-2)"/>
+        <text x="90" y="193" fill="var(--ink)">Pto. Montt</text>
+        <text x="90" y="203" fill="var(--accent-deep)" font-weight="600">+43%</text>
+
+        <rect x="30" y="292" width="42" height="30" fill="#C0400F" opacity=".26"/>
+        <circle cx="48" cy="308" r="2.6" fill="var(--accent)"/>
+        <line x1="62" y1="308" x2="88" y2="308" stroke="var(--rule-2)"/>
+        <text x="90" y="305" fill="var(--ink)">Punta Arenas</text>
+        <text x="90" y="315" fill="var(--accent-deep)" font-weight="600">+83%</text>
+      </g>
+    </svg>
+
+    <div class="stack">
+      <p class="lead">
+        En Ñuñoa los cuatro couriers cobran casi lo mismo. La diferencia entre el más caro
+        y el más barato es un 5%: no hay negocio ahí, y por eso los agregadores que optimizan
+        Santiago no le mueven la aguja a nadie.
+      </p>
+      <p>
+        A Punta Arenas, el mismo paquete va de <b class="clp">$9.170</b> a
+        <b class="clp">$16.810</b>. Es un <b>83% de diferencia</b> por decidir mal. Correos de
+        Chile tiene obligación de servicio universal, así que a zona extrema llega barato y llega
+        siempre; Blue Express ni siquiera cubre Coyhaique, y a Puerto Williams —donde el paquete
+        cruza el canal Beagle— sólo llegan dos de los cuatro. Nadie le está contando esto a la
+        tienda que despacha desde Providencia.
+      </p>
+      <p>
+        <b>Nuestra tesis, en una línea:</b> el arbitraje del despacho chileno es geográfico.
+        Está en el 40% de los envíos que salen de la Región Metropolitana, no en el 60% que
+        se queda dentro. Ahí vamos.
+      </p>
+      <p class="src">
+        <b>Los porcentajes de arriba salen del motor de tarifas de esta misma página</b>
+        (paquete de 2 kg, caja 30×25×15). Es un modelo calibrado, no una lista de precios
+        firmada. Las tarifas reales requieren contrato empresa con cada courier — ver
+        <a href="roadmap.html#m2">hito M2</a>, que es exactamente donde este negocio vive o muere.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ CÓMO FUNCIONA ═══ -->
+<section class="container">
+  <div class="eyebrow"><span class="stencil">Cómo funciona</span></div>
+  <h2 style="margin-bottom:var(--sp-m)">Cuatro portales se vuelven uno.</h2>
+
+  <div class="steps">
+    <article class="step">
+      <div class="step__n" aria-hidden="true"></div>
+      <div>
+        <h3>Entran solos</h3>
+        <p class="muted">Tus pedidos llegan desde Jumpseller, Shopify, WooCommerce, Bsale o Mercado Libre. La dirección se normaliza sola: “al ladito del jardín infantil” se convierte en calle, número y comuna que el courier acepta.</p>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step__n" aria-hidden="true"></div>
+      <div>
+        <h3>Se cotizan los cuatro</h3>
+        <p class="muted">Precio, plazo y tasa de entrega a tiempo <em>en esa comuna</em> — no un promedio nacional. Eliges tú, o pones una regla: “bajo $6.000, siempre el más barato; sobre eso, el más rápido”.</p>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step__n" aria-hidden="true"></div>
+      <div>
+        <h3>Sale la etiqueta</h3>
+        <p class="muted">Una impresora, un formato, 10×15 cm. Con la guía real del courier que elegiste. Y el tracking queda enganchado al pedido sin que copies nada.</p>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step__n" aria-hidden="true"></div>
+      <div>
+        <h3>El cliente sabe</h3>
+        <p class="muted">Avisos automáticos con la marca de <em>tu</em> tienda. Si el paquete se queda pegado 48 horas, te avisamos a ti antes de que te escriba él. Y si se pierde, el reclamo es nuestro.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════ RECLAMOS ═══ -->
+<section class="container">
+  <div class="grid grid--2" style="gap:var(--sp-l)">
+    <div class="stack">
+      <div class="eyebrow"><span class="stencil">Lo que nadie quiere hacer</span></div>
+      <h2>El reclamo lo hacemos nosotros. Literalmente.</h2>
+      <p>
+        Cuando un paquete se pierde, el courier no habla contigo: habla con quien tiene el
+        contrato. Y quien tiene el contrato somos nosotros. Eso no es un detalle legal, es
+        <b>la razón por la que un agregador que sólo vende software nunca va a poder ofrecerte esto</b>.
+      </p>
+      <p>
+        Tú aprietas un botón. Nosotros armamos el relato con el historial de tracking, adjuntamos
+        la guía y la boleta, lo presentamos dentro del plazo —que es corto y que nadie se sabe— y
+        te transferimos la indemnización. Si el courier no responde, igual te pagamos: hasta
+        <b class="clp">$60.000</b> de mercadería más el flete completo.
+      </p>
+      <p class="src">
+        Sí, esto es un costo y sí, lo asumimos: <b>0,55% de los envíos</b> se pierden o se
+        atrasan de forma irrecuperable, y recuperamos del courier alrededor del <b>60%</b>.
+        La provisión está en la economía unitaria de <a href="negocio.html#unit">negocio.html</a>.
+        No es un seguro escondido, es una línea del P&amp;L.
+      </p>
+    </div>
+
+    <div class="perf">
+      <p class="stencil" style="margin-bottom:.6rem">Reclamo #RC-2211 · abierto hace 4 días</p>
+      <div class="stack-s" style="font-size:.9rem">
+        <div style="display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px dashed var(--rule);padding-bottom:.5rem">
+          <span class="muted">Guía</span><span class="mono">OT-58291746 · Starken</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px dashed var(--rule);padding-bottom:.5rem">
+          <span class="muted">Destino</span><span>Coyhaique, Aysén</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px dashed var(--rule);padding-bottom:.5rem">
+          <span class="muted">Último evento</span><span class="mono">hace 11 días</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px dashed var(--rule);padding-bottom:.5rem">
+          <span class="muted">Mercadería</span><span class="clp">$48.900</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:.5rem">
+          <span class="muted">Estado</span><span class="chip chip--warn">En evaluación</span>
+        </div>
+      </div>
+      <hr class="dotted" style="margin:var(--sp-s) 0">
+      <p class="stencil" style="margin-bottom:.4rem">Lo que hicimos por ti</p>
+      <ul style="list-style:none;display:grid;gap:.4rem;font-size:.85rem;color:var(--ink-2)">
+        <li>✔ Redactamos el reclamo formal (día 1, plazo era 7)</li>
+        <li>✔ Adjuntamos guía, boleta y foto del bulto</li>
+        <li>✔ Escalamos a ejecutivo de cuenta (día 4)</li>
+        <li>✔ Te reenviamos el pedido sin cobrarte el flete</li>
+      </ul>
+      <p class="tiny muted" style="margin-top:.7rem">Tu clienta en Coyhaique ya recibió el reemplazo. No supo que se perdió el primero.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ PRECIOS ═══ -->
+<section class="container" id="precios">
+  <div class="eyebrow"><span class="stencil">Precios</span></div>
+  <h2 style="margin-bottom:.4rem">Empiezas gratis. Pagas la etiqueta, no el software.</h2>
+  <p class="lead prose" style="margin-bottom:var(--sp-m)">
+    Ganamos plata con el margen sobre la tarifa que negociamos al volumen, no cobrándote una
+    licencia por adelantado. Si no despachas, no pagas. Si despachas mucho, te conviene el plan
+    con suscripción: <b>subes el fijo y te bajamos el precio por etiqueta.</b>
+  </p>
+
+  <div class="grid grid--3">
+    <article class="plan">
+      <p class="stencil">Nauta</p>
+      <p class="plan__price">$0<span style="font-size:1rem;font-weight:400;font-family:var(--sans)">/mes</span></p>
+      <p class="tiny muted">Pagas sólo la etiqueta, ~22% bajo lista. Hasta 150 envíos/mes.</p>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Comparador de los 4 couriers</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Etiquetas 10×15 desde un solo lugar</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Tracking unificado + página con tu marca</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Reclamos gestionados (sí, en el plan gratis)</li>
+      </ul>
+      <a class="btn btn--ghost btn--block" href="demo/index.html">Probar</a>
+    </article>
+
+    <article class="plan" data-featured>
+      <p class="stencil stencil--accent">Bodega · el que van a elegir</p>
+      <p class="plan__price">$34.900<span style="font-size:1rem;font-weight:400;font-family:var(--sans)">/mes</span></p>
+      <p class="tiny muted">Etiqueta ~29% bajo lista. Desde 150 envíos/mes.</p>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Todo lo de Nauta, más barato por etiqueta</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Integración con Jumpseller, Shopify, WooCommerce, Bsale y Mercado Libre</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Reglas automáticas de courier</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> 600 avisos WhatsApp/mes · 3 usuarios</li>
+      </ul>
+      <a class="btn btn--primary btn--block" href="demo/index.html">Ver el demo</a>
+    </article>
+
+    <article class="plan">
+      <p class="stencil">Cordillera</p>
+      <p class="plan__price">$99.900<span style="font-size:1rem;font-weight:400;font-family:var(--sans)">/mes</span></p>
+      <p class="tiny muted">Etiqueta a costo + 7%. Desde 600 envíos/mes.</p>
+      <ul>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Te mostramos lo que nos cobra el courier. Sin margen escondido.</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> API y webhooks</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> SLA de reclamos: 48 h para presentarlo</li>
+        <li><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6.5 4.5 9 10 3"/></svg> Multi-bodega y ejecutivo con nombre</li>
+      </ul>
+      <a class="btn btn--ghost btn--block" href="negocio.html#unit">Ver la economía</a>
+    </article>
+  </div>
+
+  <p class="src" style="margin-top:var(--sp-m);max-width:var(--measure)">
+    <b>Sin letra chica:</b> el flete lo pagas por adelantado desde tu saldo. No te damos crédito
+    —eso convertiría a Kilonauta en un banco malo— y por eso podemos ser baratos. Valores en CLP,
+    IVA incluido. Si un mes no despachas nada, no te cobramos nada en el plan Nauta.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FAQ ═══ -->
+<section class="container faq">
+  <div class="eyebrow"><span class="stencil">Preguntas que sí nos hacen</span></div>
+  <h2 style="margin-bottom:var(--sp-m)">Lo incómodo, primero.</h2>
+
+  <details open>
+    <summary>Ya existe Shipit. Y Envíame. ¿Para qué otro?</summary>
+    <div>
+      <p>Sí, existen, y son competidores serios: no estamos inventando la categoría y sería
+      deshonesto decir lo contrario. La diferencia es dónde ponemos el foco.</p>
+      <p style="margin-top:.6rem">Envíame vende integración por API a retail mediano y grande —si tienes un
+      desarrollador, es una gran herramienta. Shipit atiende a la tienda chica, igual que nosotros,
+      con foco en Santiago. Kilonauta hace dos cosas que ninguno de los dos hace hoy:
+      <b>el reclamo con plata de por medio</b> (no “te ayudamos a reclamar”: te pagamos y después
+      nos las arreglamos con el courier) y <b>el arbitraje de regiones y zonas extremas expuesto en
+      la interfaz</b>, que es donde el ahorro es de dos dígitos altos. El detalle honesto, con
+      nombres, está en <a href="negocio.html#competencia">negocio.html</a>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>¿Por qué no me cobran una licencia y me dejan usar mis propias cuentas?</summary>
+    <div>
+      <p>Porque tu cuenta no tiene descuento. Los couriers reservan las tarifas buenas para quien
+      les lleva volumen, y una tienda de 300 envíos al mes nunca va a llegar a ese umbral sola.
+      Nosotros juntamos el volumen de cientos de tiendas, negociamos una vez, y te pasamos parte
+      de ese descuento. Si te cobráramos una licencia <em>y</em> te dejáramos pagando precio de
+      lista, te estaríamos cobrando por ordenarte el desorden sin quitarte el costo.</p>
+      <p style="margin-top:.6rem">Sí puedes traer tu propia cuenta si ya negociaste una buena
+      (plan Cordillera). En ese caso te cobramos sólo el software.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Si el courier me conoce a mí, ¿no me pueden cortar a ustedes?</summary>
+    <div>
+      <p>Es exactamente el riesgo que puede matar este negocio, y lo escribimos así de claro en
+      <a href="roadmap.html#muerte">el roadmap</a>. Dependemos de contratos mayoristas revocables
+      con cuatro proveedores, tres de los cuales podrían decidir que no quieren un intermediario.
+      Lo mitigamos de dos maneras: repartiendo el volumen entre los cuatro (nadie tiene más del
+      40%) y siendo un canal que les <em>trae</em> demanda que hoy no tienen. No hay una tercera
+      manera y no vamos a fingir que la hay.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>¿Qué pasa con el IVA y la boleta del flete?</summary>
+    <div>
+      <p>Kilonauta te emite una factura electrónica mensual por el total de tus etiquetas, con
+      IVA, y con el detalle envío por envío para que tu contador no te odie. No recibes cuatro
+      facturas de cuatro couriers: recibes una.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>¿La IA elige el courier por mí?</summary>
+    <div>
+      <p>No, y es a propósito. El ranking es una fórmula que puedes reproducir en una servilleta:
+      precio, plazo y tasa de entrega a tiempo en esa comuna. Puedes ver el puntaje y discrepar.
+      Una caja negra que te dice “confía en mí” sobre un paquete de <span class="clp">$80.000</span>
+      no se gana la confianza de nadie.</p>
+      <p style="margin-top:.6rem">Dónde <em>sí</em> usamos IA: normalizar direcciones escritas por
+      humanos (“depto 52 B, torre 2, al lado del jardín”) y redactar el reclamo formal cuando se
+      pierde un paquete. Dos tareas aburridas, verificables, y donde se nota. El desglose de
+      modelos y costo está en <a href="stack.html#ia">arquitectura</a>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>¿Esto sirve si despacho 40 paquetes al mes?</summary>
+    <div>
+      <p>Sirve, y el plan Nauta es gratis. Pero seamos honestos: con 40 envíos al mes tu ahorro
+      anual ronda los <span class="clp">$430.000</span> y el dolor todavía es soportable. Donde
+      Kilonauta cambia tu vida es de <b>100 envíos al mes para arriba</b>, y sobre todo si más de
+      un tercio se va a regiones.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ═════════════════════════════════════════════════════ CIERRE ═══ -->
+<section class="close">
+  <div class="container" style="text-align:center;display:grid;gap:var(--sp-s);justify-items:center">
+    <p class="stencil" style="color:#E8A88F">Kilonauta</p>
+    <h2 style="max-width:22ch">Deja de copiar direcciones a mano.</h2>
+    <p class="prose" style="max-width:52ch">
+      El demo tiene seis pedidos reales esperando. Cotiza uno, imprime la etiqueta, mira el
+      tracking y abre un reclamo. Toda la operación, de punta a punta, en el navegador.
+    </p>
+    <a class="btn btn--primary" href="demo/index.html" style="margin-top:.5rem">
+      Entrar al demo
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="container" style="display:grid;gap:var(--sp-s)">
+    <a class="wordmark" href="index.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M3 7.2 12 2.5l9 4.7v9.6L12 21.5 3 16.8V7.2Z"/><path d="m3 7.2 9 4.7 9-4.7"/><path d="M12 11.9v9.6"/>
+        <path d="M7.5 4.8 16.5 9.6" stroke="#F08A5F" stroke-width="2.2"/>
+      </svg>
+      <span>Kilo<em>nauta</em></span>
+    </a>
+    <p style="max-width:52ch">
+      Prototipo. Ninguna tarifa de esta página es una oferta: requiere contrato empresa firmado
+      con cada courier. Chilexpress, Starken, Blue Express y Correos de Chile son proveedores
+      de transporte, no clientes ni socios de Kilonauta.
+    </p>
+    <p class="mono tiny">kilonauta.com · disponible · rdap.verisign.com → HTTP 404 · 2026-07-12</p>
+  </div>
+</footer>
+
+<script src="tarifas.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* --- menú móvil --- */
+  const btn = document.getElementById('navBtn');
+  const nav = document.getElementById('nav');
+  btn.addEventListener('click', () => {
+    const open = nav.dataset.open === 'true';
+    nav.dataset.open = String(!open);
+    btn.setAttribute('aria-expanded', String(!open));
+  });
+
+  /* --- comparador en vivo --- */
+  const dest  = document.getElementById('hDest');
+  const kg    = document.getElementById('hKg');
+  const kgOut = document.getElementById('hKgOut');
+  const volEl = document.getElementById('hVol');
+  const facEl = document.getElementById('hFact');
+  const rates = document.getElementById('hRates');
+  const save  = document.getElementById('hSave');
+  const saveT = document.getElementById('hSaveTxt');
+
+  // Caja fija en la landing; en el demo se puede cambiar.
+  const BOX = { l: 30, a: 25, h: 15 };
+
+  KN.DESTINOS.forEach((d) => {
+    const o = document.createElement('option');
+    o.value = d.id;
+    o.textContent = `${d.comuna} — ${d.region}`;
+    if (d.id === 'puertomontt') o.selected = true;
+    dest.appendChild(o);
+  });
+
+  const n1 = (v) => v.toFixed(1).replace('.', ',');
+
+  function render() {
+    const peso = parseFloat(kg.value);
+    kgOut.textContent = n1(peso);
+
+    const q = KN.cotizar({
+      destinoId: dest.value, kg: peso,
+      largo: BOX.l, ancho: BOX.a, alto: BOX.h,
+      plan: 'nauta',
+    });
+
+    volEl.textContent = n1(q.pf.volumetrico);
+    facEl.textContent = n1(q.pf.facturable);
+
+    const validas = q.opciones.filter((o) => o.cobertura);
+    const maxP = Math.max(...validas.map((o) => o.precio));
+
+    rates.innerHTML = q.opciones
+      .slice()
+      .sort((a, b) => (a.cobertura === b.cobertura ? a.precio - b.precio : a.cobertura ? -1 : 1))
+      .map((o) => {
+        if (!o.cobertura) {
+          return `<div class="rate" data-out="1">
+            <div class="rate__top">
+              <span class="rate__name">${o.nombre}</span>
+              <span class="chip chip--bad">Sin cobertura</span>
+            </div>
+            <p class="tiny muted" style="margin:0">No llega a ${q.destino.comuna}. Ni por más plata.</p>
+          </div>`;
+        }
+        const w = Math.round((o.precio / maxP) * 100);
+        const flags = [];
+        if (o.recomendado) flags.push('<span class="chip chip--accent">Recomendado</span>');
+        if (o.esMasBarato && !o.recomendado) flags.push('<span class="chip chip--ok">El más barato</span>');
+        if (o.esMasRapido) flags.push('<span class="chip chip--info">El más rápido</span>');
+        return `<div class="rate" data-best="${o.recomendado ? 1 : 0}">
+          <div class="rate__top">
+            <span class="rate__name">${o.nombre}</span>
+            <span>
+              <span class="rate__list">${KN.clp(o.lista)}</span>
+              <span class="rate__price">${KN.clp(o.precio)}</span>
+            </span>
+          </div>
+          <div class="rate__bar"><i style="width:${w}%"></i></div>
+          <div class="rate__meta">
+            <span>${o.dias} día${o.dias > 1 ? 's' : ''} hábil${o.dias > 1 ? 'es' : ''}</span>
+            <span>${o.ontime}% a tiempo en ${q.destino.comuna}</span>
+            <span>puntaje ${o.puntaje}</span>
+          </div>
+          ${flags.length ? `<div class="rate__flags">${flags.join('')}</div>` : ''}
+        </div>`;
+      })
+      .join('');
+
+    save.textContent = KN.clp(q.ahorro);
+    saveT.innerHTML =
+      `Contra los <b class="clp">${KN.clp(q.referencia)}</b> de Chilexpress a precio de lista, ` +
+      `que es lo que pagas hoy. Son <b>${q.ahorroPct}%</b> menos. ` +
+      `Entre el courier más caro y el más barato hay <b>${q.dispersion}%</b> de diferencia en ${q.destino.comuna}.`;
+  }
+
+  dest.addEventListener('change', render);
+  kg.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

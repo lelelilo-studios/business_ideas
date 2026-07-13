@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio — Rutamo</title>
+<meta name="description" content="ICP, TAM/SAM/SOM con la aritmética a la vista, competencia real, economía unitaria y los primeros 90 días de Rutamo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="assets/rutamo.css">
+<style>
+  .doc { max-width: 78ch; }
+  .doc h2 { margin-top: var(--sp-xl); scroll-margin-top: 80px; }
+  .doc h3 { margin-top: var(--sp-l); }
+  .doc p, .doc ul, .doc ol { margin-top: var(--sp-s); }
+  .doc ul, .doc ol { padding-left: 1.2em; }
+  .doc li { margin-bottom: 6px; color: var(--ink-2); }
+  .toc { position: sticky; top: 80px; align-self: start; }
+  .toc a { display: block; padding: 6px 0; font-family: var(--mono); font-size: .76rem; color: var(--muted); text-decoration: none; border-left: 2px solid var(--rule); padding-left: 10px; }
+  .toc a:hover { color: var(--ink); border-color: var(--hi); border-left-width: 4px; }
+  .layout { display: grid; gap: var(--sp-l); }
+  @media (min-width: 68em) { .layout { grid-template-columns: 200px 1fr; } }
+  .math { font-family: var(--mono); font-size: .84rem; background: #EDE9DE; border: 1px solid var(--rule-2); padding: var(--sp-s); margin-top: var(--sp-s); line-height: 1.9; overflow-x: auto; }
+  .math b { background: var(--hi); padding: 0 4px; }
+  .rank { list-style: none; padding: 0; counter-reset: r; }
+  .rank li { counter-increment: r; display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: var(--sp-s) 0; border-top: 1px solid var(--rule); margin: 0; }
+  .rank li::before { content: counter(r); font-family: var(--mono); font-weight: 600; border: 1px solid var(--ink); width: 28px; height: 28px; display: grid; place-items: center; font-size: .8rem; }
+  .rank b { display: block; color: var(--ink); }
+  .yes-no { display: grid; gap: var(--sp-s); margin-top: var(--sp-s); }
+  @media (min-width: 48em) { .yes-no { grid-template-columns: 1fr 1fr; } }
+  .yes { border: 1px solid var(--ink); border-top: 5px solid var(--hi); padding: var(--sp-m); background: var(--panel); }
+  .no  { border: 1px solid var(--rule-2); border-top: 5px solid var(--critical); padding: var(--sp-m); background: var(--panel); }
+  .wk { border-left: 3px solid var(--ink); padding-left: var(--sp-s); margin-top: var(--sp-m); }
+  .wk b { font-family: var(--mono); font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); padding: 2px 6px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__in">
+    <a class="brand" href="index.html">
+      <svg class="brand__mark" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="1" y="1" width="28" height="28" fill="none" stroke="#14161A" stroke-width="2"/>
+        <path d="M6 23 L12 9 L18 17 L24 7" fill="none" stroke="#14161A" stroke-width="2.4"/>
+        <circle cx="24" cy="7" r="3.4" fill="#D9F02B" stroke="#14161A" stroke-width="2"/>
+      </svg>
+      <span class="brand__name">Ruta<em>mo</em></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__back" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Menú">Menú</summary>
+      <div class="menu__panel">
+        <a href="../index.html">← Ideas</a>
+        <a href="index.html">Producto</a>
+        <a href="demo/index.html">Demo</a>
+        <a href="negocio.html" aria-current="page">Negocio</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="stack.html">Arquitectura</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main class="container" style="padding-block: var(--sp-l)">
+  <span class="eyebrow">Plan de negocio y go-to-market</span>
+  <h1 style="max-width:20ch">A quién le vendemos, cuánto vale y qué nos puede matar.</h1>
+
+  <div class="hazard" style="margin-top:var(--sp-m);max-width:78ch">
+    <p><strong>Regla de esta página:</strong> todo número está citado o marcado como <b>estimación</b> con su
+    aritmética a la vista. Si ves una cifra sin derivación, es un error nuestro y hay que reclamar.</p>
+  </div>
+
+  <div class="layout" style="margin-top:var(--sp-xl)">
+    <nav class="toc" aria-label="Índice">
+      <a href="#icp">1 · Cliente objetivo</a>
+      <a href="#mercado">2 · Tamaño de mercado</a>
+      <a href="#cuna">3 · Posicionamiento y cuña</a>
+      <a href="#competencia">4 · Competencia</a>
+      <a href="#unit">5 · Precio y unit economics</a>
+      <a href="#canales">6 · Canales</a>
+      <a href="#ia">7 · IA en el marketing</a>
+      <a href="#dias">8 · Primeros 90 días</a>
+      <a href="#muerte">9 · Qué mataría esto</a>
+    </nav>
+
+    <div class="doc">
+
+      <!-- ======================================================= 1. ICP -->
+      <h2 id="icp">1 · Cliente objetivo</h2>
+      <p>Empresa chilena de servicios de terreno, formalizada, entre <strong>3 y 25 técnicos</strong>, que
+      despacha visitas todos los días en el Gran Santiago. Facturación anual entre
+      <strong class="mono">$150M</strong> y <strong class="mono">$1.200M</strong> CLP.</p>
+
+      <div class="scroll-x" style="margin-top:var(--sp-s)">
+        <table class="table">
+          <thead><tr><th>Dimensión</th><th>Quién exactamente</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Rubros</strong></td><td>Climatización (HVAC), refrigeración comercial, gasfitería y sanitarios, instalaciones eléctricas, ascensores y elevación, extintores y redes húmedas, control de plagas.</td></tr>
+            <tr><td><strong>Quién firma</strong></td><td>El dueño. Casi siempre técnico él mismo, entre 38 y 58 años. Paga con transferencia y quiere ver el ROI en la primera semana. No hay comité de compra ni licitación.</td></tr>
+            <tr><td><strong>Quién lo usa a diario</strong></td><td>La administradora / secretaria (contesta el teléfono, agenda y factura) y los técnicos en terreno. Son dos usuarios muy distintos: la primera vive en el escritorio, los segundos en la camioneta.</td></tr>
+            <tr><td><strong>Quién puede matar la venta</strong></td><td>El técnico más antiguo. Si dice «esto es para controlarnos», se acabó. La app tiene que <em>servirle a él</em> antes que al dueño.</td></tr>
+            <tr><td><strong>Dónde ya está</strong></td><td>Un cuaderno o pizarra. WhatsApp Business. Un Excel de «mantenciones». Bsale, Nubox o Defontana para facturar. Grupos de Facebook y WhatsApp del rubro. Registro de instaladores autorizados de la SEC.</td></tr>
+            <tr><td><strong>Qué ya paga</strong></td><td>Software de facturación (~$25.000–$60.000/mes), plan de datos de los técnicos, GPS de camionetas si es que. El presupuesto de software existe: no hay que crearlo, hay que quitárselo a otro o ampliarlo un poco.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Quién NO es cliente:</strong> el gasfíter que trabaja solo (no tiene a quién despachar);
+      la constructora que hace obra nueva (su problema es la obra, no la visita); la empresa de 200 técnicos
+      con SAP (nos pasan por encima con un requerimiento de integración de seis meses).</p>
+
+      <!-- =================================================== 2. MERCADO -->
+      <h2 id="mercado">2 · Tamaño de mercado (Chile), con la aritmética a la vista</h2>
+      <p>No tenemos un corte del SII por CIIU de servicios especializados de construcción a la mano.
+      Lo decimos en vez de inventarlo. Lo que sigue es una derivación con supuestos declarados y un
+      rango de sensibilidad: sirve para decidir, no para poner en un pitch deck sin verificar.</p>
+
+      <div class="math">
+S1 · Empresas formales en Chile con ventas sobre UF 2.400/año ................ <b>240.000</b>
+     (orden de magnitud, a partir de las estadísticas de empresas por tamaño del SII.
+      VERIFICAR el corte exacto antes de usar esta cifra fuera de esta página.)
+
+S2 · Fracción en oficios de terreno con cuadrilla (HVAC, refrigeración, gas,
+     eléctrico, ascensores, extintores, plagas) ............................. <b>4%</b>  → 9.600 empresas
+     (estimación nuestra por analogía con el peso del rubro «actividades
+      especializadas de construcción» en el empleo)
+
+TAM = 9.600 × $145.000 ARPA × 12 ............................. <b>$16.704M CLP/año  ≈ US$17,6M</b>
+
+S3 · De esas, las que tienen ≥3 técnicos y despachan a diario ............... <b>45%</b>  → 4.320 empresas
+
+SAM = 4.320 × $145.000 × 12 .................................. <b>$7.517M CLP/año  ≈ US$7,9M</b>
+
+S4 · Penetración alcanzable a 36 meses con venta de campo ................... <b>6% del SAM</b> → 259 cuentas
+
+SOM (mes 36) = 259 × $145.000 × 12 ............................ <b>$450M CLP/año   ≈ US$474k ARR</b>
+
+Tipo de cambio usado: $950 CLP/USD (referencial, julio 2026).
+      </div>
+
+      <p><strong>Sensibilidad honesta:</strong> si S2 fuera 2,5% en vez de 4%, el TAM baja a
+      <span class="mono">US$11M</span>. Si fuera 6%, sube a <span class="mono">US$26M</span>.
+      El orden de magnitud no cambia: <strong>el mercado chileno de suscripción para esto es de
+      decenas de millones de dólares, no de cientos.</strong></p>
+
+      <h3>La conclusión incómoda</h3>
+      <p>Con este TAM, Rutamo <strong>no es un negocio de venture capital en Chile solo</strong>. Es un
+      negocio de dueño excelente (US$300–600k de ARR con 4 personas, márgenes de 87%) o el primer país
+      de una plataforma regional. Cualquiera que te venda «el mercado chileno es enorme» está mintiendo
+      o no hizo la cuenta.</p>
+
+      <h3>Las dos palancas que sí cambian la escala</h3>
+      <ol>
+        <li><strong>LatAm hispanohablante.</strong> México ≈ 5× Chile, Colombia ≈ 2×, Perú ≈ 1×,
+        Argentina ≈ 2× (proporción por número de empresas formales, <b>estimación</b>). El producto es
+        casi idéntico: cambian la pasarela de pago y el emisor de documento tributario. TAM regional
+        estimado: <strong class="mono">US$210M–280M</strong>. El costo de entrar a cada país es
+        principalmente comercial, no técnico.</li>
+        <li><strong>Take rate sobre el cobro (GMV).</strong> Una cuenta de 8 técnicos mueve entre
+        <span class="mono">$25M</span> y <span class="mono">$40M</span> de trabajo facturado al mes.
+        Si el 25% pasa por el link de pago de Rutamo y cobramos 0,4% sobre eso:
+        <span class="mono">$30M × 25% × 0,4% ≈ $30.000/mes</span> por cuenta, o
+        <strong>+21% de ARPA sin vender nada nuevo</strong>. Es la hipótesis más valiosa del modelo y la
+        más peligrosa: si la cobras muy temprano, el dueño siente que le metiste la mano al bolsillo.
+        En el plan del año 1 el take rate es <strong>cero</strong>.</li>
+      </ol>
+
+      <!-- ====================================================== 3. CUÑA -->
+      <h2 id="cuna">3 · Posicionamiento y cuña</h2>
+      <p class="hazard" style="max-width:none"><strong>Cabeza de playa: climatización y refrigeración
+      comercial, 5 a 15 técnicos, Región Metropolitana.</strong></p>
+      <p>Por qué ése y no «todos los oficios»:</p>
+      <ul>
+        <li><strong>Tienen contratos de mantención recurrentes.</strong> El calendario ya existe (mensual,
+        trimestral, semestral) y hoy vive en un Excel. Cargarlo es la demo: le mostramos su propio año
+        ordenado en 20 minutos.</li>
+        <li><strong>La visita perdida les duele en plata visible.</strong> Una cámara de frío caída son
+        lácteos botados; el cliente los llama gritando. El costo de la desorganización no es abstracto.</li>
+        <li><strong>El equipo tiene número de serie.</strong> Chiller, compresor, cámara: la ficha del equipo
+        y su historial de fallas es el dato más valioso que tienen y hoy está en la cabeza del técnico
+        que se puede ir mañana.</li>
+        <li><strong>Es un gremio chico y hablador.</strong> Se conocen todos, compran los repuestos en los
+        mismos tres distribuidores y se recomiendan. Diez clientes felices en climatización valen más que
+        cincuenta repartidos en seis rubros.</li>
+      </ul>
+      <p>Desde ahí se expande a gasfitería y eléctrico (mismo flujo, distinto catálogo de repuestos), y
+      después a ascensores y extintores, que son los que tienen la reportería más exigente.</p>
+
+      <p><strong>La frase de posicionamiento:</strong> <em>«Simpliroute optimiza el reparto de cajas.
+      Bsale te emite la boleta. Rutamo se hace cargo del día del técnico: dónde va, qué lleva, qué cotiza
+      y cómo cobra.»</em></p>
+
+      <!-- =============================================== 4. COMPETENCIA -->
+      <h2 id="competencia">4 · Competencia</h2>
+      <div class="scroll-x">
+        <table class="table">
+          <thead><tr><th>Quién</th><th>Qué hace</th><th>Diferenciación honesta</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>El cuaderno + WhatsApp + Excel</strong><br><span class="tag">el titular real del puesto</span></td>
+              <td>Agenda en papel, coordinación por grupo de WhatsApp, cotización a mano, cobro a fin de mes.</td>
+              <td>Es gratis, funciona hoy y no se cae nunca. <strong>Es el rival a vencer, no los gringos.</strong> Le ganamos sólo si el dueño ve el ahorro en la primera semana. Si tenemos que explicárselo, perdimos.</td>
+            </tr>
+            <tr>
+              <td><strong>Simpliroute, Beetrack, Drivin</strong><br><span class="tag">chilenas, ruteo</span></td>
+              <td>Optimización de rutas y seguimiento de flota. Fuertes en distribución y última milla.</td>
+              <td>Resuelven muy bien un problema parecido pero <em>distinto</em>: entregar cajas. Una parada de reparto dura 4 minutos y es predecible. Una visita técnica dura entre 30 y 180 minutos, necesita un repuesto específico, genera una cotización y termina en un cobro. Ellas no cotizan, no firman, no cobran y no tienen ficha de equipo. Riesgo real: <strong>pueden bajar a este segmento</strong>. Nuestra defensa es la profundidad del oficio, no la ruta.</td>
+            </tr>
+            <tr>
+              <td><strong>Jobber, Housecall Pro, ServiceTitan</strong><br><span class="tag">EE.UU.</span></td>
+              <td>Field service management maduro y muy bueno.</td>
+              <td>En inglés, en dólares, sin SII, sin Webpay, sin WhatsApp como canal de primera clase. ServiceTitan es enterprise y cuesta más por técnico de lo que una PYME chilena gasta en software completo. Ninguno tiene equipo comercial en Chile. Es una ventaja de ventana, no un foso: <strong>si Jobber decide entrar a LatAm en serio, tenemos 18 meses.</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Odoo Field Service</strong></td>
+              <td>Módulo open source, muy barato en licencia.</td>
+              <td>Necesita un implementador. Ningún dueño de una empresa de 8 gasfíteres va a configurar Odoo un domingo. El costo real no es la licencia, es el consultor.</td>
+            </tr>
+            <tr>
+              <td><strong>Defontana, Bsale, Nubox, Relbase</strong></td>
+              <td>ERP y facturación electrónica PYME. Enormes en instalada.</td>
+              <td><strong>No son rivales: son canal.</strong> Su «orden de servicio» es un campo de texto. Nosotros les entregamos la orden cerrada y firmada para que emitan el DTE. La integración es la puerta de entrada a su base instalada.</td>
+            </tr>
+            <tr>
+              <td><strong>Marketplaces de servicios</strong></td>
+              <td>Captan demanda y la enrutan a técnicos.</td>
+              <td>Otro negocio. Ellos venden pega; nosotros operamos la pega que ya vendiste. Podrían ser socios.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- =============================================== 5. UNIT ECONOMICS -->
+      <h2 id="unit">5 · Precio y economía unitaria</h2>
+      <h3>Tramos (CLP, mensual, sin IVA)</h3>
+      <div class="scroll-x">
+        <table class="table">
+          <thead><tr><th>Plan</th><th>Técnicos</th><th class="n">Base</th><th class="n">Por técnico</th><th class="n">Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td>Cuadrilla</td><td>1–3</td><td class="n">$59.000</td><td class="n">incluido</td><td class="n">3 téc. = $59.000</td></tr>
+            <tr><td><strong>Terreno</strong></td><td>4–15</td><td class="n">$39.000</td><td class="n">$19.000</td><td class="n">8 téc. = <strong>$191.000</strong></td></tr>
+            <tr><td>Flota</td><td>16+</td><td class="n">$149.000</td><td class="n">$16.000</td><td class="n">22 téc. = $501.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src">Comisión de la pasarela: pass-through, sin recargo de Rutamo. Take rate propio: <b>0%</b> en el año 1 (ver §2).</p>
+
+      <h3>La cuenta, línea por línea</h3>
+      <div class="math">
+ARPA objetivo (mezcla de planes, mes 24) ............................. <b>$145.000</b>/mes
+
+COSTO DE SERVIR (por cuenta, por mes)
+  Inferencia de IA (derivada en Arquitectura, US$5,0 × $950) .......... $  4.750
+  WhatsApp Business API (≈300 mensajes de utilidad × US$0,008) ........ $  2.280
+  Infra (Postgres, OSRM/VROOM, storage de fotos, hosting) ............. $  3.800
+  Soporte y éxito de cliente (0,5 h/mes × $16.000 cargado) ............ $  8.000
+                                                                        ---------
+  COGS total .......................................................... <b>$ 18.830</b>
+
+MARGEN BRUTO = (145.000 − 18.830) / 145.000 ......................... <b>87,0%</b>
+Contribución mensual por cuenta ..................................... <b>$126.170</b>
+
+CAC
+  AE de terreno cargado ($2.200.000/mes) ÷ 6 cierres/mes .............. $ 366.667
+  Marketing y viáticos por cuenta cerrada ............................ $ 113.000
+  Onboarding (6 h × $12.000, se hace una vez) ......................... $  72.000
+                                                                        ---------
+  CAC total ........................................................... <b>$ 551.667</b>
+
+CHURN base (mensual) ................................................ <b>3,0%</b>  → vida media 33 meses
+  (las cuentas de 2–3 técnicos churnean el doble; las de 8+ casi no se van.
+   3,0% es el promedio ponderado que asumimos. Es el supuesto más frágil de la tabla.)
+
+LTV = $126.170 × 33 meses ........................................... <b>$4.163.610</b>
+LTV / CAC ........................................................... <b>7,5×</b>
+PAYBACK = $551.667 / $126.170 ....................................... <b>4,4 meses</b>
+      </div>
+
+      <p>Un LTV/CAC de 7,5× con payback de 4,4 meses <em>parece</em> demasiado bueno. Dos razones por las
+      que es plausible y una por la que puede estar mal:</p>
+      <ul>
+        <li><strong>Plausible 1:</strong> el ticket es bajo pero el margen es de software puro; la
+        optimización de ruta corre en un solver propio, no en un LLM que cobra por token.</li>
+        <li><strong>Plausible 2:</strong> la venta es corta. El dueño decide solo, en una reunión, con su
+        propia lista de mañana en pantalla. No hay ciclo de 6 meses.</li>
+        <li><strong>Puede estar mal:</strong> si el churn real es 6% mensual (vida de 17 meses), el LTV cae
+        a <span class="mono">$2,1M</span> y LTV/CAC a <strong>3,9×</strong>. Sigue siendo un negocio, pero
+        obliga a bajar el CAC o a subir el precio. <strong>La métrica que vigilamos desde el primer cliente
+        es la retención al mes 3, no el MRR.</strong></li>
+      </ul>
+
+      <!-- ==================================================== 6. CANALES -->
+      <h2 id="canales">6 · Canales de adquisición, rankeados</h2>
+      <ol class="rank">
+        <li>
+          <b>El registro público de instaladores autorizados de la SEC</b>
+          La Superintendencia de Electricidad y Combustibles mantiene registros públicos de instaladores
+          eléctricos y de gas autorizados (clases A, B, C). Es una lista con nombre, clase y zona: la base
+          de prospección más limpia que existe en este rubro, y es gratis. Outbound por WhatsApp + llamada,
+          con un mensaje que menciona su comuna y su especialidad. <strong>CPL ≈ $0 en plata, alto en horas.</strong>
+          <span class="tag">verificar el formato de descarga vigente del registro</span>
+        </li>
+        <li>
+          <b>Gremios del rubro</b>
+          DITAR A.G. (climatización y refrigeración) para la cuña; después CChC, ASECH, Conupia y las cámaras
+          de comercio comunales. No un auspicio: una charla de 25 minutos donde despachamos <em>en vivo</em>
+          el día de alguien del público. <span class="tag">verificar membresía, calendario y costo</span>
+        </li>
+        <li>
+          <b>Distribuidores de repuestos e insumos</b>
+          Anwo, Refrimarket, los mostradores donde el técnico compra la válvula un martes a las 7:40.
+          Acuerdo de referidos: ellos ganan comisión, nosotros llegamos donde ya hay confianza.
+          Es el canal más subestimado de la lista.
+        </li>
+        <li>
+          <b>Contadores y software PYME como distribución</b>
+          Integración certificada con Bsale, Nubox, Defontana y Relbase + comisión de referido al contador
+          que la recomienda. Es el canal que escala sin equipo de ventas, pero tarda 6–9 meses en encender.
+          Se siembra en el mes 4, se cosecha en el mes 12.
+        </li>
+        <li>
+          <b>SEO long-tail en español de Chile</b>
+          «formato de orden de trabajo para gasfitería», «cada cuánto se hace mantención a un chiller»,
+          «cómo cobrar una visita técnica». Bajo volumen, altísima intención, cero competencia.
+          Y una herramienta gratis que sí se comparte: la calculadora de horas perdidas de la portada.
+        </li>
+        <li>
+          <b>Google Ads (búsqueda, no display)</b>
+          Términos: «software para empresas de climatización», «app para técnicos en terreno», marcas de
+          competidores. <strong>CPL estimado $18.000–$35.000</strong> (estimación: el rubro casi no puja,
+          los CPC deberían ser bajos; hay que validarlo con $300.000 de prueba, no con una planilla).
+        </li>
+        <li>
+          <b>Mercado Público / ChileCompra</b>
+          Las empresas de mantención que le venden al Estado tienen obligación de reportería y son las que
+          más sufren el desorden. Canal lento y burocrático, pero de tickets grandes.
+        </li>
+        <li>
+          <b>Ferias del rubro</b>
+          Las ferias chilenas de climatización y refrigeración, y las de la construcción. Un stand con dos
+          pantallas: el mapa y el teléfono del técnico. <span class="tag">verificar ediciones y fechas vigentes</span>
+        </li>
+        <li>
+          <b>Meta / Instagram Ads</b>
+          <strong>Lo descartamos y lo decimos.</strong> El dueño de una empresa de 8 refrigeristas no compra
+          software B2B desde un reel. Gastar acá es prender plata.
+        </li>
+      </ol>
+
+      <!-- ======================================================== 7. IA -->
+      <h2 id="ia">7 · IA en el marketing: dónde sí y dónde no</h2>
+      <div class="yes-no">
+        <div class="yes">
+          <p class="tag">Donde sí ayuda de verdad</p>
+          <ul style="margin-top:8px">
+            <li><strong>Enriquecer la lista de prospección.</strong> Tomamos el registro de la SEC y le
+            pegamos, por empresa, sus reseñas de Google y su sitio (si tiene). Un modelo barato (Haiku 4.5)
+            resume en dos líneas qué hace y qué le duele. Costo: <span class="mono">~$2 CLP por empresa</span>.
+            Eso convierte un mensaje genérico en «vi que atienden refrigeración en Ñuñoa y tienen 47 reseñas,
+            la mayoría de supermercados».</li>
+            <li><strong>Codificar las entrevistas de descubrimiento.</strong> 40 conversaciones grabadas,
+            transcritas y agrupadas por dolor. Un humano tardaría dos semanas; esto tarda una tarde.</li>
+            <li><strong>Producir el SEO long-tail.</strong> 60 páginas de contenido útil, con una regla
+            innegociable: <strong>ninguna se publica sin que un técnico del rubro la lea completa.</strong>
+            Un artículo con un error técnico nos quema justo con la gente que queremos.</li>
+          </ul>
+        </div>
+        <div class="no">
+          <p class="tag">Donde no ayuda (y hacerlo nos daña)</p>
+          <ul style="margin-top:8px">
+            <li><strong>La llamada de venta.</strong> Este cliente compra por confianza y por olfato. Un
+            SDR con IA que llama en nombre nuestro nos quema el nombre en un gremio donde todos se conocen.</li>
+            <li><strong>El video de demo.</strong> Tiene que oler a taller: una camioneta, un subterráneo,
+            una mano con guantes. Un video generado se nota y nos convierte en «otra app de Santiago».</li>
+            <li><strong>El copy de marca.</strong> Si suena a «potencia tu negocio con IA», el dueño cierra
+            la pestaña. Escribimos como habla el rubro o no escribimos.</li>
+          </ul>
+          <p style="margin-top:10px"><strong>«IA en todo» no es una estrategia.</strong> Es una manera de
+          no elegir.</p>
+        </div>
+      </div>
+
+      <!-- ===================================================== 8. 90 DÍAS -->
+      <h2 id="dias">8 · Los primeros 90 días</h2>
+      <div class="wk"><b>Semanas 1–2 · Escuchar antes de escribir código</b>
+        <p>30 entrevistas: 15 dueños, 10 técnicos en terreno (en la camioneta, no en una oficina), 5
+        administradoras. Objetivo concreto: salir con la lista de los 10 equipos más comunes y los 30
+        repuestos que más se piden. Esa lista <em>es</em> el catálogo del producto.</p>
+      </div>
+      <div class="wk"><b>Semanas 3–6 · Tres design partners que pagan</b>
+        <p>Tres empresas de climatización/refrigeración, 5–12 técnicos. Pagan <strong class="mono">$50.000/mes</strong>
+        desde el día uno — no un piloto gratis: un piloto barato. Si no pagan, no valida nada. Cargamos
+        sus clientes y equipos nosotros, a mano si hace falta.</p>
+      </div>
+      <div class="wk"><b>Semanas 7–10 · La semana del técnico</b>
+        <p>Un fundador se sube a la camioneta con un técnico de cada design partner, un día completo cada
+        uno. Sin laptop. Solo mirando. Ahí se decide si la app del terreno vive o muere: la métrica es
+        <strong>% de visitas cerradas en la app sin que nadie se lo recuerde</strong>.</p>
+      </div>
+      <div class="wk"><b>Semanas 11–13 · Encender el primer canal</b>
+        <p>Outbound sobre el registro de la SEC (200 empresas de climatización en la RM), enriquecido con
+        IA, contactado por WhatsApp. Meta: 20 demos, 5 cierres. Charla en el gremio de refrigeración.
+        Primer caso escrito con números reales del design partner que más ahorró.</p>
+      </div>
+      <p><strong>Criterio de salida de los 90 días:</strong> 5 clientes pagando a precio de lista, con
+      ≥70% de sus visitas cerradas en la app por los técnicos. Si el segundo número no se cumple, no se
+      escala: se vuelve al producto.</p>
+
+      <!-- ===================================================== 9. MUERTE -->
+      <h2 id="muerte">9 · Qué mataría esto</h2>
+      <div class="hazard" style="max-width:none">
+        <p><strong>El técnico no la usa.</strong></p>
+      </div>
+      <p style="margin-top:var(--sp-m)">Ese es el riesgo. No es el mercado, no es la competencia, no es el
+      precio. Es que un maestro con 22 años de oficio, las manos sucias y un teléfono con la pantalla
+      trizada decida que la app es una forma de vigilarlo, y siga anotando en el cuaderno. Cuando eso pasa,
+      el dueño ve datos a medias, deja de confiar en el mapa, y cancela al segundo mes. <strong>Es un riesgo
+      de producto y de trato con el técnico, no de negocio</strong>, y por eso la vista del terreno tiene
+      cuatro botones y no cuarenta campos.</p>
+
+      <p><strong>Los otros tres, en orden:</strong></p>
+      <ol>
+        <li><strong>Simpliroute (o quien sea) baja al segmento.</strong> Tienen marca, plata y equipo
+        comercial en Chile. Si le agregan cotización y cobro a su producto de ruteo, la ventana se cierra.
+        Nuestra apuesta: la profundidad del oficio (ficha de equipo, repuestos, historial, SEC, DTE) es más
+        difícil de copiar que un mapa. Puede que nos equivoquemos.</li>
+        <li><strong>El TAM chileno topa antes de que lleguemos a US$1M de ARR.</strong> Con 4.320 empresas
+        en el SAM, llegar a US$1M exige ~575 cuentas: <strong>13% del SAM completo</strong>. Es mucho. O
+        subimos el ARPA (take rate sobre GMV, más módulos) o salimos de Chile antes del mes 24.</li>
+        <li><strong>Nos convertimos en un ERP.</strong> Cada cliente va a pedir inventario, RRHH,
+        remuneraciones, control de asistencia. Decir que sí a todo nos deja con un producto mediocre en diez
+        cosas. La regla: <strong>si no pasa por la camioneta, no lo construimos.</strong></li>
+      </ol>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="container" style="display:flex;flex-wrap:wrap;gap:var(--sp-s);justify-content:space-between;width:100%">
+    <span>Rutamo · rutamo.com</span>
+    <span><a href="roadmap.html">Roadmap y criterios de muerte →</a></span>
+  </div>
+</footer>
+</body>
+</html>
