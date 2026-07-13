@@ -8,7 +8,7 @@ Ojo: es un f-string, así que las llaves del CSS van dobladas: {{ }}.
 import json, glob, html, re, colorsys
 
 ideas = [json.load(open(f)) for f in sorted(glob.glob("*/meta.json"))]
-assert len(ideas) == 15, f"esperaba 15 ideas, encontré {len(ideas)}"
+assert len(ideas) == 16, f"esperaba 16 ideas, encontré {len(ideas)}"
 
 # Dos familias: las 10 de PYME y las 5 de minería. Se separan porque el comprador
 # es otro (una dueña que contesta el WhatsApp vs. un gerente de operaciones), el
@@ -16,8 +16,9 @@ assert len(ideas) == 15, f"esperaba 15 ideas, encontré {len(ideas)}"
 # cuenta sólo en un párrafo: cambia el suelo (tinta cálida → grafito frío), cambia
 # la densidad (diez tarjetas a dos columnas → cinco tarjetas anchas) y cambia la
 # ficha de la familia. Se tiene que *sentir* que entraste a otra pieza.
-pyme   = [d for d in ideas if int(d["folder"][:2]) <= 10]
-minera = [d for d in ideas if int(d["folder"][:2]) >= 11]
+pyme    = [d for d in ideas if int(d["folder"][:2]) <= 10]
+minera  = [d for d in ideas if 11 <= int(d["folder"][:2]) <= 15]
+consumo = [d for d in ideas if int(d["folder"][:2]) >= 16]
 
 
 # ---------------------------------------------------------------- color derivado
@@ -135,7 +136,7 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     <section class="fam fam--{fid}" id="{fid}" aria-labelledby="h-{fid}">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 2</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 3</p>
           <h2 class="fam__title" id="h-{fid}">{titulo}</h2>
           <p class="fam__count mono"><b>{len(items):02d}</b><span>ideas</span></p>
           <p class="fam__lede">{bajada}</p>
@@ -148,7 +149,7 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     </section>'''
 
 
-BG_PYME, BG_MINERA = "#191612", "#111922"
+BG_PYME, BG_MINERA, BG_CONSUMO = "#191612", "#111922", "#181428"
 
 secciones = (
     family(
@@ -170,6 +171,16 @@ secciones = (
          ("Ciclo de venta", "12 a 18 meses: piloto, homologación, procurement."),
          ("La cuña", "Cuatro de las cinco no le venden a la minera, sino a la contratista que ya está adentro.")],
         minera, BG_MINERA, show_market=True)
+    + family(
+        "consumo", "03", "Consumo",
+        "La única idea del set que no le vende a una empresa: le vende a una familia. "
+        "El niño juega, el papá paga y el banco termina financiando la cuenta — y esa "
+        "cadena de tres es la idea, no un detalle del modelo.",
+        [("Comprador", "El papá. Pero el que firma el cheque grande es el banco."),
+         ("Ticket", "$4.990 la familia. $54 millones al año la marca."),
+         ("Ciclo de venta", "Minutos con el papá. Cuatro a seis meses con el banco."),
+         ("El rival real", "Que el niño se aburra y juegue otra cosa.")],
+        consumo, BG_CONSUMO, show_market=True)
 )
 
 doc = f'''<!doctype html>
@@ -177,7 +188,7 @@ doc = f'''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>15 ideas de negocio — lelelilo studios</title>
+<title>16 ideas de negocio — lelelilo studios</title>
 <meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -322,6 +333,12 @@ body {{
 .fam--mineria {{
   --bg:#0A0F14; --card:#111922; --line:#26333D; --hair:#161F27;
   --mute:#93A1AB; --mute-2:#758590; --sig:#B9CBD6;
+}}
+/* Consumo: tinta de imprenta. Ni el café de la PYME ni el acero de la faena —
+   esta idea se imprime en riso, y la banda lo anticipa antes de que abras la tarjeta. */
+.fam--consumo {{
+  --bg:#0F0C18; --card:#181428; --line:#2F2A45; --hair:#1E1930;
+  --mute:#A199B8; --mute-2:#8C84A3; --sig:#E4DFF0;
 }}
 
 .fam__head {{
@@ -545,9 +562,9 @@ body {{
   }}
   .fam--pyme .idea__head {{ padding-right:3rem; }}
 
-  /* Minería: cinco tarjetas anchas, a dos columnas internas y con aire — pesan. */
-  .fam--mineria .ideas {{ gap:var(--sp-m); }}
-  .fam--mineria .idea {{
+  /* Minería y Consumo: tarjetas anchas, a dos columnas internas y con aire — pesan. */
+  .fam--mineria .ideas, .fam--consumo .ideas {{ gap:var(--sp-m); }}
+  .fam--mineria .idea, .fam--consumo .idea {{
     grid-template-columns:5rem minmax(0,.85fr) minmax(0,1.15fr);
     column-gap:var(--sp-xl);
     padding:var(--sp-l) var(--sp-l) var(--sp-m);
@@ -570,13 +587,13 @@ body {{
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>15 ideas</span><span>·</span><span>2026</span></p>
-    <h1>Quince negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería— con
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>16 ideas</span><span>·</span><span>2026</span></p>
+    <h1>Dieciséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería, una de consumo— con
       un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
       arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
 
-    <nav class="jump" aria-label="Las dos familias">
+    <nav class="jump" aria-label="Las tres familias">
       <a href="#pyme">
         <span class="jump__n mono">{len(pyme):02d}</span>
         <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
@@ -585,6 +602,11 @@ body {{
       <a href="#mineria">
         <span class="jump__n mono">{len(minera):02d}</span>
         <span class="jump__t">Minería<small>Ticket alto · decide operaciones · venta en 12-18 meses</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+      <a href="#consumo">
+        <span class="jump__n mono">{len(consumo):02d}</span>
+        <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
     </nav>
@@ -599,7 +621,7 @@ body {{
       </div>
       <div>
         <h2>Dominios</h2>
-        <p><em>Los quince dominios están verificados como libres</em> al 13 de julio de 2026
+        <p><em>Los dieciséis dominios están verificados como libres</em> al 13 de julio de 2026
           (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
           <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
           antes de comprarlo.</p>
@@ -637,7 +659,7 @@ body {{
 '''
 
 open("index.html", "w").write(doc)
-print(f"hub generado: {len(ideas)} ideas ({len(pyme)} PYME, {len(minera)} minería)")
+print(f"hub generado: {len(ideas)} ideas ({len(pyme)} PYME, {len(minera)} minería, {len(consumo)} consumo)")
 for d in ideas:
     n = int(d["folder"][:2])
     bg = BG_PYME if n <= 10 else BG_MINERA

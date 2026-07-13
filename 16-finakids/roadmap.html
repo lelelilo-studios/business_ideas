@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finakids — Roadmap: seis hitos y seis maneras de morir</title>
+<meta name="description" content="Del día 1 al mes 24: hitos con caja, headcount y criterio de muerte. Trayectoria de ingresos en tres escenarios, valle de runway, retención por cohorte y probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .titular { padding-block: var(--sp-l) var(--sp-m); }
+  .hito { border: 2px solid var(--tinta); box-shadow: var(--registro-chico); padding: var(--sp-s); display: grid; gap: 10px; }
+  .hito-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .hito-n { font-family: var(--display); font-weight: 800; font-size: var(--step-3); line-height: 1; color: var(--azul); }
+  .hito h3 { font-size: var(--step-1); max-width: 26ch; }
+  .hito-datos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--papel-3); border: 1px solid var(--papel-3); }
+  .hito-datos div { background: var(--papel); padding: 7px 9px; }
+  .hito-datos .rotulo { font-size: .6rem; }
+  .hito-datos b { font-family: var(--mono); font-size: .9rem; }
+  .muerte { border: 2px solid var(--rosa); background: var(--rosa-cl); padding: 10px; }
+  .muerte .rotulo { color: var(--rosa); }
+  .muerte p { font-size: .86rem; margin-top: 4px; }
+  .cuenta { font-family: var(--mono); font-size: .8rem; line-height: 1.9; }
+  .cuenta .op { color: var(--tinta-3); }
+  .cuenta .res { background: var(--amarillo); padding: 1px 5px; border: 1px solid var(--tinta); }
+  .rango { font-family: var(--display); font-weight: 800; font-size: var(--step-4); line-height: 1; color: var(--rosa); }
+  .factor { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px dotted var(--papel-3); align-items: baseline; }
+  .factor b { font-family: var(--mono); white-space: nowrap; }
+  @media (min-width: 56em) { .hitos { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--sp-s); } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="9" width="28" height="19" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M2 9 16 2l14 7" fill="#E8318F" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="19" r="4.5" fill="none" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M16 15.5v7M14 17.4h4M14 20.6h4" stroke="#1F1C33" stroke-width="1.6"/>
+      </svg>
+      <span class="marca-txt">Finakids</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+</header>
+<div class="nav-movil" id="menuMovil">
+  <ul role="list">
+    <li><a href="../index.html">← Ideas</a></li>
+    <li><a href="index.html">Producto</a></li>
+    <li><a href="demo/index.html">Demo</a></li>
+    <li><a href="negocio.html">Negocio</a></li>
+    <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+    <li><a href="stack.html">Arquitectura</a></li>
+  </ul>
+</div>
+
+<main>
+
+<section class="container titular">
+  <span class="rotulo">Del día 1 al mes 24</span>
+  <h1 class="mal-registro">Seis hitos. Y seis maneras de morir.</h1>
+  <p class="txt-2" style="max-width:56ch;margin-top:var(--sp-s);font-size:var(--step-1)">Un roadmap sin criterios de muerte es una carta al Viejito Pascuero. Cada hito de acá abajo trae la observación exacta que debería hacernos parar — y la del mes 9 es la que más nos aterra.</p>
+</section>
+
+<!-- GRÁFICO 1: MRR -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">Gráfico 01</span><h2>Trayectoria de ingresos, tres escenarios</h2></div>
+    <figure class="fig">
+      <figcaption>
+        <div class="fig-titulo">Ingreso mensual recurrente, meses 1 a 24</div>
+        <div class="fig-sub">Millones de pesos por mes. Los escalones son contratos de banco; la pendiente son familias.</div>
+      </figcaption>
+      <div class="leyenda">
+        <span><i style="background:#0B60C4"></i> Base</span>
+        <span><i style="background:#E8318F"></i> Pesimista</span>
+        <span><i style="background:#A87A00"></i> Optimista</span>
+      </div>
+      <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+        <svg id="gMrr" viewBox="0 0 700 344" width="100%" height="344" style="min-width:660px" role="img" aria-labelledby="mrrT mrrD">
+          <title id="mrrT">Ingreso mensual recurrente a 24 meses en tres escenarios</title>
+          <desc id="mrrD">El escenario base llega a 28,5 millones de pesos al mes en el mes 24; el pesimista a 4,0; el optimista a 67,4.</desc>
+        </svg>
+      </div>
+      <p class="fig-nota"><b>Supuestos declarados de cada escenario.</b><br>
+      <b>Pesimista:</b> un piloto de banco de 6 meses que <b>no renueva</b> (el acantilado del mes 14), conversión gratis→pago 3%, churn 7,4%/mes, 800 familias pagando al mes 24.<br>
+      <b>Base:</b> piloto en el mes 8 → contrato anual en el 13 → segundo banco en el 17 → tercero en el 22. Conversión 6%, churn 5,5%/mes, 3.000 familias al mes 24. Contrato de banco = $54M/año = $4,5M/mes.<br>
+      <b>Optimista:</b> piloto en el 6, cinco contratos al mes 24 (uno de ellos en Perú), conversión 8%, churn 4,5%/mes, 9.000 familias.<br>
+      El ARR base al mes 24 (<b>$342M</b>) es el mismo número que el SOM de <a href="negocio.html">Negocio</a>. Si algún día dejan de coincidir, uno de los dos está mal.</p>
+    </figure>
+  </div>
+</section>
+
+<!-- GRÁFICO 2: CAJA -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">Gráfico 02</span><h2>La caja: dónde nos quedamos sin aire</h2></div>
+    <!-- Una columna, no dos: en dos columnas cada gráfico quedaba más angosto que su
+         min-width y el escritorio obligaba a hacer scroll dentro de la figura. -->
+    <div class="grilla">
+      <figure class="fig" style="margin:0">
+        <figcaption>
+          <div class="fig-titulo">Ingresos contra costos, mes a mes</div>
+          <div class="fig-sub">Escenario base. Millones de pesos por mes.</div>
+        </figcaption>
+        <div class="leyenda">
+          <span><i style="background:#0B60C4"></i> Ingresos</span>
+          <span><i style="background:#E8318F"></i> Costos</span>
+        </div>
+        <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+          <svg id="gFlujo" viewBox="0 0 700 300" width="100%" height="300" style="min-width:660px" role="img" aria-labelledby="flT flD">
+            <title id="flT">Ingresos y costos mensuales, escenario base</title>
+            <desc id="flD">Los costos superan a los ingresos hasta el mes 17; vuelven a superarlos entre el 19 y el 21 al crecer el equipo; el mes 22 es el primero con caja operativa claramente positiva.</desc>
+          </svg>
+        </div>
+        <p class="fig-nota">Costos: 3 personas hasta el mes 6 ($8,0M/mes), 4 desde el 7 ($10,5M), 5 desde el 13 ($15,0M), 7 desde el 19 ($22,0M). Incluye infra, IA, legal y el DPO externo declarados en <a href="stack.html#costos">Arquitectura</a>.</p>
+      </figure>
+
+      <figure class="fig" style="margin:0">
+        <figcaption>
+          <div class="fig-titulo">Caja acumulada y el valle de runway</div>
+          <div class="fig-sub">Partiendo con $120 millones levantados. Millones de pesos.</div>
+        </figcaption>
+        <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+          <svg id="gCaja" viewBox="0 0 700 300" width="100%" height="300" style="min-width:660px" role="img" aria-labelledby="cjT cjD">
+            <title id="cjT">Caja acumulada mes a mes</title>
+            <desc id="cjD">La caja baja desde 120 millones hasta un primer valle de 8,4 millones en el mes 16 y un segundo valle de 3,7 millones en el mes 21, antes de recuperarse.</desc>
+          </svg>
+        </div>
+        <p class="fig-nota"><b>El valle está en el mes 21: quedan $3,7 millones en caja.</b> Es una semana de planilla. Si el tercer banco se atrasa un mes, no hay sueldos. Con $180M levantados en vez de $120M el valle desaparece — esa diferencia de US$63.000 es literalmente la diferencia entre dormir y no dormir.</p>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- GRÁFICO 3: RETENCIÓN -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">Gráfico 03 · la restricción real</span><h2>Retención por cohorte. Acá se decide todo.</h2></div>
+    <p class="medida txt-2">El embudo de adquisición no es nuestra restricción: con un banco detrás, las instalaciones llegan. <b>La restricción es que el niño vuelva</b>, y en esta categoría casi nunca vuelve. Por eso el gráfico que importa es éste.</p>
+    <figure class="fig" style="margin-top:var(--sp-s)">
+      <figcaption>
+        <div class="fig-titulo">Porcentaje de niños que siguen jugando, por cohorte</div>
+        <div class="fig-sub">Día 1 al día 90 desde la instalación.</div>
+      </figcaption>
+      <div class="leyenda">
+        <span><i style="background:#0B60C4"></i> Aula + panel del papá <b style="color:var(--tinta-3);font-weight:400">(nuestra apuesta)</b></span>
+        <span><i style="background:#E8318F"></i> Descarga suelta</span>
+        <span><i style="background:#A87A00"></i> Promedio de apps educativas</span>
+      </div>
+      <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+        <svg id="gRet" viewBox="0 0 700 320" width="100%" height="320" style="min-width:660px" role="img" aria-labelledby="reT reD">
+          <title id="reT">Curvas de retención a 90 días de tres cohortes</title>
+          <desc id="reD">El promedio de la industria cae al 2% al día 30. La descarga suelta llega al 6%. La cohorte de aula con panel del papá, que es nuestro supuesto, llega al 32%. El criterio de muerte está en 10% al día 30.</desc>
+        </svg>
+      </div>
+      <p class="fig-nota"><b>La línea dorada está citada; las otras dos son supuestos nuestros.</b> El promedio de retención al día 30 de las apps educativas ronda el <b>2%</b> — de los peores de todas las categorías. Nuestra cohorte de aula supone <b>32%</b>, o sea <b>16 veces el promedio</b>. Es una afirmación enorme y hay que decirlo así: se apoya en que un profesor haga jugar al curso y en que el papá tenga una razón para abrir la app el domingo (los operadores reportan que los padres que ven el progreso renuevan 2 a 3 veces más), pero <b>no lo hemos probado</b>.<br>
+      <b>La línea de puntos rosada, en 10% al día 30, es el criterio de muerte del hito 3.</b> Si en el mes 9 la cohorte real está bajo esa línea, no hay negocio y hay que decirlo en voz alta.</p>
+    </figure>
+  </div>
+</section>
+
+<!-- HITOS -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">Los seis hitos</span><h2>Qué es cierto si lo lograste. Y cuándo parar.</h2></div>
+
+    <figure class="fig" style="margin-bottom:var(--sp-m)">
+      <figcaption>
+        <div class="fig-titulo">Línea de tiempo, con los criterios de muerte marcados</div>
+        <div class="fig-sub">Cada aspa rosada es un punto donde el plan dice: párate y mira.</div>
+      </figcaption>
+      <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+        <svg id="gTiempo" viewBox="0 0 700 210" width="100%" height="210" style="min-width:660px" role="img" aria-labelledby="tiT tiD">
+          <title id="tiT">Línea de tiempo de los seis hitos</title>
+          <desc id="tiD">Hitos en los meses 1.5, 3, 6, 9, 13, 18 y el punto de decisión del mes 24. Cada uno tiene un criterio de muerte asociado.</desc>
+        </svg>
+      </div>
+    </figure>
+
+    <div class="hitos" style="display:grid;gap:var(--sp-s)">
+
+      <div class="hito">
+        <div class="hito-top">
+          <div><span class="rotulo">Día 1 – 45</span><h3>Validar que el juego enseña algo</h3></div>
+          <div class="hito-n">H0</div>
+        </div>
+        <p class="chico txt-2">30 niños de 8 a 11 juegan El Reto del Presupuesto, grabados, en un colegio de la comuna, con consentimiento de los apoderados. <b>Qué es cierto si lo logras:</b> el juego se entiende sin adulto y el niño puede explicar por qué no le alcanzó. Eso es lo único que importa a esta altura.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Caja gastada</div><b>$12M</b></div>
+          <div><div class="rotulo">Equipo</div><b>2 personas</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte</span>
+          <p>Si <b>menos del 60% de los niños termina el mes sin ayuda</b>, o si al terminar no saben decir por qué se quedaron sin plata, el juego no funciona. Se rehace o se para. <b>No se construye encima de un juego que no enseña.</b></p>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito-top">
+          <div><span class="rotulo">Mes 3</span><h3>Cinco colegios que lo usan solos</h3></div>
+          <div class="hito-n">H1</div>
+        </div>
+        <p class="chico txt-2">Cinco colegios design partner, un profesor cada uno, gratis, y nosotros sentados al fondo de la sala. <b>Qué es cierto si lo logras:</b> el canal colegio existe y no necesita que lo empujemos.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Caja gastada</div><b>$28M acum.</b></div>
+          <div><div class="rotulo">Equipo</div><b>3 personas</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte</span>
+          <p>Si <b>ningún profesor hace una segunda clase sin que se la pidamos</b>, el canal colegio no existe. Y sin el canal colegio, el CAC vuelve a $37.400 y la línea de familias no es rentable.</p>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito-top">
+          <div><span class="rotulo">Mes 6</span><h3>El primer banco paga</h3></div>
+          <div class="hito-n">H2</div>
+        </div>
+        <p class="chico txt-2">Piloto pagado: <b>$18.000.000 por 6 meses</b>, con 10 colegios y un reporte de impacto. Firmado, no prometido. <b>Qué es cierto si lo logras:</b> alguien con presupuesto cree lo suficiente como para poner plata, y el modelo de negocio entero deja de ser una hipótesis.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Ingreso</div><b>$3,0M/mes</b></div>
+          <div><div class="rotulo">Equipo</div><b>3 personas</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte</span>
+          <p>Si en 12 cuentas trabajadas <b>nadie pasó de "qué bonito" a una propuesta formal</b>, el canal banco no existe. Eso no se arregla insistiendo seis meses más: se replantea el negocio o se para.</p>
+        </div>
+      </div>
+
+      <div class="hito" style="box-shadow:4px 4px 0 var(--rosa)">
+        <div class="hito-top">
+          <div><span class="sello sello-rosa">El hito que decide todo</span><h3 style="margin-top:6px">El niño vuelve. El papá abre el informe.</h3><span class="rotulo">Mes 9</span></div>
+          <div class="hito-n" style="color:var(--rosa)">H3</div>
+        </div>
+        <p class="chico txt-2"><b>Retención D30 de niños ≥ 25%</b> en la cohorte de aula, y <b>≥ 40% de los padres abren el informe del domingo</b>. <b>Qué es cierto si lo logras:</b> la apuesta central —que el adulto sostiene el hábito del niño— es verdad. Todo el plan de negocio se apoya en esta sola línea.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Ingreso</div><b>$3,6M/mes</b></div>
+          <div><div class="rotulo">Equipo</div><b>4 personas</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte · el importante</span>
+          <p><b>Si la retención D30 está bajo el 10%</b> —o sea, apenas cinco veces el promedio de las apps educativas en vez de dieciséis—, el producto no engancha y todo lo que viene después es fantasía. <b>Se para acá</b>, con caja en el banco, y se devuelve lo que queda. Este es el criterio que más probablemente nos va a matar, y por eso está escrito antes de empezar.</p>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito-top">
+          <div><span class="rotulo">Mes 13</span><h3>El piloto se vuelve contrato anual</h3></div>
+          <div class="hito-n">H4</div>
+        </div>
+        <p class="chico txt-2">El banco renueva: <b>$54.000.000 al año</b>. Y hay <b>600 familias pagando</b>. <b>Qué es cierto si lo logras:</b> el producto sobrevivió al contacto con un cliente real durante seis meses, y eso vale más que cualquier promesa.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Ingreso</div><b>$7,9M/mes</b></div>
+          <div><div class="rotulo">Equipo</div><b>5 personas</b></div>
+          <div><div class="rotulo">Caja</div><b>$23,7M</b></div>
+          <div><div class="rotulo">ARR</div><b>$95M</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte</span>
+          <p><b>Si el banco no renueva</b>, el escenario pesimista se hizo realidad: es el acantilado del mes 14 en el primer gráfico. Con un solo cliente, no renovar no es un contratiempo — es el negocio diciéndote que no sirvió.</p>
+        </div>
+      </div>
+
+      <div class="hito">
+        <div class="hito-top">
+          <div><span class="rotulo">Mes 18</span><h3>Venta repetible</h3></div>
+          <div class="hito-n">H5</div>
+        </div>
+        <p class="chico txt-2">Segundo banco cerrado <b>en menos de 5 meses</b>, con el mismo material, el mismo pitch y sin el fundador estrella. Conversión gratis→pago ≥ 6%. <b>Qué es cierto si lo logras:</b> tienes un playbook, no suerte.</p>
+        <div class="hito-datos">
+          <div><div class="rotulo">Ingreso</div><b>$17,0M/mes</b></div>
+          <div><div class="rotulo">Equipo</div><b>5 personas</b></div>
+          <div><div class="rotulo">Caja</div><b>$11,6M</b></div>
+          <div><div class="rotulo">ARR</div><b>$204M</b></div>
+        </div>
+        <div class="muerte">
+          <span class="rotulo">Criterio de muerte</span>
+          <p>Si el <b>segundo banco tarda más que el primero</b>, no hay playbook: hubo suerte y un contacto. Un negocio que depende de que el fundador conozca a alguien no escala y no se vende.</p>
+        </div>
+      </div>
+
+      <div class="hito" style="box-shadow:6px 6px 0 var(--azul)">
+        <div class="hito-top">
+          <div><span class="sello sello-azul">Punto de decisión</span><h3 style="margin-top:6px">Levantar, bootstrapear o matar</h3><span class="rotulo">Mes 24</span></div>
+          <div class="hito-n">H6</div>
+        </div>
+        <p class="chico txt-2">Tres contratos, 3.000 familias, <b>$28,5M/mes</b> de ingreso, <b>$342M de ARR</b> (≈US$360k). La pregunta ya no es si el producto funciona: es si esto puede ser grande.</p>
+        <div class="hito-datos" style="grid-template-columns:repeat(3,1fr)">
+          <div><div class="rotulo">Levantar</div><b style="color:var(--verde)">ARR ≥ $300M<br>y churn &lt; 6%</b></div>
+          <div><div class="rotulo">Bootstrapear</div><b style="color:var(--azul)">ARR $150–300M</b></div>
+          <div><div class="rotulo">Matar</div><b style="color:var(--rosa)">ARR &lt; $120M<br>o churn &gt; 8%</b></div>
+        </div>
+        <div class="muerte" style="border-color:var(--azul);background:var(--azul-cl)">
+          <span class="rotulo rotulo-azul">La pregunta honesta del mes 24</span>
+          <p>Con $342M de ARR y 7 personas, Finakids es un buen negocio y una mala inversión de riesgo. <b>Levantar sólo tiene sentido si la expansión regional está probada</b>, no si es una lámina. Si al mes 24 no hay un banco fuera de Chile en conversación seria, la respuesta correcta es <b>bootstrapear y dejar de fingir que esto es un cohete</b>.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROBABILIDAD -->
+<section class="sec" id="probabilidad">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">Probabilidad de éxito</span><h2>Un rango, con la derivación afuera</h2></div>
+
+    <div class="honesto" style="margin-bottom:var(--sp-m)">
+      <span class="rotulo">Primero, lo que no sabemos</span>
+      <p class="chico" style="margin-top:6px"><b>No conozco una tasa base publicada y confiable</b> de qué fracción de las edtech infantiles latinoamericanas llega a US$1M de ARR. La busqué y no la encontré. <b>No la voy a inventar</b>, porque un "68% de éxito" con pinta de dato es peor que no decir nada: es autoridad falsa, y quien lea esto va a decidir en qué gastar dos años de su vida.<br>
+      Lo que sí tengo son tres tasas base reales de la categoría, y sobre ésas construyo la estimación.</p>
+    </div>
+
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <span class="rotulo">Las tasas base que sí están citadas</span>
+        <ul class="lista" style="margin-top:10px">
+          <li><b>Retención D30 de apps educativas: ~2%.</b> Una de las peores de todas las categorías de apps.</li>
+          <li><b>Churn mensual en edtech infantil: ~7,4%</b> (59,9% anual). Motivos: el niño perdió el interés (36%) y se le quedó chico el contenido (24%). <i>Estimación editorial de la industria, no cifra auditada.</i></li>
+          <li><b>Conversión prueba→pago con muro duro: 10,7% (mediana D35)</b>; con freemium blando, <b>2,1%</b>. Y LatAm monetiza sistemáticamente más bajo que EE.UU. (RevenueCat, 2026).</li>
+        </ul>
+      </div>
+
+      <div class="caja caja-dura">
+        <span class="rotulo">Ajustes para esta idea en particular</span>
+        <div style="margin-top:8px">
+          <div class="factor"><span class="chico">Presupuesto que el cliente <b>ya gasta</b>: los bancos chilenos ya financian educación financiera (Misión Ahorro, KidZania, Mi Aula, el concurso del Banco Central).</span><b style="color:var(--verde)">↑</b></div>
+          <div class="factor"><span class="chico">Canal de distribución que <b>ya existe</b>: el aula y la base de clientes del banco. No hay que inventarlo.</span><b style="color:var(--verde)">↑</b></div>
+          <div class="factor"><span class="chico">Cuña afilada: <b>7 a 12 años</b>, donde ningún banco chileno tiene producto.</span><b style="color:var(--verde)">↑</b></div>
+          <div class="factor"><span class="chico">El comprador está probado: <b>NatWest compró Rooster Money</b>; <b>Zogo</b> vive de venderle a bancos.</span><b style="color:var(--verde)">↑</b></div>
+          <div class="factor"><span class="chico">La categoría tiene retención estructuralmente mala. No es un problema de ejecución: es del terreno.</span><b style="color:var(--rosa)">↓↓</b></div>
+          <div class="factor"><span class="chico">Ciclo de venta de <b>4 a 9 meses</b> con dos personas y sin marca.</span><b style="color:var(--rosa)">↓</b></div>
+          <div class="factor"><span class="chico">Dependencia regulatoria: datos de menores, con una ley nueva que entra en plena vigencia el 1-12-2026.</span><b style="color:var(--rosa)">↓</b></div>
+          <div class="factor"><span class="chico">TAM chileno de bancos: <b>US$870k/año</b>. El techo local es bajísimo.</span><b style="color:var(--rosa)">↓</b></div>
+          <div class="factor" style="border:none"><span class="chico">El titular del puesto es <b>gratis</b> (YouTube, Roblox, y el papá que dice "arréglatelas") y es imbatible en diversión pura.</span><b style="color:var(--rosa)">↓</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grilla g2" style="margin-top:var(--sp-m)">
+      <div class="caja caja-rosa">
+        <span class="rotulo">Escenario A · negocio sano, sin levantar más</span>
+        <p class="chico txt-2" style="margin-top:4px">Llegar al hito 5 (venta repetible, 2 bancos, ~$204M de ARR) antes del mes 18.</p>
+        <div class="cuenta" style="margin-top:10px">
+          P(el juego engancha, D30 ≥ 10%) <span class="op">=</span> <b>50%</b><br>
+          <span class="op">×</span> P(1 banco pagado &lt; mes 12) <span class="op">=</span> <b>50%</b><br>
+          <span class="op">×</span> P(renueva y entra un 2°) <span class="op">=</span> <b>55%</b><br>
+          <span class="op">────────────────────────</span><br>
+          <span class="op">=</span> <span class="res">13,8%</span>
+        </div>
+        <div class="rango" style="margin-top:12px">10% – 18%</div>
+        <p class="chico txt-2" style="margin-top:4px"><b>Condicional a pasar el hito 3 en el mes 9.</b> El rango refleja el error de cada factor: ninguno de los tres lo hemos medido, son juicios informados.</p>
+      </div>
+
+      <div class="caja caja-azul">
+        <span class="rotulo">Escenario B · empresa venture-scale</span>
+        <p class="chico txt-2" style="margin-top:4px">US$5M de ARR regional al mes 60. Lo que un fondo compraría.</p>
+        <div class="cuenta" style="margin-top:10px">
+          P(escenario A) <span class="op">=</span> <b>13,8%</b><br>
+          <span class="op">×</span> P(la expansión regional funciona | A)<br>
+          <span class="op">&nbsp;&nbsp;</span><b>= 25%</b> <span class="op">(abrir el canal banco de cero</span><br>
+          <span class="op">&nbsp;&nbsp;&nbsp;en otro país, otra ley, otra red)</span><br>
+          <span class="op">────────────────────────</span><br>
+          <span class="op">=</span> <span class="res">3,5%</span>
+        </div>
+        <div class="rango" style="margin-top:12px;color:var(--azul)">2% – 6%</div>
+        <p class="chico txt-2" style="margin-top:4px">Es un número bajo y no lo vamos a maquillar. Está en el rango de cualquier startup temprana, pero <b>con una retención de categoría en contra</b>. Quien invierta acá tiene que querer el escenario A y considerar el B un regalo.</p>
+      </div>
+    </div>
+
+    <div class="veredicto" style="border:3px solid var(--tinta);padding:var(--sp-s);box-shadow:4px 4px 0 var(--amarillo);margin-top:var(--sp-m)">
+      <span class="rotulo">Lo que este rango significa en la práctica</span>
+      <p style="margin-top:8px;max-width:66ch">Hay <b>una posibilidad en dos</b> de que el juego no enganche lo suficiente y la cosa muera en el mes 9. Eso no es una razón para no hacerlo: es una razón para <b>gastar sólo $30 millones antes de saberlo</b>, que es exactamente como está armado el roadmap. Los primeros tres hitos cuestan poco y responden la pregunta cara.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b class="mono">Finakids</b> · Las series de estos gráficos están escritas como datos declarados en el código de esta página. Ábrelo: no hay librería de gráficos, hay arreglos con supuestos y SVG.</p>
+    <p style="margin-top:6px"><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Todas las ideas</a></p>
+  </div>
+</footer>
+
+<script>
+const btnMenu = document.getElementById('btnMenu');
+const menuMovil = document.getElementById('menuMovil');
+btnMenu.addEventListener('click', () => {
+  const ab = menuMovil.classList.toggle('abierto');
+  btnMenu.setAttribute('aria-expanded', ab ? 'true' : 'false');
+});
+
+/* ================================================================
+   DATOS DECLARADOS. Sin librería de gráficos: arreglos + SVG a mano.
+   Paleta validada con el validador de la skill dataviz sobre el papel
+   #F4F1E9 — pasa las seis pruebas (banda de luminosidad, croma, CVD y
+   contraste ≥ 3:1).
+   ================================================================ */
+const AZUL = '#0B60C4', ROSA = '#E8318F', ORO = '#A87A00', VERDE = '#0E9A6C',
+      TINTA = '#1F1C33', PAPEL = '#F4F1E9', LINEA = '#DCD5C1';
+
+// MRR mensual, millones de CLP, meses 1..24
+const MRR = {
+  base:      [0,0,0,0,0,0.1,0.3,3.4,3.6,3.9,4.5,6.0,7.9,8.7,10.0,11.0,16.2,17.0,18.2,19.4,20.5,26.1,27.3,28.5],
+  pesimista: [0,0,0,0,0,0,0,3.0,3.1,3.2,3.3,3.5,3.6,0.8,1.0,1.2,1.5,2.0,2.4,2.8,3.1,3.4,3.7,4.0],
+  optimista: [0,0,0,0.2,0.6,4.0,4.6,5.4,6.4,8.0,10.9,12.0,14.0,16.0,22.5,24.5,27.0,31.5,38.5,41.5,45.0,53.0,57.5,67.4]
+};
+// Costos mensuales, millones de CLP (headcount declarado en la nota del gráfico)
+const COSTOS = [8,8,8,8,8,8, 10.5,10.5,10.5,10.5,10.5,10.5, 15,15,15,15,15,15, 22,22,22,22,22,22];
+// Caja acumulada, partiendo con $120M
+const CAJA = (() => {
+  let c = 120; const s = [];
+  for (let i = 0; i < 24; i++) { c += MRR.base[i] - COSTOS[i]; s.push(Math.round(c * 10) / 10); }
+  return s;
+})();
+// Retención: días y % de niños que siguen jugando
+const DIAS = [1, 7, 14, 30, 60, 90];
+const RET = {
+  aula:      [75, 52, 41, 32, 26, 22],   // supuesto nuestro — la apuesta
+  suelta:    [40, 18, 11, 6, 3, 2],      // supuesto nuestro
+  industria: [25, 10, 5, 2, 1.2, 0.8]    // el 2% de D30 está citado
+};
+
+const svgNS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, txt) {
+  const n = document.createElementNS(svgNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (txt != null) n.textContent = txt;
+  return n;
+}
+
+/* ---------- Gráfico 1: MRR, tres escenarios ---------- */
+(function () {
+  const s = document.getElementById('gMrr');
+  const W = 700, H = 320, mL = 46, mR = 60, mT = 18, mB = 40;
+  const maxY = 70;
+  const x = i => mL + i * (W - mL - mR) / 23;
+  const y = v => mT + (1 - v / maxY) * (H - mT - mB);
+
+  [0, 10, 20, 30, 40, 50, 60, 70].forEach(v => {
+    s.appendChild(el('line', { class: 'rejilla', x1: mL, y1: y(v), x2: W - mR, y2: y(v) }));
+    s.appendChild(el('text', { class: 'eje', x: mL - 8, y: y(v) + 4, 'text-anchor': 'end' }, v));
+  });
+  s.appendChild(el('text', { class: 'eje', x: mL - 8, y: mT - 5, 'text-anchor': 'end' }, 'MM$'));
+  [0, 5, 11, 17, 23].forEach(i => {
+    s.appendChild(el('text', { class: 'eje', x: x(i), y: H - mB + 18, 'text-anchor': 'middle' }, 'mes ' + (i + 1)));
+  });
+  s.appendChild(el('line', { x1: mL, y1: y(0), x2: W - mR, y2: y(0), stroke: TINTA, 'stroke-width': 1 }));
+
+  const series = [
+    { k: 'optimista', c: ORO, lbl: '67,4' },
+    { k: 'pesimista', c: ROSA, lbl: '4,0' },
+    { k: 'base', c: AZUL, lbl: '28,5' }
+  ];
+  series.forEach(se => {
+    const pts = MRR[se.k].map((v, i) => `${x(i)},${y(v)}`).join(' ');
+    s.appendChild(el('polyline', { points: pts, fill: 'none', stroke: se.c, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    const last = MRR[se.k].length - 1;
+    s.appendChild(el('circle', { cx: x(last), cy: y(MRR[se.k][last]), r: 5, fill: se.c, stroke: PAPEL, 'stroke-width': 2 }));
+    s.appendChild(el('text', { class: 'eje-fuerte', x: x(last) + 9, y: y(MRR[se.k][last]) + 4, fill: TINTA }, se.lbl));
+  });
+  // El acantilado del pesimista. La nota va DEBAJO del eje, no al lado del punto:
+  // al lado del punto se montaba sobre el rótulo "mes 18".
+  s.appendChild(el('circle', { cx: x(13), cy: y(0.8), r: 5, fill: ROSA, stroke: PAPEL, 'stroke-width': 2 }));
+  s.appendChild(el('line', { x1: x(13), y1: y(0.8) + 9, x2: x(13), y2: H - mB + 28, stroke: ROSA, 'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: x(13), y: H - mB + 40, 'text-anchor': 'middle', fill: ROSA }, 'el banco no renueva'));
+})();
+
+/* ---------- Gráfico 2a: ingresos vs costos ---------- */
+(function () {
+  const s = document.getElementById('gFlujo');
+  const W = 700, H = 300, mL = 42, mR = 14, mT = 16, mB = 38;
+  const maxY = 30;
+  const banda = (W - mL - mR) / 24;
+  const y = v => mT + (1 - v / maxY) * (H - mT - mB);
+  const bw = Math.min(10, (banda - 4) / 2);      // ≤ 24px, con aire
+
+  [0, 10, 20, 30].forEach(v => {
+    s.appendChild(el('line', { class: 'rejilla', x1: mL, y1: y(v), x2: W - mR, y2: y(v) }));
+    s.appendChild(el('text', { class: 'eje', x: mL - 8, y: y(v) + 4, 'text-anchor': 'end' }, v));
+  });
+  s.appendChild(el('text', { class: 'eje', x: mL - 8, y: mT - 5, 'text-anchor': 'end' }, 'MM$'));
+
+  // barra con extremo redondeado 4px y base cuadrada; 2px de papel entre vecinas
+  const barra = (bx, v, color) => {
+    const alto = Math.max(1, y(0) - y(v));
+    const r = Math.min(4, alto);
+    const by = y(v);
+    const d = `M${bx} ${y(0)} L${bx} ${by + r} Q${bx} ${by} ${bx + r} ${by} L${bx + bw - r} ${by} Q${bx + bw} ${by} ${bx + bw} ${by + r} L${bx + bw} ${y(0)} Z`;
+    s.appendChild(el('path', { d, fill: color }));
+  };
+  for (let i = 0; i < 24; i++) {
+    const cx = mL + i * banda + banda / 2;
+    barra(cx - bw - 1, MRR.base[i], AZUL);   // 2px de separación entre las dos
+    barra(cx + 1, COSTOS[i], ROSA);
+  }
+  s.appendChild(el('line', { x1: mL, y1: y(0), x2: W - mR, y2: y(0), stroke: TINTA, 'stroke-width': 1 }));
+  [0, 5, 11, 17, 23].forEach(i => {
+    s.appendChild(el('text', { class: 'eje', x: mL + i * banda + banda / 2, y: H - mB + 18, 'text-anchor': 'middle' }, 'm' + (i + 1)));
+  });
+  // el primer mes con caja operativa positiva sostenida
+  const cx22 = mL + 21 * banda + banda / 2;
+  s.appendChild(el('line', { x1: cx22 - banda / 2, y1: mT, x2: cx22 - banda / 2, y2: y(0), stroke: VERDE, 'stroke-width': 2, 'stroke-dasharray': '5 4' }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: cx22 - banda / 2 - 6, y: mT + 12, fill: VERDE, 'text-anchor': 'end' }, 'operación en verde'));
+})();
+
+/* ---------- Gráfico 2b: caja acumulada ---------- */
+(function () {
+  const s = document.getElementById('gCaja');
+  const W = 700, H = 300, mL = 46, mR = 40, mT = 20, mB = 38;
+  const maxY = 130;
+  const x = i => mL + i * (W - mL - mR) / 23;
+  const y = v => mT + (1 - v / maxY) * (H - mT - mB);
+
+  [0, 30, 60, 90, 120].forEach(v => {
+    s.appendChild(el('line', { class: 'rejilla', x1: mL, y1: y(v), x2: W - mR, y2: y(v) }));
+    s.appendChild(el('text', { class: 'eje', x: mL - 8, y: y(v) + 4, 'text-anchor': 'end' }, v));
+  });
+  s.appendChild(el('text', { class: 'eje', x: mL - 8, y: mT - 6, 'text-anchor': 'end' }, 'MM$'));
+
+  // zona de peligro: bajo 1 mes de costos
+  s.appendChild(el('rect', { x: mL, y: y(22), width: W - mL - mR, height: y(0) - y(22), fill: ROSA, opacity: '.10' }));
+  s.appendChild(el('text', { class: 'eje', x: mL + 6, y: y(22) - 5, fill: ROSA }, 'menos de un mes de planilla'));
+
+  const pts = CAJA.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  s.appendChild(el('polyline', { points: pts, fill: 'none', stroke: AZUL, 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+  s.appendChild(el('line', { x1: mL, y1: y(0), x2: W - mR, y2: y(0), stroke: TINTA, 'stroke-width': 1 }));
+  [0, 5, 11, 17, 23].forEach(i => {
+    s.appendChild(el('text', { class: 'eje', x: x(i), y: H - mB + 18, 'text-anchor': 'middle' }, 'mes ' + (i + 1)));
+  });
+
+  // Los dos valles. Los rótulos van a distinta altura y a distinto lado del punto:
+  // puestos los dos encima, "valle 1" y "valle 2" se montaban uno sobre el otro.
+  s.appendChild(el('circle', { cx: x(15), cy: y(CAJA[15]), r: 6, fill: ROSA, stroke: PAPEL, 'stroke-width': 2 }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: x(15) - 12, y: y(CAJA[15]) + 4, fill: ROSA, 'text-anchor': 'end' }, 'valle 1'));
+  s.appendChild(el('circle', { cx: x(20), cy: y(CAJA[20]), r: 6, fill: ROSA, stroke: PAPEL, 'stroke-width': 2 }));
+  s.appendChild(el('path', { d: `M${x(20)} ${y(CAJA[20]) - 9} L${x(20) - 10} ${y(24)}`, stroke: ROSA, 'stroke-width': 1, fill: 'none' }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: x(20) - 6, y: y(26), fill: ROSA, 'text-anchor': 'end' }, 'valle 2 — $3,7M'));
+
+  s.appendChild(el('circle', { cx: x(0), cy: y(120), r: 5, fill: AZUL, stroke: PAPEL, 'stroke-width': 2 }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: x(0) + 12, y: y(120) - 12, fill: TINTA }, '$120M levantados'));
+})();
+
+/* ---------- Gráfico 3: retención por cohorte ---------- */
+(function () {
+  const s = document.getElementById('gRet');
+  const W = 700, H = 320, mL = 46, mR = 130, mT = 20, mB = 40;
+  const maxY = 80;
+  const x = i => mL + i * (W - mL - mR) / (DIAS.length - 1);
+  const y = v => mT + (1 - v / maxY) * (H - mT - mB);
+
+  [0, 20, 40, 60, 80].forEach(v => {
+    s.appendChild(el('line', { class: 'rejilla', x1: mL, y1: y(v), x2: W - mR, y2: y(v) }));
+    s.appendChild(el('text', { class: 'eje', x: mL - 8, y: y(v) + 4, 'text-anchor': 'end' }, v + '%'));
+  });
+  DIAS.forEach((d, i) => s.appendChild(el('text', { class: 'eje', x: x(i), y: H - mB + 18, 'text-anchor': 'middle' }, 'día ' + d)));
+  s.appendChild(el('line', { x1: mL, y1: y(0), x2: W - mR, y2: y(0), stroke: TINTA, 'stroke-width': 1 }));
+
+  // criterio de muerte: 10% al día 30
+  s.appendChild(el('line', { x1: mL, y1: y(10), x2: W - mR, y2: y(10), stroke: ROSA, 'stroke-width': 2, 'stroke-dasharray': '6 4' }));
+  // El rótulo de la línea de muerte va al extremo IZQUIERDO: el derecho ya lo ocupan
+  // las etiquetas de las series y encimarlos era ilegible.
+  s.appendChild(el('text', { class: 'eje-fuerte', x: mL + 6, y: y(10) - 7, fill: ROSA }, 'criterio de muerte'));
+
+  // Tres series: la leyenda de arriba carga la identidad. Etiquetamos en la
+  // línea SÓLO la serie de la que trata el gráfico — las otras dos terminan
+  // pegadas en el 2% y apilarles etiquetas sería ruido ilegible.
+  const series = [
+    { k: 'aula', c: AZUL, t: 'Aula + panel' },
+    { k: 'suelta', c: ROSA },
+    { k: 'industria', c: ORO }
+  ];
+  series.forEach(se => {
+    const pts = RET[se.k].map((v, i) => `${x(i)},${y(v)}`).join(' ');
+    s.appendChild(el('polyline', { points: pts, fill: 'none', stroke: se.c, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    RET[se.k].forEach((v, i) => s.appendChild(el('circle', { cx: x(i), cy: y(v), r: 4, fill: se.c, stroke: PAPEL, 'stroke-width': 2 })));
+    if (se.t) {
+      const last = RET[se.k].length - 1;
+      s.appendChild(el('text', { class: 'eje-fuerte', x: x(last) + 10, y: y(RET[se.k][last]) + 4, fill: TINTA }, se.t));
+    }
+  });
+  // Las dos que colapsan abajo terminan pegadas (2% y 0,8%): una sola nota en el
+  // margen, en dos líneas, en vez de dos etiquetas encimadas. La leyenda las nombra.
+  s.appendChild(el('text', { class: 'eje', x: x(5) + 12, y: y(2) - 4, fill: '#6E6889' }, 'las otras dos,'));
+  s.appendChild(el('text', { class: 'eje', x: x(5) + 12, y: y(2) + 9, fill: '#6E6889' }, 'en el suelo'));
+
+  // El punto que decide: D30 de la cohorte de aula. La llamada baja hacia la
+  // izquierda, al único hueco vacío del gráfico: arriba pasa la propia línea azul.
+  s.appendChild(el('circle', { cx: x(3), cy: y(32), r: 8, fill: 'none', stroke: TINTA, 'stroke-width': 2 }));
+  s.appendChild(el('path', { d: `M${x(3) - 7} ${y(32) + 5} L${x(3) - 30} ${y(32) + 22}`, stroke: TINTA, 'stroke-width': 1, fill: 'none' }));
+  s.appendChild(el('text', { class: 'eje-fuerte', x: x(3) - 33, y: y(32) + 26, fill: TINTA, 'text-anchor': 'end' }, '32% — el supuesto'));
+})();
+
+/* ---------- Gráfico 4: línea de tiempo con criterios de muerte ----------
+   El mes va DENTRO de la etiqueta de cada hito, no en un eje aparte: los
+   hitos se apiñan entre el mes 1 y el 9, y un eje de meses debajo chocaba
+   con los conectores. Dos niveles alternados y anclaje al borde en los
+   extremos para que nada se pise. */
+(function () {
+  const s = document.getElementById('gTiempo');
+  const W = 700, mL = 30, mR = 30;
+  const yl = 110;
+  const x = m => mL + (m / 24) * (W - mL - mR);
+
+  s.appendChild(el('line', { x1: mL, y1: yl, x2: W - mR, y2: yl, stroke: TINTA, 'stroke-width': 3 }));
+  s.appendChild(el('text', { class: 'eje', x: mL, y: yl + 20, 'text-anchor': 'start' }, 'día 1'));
+  // El extremo derecho no lleva rótulo: lo pone H6 ("mes 24") y repetirlo sería ruido.
+
+  // Los primeros hitos se agolpan (mes 1,5 y mes 6 caen cerca en un eje lineal de 24
+  // meses), así que H0 se ancla a la izquierda con desplazamiento propio en vez de
+  // centrarse sobre su punto: centrado, pisaba a H2.
+  const HITOS = [
+    { m: 1.5, n: 'H0 · Niños reales',    c: 'día 45', d: '<60% termina solo',   arr: true,  an: 'start', dx: -62 },
+    { m: 3,   n: 'H1 · 5 colegios',      c: 'mes 3',  d: 'ningún profe repite', arr: false, an: 'middle' },
+    { m: 6,   n: 'H2 · Banco paga',      c: 'mes 6',  d: 'nadie firma',         arr: true,  an: 'middle' },
+    { m: 9,   n: 'H3 · Retención',       c: 'mes 9',  d: 'D30 < 10%',           arr: false, an: 'middle', clave: true },
+    { m: 13,  n: 'H4 · Contrato anual',  c: 'mes 13', d: 'no renueva',          arr: true,  an: 'middle' },
+    { m: 18,  n: 'H5 · Venta repetible', c: 'mes 18', d: '2° banco más lento',  arr: false, an: 'middle' },
+    { m: 24,  n: 'H6 · Decisión',        c: 'mes 24', d: 'ARR < $120M',         arr: true,  an: 'end', dx: 4, fin: true }
+  ];
+  HITOS.forEach(h => {
+    const px = x(h.m);
+    const col = h.clave ? ROSA : (h.fin ? AZUL : TINTA);
+    // niveles: arriba = nombre 44, mes 57, aspa 71, criterio 87, conector 92→110
+    //          abajo  = conector 110→130, nombre 146, mes 159, aspa 173, criterio 189
+    const yN = h.arr ? 44 : 146, yM = h.arr ? 57 : 159, yA = h.arr ? 71 : 173, yC = h.arr ? 87 : 189;
+    s.appendChild(el('line', { x1: px, y1: yl, x2: px, y2: h.arr ? 92 : 130, stroke: col, 'stroke-width': 1.5 }));
+    s.appendChild(el('circle', { cx: px, cy: yl, r: h.clave ? 8 : 6, fill: col, stroke: PAPEL, 'stroke-width': 2 }));
+    const tx = px + (h.dx || 0);
+    s.appendChild(el('text', { class: 'eje-fuerte', x: tx, y: yN, 'text-anchor': h.an, fill: col }, h.n));
+    s.appendChild(el('text', { class: 'eje', x: tx, y: yM, 'text-anchor': h.an, fill: '#6E6889' }, h.c));
+    // aspa rosada = criterio de muerte; va sobre el centro óptico del rótulo, no del punto
+    const ax = h.an === 'end' ? tx - 34 : (h.an === 'start' ? tx + 34 : px);
+    s.appendChild(el('path', { d: `M${ax - 4} ${yA - 4} l8 8 M${ax + 4} ${yA - 4} l-8 8`, stroke: ROSA, 'stroke-width': 2, 'stroke-linecap': 'round' }));
+    s.appendChild(el('text', { class: 'eje', x: tx, y: yC, 'text-anchor': h.an, fill: ROSA }, h.d));
+  });
+})();
+</script>
+</body>
+</html>

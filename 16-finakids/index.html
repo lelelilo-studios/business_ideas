@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finakids — Que aprenda que la plata se acaba. Jugando.</title>
+<meta name="description" content="Finakids le enseña a niños de 7 a 12 años a manejar plata con juegos que se juegan en 90 segundos, y le dice al papá de qué conversar en la casa esta semana. Sin compras dentro del juego. Nunca.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero { padding-block: var(--sp-l) var(--sp-xl); position: relative; overflow: hidden; }
+  .hero h1 { max-width: 15ch; }
+  .hero-bajada { font-size: var(--step-1); margin-top: var(--sp-s); max-width: 40ch; color: var(--tinta-2); }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--sp-m); }
+  .hero-in { display: grid; gap: var(--sp-l); }
+  @media (min-width: 64em) { .hero-in { grid-template-columns: 1.1fr .9fr; align-items: center; } }
+
+  .promesa {
+    background: var(--tinta); color: var(--papel);
+    border: 3px solid var(--tinta); box-shadow: 6px 6px 0 var(--rosa);
+    padding: var(--sp-m) var(--sp-s);
+  }
+  .promesa h2 { color: var(--amarillo); font-size: var(--step-2); max-width: 20ch; }
+  .promesa p { color: #C6C1D8; margin-top: 10px; max-width: 52ch; }
+
+  /* Mini juego de la portada */
+  .mini { border: 3px solid var(--tinta); background: var(--papel); box-shadow: 8px 8px 0 var(--azul); }
+  .mini-top { background: var(--tinta); color: var(--papel); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .mini-top .rotulo { color: var(--amarillo); }
+  .mini-plata { font-family: var(--display); font-weight: 800; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+  .mini-cuerpo { padding: var(--sp-s); min-height: 300px; display: flex; flex-direction: column; }
+  .mini-ilus { display: grid; place-items: center; padding: 6px 0 8px; }
+  .mini-ilus svg { width: 90px; height: 90px; }
+  .mini-cuerpo h3 { font-size: 1.25rem; }
+  .mini-cuerpo .sub { font-size: .88rem; color: var(--tinta-2); margin-top: 5px; }
+  .mini-monto { font-family: var(--display); font-weight: 800; font-size: 1.8rem; color: var(--rosa); margin-top: 8px; }
+  .mini-acc { margin-top: auto; padding-top: var(--sp-s); display: grid; gap: 8px; }
+  .mini-nota { border: 2px solid var(--tinta); background: var(--amarillo); padding: 10px; font-size: .86rem; margin-top: 8px; }
+
+  .paso { display: grid; grid-template-columns: 52px 1fr; gap: var(--sp-s); padding: var(--sp-s) 0; border-top: 2px solid var(--tinta); }
+  .paso-n { font-family: var(--display); font-weight: 800; font-size: var(--step-3); line-height: .9; color: var(--rosa); }
+  .paso p { font-size: var(--step--1); color: var(--tinta-2); max-width: 54ch; margin-top: 4px; }
+
+  .catalogo { display: grid; gap: 1px; background: var(--tinta); border: 2px solid var(--tinta); box-shadow: var(--registro-chico); }
+  @media (min-width: 40em) { .catalogo { grid-template-columns: repeat(2,1fr); } }
+  @media (min-width: 68em) { .catalogo { grid-template-columns: repeat(3,1fr); } }
+  .juego-c { background: var(--papel); padding: var(--sp-s); display: flex; gap: 12px; }
+  .juego-c svg { width: 40px; height: 40px; flex: none; }
+  .juego-c h4 { font-size: .98rem; }
+  .juego-c p { font-size: .8rem; color: var(--tinta-2); margin-top: 3px; }
+  .juego-c.listo { background: var(--verde-cl); }
+
+  .plan { border: 2px solid var(--tinta); padding: var(--sp-s); box-shadow: var(--registro-chico); display: flex; flex-direction: column; }
+  .plan.dest { box-shadow: var(--registro); }
+  .plan ul { margin-top: var(--sp-xs); }
+  .plan .btn { margin-top: auto; }
+  .plan-pie { margin-top: var(--sp-s); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="9" width="28" height="19" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M2 9 16 2l14 7" fill="#E8318F" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="19" r="4.5" fill="none" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M16 15.5v7M14 17.4h4M14 20.6h4" stroke="#1F1C33" stroke-width="1.6"/>
+      </svg>
+      <span class="marca-txt">Finakids</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html" aria-current="page">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+</header>
+<div class="nav-movil" id="menuMovil">
+  <ul role="list">
+    <li><a href="../index.html">← Ideas</a></li>
+    <li><a href="index.html" aria-current="page">Producto</a></li>
+    <li><a href="demo/index.html">Demo</a></li>
+    <li><a href="negocio.html">Negocio</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="stack.html">Arquitectura</a></li>
+  </ul>
+</div>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-in">
+    <div>
+      <span class="sello sello-rosa">Educación financiera · 7 a 12 años</span>
+      <h1 class="mal-registro" style="margin-top:var(--sp-s)">Que aprenda que la plata se acaba.</h1>
+      <p class="hero-bajada">Finakids es un juego donde tu hijo recibe la mesada el día 1 y tiene que llegar a fin de mes. Si se la gasta el primer día, se queda sin colación. Y lo siente. No se lo decimos con un cartel: se lo enseñamos con la mecánica.</p>
+      <div class="hero-btns">
+        <a class="btn btn-primario" href="demo/index.html">Jugar el demo →</a>
+        <a class="btn" href="#precios">Ver precios</a>
+      </div>
+      <p class="chico txt-2" style="margin-top:var(--sp-s)">Un mes completo se juega en 90 segundos. Con el pulgar, en el teléfono.</p>
+    </div>
+
+    <!-- EL PRODUCTO EN VIVO, no una foto -->
+    <div>
+      <div class="mini" id="mini">
+        <div class="mini-top">
+          <span class="rotulo">Semana 1 · tu mesada</span>
+          <span class="mini-plata cifra" id="miniPlata">$20.000</span>
+        </div>
+        <div class="mini-cuerpo" id="miniCuerpo"></div>
+      </div>
+      <p class="chico txt-2" style="margin-top:8px;text-align:center">Esto no es una foto. Juégalo acá mismo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LA PROMESA -->
+<section class="sec">
+  <div class="container">
+    <div class="promesa trama">
+      <span class="rotulo">La promesa que nos amarra</span>
+      <h2 style="margin-top:8px">Sin compras dentro del juego. Nunca.</h2>
+      <p>No se pueden comprar monedas. No se pueden comprar vidas, skins ni cofres. No hay publicidad. Nada dentro de Finakids le pide plata a tu hijo, porque no se le puede enseñar a un niño a resistir el impulso de comprar mientras le vendes impulsos.</p>
+      <p>Es la línea más cara que trazamos: el dueño de esta idea proponía monedas premium, y las matamos. <a href="negocio.html#compras" style="color:var(--amarillo)">Acá está la aritmética de por qué</a> — resulta que además era el mal negocio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- EL PROBLEMA EN PALABRAS DEL CLIENTE -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza">
+      <span class="rotulo">El problema</span>
+      <h2>"Le paso la mesada el domingo y el martes ya no tiene nada."</h2>
+    </div>
+    <div class="grilla g3">
+      <div class="cita">
+        <p>"Le doy $20.000 al mes. El miércoles me está pidiendo para la colación. Yo se la doy, obvio, si es mi hijo. Y así nunca aprende."</p>
+        <footer>Carolina, mamá de Matías (9) · Maipú</footer>
+      </div>
+      <div class="cita">
+        <p>"En el colegio pasan educación financiera una clase al año, con un PowerPoint. Es simpático, pero el lunes siguiente no queda nada."</p>
+        <footer>Rodrigo, profesor jefe de 5° básico · Puente Alto</footer>
+      </div>
+      <div class="cita">
+        <p>"Nos exigen educación financiera. Terminamos financiando charlas que nadie mide. No sé si sirven y no tengo cómo saberlo."</p>
+        <footer>Gerencia de Asuntos Corporativos · banco chileno (conversación exploratoria)</footer>
+      </div>
+    </div>
+    <div class="honesto" style="margin-top:var(--sp-m)">
+      <span class="rotulo">Honestidad, primera dosis</span>
+      <p class="chico" style="margin-top:8px">Estas tres citas son <b>reconstrucciones de entrevistas por hacer</b>, no testimonios de clientes: Finakids todavía no existe. Cualquier otra cosa que dijéramos acá sería mentira, y en la página de <a href="roadmap.html">Roadmap</a> el hito 0 es justamente salir a validarlas con 30 familias reales antes de escribir una línea más de código.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza">
+      <span class="rotulo">Cómo funciona</span>
+      <h2>Dos caras, porque son dos personas distintas</h2>
+    </div>
+    <p class="medida txt-2">El niño es el usuario. El papá es el que paga. Un producto que sólo entretiene al niño se cancela al tercer mes; uno que sólo tranquiliza al papá el niño no lo abre. Las dos caras tienen que existir o esto no es un negocio.</p>
+
+    <div style="margin-top:var(--sp-m)">
+      <div class="paso">
+        <div class="paso-n">1</div>
+        <div>
+          <h3>El niño juega un mes en 90 segundos</h3>
+          <p>Recibe $20.000 de mesada el día 1. Cuatro semanas, catorce decisiones: la colación del quiosco, los sobres de láminas, la skin del jueguito que vale tres colaciones, el estuche que se perdió, el regalo del primo. Si se lo gasta todo al principio, el juego no lo reta: simplemente no le alcanza para comer, y lo ve.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-n">2</div>
+        <div>
+          <h3>El chanchito no se puede abrir sin romperlo</h3>
+          <p>La plata que guarda queda fuera de su alcance por el resto del mes. Puede romperlo, claro. Pero entonces el chanchito no sirvió de nada, y el juego se lo dice sin rodeos. Y si no le alcanza, el quiosco le fía con un recargo del 20%: la primera vez en su vida que un crédito caro le cuesta una cifra concreta que se acuerda.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="paso-n">3</div>
+        <div>
+          <h3>El papá recibe una conversación, no un puntaje</h3>
+          <p>El domingo a las 19:00, antes de pasarle la mesada, le llega esto: <i>"Matías gasta el 61% de su mesada en los primeros 7 días. Pregúntale, antes de que se la guarde: ¿cuánto de esto tiene que durarte hasta el otro domingo? No le des la respuesta."</i> Eso es lo que justifica los $4.990 al mes. No las estrellitas.</p>
+        </div>
+      </div>
+      <div class="paso" style="border-bottom:2px solid var(--tinta)">
+        <div class="paso-n">4</div>
+        <div>
+          <h3>El colegio lo usa en el aula, gratis</h3>
+          <p>Con licencia de curso completa, financiada por el banco que patrocina. El colegio no paga: el colegio chileno paga poco y decide lento, y hacer como que no es así sería el error más caro del plan. <a href="negocio.html#quien-paga">Lo explicamos entero acá.</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--sp-m);display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-rosa" href="demo/index.html">Ver las dos caras funcionando →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza">
+      <span class="rotulo">El catálogo</span>
+      <h2>Diez juegos. Uno construido de verdad.</h2>
+    </div>
+    <p class="medida txt-2">Un juego que se juega vale más que diez descritos. <b>El Reto del Presupuesto</b> está terminado y jugable hoy; los otros nueve son el plan del producto, con la lección que cada uno tiene que enseñar. Si el primero no engancha, los otros nueve no existen.</p>
+
+    <div class="catalogo" style="margin-top:var(--sp-m)">
+      <div class="juego-c listo">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="8" width="32" height="24" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/><path d="M4 16h32" stroke="#1F1C33" stroke-width="2"/><circle cx="28" cy="24" r="4" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div>
+          <span class="sello sello-verde" style="margin-bottom:4px">Jugable hoy</span>
+          <h4>El Reto del Presupuesto</h4>
+          <p>Un mes, una mesada, necesidades, deseos y eventos sorpresa. Enseña: <b>la plata se acaba y hay que repartirla en el tiempo</b>.</p>
+        </div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="24" rx="14" ry="10" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/><circle cx="32" cy="21" r="4" fill="#FBD9EA" stroke="#1F1C33" stroke-width="2"/><path d="M16 12l-3-6 8 3z" fill="#FBD9EA" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>Aventura del Ahorro</h4><p>Gana plata con tareas, decide cuánto guardar, compra una meta. Enseña: <b>postergar hoy compra algo más grande mañana</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 30l8-10 7 6 6-12 9 8" fill="none" stroke="#0B60C4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="20" r="3" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>El Mercado de Mini-Inversores</h4><p>Bolsa simulada con tres papeles. Enseña: <b>más retorno es más riesgo, y diversificar no es magia</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="18" width="9" height="16" fill="#0E9A6C" stroke="#1F1C33" stroke-width="2"/><rect x="16" y="10" width="9" height="24" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/><rect x="27" y="22" width="8" height="12" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>Ciudad Financiera</h4><p>Construye y administra una ciudad. Enseña: <b>los servicios comunes cuestan y alguien los paga</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="14" width="28" height="18" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/><path d="M12 14V9h16v5" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/><path d="M14 22h12" stroke="#1F1C33" stroke-width="2" stroke-linecap="round"/></svg>
+        <div><h4>El Desafío del Emprendedor</h4><p>Monta un negocio: costos, precio, demanda. Enseña: <b>vender caro no es lo mismo que ganar plata</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 30h32" stroke="#1F1C33" stroke-width="2"/><circle cx="14" cy="24" r="5" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/><path d="M24 30V18h8v12" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>Carrera del Billete Perdido</h4><p>Arcade: saltar las trampas de la compra impulsiva y el crédito caro. Enseña: <b>reconocer la trampa antes de caer</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="16" width="30" height="18" fill="#0B60C4" stroke="#1F1C33" stroke-width="2"/><path d="M5 16 20 6l15 10" fill="#F5C518" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/><path d="M14 34V24h5v10" fill="#F4F1E9" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>Banco Junior</h4><p>Administra un banco, presta plata, evalúa a quién. Enseña: <b>el que presta también puede perder, y por eso cobra</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/><path d="M20 11v9l6 4" stroke="#1F1C33" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M32 8l4-4M8 32l-4 4" stroke="#E8318F" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div><h4>Viaje en el Tiempo Financiero</h4><p>Del trueque a la transferencia. Enseña: <b>la plata es un acuerdo, no una cosa</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14h24l-3 18H11z" fill="#A87A00" stroke="#1F1C33" stroke-width="2"/><path d="M14 14V9a6 6 0 0 1 12 0v5" fill="none" stroke="#1F1C33" stroke-width="2"/><text x="20" y="28" font-family="monospace" font-size="10" font-weight="700" text-anchor="middle" fill="#F4F1E9">%</text></svg>
+        <div><h4>Rescate del Tesoro Perdido</h4><p>Acertijos de porcentajes e intereses. Enseña: <b>el 20% de recargo es un número, y ese número te lo sacan del bolsillo</b>.</p></div>
+      </div>
+      <div class="juego-c">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="12" width="28" height="22" fill="#F4F1E9" stroke="#1F1C33" stroke-width="2"/><path d="M12 20h16M12 26h10" stroke="#0B60C4" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="10" r="6" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>
+        <div><h4>La Aventura de los Impuestos</h4><p>Cobra impuestos, gástalos, mantén contenta a la gente. Enseña: <b>de dónde sale la plata del hospital y la plaza</b>.</p></div>
+      </div>
+    </div>
+    <p class="chico txt-2" style="margin-top:var(--sp-s)">Los <b>sellos</b> reemplazan a las monedas: se ganan jugando y no se pueden comprar. Los rankings son sólo dentro del curso, por avatar, y se borran cada semana — comparar niños por plata todas las semanas es exactamente lo que no queremos enseñar.</p>
+  </div>
+</section>
+
+<!-- PRECIOS -->
+<section class="sec" id="precios">
+  <div class="container">
+    <div class="sec-cabeza">
+      <span class="rotulo">Precios</span>
+      <h2>Tres planes. El del niño es gratis.</h2>
+    </div>
+    <div class="grilla g3">
+      <div class="plan">
+        <span class="sello sello-gris">Gratis</span>
+        <div class="precio-cifra" style="margin-top:10px">$0</div>
+        <p class="chico txt-2">Para siempre. En serio.</p>
+        <ul class="lista lista-azul">
+          <li>El Reto del Presupuesto completo, sin recortes</li>
+          <li>Un niño, sellos y rankings de curso</li>
+          <li>Sin publicidad, sin compras internas</li>
+          <li>Sin panel de padres ni informe semanal</li>
+        </ul>
+        <a class="btn btn-full plan-pie" href="demo/index.html">Jugar</a>
+      </div>
+      <div class="plan dest">
+        <span class="sello sello-rosa">Familia · el que paga la cuenta</span>
+        <div class="precio-cifra" style="margin-top:10px">$4.990<span> /mes</span></div>
+        <p class="chico txt-2">o <b>$44.900 al año</b> (dos meses de regalo)</p>
+        <ul class="lista">
+          <li>Hasta 3 hijos</li>
+          <li>Los 10 juegos a medida que salen</li>
+          <li><b>El panel de padres:</b> qué aprendió, con la evidencia</li>
+          <li><b>El informe del domingo:</b> de qué conversar esta semana</li>
+          <li>Límite de tiempo de juego que se respeta solo</li>
+        </ul>
+        <a class="btn btn-primario btn-full plan-pie" href="demo/index.html">Ver el panel →</a>
+      </div>
+      <div class="plan">
+        <span class="sello sello-azul">Marca · bancos y fintech</span>
+        <div class="precio-cifra" style="margin-top:10px">$54M<span> /año</span></div>
+        <p class="chico txt-2">Estimación. Rango real: $36M–$90M CLP.</p>
+        <ul class="lista lista-verde">
+          <li>Licencia co-marcada del programa completo</li>
+          <li>Aula gratis para los colegios que el banco elija</li>
+          <li>Reporte de impacto con datos agregados y auditables</li>
+          <li><b>Cero datos del niño</b> para el banco. Cero publicidad al niño. Cero ofertas.</li>
+        </ul>
+        <a class="btn btn-full plan-pie" href="negocio.html#quien-paga">La aritmética →</a>
+      </div>
+    </div>
+    <p class="chico txt-2" style="margin-top:var(--sp-s)">Precios en pesos chilenos, IVA incluido. La suscripción Familia se cobra en App Store / Google Play, que se quedan con el 15% (Small Business Program). Eso está descontado del margen que declaramos en <a href="negocio.html">Negocio</a>. El colegio no paga: <a href="negocio.html#quien-paga">acá está por qué</a>.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza">
+      <span class="rotulo">Preguntas</span>
+      <h2>Lo que preguntan los papás (y lo que pregunta el banco)</h2>
+    </div>
+    <div style="max-width:70ch">
+      <details>
+        <summary>¿Van a poner compras dentro del juego más adelante, cuando necesiten plata?</summary>
+        <p>No, y no es una promesa de buena voluntad: es que el modelo de negocio se cae si lo hacemos. El contrato con el banco existe <b>porque</b> no hay micropagos dentro de una app usada por niños — ningún directorio aprueba poner su marca al lado de eso. Un banco vale $54.000.000 al año; las monedas premium valdrían del orden de $5.700.000 al mes en el mejor caso y nos costarían el banco, la confianza del papá y la primera nota de prensa. <a href="negocio.html#compras">La cuenta completa está acá.</a></p>
+      </details>
+      <details>
+        <summary>¿Qué datos de mi hijo guardan? ¿Se los pasan al banco?</summary>
+        <p>La cuenta la crea usted, no el niño. Guardamos: un nombre de pila o apodo, el curso, y las decisiones que toma dentro del juego. No pedimos RUT del niño, ni foto, ni voz, ni ubicación. No hay chat. El banco patrocinador recibe <b>datos agregados del programa</b> (cuántos niños, qué destrezas mejoraron en promedio) y jamás el dato individual. La <b>Ley 21.719</b>, publicada el 13-12-2024 y con plena vigencia el <b>1 de diciembre de 2026</b>, exige consentimiento de los padres para tratar datos de menores de 14 años; el detalle de cómo se implementa eso está en <a href="stack.html#datos">Arquitectura</a>, incluyendo lo que todavía tenemos <b>por validar con abogado</b>.</p>
+      </details>
+      <details>
+        <summary>¿Se conecta a la cuenta bancaria de mi hijo? ¿Maneja plata de verdad?</summary>
+        <p>No, y por bastante tiempo no lo va a hacer. Manejar plata de menores es actividad regulada: habría que ser emisor o asociarse a uno, y abre un frente regulatorio con la CMF que hoy no podemos sostener. La idea original de "aprender con dinero real" es buena y peligrosa a la vez; nuestra posición es que la ganamos <b>después</b> de demostrar que el juego enseña, no antes. Lo tratamos en detalle en <a href="stack.html#dinero-real">Arquitectura</a>.</p>
+      </details>
+      <details>
+        <summary>Mi hijo juega tres días y no vuelve. ¿Por qué esto sería distinto?</summary>
+        <p>Puede que no lo sea, y ése es el riesgo que más nos puede matar: en las apps educativas la retención al día 30 anda en torno al <b>2%</b> y el churn en edtech infantil bordea el <b>7,4% mensual</b> (estimaciones editoriales de la industria, citadas en <a href="negocio.html">Negocio</a>). Nuestra única apuesta seria contra eso no es más gamificación: es que el <b>papá</b> tenga una razón para abrir la app el domingo. Los operadores reportan que los padres que ven el progreso de su hijo renuevan 2 a 3 veces más. Si a los 90 días la retención no se despega del promedio, el <a href="roadmap.html">roadmap</a> dice que paremos.</p>
+      </details>
+      <details>
+        <summary>Soy profesor. ¿Sirve para mi clase?</summary>
+        <p>Sí, y es gratis para el aula. Educación financiera está en el currículum chileno (la Ley 21.092, de mayo de 2018, incorporó contenidos en enseñanza media, y las Bases Curriculares tienen objetivos relacionados en básica), pero llega sin material ni tiempo. Una partida dura 90 segundos: cabe en los últimos 10 minutos de la clase, con los 30 niños jugando el mismo mes y comparando después por qué a unos les alcanzó y a otros no. Esa conversación es la clase.</p>
+      </details>
+      <details>
+        <summary>¿Y si el niño simplemente prefiere jugar otra cosa?</summary>
+        <p>Es lo más probable, y es nuestro competidor real: no es Greenlight ni GoHenry, es YouTube, Roblox y que el niño abra cualquier otra cosa. No competimos por diversión pura — la perderíamos. Competimos por los 10 minutos que un adulto decide que su hijo pase en algo que sirve, y por los 40 minutos de la clase del profesor. Por eso la app tiene que ser <b>buena</b>, pero el que la sostiene es el adulto.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec">
+  <div class="container">
+    <div class="caja caja-amar caja-azul" style="padding:var(--sp-l) var(--sp-s)">
+      <span class="rotulo">Lo que sigue</span>
+      <h2 style="max-width:22ch;margin-top:8px">Juega un mes completo. Te toma 90 segundos.</h2>
+      <p class="medida" style="margin-top:10px">Después mira el panel del papá y decide tú si eso vale $4.990 al mes. Nosotros creemos que sí; el <a href="roadmap.html">roadmap</a> tiene escrito el día exacto en que admitiríamos que no.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:var(--sp-m)">
+        <a class="btn btn-primario" href="demo/index.html">Jugar el demo →</a>
+        <a class="btn" href="negocio.html">Ver el negocio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b class="mono">Finakids</b> · finakids.com (dominio verificado libre, <span class="mono">HTTP 404</span> en rdap.verisign.com, 13-07-2026) · prototipo, sin clientes reales.</p>
+    <p style="margin-top:6px"><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Todas las ideas</a></p>
+  </div>
+</footer>
+
+<script>
+const btnMenu = document.getElementById('btnMenu');
+const menuMovil = document.getElementById('menuMovil');
+btnMenu.addEventListener('click', () => {
+  const ab = menuMovil.classList.toggle('abierto');
+  btnMenu.setAttribute('aria-expanded', ab ? 'true' : 'false');
+});
+
+/* ---- Mini juego de la portada: la semana 1 de verdad ---- */
+const clp = n => '$' + Math.round(n).toLocaleString('es-CL');
+const D = {
+  colacion: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="34" width="64" height="48" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M18 34c0-9 8-14 32-14s32 5 32 14" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><path d="M30 48h40M30 60h28" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/><circle cx="70" cy="62" r="7" fill="#0E9A6C" stroke="#1F1C33" stroke-width="3"/></svg>`,
+  skin: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="12" y="30" width="76" height="42" rx="8" fill="#1F1C33" stroke="#1F1C33" stroke-width="3"/><rect x="20" y="38" width="24" height="26" fill="#0B60C4"/><circle cx="66" cy="46" r="5" fill="#E8318F"/><circle cx="76" cy="56" r="5" fill="#F5C518"/><path d="M26 51h12M32 45v12" stroke="#F4F1E9" stroke-width="3" stroke-linecap="round"/></svg>`,
+  fotocopia: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="24" y="16" width="52" height="68" fill="#F4F1E9" stroke="#1F1C33" stroke-width="3"/><path d="M34 32h32M34 44h32M34 56h22M34 68h16" stroke="#0B60C4" stroke-width="3" stroke-linecap="round"/><path d="M64 16l12 12h-12z" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>`
+};
+const CARTAS = [
+  { i:'colacion', t:'La colación de la semana', s:'Cuatro recreos en el quiosco del colegio.', m:2000, nec:true, si:'Pagar', no:'Saltármelo' },
+  { i:'skin', t:'La skin nueva del jueguito', s:'Todos la tienen. Vale como tres colaciones. Y recién te llegó la mesada.', m:5990, nec:false, si:'Comprarla', no:'No, gracias' },
+  { i:'fotocopia', t:'Fotocopias de Historia', s:'La guía para la prueba del jueves.', m:1000, nec:true, si:'Pagar', no:'Saltármelo' }
+];
+let mPlata = 20000, mI = 0, mGasto = 0, mSaltadas = 0;
+const mCuerpo = document.getElementById('miniCuerpo');
+const mPlataEl = document.getElementById('miniPlata');
+
+function mPintar() {
+  mPlataEl.textContent = clp(mPlata);
+  if (mI >= CARTAS.length) return mFin();
+  const c = CARTAS[mI];
+  const alcanza = mPlata >= c.m;
+  mCuerpo.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span class="sello ${c.nec ? 'sello-azul' : 'sello-rosa'}">${c.nec ? 'Necesidad' : 'Deseo'}</span>
+      <span class="rotulo">${mI+1} de 3</span>
+    </div>
+    <div class="mini-ilus">${D[c.i]}</div>
+    <h3>${c.t}</h3>
+    <p class="sub">${c.s}</p>
+    <div class="mini-monto cifra">−${clp(c.m)}</div>
+    <div class="mini-acc">
+      <button class="btn ${c.nec ? 'btn-primario' : 'btn-rosa'} btn-full" data-m="si" ${alcanza ? '' : 'disabled'}>${alcanza ? c.si + ' · ' + clp(c.m) : 'No te alcanza'}</button>
+      <button class="btn btn-full" data-m="no">${c.no}</button>
+    </div>`;
+  mCuerpo.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => {
+    const c2 = CARTAS[mI];
+    if (b.dataset.m === 'si') { mPlata -= c2.m; mGasto += c2.m; }
+    else if (c2.nec) { mSaltadas++; }
+    mI++; mPintar();
+  }));
+}
+
+function mFin() {
+  const pct = Math.round(mGasto / 20000 * 100);
+  const mal = pct > 45 || mSaltadas > 0;
+  mCuerpo.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span class="sello ${mal ? 'sello-rosa' : 'sello-verde'}">Fin de la semana 1</span>
+      <span class="rotulo">Faltan 3 semanas</span>
+    </div>
+    <div style="margin-top:var(--sp-s)">
+      <div class="rotulo">Gastaste, en 7 días</div>
+      <div style="font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;color:${mal ? 'var(--rosa)' : 'var(--verde)'}">${pct}%</div>
+      <p class="chico txt-2" style="margin-top:6px">de la mesada del mes. Te quedan <b class="mono">${clp(mPlata)}</b> para tres semanas — y todavía vienen el estuche que se pierde, el regalo del primo y tres colaciones más.</p>
+    </div>
+    <div class="mini-nota">
+      ${mSaltadas > 0
+        ? `<b>Te saltaste ${mSaltadas} ${mSaltadas === 1 ? 'necesidad' : 'necesidades'}.</b> El juego no te reta: simplemente el viernes andabas con hambre y te fue mal en la prueba. Eso es lo que se aprende.`
+        : (mal
+          ? '<b>Se te va a hacer corto.</b> No te lo decimos con un cartel: lo vas a sentir en la semana 3, cuando no te alcance para la colación y el quiosco te fíe con un 20% de recargo.'
+          : '<b>Vas bien.</b> Repartiste. Ahora la pregunta es si aguantas las tres semanas que vienen — y si llegas a la meta de $4.000 para el regalo de tu mamá.')}
+    </div>
+    <div class="mini-acc">
+      <a class="btn btn-primario btn-full" href="demo/index.html">Jugar el mes completo →</a>
+      <button class="btn btn-full" id="mReset">Probar de nuevo</button>
+    </div>`;
+  document.getElementById('mReset').addEventListener('click', () => {
+    mPlata = 20000; mI = 0; mGasto = 0; mSaltadas = 0; mPintar();
+  });
+}
+mPintar();
+</script>
+</body>
+</html>

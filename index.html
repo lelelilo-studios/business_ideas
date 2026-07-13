@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>15 ideas de negocio — lelelilo studios</title>
+<title>16 ideas de negocio — lelelilo studios</title>
 <meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,6 +148,12 @@ body {
 .fam--mineria {
   --bg:#0A0F14; --card:#111922; --line:#26333D; --hair:#161F27;
   --mute:#93A1AB; --mute-2:#758590; --sig:#B9CBD6;
+}
+/* Consumo: tinta de imprenta. Ni el café de la PYME ni el acero de la faena —
+   esta idea se imprime en riso, y la banda lo anticipa antes de que abras la tarjeta. */
+.fam--consumo {
+  --bg:#0F0C18; --card:#181428; --line:#2F2A45; --hair:#1E1930;
+  --mute:#A199B8; --mute-2:#8C84A3; --sig:#E4DFF0;
 }
 
 .fam__head {
@@ -371,9 +377,9 @@ body {
   }
   .fam--pyme .idea__head { padding-right:3rem; }
 
-  /* Minería: cinco tarjetas anchas, a dos columnas internas y con aire — pesan. */
-  .fam--mineria .ideas { gap:var(--sp-m); }
-  .fam--mineria .idea {
+  /* Minería y Consumo: tarjetas anchas, a dos columnas internas y con aire — pesan. */
+  .fam--mineria .ideas, .fam--consumo .ideas { gap:var(--sp-m); }
+  .fam--mineria .idea, .fam--consumo .idea {
     grid-template-columns:5rem minmax(0,.85fr) minmax(0,1.15fr);
     column-gap:var(--sp-xl);
     padding:var(--sp-l) var(--sp-l) var(--sp-m);
@@ -396,13 +402,13 @@ body {
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>15 ideas</span><span>·</span><span>2026</span></p>
-    <h1>Quince negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería— con
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>16 ideas</span><span>·</span><span>2026</span></p>
+    <h1>Dieciséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Cada idea es un problema real —diez de la PYME chilena, cinco de la minería, una de consumo— con
       un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
       arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
 
-    <nav class="jump" aria-label="Las dos familias">
+    <nav class="jump" aria-label="Las tres familias">
       <a href="#pyme">
         <span class="jump__n mono">10</span>
         <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
@@ -411,6 +417,11 @@ body {
       <a href="#mineria">
         <span class="jump__n mono">05</span>
         <span class="jump__t">Minería<small>Ticket alto · decide operaciones · venta en 12-18 meses</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+      <a href="#consumo">
+        <span class="jump__n mono">01</span>
+        <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
     </nav>
@@ -425,7 +436,7 @@ body {
       </div>
       <div>
         <h2>Dominios</h2>
-        <p><em>Los quince dominios están verificados como libres</em> al 13 de julio de 2026
+        <p><em>Los dieciséis dominios están verificados como libres</em> al 13 de julio de 2026
           (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
           <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
           antes de comprarlo.</p>
@@ -445,7 +456,7 @@ body {
     <section class="fam fam--pyme" id="pyme" aria-labelledby="h-pyme">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 01 de 2</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 01 de 3</p>
           <h2 class="fam__title" id="h-pyme">PYME chilena</h2>
           <p class="fam__count mono"><b>10</b><span>ideas</span></p>
           <p class="fam__lede">Diez problemas que hoy se resuelven en Excel, en un cuaderno o no se resuelven. Se venden solos: la dueña prueba el demo y decide.</p>
@@ -739,7 +750,7 @@ body {
     <section class="fam fam--mineria" id="mineria" aria-labelledby="h-mineria">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 02 de 2</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 02 de 3</p>
           <h2 class="fam__title" id="h-mineria">Minería</h2>
           <p class="fam__count mono"><b>05</b><span>ideas</span></p>
           <p class="fam__lede">Cinco problemas de faena, donde una hora de planta detenida cuesta más que un año de cualquiera de las diez de arriba. El comprador tiene plata y miedo, pero compra lento.</p>
@@ -899,6 +910,51 @@ body {
             <a href="15-agua/negocio.html">Negocio</a>
             <a href="15-agua/roadmap.html">Roadmap</a>
             <a href="15-agua/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+        </div>
+      </div>
+    </section>
+    <section class="fam fam--consumo" id="consumo" aria-labelledby="h-consumo">
+      <div class="container">
+        <header class="fam__head">
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 03 de 3</p>
+          <h2 class="fam__title" id="h-consumo">Consumo</h2>
+          <p class="fam__count mono"><b>01</b><span>ideas</span></p>
+          <p class="fam__lede">La única idea del set que no le vende a una empresa: le vende a una familia. El niño juega, el papá paga y el banco termina financiando la cuenta — y esa cadena de tres es la idea, no un detalle del modelo.</p>
+          <dl class="fam__facts mono"><div><dt>Comprador</dt><dd>El papá. Pero el que firma el cheque grande es el banco.</dd></div><div><dt>Ticket</dt><dd>$4.990 la familia. $54 millones al año la marca.</dd></div><div><dt>Ciclo de venta</dt><dd>Minutos con el papá. Cuatro a seis meses con el banco.</dd></div><div><dt>El rival real</dt><dd>Que el niño se aburra y juegue otra cosa.</dd></div></dl>
+        </header>
+        <div class="ideas">
+
+      <article class="idea" style="--acc:#E93792;--acc-on:#0B0A09;--acc-soft:rgba(233,55,146,0.1);--acc-line:rgba(233,55,146,0.35)">
+        <a class="idea__hit" href="16-finakids/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">16</p>
+        <div class="idea__head">
+          <p class="idea__cat mono">Edtech infantil · Educación financiera B2B2C (banco → colegio → familia)</p>
+          <h3 class="idea__brand"><a href="16-finakids/index.html">Finakids</a></h3>
+          <p class="idea__domain mono">finakids.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → México, Colombia, Perú</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Que aprenda que la plata se acaba. Jugando 90 segundos — y el domingo le decimos a su papá de qué conversar.</p>
+          <p class="idea__problem">El papá le pasa la mesada el domingo y el martes ya no tiene nada. Se la repone, porque es su hijo, y así el niño nunca aprende que la plata se acaba. El colegio pasa educación financiera una vez al año con un PowerPoint; el banco financia charlas que nadie mide; y de los 7 a los 12 —la edad en que se forman los hábitos— no existe ningún producto: todas las cuentas para menores en Chile empiezan a los 12 o 14 años.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Gratis (el juego completo, para siempre)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="16-finakids/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Finakids">
+            <a href="16-finakids/index.html">Producto</a>
+            <a href="16-finakids/negocio.html">Negocio</a>
+            <a href="16-finakids/roadmap.html">Roadmap</a>
+            <a href="16-finakids/stack.html">Arquitectura</a>
           </nav>
         </div>
       </article>

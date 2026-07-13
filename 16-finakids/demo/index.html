@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finakids — El Reto del Presupuesto (demo jugable)</title>
+<meta name="description" content="Demo jugable de Finakids: el niño juega El Reto del Presupuesto en 90 segundos y el papá ve, en el panel, qué aprendió de verdad y de qué conversar en la casa esta semana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* --- Pestañas niño / adulto --- */
+  .caras { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 3px solid var(--tinta); background: var(--papel-2); }
+  .cara-btn {
+    min-height: 56px; padding: 8px 6px; border: none; border-right: 2px solid var(--tinta);
+    font-family: var(--display); font-weight: 700; font-size: .95rem; color: var(--tinta-2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  }
+  .cara-btn:last-child { border-right: none; }
+  .cara-btn small { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+  .cara-btn[aria-selected="true"] { background: var(--tinta); color: var(--papel); }
+  .cara-btn[aria-selected="true"] small { color: var(--amarillo); }
+
+  /* --- Juego --- */
+  .juego { max-width: 460px; margin-inline: auto; padding-block: var(--sp-s) var(--sp-l); }
+  .hud { border: var(--borde); box-shadow: var(--registro-chico); background: var(--papel); margin-bottom: var(--sp-s); }
+  .hud-fila { display: grid; grid-template-columns: 1fr 1fr; }
+  .hud-c { padding: 8px 10px; border-right: 2px solid var(--tinta); }
+  .hud-c:last-child { border-right: none; }
+  .hud-fila + .hud-fila .hud-c { border-top: 2px solid var(--tinta); }
+  .hud-k { font-family: var(--mono); font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); }
+  .hud-v { font-family: var(--display); font-weight: 800; font-size: 1.3rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .hud-v.azul { color: var(--azul); }
+  .hud-v.rosa { color: var(--rosa); }
+  .corazones { display: flex; gap: 3px; margin-top: 2px; }
+  .corazones svg { width: 17px; height: 17px; }
+
+  .barra-sem { display: flex; gap: 3px; padding: 6px 10px; border-top: 2px solid var(--tinta); background: var(--papel-2); align-items: center; }
+  .barra-sem i { flex: 1; height: 9px; border: 2px solid var(--tinta); background: var(--papel); }
+  .barra-sem i.hecha { background: var(--verde); }
+  .barra-sem i.ahora { background: var(--amarillo); }
+  .barra-sem span { font-family: var(--mono); font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-2); }
+
+  /* Carta */
+  .carta {
+    border: 3px solid var(--tinta); background: var(--papel); box-shadow: 6px 6px 0 var(--tinta);
+    padding: var(--sp-s); min-height: 330px; display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .carta-tipo { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .carta-ilus { display: grid; place-items: center; padding: 4px 0 10px; }
+  .carta-ilus svg { width: 108px; height: 108px; }
+  .carta h3 { font-size: 1.35rem; line-height: 1.1; }
+  .carta .sub { font-size: .9rem; color: var(--tinta-2); margin-top: 6px; }
+  .carta-monto { font-family: var(--display); font-weight: 800; font-size: 2.1rem; line-height: 1; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .carta-monto.gasto { color: var(--rosa); }
+  .carta-monto.ingreso { color: var(--verde); }
+  .carta-acc { margin-top: auto; padding-top: var(--sp-s); display: grid; gap: 8px; }
+  .oferta {
+    position: absolute; top: 14px; right: -34px; transform: rotate(38deg);
+    background: var(--amarillo); border-top: 2px solid var(--tinta); border-bottom: 2px solid var(--tinta);
+    font-family: var(--mono); font-weight: 700; font-size: .64rem; letter-spacing: .1em;
+    padding: 3px 40px; text-transform: uppercase;
+  }
+  .aviso {
+    border: 2px solid var(--tinta); background: var(--rosa-cl); padding: 8px 10px;
+    font-size: .84rem; margin-top: 8px;
+  }
+  .aviso.mal { background: var(--rosa-cl); }
+  .aviso.bien { background: var(--verde-cl); }
+
+  /* Chanchito */
+  .ahorro-fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .meta-barra { height: 22px; border: 2px solid var(--tinta); background: var(--papel-3); position: relative; margin-top: 8px; }
+  .meta-barra i { display: block; height: 100%; background: var(--verde); }
+  .meta-barra b {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: var(--mono); font-size: .7rem; font-weight: 700;
+  }
+
+  /* Cierre */
+  .res-fila { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--papel-3); font-size: .9rem; }
+  .res-fila b { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .sellos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+  /* --- Panel del adulto --- */
+  .panel { padding-block: var(--sp-s) var(--sp-l); }
+  .ficha { display: flex; gap: 12px; align-items: center; }
+  .ficha svg { width: 54px; height: 54px; flex: none; }
+  .hero-num { font-family: var(--display); font-weight: 800; font-size: clamp(2.4rem, 9vw, 3.4rem); line-height: 1; color: var(--rosa); font-variant-numeric: tabular-nums; }
+  .destreza { padding: 10px 0; border-bottom: 1px solid var(--papel-3); }
+  .destreza:last-child { border-bottom: none; }
+  .destreza-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .destreza-top b { font-size: .95rem; }
+  .destreza-top span { font-family: var(--mono); font-size: .78rem; font-weight: 700; white-space: nowrap; }
+  .destreza p { font-size: .8rem; color: var(--tinta-2); margin-top: 5px; }
+  .interruptor { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--papel-3); }
+  .interruptor:last-child { border-bottom: none; }
+  .interruptor label { font-size: .9rem; font-weight: 700; }
+  .interruptor p { font-size: .78rem; color: var(--tinta-2); margin-top: 3px; }
+  .llave { width: 58px; height: 32px; border: 2px solid var(--tinta); background: var(--papel-3); position: relative; flex: none; padding: 0; min-width: 58px; min-height: 32px; }
+  .llave i { position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: var(--tinta); transition: left .12s; }
+  .llave[aria-pressed="true"] { background: var(--verde); }
+  .llave[aria-pressed="true"] i { left: 28px; }
+  .llave[disabled] { background: var(--papel-3); opacity: 1; cursor: not-allowed; border-style: dashed; }
+  .llave[disabled] i { background: var(--tinta-3); }
+  select {
+    border: var(--borde); background: var(--papel); padding: 8px 10px; min-height: 44px;
+    font-family: var(--mono); font-weight: 700; font-size: .82rem;
+  }
+  .informe { font-size: .9rem; line-height: 1.6; }
+  .informe p + p { margin-top: 10px; }
+  @media (min-width: 62em) {
+    .panel-grilla { display: grid; grid-template-columns: 1.15fr .85fr; gap: var(--sp-s); align-items: start; }
+    .panel-col { display: grid; gap: var(--sp-s); }
+  }
+  .oculto { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="9" width="28" height="19" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M2 9 16 2l14 7" fill="#E8318F" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="19" r="4.5" fill="none" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M16 15.5v7M14 17.4h4M14 20.6h4" stroke="#1F1C33" stroke-width="1.6"/>
+      </svg>
+      <span class="marca-txt">Finakids</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../../index.html">← Ideas</a></li>
+        <li><a href="../index.html">Producto</a></li>
+        <li><a href="index.html" aria-current="page">Demo</a></li>
+        <li><a href="../negocio.html">Negocio</a></li>
+        <li><a href="../roadmap.html">Roadmap</a></li>
+        <li><a href="../stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+</header>
+<div class="nav-movil" id="menuMovil">
+  <ul role="list">
+    <li><a href="../../index.html">← Ideas</a></li>
+    <li><a href="../index.html">Producto</a></li>
+    <li><a href="index.html" aria-current="page">Demo</a></li>
+    <li><a href="../negocio.html">Negocio</a></li>
+    <li><a href="../roadmap.html">Roadmap</a></li>
+    <li><a href="../stack.html">Arquitectura</a></li>
+  </ul>
+</div>
+
+<!-- Las dos caras -->
+<div class="caras" role="tablist" aria-label="Las dos caras del producto">
+  <button class="cara-btn" id="tabJuego" role="tab" aria-selected="true" aria-controls="caraJuego">
+    El juego <small>La cara del niño</small>
+  </button>
+  <button class="cara-btn" id="tabPanel" role="tab" aria-selected="false" aria-controls="caraPanel">
+    El panel <small>La cara del papá</small>
+  </button>
+</div>
+
+<!-- ============ CARA DEL NIÑO ============ -->
+<main id="caraJuego" role="tabpanel" aria-labelledby="tabJuego">
+  <div class="container juego">
+
+    <div class="hud" id="hud">
+      <div class="hud-fila">
+        <div class="hud-c">
+          <div class="hud-k">En la billetera</div>
+          <div class="hud-v azul cifra" id="hudBill">$20.000</div>
+        </div>
+        <div class="hud-c">
+          <div class="hud-k">En el chanchito</div>
+          <div class="hud-v rosa cifra" id="hudChan">$0</div>
+        </div>
+      </div>
+      <div class="hud-fila">
+        <div class="hud-c">
+          <div class="hud-k">Ánimo</div>
+          <div class="corazones" id="hudAnimo"></div>
+        </div>
+        <div class="hud-c">
+          <div class="hud-k">Le debes al quiosco</div>
+          <div class="hud-v cifra" id="hudDeuda">$0</div>
+        </div>
+      </div>
+      <div class="barra-sem">
+        <span id="hudSem">Semana 1</span>
+        <i class="ahora"></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
+    <div id="escena"></div>
+
+  </div>
+</main>
+
+<!-- ============ CARA DEL ADULTO ============ -->
+<main id="caraPanel" role="tabpanel" aria-labelledby="tabPanel" class="oculto">
+  <div class="container panel">
+
+    <div class="caja caja-dura" style="margin-bottom:var(--sp-s)">
+      <div class="ficha">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/>
+          <path d="M32 14c7 0 11 4.5 11 11v3H21v-3c0-6.5 4-11 11-11Z" fill="#1F1C33"/>
+          <circle cx="32" cy="31" r="10.5" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+          <circle cx="28.4" cy="30" r="1.7" fill="#1F1C33"/><circle cx="35.6" cy="30" r="1.7" fill="#1F1C33"/>
+          <path d="M28.6 35.4c2 1.8 4.8 1.8 6.8 0" stroke="#1F1C33" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M14 58c2-9.5 9-14 18-14s16 4.5 18 14" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/>
+        </svg>
+        <div>
+          <div class="rotulo">Panel de la familia · Plan Familia</div>
+          <h2 style="font-size:var(--step-1)">Matías Fuentes Aravena</h2>
+          <p class="chico txt-2">9 años · 4° básico B · Colegio San Nicolás de Maipú · Mesada real: <b class="mono">$20.000</b>/mes</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-grilla">
+      <div class="panel-col" style="display:grid;gap:var(--sp-s)">
+
+        <!-- La cifra que importa -->
+        <div class="caja caja-rosa">
+          <div class="rotulo rotulo-rosa">Lo que hay que mirar esta semana</div>
+          <div class="hero-num" id="pnPct">61%</div>
+          <p style="font-size:var(--step-0);font-weight:700;max-width:34ch">de la mesada se le va en los primeros 7 días.</p>
+          <p class="chico txt-2" style="margin-top:8px">No le mostramos estrellas. Le mostramos esto: es la única cifra que predice si a fin de mes va a tener plata. En sus últimas <b id="pnPartidas">5</b> partidas el promedio fue <b class="mono" id="pnProm">61%</b>. Un mes sano está bajo el 35%.</p>
+        </div>
+
+        <!-- Gráfico -->
+        <figure class="fig" style="margin:0">
+          <figcaption>
+            <div class="fig-titulo">Qué porcentaje de la mesada gastó en la primera semana</div>
+            <div class="fig-sub">Una partida = un mes simulado. Menos es mejor.</div>
+          </figcaption>
+          <div class="scroll-x" style="border:none;box-shadow:none">
+            <svg id="graficoSem1" viewBox="0 0 480 210" width="100%" height="210" style="min-width:440px" role="img" aria-labelledby="gsTit">
+              <title id="gsTit">Porcentaje de la mesada gastado en la semana 1, por partida</title>
+            </svg>
+          </div>
+          <p class="fig-nota">Datos simulados del demo. En producción cada punto es una partida real y el umbral del 35% se calibra con la cohorte del curso.</p>
+        </figure>
+
+        <!-- Destrezas -->
+        <div class="caja caja-dura">
+          <div class="rotulo">Qué aprendió de verdad</div>
+          <h3 style="margin:4px 0 10px">Cinco destrezas, con la evidencia al lado</h3>
+          <div id="pnDestrezas"></div>
+        </div>
+
+      </div>
+
+      <div class="panel-col" style="display:grid;gap:var(--sp-s)">
+
+        <!-- La IA -->
+        <div class="caja caja-tinta trama">
+          <div class="rotulo">De qué conversar en la casa · lo escribe la IA</div>
+          <div class="informe" id="pnInforme" style="margin-top:10px">
+            <p>Apretá el botón para generar el informe de esta semana con los datos de las partidas de Matías.</p>
+          </div>
+          <div style="display:grid;gap:8px;margin-top:var(--sp-s)">
+            <button class="btn btn-rosa btn-full" id="btnInforme">Generar el informe de la semana</button>
+            <button class="btn btn-full oculto" id="btnConversado" style="background:var(--papel)">Ya conversamos con él</button>
+          </div>
+          <p class="chico" style="color:#B6B1CC;margin-top:10px">Modelo: <span class="mono">claude-sonnet-5</span> · ~2.500 tokens de entrada, 500 de salida · <span class="mono">US$0,015</span> por informe. La cuenta completa está en <a href="../stack.html" style="color:var(--amarillo)">Arquitectura</a>.</p>
+        </div>
+
+        <!-- Controles -->
+        <div class="caja caja-dura">
+          <div class="rotulo">Controles</div>
+          <div class="interruptor">
+            <div>
+              <label for="selTiempo">Tiempo máximo de juego al día</label>
+              <p>Finakids se apaga solo. No hay "un ratito más".</p>
+            </div>
+            <select id="selTiempo">
+              <option>10 min</option>
+              <option selected>15 min</option>
+              <option>25 min</option>
+              <option>Sin límite</option>
+            </select>
+          </div>
+          <div class="interruptor">
+            <div>
+              <label id="lblWsp">Informe semanal por WhatsApp</label>
+              <p id="txtWsp">Los domingos a las 19:00, antes de pasarle la mesada.</p>
+            </div>
+            <button class="llave" id="llaveWsp" aria-pressed="true" aria-labelledby="lblWsp"><i></i></button>
+          </div>
+          <div class="interruptor">
+            <div>
+              <label id="lblIap">Compras dentro del juego</label>
+              <p id="txtIap">Desactivadas. Y no se pueden activar.</p>
+            </div>
+            <button class="llave" id="llaveIap" aria-pressed="false" aria-labelledby="lblIap" disabled><i></i></button>
+          </div>
+          <div class="interruptor">
+            <div>
+              <label id="lblCole">Compartir el avance con el profesor jefe</label>
+              <p id="txtCole">Sólo el nivel de las destrezas. Nunca las decisiones ni los montos.</p>
+            </div>
+            <button class="llave" id="llaveCole" aria-pressed="false" aria-labelledby="lblCole"><i></i></button>
+          </div>
+        </div>
+
+        <!-- Honestidad -->
+        <div class="honesto">
+          <div class="rotulo">Lo que este panel NO sabe</div>
+          <ul class="lista" style="margin-top:8px">
+            <li>No sabe qué hace Matías con la plata de verdad. Sabe lo que hace con la plata del juego, que no es lo mismo.</li>
+            <li>No mide "educación financiera". Mide seis decisiones repetidas en un juego. Es un indicio, no un diagnóstico.</li>
+            <li>No está conectado a ninguna cuenta bancaria. Hoy no lo está y por un buen rato no lo va a estar (<a href="../stack.html" style="color:var(--azul)">por qué</a>).</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b class="mono">Finakids</b> · demo de producto, datos simulados. El juego es real y se juega entero; el panel se alimenta de tu propia partida.</p>
+    <p style="margin-top:6px"><a href="../index.html">Producto</a> · <a href="../negocio.html">Negocio</a> · <a href="../roadmap.html">Roadmap</a> · <a href="../stack.html">Arquitectura</a></p>
+  </div>
+</footer>
+
+<script>
+/* ================= Menú ================= */
+const btnMenu = document.getElementById('btnMenu');
+const menuMovil = document.getElementById('menuMovil');
+btnMenu.addEventListener('click', () => {
+  const ab = menuMovil.classList.toggle('abierto');
+  btnMenu.setAttribute('aria-expanded', ab ? 'true' : 'false');
+});
+
+/* ================= Pestañas ================= */
+const tabJuego = document.getElementById('tabJuego');
+const tabPanel = document.getElementById('tabPanel');
+const caraJuego = document.getElementById('caraJuego');
+const caraPanel = document.getElementById('caraPanel');
+function verCara(cual) {
+  const esJuego = cual === 'juego';
+  tabJuego.setAttribute('aria-selected', esJuego);
+  tabPanel.setAttribute('aria-selected', !esJuego);
+  caraJuego.classList.toggle('oculto', !esJuego);
+  caraPanel.classList.toggle('oculto', esJuego);
+  window.scrollTo(0, 0);
+}
+tabJuego.addEventListener('click', () => verCara('juego'));
+tabPanel.addEventListener('click', () => { verCara('panel'); pintarPanel(); });
+
+/* ================= Utilidades ================= */
+const clp = n => '$' + Math.round(n).toLocaleString('es-CL');
+
+/* ================= Dibujos (SVG a mano) ================= */
+const ILUS = {
+  colacion: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="34" width="64" height="48" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M18 34c0-9 8-14 32-14s32 5 32 14" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><path d="M30 48h40M30 60h28" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/><circle cx="70" cy="62" r="7" fill="#0E9A6C" stroke="#1F1C33" stroke-width="3"/></svg>`,
+  laminas: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="16" y="24" width="42" height="56" fill="#CFE0F5" stroke="#1F1C33" stroke-width="3" transform="rotate(-8 37 52)"/><rect x="34" y="20" width="42" height="56" fill="#E8318F" stroke="#1F1C33" stroke-width="3" transform="rotate(7 55 48)"/><circle cx="55" cy="42" r="11" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M46 60h20" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/></svg>`,
+  fotocopia: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="24" y="16" width="52" height="68" fill="#F4F1E9" stroke="#1F1C33" stroke-width="3"/><path d="M34 32h32M34 44h32M34 56h22M34 68h16" stroke="#0B60C4" stroke-width="3" stroke-linecap="round"/><path d="M64 16l12 12h-12z" fill="#E8318F" stroke="#1F1C33" stroke-width="2"/></svg>`,
+  estuche: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="44" width="72" height="34" rx="4" fill="#5B3FC4" stroke="#1F1C33" stroke-width="3"/><path d="M14 56h72" stroke="#1F1C33" stroke-width="3"/><path d="M30 44V26l8-10 8 10v18" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M54 44V30l7-8 7 8v14" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/></svg>`,
+  perro: `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="60" rx="28" ry="20" fill="#A87A00" stroke="#1F1C33" stroke-width="3"/><circle cx="72" cy="44" r="15" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M62 32l-4-12 12 6z" fill="#1F1C33"/><circle cx="76" cy="42" r="2.4" fill="#1F1C33"/><path d="M84 47h4" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/><path d="M22 58l-10-8" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/><path d="M36 78v8M60 78v8" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/></svg>`,
+  helado: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M34 46l16 40 16-40z" fill="#F5C518" stroke="#1F1C33" stroke-width="3" stroke-linejoin="round"/><circle cx="40" cy="38" r="12" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><circle cx="60" cy="38" r="12" fill="#0E9A6C" stroke="#1F1C33" stroke-width="3"/><circle cx="50" cy="26" r="11" fill="#CFE0F5" stroke="#1F1C33" stroke-width="3"/></svg>`,
+  skin: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="12" y="30" width="76" height="42" rx="8" fill="#1F1C33" stroke="#1F1C33" stroke-width="3"/><rect x="20" y="38" width="24" height="26" fill="#0B60C4"/><circle cx="66" cy="46" r="5" fill="#E8318F"/><circle cx="76" cy="56" r="5" fill="#F5C518"/><path d="M26 51h12M32 45v12" stroke="#F4F1E9" stroke-width="3" stroke-linecap="round"/></svg>`,
+  regalo: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="40" width="64" height="42" fill="#0B60C4" stroke="#1F1C33" stroke-width="3"/><rect x="14" y="28" width="72" height="14" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><path d="M50 28v54" stroke="#1F1C33" stroke-width="3"/><path d="M50 28c-8-16-22-10-14 0M50 28c8-16 22-10 14 0" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/></svg>`,
+  juguetes: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="46" width="34" height="34" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><rect x="52" y="52" width="30" height="28" fill="#0E9A6C" stroke="#1F1C33" stroke-width="3"/><circle cx="66" cy="30" r="14" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><path d="M22 56h18M22 66h10" stroke="#1F1C33" stroke-width="3" stroke-linecap="round"/></svg>`,
+  micro: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="10" y="30" width="80" height="40" fill="#0E9A6C" stroke="#1F1C33" stroke-width="3"/><rect x="18" y="38" width="18" height="14" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/><rect x="42" y="38" width="18" height="14" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/><rect x="66" y="38" width="16" height="14" fill="#CFE0F5" stroke="#1F1C33" stroke-width="2"/><circle cx="28" cy="74" r="8" fill="#1F1C33"/><circle cx="72" cy="74" r="8" fill="#1F1C33"/></svg>`,
+  completo: `<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="12" y="42" width="76" height="24" rx="12" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><rect x="20" y="40" width="60" height="12" rx="6" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><path d="M24 46c6 6 12-6 18 0s12-6 18 0 10-4 14 0" stroke="#0E9A6C" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  chanchito: `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="56" rx="34" ry="26" fill="#E8318F" stroke="#1F1C33" stroke-width="3"/><circle cx="78" cy="50" r="10" fill="#FBD9EA" stroke="#1F1C33" stroke-width="3"/><circle cx="76" cy="48" r="1.8" fill="#1F1C33"/><circle cx="82" cy="52" r="1.8" fill="#1F1C33"/><path d="M40 32l-6-12 16 6z" fill="#FBD9EA" stroke="#1F1C33" stroke-width="3" stroke-linejoin="round"/><rect x="38" y="32" width="24" height="5" fill="#1F1C33"/><path d="M30 80v8M46 82v6M62 80v8" stroke="#1F1C33" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="52" r="2.6" fill="#1F1C33"/></svg>`,
+  fin: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="34" fill="#F5C518" stroke="#1F1C33" stroke-width="3"/><circle cx="50" cy="50" r="24" fill="none" stroke="#1F1C33" stroke-width="2" stroke-dasharray="4 4"/><path d="M50 30v22l14 9" stroke="#1F1C33" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M50 8v8M8 50h8M84 50h8M50 84v8" stroke="#E8318F" stroke-width="4" stroke-linecap="round"/></svg>`
+};
+const corazon = (lleno) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S3 14.6 3 8.9A5 5 0 0 1 12 6a5 5 0 0 1 9 2.9C21 14.6 12 21 12 21Z" fill="${lleno ? '#E8318F' : '#DCD5C1'}" stroke="#1F1C33" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+
+/* ================= El juego ================= */
+const MESADA = 20000, META = 4000;
+
+const CARTAS = [
+  { sem:1, tipo:'nec', ilus:'colacion', t:'La colación de la semana', s:'Cuatro recreos en el quiosco del colegio.', m:2000,
+    cons:'Pasaste la semana con hambre a la salida. Andabas de mal humor.' },
+  { sem:1, tipo:'deseo', ilus:'laminas', t:'Sobres de láminas', s:'Tres sobres del álbum. El Benja ya tiene la del arquero.', m:3500, oferta:'¡Sólo hoy!' },
+  { sem:1, tipo:'deseo', ilus:'skin', t:'La skin nueva del jueguito', s:'Todos la tienen. Vale como tres colaciones. Y recién te llegó la mesada.', m:5990, oferta:'Últimas horas' },
+  { sem:1, tipo:'nec', ilus:'fotocopia', t:'Fotocopias de Historia', s:'La guía para la prueba del jueves.', m:1000,
+    cons:'Diste la prueba sin la guía. Te fue más o menos.' },
+
+  { sem:2, tipo:'evento', ilus:'estuche', t:'Se te perdió el estuche', s:'Hay que reponerlo. Esto no se puede saltar.', m:2000,
+    cons:'' },
+  { sem:2, tipo:'oport', ilus:'perro', t:'La señora Marta te ofrece pega', s:'Pasear a la Nala dos tardes. Te vas a perder el recreo largo.', m:2000 },
+  { sem:2, tipo:'nec', ilus:'colacion', t:'La colación de la semana', s:'Otra vez el quiosco. Todas las semanas hay que comer.', m:2000,
+    cons:'Segunda semana sin colación. Te dolía la guata.' },
+  { sem:2, tipo:'deseo', ilus:'helado', t:'Helado con la Emilia', s:'Salieron del colegio y hay carrito en la esquina.', m:1500 },
+
+  { sem:3, tipo:'nec', ilus:'colacion', t:'La colación de la semana', s:'Tercera semana. La plata ya no es la misma que el día 1.', m:2000,
+    cons:'Sin colación de nuevo. Te costó concentrarte.' },
+  { sem:3, tipo:'evento', ilus:'regalo', t:'Cumpleaños de tu primo', s:'Hay que llevar regalo. Esto tampoco se puede saltar.', m:3000, cons:'' },
+  { sem:3, tipo:'oport', ilus:'juguetes', t:'Vender lo que ya no usas', s:'Tres juguetes en buen estado. La vecina te los compra.', m:1500 },
+
+  { sem:4, tipo:'nec', ilus:'colacion', t:'La colación de la semana', s:'Última semana del mes.', m:2000,
+    cons:'Terminaste el mes con hambre.' },
+  { sem:4, tipo:'nec', ilus:'micro', t:'La micro al taller de fútbol', s:'Ida y vuelta, dos veces.', m:1200,
+    cons:'Te perdiste el taller de fútbol.' },
+  { sem:4, tipo:'deseo', ilus:'completo', t:'Un completo en la esquina', s:'Es viernes y quedaste con los amigos.', m:2000 }
+];
+
+let E = {};
+function reiniciar() {
+  E = {
+    bill: MESADA, chan: 0, deuda: 0, animo: 3, feliz: 0,
+    i: 0, sem: 1, gastoSem: [0,0,0,0], gastoDeseos: 0, gastoDeseosSem1: 0,
+    necPagadas: 0, necTotal: CARTAS.filter(c=>c.tipo==='nec').length,
+    ofertaResistida: 0, ofertaTotal: CARTAS.filter(c=>c.oferta).length,
+    trabajos: 0, rompio: false, fio: 0, recargos: 0, log: [], fin: false
+  };
+  pintarHud(); siguiente();
+}
+
+function pintarHud() {
+  document.getElementById('hudBill').textContent = clp(E.bill);
+  document.getElementById('hudChan').textContent = clp(E.chan);
+  document.getElementById('hudDeuda').textContent = clp(E.deuda);
+  document.getElementById('hudDeuda').style.color = E.deuda > 0 ? 'var(--rosa)' : 'var(--tinta)';
+  document.getElementById('hudAnimo').innerHTML = [1,2,3].map(n => corazon(n <= E.animo)).join('');
+  document.getElementById('hudSem').textContent = E.fin ? 'Fin de mes' : 'Semana ' + E.sem;
+  document.querySelectorAll('.barra-sem i').forEach((el, k) => {
+    el.className = '';
+    if (E.fin || k + 1 < E.sem) el.className = 'hecha';
+    else if (k + 1 === E.sem) el.className = 'ahora';
+  });
+}
+
+const esc = document.getElementById('escena');
+
+function siguiente() {
+  if (E.i >= CARTAS.length) return cerrarMes();
+  const c = CARTAS[E.i];
+  if (c.sem !== E.sem) { const s = E.sem; E.sem = c.sem; return pantallaChanchito(s); }
+  pintarCarta(c);
+}
+
+function pintarCarta(c) {
+  pintarHud();
+  const gasto = c.tipo !== 'oport';
+  const alcanza = E.bill >= c.m;
+  const etiqueta = { nec:'Necesidad', deseo:'Deseo', evento:'Pasó y punto', oport:'Oportunidad' }[c.tipo];
+  const sello = { nec:'sello-azul', deseo:'sello-rosa', evento:'sello-oro', oport:'sello-verde' }[c.tipo];
+
+  let acciones = '';
+  if (c.tipo === 'oport') {
+    acciones = `<button class="btn btn-primario btn-full" data-a="aceptar">Aceptar la pega · ${clp(c.m)}</button>
+                <button class="btn btn-full" data-a="rechazar">No, prefiero mi tiempo</button>`;
+  } else if (c.tipo === 'deseo') {
+    acciones = alcanza
+      ? `<button class="btn btn-rosa btn-full" data-a="comprar">Comprarlo · ${clp(c.m)}</button>
+         <button class="btn btn-full" data-a="pasar">No, gracias</button>`
+      : `<button class="btn btn-full" disabled>No te alcanza</button>
+         <div class="aviso mal"><b>Te faltan ${clp(c.m - E.bill)}.</b> La plata del chanchito no se toca para esto. Un deseo no se fía.</div>
+         <button class="btn btn-full" data-a="pasar">Seguir</button>`;
+  } else {
+    const bloques = [];
+    if (alcanza) bloques.push(`<button class="btn btn-primario btn-full" data-a="pagar">Pagar · ${clp(c.m)}</button>`);
+    else {
+      bloques.push(`<div class="aviso mal"><b>Te faltan ${clp(c.m - E.bill)}.</b> Esto pasa cuando la plata se gasta al principio del mes.</div>`);
+      if (E.chan >= c.m - E.bill) bloques.push(`<button class="btn btn-full" data-a="romper" style="background:var(--rosa-cl)">Romper el chanchito y pagar</button>`);
+      bloques.push(`<button class="btn btn-full" data-a="fiar" style="background:var(--amarillo)">Que te fíen · ${clp(c.m)} + ${clp(Math.round(c.m*0.2))} de recargo</button>`);
+    }
+    if (c.tipo === 'nec') bloques.push(`<button class="btn btn-full" data-a="saltar">Saltármelo</button>`);
+    acciones = bloques.join('');
+  }
+
+  esc.innerHTML = `
+    <div class="carta">
+      ${c.oferta ? `<div class="oferta">${c.oferta}</div>` : ''}
+      <div class="carta-tipo">
+        <span class="sello ${sello}">${etiqueta}</span>
+        <span class="rotulo">Carta ${E.i+1} de ${CARTAS.length}</span>
+      </div>
+      <div class="carta-ilus">${ILUS[c.ilus]}</div>
+      <h3>${c.t}</h3>
+      <p class="sub">${c.s}</p>
+      <div class="carta-monto ${gasto ? 'gasto' : 'ingreso'}">${gasto ? '−' : '+'}${clp(c.m)}</div>
+      <div class="carta-acc">${acciones}</div>
+    </div>`;
+
+  esc.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => resolver(c, b.dataset.a)));
+}
+
+function resolver(c, a) {
+  const k = c.sem - 1;
+  if (a === 'pagar')   { E.bill -= c.m; E.gastoSem[k] += c.m; if (c.tipo==='nec') E.necPagadas++; }
+  if (a === 'comprar') { E.bill -= c.m; E.gastoSem[k] += c.m; E.gastoDeseos += c.m; if (c.sem===1) E.gastoDeseosSem1 += c.m; E.feliz++; }
+  if (a === 'pasar')   { if (c.oferta) E.ofertaResistida++; }
+  if (a === 'aceptar') { E.bill += c.m; E.trabajos++; E.feliz = Math.max(0, E.feliz - 1);
+                         E.log.push(`Trabajó por ${clp(c.m)} en la semana ${c.sem}.`); }
+  if (a === 'rechazar'){ }
+  if (a === 'romper')  { E.rompio = true; const falta = c.m - E.bill; E.chan -= falta; E.bill = 0;
+                         E.gastoSem[k] += c.m; if (c.tipo==='nec') E.necPagadas++;
+                         E.log.push(`Rompió el chanchito en la semana ${c.sem} para pagar ${c.t.toLowerCase()}.`); }
+  if (a === 'fiar')    { const rec = Math.round(c.m * 0.2); E.deuda += c.m + rec; E.fio++; E.recargos += rec;
+                         E.gastoSem[k] += c.m; if (c.tipo==='nec') E.necPagadas++;
+                         E.log.push(`Le fiaron ${clp(c.m)} en la semana ${c.sem} y le cobraron ${clp(rec)} de recargo.`); }
+  if (a === 'saltar')  { E.animo = Math.max(0, E.animo - 1);
+                         E.log.push(`Se saltó ${c.t.toLowerCase()} en la semana ${c.sem}.`);
+                         E.i++; return consecuencia(c); }
+  E.i++; siguiente();
+}
+
+function consecuencia(c) {
+  pintarHud();
+  esc.innerHTML = `
+    <div class="carta" style="min-height:260px;justify-content:center;text-align:center">
+      <div class="carta-ilus">${ILUS[c.ilus]}</div>
+      <h3 style="color:var(--rosa)">No lo pagaste.</h3>
+      <p class="sub" style="max-width:32ch;margin-inline:auto">${c.cons}</p>
+      <div class="carta-acc"><button class="btn btn-full" data-a="ok">Seguir con el mes</button></div>
+    </div>`;
+  esc.querySelector('[data-a]').addEventListener('click', siguiente);
+}
+
+function pantallaChanchito(semCerrada) {
+  pintarHud();
+  const pct = Math.min(100, Math.round(E.chan / META * 100));
+  esc.innerHTML = `
+    <div class="carta" style="min-height:340px">
+      <div class="carta-tipo">
+        <span class="sello sello-verde">Fin de la semana ${semCerrada}</span>
+        <span class="rotulo">El chanchito</span>
+      </div>
+      <div class="carta-ilus">${ILUS.chanchito}</div>
+      <h3>¿Guardas algo antes de seguir?</h3>
+      <p class="sub">Tu meta: <b>${clp(META)}</b> para el regalo de tu mamá. Lo que entra al chanchito no se puede gastar en el mes… salvo que lo rompas.</p>
+      <div class="meta-barra"><i style="width:${pct}%"></i><b>${clp(E.chan)} de ${clp(META)}</b></div>
+      <div class="carta-acc">
+        <div class="ahorro-fila">
+          <button class="btn" data-g="1000" ${E.bill<1000?'disabled':''}>+$1.000</button>
+          <button class="btn" data-g="2000" ${E.bill<2000?'disabled':''}>+$2.000</button>
+          <button class="btn" data-g="5000" ${E.bill<5000?'disabled':''}>+$5.000</button>
+        </div>
+        <button class="btn btn-primario btn-full" data-g="seguir">Empezar la semana ${E.sem}</button>
+      </div>
+    </div>`;
+  esc.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.g === 'seguir') return siguiente();
+    const v = +b.dataset.g;
+    if (E.bill >= v) { E.bill -= v; E.chan += v; }
+    pantallaChanchito(semCerrada);
+  }));
+}
+
+function cerrarMes() {
+  E.fin = true;
+  // La deuda se cobra a fin de mes: primero del chanchito, después de la billetera.
+  if (E.deuda > 0) {
+    const delChan = Math.min(E.chan, E.deuda);
+    E.chan -= delChan; E.deuda -= delChan;
+    const delBill = Math.min(E.bill, E.deuda);
+    E.bill -= delBill; E.deuda -= delBill;
+  }
+  const metaOk = E.chan >= META && E.deuda === 0;
+  const pctSem1 = Math.round(E.gastoSem[0] / MESADA * 100);
+  pintarHud();
+
+  const sellos = [];
+  // El sello del ahorrador se gana ahorrando, no guardando plata y fiando al mismo tiempo.
+  if (metaOk && !E.rompio && E.fio === 0) sellos.push('<span class="sello sello-verde">Sello del Ahorrador</span>');
+  if (E.ofertaResistida === E.ofertaTotal) sellos.push('<span class="sello sello-azul">Sello del Ojo Frío</span>');
+  if (E.trabajos >= 1) sellos.push('<span class="sello sello-oro">Sello del Trabajador</span>');
+  if (E.necPagadas === E.necTotal) sellos.push('<span class="sello sello-rosa">Sello del que no se olvida de comer</span>');
+  if (!sellos.length) sellos.push('<span class="sello sello-gris">Ningún sello este mes</span>');
+
+  // La lección se arma con lo que de verdad hizo.
+  const leccion = [];
+  if (pctSem1 > 45) leccion.push(`Gastaste el <b>${pctSem1}%</b> de la mesada en la primera semana. Por eso el mes se te puso cuesta arriba.`);
+  else if (pctSem1 <= 30) leccion.push(`Sólo gastaste el <b>${pctSem1}%</b> de la mesada en la primera semana. Por eso te alcanzó hasta el final.`);
+  if (E.fio > 0) leccion.push(`Te fiaron ${E.fio} ${E.fio===1?'vez':'veces'} y el recargo te costó <b>${clp(E.recargos)}</b> que no te dio nada a cambio. Eso es exactamente lo que hace el crédito caro.`);
+  if (E.deuda > 0) leccion.push(`Y todavía le debes <b>${clp(E.deuda)}</b> al quiosco. La deuda no se acaba con el mes: te acompaña al siguiente.`);
+  if (E.rompio) leccion.push('Rompiste el chanchito. Se puede… pero entonces el chanchito no sirve de nada.');
+  if (E.necPagadas < E.necTotal) leccion.push(`Te saltaste ${E.necTotal - E.necPagadas} ${E.necTotal-E.necPagadas===1?'necesidad':'necesidades'}. Las necesidades no desaparecen: sólo cambian de forma.`);
+  if (E.gastoDeseos > 6000) leccion.push(`Gastaste ${clp(E.gastoDeseos)} en deseos. No está mal querer cosas: está mal no dejar nada para lo que viene.`);
+  if (metaOk && E.fio > 0) leccion.push(`Llegaste a la meta… pero pediste fiado <b>teniendo plata en el chanchito</b>. Pagaste ${clp(E.recargos)} de recargo por no querer abrirlo. Ahorrar es bueno; ahorrar y endeudarte a la vez, no: esa plata es tuya y estaba ahí.`);
+  else if (metaOk) leccion.push('<b>Llegaste a la meta y no le debes nada a nadie.</b> Ese regalo lo compraste tú.');
+  else if (E.deuda === 0) leccion.push(`Te faltaron ${clp(META - E.chan)} para la meta. Estuviste cerca.`);
+  if (!leccion.length) leccion.push('Cerraste el mes sin sobresaltos.');
+
+  esc.innerHTML = `
+    <div class="carta" style="min-height:auto">
+      <div class="carta-tipo">
+        <span class="sello ${metaOk ? 'sello-verde' : 'sello-rosa'}">${metaOk ? 'Meta cumplida' : 'Mes cerrado'}</span>
+        <span class="rotulo">Cierre del mes</span>
+      </div>
+      <div class="carta-ilus">${ILUS.fin}</div>
+      <h3>${metaOk ? '¡Te alcanzó y ahorraste!' : 'Se te acabó la plata antes que el mes.'}</h3>
+      <div style="margin-top:12px">
+        <div class="res-fila"><span>En el chanchito</span><b>${clp(E.chan)} / ${clp(META)}</b></div>
+        <div class="res-fila"><span>Te quedó en la billetera</span><b>${clp(E.bill)}</b></div>
+        <div class="res-fila"><span>Necesidades cubiertas</span><b>${E.necPagadas} de ${E.necTotal}</b></div>
+        <div class="res-fila"><span>Gastado en deseos</span><b>${clp(E.gastoDeseos)}</b></div>
+        <div class="res-fila"><span>Recargos que te cobró el quiosco</span><b style="color:${E.recargos ? 'var(--rosa)' : 'inherit'}">${clp(E.recargos)}</b></div>
+        ${E.deuda > 0 ? `<div class="res-fila"><span>Quedaste debiendo</span><b style="color:var(--rosa)">${clp(E.deuda)}</b></div>` : ''}
+        <div class="res-fila"><span>Gastado en la semana 1</span><b>${pctSem1}% de la mesada</b></div>
+      </div>
+      <div class="sellos">${sellos.join('')}</div>
+      <div class="aviso ${metaOk ? 'bien' : 'mal'}" style="margin-top:14px">
+        <div class="rotulo" style="margin-bottom:6px">Lo que pasó de verdad</div>
+        ${leccion.map(l => `<p style="margin-top:4px">${l}</p>`).join('')}
+      </div>
+      <div class="carta-acc">
+        <button class="btn btn-rosa btn-full" id="verPanel">Ver cómo lo vio tu mamá →</button>
+        <button class="btn btn-full" id="otraVez">Jugar otro mes</button>
+      </div>
+    </div>`;
+  document.getElementById('otraVez').addEventListener('click', reiniciar);
+  document.getElementById('verPanel').addEventListener('click', () => { verCara('panel'); pintarPanel(); });
+
+  // La partida alimenta el panel del adulto.
+  PARTIDAS[PARTIDAS.length - 1] = { n: 6, pct: pctSem1, hoy: true };
+  SESION = { pctSem1, metaOk, fio: E.fio, recargos: E.recargos, rompio: E.rompio, deseos: E.gastoDeseos,
+             nec: E.necPagadas, necTot: E.necTotal, ofertaResistida: E.ofertaResistida,
+             ofertaTot: E.ofertaTotal, trabajos: E.trabajos, log: E.log };
+}
+
+/* ================= El panel del adulto ================= */
+// Historial simulado de partidas anteriores (el demo parte con 5; la 6ª es la que juegas tú).
+const PARTIDAS = [
+  { n:1, pct:78 }, { n:2, pct:71 }, { n:3, pct:64 }, { n:4, pct:52 }, { n:5, pct:61 },
+  { n:6, pct:null, hoy:true }
+];
+let SESION = null;
+
+function destrezas() {
+  const s = SESION;
+  return [
+    { t:'Distinguir necesidad de deseo', v: s ? Math.round(s.nec / s.necTot * 100) : 80,
+      e: s ? `Cubrió ${s.nec} de ${s.necTot} necesidades en la partida de hoy.`
+           : 'Cubrió 8 de 10 necesidades en las últimas partidas. Esta la tiene.' },
+    { t:'Que la plata se acaba (planificar el mes)', v: s ? Math.max(0, 100 - s.pctSem1 * 1.6) : 34,
+      e: s ? `Gastó el ${s.pctSem1}% de la mesada en los primeros 7 días. Un mes sano está bajo el 35%.`
+           : 'Gastó más del 60% de la mesada en la primera semana en 4 de las últimas 5 partidas. Ésta es la que hay que trabajar.' },
+    { t:'Resistir la compra impulsiva', v: s ? Math.round(s.ofertaResistida / s.ofertaTot * 100) : 40,
+      e: s ? `Resistió ${s.ofertaResistida} de ${s.ofertaTot} "ofertas relámpago" hoy.`
+           : 'La etiqueta "¡sólo hoy!" lo pilla el 60% de las veces.' },
+    { t:'Entender que el crédito cuesta', v: s ? (s.fio === 0 ? 90 : 45) : 60,
+      e: s ? (s.fio === 0 ? 'Hoy no pidió fiado ni una vez.' : `Hoy pidió fiado ${s.fio} ${s.fio===1?'vez':'veces'} y pagó el recargo del 20%.`)
+           : 'Pidió fiado en 2 de 5 partidas. Cuando lo hace, no relaciona el recargo con la falta de plata al final.' },
+    { t:'Ahorrar con una meta', v: s ? (s.metaOk ? (s.fio ? 65 : 100) : (s.rompio ? 25 : 55)) : 55,
+      e: s ? (s.metaOk
+                ? (s.fio ? 'Llegó a la meta, pero pidió fiado teniendo plata guardada: le puso al chanchito un candado que no correspondía.' : 'Llegó a la meta del mes sin romper el chanchito y sin deber nada.')
+                : (s.rompio ? 'Rompió el chanchito. El ahorro todavía no le pesa.' : 'No llegó a la meta, pero al menos no rompió el chanchito.'))
+           : 'Guarda plata, pero rompe el chanchito apenas aprieta el zapato.' }
+  ];
+}
+
+function pintarPanel() {
+  const jugadas = PARTIDAS.filter(p => p.pct !== null);
+  const prom = Math.round(jugadas.reduce((a,p) => a + p.pct, 0) / jugadas.length);
+  const ult = jugadas[jugadas.length - 1].pct;
+  document.getElementById('pnPct').textContent = ult + '%';
+  document.getElementById('pnProm').textContent = prom + '%';
+  document.getElementById('pnPartidas').textContent = jugadas.length;
+
+  document.getElementById('pnDestrezas').innerHTML = destrezas().map(d => {
+    const v = Math.round(d.v);
+    const color = v >= 70 ? 'var(--verde)' : (v >= 45 ? 'var(--azul)' : 'var(--rosa)');
+    return `<div class="destreza">
+      <div class="destreza-top"><b>${d.t}</b><span style="color:${color}">${v} / 100</span></div>
+      <div class="medidor" style="margin-top:6px"><i style="width:${v}%;background:${color}"></i></div>
+      <p>${d.e}</p>
+    </div>`;
+  }).join('');
+
+  dibujarGrafico(jugadas);
+}
+
+function dibujarGrafico(jugadas) {
+  const W = 480, H = 210, mL = 40, mR = 46, mT = 16, mB = 34;
+  const x = i => mL + i * (W - mL - mR) / Math.max(1, jugadas.length - 1);
+  const y = v => mT + (100 - v) / 100 * (H - mT - mB);
+  let s = '';
+  // rejilla y eje Y
+  [0, 25, 50, 75, 100].forEach(v => {
+    s += `<line class="rejilla" x1="${mL}" y1="${y(v)}" x2="${W-mR}" y2="${y(v)}"/>`;
+    s += `<text class="eje" x="${mL-8}" y="${y(v)+4}" text-anchor="end">${v}%</text>`;
+  });
+  // umbral sano
+  s += `<line x1="${mL}" y1="${y(35)}" x2="${W-mR}" y2="${y(35)}" stroke="#0E9A6C" stroke-width="2" stroke-dasharray="6 4"/>`;
+  // El rótulo de la meta va DENTRO del área, arriba de la línea: en el margen derecho
+  // quedaba cortado cuando el gráfico scrollea en el teléfono.
+  s += `<text class="eje-fuerte" x="${W - mR - 4}" y="${y(35) - 6}" text-anchor="end" fill="#0E9A6C">meta 35%</text>`;
+  // línea
+  const pts = jugadas.map((p,i) => `${x(i)},${y(p.pct)}`).join(' ');
+  s += `<polyline points="${pts}" fill="none" stroke="#0B60C4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  jugadas.forEach((p,i) => {
+    const ultimo = i === jugadas.length - 1;
+    s += `<circle cx="${x(i)}" cy="${y(p.pct)}" r="${ultimo ? 6 : 4.5}" fill="#0B60C4" stroke="#F4F1E9" stroke-width="2"/>`;
+    s += `<text class="eje" x="${x(i)}" y="${H-14}" text-anchor="middle">${p.hoy ? 'hoy' : 'P'+p.n}</text>`;
+    if (ultimo) s += `<text class="eje-fuerte" x="${x(i)}" y="${y(p.pct)-12}" text-anchor="end" fill="#1F1C33">${p.pct}%</text>`;
+  });
+  // eje X
+  s += `<line x1="${mL}" y1="${H-mB}" x2="${W-mR}" y2="${H-mB}" stroke="#1F1C33" stroke-width="1"/>`;
+  const svg = document.getElementById('graficoSem1');
+  svg.innerHTML =
+    `<title id="gsTit">Porcentaje de la mesada gastado en la semana 1, por partida</title>` + s;
+  // En el teléfono el gráfico no cabe entero y su caja scrollea. Lo dejamos partido
+  // por el final: el punto que importa es la partida de HOY, no la primera.
+  const caja = svg.parentElement;
+  if (caja && caja.scrollWidth > caja.clientWidth) caja.scrollLeft = caja.scrollWidth;
+}
+
+/* Informe de la IA — determinista en el demo, escrito con los datos reales de la partida */
+document.getElementById('btnInforme').addEventListener('click', () => {
+  const cont = document.getElementById('pnInforme');
+  const btn = document.getElementById('btnInforme');
+  btn.disabled = true; btn.textContent = 'Escribiendo…';
+  cont.innerHTML = `<p class="mono chico" style="color:#B6B1CC">Leyendo 14 decisiones de la última partida…</p>`;
+  setTimeout(() => {
+    const s = SESION;
+    const jugadas = PARTIDAS.filter(p => p.pct !== null);
+    const ult = jugadas[jugadas.length - 1].pct;
+    let cuerpo;
+    if (!s) {
+      cuerpo = `<p><b>Lo que vimos.</b> En sus 5 partidas, Matías gasta en promedio el 61% de la mesada en los primeros 7 días. Cubre bien las necesidades cuando le queda plata; el problema no es que no las reconozca, es que llega tarde a ellas.</p>
+        <p><b>De qué conversar el domingo.</b> Cuando le pases la mesada, antes de que se la guarde, pregúntale: <i>"¿cuánto de esto tiene que durarte hasta el otro domingo?"</i>. No le digas la respuesta. Que la diga él en voz alta.</p>
+        <p><b>Por qué esto y no otra cosa.</b> Matías ordena bien cuando alguien le pide el plan <b>antes</b>. No ordena nada cuando le reclaman <b>después</b>. Lo vimos en las partidas 4 y 5: cuando el juego le pidió repartir primero, terminó el mes con plata.</p>`;
+    } else {
+      // El elogio se gana con el resultado del mes, no con una sola cifra.
+      const cerroBien = s.metaOk && s.fio === 0 && !s.rompio;
+      cuerpo = `<p><b>Lo que pasó hoy.</b> Matías gastó el <b>${ult}%</b> de la mesada en la primera semana${s.pctSem1 <= 35 ? ' — dentro de lo sano' : ' — y el mes se le hizo corto'}. Cubrió ${s.nec} de ${s.necTot} necesidades${s.fio ? ` y pidió fiado ${s.fio} ${s.fio===1?'vez':'veces'}` : ' sin pedir fiado'}. ${s.metaOk ? 'Llegó a su meta de ahorro.' : 'No llegó a su meta de ahorro.'}</p>
+        <p><b>De qué conversar el domingo.</b> ${cerroBien
+          ? 'Reconócele el resultado con la cifra en la mano: <i>"llegaste a fin de mes con plata y con el regalo comprado, ¿cómo lo hiciste?"</i>. Que él explique su propia estrategia en voz alta — eso es lo que la fija.'
+          : 'Cuando le pases la mesada, antes de que se la guarde, pregúntale: <i>"¿cuánto de esto tiene que durarte hasta el otro domingo?"</i>. No le des la respuesta. Que la diga él.'}</p>
+        ${s.rompio ? '<p><b>Ojo con esto.</b> Hoy rompió el chanchito. No lo retes: preguntale qué habría pasado si no lo rompía. El chanchito sólo enseña si duele un poquito no abrirlo.</p>' : ''}
+        ${s.fio ? `<p><b>Ojo con esto.</b> Le fiaron y pagó <b>${clp(s.recargos)}</b> de recargo. Muéstrale esa cifra exacta: es la primera vez que un crédito caro le cuesta algo concreto y se acuerda del número.</p>` : ''}
+        <p><b>Por qué esto y no otra cosa.</b> De las cinco destrezas que medimos, la única que no mejora sola con jugar es <i>planificar el mes</i>. Necesita una conversación de treinta segundos con un adulto, y tiene que ser <b>antes</b> de gastar, no después.</p>`;
+    }
+    cont.innerHTML = cuerpo;
+    btn.textContent = 'Volver a generar';
+    btn.disabled = false;
+    document.getElementById('btnConversado').classList.remove('oculto');
+  }, 900);
+});
+
+document.getElementById('btnConversado').addEventListener('click', (e) => {
+  e.target.textContent = 'Anotado — te preguntamos el próximo domingo';
+  e.target.disabled = true;
+});
+
+/* Interruptores */
+document.querySelectorAll('.llave:not([disabled])').forEach(l => {
+  l.addEventListener('click', () => {
+    const on = l.getAttribute('aria-pressed') === 'true';
+    l.setAttribute('aria-pressed', String(!on));
+    if (l.id === 'llaveWsp') document.getElementById('txtWsp').textContent = !on
+      ? 'Los domingos a las 19:00, antes de pasarle la mesada.'
+      : 'Desactivado. El informe queda sólo acá en el panel.';
+    if (l.id === 'llaveCole') document.getElementById('txtCole').textContent = !on
+      ? 'Activado: el profesor ve el nivel de las 5 destrezas. Nunca las decisiones ni los montos.'
+      : 'Sólo el nivel de las destrezas. Nunca las decisiones ni los montos.';
+  });
+});
+document.getElementById('llaveIap').addEventListener('click', () => {});
+document.getElementById('selTiempo').addEventListener('change', (e) => {
+  const v = e.target.value;
+  const p = e.target.closest('.interruptor').querySelector('p');
+  p.textContent = v === 'Sin límite'
+    ? 'Sin límite. Lo permitimos, pero no lo recomendamos.'
+    : `Finakids se apaga solo a los ${v}. No hay "un ratito más".`;
+});
+
+/* Arranque */
+reiniciar();
+pintarPanel();
+</script>
+</body>
+</html>

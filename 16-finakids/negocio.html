@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finakids — Negocio: quién paga de verdad</title>
+<meta name="description" content="ICP, mercado con la aritmética a la vista, competencia con nombre, economía unitaria por canal, y la decisión sobre las compras dentro del juego. Finakids, Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .titular { padding-block: var(--sp-l) var(--sp-m); }
+  .titular h1 { max-width: 18ch; }
+  .cuenta { font-family: var(--mono); font-size: .82rem; line-height: 1.9; }
+  .cuenta b { font-weight: 700; }
+  .cuenta .op { color: var(--tinta-3); }
+  .cuenta .res { background: var(--amarillo); padding: 1px 5px; border: 1px solid var(--tinta); }
+  .supuesto { display: flex; gap: 8px; align-items: baseline; font-size: .82rem; padding: 5px 0; border-bottom: 1px dotted var(--papel-3); }
+  .supuesto .rotulo { flex: none; min-width: 84px; }
+  .veredicto { border: 3px solid var(--tinta); padding: var(--sp-s); box-shadow: var(--registro); margin-top: var(--sp-s); }
+  .veredicto h3 { color: var(--rosa); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="9" width="28" height="19" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M2 9 16 2l14 7" fill="#E8318F" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="19" r="4.5" fill="none" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M16 15.5v7M14 17.4h4M14 20.6h4" stroke="#1F1C33" stroke-width="1.6"/>
+      </svg>
+      <span class="marca-txt">Finakids</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+</header>
+<div class="nav-movil" id="menuMovil">
+  <ul role="list">
+    <li><a href="../index.html">← Ideas</a></li>
+    <li><a href="index.html">Producto</a></li>
+    <li><a href="demo/index.html">Demo</a></li>
+    <li><a href="negocio.html" aria-current="page">Negocio</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="stack.html">Arquitectura</a></li>
+  </ul>
+</div>
+
+<main>
+
+<section class="container titular">
+  <span class="rotulo">Negocio y go-to-market</span>
+  <h1 class="mal-registro">El niño usa. El papá paga. El banco financia.</h1>
+  <p class="hero-bajada txt-2" style="max-width:56ch;margin-top:var(--sp-s);font-size:var(--step-1)">Esas tres frases no son un eslogan: son tres clientes distintos, con tres ciclos de venta distintos, y elegir mal a cuál venderle primero mata la empresa. Acá está la aritmética que nos hizo elegir.</p>
+  <div class="honesto" style="margin-top:var(--sp-m)">
+    <span class="rotulo">Regla de esta página</span>
+    <p class="chico" style="margin-top:6px">Toda cifra está <b>citada</b> o está <b>etiquetada como estimación con la aritmética a la vista</b>. Donde no conocemos el dato, lo decimos. No hay ni una cifra de mercado sin derivación.</p>
+  </div>
+</section>
+
+<!-- ICP -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">01</span><h2>Cliente objetivo</h2></div>
+    <div class="grilla g3">
+      <div class="caja caja-dura">
+        <span class="sello sello-rosa">Quien usa</span>
+        <h3 style="margin-top:8px">El niño, 7 a 12</h3>
+        <p class="chico txt-2" style="margin-top:6px">Sabe leer y sumar. Recibe mesada o plata suelta. Tiene acceso a un teléfono (el de la mamá, casi siempre). Le importan las láminas, el quiosco y lo que tienen sus amigos. <b>No tiene tarjeta, no tiene cuenta y no debería tenerla.</b></p>
+      </div>
+      <div class="caja caja-dura">
+        <span class="sello sello-azul">Quien paga</span>
+        <h3 style="margin-top:8px">La mamá o el papá</h3>
+        <p class="chico txt-2" style="margin-top:6px">30 a 48 años, hogar de quintil 3 a 5, urbano (RM, Valpo, Concepción). Ya paga suscripciones digitales. Le pasa mesada y le frustra que no dure. Compra <b>tranquilidad y una conversación</b>, no un juego. Es quien cancela.</p>
+      </div>
+      <div class="caja caja-dura">
+        <span class="sello sello-verde">Quien financia</span>
+        <h3 style="margin-top:8px">El banco o la fintech</h3>
+        <p class="chico txt-2" style="margin-top:6px">Gerencia de Asuntos Corporativos / Sostenibilidad, con presupuesto anual de educación financiera y presión reputacional. <b>Firma</b> el gerente del área; <b>vetan</b> Cumplimiento y Legal. Hoy financia charlas que nadie mide.</p>
+      </div>
+    </div>
+
+    <div class="caja caja-tinta trama" style="margin-top:var(--sp-m)">
+      <span class="rotulo">El hueco que encontramos</span>
+      <p style="margin-top:8px;max-width:62ch">Todos los productos bancarios chilenos para menores <b>empiezan a los 12 o 14 años</b>: la CuentaRUT de BancoEstado se puede obtener desde los 12; FAN Clan del Banco de Chile es para 14 a 17; Teenpo opera desde los 14. Entre los <b>7 y los 12 no hay producto</b> — hay programas de RSE sueltos (Misión Ahorro de Santander, la sucursal educativa de Scotiabank en KidZania, Mi Aula BancoEstado, el concurso escolar del Banco Central). Es decir: <b>el banco tiene el presupuesto y no tiene qué mostrar, justo en la edad en que se forman los hábitos.</b> Ése es el hueco.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MERCADO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">02</span><h2>Tamaño de mercado, con la aritmética afuera</h2></div>
+
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <span class="rotulo">Supuestos declarados</span>
+        <div style="margin-top:8px">
+          <div class="supuesto"><span class="rotulo">Fuente</span><span>Población de Chile ≈ <b>18,5 millones</b> (Censo 2024, INE).</span></div>
+          <div class="supuesto"><span class="rotulo">Fuente</span><span>El grupo <b>0–14 años representa el 17,7%</b> de la población (Censo 2024). Son 261.338 niños menos que en 2017.</span></div>
+          <div class="supuesto"><span class="rotulo">Supuesto</span><span>Las cohortes 0–14 son parejas, así que 6–12 son 7 de 15 años. <b>Es un techo</b>: la natalidad viene cayendo, las cohortes chicas son más chicas.</span></div>
+          <div class="supuesto"><span class="rotulo">Supuesto</span><span><b>1,6 niños</b> en el rango por familia que paga.</span></div>
+          <div class="supuesto"><span class="rotulo">Supuesto</span><span><b>35%</b> de los hogares puede y quiere pagar una suscripción digital recurrente (quintiles 4 y 5 + parte del 3). No tenemos fuente dura para este número: es nuestro juicio.</span></div>
+        </div>
+      </div>
+
+      <div class="caja caja-dura">
+        <span class="rotulo">La cuenta</span>
+        <div class="cuenta" style="margin-top:10px">
+          18.500.000 <span class="op">×</span> 17,7% <span class="op">=</span> <b>3.274.500</b> niños 0–14<br>
+          3.274.500 <span class="op">×</span> 7/15 <span class="op">=</span> <b>1.528.100</b> niños 6–12<br>
+          1.528.100 <span class="op">÷</span> 1,6 <span class="op">=</span> <b>955.000</b> familias<br>
+          <br>
+          <span class="op">— TAM B2C (techo irreal) —</span><br>
+          955.000 <span class="op">×</span> $4.990 <span class="op">×</span> 12 <span class="op">=</span> <span class="res">$57.200 millones/año</span><br>
+          <span class="op">(≈ US$60M. Supone que TODOS pagan. No va a pasar.)</span><br>
+          <br>
+          <span class="op">— SAM B2C —</span><br>
+          955.000 <span class="op">×</span> 35% <span class="op">=</span> <b>334.000</b> familias<br>
+          334.000 <span class="op">×</span> $4.990 <span class="op">×</span> 12 <span class="op">=</span> <span class="res">$20.000 millones/año</span><br>
+          <br>
+          <span class="op">— SAM B2B (Chile) —</span><br>
+          12 bancos/fintech <span class="op">×</span> $54M <span class="op">=</span> <b>$648M</b><br>
+          6 cajas/aseguradoras <span class="op">×</span> $30M <span class="op">=</span> <b>$180M</b><br>
+          <span class="op">=</span> <span class="res">$828 millones/año</span><br>
+          <br>
+          <span class="op">— SOM a 24 meses (escenario base) —</span><br>
+          3 bancos <span class="op">×</span> $54M <span class="op">=</span> $162M<br>
+          3.000 familias <span class="op">×</span> $4.990 <span class="op">×</span> 12 <span class="op">=</span> $180M<br>
+          <span class="op">=</span> <span class="res">$342 millones/año</span> <span class="op">(≈ US$360k ARR)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="veredicto">
+      <span class="rotulo">Lo incómodo del tamaño</span>
+      <h3 style="margin-top:6px">El TAM B2B de Chile es de US$870 mil al año. Eso es una restricción, no un detalle.</h3>
+      <p class="chico txt-2" style="margin-top:8px">Aunque ganáramos <b>todos</b> los contratos de banco de Chile, serían menos de US$1M de ARR. Chile no da para una empresa venture-scale sólo con bancos; la línea de familias es la que escala, y esa línea depende de la retención, que es justamente lo que menos controlamos. Conclusión honesta: <b>o la expansión regional (México, Colombia, Perú) funciona, o esto es un buen negocio de cuatro personas</b> — que no es un fracaso, pero no es lo que se le vende a un fondo. Preferimos decirlo acá que en la reunión del mes 24.</p>
+      <p class="chico txt-2" style="margin-top:8px">Extensión global, sin inventar cifras: LatAm tiene del orden de <b>60 a 70 millones de niños de 6 a 12</b> (estimación nuestra: ~660M de habitantes, ~10% en esa franja). El mismo playbook —banco ancla que financia el aula, familia que paga el panel— es replicable donde haya bancos con presupuesto reputacional, que es en todos. <b>No pongo un número de dólares acá porque no tengo cómo derivarlo con honestidad.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- QUIÉN PAGA -->
+<section class="sec" id="quien-paga">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">03 · la decisión que más importa</span><h2>¿A quién le vendemos primero?</h2></div>
+    <p class="medida txt-2">"Les vendemos a los tres" no es una respuesta: es lo que dice alguien que no ha hecho la cuenta. Acá está la cuenta.</p>
+
+    <h3 style="margin-top:var(--sp-m)">La economía unitaria de una familia que paga</h3>
+    <div class="grilla g2" style="margin-top:var(--sp-s)">
+      <div class="caja caja-dura">
+        <span class="rotulo">Margen bruto mensual · plan Familia</span>
+        <div class="cuenta" style="margin-top:8px">
+          Precio <span class="op">.....................</span> <b>$4.990</b><br>
+          <span class="op">−</span> Comisión App/Play (15%) <span class="op">...</span> −$749<br>
+          <span class="op">−</span> Costo de IA (ver <a href="stack.html#costos">Arquitectura</a>) <span class="op">..</span> −$180<br>
+          <span class="op">−</span> Infra prorrateada <span class="op">.........</span> −$200<br>
+          <span class="op">−</span> Soporte y medios de pago <span class="op">..</span> −$150<br>
+          <span class="op">────────────────────────────</span><br>
+          Margen bruto <span class="op">................</span> <span class="res">$3.711 (74%)</span>
+        </div>
+        <p class="chico txt-2" style="margin-top:10px">El 15% es el Small Business Program de App Store y Play (aplica bajo US$1M/año). Si pasamos ese umbral, sube al 30% y el margen cae a <b>$2.963 (59%)</b>. Lo tenemos anotado como una bomba de tiempo, no como una sorpresa.</p>
+      </div>
+      <div class="caja caja-dura">
+        <span class="rotulo">Vida y valor de una familia</span>
+        <div class="cuenta" style="margin-top:8px">
+          <span class="op">— Familias captadas por avisos pagados —</span><br>
+          Churn <b>7,4%</b>/mes (benchmark de edtech infantil)<br>
+          Vida <span class="op">=</span> 1 ÷ 0,074 <span class="op">=</span> <b>13,5 meses</b><br>
+          LTV <span class="op">=</span> 13,5 <span class="op">×</span> $3.711 <span class="op">=</span> <span class="res">$50.100</span><br>
+          <br>
+          <span class="op">— Familias captadas por colegio o banco —</span><br>
+          Churn supuesto <b>5,5%</b>/mes<br>
+          Vida <span class="op">=</span> 1 ÷ 0,055 <span class="op">=</span> <b>18,2 meses</b><br>
+          LTV <span class="op">=</span> 18,2 <span class="op">×</span> $3.711 <span class="op">=</span> <span class="res">$67.500</span>
+        </div>
+        <p class="chico txt-2" style="margin-top:10px"><b>El 7,4% está citado; el 5,5% es un supuesto nuestro</b>, y es el supuesto más frágil de todo el plan. Se apoya en un dato de la industria —los padres que <i>ven</i> el progreso de su hijo renuevan 2 a 3 veces más— pero nosotros no asumimos 2×, asumimos 1,35×. Si resulta que el panel no mueve la aguja, el churn vuelve a 7,4% y todo lo que sigue empeora.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--sp-l)">Los tres candidatos, con el CAC de cada uno</h3>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table>
+        <thead>
+          <tr><th>Candidato</th><th class="num">Ticket</th><th class="num">Ciclo</th><th class="num">CAC</th><th class="num">LTV/CAC</th><th class="num">Payback</th><th>Veredicto</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Padre por avisos</b><br><span class="chico txt-2">Meta / App Store, frío</span></td>
+            <td class="num">$4.990/mes</td>
+            <td class="num">3 días</td>
+            <td class="num">$37.400</td>
+            <td class="num" style="color:var(--rosa)"><b>1,3×</b></td>
+            <td class="num">10,1 meses</td>
+            <td class="wrap"><b style="color:var(--rosa)">No cierra.</b> Payback de 10 meses contra una vida de 13,5. Cualquier error y trabajamos gratis para Meta.</td>
+          </tr>
+          <tr>
+            <td><b>Colegio</b><br><span class="chico txt-2">como <i>canal</i>, no como cliente</span></td>
+            <td class="num">$0</td>
+            <td class="num">1–3 meses</td>
+            <td class="num">$12.900</td>
+            <td class="num" style="color:var(--verde)"><b>5,2×</b></td>
+            <td class="num">3,5 meses</td>
+            <td class="wrap"><b>Sirve, pero no paga.</b> El colegio chileno paga poco y decide lento (sostenedor, presupuesto anual, prioridades ya comprometidas). Como <i>cliente</i> es un mal negocio; como <i>puerta a 58 familias</i> es el canal más barato que tenemos.</td>
+          </tr>
+          <tr style="background:var(--verde-cl)">
+            <td><b>Banco / fintech</b><br><span class="chico txt-2">contrato ancla</span></td>
+            <td class="num">$54M/año</td>
+            <td class="num">4–9 meses</td>
+            <td class="num">~$9M<br><span class="chico txt-2">(6 meses de venta)</span></td>
+            <td class="num" style="color:var(--verde)"><b>6×</b> el primer año</td>
+            <td class="num">2 meses</td>
+            <td class="wrap"><b style="color:var(--verde)">Acá empezamos.</b> Un contrato paga el equipo entero. Y además <i>compra el canal gratis</i>: financia el aula y empuja la app a su base.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig" style="margin-top:var(--sp-m)">
+      <figcaption>
+        <div class="fig-titulo">LTV sobre CAC, por canal de adquisición de familias</div>
+        <div class="fig-sub">La regla del pulgar del SaaS de consumo: bajo 3× no se financia el crecimiento.</div>
+      </figcaption>
+      <div class="scroll-x" style="border:none;box-shadow:none">
+        <svg viewBox="0 0 640 260" width="100%" height="260" style="min-width:600px" role="img" aria-labelledby="ltvTit ltvDesc">
+          <title id="ltvTit">LTV dividido por CAC en tres canales</title>
+          <desc id="ltvDesc">Avisos pagados 1,3 veces; colegio 5,2 veces; banco 8,8 veces. El umbral mínimo aceptable es 3 veces.</desc>
+          <!-- rejilla -->
+          <line class="rejilla" x1="130" y1="40" x2="600" y2="40"/>
+          <line class="rejilla" x1="130" y1="90" x2="600" y2="90"/>
+          <line class="rejilla" x1="130" y1="140" x2="600" y2="140"/>
+          <line class="rejilla" x1="130" y1="190" x2="600" y2="190"/>
+          <!-- eje X: 0 a 10x -> 130 a 600 (47px por x) -->
+          <line x1="130" y1="215" x2="600" y2="215" stroke="#1F1C33" stroke-width="1"/>
+          <text class="eje" x="130" y="232" text-anchor="middle">0×</text>
+          <text class="eje" x="271" y="232" text-anchor="middle">3×</text>
+          <text class="eje" x="365" y="232" text-anchor="middle">5×</text>
+          <text class="eje" x="600" y="232" text-anchor="middle">10×</text>
+          <!-- umbral -->
+          <line x1="271" y1="26" x2="271" y2="215" stroke="#0E9A6C" stroke-width="2" stroke-dasharray="6 4"/>
+          <text class="eje-fuerte" x="276" y="22" fill="#0E9A6C">umbral 3×</text>
+          <!-- barras (≤24px, extremo redondeado 4px, base cuadrada) -->
+          <text class="eje-fuerte" x="120" y="45" text-anchor="end">Avisos pagados</text>
+          <path d="M130 32 h48 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-48 z" fill="#0B60C4"/>
+          <text class="eje-fuerte" x="192" y="49" fill="#1F1C33">1,3×</text>
+          <!-- La nota va a la izquierda, bajo el rótulo: a la derecha del valor cruzaba
+               por encima de la línea del umbral 3×. -->
+          <text class="eje" x="120" y="62" text-anchor="end" fill="#E8318F">no financia nada</text>
+
+          <text class="eje-fuerte" x="120" y="95" text-anchor="end">Colegio</text>
+          <path d="M130 82 h240 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-240 z" fill="#0B60C4"/>
+          <text class="eje-fuerte" x="384" y="99" fill="#1F1C33">5,2×</text>
+
+          <text class="eje-fuerte" x="120" y="145" text-anchor="end">Banco</text>
+          <path d="M130 132 h409 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-409 z" fill="#0B60C4"/>
+          <text class="eje-fuerte" x="553" y="149" fill="#1F1C33">8,8×</text>
+
+          <text class="eje-fuerte" x="120" y="195" text-anchor="end">Boca a boca</text>
+          <path d="M130 182 h300 a4 4 0 0 1 4 4 v16 a4 4 0 0 1 -4 4 h-300 z" fill="#0B60C4" opacity=".35"/>
+          <text class="eje" x="444" y="199" fill="#6E6889">~6,4× (sin medir todavía)</text>
+        </svg>
+      </div>
+      <p class="fig-nota">Una serie, un color: la barra sólo dice magnitud. El juicio lo pone el umbral verde, no el color de la barra.<br>
+      CAC pagado = CPI $1.400 ÷ (35% inicia prueba × 10,7% convierte). El 10,7% es la mediana D35 de conversión prueba→pago con muro duro (RevenueCat, State of Subscription Apps 2026); con freemium blando la mediana es <b>2,1%</b> y el CAC se dispara a <b>$190.000</b> — por eso el aviso pagado en frío está prohibido en este plan.<br>
+      CAC colegio = $60.000 de activación ÷ 58 familias gratis ÷ 8% de conversión. CAC banco = $2.000.000 de campaña ÷ 4.320 familias gratis ÷ 6%. Ambos son estimaciones nuestras con los supuestos escritos arriba.</p>
+    </figure>
+
+    <div class="veredicto">
+      <span class="rotulo">La decisión</span>
+      <h3 style="margin-top:6px;color:var(--verde)">Le vendemos primero al banco.</h3>
+      <p style="margin-top:8px;max-width:64ch">No porque sea el que más plata pone (que lo es), sino porque <b>es el único cliente que además nos regala el canal</b>. Un contrato de $54.000.000 al año paga al equipo, financia las licencias de aula gratis para 30 colegios, y empuja la app a la base de clientes del banco. Después de eso, cada familia que paga nos cuesta $7.700 en vez de $37.400.</p>
+      <p style="margin-top:8px;max-width:64ch"><b>El colegio no es cliente: es canal.</b> Decirlo así nos ahorra dos años de reuniones con sostenedores. Y <b>el padre no es el primer cliente: es el margen</b> — lo capturamos cuando ya nos regalaron el canal, no antes.</p>
+      <p class="chico" style="margin-top:10px;color:var(--rosa)"><b>El costo de esta decisión, escrito acá para que nadie diga que no avisamos:</b> quedamos con riesgo de concentración brutal. Con 3 contratos, perder uno es perder el 16% de los ingresos y un tercio del canal. Y el ciclo de venta de 4 a 9 meses significa que el mes 6 lo pasamos sin ingresos, escribiendo correos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPRAS INTERNAS -->
+<section class="sec" id="compras">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">04 · la contradicción</span><h2>Matamos las compras dentro del juego. Y no fue por buenos.</h2></div>
+
+    <div class="grilla g2">
+      <div>
+        <p class="medida">La idea original traía <i>"monedas virtuales y recompensas premium"</i> como línea de ingresos. Es decir: venderle micropagos a un niño dentro de una app que le enseña a resistir los micropagos. La objeción moral es evidente y no hace falta que la escribamos. <b>La objeción de negocio es más fuerte, y es la que decide.</b></p>
+        <p class="medida">Hicimos la cuenta de las dos cosas que no pueden coexistir.</p>
+
+        <div class="caja caja-dura" style="margin-top:var(--sp-s)">
+          <span class="rotulo rotulo-rosa">Lo que ganaríamos con monedas premium</span>
+          <div class="cuenta" style="margin-top:8px">
+            30.000 usuarios gratis (base, mes 24)<br>
+            <span class="op">×</span> US$0,20 de ARPU mensual por micropagos<br>
+            <span class="op">×</span> $950 por dólar<br>
+            <span class="op">=</span> <span class="res">$5.700.000 al mes</span> <span class="op">= $68M/año</span>
+          </div>
+          <p class="chico txt-2" style="margin-top:8px"><b>Ojo:</b> los US$0,20 son una <b>estimación nuestra</b> del ARPU de micropagos en juegos infantiles en LatAm. No tengo una fuente pública sólida para ese número. Si alguien tiene una mejor, cámbiela — pero tendría que ser <b>3 veces mayor</b> para cambiar la conclusión.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="caja caja-tinta trama">
+          <span class="rotulo">Lo que perderíamos</span>
+          <div class="cuenta" style="margin-top:10px;color:var(--papel)">
+            <b style="color:var(--amarillo)">1. El banco entero.</b><br>
+            <span class="op" style="color:#9A94B8">Ningún comité de Legal + Cumplimiento + Sostenibilidad de un banco chileno aprueba poner la marca en una app que le vende monedas a niños. El canal banco vale exactamente $0 sin la promesa.</span><br>
+            3 bancos <span class="op">×</span> $54M <span class="op">=</span> <b style="color:var(--amarillo)">−$162M/año</b><br>
+            <br>
+            <b style="color:var(--amarillo)">2. El canal gratis del aula.</b><br>
+            <span class="op" style="color:#9A94B8">Sin banco no hay licencias de aula financiadas. Sin aula, el CAC de una familia sube de $12.900 a $37.400 y el LTV/CAC cae de 5,2× a 1,3×.</span><br>
+            3.000 familias <span class="op">×</span> $59.880/año <span class="op">=</span> <b style="color:var(--amarillo)">−$180M/año</b><br>
+            <span class="op" style="color:#9A94B8">(no desaparecen todas, pero dejan de ser rentables)</span><br>
+            <br>
+            <b style="color:var(--amarillo)">3. El titular.</b><br>
+            <span class="op" style="color:#9A94B8">"App que enseña a los niños a no gastar les vende monedas". Es una nota que se escribe sola, y no se puede desescribir.</span>
+          </div>
+        </div>
+
+        <div class="veredicto" style="box-shadow:4px 4px 0 var(--verde)">
+          <span class="rotulo" style="color:var(--verde)">El veredicto</span>
+          <h3 style="margin-top:6px;color:var(--tinta)">$68M contra $342M. No es una decisión difícil.</h3>
+          <p class="chico" style="margin-top:8px">Las compras internas <b>valen menos de un quinto de lo que destruyen</b>. Matarlas no es un sacrificio: es la jugada obvia una vez que haces la resta. Y como bonus, la renuncia <i>es</i> el posicionamiento: <b>"sin compras dentro del juego, nunca"</b> es lo primero que ve el papá y lo primero que tranquiliza al banco.</p>
+          <p class="chico" style="margin-top:8px"><b>Dónde queda la línea exacta:</b> las monedas del juego (los <i>sellos</i>) existen, se ganan jugando y <b>no se pueden comprar con plata real, jamás</b>. Los packs de contenido y cuadernillos que proponía la idea original se venden <b>al adulto, en la web, fuera del juego</b> — nunca dentro, nunca al niño. Los rankings son por curso, por avatar, y se borran cada semana.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="honesto" style="margin-top:var(--sp-m)">
+      <span class="rotulo">Contra-argumento honesto</span>
+      <p class="chico" style="margin-top:6px">Si el canal banco <b>no se abre</b> —y hay un 60% de posibilidades de que no se abra en 12 meses, según el <a href="roadmap.html#probabilidad">roadmap</a>— entonces matamos una línea de ingresos a cambio de un canal que nunca llegó, y quedamos con una app gratis, sin ingresos y con un churn del 7,4%. Ése es el escenario en que esta decisión fue un error. Lo asumimos igual, porque la alternativa —micropagos a niños— es un negocio que ninguno de nosotros quiere defender en una comisión del Senado, y porque el criterio de muerte del mes 12 nos saca antes de que duela.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETENCIA -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">05</span><h2>Competencia, con nombre y apellido</h2></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Quién</th><th>Qué es</th><th class="num">Precio</th><th>Diferenciación honesta</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Greenlight</b><br><span class="chico txt-2">EE.UU.</span></td>
+            <td class="wrap">Tarjeta de débito + app de mesada y tareas para niños. Más de 6 millones de personas la han usado, según la compañía (enero 2025).</td>
+            <td class="num">US$5,99 a<br>US$14,98/mes</td>
+            <td class="wrap">Es una <b>cuenta bancaria con pedagogía encima</b>. Nosotros somos pedagogía sin cuenta. No opera en Chile. <b>Si llega con un banco local, tenemos un problema serio</b> y nuestra única defensa sería llevar 2 años de datos de aprendizaje que ellos no tienen.</td>
+          </tr>
+          <tr>
+            <td><b>GoHenry / Acorns Early</b><br><span class="chico txt-2">EE.UU. / Reino Unido</span></td>
+            <td class="wrap">Lo mismo. La marca GoHenry en EE.UU. se plegó dentro de Acorns Early a fines de 2025.</td>
+            <td class="num">US$5/mes (1 niño)<br>US$9/mes (hasta 4)</td>
+            <td class="wrap">Confirma dos cosas: el precio de referencia mundial anda en <b>US$5–10</b> (por eso nuestros $4.990), y la categoría <b>se consolida</b> — las apps sueltas terminan compradas o cerradas.</td>
+          </tr>
+          <tr>
+            <td><b>Rooster Money</b><br><span class="chico txt-2">Reino Unido</span></td>
+            <td class="wrap">App de mesada y tarjeta, <b>comprada por NatWest</b> (un banco).</td>
+            <td class="num">n/d</td>
+            <td class="wrap">Es la mejor prueba de nuestra tesis: <b>los bancos compran esta categoría</b>. También es la mejor prueba de nuestro riesgo: un banco puede comprarnos… o construirlo él.</td>
+          </tr>
+          <tr>
+            <td><b>Zogo</b><br><span class="chico txt-2">EE.UU.</span></td>
+            <td class="wrap">Educación financiera gamificada <b>vendida a bancos y cooperativas</b>, que la ofrecen gratis a su comunidad. SDK, app marca blanca, analítica incluida.</td>
+            <td class="num">No público<br><span class="chico txt-2">(por institución)</span></td>
+            <td class="wrap"><b>Es exactamente nuestro modelo de negocio</b>, y funciona: es la validación de que un banco paga por esto. Pero Zogo apunta a adolescentes y adultos jóvenes, en EE.UU., y no tiene la cara del padre. El hueco de 7–12 y el panel familiar es nuestro.</td>
+          </tr>
+          <tr>
+            <td><b>PiggyBot</b></td>
+            <td class="wrap">App de mesada, gratis, sin modelo de negocio. Prácticamente abandonada.</td>
+            <td class="num">Gratis</td>
+            <td class="wrap">La lápida de la categoría: <b>sin quién pague, esto se muere</b> aunque el producto esté bien. Es la razón de todo lo escrito en la sección 03.</td>
+          </tr>
+          <tr>
+            <td><b>Bancos chilenos</b><br><span class="chico txt-2">BancoEstado, Banco de Chile, Santander, Scotiabank, Tenpo</span></td>
+            <td class="wrap">Cuenta de Ahorro Niño y CuentaRUT desde los 12 (BancoEstado). FAN Clan, 14–17 (Banco de Chile). Teenpo, desde 14, con cuenta remunerada. Misión Ahorro (Santander). Sucursal educativa en KidZania y Creamos Futuro (Scotiabank). Economía más cerca (Banco Central).</td>
+            <td class="num">Gratis<br><span class="chico txt-2">(son productos y RSE)</span></td>
+            <td class="wrap"><b>Son nuestros clientes, no nuestros competidores</b> — hasta el día en que uno decida construirlo internamente. Todos empiezan a los 12–14 años. De 7 a 12 tienen charlas y un stand en KidZania. Ahí entramos.</td>
+          </tr>
+          <tr style="background:var(--rosa-cl)">
+            <td><b>Lo gratis</b><br><span class="chico txt-2">el verdadero titular del puesto</span></td>
+            <td class="wrap">Khan Academy Kids (gratis y excelente, pero no enseña plata). YouTube. Roblox. Y sobre todo: <b>que el niño simplemente abra otra cosa</b>.</td>
+            <td class="num">$0</td>
+            <td class="wrap"><b>Contra esto perdemos si competimos por diversión pura.</b> No competimos por eso: competimos por los 10 minutos que un <i>adulto</i> decide que valen la pena, y por los últimos 10 minutos de la clase del profesor. Nuestro competidor real no es una app: es el papá que le pasa la mesada y le dice "arréglatelas". Ése funciona gratis y a veces funciona mejor.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CANALES -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">06</span><h2>Canales, rankeados</h2></div>
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <h3><span class="mono rotulo-rosa">01</span> Venta directa a bancos y fintech</h3>
+        <p class="chico txt-2" style="margin-top:6px">12 cuentas nombradas. Entra el fundador, no un vendedor. La puerta es <b>Asuntos Corporativos / Sostenibilidad</b>, no Marketing (Marketing te pide performance; Sostenibilidad te pide impacto medible, que es lo que tenemos). Intermediarios: ABIF, directores de fundaciones educativas, un ex-gerente de banco como asesor. Ciclo: 4 a 9 meses. <b>Costo: tiempo del fundador.</b></p>
+      </div>
+      <div class="caja caja-dura">
+        <h3><span class="mono rotulo-rosa">02</span> Colegios, como distribución</h3>
+        <p class="chico txt-2" style="margin-top:6px">Un profesor entusiasta vale más que un convenio con el sostenedor. Ruta: redes de docentes, Elige Educar, congresos de profesores de Historia y Ciencias Sociales (ahí vive educación financiera), y el boca a boca entre profesores, que es feroz. Meta realista: <b>60 colegios en 12 meses</b>, 58 familias cada uno. <b>Los colegios públicos vía DAEM municipal son un pantano</b>: lentos, sin presupuesto, con prioridades urgentes reales. No los perseguimos; los recibimos.</p>
+      </div>
+      <div class="caja caja-dura">
+        <h3><span class="mono rotulo-rosa">03</span> El grupo de WhatsApp del curso</h3>
+        <p class="chico txt-2" style="margin-top:6px">El canal más subestimado de Chile y el más barato. Una mamá que recomienda una app en el grupo del 4°B convierte mejor que cualquier aviso. Lo diseñamos <b>dentro del producto</b>: el informe del domingo tiene un botón de compartir, y compartirlo le regala un mes a la familia que lo recibe. <b>Costo: $0.</b></p>
+      </div>
+      <div class="caja caja-dura">
+        <h3><span class="mono rotulo-rosa">04</span> SEO en español, cola larga</h3>
+        <p class="chico txt-2" style="margin-top:6px">"cuánta mesada dar según la edad en Chile", "cómo enseñar a ahorrar a un niño de 8 años", "actividades de educación financiera para 4° básico". Lento, compone, y nos trae exactamente al papá y al profesor. Es el único canal que en el mes 24 vale más que en el mes 6.</p>
+      </div>
+      <div class="caja caja-dura">
+        <h3><span class="mono rotulo-rosa">05</span> Prensa y medios</h3>
+        <p class="chico txt-2" style="margin-top:6px">"Sin compras dentro del juego, nunca" es una nota. La entrada en vigencia de la <b>Ley 21.719 el 1 de diciembre de 2026</b> pone el tema de datos de menores en la agenda, y nosotros tenemos una postura que defender. Un fundador que puede hablar de esto en una entrevista es un canal gratis.</p>
+      </div>
+      <div class="caja caja-dura" style="border-style:dashed">
+        <h3 style="color:var(--tinta-3)"><span class="mono">06</span> Avisos pagados <span class="sello sello-gris">restringido</span></h3>
+        <p class="chico txt-2" style="margin-top:6px"><b>Prohibido para adquisición en frío</b> — la aritmética de la sección 03 dice que no cierra. Se usa <b>sólo</b> para retargeting de padres que ya instalaron la app gratis y no han visto el panel. Ahí el CAC es una fracción y sí cierra. Y jamás, en ningún caso, publicidad dirigida a niños: es una línea ética y, con la ley nueva, probablemente también legal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IA EN MARKETING -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">07</span><h2>Dónde usamos IA de verdad (y dónde no)</h2></div>
+    <div class="grilla g2">
+      <div class="caja caja-dura caja-verdecl">
+        <span class="rotulo">Sí, y aquí paga</span>
+        <ul class="lista lista-verde" style="margin-top:10px">
+          <li><b>El informe del domingo al padre.</b> Es el producto y es el motor de retención. Cuesta US$0,015 por informe y sostiene una suscripción de $4.990. Es la mejor relación costo-valor de todo el negocio.</li>
+          <li><b>Generar escenarios nuevos del juego.</b> 40 eventos y cartas nuevas al mes (nombres, precios chilenos, situaciones), con <b>revisión pedagógica humana obligatoria</b>. El contenido fresco es el único antídoto conocido contra el "ya me lo sé" — que es el 24% de las cancelaciones en edtech infantil.</li>
+          <li><b>Resumir entrevistas.</b> 300 conversaciones con padres se vuelven cinco patrones en una tarde. Barato y honesto.</li>
+        </ul>
+      </div>
+      <div class="caja caja-dura caja-rosacl">
+        <span class="rotulo rotulo-rosa">No, y no es por ahorrar</span>
+        <ul class="lista" style="margin-top:10px">
+          <li><b>Ningún LLM conversa con un niño.</b> Nunca. Es una línea roja de producto: no hay chat, no hay "tutor IA" que le hable, no hay voz. Un modelo generativo hablando sin supervisión con un menor de 9 años es un riesgo que no sabemos acotar, y quien diga que sí sabe, miente.</li>
+          <li><b>No personalizamos el "loop de enganche".</b> Podríamos usar IA para maximizar el tiempo de pantalla del niño. Es exactamente la tecnología que hace daño en esta industria, y hacerlo destruiría lo único que vendemos.</li>
+          <li><b>No generamos creatividades masivas de anuncios.</b> Para qué: el canal pagado está restringido por la aritmética, no por falta de creatividades.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 90 DÍAS -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">08</span><h2>Los primeros 90 días</h2></div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th class="num">Días</th><th>Qué se hace</th><th>Qué se mide</th><th>Si sale mal</th></tr></thead>
+        <tbody>
+          <tr><td class="num"><b>1–15</b></td><td class="wrap">30 sesiones grabadas con niños de 8 a 11 jugando El Reto del Presupuesto. En un colegio de la comuna, con consentimiento firmado de los apoderados.</td><td class="wrap">¿Terminan el mes sin ayuda de un adulto? ¿Entienden por qué no les alcanzó?</td><td class="wrap">Si menos del 60% termina solo, <b>el juego no funciona</b>. Se rehace o se para. No se sigue construyendo encima.</td></tr>
+          <tr><td class="num"><b>16–30</b></td><td class="wrap">Reescribir el juego con lo que salió. Publicar gratis en <b>Google Play primero</b> (Android domina el parque chileno).</td><td class="wrap">Retención D7 de los niños de las sesiones.</td><td class="wrap">D7 bajo 20%: el problema es el juego, no el marketing.</td></tr>
+          <tr><td class="num"><b>31–45</b></td><td class="wrap">5 colegios design partner. Un profesor por colegio, gratis, con nosotros sentados atrás en la clase.</td><td class="wrap">¿El profesor lo usa una segunda vez sin que se lo pidamos?</td><td class="wrap">Si no hay segunda clase espontánea, el canal colegio no existe.</td></tr>
+          <tr><td class="num"><b>46–60</b></td><td class="wrap">Lista de 12 cuentas de banco/fintech. Primer contacto por LinkedIn y por intermediario. Pitch: <i>"ustedes tienen presupuesto de educación financiera y no tienen nada que medir. Nosotros les traemos la medición."</i></td><td class="wrap">Reuniones agendadas con Sostenibilidad <b>y</b> Marketing en la misma sala.</td><td class="wrap">Cero reuniones al día 60: el pitch está malo o la puerta es otra. Se cambia el pitch, no la meta.</td></tr>
+          <tr><td class="num"><b>61–90</b></td><td class="wrap">Cerrar <b>un piloto pagado</b>: $18.000.000 por 6 meses, con 10 colegios y reporte de impacto.</td><td class="wrap">Firma. No "interés". No "lo vemos el próximo año". <b>Firma.</b></td><td class="wrap">Si al día 90 nadie pasó de "qué bonito" a una propuesta formal, <b>el canal banco no existe</b> y hay que replantear el negocio entero, no insistir seis meses más.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- QUÉ MATA ESTO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">09</span><h2>Qué mataría esto</h2></div>
+    <div class="grilla g2">
+      <div class="caja caja-dura" style="box-shadow:4px 4px 0 var(--rosa)">
+        <span class="sello sello-rosa">Riesgo 1 · el más probable</span>
+        <h3 style="margin-top:8px">La retención. El niño juega tres días y no vuelve.</h3>
+        <p class="chico txt-2" style="margin-top:6px">En apps educativas la retención al día 30 ronda el <b>2%</b>, y en edtech infantil el churn mensual bordea el <b>7,4%</b> (estimaciones editoriales de la industria, no cifras auditadas — así están publicadas). El 36% de las cancelaciones es "el niño perdió el interés" y el 24% es "se le quedó chico el contenido". <b>Ninguna cantidad de talento de diseño garantiza esquivar esto.</b> Nuestra apuesta —que el papá abra el informe el domingo— puede simplemente no funcionar. Si a los 90 días la retención D30 no supera el 10%, paramos.</p>
+      </div>
+      <div class="caja caja-dura" style="box-shadow:4px 4px 0 var(--rosa)">
+        <span class="sello sello-rosa">Riesgo 2</span>
+        <h3 style="margin-top:8px">El banco descubre que le sale más barato hacerlo él.</h3>
+        <p class="chico txt-2" style="margin-top:6px">Un banco chileno con equipo digital puede construir esto. No es difícil. Nuestra defensa <b>no es tecnológica</b>: es que para ellos es un proyecto aburrido, de bajo retorno, que compite con la app de pagos por presupuesto — y que nosotros llevaremos años de datos de aprendizaje que ellos no tienen. Es una defensa frágil y lo sabemos. Rooster Money terminó comprada por NatWest; ser comprados sería un buen final, no un mal final.</p>
+      </div>
+      <div class="caja caja-dura" style="box-shadow:4px 4px 0 var(--rosa)">
+        <span class="sello sello-rosa">Riesgo 3 · el que mata de un día para otro</span>
+        <h3 style="margin-top:8px">Un incidente con datos de menores.</h3>
+        <p class="chico txt-2" style="margin-top:6px">Un solo titular —"app infantil expone datos de 8.000 niños chilenos"— y se acabó: se cae el banco, se caen los colegios, se caen los padres. La <b>Ley 21.719</b> (plena vigencia el 1 de diciembre de 2026) crea una agencia con facultad de multar hasta <b>20.000 UTM</b> y de suspender el tratamiento de datos. La mitigación no es técnica, es de diseño: <b>guardar lo mínimo</b>. Está todo en <a href="stack.html#datos">Arquitectura</a>, incluyendo lo que tenemos <b>por validar con abogado</b>.</p>
+      </div>
+      <div class="caja caja-dura" style="box-shadow:4px 4px 0 var(--rosa)">
+        <span class="sello sello-rosa">Riesgo 4 · el estructural</span>
+        <h3 style="margin-top:8px">Chile es muy chico.</h3>
+        <p class="chico txt-2" style="margin-top:6px">Aunque todo salga bien —los 3 bancos, los 60 colegios, las 3.000 familias— llegamos a US$360k de ARR en el mes 24. Es un buen negocio para cuatro personas y una decepción para un fondo. La única salida es la expansión regional, que dobla la apuesta sobre un canal (bancos) que en otro país hay que volver a abrir desde cero, con otro idioma regulatorio. <b>El mes 24 es un punto de decisión real, no una formalidad.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b class="mono">Finakids</b> · Las cifras de esta página cuadran con el costo de IA declarado en <a href="stack.html">Arquitectura</a> y con la curva de ingresos de <a href="roadmap.html">Roadmap</a>. Si no cuadran, es un error y hay que arreglarlo.</p>
+    <p style="margin-top:6px"><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Todas las ideas</a></p>
+  </div>
+</footer>
+
+<script>
+const btnMenu = document.getElementById('btnMenu');
+const menuMovil = document.getElementById('menuMovil');
+btnMenu.addEventListener('click', () => {
+  const ab = menuMovil.classList.toggle('abierto');
+  btnMenu.setAttribute('aria-expanded', ab ? 'true' : 'false');
+});
+</script>
+</body>
+</html>

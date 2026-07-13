@@ -41,6 +41,15 @@ sino a la contratista que ya está adentro de la faena.
 | 14 | [Cianota](14-permisos/) | cianota.com | Permitología: un permiso se atrasa un mes y la puesta en marcha se corre tres |
 | 15 | [Freatia](15-agua/) | freatia.com | En Atacama el agua es la licencia para operar, y el relave es el pasivo que no deja dormir |
 
+## Consumo
+
+La única idea que no le vende a una empresa: le vende a una familia. El niño juega,
+el papá paga y el banco termina financiando la cuenta.
+
+| # | Marca | Dominio | Problema |
+|---|------|---------|----------|
+| 16 | [Finakids](16-finakids/) | finakids.com | Educación financiera para niños: recibe la mesada el día 1 y tiene que llegar a fin de mes |
+
 ## Cómo está hecho
 
 HTML/CSS/JS a mano. Sin build, sin framework, sin CDN — se abre el archivo y funciona.

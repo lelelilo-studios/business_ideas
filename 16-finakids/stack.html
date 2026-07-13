@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finakids — Arquitectura: qué habría que configurar de verdad</title>
+<meta name="description" content="Modelo de datos, los agentes de IA con su modelo y su prompt, costo mensual con la aritmética, qué está falseado en el demo, y el frente regulatorio de datos de menores en Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .titular { padding-block: var(--sp-l) var(--sp-m); }
+  .cuenta { font-family: var(--mono); font-size: .8rem; line-height: 1.9; }
+  .cuenta .op { color: var(--tinta-3); }
+  .cuenta .res { background: var(--amarillo); padding: 1px 5px; border: 1px solid var(--tinta); }
+  pre {
+    font-family: var(--mono); font-size: .74rem; line-height: 1.65;
+    background: var(--tinta); color: #D8D4E6; padding: var(--sp-s);
+    overflow-x: auto; border: 2px solid var(--tinta);
+  }
+  pre b { color: var(--amarillo); font-weight: 400; }
+  pre i { color: #8E88AC; font-style: normal; }
+  pre em { color: #6FE0B5; font-style: normal; }
+  .tabla-dato { border: 2px solid var(--tinta); box-shadow: var(--registro-chico); }
+  .tabla-dato h4 { background: var(--tinta); color: var(--papel); padding: 8px 12px; font-family: var(--mono); font-size: .8rem; letter-spacing: .05em; }
+  .campos { padding: 10px 12px; }
+  .campo { display: flex; gap: 8px; font-family: var(--mono); font-size: .74rem; padding: 3px 0; align-items: baseline; }
+  .campo b { color: var(--azul); min-width: 128px; flex: none; }
+  .campo span { color: var(--tinta-2); }
+  .campo.rojo b { color: var(--rosa); }
+  .validar { display: inline-block; background: var(--amarillo); border: 2px solid var(--tinta); padding: 1px 6px; font-family: var(--mono); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .sabido { display: inline-block; background: var(--verde-cl); border: 2px solid var(--verde); padding: 1px 6px; font-family: var(--mono); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-in">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="9" width="28" height="19" fill="#F5C518" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M2 9 16 2l14 7" fill="#E8318F" stroke="#1F1C33" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="16" cy="19" r="4.5" fill="none" stroke="#1F1C33" stroke-width="2"/>
+        <path d="M16 15.5v7M14 17.4h4M14 20.6h4" stroke="#1F1C33" stroke-width="1.6"/>
+      </svg>
+      <span class="marca-txt">Finakids</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links" role="list">
+        <li><a class="volver" href="../index.html">← Ideas</a></li>
+        <li><a href="index.html">Producto</a></li>
+        <li><a href="demo/index.html">Demo</a></li>
+        <li><a href="negocio.html">Negocio</a></li>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+      </ul>
+    </nav>
+    <button class="nav-btn" id="btnMenu" aria-expanded="false" aria-controls="menuMovil">Menú</button>
+  </div>
+</header>
+<div class="nav-movil" id="menuMovil">
+  <ul role="list">
+    <li><a href="../index.html">← Ideas</a></li>
+    <li><a href="index.html">Producto</a></li>
+    <li><a href="demo/index.html">Demo</a></li>
+    <li><a href="negocio.html">Negocio</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="stack.html" aria-current="page">Arquitectura</a></li>
+  </ul>
+</div>
+
+<main>
+
+<section class="container titular">
+  <span class="rotulo">Arquitectura</span>
+  <h1 class="mal-registro">Nada de esto está aprovisionado. Está documentado.</h1>
+  <p class="txt-2" style="max-width:58ch;margin-top:var(--sp-s);font-size:var(--step-1)">Qué habría que contratar, cuánto costaría, qué modelo escribe qué, qué está falseado en el demo, y —lo más importante en un producto para niños— qué sabemos y qué no sabemos del frente legal.</p>
+</section>
+
+<!-- QUÉ ESTÁ FALSEADO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">00 · primero lo incómodo</span><h2>Qué está falseado en el demo</h2></div>
+    <div class="grilla g2">
+      <div class="caja caja-dura caja-rosacl">
+        <span class="rotulo rotulo-rosa">Falso</span>
+        <ul class="lista" style="margin-top:10px">
+          <li><b>No hay servidor, ni cuenta, ni base de datos.</b> Todo el estado del juego vive en la memoria del navegador y se borra al recargar.</li>
+          <li><b>El informe "de la IA" no llama a la API.</b> Es una plantilla determinista escrita con los datos reales de tu partida. El prompt real que la reemplazaría está publicado más abajo, palabra por palabra.</li>
+          <li><b>Las 5 partidas anteriores de Matías son inventadas.</b> La sexta —la que juegas tú— es real y alimenta el panel de verdad.</li>
+          <li><b>Los otros 9 juegos del catálogo no existen.</b> Ni una línea de código.</li>
+          <li><b>No hay app.</b> Es una página web. No hay App Store, no hay Google Play, no hay notificación, no hay WhatsApp del domingo.</li>
+          <li><b>El panel del profesor y el reporte al banco no existen</b>, ni siquiera como maqueta.</li>
+          <li><b>Nada de la sección de datos está implementado.</b> No hay consentimiento, no hay verificación de edad, no hay DPO, no hay borrado. Está <i>diseñado</i>, no construido.</li>
+        </ul>
+      </div>
+      <div class="caja caja-dura caja-verdecl">
+        <span class="rotulo" style="color:var(--verde)">De verdad</span>
+        <ul class="lista lista-verde" style="margin-top:10px">
+          <li><b>El juego es real.</b> Las 14 cartas, la economía, el chanchito que no se abre sin romperlo, el quiosco que te fía con 20% de recargo, y la deuda que se te cobra a fin de mes. Se juega entero y se puede ganar y perder.</li>
+          <li><b>El juicio del cierre es real.</b> No hay un "¡bien hecho!" precocido: el texto se arma con las decisiones que tomaste. Si ahorraste <i>y</i> pediste fiado, te lo dice y te quita el sello.</li>
+          <li><b>El panel se alimenta de tu partida.</b> Las cinco destrezas y el gráfico cambian según lo que hiciste, no según un guion.</li>
+          <li><b>El costo de la IA es real</b> y está calculado abajo con precios de lista publicados. Es el mismo número que <a href="negocio.html">Negocio</a> descuenta del margen.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELO DE DATOS -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">01</span><h2>Modelo de datos</h2></div>
+    <p class="medida txt-2">Escrito con una regla por delante: <b>si un campo no es imprescindible para enseñar, no existe</b>. La minimización no es una política de privacidad colgada en el pie de página, es el esquema de la base de datos.</p>
+
+    <div class="grilla g2" style="margin-top:var(--sp-m)">
+      <div class="tabla-dato">
+        <h4>tutor <span style="color:#8E88AC">— el adulto. El único que tiene cuenta.</span></h4>
+        <div class="campos">
+          <div class="campo"><b>id</b><span>uuid</span></div>
+          <div class="campo"><b>email</b><span>text · único</span></div>
+          <div class="campo"><b>telefono_e164</b><span>text · null (para el WhatsApp del domingo)</span></div>
+          <div class="campo"><b>nombre</b><span>text</span></div>
+          <div class="campo"><b>plan</b><span>enum: gratis | familia | patrocinado</span></div>
+          <div class="campo"><b>consent_version</b><span>text · qué texto de consentimiento aceptó</span></div>
+          <div class="campo"><b>consent_en</b><span>timestamptz · cuándo</span></div>
+          <div class="campo"><b>borrado_pedido_en</b><span>timestamptz · null · dispara el purgado a 30 días</span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>nino <span style="color:#8E88AC">— lo mínimo. Sin apellido, sin RUT, sin cara.</span></h4>
+        <div class="campos">
+          <div class="campo"><b>id</b><span>uuid</span></div>
+          <div class="campo"><b>tutor_id</b><span>uuid → tutor · <b>on delete cascade</b></span></div>
+          <div class="campo"><b>nombre_pila</b><span>text · o un apodo. Nunca el apellido.</span></div>
+          <div class="campo"><b>nac_mes_anio</b><span>date · <b>sólo mes y año</b>. El día no lo necesitamos.</span></div>
+          <div class="campo"><b>curso_id</b><span>uuid · null · sólo si el tutor lo activa</span></div>
+          <div class="campo"><b>avatar_id</b><span>int · uno de 24 personajes dibujados. Nunca una foto.</span></div>
+          <div class="campo rojo"><b>—</b><span><s>rut</s> <s>apellido</s> <s>foto</s> <s>voz</s> <s>ubicación</s> <s>contactos</s> <s>correo del niño</s></span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>partida <span style="color:#8E88AC">— un mes simulado</span></h4>
+        <div class="campos">
+          <div class="campo"><b>id</b><span>uuid</span></div>
+          <div class="campo"><b>nino_id</b><span>uuid → nino</span></div>
+          <div class="campo"><b>juego</b><span>enum: presupuesto | ahorro | …</span></div>
+          <div class="campo"><b>mesada</b><span>int · CLP</span></div>
+          <div class="campo"><b>semilla</b><span>int · para reproducir la partida exacta</span></div>
+          <div class="campo"><b>resultado</b><span>jsonb · chanchito, deuda, recargos, sellos</span></div>
+          <div class="campo"><b>iniciada_en / terminada_en</b><span>timestamptz</span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>decision <span style="color:#8E88AC">— el corazón del producto</span></h4>
+        <div class="campos">
+          <div class="campo"><b>id</b><span>bigserial</span></div>
+          <div class="campo"><b>partida_id</b><span>uuid → partida</span></div>
+          <div class="campo"><b>carta_id</b><span>text · 'skin_jueguito'</span></div>
+          <div class="campo"><b>semana</b><span>int 1..4</span></div>
+          <div class="campo"><b>tipo</b><span>enum: nec | deseo | evento | oport</span></div>
+          <div class="campo"><b>accion</b><span>enum: pagar | comprar | saltar | fiar | romper | pasar</span></div>
+          <div class="campo"><b>monto</b><span>int · CLP</span></div>
+          <div class="campo"><b>saldo_antes</b><span>int · CLP · el contexto de la decisión</span></div>
+          <div class="campo"><b>ms_pensando</b><span>int · <b>cuánto se demoró en decidir</b>. La señal más rica que tenemos: comprar en 0,8 s es un impulso; en 6 s, una decisión.</span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>destreza <span style="color:#8E88AC">— lo que el papá ve</span></h4>
+        <div class="campos">
+          <div class="campo"><b>nino_id</b><span>uuid → nino</span></div>
+          <div class="campo"><b>clave</b><span>enum: necesidad_vs_deseo | planificar_mes | resistir_impulso | costo_credito | ahorro_con_meta</span></div>
+          <div class="campo"><b>valor</b><span>int 0..100 · <b>calculado por reglas, no por IA</b></span></div>
+          <div class="campo"><b>evidencia</b><span>uuid[] · las partidas exactas que lo respaldan</span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>informe <span style="color:#8E88AC">— auditable: qué modelo escribió qué</span></h4>
+        <div class="campos">
+          <div class="campo"><b>id</b><span>uuid</span></div>
+          <div class="campo"><b>nino_id</b><span>uuid → nino</span></div>
+          <div class="campo"><b>semana_iso</b><span>text · '2026-W29'</span></div>
+          <div class="campo"><b>texto</b><span>text · lo que se le mandó al tutor</span></div>
+          <div class="campo"><b>modelo</b><span>text · 'claude-sonnet-5'</span></div>
+          <div class="campo"><b>tokens_in / tokens_out</b><span>int · para auditar el costo</span></div>
+          <div class="campo"><b>abierto_en</b><span>timestamptz · null · <b>la métrica que decide el hito 3</b></span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato">
+        <h4>colegio / curso <span style="color:#8E88AC">— el canal</span></h4>
+        <div class="campos">
+          <div class="campo"><b>colegio.rbd</b><span>int · el rol base de datos del MINEDUC</span></div>
+          <div class="campo"><b>colegio.comuna</b><span>text · 'Maipú'</span></div>
+          <div class="campo"><b>colegio.dependencia</b><span>enum: municipal | subvencionado | particular</span></div>
+          <div class="campo"><b>colegio.patrocinador_id</b><span>uuid · quién paga esta aula</span></div>
+          <div class="campo"><b>curso.nivel / letra</b><span>'4B'</span></div>
+          <div class="campo"><b>curso.profesor_id</b><span>uuid → tutor (el profe es un adulto más)</span></div>
+        </div>
+      </div>
+
+      <div class="tabla-dato" style="box-shadow:4px 4px 0 var(--rosa)">
+        <h4>impacto_agregado <span style="color:#8E88AC">— LO ÚNICO que ve el banco</span></h4>
+        <div class="campos">
+          <div class="campo"><b>patrocinador_id</b><span>uuid</span></div>
+          <div class="campo"><b>mes</b><span>date</span></div>
+          <div class="campo"><b>ninos_activos</b><span>int</span></div>
+          <div class="campo"><b>partidas</b><span>int</span></div>
+          <div class="campo"><b>destreza_prom</b><span>jsonb · promedio por destreza</span></div>
+          <div class="campo rojo"><b>regla dura</b><span><b>no se emite ninguna fila con n &lt; 25 niños.</b> Es una vista con k-anonimato, no una tabla. El banco no puede ver a un niño ni por accidente, ni con un JOIN, ni pidiéndolo.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOS AGENTES -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">02</span><h2>Los agentes de IA</h2></div>
+
+    <div class="caja caja-tinta trama" style="margin-bottom:var(--sp-m)">
+      <span class="rotulo">La regla que ordena todo lo demás</span>
+      <h3 style="margin-top:8px;color:var(--papel)">Ningún modelo de lenguaje le habla al niño. Nunca.</h3>
+      <p style="margin-top:8px;max-width:60ch">No hay chat, no hay tutor conversacional, no hay voz. Los modelos <b>sólo escriben para el adulto</b>: el informe del domingo, el reporte de destrezas y el material del profesor. Un LLM conversando sin supervisión con alguien de 9 años es un riesgo que nadie sabe acotar de verdad, y el que diga que sí, miente. Esta línea también nos ahorra la mitad de los problemas regulatorios.</p>
+      <p style="margin-top:8px;max-width:60ch"><b>Y las destrezas no las calcula la IA.</b> Se calculan con reglas deterministas sobre la tabla <span class="mono" style="color:var(--amarillo)">decision</span>, porque el papá tiene derecho a que el número que ve sea trazable hasta la decisión que lo produjo. La IA <b>escribe</b>, no <b>juzga</b>.</p>
+    </div>
+
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <span class="sello sello-azul">Agente 1 · el que sostiene la suscripción</span>
+        <h3 style="margin-top:8px">El informe del domingo</h3>
+        <div class="scroll-x" style="border:none;box-shadow:none;margin-top:10px">
+          <table>
+            <tr><th>Modelo</th><td class="mono">claude-sonnet-5</td></tr>
+            <tr><th>Cuándo</th><td>Domingo 19:00, por niño activo</td></tr>
+            <tr><th>Entrada</th><td class="num">~2.500 tokens</td></tr>
+            <tr><th>Salida</th><td class="num">~500 tokens</td></tr>
+            <tr><th>Herramientas</th><td>Ninguna. Sólo texto → texto.</td></tr>
+            <tr><th>Caché</th><td>El prompt de sistema (~1.800 tok) va con <span class="mono">cache_control</span>: se escribe una vez y se lee miles.</td></tr>
+          </table>
+        </div>
+        <p class="chico txt-2" style="margin-top:10px"><b>Por qué Sonnet 5 y no Opus:</b> es un texto de 5 frases con datos estructurados en la entrada. Opus 4.8 lo haría un poco mejor y costaría 1,7× más por un valor marginal. Aquí el volumen manda; en el informe mensual, no.</p>
+      </div>
+
+      <div>
+        <pre><i># El prompt real. No hay otro.</i>
+<b>system:</b>
+Eres el asistente de Finakids. Le escribes a un
+<b>adulto</b> —la mamá o el papá— sobre lo que su hijo
+hizo <em>dentro de un juego de presupuesto</em>. Nunca
+le escribes al niño.
+
+REGLAS DURAS
+1. No inventes ni un dato. Todo lo que afirmes tiene
+   que salir del JSON de decisiones que te paso. Si
+   no está ahí, no existe.
+2. Nunca digas que el niño "es" algo (gastador,
+   desordenado). Di lo que <em>hizo</em>, con la cifra.
+3. El objetivo NO es que el papá felicite o rete. Es
+   que <em>haga una pregunta concreta</em>, en un momento
+   concreto de la semana. Dale el guion exacto.
+4. Nunca sugieras premios ni castigos con plata.
+5. Máximo 5 párrafos. Español de Chile, tuteo, sin
+   jerga pedagógica y sin emojis.
+6. Cierra con "Por qué esto y no otra cosa": explica
+   con qué evidencia elegiste ese consejo.
+7. Este informe habla de un <em>juego</em>. Si el papá pudiera
+   confundirlo con la plata real, dilo explícitamente.
+
+<b>user:</b>
+{ "nino": "Matías", "edad": 9,
+  "mesada_juego": 20000, "meta": 4000,
+  "partidas_semana": [
+    { "pct_gastado_semana1": 62,
+      "necesidades_cubiertas": "6/6",
+      "fiado": 1, "recargos": 600, "rompio_chanchito": false,
+      "meta_alcanzada": false,
+      "decisiones": [ … 14 objetos … ] } ],
+  "destrezas": { "planificar_mes": 1, … },
+  "historico_pct_sem1": [78,71,64,52,61,62] }</pre>
+      </div>
+    </div>
+
+    <div class="grilla g3" style="margin-top:var(--sp-m)">
+      <div class="caja caja-dura">
+        <span class="sello sello-rosa">Agente 2</span>
+        <h3 style="margin-top:8px">El reporte mensual de destrezas</h3>
+        <p class="chico txt-2" style="margin-top:6px"><b class="mono">claude-opus-4-8</b> · una vez al mes por niño. Entrada ~6.000 tok (todas las partidas del mes), salida ~800. Acá sí vale Opus: es el documento que el papá guarda, imprime y le muestra al profesor. Herramientas: ninguna.</p>
+      </div>
+      <div class="caja caja-dura">
+        <span class="sello sello-oro">Agente 3</span>
+        <h3 style="margin-top:8px">El generador de cartas</h3>
+        <p class="chico txt-2" style="margin-top:6px"><b class="mono">claude-opus-4-8</b> en lote, fuera de línea. 40 cartas nuevas al mes (situaciones, precios chilenos, nombres). <b>Revisión pedagógica humana obligatoria antes de publicar</b> — el costo real acá no es la inferencia (US$0,38/mes), son las 4 horas de una profesora ($120.000/mes). El contenido fresco es el único antídoto conocido contra el "ya me lo sé", que es el 24% de las cancelaciones de la categoría.</p>
+      </div>
+      <div class="caja caja-dura">
+        <span class="sello sello-verde">Agente 4</span>
+        <h3 style="margin-top:8px">El reporte de impacto al banco</h3>
+        <p class="chico txt-2" style="margin-top:6px"><b class="mono">claude-sonnet-5</b> · una vez al mes por contrato. Lee <b>sólo la vista agregada</b> (k ≥ 25) y redacta el informe que el banco lleva a su directorio. Nunca toca la tabla <span class="mono">nino</span> — no por política, sino porque el rol de base de datos con el que corre <b>no tiene permiso de lectura sobre ella</b>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COSTOS -->
+<section class="sec" id="costos">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">03</span><h2>Costo mensual, con la aritmética</h2></div>
+
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <span class="rotulo">Inferencia · por familia que paga</span>
+        <div class="cuenta" style="margin-top:10px">
+          <span class="op">— Informe semanal (Sonnet 5) —</span><br>
+          <span class="op">precio de lista: US$3 / MTok in, US$15 / MTok out</span><br>
+          2.500 <span class="op">×</span> 3/1M <span class="op">=</span> US$0,0075<br>
+          &nbsp;&nbsp;500 <span class="op">×</span> 15/1M <span class="op">=</span> US$0,0075<br>
+          <span class="op">=</span> <b>US$0,015</b> por informe <span class="op">= $14,3 CLP</span><br>
+          <span class="op">×</span> 4,3 semanas <span class="op">×</span> 1,6 niños <span class="op">=</span> <b>$98 CLP/mes</b><br>
+          <br>
+          <span class="op">— Reporte mensual (Opus 4.8) —</span><br>
+          <span class="op">precio de lista: US$5 / MTok in, US$25 / MTok out</span><br>
+          6.000 <span class="op">×</span> 5/1M <span class="op">=</span> US$0,030<br>
+          &nbsp;&nbsp;800 <span class="op">×</span> 25/1M <span class="op">=</span> US$0,020<br>
+          <span class="op">=</span> <b>US$0,050</b> <span class="op">= $47,5 CLP</span> <span class="op">×</span> 1,6 <span class="op">=</span> <b>$76 CLP/mes</b><br>
+          <br>
+          $98 <span class="op">+</span> $76 <span class="op">+</span> reintentos <span class="op">≈</span> <span class="res">$180 CLP/mes</span>
+        </div>
+        <p class="chico txt-2" style="margin-top:10px"><b>$180 es el número exacto que <a href="negocio.html">Negocio</a> le descuenta a los $4.990.</b> Dos notas honestas: (1) usamos el <b>precio de lista</b> de Sonnet 5, no el introductorio de US$2/US$10 vigente hasta el 31-08-2026 — no se construye un margen sobre un descuento temporal; (2) <b>las familias gratis no generan costo de IA</b>, porque no tienen panel. El costo variable existe sólo donde hay ingreso, y eso fue una decisión de diseño, no una suerte.</p>
+      </div>
+
+      <div class="caja caja-dura">
+        <span class="rotulo">Infraestructura · al mes 24 (base)</span>
+        <div class="scroll-x" style="border:none;box-shadow:none;margin-top:8px">
+          <table>
+            <thead><tr><th>Servicio</th><th>Para qué</th><th class="num">US$/mes</th></tr></thead>
+            <tbody>
+              <tr><td>Supabase Pro</td><td class="wrap">Postgres, Auth, RLS por tutor</td><td class="num">50</td></tr>
+              <tr><td>Fly.io</td><td class="wrap">API y el cron del domingo</td><td class="num">40</td></tr>
+              <tr><td>Cloudflare</td><td class="wrap">CDN y WAF</td><td class="num">25</td></tr>
+              <tr><td>Sentry</td><td class="wrap">Errores y trazas</td><td class="num">30</td></tr>
+              <tr><td>Expo EAS</td><td class="wrap">Compilar iOS y Android</td><td class="num">99</td></tr>
+              <tr><td>RevenueCat</td><td class="wrap">Suscripciones (1% sobre US$15,7k de MTR)</td><td class="num">157</td></tr>
+              <tr><td>Resend</td><td class="wrap">Correo transaccional</td><td class="num">20</td></tr>
+              <tr><td>WhatsApp Business API</td><td class="wrap">El informe del domingo · 3.000 conversaciones <span class="validar">por validar</span></td><td class="num">~60</td></tr>
+              <tr style="background:var(--papel-2)"><td colspan="2"><b>Total infra</b></td><td class="num"><b>US$481</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cuenta" style="margin-top:10px">
+          US$481 <span class="op">×</span> $950 <span class="op">=</span> $457.000 CLP/mes<br>
+          $457.000 <span class="op">÷</span> 3.000 familias <span class="op">=</span> <b>$152/familia</b><br>
+          <span class="op">Negocio usa <b>$200</b> con holgura. La diferencia es colchón, no maquillaje.</span>
+        </div>
+        <p class="chico txt-2" style="margin-top:10px"><b>El precio de WhatsApp Business API en Chile está por validar</b>: Meta cobra por conversación y las tarifas varían por país y categoría. Los US$60 son una estimación nuestra. Si sale caro, el informe del domingo se manda por correo y push, que cuestan cerca de cero — el canal no es el producto.</p>
+      </div>
+    </div>
+
+    <div class="caja caja-tinta trama" style="margin-top:var(--sp-m)">
+      <span class="rotulo">Costo total mensual al mes 24 (escenario base)</span>
+      <div class="cuenta" style="margin-top:10px;color:var(--papel)">
+        IA: 3.000 familias <span class="op" style="color:#9A94B8">×</span> $180 <span class="op" style="color:#9A94B8">=</span> <b style="color:var(--amarillo)">$540.000</b><br>
+        Infra: <b style="color:var(--amarillo)">$457.000</b><br>
+        Revisión pedagógica del contenido: <b style="color:var(--amarillo)">$120.000</b><br>
+        DPO externo y asesoría legal: <b style="color:var(--amarillo)">$400.000</b><br>
+        <span class="op" style="color:#9A94B8">──────────────────────────────</span><br>
+        Total variable + servicios: <span class="res">$1.517.000 CLP/mes</span><br>
+        <span class="op" style="color:#9A94B8">(el resto de los $22M/mes de costo del roadmap son sueldos: 7 personas)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERCEROS Y ENV -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">04</span><h2>Qué hay que contratar, y con qué llaves</h2></div>
+    <div class="grilla g2">
+      <div class="caja caja-dura">
+        <span class="rotulo">Cuentas que hay que abrir</span>
+        <ul class="lista lista-azul" style="margin-top:10px">
+          <li><b>Anthropic API.</b> Los dos modelos del pipeline. Con caché de prompt activado o el costo se triplica.</li>
+          <li><b>Apple Developer ($99/año) y Google Play ($25 una vez).</b> Y las dos fichas de "app dirigida a niños", que activan revisiones especiales: Kids Category en Apple, Families Policy en Google. <b>Ambas prohíben SDK de publicidad y tracking de terceros</b> — que es justo lo que ya decidimos no tener.</li>
+          <li><b>RevenueCat.</b> Suscripciones en las dos tiendas sin escribir el infierno de los recibos.</li>
+          <li><b>WhatsApp Business API</b> (vía Meta o un BSP como Twilio). <span class="validar">precio por validar</span></li>
+          <li><b>Un DPO externo</b> y un abogado de protección de datos. <b>Antes de la primera instalación real</b>, no después.</li>
+        </ul>
+      </div>
+      <div>
+        <pre><i># .env — nada de esto existe todavía</i>
+<b>ANTHROPIC_API_KEY</b>=sk-ant-…
+<b>MODELO_INFORME</b>=claude-sonnet-5
+<b>MODELO_DESTREZAS</b>=claude-opus-4-8
+<b>MODELO_CONTENIDO</b>=claude-opus-4-8
+
+<b>SUPABASE_URL</b>=https://xxx.supabase.co
+<b>SUPABASE_SERVICE_KEY</b>=…
+<i># el rol del agente 4 NO tiene SELECT sobre `nino`</i>
+<b>SUPABASE_ROL_REPORTES</b>=finakids_agregados
+
+<b>REVENUECAT_SECRET</b>=…
+<b>APPLE_SHARED_SECRET</b>=…
+<b>GOOGLE_PLAY_SA_JSON</b>=…
+
+<b>WHATSAPP_TOKEN</b>=…
+<b>WHATSAPP_PHONE_ID</b>=…
+<b>RESEND_API_KEY</b>=…
+<b>SENTRY_DSN</b>=…
+
+<i># parámetros del diseño de privacidad</i>
+<b>K_ANONIMATO_MIN</b>=25   <i># el banco nunca ve un grupo menor</i>
+<b>RETENCION_DIAS</b>=1095  <i># 3 años <span style="color:#F5C518">POR VALIDAR</span></i>
+<b>BORRADO_DIAS</b>=30      <i># desde que el tutor lo pide</i>
+<b>DPO_EMAIL</b>=dpo@finakids.cl</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATOS DE MENORES -->
+<section class="sec" id="datos">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">05 · el frente que puede matar el proyecto de un día para otro</span><h2>Datos de menores de edad</h2></div>
+    <p class="medida txt-2">Acá separamos con brutalidad tres cosas: <b>lo que sabemos y podemos citar</b>, <b>lo que hay que validar con un abogado</b>, y <b>lo que decidimos nosotros porque nos da la gana</b>. Inventar una obligación legal en esta página no sería relleno: sería un pasivo.</p>
+
+    <h3 style="margin-top:var(--sp-m)"><span class="sabido">Sabido</span> Lo que sí está claro</h3>
+    <div class="grilla g2" style="margin-top:var(--sp-s)">
+      <div class="caja caja-dura caja-verdecl">
+        <h4>Ley 21.719 de protección de datos personales</h4>
+        <ul class="lista lista-verde" style="margin-top:8px">
+          <li>Publicada el <b>13 de diciembre de 2024</b>. Entra en <b>plena vigencia el 1 de diciembre de 2026</b> (24 meses después). Reemplaza el régimen sin dientes de la Ley 19.628, de 1999.</li>
+          <li>Crea la <b>Agencia de Protección de Datos Personales (APDP)</b>, con facultad de investigar de oficio, multar, <b>suspender el tratamiento de datos</b> y publicar un registro nacional de sanciones.</li>
+          <li>Multa máxima: <b>20.000 UTM</b>. Reincidencia: hasta el <b>4% de los ingresos anuales</b>.</li>
+          <li>Considera <b>niños a los menores de 14</b> y adolescentes a los de 14 a 17. <b>Para tratar datos de niños se requiere el consentimiento del padre, madre o tutor.</b> El tratamiento debe atender al <b>interés superior</b> del menor.</li>
+        </ul>
+        <p class="chico" style="margin-top:10px"><b>Traducido a Finakids:</b> nuestro usuario tiene entre 7 y 12 años. Es decir, <b>siempre, sin excepción, se requiere el consentimiento del tutor</b>. Por eso la cuenta la crea el adulto y el niño no tiene credencial propia. No es una decisión de producto: es la ley.</p>
+      </div>
+      <div class="caja caja-dura">
+        <h4>Y una cosa más que sabemos, y que ayuda</h4>
+        <p class="chico txt-2" style="margin-top:8px">Educación financiera <b>ya está en el marco curricular chileno</b>: la <b>Ley 21.092</b>, de mayo de 2018, modificó la Ley General de Educación para incorporar contenidos de educación financiera básica en enseñanza media, y las Bases Curriculares de básica tienen objetivos relacionados. El MINEDUC mantiene una línea de recursos de Educación Financiera en Currículum Nacional, y en 2025 Chile retomó el módulo de <b>PISA financiera</b>.</p>
+        <p class="chico txt-2" style="margin-top:8px"><b>Por qué importa:</b> no tenemos que convencer a nadie de que esto <i>debería</i> enseñarse. Ya está mandatado. Lo que no existe es el material, el tiempo ni la medición. Ése es exactamente el hueco que vende Finakids — al colegio y, sobre todo, al banco que quiere aparecer llenándolo.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--sp-l)"><span class="validar">Por validar</span> Lo que NO vamos a inventar</h3>
+    <div class="scroll-x" style="margin-top:var(--sp-s)">
+      <table>
+        <thead><tr><th>Pregunta abierta</th><th>Por qué no la respondemos acá</th><th>Cuándo hay que cerrarla</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="wrap"><b>¿El consentimiento del tutor tiene que ser "verificable"? ¿Con qué mecanismo?</b></td>
+            <td class="wrap">En COPPA (EE.UU.) hay métodos tasados y explícitos. En Chile, cómo se acredita el consentimiento parental bajo la 21.719 depende del reglamento y de la doctrina que fije la APDP, y <b>no me consta</b>. Un correo con casilla marcada podría bastar… o no.</td>
+            <td class="wrap">Antes del hito 0 (día 45). Es la primera pregunta al abogado.</td>
+          </tr>
+          <tr>
+            <td class="wrap"><b>¿Mandarle el avance del niño al profesor es una cesión de datos que requiere consentimiento aparte?</b></td>
+            <td class="wrap">Probablemente sí, pero <b>no lo afirmo</b>. Por eso en el demo el interruptor "compartir con el profesor jefe" viene <b>apagado</b> y hay que activarlo a mano.</td>
+            <td class="wrap">Antes del primer colegio (mes 3).</td>
+          </tr>
+          <tr style="background:var(--rosa-cl)">
+            <td class="wrap"><b>¿Que un banco patrocine una app usada por niños es publicidad dirigida a menores?</b></td>
+            <td class="wrap"><b>Ésta es la que puede volar el modelo de negocio entero</b> y no tengo la respuesta. Nuestra postura de diseño es no arriesgarla: la marca del banco aparece <b>sólo en el panel del adulto y en la pantalla que ve el adulto</b>. <b>Jamás dentro del juego</b>, jamás en una carta, jamás en un sello, jamás en un ranking. El niño no ve el logo del banco. Si la respuesta legal fuera "igual es publicidad", tendríamos que rediseñar el contrato.</td>
+            <td class="wrap"><b>Antes de firmar el primer piloto (mes 6).</b> Y el legal del banco va a preguntarlo antes que nosotros.</td>
+          </tr>
+          <tr>
+            <td class="wrap"><b>¿Cuánto tiempo podemos conservar las decisiones de juego de un niño?</b></td>
+            <td class="wrap">Pusimos 3 años en la variable de entorno porque el valor pedagógico está en la serie larga. <b>No sé si es defendible.</b> Es un número puesto por un ingeniero, no por un abogado.</td>
+            <td class="wrap">Antes del hito 3 (mes 9).</td>
+          </tr>
+          <tr>
+            <td class="wrap"><b>Si publicamos en la App Store global, ¿nos alcanzan COPPA (EE.UU., &lt;13) y el artículo 8 del RGPD (13 a 16 según el país)?</b></td>
+            <td class="wrap">Hoy no aplican: sólo operamos en Chile. Pero una app en la App Store es descargable desde cualquier parte, y <b>éste es exactamente el tipo de detalle que hunde proyectos</b>. Puede que haya que geo-restringir la publicación.</td>
+            <td class="wrap">Antes de publicar en las tiendas (mes 2).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:var(--sp-l)">Lo que decidimos nosotros, sin que nadie nos obligue</h3>
+    <div class="grilla g3" style="margin-top:var(--sp-s)">
+      <div class="caja caja-dura">
+        <ul class="lista">
+          <li><b>La cuenta la crea el adulto.</b> Siempre. El niño entra desde el perfil del tutor y no tiene credencial propia.</li>
+          <li><b>No pedimos RUT, apellido, foto, voz, ubicación ni contactos.</b> Ni siquiera el día de nacimiento: mes y año bastan.</li>
+          <li><b>No hay chat.</b> No existe ningún canal por el que un desconocido pueda escribirle a un niño.</li>
+        </ul>
+      </div>
+      <div class="caja caja-dura">
+        <ul class="lista">
+          <li><b>Cero publicidad. Cero compras internas.</b> Cero SDK de terceros dentro de la app del niño: no hay pixel de Meta, no hay Google Analytics, no hay nada mirando.</li>
+          <li><b>El banco sólo ve agregados</b> con k ≥ 25, y el rol de base de datos del agente que los genera <b>no tiene permiso</b> de leer la tabla de niños.</li>
+          <li><b>Rankings sólo dentro del curso, por avatar, y se borran cada semana.</b></li>
+        </ul>
+      </div>
+      <div class="caja caja-dura">
+        <ul class="lista">
+          <li><b>DPO externo desde el día 1</b> ($400.000/mes en el presupuesto, no una promesa).</li>
+          <li><b>Borrado real en 30 días</b> a pedido del tutor, en cascada, incluyendo los informes ya generados.</li>
+          <li><b>Ningún LLM le habla al niño.</b> Ya lo dijimos arriba y lo repetimos acá, porque es la decisión que más nos protege.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DINERO REAL -->
+<section class="sec" id="dinero-real">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">06</span><h2>"Integración con bancos para aprender con dinero real"</h2></div>
+    <div class="grilla g2">
+      <div>
+        <p class="medida">Es la parte más atractiva de la idea original y la más peligrosa. <b>No la hacemos, y no es por cobardía: es que es otra empresa.</b></p>
+        <ul class="lista" style="margin-top:var(--sp-s)">
+          <li><b>Custodiar o mover fondos de menores es actividad regulada.</b> Habría que ser emisor de medios de pago o de tarjetas de prepago —o vivir bajo la ficha de uno—, con la CMF encima. Eso no es una funcionalidad: es cambiar de rubro, de equipo y de capital.</li>
+          <li><b>Nos convierte en un vector de riesgo.</b> Un error en el saldo de un niño no es un bug: es una noticia. Y un producto financiero para menores es un imán de fraude y de suplantación.</li>
+          <li><b>Cambia el riesgo del banco patrocinador.</b> Hoy patrocina educación, que es reputacionalmente barato. Ahí pasaría a ser corresponsable de un producto financiero para menores, que es reputacionalmente carísimo. <b>Perderíamos al cliente que estamos tratando de ganar.</b></li>
+        </ul>
+      </div>
+      <div class="caja caja-dura" style="box-shadow:4px 4px 0 var(--amarillo)">
+        <span class="rotulo">Lo único que sí haríamos, y no antes del mes 24</span>
+        <h3 style="margin-top:8px">El "modo espejo", de sólo lectura</h3>
+        <p class="chico txt-2" style="margin-top:8px">El saldo <b>real</b> de la Cuenta de Ahorro Niño que el chico ya tiene en BancoEstado alimenta la meta del chanchito del juego. <b>Sin mover un peso. Sin tarjeta. Sin poder gastar.</b> Sólo el número, para que el juego y la vida hablen de lo mismo.</p>
+        <p class="chico txt-2" style="margin-top:8px">Es elegante y probablemente sea el mejor feature que Finakids pueda tener algún día. Y aun así:</p>
+        <p class="chico" style="margin-top:8px"><span class="validar">por validar</span> La <b>Ley Fintech (21.521)</b> creó en Chile un marco de finanzas abiertas cuya implementación es <b>gradual</b>. Si un tercero puede <i>leer</i> —nunca mover— el saldo de la cuenta de un menor con consentimiento del tutor, bajo qué condiciones y desde cuándo, <b>no me consta</b>. No lo voy a afirmar en una página que alguien podría usar para decidir. Es una pregunta para el abogado y para el área de open finance del banco, y su respuesta puede perfectamente ser "no".</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMINIO -->
+<section class="sec">
+  <div class="container">
+    <div class="sec-cabeza"><span class="rotulo">07</span><h2>Evidencia del dominio</h2></div>
+    <pre>$ ./_kit/check-domain.sh finakids platalandia ahorrolandia mesadita
+
+finakids               .com AVAILABLE          (http 404)   .cl AVAILABLE
+platalandia            .com AVAILABLE          (http 404)   .cl AVAILABLE
+ahorrolandia           .com AVAILABLE          (http 404)   .cl AVAILABLE
+mesadita               .com AVAILABLE          (http 404)   .cl AVAILABLE
+
+<i># rdap.verisign.com/com/v1/domain/finakids.com → HTTP 404 = disponible</i>
+<i># NIC Chile: "no existe" = disponible</i>
+<i># Verificado el 13 de julio de 2026.</i></pre>
+    <p class="chico txt-2" style="margin-top:var(--sp-s)"><b>finakids.com y finakids.cl están libres.</b> El nombre lo eligió el dueño de la idea y el dominio acompaña, así que no había nada que discutir. Las otras tres quedan verificadas en <span class="mono">meta.json</span> por si el orquestador tiene que desempatar con otra idea.</p>
+  </div>
+</section>
+
+<!-- LAS TRES COSAS -->
+<section class="sec">
+  <div class="container">
+    <div class="caja caja-tinta trama" style="padding:var(--sp-l) var(--sp-s)">
+      <span class="rotulo">En resumen</span>
+      <h2 style="color:var(--papel);margin-top:8px">Las tres cosas que habría que configurar para que esto fuera real</h2>
+      <div class="grilla g3" style="margin-top:var(--sp-m)">
+        <div>
+          <div style="font-family:var(--display);font-weight:800;font-size:2.4rem;color:var(--amarillo);line-height:1">01</div>
+          <h3 style="color:var(--papel);margin-top:6px">Una cuenta de Anthropic y el cron del domingo</h3>
+          <p class="chico" style="color:#B6B1CC;margin-top:6px">Sonnet 5 para el informe semanal, Opus 4.8 para el reporte mensual, caché de prompt activado. Es lo más barato y lo más rápido de las tres: se hace en una semana y cuesta $180 por familia al mes.</p>
+        </div>
+        <div>
+          <div style="font-family:var(--display);font-weight:800;font-size:2.4rem;color:var(--amarillo);line-height:1">02</div>
+          <h3 style="color:var(--papel);margin-top:6px">Un abogado de datos y un DPO — <i>antes</i> de la primera instalación</h3>
+          <p class="chico" style="color:#B6B1CC;margin-top:6px">Para cerrar los cinco "por validar" de arriba, y sobre todo el que puede volar el negocio: si el patrocinio de un banco dentro de una app infantil cuenta como publicidad dirigida a menores. Esa pregunta se responde <b>antes</b> de firmar, no después.</p>
+        </div>
+        <div>
+          <div style="font-family:var(--display);font-weight:800;font-size:2.4rem;color:var(--amarillo);line-height:1">03</div>
+          <h3 style="color:var(--papel);margin-top:6px">Un banco ancla que firme los $18 millones</h3>
+          <p class="chico" style="color:#B6B1CC;margin-top:6px">Sin él, el CAC de $37.400 se come la línea de familias y no hay negocio: hay una app bonita. Todo lo demás de esta página es ejecutable; esto es lo único que hay que <b>ganar</b>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <p><b class="mono">Finakids</b> · finakids.com verificado libre (<span class="mono">HTTP 404</span>, rdap.verisign.com, 13-07-2026). Precios de modelo tomados de la lista pública de Anthropic; todo lo demás con la aritmética a la vista.</p>
+    <p style="margin-top:6px"><a href="index.html">Producto</a> · <a href="demo/index.html">Demo</a> · <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a> · <a href="../index.html">← Todas las ideas</a></p>
+  </div>
+</footer>
+
+<script>
+const btnMenu = document.getElementById('btnMenu');
+const menuMovil = document.getElementById('menuMovil');
+btnMenu.addEventListener('click', () => {
+  const ab = menuMovil.classList.toggle('abierto');
+  btnMenu.setAttribute('aria-expanded', ab ? 'true' : 'false');
+});
+</script>
+</body>
+</html>
