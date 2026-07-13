@@ -187,8 +187,10 @@
           <circle cx="710" cy="144.3" r="5"   fill="#A81E12" stroke="#FFFDF7" stroke-width="2"/>
           <circle cx="710" cy="220.0" r="4.5" fill="#B8811A" stroke="#FFFDF7" stroke-width="2"/>
 
-          <!-- etiquetas directas, selectivas: sólo el punto final -->
-          <g font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">
+          <!-- Etiquetas directas, selectivas: sólo el punto final.
+               Halo del color de la superficie para que las líneas no las corten. -->
+          <g font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600"
+             stroke="#FFFDF7" stroke-width="4" stroke-linejoin="round" paint-order="stroke">
             <text x="700" y="42"  fill="#57503F" text-anchor="end">$16,9M · 291 clientes</text>
             <text x="700" y="138" fill="#15120D" text-anchor="end">$11,1M · 192 clientes</text>
             <text x="700" y="214" fill="#57503F" text-anchor="end">$6,6M · 114 clientes</text>
@@ -233,9 +235,15 @@
         mes 25.</b>
       </p>
 
+      <!-- Dos paneles = dos leyendas. Con una sola, el verde significaría dos cosas
+           distintas en la misma figura. -->
       <div class="leyenda">
+        <span class="leyenda__g">Panel de arriba</span>
         <span><i style="background:#1F7A4C"></i>Ingresos mensuales</span>
         <span><i style="background:#A81E12"></i>Gastos mensuales</span>
+      </div>
+      <div class="leyenda">
+        <span class="leyenda__g">Panel de abajo</span>
         <span><i class="pt" style="background:#A81E12"></i>Caja — plan normal</span>
         <span><i class="pt" style="background:#B8811A"></i>Caja — cortando marketing</span>
         <span><i class="pt" style="background:#1F7A4C"></i>Caja — congelando el equipo</span>
@@ -283,9 +291,9 @@
           <circle cx="710" cy="54.0" r="4" fill="#A81E12" stroke="#FFFDF7" stroke-width="2"/>
           <circle cx="710" cy="88.7" r="4" fill="#1F7A4C" stroke="#FFFDF7" stroke-width="2"/>
           <text x="700" y="48" font-family="IBM Plex Mono, monospace" font-size="11"
-                font-weight="600" fill="#57503F" text-anchor="end">Gastos $14,8M</text>
+                font-weight="600" fill="#57503F" text-anchor="end" stroke="#FFFDF7" stroke-width="4" stroke-linejoin="round" paint-order="stroke">Gastos $14,8M</text>
           <text x="700" y="105" font-family="IBM Plex Mono, monospace" font-size="11"
-                font-weight="600" fill="#57503F" text-anchor="end">Ingresos $11,1M</text>
+                font-weight="600" fill="#57503F" text-anchor="end" stroke="#FFFDF7" stroke-width="4" stroke-linejoin="round" paint-order="stroke">Ingresos $11,1M</text>
 
           <!-- los escalones de contratación -->
           <g stroke="#B9B099" stroke-width="1">
@@ -335,7 +343,8 @@
           <circle cx="710" cy="464"   r="4" fill="#B8811A" stroke="#FFFDF7" stroke-width="2"/>
           <circle cx="710" cy="411.2" r="4.5" fill="#1F7A4C" stroke="#FFFDF7" stroke-width="2"/>
 
-          <g font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600">
+          <g font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600"
+             stroke="#FFFDF7" stroke-width="4" stroke-linejoin="round" paint-order="stroke">
             <text x="700" y="405" fill="#57503F" text-anchor="end">Congelando el equipo: +$27,9M</text>
             <text x="700" y="484" fill="#A81E12" text-anchor="end">Plan normal: $0 · Cortando marketing: −$2,5M</text>
           </g>

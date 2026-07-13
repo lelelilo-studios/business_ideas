@@ -180,7 +180,7 @@ a:hover { text-decoration-thickness: 2px; }
 .btn--fantasma:hover { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
 .btn--rojo { background: var(--rojo); border-color: var(--rojo); color: var(--hoja); }
 .btn--rojo:hover { background: var(--rojo-hover); border-color: var(--rojo-hover); }
-.btn--chico { padding: 8px 13px; min-height: 40px; font-size: 0.72rem; }
+.btn--chico { padding: 8px 13px; min-height: 44px; font-size: 0.72rem; }
 
 /* --------------------------------------------------------------- hoja ---- */
 /* La superficie base: una hoja de papel sobre el escritorio. Sin sombra suave,

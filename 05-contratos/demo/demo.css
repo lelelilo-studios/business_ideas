@@ -2,14 +2,22 @@
    ANTEFIRMA — Demo. Marginalia jurídica aplicada al producto.
    ----------------------------------------------------------------------------
    El problema difícil: leer un documento largo en un teléfono.
-   La solución, en tres partes:
-     1. En móvil el visor arranca en "Sólo riesgos" — 9 cláusulas, no 24.
-        Nadie lee un contrato completo en 390px, así que no fingimos que sí.
-     2. La anotación NO es un tooltip: es un panel que sube desde abajo,
+   La solución, en cuatro partes:
+     1. En 390px el visor arranca filtrado: sólo las cláusulas que muerden
+        (críticas y a revisar — 12 de 15 en el arriendo del demo), sin las
+        estándar. Nadie lee un contrato completo en un teléfono, y no fingimos
+        que sí.
+     2. El texto jurídico de cada cláusula va recortado a 4 líneas. Lo que se
+        lee es la traducción, no la jerga. La jerga está a un toque, si la
+        quieres.
+     3. La anotación NO es un tooltip: es un panel que sube desde abajo,
         arrastrable, con scroll propio. En escritorio, la misma anotación vive
         en el margen derecho, que es donde vive una nota al margen.
-     3. Un navegador flotante "◀ Riesgo 3 de 9 ▶" fijo abajo: puedes recorrer
-        todo el peligro del contrato con el pulgar, sin buscar nada.
+     4. Un navegador "◀ Riesgo 3 de 14 ▶" para recorrer todo el peligro con el
+        pulgar. Existe DOS veces: flotante cuando el panel está cerrado, y
+        dentro del panel cuando está abierto — porque con el panel arriba el
+        flotante queda bajo el velo y sería inalcanzable. Ese detalle es la
+        diferencia entre que la función exista y que se pueda usar.
    ========================================================================== */
 
 /* ------------------------------------------------------------- cascarón -- */
@@ -247,7 +255,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--foco); outline-offs
   backdrop-filter: blur(6px);
 }
 .filtro {
-  min-height: 40px; padding: 7px 12px;
+  min-height: 44px; padding: 7px 12px;
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em;
   color: var(--tinta-2); background: var(--hoja);
   border: 1px solid var(--regla-fuerte);
@@ -261,6 +269,11 @@ input[type="range"]:focus-visible { outline: 2px solid var(--foco); outline-offs
 .filtro__punto--critico  { background: var(--critico); }
 .filtro__punto--revisar  { background: var(--revisar); }
 .filtro__punto--estandar { background: var(--estandar); }
+
+/* El navegador flotante de riesgos vive fijo abajo: hay que dejarle sitio para
+   que nunca tape la última cláusula. */
+.panel[data-panel="documento"] { padding-bottom: 84px; }
+@media (min-width: 75em) { .panel[data-panel="documento"] { padding-bottom: var(--sp-l); } }
 
 .visor { display: block; }
 @media (min-width: 75em) {
@@ -308,7 +321,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--foco); outline-offs
 }
 .clausula__ver {
   font-family: var(--mono); font-size: 0.7rem; color: var(--rojo);
-  background: none; padding: 6px 0; min-height: 36px; text-decoration: underline;
+  background: none; padding: 6px 0; min-height: 44px; text-decoration: underline;
   text-underline-offset: 3px;
 }
 @media (min-width: 48em) { .clausula__ver { margin-left: calc(2.2em + var(--sp-xs)); } }
@@ -410,9 +423,30 @@ input[type="range"]:focus-visible { outline: 2px solid var(--foco); outline-offs
 .hoja-inf__tirador::before {
   content: ""; width: 42px; height: 4px; background: var(--regla-fuerte); border-radius: 2px;
 }
-.hoja-inf__cerrar {
-  position: absolute; top: 4px; right: 4px; width: 44px; height: 44px;
-  display: grid; place-items: center; color: var(--tinta-3);
+/* El navegador de riesgos, dentro del panel. Con el panel abierto el flotante
+   queda bajo el velo: si no estuviera esto, no podrías pasar al riesgo siguiente
+   sin cerrar y volver a abrir. */
+.hoja-inf__nav {
+  display: flex; align-items: stretch; flex: none;
+  border-block: 1px solid var(--regla); background: var(--hoja-2);
+}
+.hoja-inf__nav button {
+  width: 48px; min-height: 48px; background: none; color: var(--tinta);
+  display: grid; place-items: center;
+}
+.hoja-inf__nav button:hover:not(:disabled) { background: var(--rojo); color: var(--hoja); }
+.hoja-inf__nav button:disabled { opacity: .28; cursor: not-allowed; }
+.hoja-inf__nav button:last-child {
+  margin-left: auto; border-left: 1px solid var(--regla); color: var(--tinta-3);
+}
+.hoja-inf__nav-txt {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 6px 12px; font-family: var(--mono); font-size: 0.74rem;
+  border-inline: 1px solid var(--regla);
+}
+.hoja-inf__nav-txt b { font-weight: 600; }
+.hoja-inf__nav-txt small {
+  font-size: 0.62rem; color: var(--tinta-3); letter-spacing: 0.06em; text-transform: uppercase;
 }
 .hoja-inf__cuerpo {
   overflow-y: auto; -webkit-overflow-scrolling: touch;

@@ -280,6 +280,14 @@
 .leyenda span { display: inline-flex; align-items: center; gap: 7px; }
 .leyenda i { width: 14px; height: 3px; flex: none; }
 .leyenda i.pt { width: 10px; height: 10px; border-radius: 50%; }
+/* Cuando una figura tiene dos paneles, cada uno lleva su propia leyenda rotulada:
+   si no, el mismo color significaría dos cosas distintas en la misma figura. */
+.leyenda__g {
+  font-size: 0.64rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--tinta-3);
+  padding-right: 4px; border-right: 1px solid var(--regla);
+}
+.leyenda + .leyenda { margin-top: calc(-1 * var(--sp-2xs)); }
 .grafico__nota {
   margin-top: var(--sp-s); padding-top: var(--sp-s); border-top: 1px solid var(--regla);
   font-size: 0.78rem; color: var(--tinta-2); line-height: 1.65;
@@ -289,7 +297,7 @@
 /* Tabla de datos alternativa al gráfico */
 .grafico details summary {
   font-family: var(--mono); font-size: 0.72rem; color: var(--tinta-3);
-  cursor: pointer; padding: var(--sp-xs) 0; min-height: 40px;
+  cursor: pointer; padding: var(--sp-xs) 0; min-height: 44px;
   display: flex; align-items: center;
 }
 .grafico details summary:hover { color: var(--rojo); }

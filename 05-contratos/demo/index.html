@@ -276,11 +276,28 @@
 <div class="velo" id="velo"></div>
 <div class="hoja-inf" id="hoja-inf" role="dialog" aria-modal="false" aria-label="Anotación de la cláusula">
   <div class="hoja-inf__tirador" id="hoja-tirador"></div>
-  <button class="hoja-inf__cerrar" id="hoja-cerrar" aria-label="Cerrar la anotación">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
-  </button>
+
+  <!-- El navegador de riesgos vive TAMBIÉN dentro del panel: con el panel abierto,
+       el flotante queda bajo el velo y sería inalcanzable con el pulgar. -->
+  <div class="hoja-inf__nav" role="group" aria-label="Navegar entre riesgos">
+    <button id="nav2-prev" aria-label="Riesgo anterior">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="hoja-inf__nav-txt" id="nav2-txt" aria-live="polite"></div>
+    <button id="nav2-next" aria-label="Riesgo siguiente">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button id="hoja-cerrar" aria-label="Cerrar la anotación">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
   <div class="hoja-inf__cuerpo" id="hoja-cuerpo"></div>
 </div>
 

@@ -10,10 +10,30 @@
     "metodo": "_kit/check-domain.sh — RDAP de Verisign para .com (404 = libre), NIC Chile para .cl",
     "evidencia": "zurcia .com AVAILABLE (http 404) .cl AVAILABLE",
     "alternativas": [
-      { "dominio": "horaza.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
-      { "dominio": "horalta.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
-      { "dominio": "sillana.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" },
-      { "dominio": "zurcio.com", "http": 404, "estado": "AVAILABLE", "cl": "AVAILABLE" }
+      {
+        "dominio": "horaza.com",
+        "http": 404,
+        "estado": "AVAILABLE",
+        "cl": "AVAILABLE"
+      },
+      {
+        "dominio": "horalta.com",
+        "http": 404,
+        "estado": "AVAILABLE",
+        "cl": "AVAILABLE"
+      },
+      {
+        "dominio": "sillana.com",
+        "http": 404,
+        "estado": "AVAILABLE",
+        "cl": "AVAILABLE"
+      },
+      {
+        "dominio": "zurcio.com",
+        "http": 404,
+        "estado": "AVAILABLE",
+        "cl": "AVAILABLE"
+      }
     ]
   },
   "direccion_de_arte": "Libro de citas: papel crema con pauta, tinta negra y timbre verde botella — el cuaderno de agenda que el producto reemplaza, no un dashboard oscuro.",
@@ -28,14 +48,34 @@
     "sello": "#14624A",
     "ladrillo": "#A83A22",
     "ambar": "#8A6412",
-    "graficos": ["#C0451F", "#1B8A5F", "#3C6DB8"]
+    "graficos": [
+      "#C0451F",
+      "#1B8A5F",
+      "#3C6DB8"
+    ]
   },
   "precio": {
     "moneda": "CLP",
     "planes": [
-      { "nombre": "Silla", "mensual": 34000, "para": "1 profesional", "mensajes_incluidos": 600 },
-      { "nombre": "Local", "mensual": 79000, "para": "2 a 6 profesionales", "mensajes_incluidos": 2500, "destacado": true },
-      { "nombre": "Cadena", "mensual": 210000, "para": "3 a 10 sucursales", "mensajes_incluidos": 8000 }
+      {
+        "nombre": "Silla",
+        "mensual": 34000,
+        "para": "1 profesional",
+        "mensajes_incluidos": 600
+      },
+      {
+        "nombre": "Local",
+        "mensual": 79000,
+        "para": "2 a 6 profesionales",
+        "mensajes_incluidos": 2500,
+        "destacado": true
+      },
+      {
+        "nombre": "Cadena",
+        "mensual": 210000,
+        "para": "3 a 10 sucursales",
+        "mensajes_incluidos": 8000
+      }
     ],
     "excedente_por_mensaje": 19,
     "precio_fundador": 49000,
@@ -73,7 +113,10 @@
     "mrr_mes24_base_clp": 53940000,
     "arr_mes24_base_usd": 674000,
     "break_even": "mes 24",
-    "valle_de_caja": { "mes": 23, "caja_clp": 30500000 },
+    "valle_de_caja": {
+      "mes": 23,
+      "caja_clp": 30500000
+    },
     "probabilidad_1m_arr_30m": "10–18%, condicional a cumplir M3 en el mes 12",
     "resultado_modal": "35–45% de terminar en US$300–500k de ARR, bootstrapeado, sin levantar"
   },
@@ -86,6 +129,30 @@
     "Flow (pagos en CLP)",
     "Fly.io, Sentry, Axiom"
   ],
-  "paginas": ["index.html", "demo/index.html", "negocio.html", "roadmap.html", "stack.html"],
-  "estado": "prototipo navegable, sin backend"
+  "paginas": [
+    "index.html",
+    "demo/index.html",
+    "negocio.html",
+    "roadmap.html",
+    "stack.html"
+  ],
+  "estado": "prototipo navegable, sin backend",
+  "folder": "03-agenda",
+  "brand": "Zurcia",
+  "domain": "zurcia.com",
+  "domain_evidence": "zurcia .com AVAILABLE (http 404) .cl AVAILABLE — _kit/check-domain.sh — RDAP de Verisign para .com (404 = libre), NIC Chile para .cl, 2026-07-12",
+  "alternates": [
+    "horaza.com",
+    "horalta.com",
+    "sillana.com",
+    "zurcio.com"
+  ],
+  "tagline": "La hora que se cae, se vuelve a vender sola.",
+  "category": "SaaS vertical · Servicios locales",
+  "market": "Chile → LatAm",
+  "icp": "Peluquería o barbería de 2 a 5 sillas, comuna urbana de clase media, dueña presente que corta pelo y contesta el WhatsApp al mismo tiempo. $9–14M de venta al mes.",
+  "price_clp": "Desde $34.000/mes · plan Local $79.000/mes",
+  "accent": "#14624A",
+  "problem": "Los servicios locales chilenos (peluquerías, dentistas, veterinarias, talleres, kinesiólogos) agendan por WhatsApp a mano. Una persona contesta mensajes todo el día. Los no-shows y las cancelaciones tardías se comen el margen —una hora perdida no se recupera nunca— y la agenda tiene huecos mientras hay gente esperando a la que nadie avisa.",
+  "status": "prototipo navegable, sin backend"
 }

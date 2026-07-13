@@ -162,8 +162,12 @@
   function informe() {
     ver("pantalla-informe");
     var c = estado.contrato;
-    // En pantalla ancha mostramos el documento completo; en móvil, sólo riesgos.
-    estado.soloRiesgos = !window.matchMedia("(min-width: 75em)").matches;
+    // En pantalla ancha mostramos el documento completo. En teléfono arrancamos en
+    // "sólo riesgos" y además dejamos fuera las cláusulas estándar: en 390px lo que
+    // se quiere leer son las que muerden, no las que están bien.
+    var ancha = window.matchMedia("(min-width: 75em)").matches;
+    estado.soloRiesgos = !ancha;
+    estado.niveles = { critico: true, revisar: true, estandar: ancha };
 
     $("#doc-nombre").textContent = c.archivo;
     $("#doc-meta").textContent = c.paginas + " págs · " + c.palabras.toLocaleString("es-CL") + " palabras";
@@ -372,7 +376,7 @@
       h += '<div class="redline">' +
         '<div class="redline__cab"><span>Lo que pedirías cambiar</span>' +
           '<button class="btn btn--chico" data-copiar-rl="' + cl.n + '" ' +
-          'style="background:var(--papel);color:var(--tinta);border-color:var(--papel);min-height:32px;padding:5px 9px">' +
+          'style="background:var(--papel);color:var(--tinta);border-color:var(--papel);min-height:44px;padding:8px 11px">' +
           IC.copiar + "Copiar</button></div>" +
         '<div class="redline__cuerpo">' +
           "<del>" + esc(r.redline.original) + "</del>" +
@@ -420,30 +424,47 @@
   function cerrarHoja() {
     $("#hoja-inf").classList.remove("abierta");
     $("#velo").classList.remove("visible");
+    pintarNav();   // al cerrar el panel vuelve el navegador flotante
   }
 
-  /* Navegador de riesgos: recorrer el peligro con el pulgar. */
+  /* Navegador de riesgos: recorrer el peligro con el pulgar.
+     Hay DOS: el flotante (panel cerrado) y el del panel (panel abierto). Con el
+     panel abierto el flotante queda bajo el velo, así que sería inalcanzable. */
+  var NIVEL = { critico: "Crítico", revisar: "Revisar", estandar: "Estándar" };
+
   function pintarNav() {
     var nav = $("#navriesgo");
     var lista = riesgosVisibles();
-    if (estado.tab !== "documento" || !lista.length) { nav.hidden = true; return; }
-    nav.hidden = false;
+    var abierta = $("#hoja-inf").classList.contains("abierta");
+
+    if (estado.tab !== "documento" || !lista.length) {
+      nav.hidden = true;
+      $("#nav2-txt").textContent = "";
+      return;
+    }
+    nav.hidden = abierta;   // con el panel abierto manda el navegador del panel
 
     var idx = lista.findIndex(function (cl) { return cl.n === estado.activa; });
     var pos = idx < 0 ? 0 : idx;
     var actual = lista[pos];
 
-    $("#nav-txt").innerHTML =
-      "<b>Riesgo " + (pos + 1) + " de " + lista.length + "</b>" +
-      "<small>Cláusula " + actual.n + " · " + { critico: "Crítico", revisar: "Revisar", estandar: "Estándar" }[actual.riesgo.nivel] + "</small>";
-    $("#nav-prev").disabled = pos === 0;
-    $("#nav-next").disabled = pos === lista.length - 1;
-
-    $("#nav-prev").onclick = function () { if (pos > 0) abrir(lista[pos - 1].n); };
-    $("#nav-next").onclick = function () {
+    var html = "<b>Riesgo " + (pos + 1) + " de " + lista.length + "</b>" +
+               "<small>Cláusula " + actual.n + " · " + NIVEL[actual.riesgo.nivel] + "</small>";
+    var irPrev = function () { if (pos > 0) abrir(lista[pos - 1].n); };
+    var irNext = function () {
       if (idx < 0) { abrir(lista[0].n); return; }
       if (pos < lista.length - 1) abrir(lista[pos + 1].n);
     };
+
+    [["#nav-txt", "#nav-prev", "#nav-next"], ["#nav2-txt", "#nav2-prev", "#nav2-next"]]
+      .forEach(function (ids) {
+        $(ids[0]).innerHTML = html;
+        var prev = $(ids[1]), next = $(ids[2]);
+        prev.disabled = pos === 0;
+        next.disabled = idx >= 0 && pos === lista.length - 1;
+        prev.onclick = irPrev;
+        next.onclick = irNext;
+      });
   }
 
   /* ---------------------------------------------------------------- FECHAS */
@@ -614,7 +635,7 @@
         '<div class="redline">' +
           '<div class="redline__cab"><span>Texto propuesto</span>' +
             '<button class="btn btn--chico" data-rl="' + cl.n + '" ' +
-            'style="background:var(--papel);color:var(--tinta);border-color:var(--papel);min-height:32px;padding:5px 9px">' +
+            'style="background:var(--papel);color:var(--tinta);border-color:var(--papel);min-height:44px;padding:8px 11px">' +
             IC.copiar + "Copiar</button></div>" +
           '<div class="redline__cuerpo"><del>' + esc(cl.riesgo.redline.original) + "</del>" +
             "<ins>" + esc(cl.riesgo.redline.propuesto) + "</ins></div>" +
