@@ -72,6 +72,7 @@ body {
   text-decoration:none; transform:translateY(-200%);
 }
 .skip:focus { transform:none; }
+.skip { min-height:44px; display:inline-flex; align-items:center; }
 
 /* ============================================================== masthead === */
 .masthead { padding-block:var(--sp-xl) var(--sp-l); }
@@ -131,6 +132,193 @@ body {
 /* Cada familia es una banda a sangre completa con su propio suelo. El cambio
    de temperatura (tinta cálida → grafito frío) es lo que avisa que entraste
    a otra pieza, antes de que leas nada. */
+/* ------------------------------------------------------------------
+   La banda del ranking. El test del LLM es el dato que decide si una
+   idea vale la pena, asi que va arriba, no escondido en otra pagina.
+   Dos colores de veredicto y nada mas: verde aprueba, rojo reprueba,
+   y "justo" no gasta un tercer color (es un disco hueco punteado).
+   ------------------------------------------------------------------ */
+.rk {
+  --bg:#0C0F14; --card:#141A21; --line:#26303B; --sig:#E6EBF0;
+  --mute:#94A2AF; --ok:#3DD68C; --no:#FF6B5E;
+  position:relative; background:var(--bg); color:var(--sig);
+  border-block:1px solid var(--line); padding-block:var(--sp-xl);
+}
+.rk__kicker {
+  font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--mute);
+}
+.rk__top { margin-top:var(--sp-m); }
+.rk__title {
+  font-size:var(--step-3); font-weight:700; letter-spacing:-.02em;
+  text-wrap:balance; max-width:22ch;
+}
+.rk__lede {
+  margin-top:var(--sp-s); color:var(--mute); max-width:var(--measure);
+  line-height:1.65; font-size:var(--step-0);
+}
+.rk__lede em { color:var(--sig); font-style:italic; }
+
+.rk__list {
+  list-style:none; margin-top:var(--sp-l);
+  display:grid; gap:1px; background:var(--line);
+  border:1px solid var(--line);
+}
+.rk__row { background:var(--card); }
+.rk__row a {
+  display:grid; grid-template-columns:auto 1fr auto; gap:var(--sp-2xs) var(--sp-s);
+  align-items:baseline; padding:var(--sp-s) var(--sp-m);
+  text-decoration:none; min-height:44px;
+}
+.rk__row a:hover { background:color-mix(in srgb, var(--sig) 5%, transparent); }
+.rk__p {
+  grid-row:1 / span 2; align-self:center;
+  font-size:var(--step-3); font-weight:700; color:var(--mute);
+  min-width:2ch; text-align:right;
+}
+.rk__b { font-weight:700; font-size:var(--step-1); color:var(--sig); }
+.rk__q {
+  grid-column:2; color:var(--mute); font-size:var(--step--1);
+  line-height:1.55; text-wrap:pretty;
+}
+.rk__s { grid-column:3; grid-row:1; color:var(--sig); font-size:var(--step-0); }
+.rk__v {
+  grid-column:3; grid-row:2; font-size:.72rem; letter-spacing:.08em;
+  text-transform:uppercase; text-align:right;
+}
+.rk__row.v--aprueba .rk__v { color:var(--ok); }
+.rk__row.v--reprueba .rk__v { color:var(--no); }
+.rk__row.v--justo .rk__v { color:var(--mute); }
+.rk__row.v--aprueba { box-shadow:inset 3px 0 0 var(--ok); }
+.rk__row.v--reprueba { box-shadow:inset 3px 0 0 var(--no); }
+.rk__row.v--justo { box-shadow:inset 3px 0 0 var(--mute); }
+
+.rk__facts {
+  margin-top:var(--sp-l); display:grid; gap:1px;
+  background:var(--line); border:1px solid var(--line);
+}
+.rk__facts > div { background:var(--card); padding:var(--sp-s) var(--sp-m); }
+.rk__facts dt {
+  color:var(--sig); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+}
+.rk__facts dd {
+  color:var(--mute); font-size:var(--step--1); line-height:1.6;
+  margin-top:var(--sp-3xs); font-family:'Space Grotesk',system-ui,sans-serif;
+}
+.rk__cta {
+  margin-top:var(--sp-l);
+  display:inline-flex; align-items:center; gap:var(--sp-2xs);
+  min-height:44px; padding-inline:var(--sp-m);
+  background:var(--sig); color:var(--bg); font-weight:500;
+  text-decoration:none; border-radius:2px;
+}
+.rk__cta:hover { filter:brightness(.92); }
+
+/* La insignia de puesto que viaja en cada tarjeta de idea. */
+.idea__rank {
+  position:relative; z-index:1;
+  display:inline-flex; align-items:center; gap:.4em;
+  align-self:start; justify-self:end;
+  padding:.25em .6em; border:1px solid var(--line);
+  border-radius:2px; text-decoration:none;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--mute-2); white-space:nowrap;
+}
+.idea__rank b { color:var(--sig); font-weight:500; }
+.idea__rank:hover { border-color:currentColor; }
+.idea__rank::after { content:""; position:absolute; inset:-10px -6px; }
+.idea__rank.v--aprueba { color:#3DD68C; }
+.idea__rank.v--reprueba { color:#FF6B5E; }
+.idea__rank.v--justo { color:#B9A25E; }
+
+@media (min-width:48em) {
+  .rk { padding-block:var(--sp-2xl); }
+  .rk__facts { grid-template-columns:1fr 1fr; }
+  .rk__row a {
+    grid-template-columns:auto 12rem 1fr auto auto;
+    align-items:center; gap:var(--sp-m);
+  }
+  .rk__p { grid-row:1; font-size:var(--step-4); }
+  .rk__b { grid-column:2; }
+  .rk__q { grid-column:3; }
+  .rk__s { grid-column:4; grid-row:1; }
+  .rk__v { grid-column:5; grid-row:1; min-width:7ch; }
+}
+
+/* ------------------------------------------------------------------
+   La banda del sistema. No es una idea: es la maquina que opera a las
+   otras 21, asi que va arriba de todas y no se parece a ninguna.
+   Terminal de mando: verde de senal, mono, densidad.
+   ------------------------------------------------------------------ */
+.sis {
+  --bg:#0B0E10; --card:#12171B; --line:#243038; --hair:#161D22;
+  --mute:#8D9AA3; --mute-2:#7C8892; --sig:#D6E2E8;
+  position:relative; background:var(--bg); color:var(--sig);
+  border-block:1px solid var(--line); padding-block:var(--sp-xl);
+}
+.sis__kicker {
+  display:flex; align-items:center; gap:var(--sp-2xs);
+  font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--acc);
+}
+.sis__dot {
+  width:.5rem; height:.5rem; border-radius:50%; background:var(--acc);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--acc) 22%, transparent);
+  animation:sis-pulse 2.4s ease-in-out infinite;
+}
+@keyframes sis-pulse { 50% { opacity:.35; } }
+@media (prefers-reduced-motion:reduce) { .sis__dot { animation:none; } }
+.sis__top { margin-top:var(--sp-m); display:grid; gap:var(--sp-s); }
+.sis__title { font-size:var(--step-4); font-weight:700; letter-spacing:-.03em; }
+.sis__domain {
+  display:flex; align-items:center; gap:var(--sp-2xs); flex-wrap:wrap;
+  color:var(--mute-2); font-size:var(--step--1); margin-top:.2em;
+}
+.sis__tagline {
+  font-size:var(--step-1); color:var(--sig); max-width:34ch; text-wrap:balance;
+}
+.sis__problem {
+  margin-top:var(--sp-m); color:var(--mute); max-width:var(--measure);
+  font-size:var(--step-0); line-height:1.65;
+}
+.sis__facts {
+  margin-top:var(--sp-l); display:grid; gap:1px;
+  background:var(--line); border:1px solid var(--line);
+}
+.sis__facts > div { background:var(--card); padding:var(--sp-s) var(--sp-m); }
+.sis__facts dt {
+  color:var(--acc); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+}
+.sis__facts dd {
+  color:var(--mute); font-size:var(--step--1); line-height:1.6;
+  margin-top:var(--sp-3xs); font-family:'Space Grotesk',system-ui,sans-serif;
+}
+.sis__facts em { color:var(--sig); font-style:italic; }
+.sis__links {
+  margin-top:var(--sp-l); display:flex; flex-wrap:wrap; align-items:center;
+  gap:var(--sp-s);
+}
+.sis__cta {
+  display:inline-flex; align-items:center; gap:var(--sp-2xs);
+  min-height:44px; padding-inline:var(--sp-m);
+  background:var(--acc); color:var(--acc-on); font-weight:500;
+  text-decoration:none; border-radius:2px;
+}
+.sis__cta:hover { filter:brightness(1.1); }
+.sis__docs { display:flex; flex-wrap:wrap; gap:var(--sp-xs); }
+.sis__docs a {
+  display:inline-flex; align-items:center; min-height:44px;
+  color:var(--mute); font-size:var(--step--1);
+  text-decoration-color:var(--line); text-underline-offset:4px;
+}
+.sis__docs a:hover { color:var(--sig); text-decoration-color:var(--acc); }
+@media (min-width:48em) {
+  .sis { padding-block:var(--sp-2xl); }
+  .sis__top { grid-template-columns:1fr 1fr; align-items:end; gap:var(--sp-l); }
+  .sis__facts { grid-template-columns:1fr 1fr; }
+}
+
 .fam { position:relative; background:var(--bg); border-top:1px solid var(--line); }
 .fam > .container { position:relative; z-index:1; }
 /* retícula técnica: sólo se ve en el encabezado, las tarjetas la tapan */
@@ -424,6 +612,11 @@ body {
         <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
+      <a href="#ranking">
+        <span class="jump__n mono">#1</span>
+        <span class="jump__t">El ranking<small>&iquest;Por qu&eacute; no ChatGPT? · las 21 ordenadas</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
       <a href="#autonomas">
         <span class="jump__n mono">05</span>
         <span class="jump__t">Autónomas<small>Se operan solas · nadie en el loop</small></span>
@@ -488,6 +681,27 @@ body {
         </nav>
       </div>
     </section>
+    <section class="rk" id="ranking" aria-labelledby="h-rk">
+      <div class="container">
+        <p class="rk__kicker mono">El veredicto · las 21, ordenadas</p>
+        <div class="rk__top">
+          <h2 class="rk__title" id="h-rk">&iquest;Por qu&eacute; te pagar&iacute;an a ti, y no US$20 al mes a ChatGPT?</h2>
+          <p class="rk__lede">Es la pregunta que mata a la mitad de las ideas de IA, as&iacute; que
+            cada una de las 21 la rinde como examen. El hallazgo, despu&eacute;s de leerlas juntas:
+            <em>el foso nunca est&aacute; en el modelo — est&aacute; en el cable que va del modelo al mundo.</em></p>
+        </div>
+        <ol class="rk__list"><li class="rk__row v--aprueba"><a href="09-despacho/index.html"><span class="rk__p mono">1</span><span class="rk__b">Kilonauta</span><span class="rk__q">Ningún proveedor de modelos va a negociar una tarifa con Chilexpress ni imprimir tu etiqueta. Lo que se vende no es una respuesta: es un contrato de compra mayorista y un pedazo de papel adhesivo.</span><span class="rk__s mono">81.8</span><span class="rk__v mono">aprueba</span></a></li><li class="rk__row v--aprueba"><a href="02-cobranza/index.html"><span class="rk__p mono">2</span><span class="rk__b">Tinoria</span><span class="rk__q">Un chat te redacta el correo de cobranza; no sabe quién te debe, no lo manda a las 9:00 del martes, y no se acuerda en agosto de la promesa de pago que te hicieron en marzo.</span><span class="rk__s mono">80.9</span><span class="rk__v mono">aprueba</span></a></li><li class="rk__row v--aprueba"><a href="10-contabilidad/index.html"><span class="rk__p mono">3</span><span class="rk__b">Talonio</span><span class="rk__q">Un contador no firma un F29 que calculó un chatbot. Acá la aritmética la hace el servidor con test unitario y el modelo tiene prohibido sumar — y eso, precisamente, es lo que le vendes en contra del LLM.</span><span class="rk__s mono">79.4</span><span class="rk__v mono">aprueba</span></a></li><li class="rk__row v--aprueba"><a href="19-precios/index.html"><span class="rk__p mono">4</span><span class="rk__b">Cotejia</span><span class="rk__q">El precio que tu competencia puso a las 3 de la mañana no está en ningún modelo: hay que ir a mirarlo, todas las noches. Y la decisión de reprecio es aritmética con test unitario — «prohibido meterle un LLM».</span><span class="rk__s mono">78.9</span><span class="rk__v mono">aprueba</span></a></li><li class="rk__row v--aprueba"><a href="18-alertas/index.html"><span class="rk__p mono">5</span><span class="rk__b">Pregonia</span><span class="rk__q">Nadie va a pegar el Diario Oficial en ChatGPT todos los días a las seis de la mañana — y ése, literalmente, es el producto entero.</span><span class="rk__s mono">75.2</span><span class="rk__v mono">aprueba</span></a></li></ol>
+        <dl class="rk__facts mono">
+          <div><dt>Aprueban</dt><dd>15 de 21 — dato que el modelo no tiene, vigilancia, actuaci&oacute;n o libro.</dd></div>
+          <div><dt>Raspando</dt><dd>5 — aprueban el literal, con una defensa d&eacute;bil o de vida corta.</dd></div>
+          <div><dt>Reprueba</dt><dd>1 — Antefirma. Su propio negocio.html ya lista a ChatGPT como competidor a $0.</dd></div>
+          <div><dt>No construir&iacute;a</dt><dd>Finakids, Freatia, Cintavia — las tres fallan por techo de mercado, no por ejecuci&oacute;n.</dd></div>
+        </dl>
+        <a class="rk__cta" href="ranking/index.html"><span>Ver el ranking completo</span>
+          <svg viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+      </div>
+    </section>
     <section class="fam fam--pyme" id="pyme" aria-labelledby="h-pyme">
       <div class="container">
         <header class="fam__head">
@@ -502,6 +716,7 @@ body {
       <article class="idea" style="--acc:#D7584F;--acc-on:#0B0A09;--acc-soft:rgba(215,88,79,0.1);--acc-line:rgba(215,88,79,0.35)">
         <a class="idea__hit" href="01-licitaciones/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">01</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 6 de 21 en el ranking - el test del LLM: aprueba"><b>#6</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS vertical · Compras públicas</p>
           <h3 class="idea__brand"><a href="01-licitaciones/index.html">Adjudate</a></h3>
@@ -530,6 +745,7 @@ body {
       <article class="idea" style="--acc:#D8593D;--acc-on:#0B0A09;--acc-soft:rgba(216,89,61,0.1);--acc-line:rgba(216,89,61,0.35)">
         <a class="idea__hit" href="02-cobranza/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">02</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 2 de 21 en el ranking - el test del LLM: aprueba"><b>#2</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Fintech PYME · cuentas por cobrar</p>
           <h3 class="idea__brand"><a href="02-cobranza/index.html">Tinoria</a></h3>
@@ -558,6 +774,7 @@ body {
       <article class="idea" style="--acc:#1E936F;--acc-on:#0B0A09;--acc-soft:rgba(30,147,111,0.1);--acc-line:rgba(30,147,111,0.35)">
         <a class="idea__hit" href="03-agenda/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">03</p>
+        <a class="idea__rank v--justo" href="ranking/index.html" title="Puesto 11 de 21 en el ranking - el test del LLM: justo"><b>#11</b><span>justo</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS vertical · Servicios locales</p>
           <h3 class="idea__brand"><a href="03-agenda/index.html">Zurcia</a></h3>
@@ -586,6 +803,7 @@ body {
       <article class="idea" style="--acc:#D35C41;--acc-on:#0B0A09;--acc-soft:rgba(211,92,65,0.1);--acc-line:rgba(211,92,65,0.35)">
         <a class="idea__hit" href="04-inventario/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">04</p>
+        <a class="idea__rank v--justo" href="ranking/index.html" title="Puesto 18 de 21 en el ranking - el test del LLM: justo"><b>#18</b><span>justo</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS vertical para gastronomía · pronóstico de demanda y compras</p>
           <h3 class="idea__brand"><a href="04-inventario/index.html">Mermata</a></h3>
@@ -614,6 +832,7 @@ body {
       <article class="idea" style="--acc:#EA4638;--acc-on:#0B0A09;--acc-soft:rgba(234,70,56,0.1);--acc-line:rgba(234,70,56,0.35)">
         <a class="idea__hit" href="05-contratos/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">05</p>
+        <a class="idea__rank v--reprueba" href="ranking/index.html" title="Puesto 13 de 21 en el ranking - el test del LLM: reprueba"><b>#13</b><span>reprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Legaltech PYME</p>
           <h3 class="idea__brand"><a href="05-contratos/index.html">Antefirma</a></h3>
@@ -642,6 +861,7 @@ body {
       <article class="idea" style="--acc:#D35E43;--acc-on:#0B0A09;--acc-soft:rgba(211,94,67,0.1);--acc-line:rgba(211,94,67,0.35)">
         <a class="idea__hit" href="06-arriendos/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">06</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 7 de 21 en el ranking - el test del LLM: aprueba"><b>#7</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">PropTech / SaaS vertical</p>
           <h3 class="idea__brand"><a href="06-arriendos/index.html">Conserjo</a></h3>
@@ -670,6 +890,7 @@ body {
       <article class="idea" style="--acc:#D9F02B;--acc-on:#0B0A09;--acc-soft:rgba(217,240,43,0.1);--acc-line:rgba(217,240,43,0.35)">
         <a class="idea__hit" href="07-terreno/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">07</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 12 de 21 en el ranking - el test del LLM: aprueba"><b>#12</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Software de terreno (field service) para PYME</p>
           <h3 class="idea__brand"><a href="07-terreno/index.html">Rutamo</a></h3>
@@ -698,6 +919,7 @@ body {
       <article class="idea" style="--acc:#DB525E;--acc-on:#0B0A09;--acc-soft:rgba(219,82,94,0.1);--acc-line:rgba(219,82,94,0.35)">
         <a class="idea__hit" href="08-laboral/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">08</p>
+        <a class="idea__rank v--justo" href="ranking/index.html" title="Puesto 9 de 21 en el ranking - el test del LLM: justo"><b>#9</b><span>justo</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Regtech / Cumplimiento laboral PYME</p>
           <h3 class="idea__brand"><a href="08-laboral/index.html">Contralta</a></h3>
@@ -726,6 +948,7 @@ body {
       <article class="idea" style="--acc:#E34E22;--acc-on:#0B0A09;--acc-soft:rgba(227,78,34,0.1);--acc-line:rgba(227,78,34,0.35)">
         <a class="idea__hit" href="09-despacho/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">09</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 1 de 21 en el ranking - el test del LLM: aprueba"><b>#1</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Logística / E-commerce PYME</p>
           <h3 class="idea__brand"><a href="09-despacho/index.html">Kilonauta</a></h3>
@@ -754,6 +977,7 @@ body {
       <article class="idea" style="--acc:#E14F30;--acc-on:#0B0A09;--acc-soft:rgba(225,79,48,0.1);--acc-line:rgba(225,79,48,0.35)">
         <a class="idea__hit" href="10-contabilidad/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">10</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 3 de 21 en el ranking - el test del LLM: aprueba"><b>#3</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Contabilidad PYME / Fintech tributaria</p>
           <h3 class="idea__brand"><a href="10-contabilidad/index.html">Talonio</a></h3>
@@ -796,6 +1020,7 @@ body {
       <article class="idea" style="--acc:#FFB000;--acc-on:#0B0A09;--acc-soft:rgba(255,176,0,0.1);--acc-line:rgba(255,176,0,0.35)">
         <a class="idea__hit" href="11-correas/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">11</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 17 de 21 en el ranking - el test del LLM: aprueba"><b>#17</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Minería · confiabilidad de correas transportadoras</p>
           <h3 class="idea__brand"><a href="11-correas/index.html">Cintavia</a></h3>
@@ -827,6 +1052,7 @@ body {
       <article class="idea" style="--acc:#FFD100;--acc-on:#0B0A09;--acc-soft:rgba(255,209,0,0.1);--acc-line:rgba(255,209,0,0.35)">
         <a class="idea__hit" href="12-seguridad/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">12</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 19 de 21 en el ranking - el test del LLM: aprueba"><b>#19</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Seguridad y gestión de riesgos para minería</p>
           <h3 class="idea__brand"><a href="12-seguridad/index.html">Cuasio</a></h3>
@@ -858,6 +1084,7 @@ body {
       <article class="idea" style="--acc:#22C3AC;--acc-on:#0B0A09;--acc-soft:rgba(34,195,172,0.1);--acc-line:rgba(34,195,172,0.35)">
         <a class="idea__hit" href="13-contratistas/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">13</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 16 de 21 en el ranking - el test del LLM: aprueba"><b>#16</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Compliance y control de acceso · Minería</p>
           <h3 class="idea__brand"><a href="13-contratistas/index.html">Torniqua</a></h3>
@@ -889,6 +1116,7 @@ body {
       <article class="idea" style="--acc:#56D7EF;--acc-on:#0B0A09;--acc-soft:rgba(86,215,239,0.1);--acc-line:rgba(86,215,239,0.35)">
         <a class="idea__hit" href="14-permisos/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">14</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 14 de 21 en el ranking - el test del LLM: aprueba"><b>#14</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">RegTech industrial · permitología de proyectos</p>
           <h3 class="idea__brand"><a href="14-permisos/index.html">Cianota</a></h3>
@@ -920,6 +1148,7 @@ body {
       <article class="idea" style="--acc:#3F9BD6;--acc-on:#0B0A09;--acc-soft:rgba(63,155,214,0.1);--acc-line:rgba(63,155,214,0.35)">
         <a class="idea__hit" href="15-agua/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">15</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 20 de 21 en el ranking - el test del LLM: aprueba"><b>#20</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS industrial · Gestión hídrica y monitoreo de depósitos de relaves</p>
           <h3 class="idea__brand"><a href="15-agua/index.html">Freatia</a></h3>
@@ -965,6 +1194,7 @@ body {
       <article class="idea" style="--acc:#E93792;--acc-on:#0B0A09;--acc-soft:rgba(233,55,146,0.1);--acc-line:rgba(233,55,146,0.35)">
         <a class="idea__hit" href="16-finakids/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">16</p>
+        <a class="idea__rank v--justo" href="ranking/index.html" title="Puesto 21 de 21 en el ranking - el test del LLM: justo"><b>#21</b><span>justo</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Edtech infantil · Educación financiera B2B2C (banco → colegio → familia)</p>
           <h3 class="idea__brand"><a href="16-finakids/index.html">Finakids</a></h3>
@@ -1010,6 +1240,7 @@ body {
       <article class="idea" style="--acc:#417FE6;--acc-on:#0B0A09;--acc-soft:rgba(65,127,230,0.1);--acc-line:rgba(65,127,230,0.35)">
         <a class="idea__hit" href="17-datos-empresas/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">17</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 8 de 21 en el ranking - el test del LLM: aprueba"><b>#8</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">API de datos · KYB Chile</p>
           <h3 class="idea__brand"><a href="17-datos-empresas/index.html">Fedatia</a></h3>
@@ -1041,6 +1272,7 @@ body {
       <article class="idea" style="--acc:#FF3B30;--acc-on:#0B0A09;--acc-soft:rgba(255,59,48,0.1);--acc-line:rgba(255,59,48,0.35)">
         <a class="idea__hit" href="18-alertas/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">18</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 5 de 21 en el ranking - el test del LLM: aprueba"><b>#5</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">Vigilancia regulatoria · SaaS legal B2B autoservicio</p>
           <h3 class="idea__brand"><a href="18-alertas/index.html">Pregonia</a></h3>
@@ -1072,6 +1304,7 @@ body {
       <article class="idea" style="--acc:#F2B544;--acc-on:#0B0A09;--acc-soft:rgba(242,181,68,0.1);--acc-line:rgba(242,181,68,0.35)">
         <a class="idea__hit" href="19-precios/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">19</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 4 de 21 en el ranking - el test del LLM: aprueba"><b>#4</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS e-commerce · Inteligencia de precios</p>
           <h3 class="idea__brand"><a href="19-precios/index.html">Cotejia</a></h3>
@@ -1103,6 +1336,7 @@ body {
       <article class="idea" style="--acc:#F0A93F;--acc-on:#0B0A09;--acc-soft:rgba(240,169,63,0.1);--acc-line:rgba(240,169,63,0.35)">
         <a class="idea__hit" href="20-recepcion/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">20</p>
+        <a class="idea__rank v--justo" href="ranking/index.html" title="Puesto 15 de 21 en el ranking - el test del LLM: justo"><b>#15</b><span>justo</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">SaaS vertical · Voz con IA</p>
           <h3 class="idea__brand"><a href="20-recepcion/index.html">Fonalta</a></h3>
@@ -1134,6 +1368,7 @@ body {
       <article class="idea" style="--acc:#3B7FE6;--acc-on:#0B0A09;--acc-soft:rgba(59,127,230,0.1);--acc-line:rgba(59,127,230,0.35)">
         <a class="idea__hit" href="21-inmuebles/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">21</p>
+        <a class="idea__rank v--aprueba" href="ranking/index.html" title="Puesto 10 de 21 en el ranking - el test del LLM: aprueba"><b>#10</b><span>aprueba</span></a>
         <div class="idea__head">
           <p class="idea__cat mono">PropTech · datos de inversión inmobiliaria</p>
           <h3 class="idea__brand"><a href="21-inmuebles/index.html">Caprato</a></h3>

@@ -8,6 +8,8 @@ Ojo: es un f-string, así que las llaves del CSS van dobladas: {{ }}.
 import json, glob, html, re, colorsys
 
 todo    = [json.load(open(f)) for f in sorted(glob.glob("*/meta.json"))]
+rank    = json.load(open("ranking/ranking.json"))
+por_folder = {r["folder"]: r for r in rank["ideas"]}
 sistema = next(d for d in todo if d.get("kind") == "sistema")
 ideas   = [d for d in todo if d.get("kind") != "sistema"]
 assert len(ideas) == 21, f"esperaba 21 ideas, encontré {len(ideas)}"
@@ -84,6 +86,8 @@ def e(s):
 
 
 # --------------------------------------------------------------------- tarjeta
+BADGE = '<a class="idea__rank v--{v}" href="ranking/index.html" title="Puesto {p} de 21 en el ranking - el test del LLM: {v}"><b>#{p}</b><span>{v}</span></a>'
+
 def card(d, bg, show_market=False):
     num = d["folder"].split("-")[0]
     f = d["folder"]
@@ -92,6 +96,10 @@ def card(d, bg, show_market=False):
              f"--acc-soft:{rgba(acc, .10)};--acc-line:{rgba(acc, .35)}")
     more = ('<span class="idea__more">+ tramos</span>'
             if price_has_more(d["price_clp"]) else "")
+    # El puesto y el veredicto del test del LLM viajan con la tarjeta: son el dato
+    # que decide si la idea vale la pena. Esconderlos en otra pagina seria cobarde.
+    r = por_folder.get(d['folder'])
+    rk = BADGE.format(p=r['puesto'], v=r['test_llm']) if r else ''
     # En minería el mercado es parte de la tesis: el TAM chileno es chico y la
     # plata está afuera. En PYME no aporta nada al índice, así que no se muestra.
     market = (f'''
@@ -102,6 +110,7 @@ def card(d, bg, show_market=False):
       <article class="idea" style="{style}">
         <a class="idea__hit" href="{f}/index.html" tabindex="-1" aria-hidden="true"></a>
         <p class="idea__num mono">{num}</p>
+        {rk}
         <div class="idea__head">
           <p class="idea__cat mono">{e(d['category'])}</p>
           <h3 class="idea__brand"><a href="{f}/index.html">{e(d['brand'])}</a></h3>
@@ -152,6 +161,53 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     </section>'''
 
 
+def banda_ranking(rk):
+    top = rk["ideas"][:5]
+    n_ap = sum(1 for i in rk["ideas"] if i["test_llm"] == "aprueba")
+    n_ju = sum(1 for i in rk["ideas"] if i["test_llm"] == "justo")
+    n_re = sum(1 for i in rk["ideas"] if i["test_llm"] == "reprueba")
+    filas = "".join(
+        FILA.format(
+            p=i["puesto"], b=e(i["brand"]), s=i["puntaje"], v=i["test_llm"],
+            f=i["folder"], q=e(i["por_que_no_chatgpt"]))
+        for i in top)
+    marca = {r["folder"]: r["brand"] for r in rk["ideas"]}
+    no = ", ".join(e(marca.get(x, x)) for x in rk["no_construiria"])
+    return BANDA.format(filas=filas, ap=n_ap, ju=n_ju, re=n_re, no=no)
+
+
+FILA = (
+    '<li class="rk__row v--{v}">'
+    '<a href="{f}/index.html"><span class="rk__p mono">{p}</span>'
+    '<span class="rk__b">{b}</span>'
+    '<span class="rk__q">{q}</span>'
+    '<span class="rk__s mono">{s}</span>'
+    '<span class="rk__v mono">{v}</span></a></li>')
+
+BANDA = """
+    <section class="rk" id="ranking" aria-labelledby="h-rk">
+      <div class="container">
+        <p class="rk__kicker mono">El veredicto · las 21, ordenadas</p>
+        <div class="rk__top">
+          <h2 class="rk__title" id="h-rk">&iquest;Por qu&eacute; te pagar&iacute;an a ti, y no US$20 al mes a ChatGPT?</h2>
+          <p class="rk__lede">Es la pregunta que mata a la mitad de las ideas de IA, as&iacute; que
+            cada una de las 21 la rinde como examen. El hallazgo, despu&eacute;s de leerlas juntas:
+            <em>el foso nunca est&aacute; en el modelo — est&aacute; en el cable que va del modelo al mundo.</em></p>
+        </div>
+        <ol class="rk__list">{filas}</ol>
+        <dl class="rk__facts mono">
+          <div><dt>Aprueban</dt><dd>{ap} de 21 — dato que el modelo no tiene, vigilancia, actuaci&oacute;n o libro.</dd></div>
+          <div><dt>Raspando</dt><dd>{ju} — aprueban el literal, con una defensa d&eacute;bil o de vida corta.</dd></div>
+          <div><dt>Reprueba</dt><dd>{re} — Antefirma. Su propio negocio.html ya lista a ChatGPT como competidor a $0.</dd></div>
+          <div><dt>No construir&iacute;a</dt><dd>{no} — las tres fallan por techo de mercado, no por ejecuci&oacute;n.</dd></div>
+        </dl>
+        <a class="rk__cta" href="ranking/index.html"><span>Ver el ranking completo</span>
+          <svg viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+      </div>
+    </section>"""
+
+
 def banda_sistema(d):
     acc = d["accent"]
     return f"""
@@ -191,6 +247,7 @@ BG_PYME, BG_MINERA, BG_CONSUMO, BG_AUTO = "#191612", "#111922", "#181428", "#121
 
 secciones = (
     banda_sistema(sistema)
+    + banda_ranking(rank)
     + family(
         "pyme", "01", "PYME chilena",
         "Diez problemas que hoy se resuelven en Excel, en un cuaderno o no se resuelven. "
@@ -306,6 +363,7 @@ body {{
   text-decoration:none; transform:translateY(-200%);
 }}
 .skip:focus {{ transform:none; }}
+.skip {{ min-height:44px; display:inline-flex; align-items:center; }}
 
 /* ============================================================== masthead === */
 .masthead {{ padding-block:var(--sp-xl) var(--sp-l); }}
@@ -365,6 +423,193 @@ body {{
 /* Cada familia es una banda a sangre completa con su propio suelo. El cambio
    de temperatura (tinta cálida → grafito frío) es lo que avisa que entraste
    a otra pieza, antes de que leas nada. */
+/* ------------------------------------------------------------------
+   La banda del ranking. El test del LLM es el dato que decide si una
+   idea vale la pena, asi que va arriba, no escondido en otra pagina.
+   Dos colores de veredicto y nada mas: verde aprueba, rojo reprueba,
+   y "justo" no gasta un tercer color (es un disco hueco punteado).
+   ------------------------------------------------------------------ */
+.rk {{
+  --bg:#0C0F14; --card:#141A21; --line:#26303B; --sig:#E6EBF0;
+  --mute:#94A2AF; --ok:#3DD68C; --no:#FF6B5E;
+  position:relative; background:var(--bg); color:var(--sig);
+  border-block:1px solid var(--line); padding-block:var(--sp-xl);
+}}
+.rk__kicker {{
+  font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--mute);
+}}
+.rk__top {{ margin-top:var(--sp-m); }}
+.rk__title {{
+  font-size:var(--step-3); font-weight:700; letter-spacing:-.02em;
+  text-wrap:balance; max-width:22ch;
+}}
+.rk__lede {{
+  margin-top:var(--sp-s); color:var(--mute); max-width:var(--measure);
+  line-height:1.65; font-size:var(--step-0);
+}}
+.rk__lede em {{ color:var(--sig); font-style:italic; }}
+
+.rk__list {{
+  list-style:none; margin-top:var(--sp-l);
+  display:grid; gap:1px; background:var(--line);
+  border:1px solid var(--line);
+}}
+.rk__row {{ background:var(--card); }}
+.rk__row a {{
+  display:grid; grid-template-columns:auto 1fr auto; gap:var(--sp-2xs) var(--sp-s);
+  align-items:baseline; padding:var(--sp-s) var(--sp-m);
+  text-decoration:none; min-height:44px;
+}}
+.rk__row a:hover {{ background:color-mix(in srgb, var(--sig) 5%, transparent); }}
+.rk__p {{
+  grid-row:1 / span 2; align-self:center;
+  font-size:var(--step-3); font-weight:700; color:var(--mute);
+  min-width:2ch; text-align:right;
+}}
+.rk__b {{ font-weight:700; font-size:var(--step-1); color:var(--sig); }}
+.rk__q {{
+  grid-column:2; color:var(--mute); font-size:var(--step--1);
+  line-height:1.55; text-wrap:pretty;
+}}
+.rk__s {{ grid-column:3; grid-row:1; color:var(--sig); font-size:var(--step-0); }}
+.rk__v {{
+  grid-column:3; grid-row:2; font-size:.72rem; letter-spacing:.08em;
+  text-transform:uppercase; text-align:right;
+}}
+.rk__row.v--aprueba .rk__v {{ color:var(--ok); }}
+.rk__row.v--reprueba .rk__v {{ color:var(--no); }}
+.rk__row.v--justo .rk__v {{ color:var(--mute); }}
+.rk__row.v--aprueba {{ box-shadow:inset 3px 0 0 var(--ok); }}
+.rk__row.v--reprueba {{ box-shadow:inset 3px 0 0 var(--no); }}
+.rk__row.v--justo {{ box-shadow:inset 3px 0 0 var(--mute); }}
+
+.rk__facts {{
+  margin-top:var(--sp-l); display:grid; gap:1px;
+  background:var(--line); border:1px solid var(--line);
+}}
+.rk__facts > div {{ background:var(--card); padding:var(--sp-s) var(--sp-m); }}
+.rk__facts dt {{
+  color:var(--sig); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+}}
+.rk__facts dd {{
+  color:var(--mute); font-size:var(--step--1); line-height:1.6;
+  margin-top:var(--sp-3xs); font-family:'Space Grotesk',system-ui,sans-serif;
+}}
+.rk__cta {{
+  margin-top:var(--sp-l);
+  display:inline-flex; align-items:center; gap:var(--sp-2xs);
+  min-height:44px; padding-inline:var(--sp-m);
+  background:var(--sig); color:var(--bg); font-weight:500;
+  text-decoration:none; border-radius:2px;
+}}
+.rk__cta:hover {{ filter:brightness(.92); }}
+
+/* La insignia de puesto que viaja en cada tarjeta de idea. */
+.idea__rank {{
+  position:relative; z-index:1;
+  display:inline-flex; align-items:center; gap:.4em;
+  align-self:start; justify-self:end;
+  padding:.25em .6em; border:1px solid var(--line);
+  border-radius:2px; text-decoration:none;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--mute-2); white-space:nowrap;
+}}
+.idea__rank b {{ color:var(--sig); font-weight:500; }}
+.idea__rank:hover {{ border-color:currentColor; }}
+.idea__rank::after {{ content:""; position:absolute; inset:-10px -6px; }}
+.idea__rank.v--aprueba {{ color:#3DD68C; }}
+.idea__rank.v--reprueba {{ color:#FF6B5E; }}
+.idea__rank.v--justo {{ color:#B9A25E; }}
+
+@media (min-width:48em) {{
+  .rk {{ padding-block:var(--sp-2xl); }}
+  .rk__facts {{ grid-template-columns:1fr 1fr; }}
+  .rk__row a {{
+    grid-template-columns:auto 12rem 1fr auto auto;
+    align-items:center; gap:var(--sp-m);
+  }}
+  .rk__p {{ grid-row:1; font-size:var(--step-4); }}
+  .rk__b {{ grid-column:2; }}
+  .rk__q {{ grid-column:3; }}
+  .rk__s {{ grid-column:4; grid-row:1; }}
+  .rk__v {{ grid-column:5; grid-row:1; min-width:7ch; }}
+}}
+
+/* ------------------------------------------------------------------
+   La banda del sistema. No es una idea: es la maquina que opera a las
+   otras 21, asi que va arriba de todas y no se parece a ninguna.
+   Terminal de mando: verde de senal, mono, densidad.
+   ------------------------------------------------------------------ */
+.sis {{
+  --bg:#0B0E10; --card:#12171B; --line:#243038; --hair:#161D22;
+  --mute:#8D9AA3; --mute-2:#7C8892; --sig:#D6E2E8;
+  position:relative; background:var(--bg); color:var(--sig);
+  border-block:1px solid var(--line); padding-block:var(--sp-xl);
+}}
+.sis__kicker {{
+  display:flex; align-items:center; gap:var(--sp-2xs);
+  font-size:var(--step--1); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--acc);
+}}
+.sis__dot {{
+  width:.5rem; height:.5rem; border-radius:50%; background:var(--acc);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--acc) 22%, transparent);
+  animation:sis-pulse 2.4s ease-in-out infinite;
+}}
+@keyframes sis-pulse {{ 50% {{ opacity:.35; }} }}
+@media (prefers-reduced-motion:reduce) {{ .sis__dot {{ animation:none; }} }}
+.sis__top {{ margin-top:var(--sp-m); display:grid; gap:var(--sp-s); }}
+.sis__title {{ font-size:var(--step-4); font-weight:700; letter-spacing:-.03em; }}
+.sis__domain {{
+  display:flex; align-items:center; gap:var(--sp-2xs); flex-wrap:wrap;
+  color:var(--mute-2); font-size:var(--step--1); margin-top:.2em;
+}}
+.sis__tagline {{
+  font-size:var(--step-1); color:var(--sig); max-width:34ch; text-wrap:balance;
+}}
+.sis__problem {{
+  margin-top:var(--sp-m); color:var(--mute); max-width:var(--measure);
+  font-size:var(--step-0); line-height:1.65;
+}}
+.sis__facts {{
+  margin-top:var(--sp-l); display:grid; gap:1px;
+  background:var(--line); border:1px solid var(--line);
+}}
+.sis__facts > div {{ background:var(--card); padding:var(--sp-s) var(--sp-m); }}
+.sis__facts dt {{
+  color:var(--acc); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+}}
+.sis__facts dd {{
+  color:var(--mute); font-size:var(--step--1); line-height:1.6;
+  margin-top:var(--sp-3xs); font-family:'Space Grotesk',system-ui,sans-serif;
+}}
+.sis__facts em {{ color:var(--sig); font-style:italic; }}
+.sis__links {{
+  margin-top:var(--sp-l); display:flex; flex-wrap:wrap; align-items:center;
+  gap:var(--sp-s);
+}}
+.sis__cta {{
+  display:inline-flex; align-items:center; gap:var(--sp-2xs);
+  min-height:44px; padding-inline:var(--sp-m);
+  background:var(--acc); color:var(--acc-on); font-weight:500;
+  text-decoration:none; border-radius:2px;
+}}
+.sis__cta:hover {{ filter:brightness(1.1); }}
+.sis__docs {{ display:flex; flex-wrap:wrap; gap:var(--sp-xs); }}
+.sis__docs a {{
+  display:inline-flex; align-items:center; min-height:44px;
+  color:var(--mute); font-size:var(--step--1);
+  text-decoration-color:var(--line); text-underline-offset:4px;
+}}
+.sis__docs a:hover {{ color:var(--sig); text-decoration-color:var(--acc); }}
+@media (min-width:48em) {{
+  .sis {{ padding-block:var(--sp-2xl); }}
+  .sis__top {{ grid-template-columns:1fr 1fr; align-items:end; gap:var(--sp-l); }}
+  .sis__facts {{ grid-template-columns:1fr 1fr; }}
+}}
+
 .fam {{ position:relative; background:var(--bg); border-top:1px solid var(--line); }}
 .fam > .container {{ position:relative; z-index:1; }}
 /* retícula técnica: sólo se ve en el encabezado, las tarjetas la tapan */
@@ -656,6 +901,11 @@ body {{
       <a href="#consumo">
         <span class="jump__n mono">{len(consumo):02d}</span>
         <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+      <a href="#ranking">
+        <span class="jump__n mono">#1</span>
+        <span class="jump__t">El ranking<small>&iquest;Por qu&eacute; no ChatGPT? · las 21 ordenadas</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
       <a href="#autonomas">

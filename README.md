@@ -64,6 +64,30 @@ y es operada por el sistema de abajo.
 | 20 | [Fonalta](20-recepcion/) | fonalta.com | El teléfono que siempre contesta — y que se declara IA en los primeros 5 segundos |
 | 21 | [Caprato](21-inmuebles/) | caprato.com | Arriendo × 12 ÷ precio no es la rentabilidad. La mayoría de las semanas no te avisa nada |
 
+## El [ranking](ranking/): ¿por qué te pagarían a ti, y no US$20 al mes a ChatGPT?
+
+Las 21 ideas rinden esa pregunta como examen, porque es la que mata a la mitad de las
+ideas de IA. **15 aprueban · 5 raspando · 1 reprueba.**
+
+El hallazgo, después de leerlas juntas: **el foso nunca está en el modelo — está en el
+cable que va del modelo al mundo.** Datos que el modelo no tiene (Pregonia, Cotejia),
+vigilancia continua que nadie va a hacer a mano a las 6 AM, actuación sobre el mundo
+(contestar el teléfono, imprimir la etiqueta), un libro que se acumula por años, y
+determinismo donde importa — Talonio y Cianota le *prohíben* al modelo hacer la aritmética,
+y eso se le vende **en contra** del LLM.
+
+| | Idea | Por qué no ChatGPT |
+|---|------|--------------------|
+| 1 | Kilonauta | Ningún proveedor de modelos va a negociar una tarifa con Chilexpress |
+| 2 | Tinoria | Un chat te redacta el correo; no sabe quién te debe ni lo manda el martes a las 9 |
+| 3 | Talonio | Un contador no firma un F29 que calculó un chatbot |
+| 4 | Cotejia | El precio que pusieron a las 3 AM no está en ningún modelo: hay que ir a mirarlo |
+| 5 | Pregonia | Nadie va a pegar el Diario Oficial en ChatGPT todos los días a las seis |
+
+**Reprueba: Antefirma** — su propio `negocio.html` ya lista a ChatGPT como competidor a $0.
+**No construiría: Finakids, Freatia, Cintavia** — las tres fallan por techo de mercado
+(TAM US$0,87M / US$8M / US$3,6M), no por ejecución.
+
 ## El sistema: [Cuantario](00-sistema/)
 
 `cuantario.com` — La máquina que comercializa, mide y decide sobre todas las ideas de acá,

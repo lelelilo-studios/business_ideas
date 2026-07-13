@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking · 21 ideas, una tabla de posiciones</title>
+<meta name="description" content="Evaluación y ranking de las 21 ideas del repositorio. El test del LLM como criterio central.">
+<!--
+  DIRECCIÓN DE ARTE — TABLA DE POSICIONES / HOJA DE EVALUACIÓN.
+  Referencia: la tabla de la liga y la planilla del juez, no el cuaderno ni el terminal.
+  · Numerales de puesto enormes en Anton (display condensado de rótulo). Public Sans para
+    todo lo demás, con tabular-nums en las cifras. NO monoespaciada en todo: eso es
+    Cuantario. NO cinta ni marquesina: eso es Cotejia. NO papel crema con rojo óxido.
+  · Hoja gris fría #E9EBEE, fichas blancas, filetes de 1px, esquinas rectas.
+  · DOS colores de veredicto y nada más: verde #0A7D4F (aprueba) y rojo #C42B32 (reprueba).
+    El estado intermedio (justo) no gasta un tercer color: es un disco hueco de trazo
+    discontinuo. Todo veredicto lleva SIEMPRE forma + etiqueta de texto, nunca color solo.
+  · Paleta validada con dataviz/scripts/validate_palette.js --pairs all --mode light:
+    banda de luminosidad PASS · piso de croma PASS · separación CVD PASS (ΔE 13,2 protan,
+    sobre el objetivo de 12) · contraste PASS.
+  · Sin build, sin CDN, sin librería de gráficos: SVG inline. Único externo: Google Fonts.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#E9EBEE;color:#14181D;font-family:"Public Sans",system-ui,sans-serif;
+  font-size:16px;line-height:1.55;font-variant-numeric:tabular-nums;overflow-x:hidden}
+h1,h2,h3,h4{margin:0;line-height:1.12;font-weight:800;letter-spacing:-.012em}
+p{margin:0 0 .85em}
+a{color:#14181D}
+img,svg{max-width:100%}
+:focus-visible{outline:3px solid #14181D;outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.rule{border:0;border-top:1px solid #C6CBD1;margin:0}
+
+/* ---- nav ---- */
+.nav{position:sticky;top:0;z-index:40;background:#14181D;color:#F2F4F6;border-bottom:2px solid #14181D}
+.nav .wrap{display:flex;align-items:center;gap:4px;min-height:52px;flex-wrap:wrap}
+.nav a{color:#C6CBD1;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;padding:14px 10px;min-height:44px;display:inline-flex;align-items:center}
+.nav a:hover,.nav a:focus-visible{color:#fff}
+.nav a.home{color:#fff;margin-right:auto;letter-spacing:.02em}
+.nav a.home b{font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.03em}
+
+/* ---- hero ---- */
+.hero{padding:38px 0 26px;border-bottom:2px solid #14181D}
+.kicker{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#4A525C;margin-bottom:12px}
+.hero h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:clamp(38px,10.5vw,86px);
+  letter-spacing:.005em;text-transform:uppercase;line-height:.92}
+.hero .lede{font-size:clamp(16px,4vw,20px);max-width:60ch;margin-top:18px;color:#2B3138}
+.stats{display:grid;grid-template-columns:1fr;gap:1px;background:#C6CBD1;border:1px solid #C6CBD1;margin-top:26px}
+.stat{background:#E9EBEE;padding:14px 16px}
+.stat b{display:block;font-family:Anton,Impact,sans-serif;font-weight:400;font-size:34px;line-height:1;letter-spacing:.01em}
+.stat span{font-size:13px;color:#3C434B;display:block;margin-top:6px;line-height:1.35}
+.stat.no b{color:#C42B32}
+
+section{padding:44px 0;scroll-margin-top:110px}
+.sechead{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.secnum{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:15px;color:#5F676F;letter-spacing:.1em}
+h2{font-size:clamp(24px,6vw,36px);text-transform:uppercase;font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.02em}
+.sub{color:#3C434B;max-width:68ch;margin-bottom:26px;font-size:16px}
+
+/* ---- podio ---- */
+.podio{display:grid;grid-template-columns:1fr;gap:14px}
+.pod{background:#fff;border:1px solid #C6CBD1;border-top:5px solid #14181D;padding:16px;display:flex;gap:14px}
+.pod .n{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:76px;line-height:.78;letter-spacing:-.02em;flex:0 0 auto}
+.pod .b{min-width:0}
+.pod h3{font-size:23px;text-transform:uppercase;font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.02em}
+.pod .sc{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:27px;line-height:1;margin:2px 0 8px}
+.pod p{font-size:14px;margin:0;color:#2B3138}
+.pod .fld{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5F676F;font-weight:600}
+
+/* ---- veredicto ---- */
+.vd{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 8px;border:1.5px solid;white-space:nowrap}
+.vd.ok{color:#08643F;border-color:#0A7D4F;background:#E6F3ED}
+.vd.no{color:#A81F27;border-color:#C42B32;background:#FAE9EA}
+.vd.mid{color:#14181D;border-color:#14181D;background:transparent;border-style:dashed}
+.vd i{width:9px;height:9px;flex:0 0 auto}
+.vd.ok i{background:#0A7D4F;border-radius:50%}
+.vd.no i{background:#C42B32}
+.vd.mid i{border:1.5px dashed #14181D;border-radius:50%}
+.plat{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5F676F;white-space:nowrap}
+.plat.alto{color:#C42B32}
+
+/* ---- tabla ---- */
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #C6CBD1;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:880px;font-size:14px}
+thead th{background:#14181D;color:#F2F4F6;text-align:left;padding:11px 10px;font-size:11px;
+  letter-spacing:.09em;text-transform:uppercase;font-weight:700;position:sticky;top:0;white-space:nowrap}
+tbody td{padding:11px 10px;border-top:1px solid #DDE1E5;vertical-align:middle;height:52px}
+tbody tr:nth-child(even) td{background:#F4F5F7}
+tbody tr:hover td{background:#EDEFF2}
+td.p{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:26px;width:44px;text-align:center;line-height:1}
+td.marca{font-weight:800;white-space:nowrap}
+td.marca small{display:block;font-weight:400;font-size:11px;color:#5F676F;letter-spacing:.06em;text-transform:uppercase}
+td.sc{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:22px;width:64px}
+td.num{text-align:right;white-space:nowrap}
+td.frase{min-width:280px;font-size:13px;color:#2B3138;line-height:1.45}
+tr.top3 td.p{color:#0A7D4F}
+tr.rep td{background:#FAE9EA !important}
+
+/* ---- gráficos ---- */
+figure{margin:0 0 8px}
+.chart{display:block;width:100%;height:auto;background:#fff}
+.chartbox{border:1px solid #C6CBD1;background:#fff;padding:14px 12px}
+.chartbox .scroll-x{border:0}
+.chartbox .scroll-x>svg{min-width:600px}
+figcaption{font-size:13px;color:#3C434B;margin-top:10px;line-height:1.5}
+.s-lbl{font:600 12px "Public Sans",sans-serif;fill:#14181D}
+.s-val{font:700 12px "Public Sans",sans-serif;fill:#3C434B}
+.s-ax{font:400 11px "Public Sans",sans-serif;fill:#5F676F}
+.s-axt{font:700 12px "Public Sans",sans-serif;fill:#3C434B;letter-spacing:.04em}
+.s-cap{font:400 11px "Public Sans",sans-serif;fill:#5F676F}
+.s-dot{font:700 11px "Public Sans",sans-serif}
+.leyenda{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 0;font-size:13px;align-items:center}
+.leyenda span{display:inline-flex;align-items:center;gap:7px;color:#2B3138}
+.lg{width:16px;height:16px;flex:0 0 auto}
+.lg.ok{background:#0A7D4F;border-radius:50%}
+.lg.mid{border:2px dashed #14181D;border-radius:50%}
+.lg.no{background:#C42B32}
+
+/* ---- pesos ---- */
+.pesos{display:grid;grid-template-columns:1fr;gap:1px;background:#C6CBD1;border:1px solid #C6CBD1;margin-top:22px}
+.peso{background:#fff;padding:14px 16px}
+.peso .ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.peso h4{font-size:15px;text-transform:uppercase;letter-spacing:.02em}
+.peso b{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:24px;line-height:1}
+.peso p{font-size:13.5px;color:#3C434B;margin:6px 0 0;line-height:1.5}
+.peso.hi{background:#14181D;color:#F2F4F6}
+.peso.hi p{color:#C6CBD1}
+
+/* ---- escalera ---- */
+.esc{counter-reset:e;margin:0;padding:0;list-style:none;border:1px solid #C6CBD1;background:#fff}
+.esc li{counter-increment:e;display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid #DDE1E5;font-size:14.5px}
+.esc li:last-child{border-bottom:0}
+.esc li::before{content:counter(e);font-family:Anton,Impact,sans-serif;font-weight:400;font-size:26px;
+  line-height:1;color:#0A7D4F;flex:0 0 26px}
+.esc li.weak::before{color:#C42B32}
+.esc li b{display:block}
+.esc li span{color:#3C434B;font-size:13.5px}
+
+/* ---- fichas ---- */
+.fichas{display:grid;grid-template-columns:1fr;gap:16px}
+.ficha{background:#fff;border:1px solid #C6CBD1;border-left:6px solid #4A525C;padding:16px}
+.ficha.v-ok{border-left-color:#0A7D4F}
+.ficha.v-no{border-left-color:#C42B32}
+.ficha.v-mid{border-left-color:#14181D;border-left-style:dashed}
+.fh{display:flex;gap:14px;align-items:flex-start}
+.fh .n{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:58px;line-height:.8;color:#14181D;flex:0 0 auto;min-width:50px}
+.fh .t{min-width:0;flex:1}
+.fh h3{font-size:22px;text-transform:uppercase;font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.02em}
+.fh .meta{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#5F676F;font-weight:600;margin-top:2px}
+.fh .sc{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:34px;line-height:1;text-align:right}
+.fh .sc small{display:block;font-family:"Public Sans",sans-serif;font-weight:600;font-size:10px;
+  letter-spacing:.1em;color:#5F676F;text-transform:uppercase}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.cifras{font-size:12.5px;color:#3C434B;border-top:1px solid #DDE1E5;border-bottom:1px solid #DDE1E5;
+  padding:8px 0;margin:12px 0}
+.qa{margin:12px 0 0}
+.qa dt{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#5F676F;margin-top:12px}
+.qa dd{margin:3px 0 0;font-size:14.5px;color:#20262C;line-height:1.5}
+.qa dd.gpt{background:#F4F5F7;border-left:3px solid #14181D;padding:9px 11px;font-size:14.5px}
+.ficha.v-no .qa dd.gpt{border-left-color:#C42B32;background:#FAE9EA}
+.ficha.v-ok .qa dd.gpt{border-left-color:#0A7D4F}
+.crit{margin-top:14px;border-top:1px solid #DDE1E5;padding-top:10px}
+.crow{display:grid;grid-template-columns:1fr 90px 20px;align-items:center;gap:8px;padding:2.5px 0}
+.cnom{font-size:11.5px;color:#4A525C;letter-spacing:.02em}
+.cbar{height:9px;background:#E4E7EA;display:block;position:relative}
+.cfill{display:block;height:100%;background:#4A525C}
+.cfill.ok{background:#0A7D4F}
+.cfill.no{background:#C42B32}
+.cfill.mid{background:#14181D}
+.cval{font-size:11.5px;font-weight:700;text-align:right;color:#14181D}
+
+/* ---- no construiría ---- */
+.kill{background:#14181D;color:#F2F4F6;padding:44px 0;margin-top:8px}
+.kill h2{color:#fff}
+.kill .sub{color:#A7AFB7}
+.kill .secnum{color:#9AA2AA}
+.kcard{background:#1D2329;border:1px solid #333B44;border-left:6px solid #C42B32;padding:16px;margin-bottom:14px}
+.kcard h3{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:22px;text-transform:uppercase;color:#fff;letter-spacing:.02em}
+.kcard .why{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#E8797F;margin:8px 0 6px}
+.kcard p{color:#C6CBD1;font-size:14.5px;margin:0 0 8px}
+.kcard p:last-child{margin:0}
+.kcard .num{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:15px;color:#fff;letter-spacing:.04em}
+.kcard.soft{border-left-color:#5F676F}
+.kcard.soft .why{color:#A7AFB7}
+
+/* ---- contradicciones ---- */
+.contra{border:1px solid #C6CBD1;background:#fff}
+.contra > div{padding:15px 16px;border-bottom:1px solid #DDE1E5}
+.contra > div:last-child{border-bottom:0}
+.contra h4{font-size:15px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:5px}
+.contra p{font-size:14px;color:#2B3138;margin:0}
+.contra .tag{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#C42B32;display:block;margin-bottom:3px}
+
+footer{background:#14181D;color:#8A9199;padding:34px 0;font-size:13px}
+footer p{max-width:78ch}
+footer .volver{display:inline-flex;align-items:center;min-height:44px;padding:10px 16px;margin-top:12px;
+  color:#F2F4F6;background:#242B32;border:1px solid #3C434B;text-decoration:none;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;font-size:12px}
+footer .volver:hover,footer .volver:focus-visible{background:#2E363E;color:#fff}
+.ficha{scroll-margin-top:110px}
+
+@media (min-width:640px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .podio{grid-template-columns:1fr}
+}
+@media (min-width:900px){
+  .wrap{padding:0 28px}
+  section{padding:60px 0}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .podio{grid-template-columns:repeat(3,1fr)}
+  .pesos{grid-template-columns:repeat(2,1fr)}
+  .fichas{grid-template-columns:repeat(2,1fr)}
+  .pod .n{font-size:96px}
+  .hero{padding:56px 0 40px}
+  .chartbox{padding:20px}
+}
+@media (min-width:1200px){
+  .fichas{grid-template-columns:repeat(3,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Principal">
+  <div class="wrap">
+    <a class="home" href="../index.html">← <b>Ideas</b></a>
+    <a href="#metodo">Método</a>
+    <a href="#test">Test del LLM</a>
+    <a href="#tabla">Tabla</a>
+    <a href="#fichas">Fichas</a>
+    <a href="#nocons">No construiría</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Hoja de evaluación · 21 ideas · 13 de julio de 2026</div>
+    <h1>La tabla<br>de posiciones</h1>
+    <p class="lede">Veintiún planes de negocio, un dueño y dos años de su vida. Esto no es un
+    resumen: es un juicio, ordenado de arriba abajo, con los pesos declarados y la aritmética a la
+    vista. Todas las cifras salen de las propias ideas. Donde no hay dato, lo digo.</p>
+    <div class="stats">
+      <div class="stat"><b>21</b><span>ideas evaluadas contra diez criterios</span></div>
+      <div class="stat no"><b>1</b><span>reprueba el test del LLM · 5 pasan raspando</span></div>
+      <div class="stat"><b>US$18,4M</b><span>TAM chileno mediano. Catorce de las 21 están bajo US$50M</span></div>
+      <div class="stat no"><b>30%</b><span>la probabilidad más alta de US$1M de ARR que declara alguien acá</span></div>
+    </div>
+  </div>
+</header>
+<section id="podio"><div class="wrap">
+<div class="sechead"><span class="secnum">01</span><h2>El podio</h2></div>
+<p class="sub">Las tres que construiría, en ese orden. Las tres comparten una cosa y no es el mercado: <strong>lo que venden no cabe en una conversación</strong>. Un contrato con un courier, el libro de ventas del SII, un F29 que tiene que cuadrar.</p>
+<div class="podio">
+<div class="pod">
+  <div class="n">1</div>
+  <div class="b">
+    <div class="fld">09-despacho</div>
+    <h3>Kilonauta</h3>
+    <div class="sc">81,8<span style="font-family:'Public Sans';font-size:12px;font-weight:600;color:#5F676F"> / 100</span></div>
+    <p>Ningún proveedor de modelos va a negociar una tarifa con Chilexpress ni imprimir tu etiqueta. Lo que se vende no es una respuesta: es un contrato de compra mayorista y un pedazo de papel adhesivo.</p>
+  </div>
+</div>
+<div class="pod">
+  <div class="n">2</div>
+  <div class="b">
+    <div class="fld">02-cobranza</div>
+    <h3>Tinoria</h3>
+    <div class="sc">80,9<span style="font-family:'Public Sans';font-size:12px;font-weight:600;color:#5F676F"> / 100</span></div>
+    <p>Un chat te redacta el correo de cobranza; no sabe quién te debe, no lo manda a las 9:00 del martes, y no se acuerda en agosto de la promesa de pago que te hicieron en marzo.</p>
+  </div>
+</div>
+<div class="pod">
+  <div class="n">3</div>
+  <div class="b">
+    <div class="fld">10-contabilidad</div>
+    <h3>Talonio</h3>
+    <div class="sc">79,4<span style="font-family:'Public Sans';font-size:12px;font-weight:600;color:#5F676F"> / 100</span></div>
+    <p>Un contador no firma un F29 que calculó un chatbot. Acá la aritmética la hace el servidor con test unitario y el modelo tiene <em>prohibido</em> sumar — y eso, precisamente, es lo que le vendes en contra del LLM.</p>
+  </div>
+</div>
+</div></div></section>
+<hr class="rule">
+<section id="metodo"><div class="wrap">
+<div class="sechead"><span class="secnum">02</span><h2>El método y los pesos</h2></div>
+<p class="sub">Diez criterios. Cada idea recibe de 0 a 10 en cada uno; el puntaje es la suma ponderada × 10. Los pesos son un juicio y por eso están escritos, no escondidos: si no estás de acuerdo con uno, muévelo y el orden cambia. Eso es exactamente lo que tiene que poder pasar.</p>
+<div class="chartbox"><figure><div class="scroll-x"><svg viewBox="0 0 640 332" role="img" aria-label="Pesos del marco de evaluación" class="chart">
+<line x1="250" y1="8" x2="250" y2="308" stroke="#C6CBD1" stroke-width="1"/>
+<text x="240" y="23" text-anchor="end" class="s-lbl">Test del LLM</text>
+<rect x="250" y="12" width="330.0" height="15" rx="3" fill="#14181D"><title>Test del LLM: peso 0.22</title></rect>
+<text x="588.0" y="24" class="s-val">0.22</text>
+<text x="240" y="53" text-anchor="end" class="s-lbl">Dolor y disposición a pagar</text>
+<rect x="250" y="42" width="210.0" height="15" rx="3" fill="#4A525C"><title>Dolor y disposición a pagar: peso 0.14</title></rect>
+<text x="468.0" y="54" class="s-val">0.14</text>
+<text x="240" y="83" text-anchor="end" class="s-lbl">Canal y ciclo de venta en Chile</text>
+<rect x="250" y="72" width="195.0" height="15" rx="3" fill="#4A525C"><title>Canal y ciclo de venta en Chile: peso 0.13</title></rect>
+<text x="453.0" y="84" class="s-val">0.13</text>
+<text x="240" y="113" text-anchor="end" class="s-lbl">Foso contra el titular real</text>
+<rect x="250" y="102" width="180.0" height="15" rx="3" fill="#4A525C"><title>Foso contra el titular real: peso 0.12</title></rect>
+<text x="438.0" y="114" class="s-val">0.12</text>
+<text x="240" y="143" text-anchor="end" class="s-lbl">TAM chileno</text>
+<rect x="250" y="132" width="150.0" height="15" rx="3" fill="#4A525C"><title>TAM chileno: peso 0.10</title></rect>
+<text x="408.0" y="144" class="s-val">0.10</text>
+<text x="240" y="173" text-anchor="end" class="s-lbl">Economía unitaria neta de IA</text>
+<rect x="250" y="162" width="135.0" height="15" rx="3" fill="#4A525C"><title>Economía unitaria neta de IA: peso 0.09</title></rect>
+<text x="393.0" y="174" class="s-val">0.09</text>
+<text x="240" y="203" text-anchor="end" class="s-lbl">Tiempo hasta el primer peso</text>
+<rect x="250" y="192" width="105.0" height="15" rx="3" fill="#4A525C"><title>Tiempo hasta el primer peso: peso 0.07</title></rect>
+<text x="363.0" y="204" class="s-val">0.07</text>
+<text x="240" y="233" text-anchor="end" class="s-lbl">Se puede operar sola</text>
+<rect x="250" y="222" width="90.0" height="15" rx="3" fill="#4A525C"><title>Se puede operar sola: peso 0.06</title></rect>
+<text x="348.0" y="234" class="s-val">0.06</text>
+<text x="240" y="263" text-anchor="end" class="s-lbl">Riesgo regulatorio (invertido)</text>
+<rect x="250" y="252" width="60.0" height="15" rx="3" fill="#4A525C"><title>Riesgo regulatorio (invertido): peso 0.04</title></rect>
+<text x="318.0" y="264" class="s-val">0.04</text>
+<text x="240" y="293" text-anchor="end" class="s-lbl">Honestidad y falsabilidad</text>
+<rect x="250" y="282" width="45.0" height="15" rx="3" fill="#4A525C"><title>Honestidad y falsabilidad: peso 0.03</title></rect>
+<text x="303.0" y="294" class="s-val">0.03</text>
+<text x="250" y="328" class="s-cap">Suma = 1,00</text>
+</svg></div><figcaption>El test del LLM pesa 0,22 — más que ningún otro, y más que el TAM y la economía unitaria juntos. No es capricho: es el único riesgo de esta lista que <em>crece solo</em> mientras tú construyes.</figcaption></figure></div>
+<div class="pesos">
+<div class="peso hi"><div class="ph"><h4>Test del LLM</h4><b>0.22</b></div><p>El criterio que el dueño puso primero y el único que puede invalidar todo lo demás. Si el cliente obtiene el 70% del valor pegando un documento en ChatGPT, no hay CAC ni margen que te salve. Le doy más peso que a cualquier otro porque es el único riesgo que <em>crece</em> solo mientras construyes.</p></div>
+<div class="peso"><div class="ph"><h4>Dolor y disposición a pagar</h4><b>0.14</b></div><p>Un dolor que no se paga es un hobby. Puntúa alto lo que se mide en plata perdida (caja, multa, contrato perdido) y bajo lo que se mide en incomodidad.</p></div>
+<div class="peso"><div class="ph"><h4>Canal y ciclo de venta en Chile</h4><b>0.13</b></div><p>Casi todas estas ideas mueren acá y no en el producto. Puntúa el CAC declarado contra el ticket declarado, y si el comprador es alcanzable sin un vendedor caro.</p></div>
+<div class="peso"><div class="ph"><h4>Foso contra el titular real</h4><b>0.12</b></div><p>El titular no es otra startup: es Excel, el cuaderno, Defontana, el portal, y a veces el propio Estado. Esto es distinto del test del LLM y hay que puntuarlo aparte.</p></div>
+<div class="peso"><div class="ph"><h4>TAM chileno</h4><b>0.10</b></div><p>El dato incómodo recurrente. Peso 0,10 y no más porque un negocio de dueño de US$400k de ARR es un resultado legítimo — pero un TAM bajo US$10M significa que ganar Chile entero no paga el equipo.</p></div>
+<div class="peso"><div class="ph"><h4>Economía unitaria neta de IA</h4><b>0.09</b></div><p>Margen bruto ya descontado el costo de inferencia que la idea declara en su propio stack.html, más LTV/CAC y payback. Peso moderado: casi todas tienen buena economía unitaria, así que discrimina poco.</p></div>
+<div class="peso"><div class="ph"><h4>Tiempo hasta el primer peso</h4><b>0.07</b></div><p>Cuántos meses hasta que un desconocido paga. Un hito de «estación instalada con permiso de faena» no es lo mismo que «puso la tarjeta a las 2 de la mañana».</p></div>
+<div class="peso"><div class="ph"><h4>Se puede operar sola</h4><b>0.06</b></div><p>La clasificación es de Cuantario (00-sistema/integracion.html), no mía: total / parcial / no. Peso bajo a propósito — que el sistema pueda operarla no predice que funcione. 08-laboral es autonomía total y el juez la pausó igual.</p></div>
+<div class="peso"><div class="ph"><h4>Riesgo regulatorio (invertido)</h4><b>0.04</b></div><p>Puntaje alto = poco riesgo. Datos personales, cobranza, asesoría legal sin serlo, scraping, voz sintética, menores de edad.</p></div>
+<div class="peso"><div class="ph"><h4>Honestidad y falsabilidad</h4><b>0.03</b></div><p>¿Sus criterios de muerte son observaciones reales o poesía? Peso bajo porque no cambia si el negocio funciona — pero sí cambia cuánto puedes confiar en las otras nueve columnas de esa misma idea.</p></div>
+</div>
+<p class="sub" style="margin-top:22px">Dos advertencias sobre el puntaje. <strong>Primera:</strong> el rango va de 50 a 82, no de 0 a 100
+— las 21 se escribieron bajo el mismo contrato y todas tienen economía unitaria decente, así que
+el puntaje discrimina menos de lo que parece. Lo que discrimina son las columnas.
+<strong>Segunda:</strong> una idea puede reprobar el test del LLM y aun así quedar a mitad de tabla,
+porque las otras nueve columnas la sostienen. Eso le pasa a Antefirma, y es un resultado honesto:
+no significa «constrúyela», significa «el producto que describe no es el producto».</p>
+</div></section>
+<hr class="rule">
+<section id="test"><div class="wrap">
+<div class="sechead"><span class="secnum">03</span><h2>El test del LLM</h2></div>
+<p class="sub"><strong>«¿Por qué alguien me pagaría a mí, en vez de pagarle US$20 al mes a ChatGPT y resolver el problema solo?»</strong> Es la pregunta correcta y es letal. La traté como un examen que se aprueba o se reprueba, no como un párrafo. Las defensas reales, de la más fuerte a la más débil:</p>
+<ol class="esc">
+<li><b>Datos que el modelo no tiene.</b><span>Lo que se publicó hoy en el Diario Oficial. Cuánto se arrienda <em>de verdad</em> ese edificio. El precio que puso tu competencia a las 3 AM. Ninguna suscripción te da eso, y ninguna versión futura del modelo tampoco. <strong>Pregonia, Cotejia, Caprato, Fedatia.</strong></span></li>
+<li><b>Vigilancia continua.</b><span>Una suscripción responde cuando le preguntas. Estos productos miran solos. Nadie va a pegar el Diario Oficial en un chat todos los días a las 6 AM — y el valor está justamente en que ocurre sin ti. <strong>Pregonia, Adjudate, Tinoria, Caprato.</strong></span></li>
+<li><b>Actuación sobre el mundo.</b><span>Mandar el WhatsApp, contestar el teléfono, imprimir la etiqueta, cerrar el torniquete. Un chat no toca el mundo. <strong>Kilonauta, Tinoria, Fonalta, Zurcia, Torniqua.</strong></span></li>
+<li><b>Sistema de registro.</b><span>Obligaciones, plazos, libros y estados que se acumulan por años. Una conversación no se acuerda de tu contrato de arriendo de 2027. <strong>Talonio, Contralta, Conserjo, Rutamo.</strong></span></li>
+<li><b>Determinismo donde importa.</b><span>El finiquito de Contralta, la ruta crítica de Cianota, el F29 de Talonio, el reprecio de Cotejia: todos le <em>prohíben</em> al modelo hacer la aritmética. Un chatbot alucina el número con soltura absoluta. Eso se le vende <em>en contra</em> del LLM.</span></li>
+<li><b>Responsabilidad y fe pública.</b><span>Un banco no puede actuar sobre lo que «dijo ChatGPT». <strong>Fedatia</strong> vende la procedencia, no el dato — y es irónico que renuncie al banco, que es justamente el cliente que compra esta defensa.</span></li>
+<li class="weak"><b>Distribución a un comprador que jamás va a promptear.</b><span>La dueña de la peluquería no va a escribir un prompt. <strong>Ésta es la defensa más débil de todas</strong> y se erosiona sola a medida que mejora la UX de los modelos. Es una ventaja temporal, no un foso. Es lo único que tienen <strong>Zurcia</strong> y <strong>Finakids</strong>.</span></li>
+</ol>
+<div style="margin-top:26px">
+<h3 style="font-family:Anton,Impact,sans-serif;font-weight:400;font-size:22px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:8px">El reverso: ¿para cuáles el cliente obtiene el 70% pegando un documento en ChatGPT?</h3>
+<p class="sub"><strong>Una sola, y la sospecha del dueño era correcta: <span style="color:#A81F27">05-contratos (Antefirma)</span>.</strong>
+No lo digo yo primero: lo dice su propio <code>negocio.html</code>, que lista a «ChatGPT / Claude · pegado a mano»
+como competidor con precio $0, y su propio riesgo n°1, textual: <em>«Hoy pegar un contrato en ChatGPT ya da algo
+decente. En 18 meses va a dar algo muy bueno, va a estar dentro de WhatsApp, y va a ser gratis. Si nuestro
+producto sigue siendo ‹analizamos tu contrato›, estamos muertos y ni siquiera nos vamos a dar cuenta.»</em></p>
+<p class="sub">Su defensa tendría que ser el corpus chileno anotado, el calendario de obligaciones y la vigilancia
+por tres años — o sea, <strong>todo menos el análisis del documento, que es la parte que parecía el producto</strong>.
+Y ahí aparece el problema de verdad: esa vigilancia, reconstruida, es un <strong>Pregonia peor</strong> — porque
+Pregonia vigila fuentes que el modelo no puede tener, y Antefirma vigilaría un calendario que el propio usuario
+le dictó. Un foso de datos contra un recordatorio. Ya está construido y va quinto.</p>
+<p class="sub">Otras cuatro pasan <strong>raspando</strong> (JUSTO), y por motivos distintos:
+<strong>Contralta</strong> (la mitad explicativa ya es gratis, y el Estado puede regalar la otra mitad vía Mi DT),
+<strong>Mermata</strong> (un chat pronostica sobre un CSV; lo que no hace es conectarse solo al SII),
+<strong>Zurcia</strong> (aprueba por actuación, pero su defensa de fondo es «la dueña no promptea», la n°7)
+y <strong>Fonalta</strong> (aprueba el test literal y reprueba el hermano).</p>
+</div>
+
+<div style="margin-top:26px">
+<h3 style="font-family:Anton,Impact,sans-serif;font-weight:400;font-size:22px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:8px">El riesgo hermano: ¿y si OpenAI o Anthropic lanzan la función?</h3>
+<p class="sub"><strong>Inmunes (riesgo nulo):</strong> las cinco de minería más Kilonauta. Ningún proveedor de modelos
+va a negociar tarifas con Chilexpress, instalar una estación en un kilómetro de correa, ni poner un lector en la
+portería de Escondida. El riesgo de plataforma es cero por construcción, y eso vale.</p>
+<p class="sub"><strong>Expuestas (riesgo alto):</strong> <span style="color:#A81F27"><strong>Antefirma</strong></span>
+(análisis de documento: ya lanzada, de hecho),
+<span style="color:#A81F27"><strong>Fonalta</strong></span> (la voz en tiempo real es una API de los proveedores; lo que
+queda es el número +56 y el acento) y <span style="color:#A81F27"><strong>Zurcia</strong></span> (Meta está metiendo
+agentes de IA dentro de WhatsApp Business, que es exactamente la capa que Zurcia vende).</p>
+<p class="sub">El resto están en un punto medio útil: el proveedor de modelos puede darles el motor, pero no la
+conexión al SII, ni el corpus de once portales chilenos, ni el contrato de tarifas. Ese es el patrón, y el patrón es
+la conclusión: <strong>el foso nunca está en el modelo. Está en el cable que va del modelo al mundo.</strong></p>
+</div>
+</div></section>
+<hr class="rule">
+<section id="tabla"><div class="wrap">
+<div class="sechead"><span class="secnum">04</span><h2>Las 21, ordenadas</h2></div>
+<p class="sub">Puntaje de 0 a 100 = suma ponderada de los diez criterios. La columna del veredicto del LLM va al lado del puntaje a propósito: es la que hay que mirar primero. <strong>15 aprueban · 5 raspando · 1 reprueba.</strong> En móvil, la tabla scrollea hacia el lado dentro de su caja.</p>
+<div class="scroll-x"><table>
+<thead><tr><th>#</th><th>Marca</th><th>Pts</th><th>Test del LLM</th><th>¿Por qué no ChatGPT?</th><th class="num">TAM CL</th><th>Autonomía</th><th>Plataforma</th></tr></thead>
+<tbody>
+<tr class="top3"><td class="p">1</td><td class="marca">Kilonauta<small>09-despacho</small></td><td class="sc">81,8</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Ningún proveedor de modelos va a negociar una tarifa con Chilexpress ni imprimir tu etiqueta. Lo que se vende no es una respuesta: es un contrato de compra mayorista y un pedazo de papel adhesivo.</td><td class="num">US$39M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">SAM†</small></td><td>Total*</td><td><span class="plat ">nulo</span></td></tr>
+<tr class="top3"><td class="p">2</td><td class="marca">Tinoria<small>02-cobranza</small></td><td class="sc">80,9</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Un chat te redacta el correo de cobranza; no sabe quién te debe, no lo manda a las 9:00 del martes, y no se acuerda en agosto de la promesa de pago que te hicieron en marzo.</td><td class="num">US$115M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr class="top3"><td class="p">3</td><td class="marca">Talonio<small>10-contabilidad</small></td><td class="sc">79,4</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Un contador no firma un F29 que calculó un chatbot. Acá la aritmética la hace el servidor con test unitario y el modelo tiene <em>prohibido</em> sumar — y eso, precisamente, es lo que le vendes en contra del LLM.</td><td class="num">US$94M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">4</td><td class="marca">Cotejia<small>19-precios</small></td><td class="sc">78,9</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">El precio que tu competencia puso a las 3 de la mañana no está en ningún modelo: hay que ir a mirarlo, todas las noches. Y la decisión de reprecio es aritmética con test unitario — «prohibido meterle un LLM».</td><td class="num">US$17,9M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM§</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">5</td><td class="marca">Pregonia<small>18-alertas</small></td><td class="sc">75,2</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Nadie va a pegar el Diario Oficial en ChatGPT todos los días a las seis de la mañana — y ése, literalmente, es el producto entero.</td><td class="num">US$14,4M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">6</td><td class="marca">Adjudate<small>01-licitaciones</small></td><td class="sc">74,2</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">ChatGPT te lee unas bases si se las pegas; no revisa las tres mil que se publicaron esta semana, ni te avisa el jueves que faltó el Anexo N°4.</td><td class="num">US$35,6M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">7</td><td class="marca">Conserjo<small>06-arriendos</small></td><td class="sc">73,6</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Un chat no persigue la transferencia del día 5, no concilia la cartola ni te dice si el que quiere arrendar ya dejó colgado a otro propietario. Ese historial no está en el corpus de entrenamiento de nadie.</td><td class="num">US$42,5M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">8</td><td class="marca">Fedatia<small>17-datos-empresas</small></td><td class="sc">71,6</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Un banco no puede dar de alta a una empresa porque «lo dijo ChatGPT». Lo que se vende no es el dato: es la procedencia del dato, con fecha, fuente y sello.</td><td class="num">US$2,5M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">SAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">9</td><td class="marca">Contralta<small>08-laboral</small></td><td class="sc">68,8</td><td><span class="vd mid"><i></i>JUSTO</span></td><td class="frase">La mitad explicativa te la regala un chatbot hoy mismo. Lo que no te regala: el finiquito calculado por un servidor que tiene prohibido alucinar, y el calendario de plazos de <em>tus</em> trabajadores.</td><td class="num">US$189M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM*</small></td><td>Total</td><td><span class="plat ">medio</span></td></tr>
+<tr><td class="p">10</td><td class="marca">Caprato<small>21-inmuebles</small></td><td class="sc">68,8</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Ningún modelo sabe cuánto se arrienda <em>de verdad</em> ese edificio: eso hay que haberlo observado durante doce meses, edificio por edificio, y ése es todo el producto.</td><td class="num">US$18,4M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">11</td><td class="marca">Zurcia<small>03-agenda</small></td><td class="sc">68,5</td><td><span class="vd mid"><i></i>JUSTO</span></td><td class="frase">Porque la dueña no va a promptear — y ésa es la defensa más débil de la lista, la que se erosiona sola. Lo que sí vale: el agente contesta el WhatsApp de sus clientas, y un chat no toca el mundo.</td><td class="num">US$76M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat alto">alto</span></td></tr>
+<tr><td class="p">12</td><td class="marca">Rutamo<small>07-terreno</small></td><td class="sc">66,5</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">La ruta la calcula un solver que corre en un CPU y cuesta cero, no un modelo que cobra por token. Y el chat no despacha a la cuadrilla, no anota la visita con el guante puesto ni cobra la cotización.</td><td class="num">US$17,6M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Parcial</td><td><span class="plat ">bajo</span></td></tr>
+<tr class="rep"><td class="p">13</td><td class="marca">Antefirma<small>05-contratos</small></td><td class="sc">64,6</td><td><span class="vd no"><i></i>REPRUEBA</span></td><td class="frase">Casi no hay respuesta, y es grave: «súbele el contrato a ChatGPT y pregúntale qué cláusula te puede doler» entrega el 70% del valor por US$20 al mes. Su propia página de negocio lista a ChatGPT como competidor, con precio: $0.</td><td class="num">US$172,2M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat alto">alto</span></td></tr>
+<tr><td class="p">14</td><td class="marca">Cianota<small>14-permisos</small></td><td class="sc">63,0</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">«Si un LLM te dice ‘tu RCA sale el 18 de enero’, igual vas a tener que revisarlo. Entonces mejor que no lo diga». La ruta crítica es un grafo: se calcula, no se conversa.</td><td class="num">US$10,9M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM‡</small></td><td>No</td><td><span class="plat ">nulo</span></td></tr>
+<tr><td class="p">15</td><td class="marca">Fonalta<small>20-recepcion</small></td><td class="sc">62,7</td><td><span class="vd mid"><i></i>JUSTO</span></td><td class="frase">Aprueba el test literal —un chat no contesta tu teléfono— y reprueba el hermano: lo que Fonalta vende es el <em>ensamblaje</em> (telefonía + ASR + LLM + TTS), y ése es exactamente el producto que los proveedores de modelos están comoditizando con sus APIs de voz en tiempo real.</td><td class="num">US$52,4M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Total</td><td><span class="plat alto">alto</span></td></tr>
+<tr><td class="p">16</td><td class="marca">Torniqua<small>13-contratistas</small></td><td class="sc">62,6</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">El lector de la portería bloquea físicamente al que tiene el examen de altura vencido. Un chat no cierra un torniquete.</td><td class="num">US$11,9M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>No</td><td><span class="plat ">nulo</span></td></tr>
+<tr><td class="p">17</td><td class="marca">Cintavia<small>11-correas</small></td><td class="sc">62,4</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">Ningún modelo ve la correa. Las estaciones miran 4 km de cinta con visión, térmica y acústica, y ninguno de los tres detectores es un LLM: «meter un LLM multimodal a mirar 30 fps de correa sería 400× más caro y peor».</td><td class="num">US$3,6M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>No</td><td><span class="plat ">nulo</span></td></tr>
+<tr><td class="p">18</td><td class="marca">Mermata<small>04-inventario</small></td><td class="sc">58,3</td><td><span class="vd mid"><i></i>JUSTO</span></td><td class="frase">Con un CSV de ventas, un chat te hace un pronóstico pasable por US$20 al mes; lo que no hace es conectarse solo al SII todos los martes y decirte cuántos kilos de harina comprar.</td><td class="num">US$86M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>Parcial</td><td><span class="plat ">bajo</span></td></tr>
+<tr><td class="p">19</td><td class="marca">Cuasio<small>12-seguridad</small></td><td class="sc">58,1</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">El casi-accidente ocurre en la faena, con guantes puestos y treinta segundos de tiempo. No hay prompt que lo capture, y el que casi se muere no va a abrir un chat.</td><td class="num">US$16,1M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>No</td><td><span class="plat ">nulo</span></td></tr>
+<tr><td class="p">20</td><td class="marca">Freatia<small>15-agua</small></td><td class="sc">57,5</td><td><span class="vd ok"><i></i>APRUEBA</span></td><td class="frase">El balance hídrico se arma con caudalímetros y piezómetros, y hay que poder trazar cada litro hasta el sensor que lo midió. Un chat no tiene sensores, y un fiscalizador no acepta una conversación como evidencia.</td><td class="num">US$8M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM</small></td><td>No</td><td><span class="plat ">nulo</span></td></tr>
+<tr><td class="p">21</td><td class="marca">Finakids<small>16-finakids</small></td><td class="sc">50,5</td><td><span class="vd mid"><i></i>JUSTO</span></td><td class="frase">Al papá, ChatGPT ya le da gratis «de qué conversar el domingo» — que es literalmente la mitad del producto. Lo que queda es el juego, y el juego arranca con 2% de retención al día 30 según el benchmark que la propia idea cita.</td><td class="num">US$0,9M<br><small style="color:#5F676F;font-size:10px;letter-spacing:.06em">TAM B2B</small></td><td>Parcial</td><td><span class="plat ">bajo</span></td></tr>
+</tbody></table></div>
+<p class="sub" style="margin-top:14px;font-size:13.5px">
+<strong>*</strong> Contralta: TAM no publicado en dólares; derivado de su propia aritmética (325.000 empresas × $46.000/mes × 12 ÷ 950).
+<strong>†</strong> Kilonauta: su TAM declarado (US$880M) es el <em>gasto en flete</em> de todo Chile, no ingreso capturable; uso su SAM de ingreso neto.
+<strong>‡</strong> Cianota: derivado de su propia tabla (SOM mes 24 = US$545k = 5,0% del TAM).
+<strong>§</strong> Cotejia: derivado de su aritmética (27.500 tiendas × $52.000 × 12 ÷ 960).
+Fedatia y Finakids no publican TAM comparable: uso el SAM y el TAM B2B que ellas mismas declaran.
+«Autonomía» es la clasificación de Cuantario, no mía.</p>
+</div></section>
+<hr class="rule">
+<section id="graficos"><div class="wrap">
+<div class="sechead"><span class="secnum">05</span><h2>Tres gráficos que dicen más que la tabla</h2></div>
+<div class="chartbox"><figure><div class="scroll-x"><svg viewBox="0 0 700 520" role="img" aria-label="Dispersión: defensa contra el LLM contra dolor y disposición a pagar" class="chart">
+<rect x="56" y="30" width="224" height="436" fill="#C42B32" opacity="0.05"/>
+<text x="64" y="46" class="s-cap">zona de sustitución por US$20/mes</text>
+<line x1="56" y1="30" x2="56" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="56" y="484" text-anchor="middle" class="s-ax">2</text>
+<line x1="130" y1="30" x2="130" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="130" y="484" text-anchor="middle" class="s-ax">3</text>
+<line x1="205" y1="30" x2="205" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="205" y="484" text-anchor="middle" class="s-ax">4</text>
+<line x1="280" y1="30" x2="280" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="280" y="484" text-anchor="middle" class="s-ax">5</text>
+<line x1="354" y1="30" x2="354" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="354" y="484" text-anchor="middle" class="s-ax">6</text>
+<line x1="428" y1="30" x2="428" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="428" y="484" text-anchor="middle" class="s-ax">7</text>
+<line x1="503" y1="30" x2="503" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="503" y="484" text-anchor="middle" class="s-ax">8</text>
+<line x1="578" y1="30" x2="578" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="578" y="484" text-anchor="middle" class="s-ax">9</text>
+<line x1="652" y1="30" x2="652" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="652" y="484" text-anchor="middle" class="s-ax">10</text>
+<line x1="56" y1="466" x2="652" y2="466" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="470" text-anchor="end" class="s-ax">3</text>
+<line x1="56" y1="404" x2="652" y2="404" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="408" text-anchor="end" class="s-ax">4</text>
+<line x1="56" y1="341" x2="652" y2="341" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="345" text-anchor="end" class="s-ax">5</text>
+<line x1="56" y1="279" x2="652" y2="279" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="283" text-anchor="end" class="s-ax">6</text>
+<line x1="56" y1="217" x2="652" y2="217" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="221" text-anchor="end" class="s-ax">7</text>
+<line x1="56" y1="155" x2="652" y2="155" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="159" text-anchor="end" class="s-ax">8</text>
+<line x1="56" y1="92" x2="652" y2="92" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="96" text-anchor="end" class="s-ax">9</text>
+<line x1="56" y1="30" x2="652" y2="30" stroke="#C6CBD1" stroke-width="1" opacity="0.5"/>
+<text x="46" y="34" text-anchor="end" class="s-ax">10</text>
+<text x="354" y="504" text-anchor="middle" class="s-axt">Defensa contra el modelo genérico  →</text>
+<text x="16" y="248" transform="rotate(-90 16 248)" text-anchor="middle" class="s-axt">Dolor y disposición a pagar  →</text>
+<circle cx="622.0" cy="139.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Kilonauta (09-despacho) · defensa 10/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="622.0" y="143.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">09</text>
+<circle cx="560.5" cy="92.3" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Tinoria (02-cobranza) · defensa 9/10 · dolor 9/10 · APRUEBA</title></circle>
+<text x="560.5" y="96.3" text-anchor="middle" class="s-dot" fill="#FFFFFF">02</text>
+<circle cx="594.5" cy="92.3" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Talonio (10-contabilidad) · defensa 9/10 · dolor 9/10 · APRUEBA</title></circle>
+<text x="594.5" y="96.3" text-anchor="middle" class="s-dot" fill="#FFFFFF">10</text>
+<circle cx="682.0" cy="170.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Cotejia (19-precios) · defensa 10/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="682.0" y="174.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">19</text>
+<circle cx="662.0" cy="139.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Pregonia (18-alertas) · defensa 10/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="662.0" y="143.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">18</text>
+<circle cx="486.0" cy="140.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Adjudate (01-licitaciones) · defensa 8/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="486.0" y="144.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">01</text>
+<circle cx="520.0" cy="140.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Conserjo (06-arriendos) · defensa 8/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="520.0" y="144.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">06</text>
+<circle cx="667.0" cy="216.9" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Fedatia (17-datos-empresas) · defensa 10/10 · dolor 7/10 · APRUEBA</title></circle>
+<text x="667.0" y="220.9" text-anchor="middle" class="s-dot" fill="#FFFFFF">17</text>
+<circle cx="339.0" cy="167.6" r="13" fill="#FFFFFF" stroke="#14181D" stroke-width="2.5" stroke-dasharray="3 2.4"><title>Contralta (08-laboral) · defensa 6/10 · dolor 8/10 · JUSTO</title></circle>
+<text x="339.0" y="171.6" text-anchor="middle" class="s-dot" fill="#14181D">08</text>
+<circle cx="577.5" cy="216.9" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Caprato (21-inmuebles) · defensa 9/10 · dolor 7/10 · APRUEBA</title></circle>
+<text x="577.5" y="220.9" text-anchor="middle" class="s-dot" fill="#FFFFFF">21</text>
+<circle cx="428.5" cy="154.6" r="13" fill="#FFFFFF" stroke="#14181D" stroke-width="2.5" stroke-dasharray="3 2.4"><title>Zurcia (03-agenda) · defensa 7/10 · dolor 8/10 · JUSTO</title></circle>
+<text x="428.5" y="158.6" text-anchor="middle" class="s-dot" fill="#14181D">03</text>
+<circle cx="503.0" cy="169.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Rutamo (07-terreno) · defensa 8/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="503.0" y="173.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">07</text>
+<rect x="118.0" y="328.9" width="25" height="25" rx="2" fill="#C42B32" stroke="#FFFFFF" stroke-width="2"><title>Antefirma (05-contratos) · defensa 3/10 · dolor 5/10 · REPRUEBA</title></rect>
+<text x="130.5" y="345.4" text-anchor="middle" class="s-dot" fill="#FFFFFF">05</text>
+<circle cx="577.5" cy="30.0" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Cianota (14-permisos) · defensa 9/10 · dolor 10/10 · APRUEBA</title></circle>
+<text x="577.5" y="34.0" text-anchor="middle" class="s-dot" fill="#FFFFFF">14</text>
+<circle cx="369.0" cy="167.6" r="13" fill="#FFFFFF" stroke="#14181D" stroke-width="2.5" stroke-dasharray="3 2.4"><title>Fonalta (20-recepcion) · defensa 6/10 · dolor 8/10 · JUSTO</title></circle>
+<text x="369.0" y="171.6" text-anchor="middle" class="s-dot" fill="#14181D">20</text>
+<circle cx="642.0" cy="170.6" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Torniqua (13-contratistas) · defensa 10/10 · dolor 8/10 · APRUEBA</title></circle>
+<text x="642.0" y="174.6" text-anchor="middle" class="s-dot" fill="#FFFFFF">13</text>
+<circle cx="652.0" cy="92.3" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Cintavia (11-correas) · defensa 10/10 · dolor 9/10 · APRUEBA</title></circle>
+<text x="652.0" y="96.3" text-anchor="middle" class="s-dot" fill="#FFFFFF">11</text>
+<circle cx="354.0" cy="279.1" r="13" fill="#FFFFFF" stroke="#14181D" stroke-width="2.5" stroke-dasharray="3 2.4"><title>Mermata (04-inventario) · defensa 6/10 · dolor 6/10 · JUSTO</title></circle>
+<text x="354.0" y="283.1" text-anchor="middle" class="s-dot" fill="#14181D">04</text>
+<circle cx="577.5" cy="279.1" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Cuasio (12-seguridad) · defensa 9/10 · dolor 6/10 · APRUEBA</title></circle>
+<text x="577.5" y="283.1" text-anchor="middle" class="s-dot" fill="#FFFFFF">12</text>
+<circle cx="637.0" cy="216.9" r="13" fill="#0A7D4F" stroke="#FFFFFF" stroke-width="2"><title>Freatia (15-agua) · defensa 10/10 · dolor 7/10 · APRUEBA</title></circle>
+<text x="637.0" y="220.9" text-anchor="middle" class="s-dot" fill="#FFFFFF">15</text>
+<circle cx="428.5" cy="403.7" r="13" fill="#FFFFFF" stroke="#14181D" stroke-width="2.5" stroke-dasharray="3 2.4"><title>Finakids (16-finakids) · defensa 7/10 · dolor 4/10 · JUSTO</title></circle>
+<text x="428.5" y="407.7" text-anchor="middle" class="s-dot" fill="#14181D">16</text>
+</svg></div><div class="leyenda">
+  <span><i class="lg ok"></i> Aprueba el test del LLM</span>
+  <span><i class="lg mid"></i> Justo — pasa raspando</span>
+  <span><i class="lg no"></i> Reprueba</span>
+  <span style="color:#5F676F">El numeral dentro del disco es la carpeta (01…21).</span>
+</div><figcaption><strong>Dolor contra foso.</strong> Los dos ejes son juicios míos, de 0 a 10, no datos de las ideas — están declarados como tales. El cuadrante que importa es el de arriba a la derecha: duele mucho <em>y</em> el modelo genérico no lo resuelve. Ahí viven Cianota (14), Tinoria (02), Cintavia (11) y Talonio (10). La banda roja de la izquierda es la zona de sustitución: <strong>Antefirma (05) es la única que cae dentro</strong>. Finakids (16) está sola abajo — no porque el modelo la sustituya, sino porque el dolor no duele lo suficiente como para pagarlo.</figcaption></figure></div>
+<div class="chartbox" style="margin-top:22px"><figure><div class="scroll-x"><svg viewBox="0 0 700 606" role="img" aria-label="TAM chileno declarado por cada idea, escala logarítmica" class="chart">
+<line x1="160" y1="18" x2="160" y2="572" stroke="#C6CBD1" stroke-width="1"/>
+<text x="160" y="12" text-anchor="middle" class="s-ax">US$1M</text>
+<line x1="364" y1="18" x2="364" y2="572" stroke="#C6CBD1" stroke-width="1"/>
+<text x="364" y="12" text-anchor="middle" class="s-ax">US$10M</text>
+<line x1="568" y1="18" x2="568" y2="572" stroke="#C6CBD1" stroke-width="1"/>
+<text x="568" y="12" text-anchor="middle" class="s-ax">US$100M</text>
+<line x1="364" y1="18" x2="364" y2="572" stroke="#C42B32" stroke-width="2" stroke-dasharray="5 3"/>
+<text x="118" y="42" text-anchor="end" class="s-lbl">Contralta</text>
+<rect x="128" y="31" width="496.5" height="13" rx="3" fill="#4A525C"><title>Contralta: TAM* US$189.0M</title></rect>
+<text x="632" y="42" class="s-val">189</text>
+<text x="118" y="68" text-anchor="end" class="s-lbl">Antefirma</text>
+<rect x="128" y="57" width="488.3" height="13" rx="3" fill="#4A525C"><title>Antefirma: TAM US$172.2M</title></rect>
+<text x="623" y="68" class="s-val">172,2</text>
+<text x="118" y="94" text-anchor="end" class="s-lbl">Tinoria</text>
+<rect x="128" y="83" width="452.5" height="13" rx="3" fill="#4A525C"><title>Tinoria: TAM US$115.0M</title></rect>
+<text x="587" y="94" class="s-val">115</text>
+<text x="118" y="120" text-anchor="end" class="s-lbl">Talonio</text>
+<rect x="128" y="109" width="434.6" height="13" rx="3" fill="#4A525C"><title>Talonio: TAM US$94.0M</title></rect>
+<text x="570" y="120" class="s-val">94</text>
+<text x="118" y="146" text-anchor="end" class="s-lbl">Mermata</text>
+<rect x="128" y="135" width="426.7" height="13" rx="3" fill="#4A525C"><title>Mermata: TAM US$86.0M</title></rect>
+<text x="562" y="146" class="s-val">86</text>
+<text x="118" y="172" text-anchor="end" class="s-lbl">Zurcia</text>
+<rect x="128" y="161" width="415.7" height="13" rx="3" fill="#4A525C"><title>Zurcia: TAM US$76.0M</title></rect>
+<text x="551" y="172" class="s-val">76</text>
+<text x="118" y="198" text-anchor="end" class="s-lbl">Fonalta</text>
+<rect x="128" y="187" width="382.8" height="13" rx="3" fill="#4A525C"><title>Fonalta: TAM US$52.4M</title></rect>
+<text x="518" y="198" class="s-val">52,4</text>
+<text x="118" y="224" text-anchor="end" class="s-lbl">Conserjo</text>
+<rect x="128" y="213" width="364.2" height="13" rx="3" fill="#4A525C"><title>Conserjo: TAM US$42.5M</title></rect>
+<text x="499" y="224" class="s-val">42,5</text>
+<text x="118" y="250" text-anchor="end" class="s-lbl">Kilonauta</text>
+<rect x="128" y="239" width="356.6" height="13" rx="3" fill="#4A525C"><title>Kilonauta: SAM† US$39.0M</title></rect>
+<text x="492" y="250" class="s-val">39</text>
+<text x="118" y="276" text-anchor="end" class="s-lbl">Adjudate</text>
+<rect x="128" y="265" width="348.5" height="13" rx="3" fill="#4A525C"><title>Adjudate: TAM US$35.6M</title></rect>
+<text x="483" y="276" class="s-val">35,6</text>
+<text x="118" y="302" text-anchor="end" class="s-lbl">Caprato</text>
+<rect x="128" y="291" width="289.9" height="13" rx="3" fill="#4A525C"><title>Caprato: TAM US$18.4M</title></rect>
+<text x="425" y="302" class="s-val">18,4</text>
+<text x="118" y="328" text-anchor="end" class="s-lbl">Cotejia</text>
+<rect x="128" y="317" width="287.5" height="13" rx="3" fill="#4A525C"><title>Cotejia: TAM§ US$17.9M</title></rect>
+<text x="422" y="328" class="s-val">17,9</text>
+<text x="118" y="354" text-anchor="end" class="s-lbl">Rutamo</text>
+<rect x="128" y="343" width="286.0" height="13" rx="3" fill="#4A525C"><title>Rutamo: TAM US$17.6M</title></rect>
+<text x="421" y="354" class="s-val">17,6</text>
+<text x="118" y="380" text-anchor="end" class="s-lbl">Cuasio</text>
+<rect x="128" y="369" width="278.1" height="13" rx="3" fill="#4A525C"><title>Cuasio: TAM US$16.1M</title></rect>
+<text x="413" y="380" class="s-val">16,1</text>
+<text x="118" y="406" text-anchor="end" class="s-lbl">Pregonia</text>
+<rect x="128" y="395" width="268.2" height="13" rx="3" fill="#4A525C"><title>Pregonia: TAM US$14.4M</title></rect>
+<text x="403" y="406" class="s-val">14,4</text>
+<text x="118" y="432" text-anchor="end" class="s-lbl">Torniqua</text>
+<rect x="128" y="421" width="251.3" height="13" rx="3" fill="#4A525C"><title>Torniqua: TAM US$11.9M</title></rect>
+<text x="386" y="432" class="s-val">11,9</text>
+<text x="118" y="458" text-anchor="end" class="s-lbl">Cianota</text>
+<rect x="128" y="447" width="243.5" height="13" rx="3" fill="#4A525C"><title>Cianota: TAM‡ US$10.9M</title></rect>
+<text x="378" y="458" class="s-val">10,9</text>
+<text x="118" y="484" text-anchor="end" class="s-lbl">Freatia</text>
+<rect x="128" y="473" width="216.1" height="13" rx="3" fill="#C42B32"><title>Freatia: TAM US$8.0M</title></rect>
+<text x="351" y="484" class="s-val">8</text>
+<text x="118" y="510" text-anchor="end" class="s-lbl">Cintavia</text>
+<rect x="128" y="499" width="145.2" height="13" rx="3" fill="#C42B32"><title>Cintavia: TAM US$3.6M</title></rect>
+<text x="280" y="510" class="s-val">3,6</text>
+<text x="118" y="536" text-anchor="end" class="s-lbl">Fedatia</text>
+<rect x="128" y="525" width="112.9" height="13" rx="3" fill="#C42B32"><title>Fedatia: SAM US$2.5M</title></rect>
+<text x="248" y="536" class="s-val">2,5</text>
+<text x="118" y="562" text-anchor="end" class="s-lbl">Finakids</text>
+<rect x="128" y="551" width="19.3" height="13" rx="3" fill="#C42B32"><title>Finakids: TAM B2B US$0.87M</title></rect>
+<text x="154" y="562" class="s-val">0,9</text>
+<text x="128" y="594" class="s-cap" fill="#C42B32">Línea roja = US$10M. Bajo ella, el 10% de TODO Chile no llega a US$1M de ARR.</text>
+</svg></div><figcaption><strong>El techo chileno, según cada idea.</strong> Escala logarítmica: el rango va de US$0,87M a US$189M, dos órdenes de magnitud. Cifras declaradas por cada idea (ver las notas de la tabla). La mediana es US$18,4M y <strong>catorce de las 21 están bajo US$50M</strong>. Las <strong>cuatro bajo los US$10M</strong> — Finakids, Fedatia, Cintavia, Freatia — merecen una frase aparte, porque significa algo muy concreto: capturar el <em>10% de todo el mercado chileno</em> no produce US$1M de ARR. Para esas cuatro, salir de Chile no es una fase 2: es el día uno.</figcaption></figure></div>
+<div class="chartbox" style="margin-top:22px"><figure><div class="scroll-x"><svg viewBox="0 0 700 581" role="img" aria-label="Probabilidad declarada de llegar a un millón de dólares de ARR" class="chart">
+<line x1="128" y1="18" x2="128" y2="551" stroke="#C6CBD1" stroke-width="1"/>
+<text x="128" y="12" text-anchor="middle" class="s-ax">0%</text>
+<line x1="284" y1="18" x2="284" y2="551" stroke="#C6CBD1" stroke-width="1"/>
+<text x="284" y="12" text-anchor="middle" class="s-ax">10%</text>
+<line x1="439" y1="18" x2="439" y2="551" stroke="#C6CBD1" stroke-width="1"/>
+<text x="439" y="12" text-anchor="middle" class="s-ax">20%</text>
+<line x1="595" y1="18" x2="595" y2="551" stroke="#C6CBD1" stroke-width="1"/>
+<text x="595" y="12" text-anchor="middle" class="s-ax">30%</text>
+<text x="118" y="43" text-anchor="end" class="s-lbl">Cianota</text>
+<line x1="439.2" y1="39" x2="594.9" y2="39" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Cianota: 20–30% · cond. M4 (10 cuentas) en el mes 12 · bajo 10% si falla</title></line>
+<circle cx="439.2" cy="39" r="4.5" fill="#14181D"/><circle cx="594.9" cy="39" r="4.5" fill="#14181D"/>
+<text x="604" y="43" class="s-val">20–30%</text>
+<text x="118" y="68" text-anchor="end" class="s-lbl">Kilonauta</text>
+<line x1="361.4" y1="64" x2="532.6" y2="64" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Kilonauta: 15–26% · cond. M2 (≥2 couriers a ≥30% bajo lista) antes del mes 9 · &lt;4% si M2 falla</title></line>
+<circle cx="361.4" cy="64" r="4.5" fill="#14181D"/><circle cx="532.6" cy="64" r="4.5" fill="#14181D"/>
+<text x="542" y="68" class="s-val">15–26%</text>
+<text x="118" y="93" text-anchor="end" class="s-lbl">Cotejia</text>
+<line x1="314.8" y1="89" x2="517.1" y2="89" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Cotejia: 12–25% · cond. M2 (activación ≥40%) en el mes 6 · 30–49% si M2 se cumple</title></line>
+<circle cx="314.8" cy="89" r="4.5" fill="#14181D"/><circle cx="517.1" cy="89" r="4.5" fill="#14181D"/>
+<text x="526" y="93" class="s-val">12–25%</text>
+<text x="118" y="118" text-anchor="end" class="s-lbl">Talonio</text>
+<line x1="314.8" y1="114" x2="439.2" y2="114" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Talonio: 12–20% · incondicional, al mes 36</title></line>
+<circle cx="314.8" cy="114" r="4.5" fill="#14181D"/><circle cx="439.2" cy="114" r="4.5" fill="#14181D"/>
+<text x="448" y="118" class="s-val">12–20%</text>
+<text x="118" y="143" text-anchor="end" class="s-lbl">Zurcia</text>
+<line x1="283.6" y1="139" x2="408.1" y2="139" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Zurcia: 10–18% · cond. M3 en el mes 12 · si falla, bajo 5%</title></line>
+<circle cx="283.6" cy="139" r="4.5" fill="#14181D"/><circle cx="408.1" cy="139" r="4.5" fill="#14181D"/>
+<text x="417" y="143" class="s-val">10–18%</text>
+<text x="118" y="168" text-anchor="end" class="s-lbl">Rutamo</text>
+<line x1="283.6" y1="164" x2="408.1" y2="164" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Rutamo: 10–18% · cond. Hito 3 en el mes 10</title></line>
+<circle cx="283.6" cy="164" r="4.5" fill="#14181D"/><circle cx="408.1" cy="164" r="4.5" fill="#14181D"/>
+<text x="417" y="168" class="s-val">10–18%</text>
+<text x="118" y="193" text-anchor="end" class="s-lbl">Tinoria</text>
+<line x1="252.5" y1="189" x2="345.9" y2="189" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Tinoria: 8–14% · cond. H3 en el mes 7 · sin condicional: 4–7%</title></line>
+<circle cx="252.5" cy="189" r="4.5" fill="#14181D"/><circle cx="345.9" cy="189" r="4.5" fill="#14181D"/>
+<text x="355" y="193" class="s-val">8–14%</text>
+<text x="118" y="218" text-anchor="end" class="s-lbl">Fonalta</text>
+<line x1="221.4" y1="214" x2="314.8" y2="214" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Fonalta: 6–12% · cond. M4 en el mes 12 · 30–40% de morir antes del mes 12</title></line>
+<circle cx="221.4" cy="214" r="4.5" fill="#14181D"/><circle cx="314.8" cy="214" r="4.5" fill="#14181D"/>
+<text x="324" y="218" class="s-val">6–12%</text>
+<text x="118" y="243" text-anchor="end" class="s-lbl">Cintavia</text>
+<line x1="221.4" y1="239" x2="314.8" y2="239" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Cintavia: 6–12% · incondicional al mes 30 · 18–28% cond. M2 · &lt;3% si M2 falla</title></line>
+<circle cx="221.4" cy="239" r="4.5" fill="#14181D"/><circle cx="314.8" cy="239" r="4.5" fill="#14181D"/>
+<text x="324" y="243" class="s-val">6–12%</text>
+<text x="118" y="268" text-anchor="end" class="s-lbl">Adjudate</text>
+<line x1="205.8" y1="264" x2="314.8" y2="264" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Adjudate: 5–12% · cond. Hito 3 en el mes 9</title></line>
+<circle cx="205.8" cy="264" r="4.5" fill="#14181D"/><circle cx="314.8" cy="264" r="4.5" fill="#14181D"/>
+<text x="324" y="268" class="s-val">5–12%</text>
+<text x="118" y="293" text-anchor="end" class="s-lbl">Cuasio</text>
+<line x1="205.8" y1="289" x2="268.1" y2="289" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Cuasio: 5–9% · incondicional al mes 36 · 10–18% cond. H3 · 25–35% si el objetivo es un negocio chico</title></line>
+<circle cx="205.8" cy="289" r="4.5" fill="#14181D"/><circle cx="268.1" cy="289" r="4.5" fill="#14181D"/>
+<text x="277" y="293" class="s-val">5–9%</text>
+<text x="118" y="318" text-anchor="end" class="s-lbl">Caprato</text>
+<line x1="190.2" y1="314" x2="268.1" y2="314" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Caprato: 4–9% · cond. M3 (SEO ≥35% de los registros) al mes 6 · bajo 2% si falla</title></line>
+<circle cx="190.2" cy="314" r="4.5" fill="#14181D"/><circle cx="268.1" cy="314" r="4.5" fill="#14181D"/>
+<text x="277" y="318" class="s-val">4–9%</text>
+<text x="118" y="343" text-anchor="end" class="s-lbl">Pregonia</text>
+<line x1="190.2" y1="339" x2="252.5" y2="339" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Pregonia: 4–8% · venture-scale · 25–35% de llegar a US$250k de ARR al mes 24</title></line>
+<circle cx="190.2" cy="339" r="4.5" fill="#14181D"/><circle cx="252.5" cy="339" r="4.5" fill="#14181D"/>
+<text x="262" y="343" class="s-val">4–8%</text>
+<text x="118" y="368" text-anchor="end" class="s-lbl">Mermata</text>
+<line x1="216.7" y1="364" x2="219.7" y2="364" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Mermata: 5.7–5.7% · punto derivado; ellos mismos dicen que «está mal por lo bajo»</title></line>
+<circle cx="216.7" cy="364" r="4.5" fill="#14181D"/><circle cx="216.7" cy="364" r="4.5" fill="#14181D"/>
+<text x="226" y="368" class="s-val">5,7%</text>
+<text x="118" y="393" text-anchor="end" class="s-lbl">Conserjo</text>
+<line x1="190.2" y1="389" x2="236.9" y2="389" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Conserjo: 4–7% · hoy, incondicional · 15–25% después de los hitos</title></line>
+<circle cx="190.2" cy="389" r="4.5" fill="#14181D"/><circle cx="236.9" cy="389" r="4.5" fill="#14181D"/>
+<text x="246" y="393" class="s-val">4–7%</text>
+<text x="118" y="418" text-anchor="end" class="s-lbl">Freatia</text>
+<line x1="174.7" y1="414" x2="252.5" y2="414" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Freatia: 3–8% · incondicional al mes 30 · 20–30% cond. M2</title></line>
+<circle cx="174.7" cy="414" r="4.5" fill="#14181D"/><circle cx="252.5" cy="414" r="4.5" fill="#14181D"/>
+<text x="262" y="418" class="s-val">3–8%</text>
+<text x="118" y="443" text-anchor="end" class="s-lbl">Contralta</text>
+<line x1="174.7" y1="439" x2="236.9" y2="439" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Contralta: 3–7% · cond. M4 en el mes 12, a 48 meses · 25–35% de negocio chico rentable</title></line>
+<circle cx="174.7" cy="439" r="4.5" fill="#14181D"/><circle cx="236.9" cy="439" r="4.5" fill="#14181D"/>
+<text x="246" y="443" class="s-val">3–7%</text>
+<text x="118" y="468" text-anchor="end" class="s-lbl">Finakids</text>
+<line x1="159.1" y1="464" x2="221.4" y2="464" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Finakids: 2–6% · venture-scale · 10–18% de negocio sano de 4 personas</title></line>
+<circle cx="159.1" cy="464" r="4.5" fill="#14181D"/><circle cx="221.4" cy="464" r="4.5" fill="#14181D"/>
+<text x="230" y="468" class="s-val">2–6%</text>
+<text x="118" y="493" text-anchor="end" class="s-lbl">Torniqua</text>
+<line x1="159.1" y1="489" x2="205.8" y2="489" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Torniqua: 2–5% · al mes 24 · 30–40% de llegar a US$300k ARR · 40–55% de empresa rentable de 8 personas</title></line>
+<circle cx="159.1" cy="489" r="4.5" fill="#14181D"/><circle cx="205.8" cy="489" r="4.5" fill="#14181D"/>
+<text x="215" y="493" class="s-val">2–5%</text>
+<text x="118" y="518" text-anchor="end" class="s-lbl">Antefirma</text>
+<line x1="159.1" y1="514" x2="190.2" y2="514" stroke="#4A525C" stroke-width="5" stroke-linecap="round"><title>Antefirma: 2–4% · incondicional, hoy · 12–20% cond. M4 en el mes 12</title></line>
+<circle cx="159.1" cy="514" r="4.5" fill="#14181D"/><circle cx="190.2" cy="514" r="4.5" fill="#14181D"/>
+<text x="199" y="518" class="s-val">2–4%</text>
+<text x="118" y="543" text-anchor="end" class="s-lbl">Fedatia</text>
+<line x1="128" y1="539" x2="162" y2="539" stroke="#C6CBD1" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 4"/>
+<text x="172" y="543" class="s-cap">no la declara — su meta es US$83k de ARR</text>
+<text x="128" y="573" class="s-cap">Rangos textuales de cada roadmap.html. Ninguna de las 21 declara más de 30%.</text>
+</svg></div><figcaption><strong>Lo que cada idea se atreve a prometerse a sí misma.</strong> El rango de probabilidad de llegar a ~US$1M de ARR que cada <code>roadmap.html</code> declara, con su derivación. Algunos son condicionales a un hito y otros no — el detalle está en cada ficha. Dos lecturas incómodas: <strong>ninguna de las 21 declara más de 30%</strong>, y la que declara la más alta (Cianota, 20–30%) es justamente la que no tiene embudo, sino una lista de 300 cuentas que hay que ir a visitar. Un número alto acá no es una buena noticia: casi siempre significa que el mercado es tan chico que el modelo cabe entero en la cabeza de quien lo escribió.</figcaption></figure></div>
+</div></section>
+<hr class="rule">
+<section id="fichas"><div class="wrap">
+<div class="sechead"><span class="secnum">06</span><h2>Ficha por ficha</h2></div>
+<p class="sub">Las 21, en orden de puntaje. Qué la hace ganar, qué la mata, y la respuesta en una frase a «¿por qué no ChatGPT?». Las barras son los diez criterios, en el orden de sus pesos.</p>
+<div class="fichas">
+<article class="ficha v-ok" id="09-despacho">
+  <div class="fh">
+    <div class="n">1</div>
+    <div class="t"><h3>Kilonauta</h3><div class="meta">09-despacho · Logística e-commerce</div></div>
+    <div class="sc">81,8<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: Total*</span>
+  </div>
+  <div class="cifras">Gratis–$99.900/mes · margen 59% sobre ingreso neto · CAC $145.000 · LTV/CAC 13,0× · payback 1,8 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">15–26%</strong> — cond. M2 (≥2 couriers a ≥30% bajo lista) antes del mes 9 · &lt;4% si M2 falla</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Ningún proveedor de modelos va a negociar una tarifa con Chilexpress ni imprimir tu etiqueta. Lo que se vende no es una respuesta: es un contrato de compra mayorista y un pedazo de papel adhesivo.</dd>
+    <dt>Qué la hace ganar</dt><dd>El foso es un contrato, no un prompt — y un contrato no se commoditiza. El canal es autoservicio puro (marketplace de apps de Jumpseller), el payback es de 1,8 meses, y el dolor tiene precio en la portada: el mismo paquete a Puerto Montt cuesta $9.930 o $5.320.</dd>
+    <dt>Qué la mata</dt><dd>El negocio no existe sin el contrato de tarifas: si ningún courier baja del 25% bajo lista antes del mes 9 (hito M2), no hay spread y queda un SaaS con techo bajo. Su propio roadmap le pone <4% de probabilidad a ese escenario. Y Cuantario es explícito: el sistema la opera, no la funda.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="02-cobranza">
+  <div class="fh">
+    <div class="n">2</div>
+    <div class="t"><h3>Tinoria</h3><div class="meta">02-cobranza · Cuentas por cobrar</div></div>
+    <div class="sc">80,9<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$49.000–$229.000/mes · margen 86% · CAC $260.000 · LTV/CAC 7,9–10,5× · payback 3,2 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">8–14%</strong> — cond. H3 en el mes 7 · sin condicional: 4–7%</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Un chat te redacta el correo de cobranza; no sabe quién te debe, no lo manda a las 9:00 del martes, y no se acuerda en agosto de la promesa de pago que te hicieron en marzo.</dd>
+    <dt>Qué la hace ganar</dt><dd>Es la única que junta cuatro de las defensas fuertes a la vez: dato del SII que el modelo no tiene, vigilancia de vencimientos, actuación sobre el mundo (manda el WhatsApp) y libro de la cartera. Y el dolor es caja, no tiempo: «tu DSO son 68 días y deberían ser 40; eso son $37 millones tuyos en el bolsillo de otro».</dd>
+    <dt>Qué la mata</dt><dd>El churn, que es un supuesto y no un dato: a 3%/mes el LTV/CAC es 10,5×, a 4% es 7,9×. Y su cuña declarada —«el tono es el producto»— no es un foso: es lo único de todo el repositorio que un competidor copia en una tarde.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-ok" id="10-contabilidad">
+  <div class="fh">
+    <div class="n">3</div>
+    <div class="t"><h3>Talonio</h3><div class="meta">10-contabilidad · Contabilidad PYME</div></div>
+    <div class="sc">79,4<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$7.900/RUT/mes (contador) · $34.900/mes (PYME) · margen 63%/92% · CAC $20.000 vía contador · LTV/CAC 6,2× · payback 4,0 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">12–20%</strong> — incondicional, al mes 36</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Un contador no firma un F29 que calculó un chatbot. Acá la aritmética la hace el servidor con test unitario y el modelo tiene <em>prohibido</em> sumar — y eso, precisamente, es lo que le vendes en contra del LLM.</dd>
+    <dt>Qué la hace ganar</dt><dd>El mejor canal de distribución del repositorio: el contador. Una sola venta trae 20 RUT, el CAC cae a $20.000 y el payback a 4 meses. Y el dolor está cuantificado en plata que ya es tuya: $2,6 millones al año de IVA crédito fiscal que se van al basurero.</dd>
+    <dt>Qué la mata</dt><dd>Defontana, Nubox y Bsale ya están en el escritorio del contador. Si cualquiera agrega captura de boletas físicas, Talonio es una función y no una empresa. TAM US$94M pero SAM US$19,4M — y si el supuesto de digitalización está inflado, el SAM cae a US$10,7M y hay que salir de Chile antes.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-ok" id="19-precios">
+  <div class="fh">
+    <div class="n">4</div>
+    <div class="t"><h3>Cotejia</h3><div class="meta">19-precios · Inteligencia de precios</div></div>
+    <div class="sc">78,9<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$29.900–$59.900/mes · margen 91,1% (85% consolidado) · CAC $49.300 · LTV/CAC 17× · payback 0,97 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">12–25%</strong> — cond. M2 (activación ≥40%) en el mes 6 · 30–49% si M2 se cumple</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">El precio que tu competencia puso a las 3 de la mañana no está en ningún modelo: hay que ir a mirarlo, todas las noches. Y la decisión de reprecio es aritmética con test unitario — «prohibido meterle un LLM».</dd>
+    <dt>Qué la hace ganar</dt><dd>El foso más fresco del lote: un dato observado que caduca en horas. Payback de 0,97 meses, margen 91%, ciclo de venta de minutos (la dueña firma y usa), y un canal donde el comprador ya está congregado (vendedores de Mercado Libre).</dd>
+    <dt>Qué la mata</dt><dd>El TAM. 6.050 tiendas en todo Chile: aunque te quedaras con el 100% del SOM chileno son US$4,0M de ARR. Y el churn de 6% mensual es un supuesto del e-commerce PYME, no un dato: a 10% con activación de 20%, el negocio se cae.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="18-alertas">
+  <div class="fh">
+    <div class="n">5</div>
+    <div class="t"><h3>Pregonia</h3><div class="meta">18-alertas · Vigilancia regulatoria</div></div>
+    <div class="sc">75,2<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$14.900–$249.000/mes · margen 90% · CAC $32.000 · LTV/CAC 44× · payback 0,45 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">4–8%</strong> — venture-scale · 25–35% de llegar a US$250k de ARR al mes 24</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Nadie va a pegar el Diario Oficial en ChatGPT todos los días a las seis de la mañana — y ése, literalmente, es el producto entero.</dd>
+    <dt>Qué la hace ganar</dt><dd>La defensa n°2 en estado puro: vigilancia continua sobre dato que sólo existe hoy y que ningún modelo tiene. Margen 90%, payback de medio mes, y un valle de caja de $2,9 millones de pesos — unos US$3.000. Este negocio no muere por caja.</dd>
+    <dt>Qué la mata</dt><dd>El techo del canal. Su LTV/CAC de 44× no es una buena noticia y ellos lo dicen: «es la señal de que el cuello de botella está en la demanda, no en la eficiencia». En Chile casi nadie está buscando esto y el TAM completo es de US$14,4M.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div></div>
+</article>
+<article class="ficha v-ok" id="01-licitaciones">
+  <div class="fh">
+    <div class="n">6</div>
+    <div class="t"><h3>Adjudate</h3><div class="meta">01-licitaciones · Compras públicas</div></div>
+    <div class="sc">74,2<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$59.000/mes · margen 82,5% · CAC $260.000 · LTV/CAC 7,5× · payback 3,3 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">5–12%</strong> — cond. Hito 3 en el mes 9</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">ChatGPT te lee unas bases si se las pegas; no revisa las tres mil que se publicaron esta semana, ni te avisa el jueves que faltó el Anexo N°4.</dd>
+    <dt>Qué la hace ganar</dt><dd>El ICP mejor documentado de Chile: los oferentes de cada licitación son información pública. Puedes listar hoy, con RUT, a todas las empresas que postularon y perdieron en 12 meses, contra quién y por cuánta plata. Y el chequeo de admisibilidad es determinista y cuesta $0 — su propio stack dice que meterle un LLM «costaría una fortuna».</dd>
+    <dt>Qué la mata</dt><dd>TAM US$35,6M, SAM US$10,7M: «aun ganando el mercado entero, esto no llega a ser una empresa grande» (palabras suyas). Y su criterio M5: si al mes 20 todo sigue siendo outbound a mano, esto es una consultora, no una empresa de software.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-ok" id="06-arriendos">
+  <div class="fh">
+    <div class="n">7</div>
+    <div class="t"><h3>Conserjo</h3><div class="meta">06-arriendos · PropTech · administración</div></div>
+    <div class="sc">73,6<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$3.900–$7.900/unidad/mes · margen 89% · CAC $95.000 · LTV/CAC 10,5× · payback 3,1 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">4–7%</strong> — hoy, incondicional · 15–25% después de los hitos</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Un chat no persigue la transferencia del día 5, no concilia la cartola ni te dice si el que quiere arrendar ya dejó colgado a otro propietario. Ese historial no está en el corpus de entrenamiento de nadie.</dd>
+    <dt>Qué la hace ganar</dt><dd>LTV/CAC 10,5×, payback 3,1 meses, y una cuña transaccional que se compra sin hablar con nadie: el informe de arrendatario suelto a $6.900. Una corredora trae 20–80 unidades de una sola venta: la densidad por conversación es 10× la del dueño individual.</dd>
+    <dt>Qué la mata</dt><dd>Scorear personas es riesgo regulatorio de verdad (Ley 19.628, Ley 21.719), y es la única de las 21 cuyo producto estrella toca datos personales de un tercero que no es el cliente. Y el TAM de US$42,5M se apoya en un conteo de unidades del que ellos mismos dicen: «NO tenemos una fuente».</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-ok" id="17-datos-empresas">
+  <div class="fh">
+    <div class="n">8</div>
+    <div class="t"><h3>Fedatia</h3><div class="meta">17-datos-empresas · API de datos · KYB</div></div>
+    <div class="sc">71,6<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">Gratis–$29.000+/mes · margen 88% · CAC $320.000 · LTV/CAC 10× · payback 3,3 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">no la declara</strong> — No declara probabilidad de US$1M de ARR: su escenario base es US$83k de ARR, con 12–20%</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Un banco no puede dar de alta a una empresa porque «lo dijo ChatGPT». Lo que se vende no es el dato: es la procedencia del dato, con fecha, fuente y sello.</dd>
+    <dt>Qué la hace ganar</dt><dd>Autonomía total de verdad, no declarada: el sistema meta la operó, le asignó presupuesto, midió el embudo y decidió escalarla con n=34 — sin saber siquiera cómo se llamaba la marca. Margen 88%, payback 3,3 meses.</dd>
+    <dt>Qué la mata</dt><dd>SAM chileno de US$2,5 millones, y ellos lo publican en la primera pantalla: «la conclusión que un pitch deck escondería». Su LTV/CAC de 10× grita que el problema no es convertir sino que aparezca alguien: el techo del canal es ~18 clientes nuevos al mes <em>en el mejor caso</em>.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-mid" id="08-laboral">
+  <div class="fh">
+    <div class="n">9</div>
+    <div class="t"><h3>Contralta</h3><div class="meta">08-laboral · Cumplimiento laboral</div></div>
+    <div class="sc">68,8<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd mid"><i></i>JUSTO</span>
+    <span class="plat ">Plataforma: medio</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$34.000–$69.000/mes · margen 87,8% · CAC $180.000 (Cuantario observó $484.000) · LTV/CAC 6,4× · payback 4,5 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">3–7%</strong> — cond. M4 en el mes 12, a 48 meses · 25–35% de negocio chico rentable</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">La mitad explicativa te la regala un chatbot hoy mismo. Lo que no te regala: el finiquito calculado por un servidor que tiene prohibido alucinar, y el calendario de plazos de <em>tus</em> trabajadores.</dd>
+    <dt>Qué la hace ganar</dt><dd>El TAM chileno más grande del repositorio (325.000 empresas × $46.000 × 12 ÷ 950 = US$189M) y un disparador de compra brutal: la primera demanda en la Dirección del Trabajo. La regla dura —el modelo no hace la aritmética del finiquito— es exactamente lo que le vendes en contra del LLM.</dd>
+    <dt>Qué la mata</dt><dd>Mi DT. Si la Dirección del Trabajo agrega alertas de plazos —técnicamente, un correo automático; ya tiene los contratos y los finiquitos— borra la mitad avisadora del producto, gratis y de un día para otro. Y es la única idea cuyo CAC fue «medido»: Cuantario la pausó en el mes 9 con CAC de $484.000 contra el techo de $350.000 que ella misma declaró.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill mid" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-ok" id="21-inmuebles">
+  <div class="fh">
+    <div class="n">10</div>
+    <div class="t"><h3>Caprato</h3><div class="meta">21-inmuebles · PropTech · inversión</div></div>
+    <div class="sc">68,8<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$9.900–$49.000/mes · margen 88% · CAC $72.339 · LTV/CAC 3,24× · payback 4,8 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">4–9%</strong> — cond. M3 (SEO ≥35% de los registros) al mes 6 · bajo 2% si falla</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Ningún modelo sabe cuánto se arrienda <em>de verdad</em> ese edificio: eso hay que haberlo observado durante doce meses, edificio por edificio, y ése es todo el producto.</dd>
+    <dt>Qué la hace ganar</dt><dd>Un foso de datos honesto —el corpus histórico de arriendos por edificio no se borra aunque mañana te bloqueen el portal— y la única posición del repositorio que puede cobrar por decir «no compres»: «nadie en la cadena inmobiliaria gana plata diciéndote que no compres».</dd>
+    <dt>Qué la mata</dt><dd>Es binario: si el portal bloquea el acceso, el radar queda ciego en una semana. Ellos mismos lo ponen en 20–30% a 24 meses. Y sin el canal orgánico el LTV/CAC cae a 1,47 con payback de 10,5 meses: el negocio no cierra y no hay plan B de canal.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-mid" id="03-agenda">
+  <div class="fh">
+    <div class="n">11</div>
+    <div class="t"><h3>Zurcia</h3><div class="meta">03-agenda · Servicios locales</div></div>
+    <div class="sc">68,5<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd mid"><i></i>JUSTO</span>
+    <span class="plat alto">Plataforma: alto</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$34.000–$210.000/mes · margen 65% · CAC $250.000 · LTV/CAC 5,7× · payback 4,4 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">10–18%</strong> — cond. M3 en el mes 12 · si falla, bajo 5%</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Porque la dueña no va a promptear — y ésa es la defensa más débil de la lista, la que se erosiona sola. Lo que sí vale: el agente contesta el WhatsApp de sus clientas, y un chat no toca el mundo.</dd>
+    <dt>Qué la hace ganar</dt><dd>El caso de libro de la autonomía según Cuantario: embedded signup de Meta, ticket bajo, volumen alto, ICP alcanzable por Meta Ads. El dolor es medible el primer día: 49 horas muertas al mes × $25.000 = $1.235.000. Y el motor de calce es determinista, no un LLM.</dd>
+    <dt>Qué la mata</dt><dd>«AgendaPro agrega relleno automático. Es lo más probable de esta lista» — lo escribieron ellos, y lo pusieron primero. Además Meta está metiendo agentes de IA dentro de WhatsApp Business, que es exactamente la capa que Zurcia vende. Margen 65%: el segundo peor del repositorio.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill mid" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="07-terreno">
+  <div class="fh">
+    <div class="n">12</div>
+    <div class="t"><h3>Rutamo</h3><div class="meta">07-terreno · Field service PYME</div></div>
+    <div class="sc">66,5<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Parcial</span>
+  </div>
+  <div class="cifras">$59.000/mes · margen 87% · CAC $551.660 · LTV/CAC 7,5× · payback 4,4 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">10–18%</strong> — cond. Hito 3 en el mes 10</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">La ruta la calcula un solver que corre en un CPU y cuesta cero, no un modelo que cobra por token. Y el chat no despacha a la cuadrilla, no anota la visita con el guante puesto ni cobra la cotización.</dd>
+    <dt>Qué la hace ganar</dt><dd>Margen 87%, LTV/CAC 7,5×, y un dueño que decide solo en una reunión, sin comité y sin licitación. El activo real es la ficha del equipo instalado —historial, repuestos, SEC, DTE—, que es más difícil de copiar que un mapa.</dd>
+    <dt>Qué la mata</dt><dd>El técnico más antiguo. Si dice «esto es para controlarnos», se acabó: su propio criterio H3 es adopción bajo 50% a la semana 4. Y el TAM chileno de US$17,6M topa antes de que llegues a US$1M de ARR — lo dice su negocio.html sin anestesia.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-no" id="05-contratos">
+  <div class="fh">
+    <div class="n">13</div>
+    <div class="t"><h3>Antefirma</h3><div class="meta">05-contratos · Legaltech PYME</div></div>
+    <div class="sc">64,6<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd no"><i></i>REPRUEBA</span>
+    <span class="plat alto">Plataforma: alto</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$29.000/contrato · $39.000/mes · margen 88,7% · CAC $140.000 · LTV/CAC 6,1× · payback 2,7 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">2–4%</strong> — incondicional, hoy · 12–20% cond. M4 en el mes 12</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Casi no hay respuesta, y es grave: «súbele el contrato a ChatGPT y pregúntale qué cláusula te puede doler» entrega el 70% del valor por US$20 al mes. Su propia página de negocio lista a ChatGPT como competidor, con precio: $0.</dd>
+    <dt>Qué la hace ganar</dt><dd>La mejor distribución del repositorio y no está ni cerca: transaccional, sin onboarding, sin contrato, valor entregado en minutos, payback de 2,7 meses. Cuantario la llama «el caso más limpio del repositorio». TAM chileno US$172,2M, el segundo mayor.</dd>
+    <dt>Qué la mata</dt><dd>Que el análisis se vuelva gratis antes de que la vigilancia exista — y ya es gratis. Su riesgo n°1, escrito por ellos: «Hoy pegar un contrato en ChatGPT ya da algo decente. En 18 meses va a dar algo muy bueno, va a estar dentro de WhatsApp, y va a ser gratis. Estamos muertos y ni siquiera nos vamos a dar cuenta».</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill no" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div></div>
+</article>
+<article class="ficha v-ok" id="14-permisos">
+  <div class="fh">
+    <div class="n">14</div>
+    <div class="t"><h3>Cianota</h3><div class="meta">14-permisos · Permitología industrial</div></div>
+    <div class="sc">63,0<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: No</span>
+  </div>
+  <div class="cifras">$890.000–$3.900.000/mes · margen 93% (84% real bajo 40 cuentas) · CAC $8.200.000 · LTV/CAC 7,9× · payback 5,1 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">20–30%</strong> — cond. M4 (10 cuentas) en el mes 12 · bajo 10% si falla</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">«Si un LLM te dice ‘tu RCA sale el 18 de enero’, igual vas a tener que revisarlo. Entonces mejor que no lo diga». La ruta crítica es un grafo: se calcula, no se conversa.</dd>
+    <dt>Qué la hace ganar</dt><dd>El dolor más caro del repositorio, y está tasado por ellos: un mes de atraso en la Adenda arrastra a otros cuatro permisos y corre la puesta en marcha tres meses — US$34,8 millones. La probabilidad declarada de llegar a US$1M de ARR (20–30%) es la más alta de las 21.</dd>
+    <dt>Qué la mata</dt><dd>No hay embudo: hay una lista de 300 a 600 cuentas con nombre y apellido, y hay que ir a verlas. CAC de $8.200.000, ciclo mediano de 9 meses, y un churn que es estructural y no de producto: el proyecto termina de tramitar y la cuenta se va.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div></div>
+</article>
+<article class="ficha v-mid" id="20-recepcion">
+  <div class="fh">
+    <div class="n">15</div>
+    <div class="t"><h3>Fonalta</h3><div class="meta">20-recepcion · Voz con IA</div></div>
+    <div class="sc">62,7<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd mid"><i></i>JUSTO</span>
+    <span class="plat alto">Plataforma: alto</span>
+    <span class="plat">Autonomía: Total</span>
+  </div>
+  <div class="cifras">$29.000–$159.000/mes · margen 68,9% · CAC $109.133 · LTV/CAC 9,4× · payback 2,1 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">6–12%</strong> — cond. M4 en el mes 12 · 30–40% de morir antes del mes 12</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Aprueba el test literal —un chat no contesta tu teléfono— y reprueba el hermano: lo que Fonalta vende es el <em>ensamblaje</em> (telefonía + ASR + LLM + TTS), y ése es exactamente el producto que los proveedores de modelos están comoditizando con sus APIs de voz en tiempo real.</dd>
+    <dt>Qué la hace ganar</dt><dd>Actuación pura sobre el mundo: contesta el teléfono a las 22:00 cuando el hotel cerró la recepción. Payback 2,1 meses, autonomía total, y una honestidad poco común — declara que los 730 ms de latencia son presupuesto de arquitectura, no una medición.</dd>
+    <dt>Qué la mata</dt><dd>Que el chileno cuelgue. «Todo el negocio descansa sobre una apuesta cultural que nadie ha probado en Chile». Margen 68,9% —el 31% de la venta se va en minutos—, y un techo de canal de intención de ~6 clientes al mes en todo el país.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill mid" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="13-contratistas">
+  <div class="fh">
+    <div class="n">16</div>
+    <div class="t"><h3>Torniqua</h3><div class="meta">13-contratistas · Minería · acceso</div></div>
+    <div class="sc">62,6<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: No</span>
+  </div>
+  <div class="cifras">$69.000–$189.000/mes · margen 91,5% · CAC $307.700 · LTV/CAC 15,3× · payback 1,9 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">2–5%</strong> — al mes 24 · 30–40% de llegar a US$300k ARR · 40–55% de empresa rentable de 8 personas</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">El lector de la portería bloquea físicamente al que tiene el examen de altura vencido. Un chat no cierra un torniquete.</dd>
+    <dt>Qué la hace ganar</dt><dd>Payback 1,9 meses, margen 91,5%, y un momento de dolor de nitidez cinematográfica: las 06:12, el bus en la portería, y cuatro que no pueden entrar. El LTV/CAC de 15,3× es el segundo mayor del repositorio.</dd>
+    <dt>Qué la mata</dt><dd>El canal no es tuyo. Hay que regalarle un lector a la MANDANTE, que no es la que paga: «si a los 60 días ninguna faena nos deja instalar el lector, el canal no existe». Y ellos mismos advierten que el LTV/CAC se ve espectacular sólo porque la portería todavía es gratis. TAM US$11,9M.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="11-correas">
+  <div class="fh">
+    <div class="n">17</div>
+    <div class="t"><h3>Cintavia</h3><div class="meta">11-correas · Minería · correas</div></div>
+    <div class="sc">62,4<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: No</span>
+  </div>
+  <div class="cifras">$890.000–$8.400.000/mes + $2.250.000/estación · margen 79,1% · CAC US$18.800 · LTV/CAC 4,5× · payback en caja 4,2 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">6–12%</strong> — incondicional al mes 30 · 18–28% cond. M2 · &lt;3% si M2 falla</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Ningún modelo ve la correa. Las estaciones miran 4 km de cinta con visión, térmica y acústica, y ninguno de los tres detectores es un LLM: «meter un LLM multimodal a mirar 30 fps de correa sería 400× más caro y peor».</dd>
+    <dt>Qué la hace ganar</dt><dd>El foso más físico del repositorio, y un cliente elegido con inteligencia: el contratista, no la minera (ciclo 8–14 semanas contra 18 meses; CAC US$18.800 contra US$326.000). El dolor está tasado: un polín trabado que roza la cinta un turno cuesta US$1,41M de planta detenida.</dd>
+    <dt>Qué la mata</dt><dd>TAM Chile: US$3,6M de ARR. Es el techo nacional más bajo de las 21 y lo confiesa en su propio meta.json. Necesita Perú, Brasil y Australia desde el día uno, y sale a conquistarlos con fierro que hay que instalar dentro de una faena con permiso escrito.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:30%"></i></span><span class="cval">3</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div></div>
+</article>
+<article class="ficha v-mid" id="04-inventario">
+  <div class="fh">
+    <div class="n">18</div>
+    <div class="t"><h3>Mermata</h3><div class="meta">04-inventario · Gastronomía · demanda</div></div>
+    <div class="sc">58,3<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd mid"><i></i>JUSTO</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Parcial</span>
+  </div>
+  <div class="cifras">$49.000–$99.000/mes + $190.000 puesta en marcha · margen 85,2% · CAC $420.000 · LTV/CAC 4,3× · payback 5,8 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">5,7%</strong> — punto derivado; ellos mismos dicen que «está mal por lo bajo»</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Con un CSV de ventas, un chat te hace un pronóstico pasable por US$20 al mes; lo que no hace es conectarse solo al SII todos los martes y decirte cuántos kilos de harina comprar.</dd>
+    <dt>Qué la hace ganar</dt><dd>El pronóstico corre en estadística clásica, no en tokens — «si en 2026 alguien te dice que le pide a un LLM que pronostique la venta de marraqueta, sal corriendo» — y por eso el margen es 85% y no 40%. El diagnóstico gratis es un imán de leads perfecto y automatizable.</dd>
+    <dt>Qué la mata</dt><dd>Nadie mide la merma, y por eso nadie siente el dolor: estás vendiendo contra una pérdida invisible. Puesta en marcha de $190.000, integración con cada POS, y a 7% de churn el LTV/CAC cae a 2,4× — «la frontera de lo financiable», dicho por ellos.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill mid" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="12-seguridad">
+  <div class="fh">
+    <div class="n">19</div>
+    <div class="t"><h3>Cuasio</h3><div class="meta">12-seguridad · Minería · seguridad</div></div>
+    <div class="sc">58,1<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: No</span>
+  </div>
+  <div class="cifras">$190.000/mes · margen 88,6% · CAC $1.398.000 · LTV/CAC 14,2× (churn 1,5%) · payback 3,4 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">5–9%</strong> — incondicional al mes 36 · 10–18% cond. H3 · 25–35% si el objetivo es un negocio chico</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">El casi-accidente ocurre en la faena, con guantes puestos y treinta segundos de tiempo. No hay prompt que lo capture, y el que casi se muere no va a abrir un chat.</dd>
+    <dt>Qué la hace ganar</dt><dd>Margen 88,6%, payback 3,4 meses, y un comprador que no firma por moral: firma porque si el mandante le baja el índice de seguridad, pierde el contrato y pierde la empresa. El ticket más bajo de las cinco de minería.</dd>
+    <dt>Qué la mata</dt><dd>Que la gente no reporte, y eso no lo arregla el software: «bajamos el costo de reportar de veinte minutos a treinta segundos; no bajamos el miedo». Señal de muerte propia: cobertura bajo 25% al mes 3 en dos de tres pilotos. Y TAM US$16M — «un TAM de US$16M no sostiene una empresa de riesgo».</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:90%"></i></span><span class="cval">9</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:90%"></i></span><span class="cval">9</span></div></div>
+</article>
+<article class="ficha v-ok" id="15-agua">
+  <div class="fh">
+    <div class="n">20</div>
+    <div class="t"><h3>Freatia</h3><div class="meta">15-agua · Minería · agua y relaves</div></div>
+    <div class="sc">57,5<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd ok"><i></i>APRUEBA</span>
+    <span class="plat ">Plataforma: nulo</span>
+    <span class="plat">Autonomía: No</span>
+  </div>
+  <div class="cifras">$2.900.000–$9.800.000/mes + $12–28M de implementación · margen 72,9% · CAC $35.000.000 · LTV/CAC 6,1× · payback 7,8 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">3–8%</strong> — incondicional al mes 30 · 20–30% cond. M2</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">El balance hídrico se arma con caudalímetros y piezómetros, y hay que poder trazar cada litro hasta el sensor que lo midió. Un chat no tiene sensores, y un fiscalizador no acepta una conversación como evidencia.</dd>
+    <dt>Qué la hace ganar</dt><dd>La tesis más honesta del repositorio: «todos los demás cierran el balance forzando un coeficiente; Freatia se niega, deja el hueco a la vista y lo convierte en la pregunta que vale plata». El residual sin explicar es el producto.</dd>
+    <dt>Qué la mata</dt><dd>Que a nadie le convenga mirar la discrepancia — porque el producto obliga al cliente a dejar por escrito, de forma auditable, que tiene 40 l/s que no puede explicar. Universo de 200 cuentas en todo Chile, CAC de $35.000.000, ciclo sobre 12 meses (su propio criterio de muerte) y el margen más bajo de las 21 (72,9%).</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill ok" style="width:100%"></i></span><span class="cval">10</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:80%"></i></span><span class="cval">8</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:20%"></i></span><span class="cval">2</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div></div>
+</article>
+<article class="ficha v-mid" id="16-finakids">
+  <div class="fh">
+    <div class="n">21</div>
+    <div class="t"><h3>Finakids</h3><div class="meta">16-finakids · Edtech infantil</div></div>
+    <div class="sc">50,5<small>puntos</small></div>
+  </div>
+  <div class="badges">
+    <span class="vd mid"><i></i>JUSTO</span>
+    <span class="plat ">Plataforma: bajo</span>
+    <span class="plat">Autonomía: Parcial</span>
+  </div>
+  <div class="cifras">$4.990/mes (familia) · $54.000.000/año (banco) · margen 74% · CAC $37.400 por avisos · LTV/CAC 1,3× por avisos, 3,9× por colegio · payback 10 m<br><span style="color:#5F676F">P(US$1M ARR): <strong style="color:#14181D">2–6%</strong> — venture-scale · 10–18% de negocio sano de 4 personas</span></div>
+  <dl class="qa">
+    <dt>¿Por qué no ChatGPT?</dt>
+    <dd class="gpt">Al papá, ChatGPT ya le da gratis «de qué conversar el domingo» — que es literalmente la mitad del producto. Lo que queda es el juego, y el juego arranca con 2% de retención al día 30 según el benchmark que la propia idea cita.</dd>
+    <dt>Qué la hace ganar</dt><dd>El hueco real de los 7 a los 12 años: todo producto bancario chileno para menores empieza a los 12–14 (CuentaRUT 12, FAN Clan 14, Teenpo 14). El banco tiene el presupuesto y no tiene qué mostrar, y al financiar te regala el canal: la familia captada por el aula cuesta $12.900 en vez de $37.400.</dd>
+    <dt>Qué la mata</dt><dd>El TAM. US$870.000 al año en bancos chilenos: ganando <em>todos</em> los contratos del país no llegas a US$1M de ARR. Y el plan supone 32% de retención D30 —dieciséis veces el promedio de su categoría— sin haberlo probado. Ellos lo escribieron así.</dd>
+  </dl>
+  <div class="crit"><div class="crow"><span class="cnom">Test del LLM</span><span class="cbar"><i class="cfill mid" style="width:70%"></i></span><span class="cval">7</span></div><div class="crow"><span class="cnom">Foso contra el titular real</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Dolor y disposición a pagar</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Canal y ciclo de venta en Chile</span><span class="cbar"><i class="cfill" style="width:60%"></i></span><span class="cval">6</span></div><div class="crow"><span class="cnom">TAM chileno</span><span class="cbar"><i class="cfill" style="width:10%"></i></span><span class="cval">1</span></div><div class="crow"><span class="cnom">Economía unitaria neta de IA</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Tiempo hasta el primer peso</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Se puede operar sola</span><span class="cbar"><i class="cfill" style="width:50%"></i></span><span class="cval">5</span></div><div class="crow"><span class="cnom">Riesgo regulatorio (invertido)</span><span class="cbar"><i class="cfill" style="width:40%"></i></span><span class="cval">4</span></div><div class="crow"><span class="cnom">Honestidad y falsabilidad</span><span class="cbar"><i class="cfill" style="width:100%"></i></span><span class="cval">10</span></div></div>
+</article>
+</div></div></section>
+<section class="kill" id="nocons"><div class="wrap">
+<div class="sechead"><span class="secnum">07</span><h2>Las que no construiría</h2></div>
+<p class="sub">No son las peores por poco: son las que fallan una prueba <em>de existencia</em>, no de ejecución.
+La regla que uso es una sola, y es falsable: <strong>si el techo nacional declarado no paga el equipo que la
+propia idea dice necesitar, o si el riesgo mortal no es «lo hicimos mal» sino «esto no existe», no se
+construye.</strong> Tres cumplen esa regla. Una cuarta se salva sólo si dejas de construir el producto que describe.</p>
+
+<div class="kcard">
+  <h3>16-finakids · Finakids <span class="num">— 21.º · 50,5 pts</span></h3>
+  <div class="why">Por qué no</div>
+  <p>El TAM de bancos chilenos es de <strong>US$870.000 al año</strong>. No es que sea difícil ganar: es que
+  <em>ganando todos los contratos de educación financiera de todos los bancos de Chile</em> no llegas a US$1M de ARR.
+  Y la línea que sí escala —la familia a $4.990— tiene un LTV/CAC de <strong>1,3×</strong> por canal pagado: trabajas gratis.</p>
+  <p>Encima, el plan supone <strong>32% de retención D30</strong> contra un benchmark de <strong>2%</strong> en apps
+  educativas — dieciséis veces el promedio de su categoría— y lo dice sin haberlo probado. La propia idea lo escribe.
+  Es el documento más honesto del repositorio y esa honestidad es exactamente lo que lo condena.</p>
+  <p>Y la mitad del producto que el papá <em>consume</em> («de qué conversar el domingo») ya se la da ChatGPT gratis.</p>
+</div>
+
+<div class="kcard">
+  <h3>15-agua · Freatia <span class="num">— 20.º · 57,5 pts</span></h3>
+  <div class="why">Por qué no</div>
+  <p>Doscientas cuentas en todo Chile. CAC de <strong>$35.000.000</strong>. Ciclo de venta sobre 12 meses —que es
+  su propio criterio de muerte—, implementación de 12 semanas con un fundador sentado en la faena, y el
+  <strong>margen bruto más bajo de las 21</strong> (72,9%). TAM: US$8M.</p>
+  <p>Pero eso no es lo que la mata. Lo que la mata es su propia frase: <em>«es perfectamente posible que un
+  producto cuyo principal aporte es hacer visible un problema incómodo sea un producto que nadie quiera
+  comprar»</em>. Estás vendiéndole a un gerente un sistema cuyo valor es dejar por escrito, de forma auditable,
+  que tiene 40 litros por segundo que no sabe explicar — y que un fiscalizador de la SMA puede leer.</p>
+  <p>Y su hito M4 lo remata: <em>«si el producto no se puede instalar sin nosotros, no es un producto»</em>.
+  Hoy, por su propia definición, <strong>no lo es</strong>: es una consultoría con software adentro. La tesis es
+  intelectualmente la mejor del repositorio. El negocio, no.</p>
+</div>
+
+<div class="kcard">
+  <h3>11-correas · Cintavia <span class="num">— 17.º · 62,4 pts</span></h3>
+  <div class="why">Por qué no — en Chile</div>
+  <p><strong>TAM Chile: US$3,6M de ARR.</strong> Es el techo nacional más bajo de las 21 y lo confiesa en su propio
+  <code>meta.json</code>. El mercado no está en Chile: está en Perú, Brasil y Australia. Y a esos mercados hay que
+  salir con <em>fierro que se instala dentro de una faena minera</em>, con permiso escrito, homologación del
+  contratista y un hito M0 que dice «una estación instalada al día 90».</p>
+  <p>El producto es bueno —el foso más físico del lote, el cliente elegido con inteligencia (el contratista, no la
+  minera)— y su honestidad es ejemplar. Pero un dueño que empieza en Chile con hardware, un TAM local de US$3,6M
+  y quince meses hasta el primer peso está eligiendo la peor combinación posible de las que hay sobre la mesa.
+  Esta idea necesita un fundador con faena, no un fundador con repositorio.</p>
+</div>
+
+<div class="kcard soft">
+  <h3>05-contratos · Antefirma <span class="num">— 13.º · 64,6 pts · el matiz</span></h3>
+  <div class="why">No construiría el producto que describe — el negocio sí puede existir</div>
+  <p>Es la única que <strong>reprueba el test del LLM</strong>, y a la vez tiene la mejor distribución del
+  repositorio: transaccional, sin onboarding, payback 2,7 meses, TAM US$172M. Por eso queda a mitad de tabla y
+  no al fondo: todo lo demás funciona. Lo que no funciona es <em>lo que vende</em>.</p>
+  <p>Si de verdad se construye, hay que aceptar el precio: <strong>el informe es el señuelo y regala margen desde
+  el día uno</strong>, y el negocio entero pasa a ser el calendario de obligaciones y la vigilancia a tres años.
+  Y ahí topas con el problema real — esa vigilancia es un <strong>Pregonia peor</strong>, porque Pregonia vigila
+  fuentes públicas que el modelo <em>no puede tener</em> y Antefirma vigilaría un calendario que el propio usuario
+  le dictó. Un foso de datos contra un recordatorio de Google Calendar.</p>
+  <p>Traducción: <strong>construye Pregonia. Y si Antefirma te gusta, constrúyela después, encima de Pregonia,
+  como el módulo de contratos privados.</strong> Nunca al revés.</p>
+</div>
+
+<div class="kcard soft">
+  <h3>Casi: 12-seguridad (Cuasio) y 13-contratistas (Torniqua)</h3>
+  <div class="why">Por qué se salvan — apenas</div>
+  <p>Las dos tienen economía unitaria excelente (payback de 3,4 y 1,9 meses) y las dos tienen el mismo problema:
+  <strong>el canal pertenece a un tercero que no paga</strong>. Torniqua necesita que la minera —que no es su
+  cliente— la deje poner un lector en la portería: «si a los 60 días ninguna faena nos deja instalar el lector, el
+  canal no existe». Cuasio necesita que un trabajador reporte lo que casi lo mata, y eso no es un problema de
+  software: «bajamos el costo de reportar de veinte minutos a treinta segundos; no bajamos el miedo».</p>
+  <p>No están en la lista negra porque su riesgo es de <em>ejecución</em> y se resuelve barato (60 días, tres
+  pilotos). Pero con TAM de US$11,9M y US$16,1M, el premio por resolverlo tampoco es grande.</p>
+</div>
+</div></section>
+<section id="contradicciones"><div class="wrap">
+<div class="sechead"><span class="secnum">08</span><h2>Donde las ideas se contradicen entre sí</h2></div>
+<p class="sub">El encargo pedía decirlo si pasaba. Pasa, y en seis lugares. Ninguno invalida una idea por
+sí solo, pero los seis juntos dicen algo sobre el portafolio: <strong>fue escrito por 21 agentes que no se
+leyeron entre ellos.</strong></p>
+<div class="contra">
+<div>
+  <span class="tag">Contradicción 1 · el mismo comprador, dos veces</span>
+  <h4>Tinoria (02) y Talonio (10)</h4>
+  <p>Las dos se conectan al SII, las dos le venden a la misma administrativa de la misma PYME, y las dos declaran
+  al contador como su mejor canal. Tinoria pone su TAM chileno en US$115M; Talonio en US$94M. No pueden ser dos
+  mercados: <strong>es el mismo bolsillo y la misma línea de gasto.</strong> Construir las dos es competir contigo
+  mismo por la atención del mismo contador — y ese contador tiene una sola conversación al mes contigo.</p>
+</div>
+<div>
+  <span class="tag">Contradicción 2 · el mismo local, dos suscripciones</span>
+  <h4>Zurcia (03) y Fonalta (20)</h4>
+  <p>El <code>meta.json</code> de Fonalta dice que «se complementan». Puede ser, pero los TAM no se complementan:
+  Zurcia cuenta 70.000 establecimientos de servicios locales y Fonalta cuenta 56.250 PYMEs «cuyo rubro usa el
+  teléfono». <strong>La misma veterinaria está contada dos veces</strong>, y se le está pidiendo que pague $79.000
+  a una y $69.000 a la otra por atender al mismo cliente por dos canales distintos. Una de las dos va a tener que
+  ser un módulo de la otra.</p>
+</div>
+<div>
+  <span class="tag">Contradicción 3 · el único CAC que fue medido, se salió del plan</span>
+  <h4>Contralta (08): $180.000 declarado contra $484.000 observado</h4>
+  <p>Su <code>negocio.html</code> declara un CAC mezclado de <strong>$180.000</strong>. La bitácora de Cuantario dice
+  que la pausó en el mes 9 <em>«porque su CAC llegó a $484.000 contra el techo de $350.000 que ella misma
+  declaró»</em>. Es <strong>2,7× sobre el plan</strong>. Es la única idea del repositorio cuyo CAC pasó por algo
+  parecido a una medición — y se salió. Los otros veinte CAC de esta página son modelos, y hay que leerlos
+  sabiendo eso.</p>
+</div>
+<div>
+  <span class="tag">Contradicción 4 · dos CAC para la misma idea</span>
+  <h4>Rutamo (07): $551.660 en su negocio, $900.000 en la ficha de Cuantario</h4>
+  <p>La tabla de integración del sistema meta dice que el roadmap de Rutamo «modela un vendedor cerrando 3 cuentas
+  al mes con CAC de $900.000». Su propio <code>negocio.html</code> deriva $551.660, con la resta a la vista.
+  <strong>No cuadran</strong>, y la diferencia (63%) es exactamente lo que separa un LTV/CAC de 7,5× de uno de 4,6×.
+  Alguien tiene que ir a mirar cuál de los dos documentos está mal antes de que esa cifra financie una decisión.</p>
+</div>
+<div>
+  <span class="tag">Contradicción 5 · el mismo producto, foso opuesto</span>
+  <h4>Antefirma (05) y Pregonia (18)</h4>
+  <p>Las dos venden <em>vigilancia de plazos que muerden</em>. Pregonia vigila el Diario Oficial, INAPI y el Boletín
+  Concursal: <strong>fuentes que el modelo no puede tener</strong>. Antefirma vigilaría el calendario que el usuario
+  le dictó al subir su contrato: <strong>un recordatorio</strong>. La forma del producto es idéntica; el foso es de
+  categorías distintas. Si vas a construir sólo una, la respuesta no admite discusión.</p>
+</div>
+<div>
+  <span class="tag">Contradicción 6 · el patrón que nadie miró junto</span>
+  <h4>Cinco LTV/CAC de fantasía: 44× · 17× · 15,3× · 14,2× · 13×</h4>
+  <p>Pregonia (44×), Cotejia (17×), Torniqua (15,3×), Cuasio (14,2×) y Kilonauta (13×). Tres de las cinco dicen
+  explícitamente que el número alto es una <em>mala</em> noticia — Pregonia lo escribe entero: <em>«un LTV/CAC de 44x
+  no es una buena noticia: es la señal de que el cuello de botella está en la demanda, no en la eficiencia»</em>.
+  Las otras dos no lo dicen. <strong>Un LTV/CAC de 15× en un mercado sano no existe.</strong> Significa que no hay a
+  quién venderle, y que el CAC es barato porque nadie está compitiendo por un cliente que casi no aparece.
+  Es el hallazgo más útil de leer las 21 juntas, y no está escrito en ninguna de las 21.</p>
+</div>
+</div>
+</div></section>
+<hr class="rule">
+<section id="cierre"><div class="wrap">
+<div class="sechead"><span class="secnum">09</span><h2>El veredicto, en cinco líneas</h2></div>
+<div style="max-width:70ch">
+<p><strong>1. Construye Kilonauta (09).</strong> Es la única del repositorio cuyo foso no es software: es un
+contrato de tarifas con un courier. Un contrato no se commoditiza, ningún proveedor de modelos lo va a lanzar, y
+el canal (el marketplace de apps de Jumpseller) es autoservicio puro. El riesgo está concentrado en un solo
+hito verificable a los 9 meses — que un courier baje del 25% bajo lista— y eso es exactamente donde quieres tu
+riesgo: en un sí o un no, temprano, barato.</p>
+<p><strong>2. Si no, Tinoria (02) o Talonio (10) — pero no las dos.</strong> Son el mismo cliente y el mismo
+canal. Tinoria vende caja (el argumento más fácil de vender que existe); Talonio vende a través del contador,
+que es el mejor distribuidor de software PYME de Chile. Elige por temperamento: Tinoria si te gusta la venta
+directa, Talonio si te gusta construir un canal.</p>
+<p><strong>3. Pregonia (18) es el mejor negocio pequeño de la lista, y hay que saber que es pequeño.</strong>
+Margen 90%, payback de medio mes, valle de caja de US$3.000, autonomía total. Es el único que Cuantario podría
+operar solo casi sin ti. Techo: US$14,4M de TAM. Es un negocio de US$250k de ARR que te devuelve tu tiempo, no
+uno que te haga rico.</p>
+<p><strong>4. No construyas Finakids, Freatia ni Cintavia.</strong> Las tres fallan por techo, no por ejecución.
+Ninguna cantidad de trabajo arregla un TAM de US$870.000.</p>
+<p><strong>5. Y no construyas Antefirma como está escrita.</strong> Reprueba el test que tú mismo pusiste
+primero, y su propio documento lo admite antes que yo. Si te gusta el problema de los contratos, es un módulo de
+Pregonia — no una empresa.</p>
+<p style="margin-top:24px;padding-top:18px;border-top:2px solid #14181D"><strong>El hallazgo que no esperaba.</strong>
+Después de leer las 21, el patrón no es el TAM ni el CAC: es que <strong>el foso nunca está en el modelo</strong>.
+Está en el cable que va del modelo al mundo — el contrato con el courier, la conexión al SII, la estación en la
+correa, el lector en la portería, el corpus de once portales que cambian de maqueta sin avisar. Las ideas que
+ganan esta tabla no ganan porque usen mejor la IA. Ganan porque la IA es la parte fácil, y ellas eligieron
+quedarse con la parte difícil.</p>
+</div>
+</div></section>
+
+<footer><div class="wrap">
+<p><strong>Cómo leer esto.</strong> Los puntajes de los diez criterios son juicios míos, declarados como tales, de 0 a 10.
+Todo lo demás —TAM, SAM, CAC, LTV, margen, payback, probabilidades, criterios de muerte— está citado de
+<code>negocio.html</code>, <code>roadmap.html</code>, <code>stack.html</code> y <code>meta.json</code> de cada idea, o
+derivado de su propia aritmética con la operación a la vista. La clasificación de autonomía es de
+<code>00-sistema/integracion.html</code>. <strong>No inventé un solo dato de mercado.</strong> Donde una idea no
+publica una cifra, esta página dice que no la publica.</p>
+<p style="margin-top:14px">Paleta de dos veredictos validada con el validador de la skill <code>dataviz</code>
+(banda de luminosidad, piso de croma, separación CVD ΔE 13,2 protan y contraste: todo PASS). Todo veredicto lleva
+forma y etiqueta de texto además del color. Gráficos en SVG inline, sin librerías.
+Único recurso externo de la página: Google Fonts.</p>
+<a class="volver" href="../index.html">← Volver a las ideas</a>
+</div></footer>
+</body>
+</html>
