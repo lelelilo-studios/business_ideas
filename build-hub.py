@@ -82,8 +82,21 @@ def price_head(s):
 def price_has_more(s):
     return len(s.split(" · ")) > 1
 
+# La raya (—) es el tell tipográfico número uno y en el hub está prohibida.
+# Igual que accent_safe() con el color, el índice normaliza el texto que llega
+# de los meta.json sin editarlos (son de otros agentes). Tres reglas, en orden:
+# el inciso entre rayas pasa a paréntesis, la raya seguida de "y" pasa a coma,
+# y cualquier otra raya pasa a dos puntos. El guión corto de rango pasa a guión.
+RAYA_INCISO = re.compile(r"\s—([^—]+)—(\s|(?=[,.;:]))")
+
+def sin_raya(s):
+    s = RAYA_INCISO.sub(lambda m: " (" + m.group(1).strip() + ")" + m.group(2), s)
+    s = s.replace(" — y ", ", y ")
+    s = re.sub(r"\s*—\s*", ": ", s)
+    return s.replace("–", "-")
+
 def e(s):
-    return html.escape(str(s))
+    return html.escape(sin_raya(str(s)))
 
 
 # --------------------------------------------------------------------- tarjeta
@@ -193,14 +206,14 @@ BANDA = """
           <h2 class="rk__title" id="h-rk">&iquest;Por qu&eacute; te pagar&iacute;an a ti, y no US$20 al mes a ChatGPT?</h2>
           <p class="rk__lede">Es la pregunta que mata a la mitad de las ideas de IA, as&iacute; que
             cada una de las 21 la rinde como examen. El hallazgo, despu&eacute;s de leerlas juntas:
-            <em>el foso nunca est&aacute; en el modelo — est&aacute; en el cable que va del modelo al mundo.</em></p>
+            <em>el foso nunca est&aacute; en el modelo: est&aacute; en el cable que va del modelo al mundo.</em></p>
         </div>
         <ol class="rk__list">{filas}</ol>
         <dl class="rk__facts mono">
-          <div><dt>Aprueban</dt><dd>{ap} de 21 — dato que el modelo no tiene, vigilancia, actuaci&oacute;n o libro.</dd></div>
-          <div><dt>Raspando</dt><dd>{ju} — aprueban el literal, con una defensa d&eacute;bil o de vida corta.</dd></div>
-          <div><dt>Reprueba</dt><dd>{re} — Antefirma. Su propio negocio.html ya lista a ChatGPT como competidor a $0.</dd></div>
-          <div><dt>No construir&iacute;a</dt><dd>{no} — las tres fallan por techo de mercado, no por ejecuci&oacute;n.</dd></div>
+          <div><dt>Aprueban</dt><dd>{ap} de 21: dato que el modelo no tiene, vigilancia, actuaci&oacute;n o libro.</dd></div>
+          <div><dt>Raspando</dt><dd>{ju}: aprueban el literal, con una defensa d&eacute;bil o de vida corta.</dd></div>
+          <div><dt>Reprueba</dt><dd>{re}: Antefirma. Su propio negocio.html ya lista a ChatGPT como competidor a $0.</dd></div>
+          <div><dt>No construir&iacute;a</dt><dd>{no}: las tres fallan por techo de mercado, no por ejecuci&oacute;n.</dd></div>
         </dl>
         <a class="rk__cta" href="ranking/index.html"><span>Ver el ranking completo</span>
           <svg viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false"><path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -272,7 +285,7 @@ secciones = (
     + family(
         "consumo", "03", "Consumo",
         "La única idea del set que no le vende a una empresa: le vende a una familia. "
-        "El niño juega, el papá paga y el banco termina financiando la cuenta — y esa "
+        "El niño juega, el papá paga y el banco termina financiando la cuenta, y esa "
         "cadena de tres es la idea, no un detalle del modelo.",
         [("Comprador", "El papá. Pero el que firma el cheque grande es el banco."),
          ("Ticket", "$4.990 la familia. $54 millones al año la marca."),
@@ -283,10 +296,10 @@ secciones = (
         "autonomas", "04", "Autónomas",
         "Cinco ideas elegidas por una sola razón: se venden, se entregan, se cobran y se "
         "soportan sin que una persona intervenga. Son las que el sistema de arriba puede "
-        "operar de verdad — y la razón por la que existe.",
+        "operar de verdad, y la razón por la que existe.",
         [("Comprador", "Se registra solo. Nunca habla con nadie, y no quiere hacerlo."),
          ("Entrega", "Software: una API, una alerta, una llamada. Nada físico."),
-         ("El humano que queda", "Casi ninguno — y cada idea declara cuál, en vez de decir cero."),
+         ("El humano que queda", "Casi ninguno, y cada idea declara cuál, en vez de decir cero."),
          ("El cuello real", "No el CAC. La demanda: el mercado chileno es chico y lo dicen.")],
         autonomas, BG_AUTO, show_market=True)
     + family(
@@ -325,7 +338,7 @@ doc = f'''<!doctype html>
 
    1. LAS DOS FAMILIAS SON DOS PIEZAS DISTINTAS, no dos títulos. Cada una es
       una banda a sangre completa con su propio suelo: PYME en tinta cálida
-      (#12100E), Minería en grafito frío (#0A0F14 — el mismo grafito que
+      (#12100E), Minería en grafito frío (#0A0F14, el mismo grafito que
       eligieron por su cuenta las ideas de faena). El ojo registra el cambio
       de temperatura antes de leer el encabezado. Además cambia la densidad:
       PYME va a dos columnas de tarjetas medianas (son diez, ticket bajo,
@@ -345,6 +358,15 @@ doc = f'''<!doctype html>
    4. CONTRASTE. Los acentos oscuros de PYME (#A81E12, #14624A…) daban 2,5:1
       sobre la tinta. El generador deriva un acento del mismo tono que cruza
       4,6:1. Ver accent_safe() en build-hub.py.
+
+   5. TERCERA PASADA (la de diseño). El masthead pasa a dos columnas para que
+      el mapa de la página quede sobre el pliegue, y el índice de familias es
+      una leyenda: cada fila lleva el lomo con la señal de su banda. Autónomas
+      gana su propio suelo (acero petróleo) y de paso el AA de sus acentos se
+      calcula contra la tarjeta que de verdad se pinta. Las cuatro familias de
+      tarjetas anchas comparten una sola pauta interna. El aviso pierde sus
+      cajas. Esquinas a 0 en todo. Y la raya larga queda prohibida en el hub:
+      sin_raya() normaliza la que venga de los meta.json, sin editarlos.
    ------------------------------------------------------------------ */
 :root {{
   --ink:#0B0A09;          /* suelo del masthead y del colofón */
@@ -391,9 +413,13 @@ body {{
 .masthead h1 em {{ font-style:normal; color:var(--mute); }}
 .lede {{ font-size:var(--step-1); color:var(--mute); max-width:56ch; text-wrap:pretty; }}
 
-/* -- el atajo a las dos familias: la única navegación de la página -- */
+/* -- el masthead a dos columnas: la bajada a la izquierda, el índice de
+   familias a la derecha, para que el mapa de la página quede sobre el pliegue.
+   El índice es una leyenda: cada fila lleva un lomo con la señal de color de
+   su banda, el mismo recurso que el lomo de acento de cada tarjeta. -- */
+.masthead__grid {{ display:grid; gap:var(--sp-l); margin-top:var(--sp-m); }}
+.rk, .sis, .fam {{ scroll-margin-top:var(--sp-s); }}
 .jump {{
-  margin-top:var(--sp-l);
   display:grid; gap:var(--sp-2xs);
   border-top:1px solid var(--line);
   padding-top:var(--sp-m);
@@ -401,12 +427,12 @@ body {{
 .jump a {{
   display:grid; grid-template-columns:auto 1fr auto; align-items:center;
   gap:var(--sp-s); min-height:56px; padding:var(--sp-2xs) var(--sp-s);
-  text-decoration:none; border:1px solid var(--line); background:var(--hair);
+  text-decoration:none; background:var(--hair);
+  border:1px solid var(--line); border-left:3px solid var(--chip, var(--line));
   transition:border-color .15s ease, background .15s ease;
 }}
-.jump a:hover {{ border-color:var(--mute); background:#17140F; }}
-.jump a:nth-child(2):hover {{ background:#0F1720; }}
-.jump__n {{ font-size:var(--step-2); font-weight:700; color:var(--paper); line-height:1; }}
+.jump a:hover {{ border-color:var(--mute); border-left-color:var(--chip); background:#17140F; }}
+.jump__n {{ font-size:var(--step-2); font-weight:700; color:var(--paper); line-height:1; min-width:2.2ch; }}
 .jump__t {{ font-weight:500; }}
 .jump__t small {{
   display:block; color:var(--mute); font-weight:400;   /* mute-2 no cruza AA sobre --hair */
@@ -416,19 +442,21 @@ body {{
 .jump a:hover svg {{ color:var(--paper); }}
 
 /* ================================================================= aviso === */
+/* El aviso perdió sus cajas: tres columnas sobre el mismo suelo, divididas
+   por filetes. La honestidad no necesita paneles. */
 .note {{
-  margin-block:var(--sp-l) var(--sp-2xl);
-  display:grid; gap:1px; background:var(--line);
-  border:1px solid var(--line);
+  margin-block:var(--sp-xl) var(--sp-2xl);
+  border-block:1px solid var(--line);
+  display:grid;
 }}
-.note > div {{ background:var(--ink); padding:var(--sp-m); }}
+.note > div {{ padding-block:var(--sp-m); }}
+.note > div + div {{ border-top:1px solid var(--hair); }}
 .note h2 {{
   font-family:'JetBrains Mono',monospace; font-size:var(--step--1); font-weight:500;
   letter-spacing:.12em; text-transform:uppercase; color:var(--paper);
-  padding-bottom:var(--sp-2xs); margin-bottom:var(--sp-2xs);
-  border-bottom:1px solid var(--line);
+  margin-bottom:var(--sp-2xs);
 }}
-.note p {{ color:var(--mute); font-size:var(--step--1); line-height:1.65; }}
+.note p {{ color:var(--mute); font-size:var(--step--1); line-height:1.65; max-width:52ch; }}
 .note em {{ font-style:normal; color:var(--paper); }}
 
 /* =============================================================== familia === */
@@ -513,7 +541,7 @@ body {{
   display:inline-flex; align-items:center; gap:var(--sp-2xs);
   min-height:44px; padding-inline:var(--sp-m);
   background:var(--sig); color:var(--bg); font-weight:500;
-  text-decoration:none; border-radius:2px;
+  text-decoration:none; border-radius:0;
 }}
 .rk__cta:hover {{ filter:brightness(.92); }}
 
@@ -523,7 +551,7 @@ body {{
   display:inline-flex; align-items:center; gap:.4em;
   align-self:start; justify-self:end;
   padding:.25em .6em; border:1px solid var(--line);
-  border-radius:2px; text-decoration:none;
+  border-radius:0; text-decoration:none;
   font-family:'JetBrains Mono',ui-monospace,monospace;
   font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
   color:var(--mute-2); white-space:nowrap;
@@ -606,7 +634,7 @@ body {{
   display:inline-flex; align-items:center; gap:var(--sp-2xs);
   min-height:44px; padding-inline:var(--sp-m);
   background:var(--acc); color:var(--acc-on); font-weight:500;
-  text-decoration:none; border-radius:2px;
+  text-decoration:none; border-radius:0;
 }}
 .sis__cta:hover {{ filter:brightness(1.1); }}
 .sis__docs {{ display:flex; flex-wrap:wrap; gap:var(--sp-xs); }}
@@ -640,11 +668,22 @@ body {{
   --bg:#0A0F14; --card:#111922; --line:#26333D; --hair:#161F27;
   --mute:#93A1AB; --mute-2:#758590; --sig:#B9CBD6;
 }}
-/* Consumo: tinta de imprenta. Ni el café de la PYME ni el acero de la faena —
+/* Consumo: tinta de imprenta. Ni el café de la PYME ni el acero de la faena:
    esta idea se imprime en riso, y la banda lo anticipa antes de que abras la tarjeta. */
 .fam--consumo {{
   --bg:#0F0C18; --card:#181428; --line:#2F2A45; --hair:#1E1930;
   --mute:#A199B8; --mute-2:#8C84A3; --sig:#E4DFF0;
+}}
+/* Autónomas: acero petróleo. Hasta ahora esta banda caía al suelo raíz por
+   omisión, y el contraste AA de sus acentos se calculaba contra una tarjeta
+   (#12171B) que nunca se pintaba. Ahora el suelo existe y la cuenta cuadra.
+   El tick hueco es la firma: la familia sin nadie adentro. */
+.fam--autonomas {{
+  --bg:#0B1114; --card:#12171B; --line:#243139; --hair:#151D22;
+  --mute:#8FA0AA; --mute-2:#7A8B95; --sig:#D3E2E9;
+}}
+.fam--autonomas .fam__tick {{
+  background:transparent; border:1px solid var(--sig);
 }}
 /* Creadas por Fable: tinta verde botella. La cuarta temperatura del índice:
    ni el café de la PYME, ni el acero de la faena, ni la tinta riso del consumo.
@@ -727,6 +766,10 @@ body {{
 }}
 .idea:hover, .idea:focus-within {{
   background:var(--acc-soft); border-color:var(--acc-line); border-left-color:var(--acc);
+  transform:translateY(-2px);
+}}
+@media (prefers-reduced-motion:reduce) {{
+  .idea:hover, .idea:focus-within {{ transform:none; }}
 }}
 /* el anillo de foco dentro de una tarjeta se tiñe con el acento de esa idea */
 .idea :focus-visible {{ outline:2px solid var(--acc); outline-offset:2px; }}
@@ -849,7 +892,8 @@ body {{
 /* ================================================================= tablet === */
 @media (min-width:48em) {{
   .jump {{ grid-template-columns:1fr 1fr; gap:var(--sp-s); }}
-  .note {{ grid-template-columns:repeat(3,1fr); }}
+  .note {{ grid-template-columns:repeat(3,1fr); column-gap:var(--sp-l); }}
+  .note > div + div {{ border-top:0; border-left:1px solid var(--hair); padding-left:var(--sp-l); }}
   .fam__facts {{ grid-template-columns:repeat(2,1fr); column-gap:1px; }}
   .fam__facts > div {{ padding:var(--sp-s) var(--sp-m) var(--sp-s) 0; }}
   .fam__facts > div:nth-child(2n) {{ padding-left:var(--sp-m); }}
@@ -868,12 +912,21 @@ body {{
 
 /* ================================================================ desktop === */
 @media (min-width:64em) {{
+  .masthead__grid {{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
+    gap:var(--sp-2xl); align-items:start;
+  }}
+  .jump {{ grid-template-columns:1fr; gap:var(--sp-2xs); border-top:0; padding-top:0; }}
+  .jump a {{ min-height:52px; }}
+  /* A ancho completo el titular a step-5 rompe en tres líneas; un paso menos
+     lo deja en dos y sube el índice entero sobre el pliegue de un notebook. */
+  .masthead h1 {{ font-size:var(--step-4); max-width:44ch; }}
   .fam__facts {{ grid-template-columns:repeat(4,1fr); }}
   .fam__facts > div {{ padding:var(--sp-s) var(--sp-m); }}
   .fam__facts > div:first-child {{ padding-left:0; }}
   .fam__facts > div:nth-child(2n) {{ padding-left:var(--sp-m); }}
 
-  /* PYME: diez tarjetas medianas, a dos columnas — se escanean. */
+  /* PYME: diez tarjetas medianas, a dos columnas: se escanean. */
   .fam--pyme .ideas {{ grid-template-columns:1fr 1fr; gap:var(--sp-m); }}
   .fam--pyme .idea {{ display:flex; flex-direction:column; }}
   .fam--pyme .idea__num {{
@@ -882,22 +935,28 @@ body {{
   }}
   .fam--pyme .idea__head {{ padding-right:3rem; }}
 
-  /* Minería y Consumo: tarjetas anchas, a dos columnas internas y con aire — pesan. */
-  .fam--mineria .ideas, .fam--consumo .ideas {{ gap:var(--sp-m); }}
-  .fam--mineria .idea, .fam--consumo .idea {{
+  /* Minería, Consumo, Autónomas y Fable: tarjetas anchas, a dos columnas
+     internas y con aire. Pesan. Antes sólo Minería tenía la pauta interna
+     completa: Consumo dejaba su tercera columna vacía y las dos familias
+     nuevas caían a la pauta apilada de tablet. Ahora las cuatro comparten
+     una sola pauta. */
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .ideas {{ gap:var(--sp-m); }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea {{
     grid-template-columns:5rem minmax(0,.85fr) minmax(0,1.15fr);
     column-gap:var(--sp-xl);
     padding:var(--sp-l) var(--sp-l) var(--sp-m);
   }}
-  .fam--mineria .idea__num {{ font-size:var(--step-3); }}
-  .fam--mineria .idea__head {{ grid-column:2; grid-row:1; }}
-  .fam--mineria .idea__pitch {{ grid-column:3; grid-row:1; }}
-  .fam--mineria .idea__tagline {{ font-size:var(--step-2); letter-spacing:-.02em; }}
-  .fam--mineria .idea__foot {{ grid-column:2 / -1; grid-row:2; }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea__num {{ font-size:var(--step-3); }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea__head {{ grid-column:2; grid-row:1; }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea__pitch {{ grid-column:3; grid-row:1; }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea__tagline {{ font-size:var(--step-2); letter-spacing:-.02em; }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea__foot {{ grid-column:2 / -1; grid-row:2; }}
 }}
 
 @media (min-width:75em) {{
-  .fam--mineria .idea {{ grid-template-columns:6rem minmax(0,.8fr) minmax(0,1.2fr); }}
+  :is(.fam--mineria, .fam--consumo, .fam--autonomas, .fam--fable) .idea {{
+    grid-template-columns:6rem minmax(0,.8fr) minmax(0,1.2fr);
+  }}
 }}
 </style>
 </head>
@@ -907,52 +966,55 @@ body {{
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>26 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>2026</span></p>
     <h1>Veintiséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Veintiséis problemas reales: PYME, minería, consumo, cinco que se operan solas
-      y cinco elegidas por Fable. Cada uno con un producto que funciona en el navegador, un plan de
-      marketing, un roadmap a 24 meses y la arquitectura que habría que configurar para que dejara
-      de ser una maqueta.</p>
 
-    <nav class="jump" aria-label="Las cinco familias">
-      <a href="#pyme">
-        <span class="jump__n mono">{len(pyme):02d}</span>
-        <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-      <a href="#mineria">
-        <span class="jump__n mono">{len(minera):02d}</span>
-        <span class="jump__t">Minería<small>Ticket alto · decide operaciones · venta en 12-18 meses</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-      <a href="#consumo">
-        <span class="jump__n mono">{len(consumo):02d}</span>
-        <span class="jump__t">Consumo<small>Le vende a una familia · el niño juega, el papá paga</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-      <a href="#ranking">
-        <span class="jump__n mono">#1</span>
-        <span class="jump__t">El ranking<small>&iquest;Por qu&eacute; no ChatGPT? · las 21 ordenadas</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-      <a href="#autonomas">
-        <span class="jump__n mono">{len(autonomas):02d}</span>
-        <span class="jump__t">Autónomas<small>Se operan solas · nadie en el loop</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-      <a href="#fable">
-        <span class="jump__n mono">{len(fable):02d}</span>
-        <span class="jump__t">Creadas por Fable<small>Los huecos que las 21 dejaron · las eligió el modelo</small></span>
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      </a>
-    </nav>
+    <div class="masthead__grid">
+      <p class="lede">Veintiséis problemas reales: PYME, minería, consumo, cinco que se operan solas
+        y cinco elegidas por Fable. Cada uno con un producto que funciona en el navegador, un plan de
+        marketing, un roadmap a 24 meses y la arquitectura que habría que configurar para que dejara
+        de ser una maqueta.</p>
+
+      <nav class="jump" aria-label="Las cinco familias y el ranking">
+        <a href="#pyme" style="--chip:#E3D5BF">
+          <span class="jump__n mono">{len(pyme):02d}</span>
+          <span class="jump__t">PYME chilena<small>Ticket bajo, venta en días: decide la dueña</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+        <a href="#mineria" style="--chip:#9FB9C9">
+          <span class="jump__n mono">{len(minera):02d}</span>
+          <span class="jump__t">Minería<small>Ticket alto, venta de 12 a 18 meses</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+        <a href="#consumo" style="--chip:#C4B5E4">
+          <span class="jump__n mono">{len(consumo):02d}</span>
+          <span class="jump__t">Consumo<small>El niño juega, el papá paga</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+        <a href="#autonomas" style="--chip:#86A8B8">
+          <span class="jump__n mono">{len(autonomas):02d}</span>
+          <span class="jump__t">Autónomas<small>Se venden y se cobran sin nadie en el loop</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+        <a href="#fable" style="--chip:#9FC7AA">
+          <span class="jump__n mono">{len(fable):02d}</span>
+          <span class="jump__t">Creadas por Fable<small>Los huecos que las 21 dejaron, elegidos por el modelo</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+        <a href="#ranking" style="--chip:#3DD68C">
+          <span class="jump__n mono">#1</span>
+          <span class="jump__t">El ranking<small>&iquest;Por qu&eacute; no ChatGPT? Las 21, ordenadas</small></span>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </a>
+      </nav>
+    </div>
 
     <div class="note">
       <div>
         <h2>Sin conexión</h2>
         <p><em>Nada de esto está conectado a nada.</em> No hay base de datos, ni agentes de IA
-          corriendo, ni APIs contratadas. Los demos funcionan con datos falsos —creíbles, pero
-          falsos— y cada idea documenta en su <em>Arquitectura</em> qué habría que configurar,
+          corriendo, ni APIs contratadas. Los demos funcionan con datos falsos (creíbles, pero
+          falsos) y cada idea documenta en su <em>Arquitectura</em> qué habría que configurar,
           cuánto costaría al mes y qué parte está fingida.</p>
       </div>
       <div>
