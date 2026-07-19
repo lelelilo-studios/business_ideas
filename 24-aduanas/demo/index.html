@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo · Aforqua</title>
+<meta name="description" content="Clasifica un producto de punta a punta: extracción de atributos, recorrido de las Reglas Generales de Interpretación como código, cómputo de derechos con TLC y dossier firmable. Más vigilancia y libro del importador.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  .demo-cab { padding-block: var(--sp-m); display: flex; flex-wrap: wrap; gap: var(--sp-s); align-items: center; justify-content: space-between; }
+  .cuenta { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+  .cuenta .cuadro {
+    width: 40px; height: 40px; flex: none; border-radius: var(--radio);
+    background: var(--mar-2); border: 1px solid var(--linea-2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 600; color: var(--naranja-claro); font-size: .8rem;
+  }
+  .cuenta .qn { font-weight: 600; line-height: 1.25; }
+  .cuenta .qr { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); }
+
+  /* pestañas */
+  .tabs { display: flex; gap: .3rem; border-bottom: 1px solid var(--linea); overflow-x: auto; }
+  .tab {
+    min-height: 48px; padding: .6rem 1rem; border-radius: var(--radio) var(--radio) 0 0;
+    font-weight: 600; font-size: .92rem; color: var(--hielo-2);
+    border: 1px solid transparent; border-bottom: 0; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: .5rem;
+  }
+  .tab:hover { color: var(--hielo); background: var(--mar-1); }
+  .tab[aria-selected="true"] {
+    color: var(--naranja-claro); background: var(--mar-1);
+    border-color: var(--linea); position: relative;
+  }
+  .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--naranja); }
+  .tab .cnt { font-family: var(--mono); font-size: .68rem; background: var(--mar-3); border-radius: var(--radio); padding: .1rem .4rem; color: var(--hielo-2); }
+  .panel-tab { padding-block: var(--sp-l) var(--sp-2xl); }
+  [hidden] { display: none !important; }
+
+  /* ---- Clasificar ---- */
+  .flujo { display: grid; gap: var(--sp-m); }
+  @media (min-width: 64em) { .flujo { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; } }
+  .caja { background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+  .caja + .caja { margin-top: var(--sp-m); }
+  .caja-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+    padding: .65rem .9rem; border-bottom: 1px solid var(--linea); background: var(--mar-2);
+  }
+  .caja-cab h2, .caja-cab h3 {
+    font-family: var(--mono); font-size: .72rem; font-weight: 500;
+    letter-spacing: .13em; text-transform: uppercase; color: var(--hielo-3);
+  }
+  .caja-cue { padding: var(--sp-s); }
+  .chips-prod { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: var(--sp-s); }
+  textarea {
+    width: 100%; min-height: 11rem; padding: .8rem;
+    background: var(--mar-0); color: var(--hielo-2);
+    border: 1px solid var(--linea-2); border-radius: var(--radio);
+    font-family: var(--mono); font-size: .8rem; line-height: 1.65; resize: vertical;
+  }
+  textarea:focus-visible { outline: 2px solid var(--naranja); outline-offset: -1px; }
+  .acciones { display: flex; flex-direction: column; gap: .5rem; margin-top: var(--sp-s); }
+  .btn[disabled], .btn-sec[disabled] { opacity: .38; cursor: not-allowed; transform: none; }
+  .btn-paso { width: 100%; justify-content: flex-start; gap: .8rem; }
+  .btn-paso .np { font-family: var(--mono); font-size: .8rem; opacity: .8; }
+
+  /* atributos extraídos */
+  .attr-fila { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: .2rem .9rem; padding: .55rem 0; border-bottom: 1px dotted var(--linea); }
+  .attr-fila:last-child { border-bottom: 0; }
+  .attr-fila .k { font-family: var(--mono); font-size: .74rem; color: var(--hielo-3); padding-top: .1rem; }
+  .attr-fila .v { font-size: var(--step--1); color: var(--hielo); font-weight: 500; }
+  .attr-fila .cita { grid-column: 2; font-size: .74rem; color: var(--hielo-3); font-family: var(--mono); }
+  .attr-fila .cita::before { content: "» "; color: var(--naranja); }
+
+  /* árbol RGI */
+  .nodo { display: grid; grid-template-columns: 4.6rem 1fr; gap: .8rem; padding: .8rem 0; border-bottom: 1px solid var(--linea); }
+  .nodo:last-child { border-bottom: 0; }
+  .nodo .regla { font-family: var(--mono); font-size: .78rem; font-weight: 600; color: var(--hielo); }
+  .nodo .cuerpo { min-width: 0; }
+  .nodo .cond { font-family: var(--mono); font-size: .74rem; color: var(--hielo-2); background: var(--mar-0); border: 1px solid var(--linea); border-radius: var(--radio); padding: .45rem .6rem; overflow-x: auto; white-space: pre; }
+  .nodo .det { font-size: var(--step--1); color: var(--hielo-2); margin-top: .4rem; }
+  .nodo .det b { color: var(--hielo); }
+  .nodo .badge { margin-top: .45rem; }
+  .resultado {
+    margin-top: var(--sp-s); padding: var(--sp-m);
+    background: var(--naranja-velo); border: 1px solid var(--naranja); border-radius: var(--radio);
+  }
+  .resultado .codigo { font-family: var(--mono); font-size: var(--step-3); font-weight: 600; color: var(--naranja-claro); letter-spacing: .02em; }
+  .resultado .glosa { color: var(--hielo); margin-top: .2rem; }
+  .respaldos { display: grid; gap: .6rem; margin-top: var(--sp-s); }
+  .respaldo { background: var(--mar-1); border: 1px solid var(--linea-2); border-radius: var(--radio); padding: .7rem .8rem; }
+  .respaldo .rn { font-family: var(--mono); font-size: .78rem; font-weight: 600; color: var(--hielo); }
+  .respaldo .rx { font-size: .8rem; color: var(--hielo-2); margin-top: .2rem; }
+
+  /* calculadora */
+  .calc-grid { display: grid; gap: var(--sp-s); }
+  @media (min-width: 40em) { .calc-grid { grid-template-columns: 1fr 1fr; } }
+  .campo label { display: block; font-size: var(--step--1); font-weight: 500; color: var(--hielo); margin-bottom: .3rem; }
+  .campo input[type="number"] {
+    width: 100%; min-height: 46px; padding: .5rem .7rem;
+    background: var(--mar-0); color: var(--hielo);
+    border: 1px solid var(--linea-2); border-radius: var(--radio);
+    font-family: var(--mono); font-size: .95rem;
+  }
+  .campo input:focus-visible { outline: 2px solid var(--naranja); outline-offset: -1px; }
+  .campo .ayuda { font-size: .72rem; color: var(--hielo-3); margin-top: .25rem; font-family: var(--mono); }
+  .check { display: flex; align-items: center; gap: .6rem; min-height: 44px; cursor: pointer; font-size: var(--step--1); color: var(--hielo); grid-column: 1 / -1; }
+  .check input { width: 20px; height: 20px; accent-color: var(--naranja); }
+  .calc-tabla { margin-top: var(--sp-s); font-family: var(--mono); font-size: .82rem; }
+  .calc-tabla .fila { display: flex; justify-content: space-between; gap: var(--sp-s); padding: .45rem 0; border-bottom: 1px dotted var(--linea); }
+  .calc-tabla .fila:last-child { border-bottom: 0; }
+  .calc-tabla .et { color: var(--hielo-3); }
+  .calc-tabla .monto { color: var(--hielo); font-variant-numeric: tabular-nums; }
+  .calc-tabla .fila--total { border-top: 1px solid var(--linea-2); margin-top: .2rem; }
+  .calc-tabla .fila--total .et, .calc-tabla .fila--total .monto { color: var(--naranja-claro); font-weight: 600; }
+  .ahorro { margin-top: var(--sp-s); padding: .6rem .8rem; border-radius: var(--radio); background: var(--ok-velo); color: var(--ok); font-size: var(--step--1); display: flex; gap: .5rem; align-items: baseline; }
+  .ahorro b { font-family: var(--mono); }
+
+  /* dossier */
+  .dossier { background: var(--mar-2); border: 1px solid var(--linea-2); border-radius: var(--radio); padding: var(--sp-m); }
+  .dossier h3 { font-size: var(--step-1); }
+  .dossier .dmeta { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); margin-top: .2rem; }
+  .dossier section { margin-top: var(--sp-m); border-top: 1px solid var(--linea); padding-top: var(--sp-s); }
+  .dossier section h4 { font-family: var(--mono); font-size: .7rem; letter-spacing: .13em; text-transform: uppercase; color: var(--naranja-claro); margin-bottom: .5rem; }
+  .dossier p, .dossier li { font-size: var(--step--1); color: var(--hielo-2); }
+  .dossier ul { padding-left: 1.1rem; }
+  .dossier .firma { margin-top: var(--sp-m); display: flex; flex-wrap: wrap; gap: var(--sp-s); }
+
+  /* ---- Vigilancia ---- */
+  .filtros { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: var(--sp-m); }
+  .evento { border: 1px solid var(--linea); border-radius: var(--radio); background: var(--mar-1); margin-bottom: .6rem; overflow: hidden; }
+  .evento summary {
+    display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; align-items: baseline;
+    padding: var(--sp-s); cursor: pointer; list-style: none; min-height: 56px;
+  }
+  .evento summary::-webkit-details-marker { display: none; }
+  .evento summary:hover { background: var(--mar-2); }
+  .evento .fecha { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); white-space: nowrap; }
+  .evento .tit { font-size: var(--step--1); color: var(--hielo); font-weight: 500; }
+  .evento .badge { grid-column: 2; justify-self: start; margin-top: .2rem; }
+  @media (min-width: 48em) {
+    .evento summary { grid-template-columns: 7rem 1fr auto; }
+    .evento .badge { grid-column: auto; justify-self: end; margin-top: 0; }
+  }
+  .evento-cuerpo { padding: 0 var(--sp-s) var(--sp-s); border-top: 1px solid var(--linea); }
+  .evento-cuerpo p { font-size: var(--step--1); margin-top: var(--sp-s); max-width: 70ch; }
+  .evento-cuerpo .acc { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: var(--sp-s); }
+
+  /* ---- Libro ---- */
+  .stats { display: grid; gap: var(--sp-s); grid-template-columns: repeat(2, 1fr); margin-bottom: var(--sp-m); }
+  @media (min-width: 48em) { .stats { grid-template-columns: repeat(4, 1fr); } }
+  .stat { background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); padding: var(--sp-s); }
+  .stat .sv { font-family: var(--sans); font-weight: 700; font-size: var(--step-2); color: var(--hielo); }
+  .stat .sl { font-size: .78rem; color: var(--hielo-3); margin-top: .15rem; }
+  .fila-nueva td { background: var(--naranja-velo) !important; }
+  .fila-marcada td { background: var(--mar-3) !important; }
+
+  /* toast */
+  .toast {
+    position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%) translateY(20px);
+    background: var(--mar-3); color: var(--hielo); border: 1px solid var(--linea-2);
+    border-left: 3px solid var(--naranja);
+    padding: .7rem 1rem; border-radius: var(--radio); font-size: .88rem;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+    max-width: min(92vw, 34rem); z-index: 60;
+  }
+  .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+  /* impresión: sólo el dossier */
+  @media print {
+    body * { visibility: hidden; }
+    #dossier, #dossier * { visibility: visible; }
+    #dossier { position: absolute; inset: 0; background: #fff; color: #000; border: 0; }
+    #dossier h3, #dossier h4, #dossier p, #dossier li, #dossier .dmeta { color: #000; }
+    #dossier .firma { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-envuelto">
+    <div class="nav-fila">
+      <a class="marca" href="../index.html" aria-label="Aforqua, inicio">
+        <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="2" y="6.5" width="22" height="13" rx="1.5" stroke="#ed6a1f" stroke-width="1.8"/>
+          <path d="M7 6.5v13M11 6.5v13M15 6.5v13M19 6.5v13" stroke="#ed6a1f" stroke-width="1.3" opacity=".55"/>
+        </svg>
+        <span>Aforqua</span>
+      </a>
+      <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Cuenta mock del demo: importador y RUT ficticios -->
+  <div class="demo-cab">
+    <div class="cuenta">
+      <span class="cuadro">CA</span>
+      <div>
+        <p class="qn">Comercial Andesur SpA</p>
+        <p class="qr">RUT 76.892.140-5 · Plan Importador · Huechuraba</p>
+      </div>
+    </div>
+    <span class="badge badge--acento">demo con datos ficticios</span>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Secciones del demo">
+    <button class="tab" role="tab" id="tab-clasificar" aria-selected="true" aria-controls="panel-clasificar">Clasificar</button>
+    <button class="tab" role="tab" id="tab-vigilancia" aria-selected="false" aria-controls="panel-vigilancia">Vigilancia <span class="cnt" id="cnt-vigilancia">5</span></button>
+    <button class="tab" role="tab" id="tab-libro" aria-selected="false" aria-controls="panel-libro">Libro <span class="cnt" id="cnt-libro">41</span></button>
+  </div>
+
+  <!-- ================= CLASIFICAR ================= -->
+  <div class="panel-tab" role="tabpanel" id="panel-clasificar" aria-labelledby="tab-clasificar">
+    <div class="flujo">
+      <div>
+        <div class="caja">
+          <div class="caja-cab"><h2>El producto</h2><span class="badge badge--neutro" id="sku-actual">SKU TAL-20V</span></div>
+          <div class="caja-cue">
+            <div class="chips-prod" role="group" aria-label="Productos de ejemplo">
+              <button class="chip" data-prod="tal" aria-pressed="true">Taladro 20V</button>
+              <button class="chip" data-prod="led" aria-pressed="false">Panel LED 48W</button>
+              <button class="chip" data-prod="zap" aria-pressed="false">Zapatilla textil</button>
+            </div>
+            <label class="visually-hidden" for="ficha">Ficha técnica del producto</label>
+            <textarea id="ficha" spellcheck="false"></textarea>
+            <p class="atenuado" style="font-size:.74rem; margin-top:.4rem; font-family:var(--mono);">demo: los tres productos precargados recorren el árbol real; el texto es editable pero la extracción usa el backend en el producto final</p>
+            <div class="acciones">
+              <button class="btn btn-paso" id="btn-extraer"><span class="np">1</span> Extraer atributos</button>
+              <button class="btn btn-paso" id="btn-arbol" disabled><span class="np">2</span> Ejecutar árbol RGI</button>
+              <button class="btn btn-paso" id="btn-dossier" disabled><span class="np">3</span> Generar dossier</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="caja" id="caja-attr" hidden>
+          <div class="caja-cab"><h2>Atributos extraídos</h2><span class="badge badge--ok"><svg viewBox="0 0 12 12" fill="none"><path d="m2 6.5 2.6 2.6L10 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>cada uno con su cita</span></div>
+          <div class="caja-cue" id="lista-attr"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="caja" id="caja-vacia">
+          <div class="caja-cab"><h2>Recorrido RGI</h2></div>
+          <div class="caja-cue" style="display:flex; flex-direction:column; align-items:flex-start; gap:.6rem; padding-block: var(--sp-l);">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" style="width:44px;height:44px;">
+              <path d="M8 24h10" stroke="#8aa2b0" stroke-width="1.8"/>
+              <rect x="18" y="16" width="12" height="16" rx="2" stroke="#8aa2b0" stroke-width="1.8"/>
+              <path d="M30 24h4m0 0v-8h6m-6 8v8h6" stroke="#ed6a1f" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <p style="font-size: var(--step--1); color: var(--hielo-3); max-width: 34ch;">Ejecuta los pasos 1 y 2 a la izquierda y aquí aparece el árbol completo, nodo a nodo, con la partida y sus respaldos.</p>
+          </div>
+        </div>
+        <div class="caja" id="caja-arbol" hidden>
+          <div class="caja-cab"><h2>Recorrido RGI</h2><span class="badge badge--neutro">árbol determinista</span></div>
+          <div class="caja-cue">
+            <div id="lista-nodos"></div>
+            <div class="resultado aparece" id="res-final" hidden>
+              <div style="display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap;">
+                <span class="codigo" id="res-codigo"></span>
+                <button class="btn-sec" id="btn-copiar" style="min-height:44px; padding:.4rem .9rem; font-size:.8rem;">Copiar código</button>
+              </div>
+              <p class="glosa" id="res-glosa"></p>
+              <div class="respaldos" id="res-respaldos"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="caja" id="caja-calc" hidden>
+          <div class="caja-cab"><h2>Derechos, IVA y TLC</h2></div>
+          <div class="caja-cue">
+            <div class="calc-grid">
+              <div class="campo">
+                <label for="cif">Valor CIF (USD)</label>
+                <input type="number" id="cif" min="0" step="100" inputmode="decimal">
+                <p class="ayuda">factura + flete + seguro</p>
+              </div>
+              <div class="campo">
+                <label for="tc">Tipo de cambio (CLP/USD)</label>
+                <input type="number" id="tc" min="1" step="1" value="950" inputmode="decimal">
+                <p class="ayuda">dólar aduanero de referencia (dato del demo)</p>
+              </div>
+              <label class="check"><input type="checkbox" id="tlc" checked> <span id="tlc-label">Con certificado de origen (TLC)</span></label>
+            </div>
+            <div class="calc-tabla" id="calc-salida" aria-live="polite"></div>
+            <p class="ahorro" id="ahorro" hidden></p>
+          </div>
+        </div>
+
+        <div class="caja" id="caja-dossier" hidden>
+          <div class="caja-cab"><h2>Dossier de clasificación</h2><span class="badge badge--neutro" id="dossier-n"></span></div>
+          <div class="caja-cue">
+            <article class="dossier" id="dossier"></article>
+            <div class="firma acciones" style="flex-direction:row; flex-wrap:wrap;">
+              <button class="btn" id="btn-enviar">Enviar al agente para firma</button>
+              <button class="btn-sec" id="btn-imprimir">Imprimir dossier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VIGILANCIA ================= -->
+  <div class="panel-tab" role="tabpanel" id="panel-vigilancia" aria-labelledby="tab-vigilancia" hidden>
+    <div class="filtros" role="group" aria-label="Filtrar eventos">
+      <button class="chip" data-filtro="todos" aria-pressed="true">Todos</button>
+      <button class="chip" data-filtro="mios" aria-pressed="false">Afectan mis SKU</button>
+      <button class="chip" data-filtro="resolucion" aria-pressed="false">Resoluciones</button>
+      <button class="chip" data-filtro="arancel" aria-pressed="false">Arancel y TLC</button>
+    </div>
+    <div id="lista-eventos"></div>
+  </div>
+
+  <!-- ================= LIBRO ================= -->
+  <div class="panel-tab" role="tabpanel" id="panel-libro" aria-labelledby="tab-libro" hidden>
+    <div class="stats">
+      <div class="stat"><p class="sv num-tab" id="st-total">41</p><p class="sl">clasificaciones en el libro</p></div>
+      <div class="stat"><p class="sv num-tab" id="st-respaldo">41</p><p class="sl">con respaldo citado</p></div>
+      <div class="stat"><p class="sv num-tab">2</p><p class="sl">defendidas en fiscalización</p></div>
+      <div class="stat"><p class="sv num-tab" id="st-pend">5</p><p class="sl">eventos de vigilancia abiertos</p></div>
+    </div>
+    <div class="caja">
+      <div class="caja-cab">
+        <h2>Libro del importador · últimas entradas</h2>
+        <button class="btn-sec" id="btn-csv" style="min-height:44px; padding:.4rem .9rem; font-size:.8rem;">Exportar CSV</button>
+      </div>
+      <div class="scroll-x">
+        <table class="tabla" id="tabla-libro">
+          <thead>
+            <tr><th>Fecha</th><th>SKU</th><th>Producto</th><th>Código</th><th>Respaldo</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="cuerpo-libro"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="atenuado" style="font-size:.78rem; margin-top: var(--sp-s);">Mostrando las últimas entradas del libro. Esto es lo que se le muestra a Aduanas en una fiscalización: cada código, con su fecha, su recorrido y su respaldo.</p>
+  </div>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-fila">
+    <span>Aforqua · demo con datos ficticios: partidas plausibles, resoluciones y montos de ejemplo.</span>
+    <span class="mono">estado local en tu navegador, nada se envía</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../sitio.js"></script>
+<script>
+/* ===========================================================================
+   DEMO AFORQUA. Todo el estado vive en el cliente.
+   MOCK: los productos, atributos, números de resolución, dictámenes, montos,
+   RUT y nombres de empresas son ficticios pero verosímiles. El árbol RGI de
+   cada producto está implementado como datos + reglas deterministas: el
+   "modelo" (aquí simulado) sólo aporta los atributos; el código final sale
+   del árbol, nunca del texto libre.
+   =========================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------- datos mock ---------- */
+  var PRODUCTOS = {
+    tal: {
+      sku: "TAL-20V",
+      nombre: "Taladro percutor inalámbrico 20V",
+      ficha: "Taladro percutor inalámbrico 20V, portátil, para uso manual. Motor eléctrico incorporado (brushless). Incluye batería de litio 20V 4,0Ah, cargador y maletín. Mandril de 13 mm, 2 velocidades, función percusión para hormigón. Origen: Ningbo, China. Presentación: caja individual, 4,2 kg.",
+      atributos: [
+        ["función", "perforar, con percusión", "función percusión para hormigón"],
+        ["accionamiento", "motor eléctrico incorporado", "Motor eléctrico incorporado (brushless)"],
+        ["alimentación", "batería de litio 20V", "batería de litio 20V 4,0Ah"],
+        ["modo de uso", "manual, portátil", "portátil, para uso manual"],
+        ["presentación", "surtido con accesorios en maletín", "Incluye batería..., cargador y maletín"],
+        ["origen", "China", "Origen: Ningbo, China"]
+      ],
+      arbol: [
+        { r: "RGI 1", cond: "SI texto_de_partida(articulo) ES univoco\n  → clasificar por texto + notas de Seccion/Capitulo", det: "Herramienta <b>de uso manual</b> con <b>motor eléctrico incorporado</b>: texto de la partida <b>84.67</b> (Sección XVI). Se descarta 84.66 (partes y accesorios de máquinas herramienta) y 85.08 (aspiradoras).", estado: "resuelve", out: "partida 84.67" },
+        { r: "RGI 2a", cond: "SI articulo incompleto O desmontado\n  → clasificar como completo si conserva caracter esencial", det: "Se presenta completo y armado. No aplica.", estado: "noaplica" },
+        { r: "RGI 3b", cond: "SI surtido de articulos distintos\n  → clasifica la materia/articulo que da el caracter esencial", det: "Taladro + batería + cargador + maletín es un <b>surtido acondicionado para venta al por menor</b>: el carácter esencial lo da el taladro.", estado: "aplica", out: "se mantiene 84.67" },
+        { r: "RGI 6", cond: "comparar subpartidas del mismo nivel\n  8467.11/19 (neumaticas) vs 8467.21 (taladros electricos)", det: "Accionamiento eléctrico, no neumático. Subpartida <b>8467.21</b>: taladros de toda clase.", estado: "resuelve", out: "8467.21" },
+        { r: "Nota nac.", cond: "apertura nacional del Arancel chileno (8 digitos)", det: "Línea nacional única para la subpartida.", estado: "resuelve", out: "8467.21.00" }
+      ],
+      codigo: "8467.21.00",
+      glosa: "Taladros de toda clase, con motor eléctrico incorporado, de uso manual",
+      respaldos: [
+        ["Resolución Anticipada N° 4.812/2024, DNA (ejemplo)", "Taladro inalámbrico con batería intercambiable y accesorios en maletín: surtido RGI 3b, carácter esencial del taladro, subpartida 8467.21."],
+        ["Dictamen de Clasificación N° 82/2021 (ejemplo)", "Las herramientas de mano con motor incorporado se clasifican en 84.67 aunque se presenten con cargador y estuche."]
+      ],
+      cif: 18400, tlcNombre: "TLC Chile-China", origen: "cambio de partida + certificado de origen", advalGeneral: 0.06, advalTlc: 0
+    },
+    led: {
+      sku: "LED-48",
+      nombre: "Panel LED empotrable 48W",
+      ficha: "Panel LED empotrable para techo, 48W, 4.000K. Luminaria terminada con fuente luminosa LED integrada no reemplazable y driver incluido. Uso: iluminación de oficinas. Dimensiones 60x60 cm. Origen: Shenzhen, China. Se importa en cajas de 20 unidades.",
+      atributos: [
+        ["tipo de artículo", "luminaria terminada (no ampolleta)", "Luminaria terminada con fuente luminosa LED integrada"],
+        ["fuente luminosa", "LED integrada, no reemplazable", "LED integrada no reemplazable"],
+        ["montaje", "empotrable de techo", "Panel LED empotrable para techo"],
+        ["potencia", "48W", "48W, 4.000K"],
+        ["uso previsto", "iluminación de oficinas", "Uso: iluminación de oficinas"],
+        ["origen", "China", "Origen: Shenzhen, China"]
+      ],
+      arbol: [
+        { r: "RGI 1", cond: "SI texto_de_partida(articulo) ES univoco\n  → clasificar por texto + notas de Seccion/Capitulo", det: "Es una <b>luminaria completa</b>, no una fuente luminosa suelta: se descarta 85.39 (lámparas y fuentes LED) por Nota 1 f) del capítulo 94 a contrario. Partida <b>94.05</b>: aparatos de alumbrado no expresados en otra parte.", estado: "resuelve", out: "partida 94.05" },
+        { r: "RGI 2b", cond: "SI mezcla o combinacion de materias\n  → extender la partida a la materia mezclada", det: "Aluminio + policarbonato + electrónica no altera la partida: es un aparato, no una materia. No aplica.", estado: "noaplica" },
+        { r: "RGI 6", cond: "comparar subpartidas del mismo nivel\n  9405.11 (LED exclusivo, techo/pared) vs 9405.19 (los demas)", det: "Diseñada <b>exclusivamente para fuente LED</b> (integrada, no reemplazable) y es de techo: subpartida <b>9405.11</b>.", estado: "resuelve", out: "9405.11" },
+        { r: "Nota nac.", cond: "apertura nacional del Arancel chileno (8 digitos)", det: "Línea nacional única para la subpartida.", estado: "resuelve", out: "9405.11.00" }
+      ],
+      codigo: "9405.11.00",
+      glosa: "Luminarias de techo o pared, diseñadas para utilizar exclusivamente fuentes luminosas LED",
+      respaldos: [
+        ["Dictamen de Clasificación N° 17/2023 (ejemplo)", "Paneles LED con fuente integrada no reemplazable: luminarias de 9405.11, no fuentes luminosas de 85.39."],
+        ["Resolución Anticipada N° 2.244/2023, DNA (ejemplo)", "Luminaria empotrable de techo con driver incluido se clasifica como aparato completo de la partida 94.05."]
+      ],
+      cif: 9200, tlcNombre: "TLC Chile-China", origen: "cambio de partida + certificado de origen", advalGeneral: 0.06, advalTlc: 0
+    },
+    zap: {
+      sku: "ZAP-TX",
+      nombre: "Zapatilla urbana, corte textil",
+      ficha: "Zapatilla urbana adulto. Parte superior (corte) 100% textil, malla de poliéster. Suela exterior de caucho vulcanizado. Sin puntera de protección, sin clavos ni elementos para un deporte específico. Tallas 36 a 44. Origen: Ho Chi Minh, Vietnam.",
+      atributos: [
+        ["materia del corte", "textil (malla de poliéster)", "Parte superior (corte) 100% textil"],
+        ["materia de la suela", "caucho vulcanizado", "Suela exterior de caucho vulcanizado"],
+        ["uso previsto", "urbano, no deportivo", "sin clavos ni elementos para un deporte específico"],
+        ["protección", "sin puntera de protección", "Sin puntera de protección"],
+        ["origen", "Vietnam", "Origen: Ho Chi Minh, Vietnam"]
+      ],
+      arbol: [
+        { r: "RGI 1", cond: "notas del capitulo 64: la partida la determina\n  la materia de la SUELA y la del CORTE", det: "Suela de <b>caucho</b> + corte <b>textil</b>: se descartan 64.03 (corte de cuero) y 64.02 (corte de caucho/plástico). Partida <b>64.04</b>.", estado: "resuelve", out: "partida 64.04" },
+        { r: "RGI 3a", cond: "SI dos partidas parecen aplicables\n  → prima la mas especifica", det: "Sólo 64.04 describe suela de caucho con corte textil. No hay conflicto que resolver.", estado: "noaplica" },
+        { r: "RGI 6", cond: "comparar subpartidas del mismo nivel\n  6404.11 (deporte, tenis, gimnasia) vs 6404.19 (los demas)", det: "Sin elementos para deporte específico y de uso urbano: <b>6404.19</b>, los demás.", estado: "resuelve", out: "6404.19" },
+        { r: "Nota nac.", cond: "apertura nacional del Arancel chileno (8 digitos)", det: "Línea nacional única para la subpartida.", estado: "resuelve", out: "6404.19.00" }
+      ],
+      codigo: "6404.19.00",
+      glosa: "Calzado con suela de caucho o plástico y parte superior de materia textil, los demás",
+      respaldos: [
+        ["Resolución Anticipada N° 3.106/2023, DNA (ejemplo)", "Zapatilla urbana de malla textil sin refuerzos deportivos: 6404.19, no 6404.11; el criterio deportivo exige elementos objetivos."],
+        ["Dictamen de Clasificación N° 51/2022 (ejemplo)", "La distinción 6404.11 / 6404.19 se resuelve por características constructivas, no por el marketing del producto."]
+      ],
+      cif: 32000, tlcNombre: "TLC Chile-Vietnam", origen: "regla de origen específica del capítulo 64 + certificado de origen", advalGeneral: 0.06, advalTlc: 0
+    }
+  };
+
+  var EVENTOS = [
+    { fecha: "14-07-2026", cat: "resolucion", mio: true, sku: "CHG-65",
+      tit: "Resolución Anticipada N° 5.240/2026: los cargadores GaN multipuerto se clasifican en 8504.40, no en 8504.31.",
+      cuerpo: "Tu SKU CHG-65 (cargador GaN 65W) está declarado en 8504.40.19, consistente con la nueva resolución. La glosa de tu libro fue revalidada automáticamente; no hay diferencia de derechos.",
+      accion: "ver-libro", badge: "afecta 1 SKU", tipo: "alerta" },
+    { fecha: "09-07-2026", cat: "arancel", mio: true, sku: null,
+      tit: "VIII Enmienda del Sistema Armonizado: 34 líneas del capítulo 85 cambian de glosa en el Arancel 2027.",
+      cuerpo: "Tres SKU de tu libro (CHG-65, VEN-12 y un SKU archivado) caen en líneas renumeradas. Aforqua propondrá la reclasificación con el árbol actualizado antes del 01-01-2027, y el dossier nuevo citará la tabla de correlación oficial.",
+      accion: null, badge: "afecta 3 SKU", tipo: "alerta" },
+    { fecha: "02-07-2026", cat: "arancel", mio: false, sku: null,
+      tit: "TLC Chile-India: entra en vigencia la fase 2 de desgravación para el capítulo 94.",
+      cuerpo: "Tu SKU LED-48 es del capítulo 94, pero importas origen China con preferencia ya en 0%. Sin efecto en tus costos; queda registrado por si cambias de proveedor.",
+      accion: null, badge: "informativo", tipo: "neutro" },
+    { fecha: "25-06-2026", cat: "resolucion", mio: false, sku: null,
+      tit: "Dictamen N° 44/2026: hervidores con control electrónico de temperatura siguen en 8516.71.",
+      cuerpo: "Sin coincidencias con tu libro. Se indexa al corpus para futuras clasificaciones del capítulo 85.",
+      accion: null, badge: "informativo", tipo: "neutro" },
+    { fecha: "05-06-2026", cat: "resolucion", mio: false, sku: null,
+      tit: "Resolución Anticipada N° 4.977/2026: scooters eléctricos de más de 250W en 8711.60.",
+      cuerpo: "Sin coincidencias con tu libro. Relevante si algún cliente de tu agencia importa movilidad eléctrica.",
+      accion: null, badge: "informativo", tipo: "neutro" }
+  ];
+
+  var LIBRO = [
+    ["12-05-2026", "CHG-65", "Cargador GaN 65W multipuerto", "8504.40.19", "Res. Ant. 5.240/2026", "vigente"],
+    ["03-04-2026", "TAL-20V", "Taladro percutor inalámbrico 20V", "8467.21.00", "Res. Ant. 4.812/2024", "defendida"],
+    ["22-03-2026", "LED-48", "Panel LED empotrable 48W", "9405.11.00", "Dictamen 17/2023", "vigente"],
+    ["15-01-2026", "ZAP-TX", "Zapatilla urbana corte textil", "6404.19.00", "Res. Ant. 3.106/2023", "vigente"],
+    ["09-12-2025", "HID-3T", "Gata hidráulica de taller 3T", "8425.42.00", "Res. Ant. 2.981/2022", "defendida"],
+    ["18-11-2025", "VEN-12", "Ventilador industrial 12 pulgadas", "8414.59.00", "Dictamen 63/2021", "vigente"]
+  ];
+
+  /* ---------- utilidades ---------- */
+  var $ = function (s) { return document.querySelector(s); };
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function clp(n) { return "$" + Math.round(n).toLocaleString("es-CL"); }
+  function toast(msg) {
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("visible");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.classList.remove("visible"); }, 3400);
+  }
+
+  /* ---------- pestañas ---------- */
+  var TABS = ["clasificar", "vigilancia", "libro"];
+  function abreTab(nombre) {
+    TABS.forEach(function (t) {
+      $("#tab-" + t).setAttribute("aria-selected", t === nombre ? "true" : "false");
+      $("#panel-" + t).hidden = t !== nombre;
+    });
+  }
+  TABS.forEach(function (t) {
+    $("#tab-" + t).addEventListener("click", function () { abreTab(t); });
+  });
+
+  /* ---------- estado del flujo de clasificación ---------- */
+  var prodActual = "tal";
+  var paso = 0; /* 0 sin extraer · 1 extraído · 2 árbol listo · 3 dossier */
+  var dossierN = 142;
+
+  function reinicia(clave) {
+    prodActual = clave;
+    paso = 0;
+    var p = PRODUCTOS[clave];
+    $("#ficha").value = p.ficha;
+    $("#sku-actual").textContent = "SKU " + p.sku;
+    $("#caja-vacia").hidden = false;
+    $("#caja-attr").hidden = true;
+    $("#caja-arbol").hidden = true;
+    $("#caja-calc").hidden = true;
+    $("#caja-dossier").hidden = true;
+    $("#res-final").hidden = true;
+    $("#btn-arbol").disabled = true;
+    $("#btn-dossier").disabled = true;
+  }
+
+  document.querySelectorAll(".chips-prod .chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      document.querySelectorAll(".chips-prod .chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      chip.setAttribute("aria-pressed", "true");
+      reinicia(chip.dataset.prod);
+    });
+  });
+
+  /* paso 1: extracción de atributos (simulada; en producción la hace el modelo) */
+  $("#btn-extraer").addEventListener("click", function () {
+    var p = PRODUCTOS[prodActual];
+    var cont = $("#lista-attr");
+    cont.innerHTML = "";
+    p.atributos.forEach(function (a) {
+      var fila = document.createElement("div");
+      fila.className = "attr-fila aparece";
+      var k = document.createElement("span"); k.className = "k"; k.textContent = a[0];
+      var v = document.createElement("span"); v.className = "v"; v.textContent = a[1];
+      var c = document.createElement("span"); c.className = "cita"; c.textContent = '"' + a[2] + '"';
+      fila.appendChild(k); fila.appendChild(v); fila.appendChild(c);
+      cont.appendChild(fila);
+    });
+    $("#caja-attr").hidden = false;
+    $("#btn-arbol").disabled = false;
+    paso = 1;
+    toast("Atributos extraídos. El modelo llega hasta aquí: el código lo decide el árbol.");
+  });
+
+  /* paso 2: árbol RGI (determinista, nodo a nodo) */
+  function pintaNodo(n) {
+    var div = document.createElement("div");
+    div.className = "nodo aparece";
+    var regla = document.createElement("span"); regla.className = "regla"; regla.textContent = n.r;
+    var cuerpo = document.createElement("div"); cuerpo.className = "cuerpo";
+    var cond = document.createElement("div"); cond.className = "cond"; cond.textContent = n.cond;
+    var det = document.createElement("p"); det.className = "det"; det.innerHTML = n.det;
+    cuerpo.appendChild(cond); cuerpo.appendChild(det);
+    var badge = document.createElement("span");
+    if (n.estado === "resuelve") {
+      badge.className = "badge badge--acento";
+      badge.textContent = "resuelve → " + n.out;
+    } else if (n.estado === "aplica") {
+      badge.className = "badge badge--ok";
+      badge.textContent = "aplica → " + n.out;
+    } else {
+      badge.className = "badge badge--neutro";
+      badge.textContent = "no aplica";
+    }
+    cuerpo.appendChild(badge);
+    div.appendChild(regla); div.appendChild(cuerpo);
+    return div;
+  }
+
+  $("#btn-arbol").addEventListener("click", function () {
+    var p = PRODUCTOS[prodActual];
+    var cont = $("#lista-nodos");
+    cont.innerHTML = "";
+    $("#caja-vacia").hidden = true;
+    $("#caja-arbol").hidden = false;
+    $("#res-final").hidden = true;
+    $("#caja-arbol").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+
+    var i = 0;
+    function siguiente() {
+      if (i < p.arbol.length) {
+        cont.appendChild(pintaNodo(p.arbol[i]));
+        i++;
+        if (reduceMotion) { siguiente(); } else { setTimeout(siguiente, 420); }
+      } else {
+        muestraResultado(p);
+      }
+    }
+    siguiente();
+  });
+
+  function muestraResultado(p) {
+    $("#res-codigo").textContent = p.codigo;
+    $("#res-glosa").textContent = p.glosa;
+    var rs = $("#res-respaldos");
+    rs.innerHTML = "";
+    p.respaldos.forEach(function (r) {
+      var d = document.createElement("div"); d.className = "respaldo";
+      var n = document.createElement("p"); n.className = "rn"; n.textContent = r[0];
+      var x = document.createElement("p"); x.className = "rx"; x.textContent = r[1];
+      d.appendChild(n); d.appendChild(x);
+      rs.appendChild(d);
+    });
+    $("#res-final").hidden = false;
+    $("#cif").value = p.cif;
+    $("#tlc-label").textContent = "Con certificado de origen (" + p.tlcNombre + ")";
+    $("#caja-calc").hidden = false;
+    calcula();
+    $("#btn-dossier").disabled = false;
+    paso = 2;
+  }
+
+  $("#btn-copiar").addEventListener("click", function () {
+    var cod = $("#res-codigo").textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cod).then(function () { toast("Código " + cod + " copiado."); },
+        function () { toast("Código: " + cod); });
+    } else { toast("Código: " + cod); }
+  });
+
+  /* calculadora de derechos */
+  function calcula() {
+    var p = PRODUCTOS[prodActual];
+    var cifUsd = parseFloat($("#cif").value) || 0;
+    var tc = parseFloat($("#tc").value) || 0;
+    var conTlc = $("#tlc").checked;
+    var cifClp = cifUsd * tc;
+    var tasa = conTlc ? p.advalTlc : p.advalGeneral;
+    var derechos = cifClp * tasa;
+    var derechosGeneral = cifClp * p.advalGeneral;
+    var iva = (cifClp + derechos) * 0.19;
+    var total = derechos + iva;
+    var salida = $("#calc-salida");
+    salida.innerHTML =
+      '<div class="fila"><span class="et">CIF en pesos (' + cifUsd.toLocaleString("es-CL") + " USD × " + tc.toLocaleString("es-CL") + ')</span><span class="monto">' + clp(cifClp) + "</span></div>" +
+      '<div class="fila"><span class="et">Derechos ad valorem (' + (tasa * 100).toLocaleString("es-CL") + "%" + (conTlc ? ", " + p.tlcNombre : ", régimen general") + ')</span><span class="monto">' + clp(derechos) + "</span></div>" +
+      '<div class="fila"><span class="et">IVA 19% sobre CIF + derechos</span><span class="monto">' + clp(iva) + "</span></div>" +
+      '<div class="fila fila--total"><span class="et">Total giro de importación</span><span class="monto">' + clp(total) + "</span></div>";
+    var ah = $("#ahorro");
+    if (conTlc && derechosGeneral > derechos) {
+      ah.hidden = false;
+      ah.innerHTML = "Ahorro frente al régimen general: <b>" + clp(derechosGeneral - derechos) + "</b> en este embarque. Regla de origen: " + p.origen + ".";
+    } else {
+      ah.hidden = true;
+    }
+  }
+  ["cif", "tc"].forEach(function (id) { $("#" + id).addEventListener("input", calcula); });
+  $("#tlc").addEventListener("change", calcula);
+
+  /* paso 3: dossier */
+  $("#btn-dossier").addEventListener("click", function () {
+    var p = PRODUCTOS[prodActual];
+    var cifUsd = parseFloat($("#cif").value) || 0;
+    var tc = parseFloat($("#tc").value) || 0;
+    var conTlc = $("#tlc").checked;
+    var cifClp = cifUsd * tc;
+    var tasa = conTlc ? p.advalTlc : p.advalGeneral;
+    var derechos = cifClp * tasa;
+    var iva = (cifClp + derechos) * 0.19;
+    var nDoc = "AFQ-2026-0" + dossierN;
+    $("#dossier-n").textContent = nDoc;
+
+    var arbolHtml = "";
+    p.arbol.forEach(function (n) {
+      arbolHtml += "<li><b>" + n.r + ":</b> " + n.det + (n.out ? " <span class='mono'>[" + n.out + "]</span>" : "") + "</li>";
+    });
+    var respHtml = "";
+    p.respaldos.forEach(function (r) { respHtml += "<li><b>" + r[0] + ".</b> " + r[1] + "</li>"; });
+
+    $("#dossier").innerHTML =
+      "<h3>Dossier de clasificación arancelaria</h3>" +
+      '<p class="dmeta">' + nDoc + " · 18-07-2026 · generado por Aforqua, pendiente de firma del agente</p>" +
+      "<section><h4>Importador</h4><p>Comercial Andesur SpA, RUT 76.892.140-5, Av. El Salto 4001, of. 703, Huechuraba. Agencia despachadora: Agencia de Aduanas R. Montecinos y Cía. Ltda. (datos de ejemplo).</p></section>" +
+      "<section><h4>Producto</h4><p><b>" + p.nombre + "</b> (SKU " + p.sku + "). " + p.ficha + "</p></section>" +
+      "<section><h4>Recorrido de clasificación (RGI)</h4><ul>" + arbolHtml + "</ul></section>" +
+      "<section><h4>Código propuesto</h4><p><span class='mono'><b>" + p.codigo + "</b></span> · " + p.glosa + "</p></section>" +
+      "<section><h4>Respaldos citados</h4><ul>" + respHtml + "</ul></section>" +
+      "<section><h4>Tributos del embarque de referencia</h4><p>CIF " + cifUsd.toLocaleString("es-CL") + " USD (" + clp(cifClp) + "). Derechos ad valorem " + (tasa * 100).toLocaleString("es-CL") + "%" + (conTlc ? " por " + p.tlcNombre + " (" + p.origen + ")" : ", régimen general") + ": " + clp(derechos) + ". IVA 19%: " + clp(iva) + ".</p></section>" +
+      "<section><h4>Recomendación</h4><p>" + (cifClp > 20000000 ? "Por el monto anual involucrado, se recomienda solicitar una resolución anticipada formal ante la Dirección Nacional de Aduanas para blindar esta clasificación." : "Mantener este dossier en el libro del importador y vigilar la subpartida; si el volumen anual crece, solicitar resolución anticipada formal.") + "</p></section>";
+
+    $("#caja-dossier").hidden = false;
+    $("#btn-enviar").disabled = false;
+    $("#caja-dossier").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    paso = 3;
+  });
+
+  $("#btn-imprimir").addEventListener("click", function () { window.print(); });
+
+  $("#btn-enviar").addEventListener("click", function () {
+    var p = PRODUCTOS[prodActual];
+    LIBRO.unshift(["18-07-2026", p.sku, p.nombre, p.codigo, "Dossier AFQ-2026-0" + dossierN, "firma"]);
+    dossierN++;
+    this.disabled = true;
+    var total = parseInt($("#st-total").textContent, 10) + 1;
+    $("#st-total").textContent = total;
+    $("#st-respaldo").textContent = total;
+    $("#cnt-libro").textContent = total;
+    pintaLibro(true);
+    abreTab("libro");
+    toast("Dossier enviado a la agencia. Quedó en tu libro como pendiente de firma.");
+  });
+
+  /* ---------- vigilancia ---------- */
+  var filtroActual = "todos";
+  var revisados = {};
+
+  function pintaEventos() {
+    var cont = $("#lista-eventos");
+    cont.innerHTML = "";
+    var visibles = EVENTOS.filter(function (e) {
+      if (filtroActual === "todos") return true;
+      if (filtroActual === "mios") return e.mio;
+      return e.cat === filtroActual;
+    });
+    if (!visibles.length) {
+      var vacio = document.createElement("p");
+      vacio.className = "atenuado";
+      vacio.textContent = "Sin eventos en este filtro. La vigilancia sigue corriendo a diario.";
+      cont.appendChild(vacio);
+      return;
+    }
+    visibles.forEach(function (e, idx) {
+      var det = document.createElement("details");
+      det.className = "evento";
+      var sum = document.createElement("summary");
+      var revisado = revisados[e.tit];
+      sum.innerHTML = '<span class="fecha">' + e.fecha + '</span><span class="tit"></span>' +
+        '<span class="badge ' + (revisado ? "badge--ok" : (e.tipo === "alerta" ? "badge--alerta" : "badge--neutro")) + '">' + (revisado ? "revisado" : e.badge) + "</span>";
+      sum.querySelector(".tit").textContent = e.tit;
+      var cuerpo = document.createElement("div");
+      cuerpo.className = "evento-cuerpo";
+      var pr = document.createElement("p"); pr.textContent = e.cuerpo;
+      cuerpo.appendChild(pr);
+      var acc = document.createElement("div"); acc.className = "acc";
+      var btnRev = document.createElement("button");
+      btnRev.className = "btn-sec";
+      btnRev.style.cssText = "min-height:44px; padding:.4rem .9rem; font-size:.8rem;";
+      btnRev.textContent = revisado ? "Marcar como pendiente" : "Marcar revisado";
+      btnRev.addEventListener("click", function () {
+        revisados[e.tit] = !revisados[e.tit];
+        actualizaPendientes();
+        pintaEventos();
+      });
+      acc.appendChild(btnRev);
+      if (e.accion === "ver-libro") {
+        var btnLibro = document.createElement("button");
+        btnLibro.className = "btn-sec";
+        btnLibro.style.cssText = "min-height:44px; padding:.4rem .9rem; font-size:.8rem;";
+        btnLibro.textContent = "Ver SKU en el libro";
+        btnLibro.addEventListener("click", function () {
+          abreTab("libro");
+          pintaLibro(false, e.sku);
+        });
+        acc.appendChild(btnLibro);
+      }
+      cuerpo.appendChild(acc);
+      det.appendChild(sum); det.appendChild(cuerpo);
+      cont.appendChild(det);
+    });
+  }
+
+  function actualizaPendientes() {
+    var pendientes = EVENTOS.filter(function (e) { return !revisados[e.tit]; }).length;
+    $("#cnt-vigilancia").textContent = pendientes;
+    $("#st-pend").textContent = pendientes;
+  }
+
+  document.querySelectorAll(".filtros .chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      document.querySelectorAll(".filtros .chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      chip.setAttribute("aria-pressed", "true");
+      filtroActual = chip.dataset.filtro;
+      pintaEventos();
+    });
+  });
+
+  /* ---------- libro ---------- */
+  function badgeEstado(estado) {
+    if (estado === "defendida") return '<span class="badge badge--ok"><svg viewBox="0 0 12 12" fill="none"><path d="m2 6.5 2.6 2.6L10 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>defendida</span>';
+    if (estado === "firma") return '<span class="badge badge--alerta"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 3.8V6l1.6 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>en firma</span>';
+    return '<span class="badge badge--neutro">vigente</span>';
+  }
+
+  function pintaLibro(marcaNueva, skuDestacado) {
+    var cuerpo = $("#cuerpo-libro");
+    cuerpo.innerHTML = "";
+    LIBRO.forEach(function (fila, i) {
+      var tr = document.createElement("tr");
+      if (marcaNueva && i === 0) tr.className = "fila-nueva";
+      if (skuDestacado && fila[1] === skuDestacado) tr.className = "fila-marcada";
+      tr.innerHTML = "<td class='mono'>" + fila[0] + "</td><td class='mono'>" + fila[1] + "</td><td></td><td class='mono'>" + fila[3] + "</td><td></td><td>" + badgeEstado(fila[5]) + "</td>";
+      tr.children[2].textContent = fila[2];
+      tr.children[4].textContent = fila[4];
+      cuerpo.appendChild(tr);
+    });
+    if (skuDestacado) {
+      var marcada = cuerpo.querySelector(".fila-marcada");
+      if (marcada) marcada.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+    }
+  }
+
+  $("#btn-csv").addEventListener("click", function () {
+    var enc = "fecha,sku,producto,codigo,respaldo,estado\n";
+    var csv = enc + LIBRO.map(function (f) {
+      return f.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(",");
+    }).join("\n");
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "aforqua-libro-andesur.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("Libro exportado como CSV.");
+  });
+
+  /* ---------- arranque ---------- */
+  reinicia("tal");
+  pintaEventos();
+  actualizaPendientes();
+  pintaLibro(false);
+})();
+</script>
+</body>
+</html>

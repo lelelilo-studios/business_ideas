@@ -1,0 +1,15 @@
+{
+  "folder": "24-aduanas",
+  "brand": "Aforqua",
+  "domain": "aforqua.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/aforqua.com -> HTTP 404 (disponible); NIC Chile: aforqua.cl 'no existe' (disponible). Verificado con _kit/check-domain.sh el 2026-07-18.",
+  "alternates": ["partiqua.com", "glosavia.com", "aranquia.com"],
+  "tagline": "La partida arancelaria correcta, con respaldo que se firma.",
+  "category": "LegalTech comercio exterior",
+  "market": "Chile → Perú y Colombia",
+  "icp": "Importador PYME recurrente (ferretería, retail especializado, e-commerce con contenedores propios; 200-2.000 SKU) y agencias de aduana de 3-20 personas como herramienta y canal.",
+  "price_clp": "Dossier $45.000 · planes desde $79.000/mes",
+  "accent": "#ed6a1f",
+  "problem": "La partida arancelaria la elige en cinco minutos un agente apurado: o pagas derechos de más por años, o Aduanas te formula cargos con multa y carga retenida.",
+  "status": "prototipo"
+}

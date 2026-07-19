@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio: Prorratia</title>
+<meta name="description" content="Cliente objetivo, mercado con la aritmética a la vista, competencia honesta, precios y canales para Prorratia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cabecera { padding-block: var(--sp-xl) var(--sp-l); }
+  .cabecera h1 { max-width: 20ch; font-size: var(--step-3); }
+  .cabecera p { max-width: 58ch; margin-top: var(--sp-s); }
+
+  .dos-lados { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .dos-lados { grid-template-columns: 1fr 1fr; } }
+  .lado h3 { display: flex; align-items: baseline; gap: .5rem; }
+  .lado .rol { font-family: var(--mono); font-size: .7rem; color: var(--verde); text-transform: uppercase; letter-spacing: .1em; }
+  .lado ul { list-style: none; margin: var(--sp-s) 0 0; padding: 0; font-size: var(--step--1); color: var(--tinta-2); display: grid; gap: .45rem; }
+  .lado ul li { padding-left: 1rem; position: relative; }
+  .lado ul li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 2px; background: var(--verde); }
+
+  .mercado-tabla td:first-child { font-weight: 600; color: var(--tinta); white-space: nowrap; }
+  .mercado-tabla .calculo { font-family: var(--mono); font-size: .75rem; color: var(--tinta-3); }
+
+  .test-llm { border-left: 3px solid var(--verde); padding-left: var(--sp-m); }
+  .test-llm + .test-llm { margin-top: var(--sp-m); }
+  .test-llm h3 { margin-bottom: .3rem; }
+  .test-llm p { font-size: var(--step--1); max-width: 62ch; }
+
+  .eco { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .eco { grid-template-columns: repeat(3, 1fr); } }
+  .eco .kpi .k-derivacion { font-family: var(--mono); font-size: .7rem; color: var(--tinta-3); margin-top: .35rem; line-height: 1.5; }
+  .kpi { padding: var(--sp-s) var(--sp-m); }
+  .kpi .k-label { font-size: .78rem; color: var(--tinta-3); }
+  .kpi .k-valor { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.02em; margin-top: .2rem; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="2" stroke="#0D5E36" stroke-width="1.7"/>
+        <path d="M9.6 2.75v18.5M15.4 2.75v11M2.75 13.75h12.65" stroke="#0D5E36" stroke-width="1.7"/>
+      </svg>
+      <span>Prorratia</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<div class="cabecera">
+  <div class="container">
+    <h1>El negocio: cobrar poco, por unidad, para siempre.</h1>
+    <p>Prorratia vende orden legal y auditabilidad en un gasto que la comunidad ya paga todos los meses. La regla de esta página: cada número viene con su fuente o con su aritmética a la vista.</p>
+  </div>
+</div>
+
+<!-- ===== ICP ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Cliente objetivo: dos lados de la misma mesa.</h2>
+    <div class="dos-lados">
+      <div class="placa lado">
+        <h3><span class="rol">Lado A</span> El comité de administración</h3>
+        <ul>
+          <li>Condominio de 20 a 80 unidades, en régimen de copropiedad (Ley 21.442).</li>
+          <li>Autoadministrado o con un administrador informal al que no puede auditar.</li>
+          <li>Firma: el comité, con acuerdo de asamblea o según faculte el reglamento.</li>
+          <li>Usa: el comité carga y revisa; las 24 a 80 unidades miran.</li>
+          <li>Dónde está: buscando en Google cómo cumplir la ley, y peleando en el grupo de WhatsApp del edificio.</li>
+        </ul>
+      </div>
+      <div class="placa lado">
+        <h3><span class="rol">Lado B</span> El administrador chico</h3>
+        <ul>
+          <li>Una a tres personas, 3 a 10 comunidades, inscrito o por inscribirse en el Registro Nacional de Administradores.</li>
+          <li>Hoy opera con Excel, transferencias y WhatsApp; pierde edificios por desconfianza, no por precio.</li>
+          <li>Firma: él mismo; el gasto lo traspasa al gasto común de cada comunidad.</li>
+          <li>Su dolor: verse profesional ante comités que hoy dudan de todos.</li>
+          <li>Dónde está: el Registro Nacional (público), grupos de administradores, LinkedIn.</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top: var(--sp-m); font-size: var(--step--1); max-width: 62ch;">La cabeza de playa es el lado A: el comité que se siente expuesto. Es quien más sufre el problema y quien decide más rápido. El lado B escala: cada administrador trae 3 a 10 comunidades de una vez.</p>
+  </div>
+</section>
+
+<!-- ===== Mercado ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Mercado: la aritmética a la vista.</h2>
+    <p class="intro">No existe un registro público consolidado de copropiedades activas. Todo lo que sigue declara su supuesto.</p>
+    <div class="scroll-x" style="margin-top: var(--sp-l);">
+      <table class="mercado-tabla">
+        <thead><tr><th>Capa</th><th>Valor</th><th>Derivación y supuestos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Unidades en copropiedad</td>
+            <td class="num">~1.400.000</td>
+            <td>Censo 2017 (INE): del orden de 1,1 millones de departamentos en edificio. Sumamos condominios de casas y lo construido desde 2017: estimación nuestra, redondeada hacia abajo.</td>
+          </tr>
+          <tr>
+            <td>TAM Chile</td>
+            <td class="num">$8.736M CLP/año</td>
+            <td><span class="calculo">1.400.000 unidades × $520 promedio × 12 meses.</span> Unos US$9,2M al año (a $950/US$, estimación julio 2026). Es un vertical chico y profundo, no un cuento de miles de millones.</td>
+          </tr>
+          <tr>
+            <td>SAM</td>
+            <td class="num">$3.494M CLP/año</td>
+            <td><span class="calculo">Supuesto: 40% de las unidades está en comunidades de 20 a 80 unidades sin software o mal servidas = 560.000 unidades × $520 × 12.</span></td>
+          </tr>
+          <tr>
+            <td>SOM a 24 meses</td>
+            <td class="num">$42,3M CLP/año</td>
+            <td><span class="calculo">150 comunidades × 45 unidades × $522 × 12 ≈ MRR $3,5M en el mes 24.</span> Un 1,2% del SAM: ambicioso pero no delirante.</td>
+          </tr>
+          <tr>
+            <td>Extensión</td>
+            <td>LatAm</td>
+            <td>Perú y Colombia tienen leyes de propiedad horizontal con obligaciones análogas. Recién después del mes 24, y solo con el playbook chileno probado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Posicionamiento ===== -->
+<section class="seccion seccion--hundida">
+  <div class="container">
+    <h2>La cuña: cumplimiento auditable, no otra app de edificios.</h2>
+    <p class="intro">Los incumbentes venden comunicación y cobro. Nosotros vendemos estar en regla y poder demostrarlo: la boleta detrás de cada peso, el quórum detrás de cada acta, el libro completo detrás de cada traspaso. El segmento cabecera de playa: comités de Santiago que se autoadministran y acaban de descubrir lo que la Ley 21.442 les exige. Sienten el riesgo personalmente y no tienen que despedir a nadie para contratarnos.</p>
+  </div>
+</section>
+
+<!-- ===== El test del LLM ===== -->
+<section class="seccion">
+  <div class="container">
+    <span class="ojal">El test del LLM</span>
+    <h2>¿Por qué esto no lo mata ChatGPT?</h2>
+    <p class="intro">Un chat generalista redacta una citación decente en dos minutos. Si eso fuera el producto, no habría negocio. El producto es lo que un chat no puede sostener:</p>
+    <div style="margin-top: var(--sp-l);">
+      <div class="test-llm">
+        <h3>El libro</h3>
+        <p>Años de rendiciones, la morosidad de cada unidad, el historial del fondo de reserva con sus acuerdos. Un LLM no tiene dónde guardar eso ni cómo garantizar que no lo alucina. El valor está en el estado acumulado, y el estado acumulado crea el costo de cambio.</p>
+      </div>
+      <div class="test-llm">
+        <h3>La actuación</h3>
+        <p>El día 5 de cada mes salen 24 boletas de gasto común, con recordatorios el 15 y el 25, sin que nadie se acuerde de pedirlo. Un chat responde cuando le escriben; no cobra solo, no cita solo, no persigue solo.</p>
+      </div>
+      <div class="test-llm">
+        <h3>El determinismo</h3>
+        <p>El prorrateo por alícuota, los intereses y los quórums son aritmética que debe dar exactamente igual las mil veces que se recalcule, porque se audita y se impugna. En Prorratia esa aritmética es código con tests. La IA redacta borradores y digitaliza boletas; jamás suma.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Competencia ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Competencia: el espacio no está vacío.</h2>
+    <div class="scroll-x" style="margin-top: var(--sp-l);">
+      <table>
+        <thead><tr><th>Quién</th><th>Qué hace bien</th><th>Dónde ganamos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Excel + transferencias</strong><br><span style="font-size:.78rem; color:var(--tinta-3);">el verdadero titular del puesto</span></td>
+            <td>Gratis, flexible, ya lo saben usar.</td>
+            <td>No cobra solo, no adjunta boletas, no verifica formalidades y se va con quien lo lleva. La ley le quedó grande.</td>
+          </tr>
+          <tr>
+            <td><strong>ComunidadFeliz</strong></td>
+            <td>Marca instalada, cobro y comunicación maduros, años de operación en Chile y la región. Respeto total.</td>
+            <td>Su centro es la app de comunicación y el cobro. El nuestro es el cumplimiento auditable: respaldo obligatorio por gasto, checklist legal antes de citar, traspaso completo en un link. Es una cuña, no una guerra frontal.</td>
+          </tr>
+          <tr>
+            <td><strong>Edipro, Kastor y similares</strong></td>
+            <td>Funcionales para administradoras medianas y grandes.</td>
+            <td>El condominio de 20 a 80 unidades autoadministrado les queda chico como cliente; a nosotros nos queda exacto.</td>
+          </tr>
+          <tr>
+            <td><strong>No hacer nada</strong></td>
+            <td>No cuesta plata este mes.</td>
+            <td>Cuesta morosidad sin gestión, fondo de reserva inexistente y un comité personalmente expuesto. Nuestra venta es hacer visible ese costo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Economía unitaria ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Precio y economía unitaria.</h2>
+    <p class="intro">Tramos: $590 por unidad al mes (comités, mínimo $19.900) y $450 (administradores desde 150 unidades, mínimo $59.000). Traspaso histórico: $190.000 por una vez. La comunidad tipo del modelo: 45 unidades, ticket promedio $23.500/mes.</p>
+    <div class="eco">
+      <div class="placa kpi">
+        <div class="k-label">Margen bruto</div>
+        <div class="k-valor">87%</div>
+        <div class="k-derivacion">ARPA $23.500 menos $3.040 de costo variable por comunidad (inferencia IA + WhatsApp + infra, aritmética en Arquitectura) = $20.460/mes.</div>
+      </div>
+      <div class="placa kpi">
+        <div class="k-label">CAC combinado</div>
+        <div class="k-valor">$110.000</div>
+        <div class="k-derivacion">Comités vía contenido: ~$150.000 (estimación: CPL $8.000, cierre 1 de 12, más horas de demo). Administradores vía outbound: ~$350.000 por administrador que trae 5 comunidades = $70.000 c/u. Mezcla 50/50.</div>
+      </div>
+      <div class="placa kpi">
+        <div class="k-label">Payback</div>
+        <div class="k-valor">5,4 meses</div>
+        <div class="k-derivacion">$110.000 ÷ $20.460 de margen mensual. Con churn supuesto de 1%/mes y vida acotada a 60 meses por prudencia: LTV ≈ $1,23M, LTV/CAC ≈ 11.</div>
+      </div>
+    </div>
+    <p style="margin-top: var(--sp-m); font-size: var(--step--1); max-width: 62ch;">El churn bajo no es optimismo: cambiarse de sistema implica mover el libro histórico y volver a explicárselo a la asamblea. Nadie hace eso por $140 de diferencia por unidad. El riesgo real no es el churn: es el ciclo de venta (ver Roadmap).</p>
+  </div>
+</section>
+
+<!-- ===== Canales ===== -->
+<section class="seccion seccion--hundida">
+  <div class="container">
+    <h2>Canales, en orden de convicción.</h2>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li>
+        <span class="n">1</span>
+        <div>
+          <h3>SEO legal long-tail con plantillas gratis</h3>
+          <p>"Modelo de citación asamblea Ley 21.442", "formato rendición de cuentas condominio", "cómo calcular gasto común por alícuota". El comprador googlea la obligación antes de saber que existe el software. Cada plantilla descargable termina en el producto que la llena sola.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <div>
+          <h3>El libro como canal: cada copropietario es un lead</h3>
+          <p>Las 45 unidades de cada comunidad ven el libro con el sello "llevado con Prorratia". Muchos son dueños o arrendatarios en otros edificios peor administrados. Es la viralidad natural del producto: se muestra solo en la asamblea.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <div>
+          <h3>Outbound quirúrgico a administradores chicos</h3>
+          <p>El Registro Nacional de Administradores de Condominios (creado por la propia ley) es una lista pública del lado B. LinkedIn más WhatsApp personal, de a uno, con el traspaso auditable como gancho: "gana edificios mostrando cómo rindes".</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <div>
+          <h3>Inmobiliarias y corredoras que entregan edificios nuevos</h3>
+          <p>El edificio recién entregado no tiene historia ni vicios: es el cliente perfecto. Acuerdo de referencia con quienes constituyen la primera asamblea.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">5</span>
+        <div>
+          <h3>Google Ads, medido y chico</h3>
+          <p>Solo sobre las mismas búsquedas legales del canal 1 mientras el SEO madura. CPL estimado $6.000 a $12.000 (estimación sin histórico propio; se valida con los primeros $300.000 de gasto).</p>
+        </div>
+      </li>
+    </ul>
+    <div class="placa" style="margin-top: var(--sp-l); max-width: 46rem;">
+      <h3>IA en el marketing mismo</h3>
+      <p style="font-size: var(--step--1); margin-top: .4rem;"><strong>Sí:</strong> borradores del contenido SEO legal (un abogado revisa cada pieza antes de publicar: el rubro es exactamente el equivocado para alucinar), y respuestas del chat del sitio ancladas a la ley con cita al artículo.</p>
+      <p style="font-size: var(--step--1); margin-top: .6rem;"><strong>No:</strong> outbound masivo automatizado por WhatsApp (el comprador es un vecino, no una base de datos: un mensaje robótico mata la confianza que vendemos), y nada de lead scoring con 200 leads: a esa escala, se leen de a uno.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 90 días ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Primeros 90 días.</h2>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li>
+        <span class="n">S1-2</span>
+        <div><p>Veinte conversaciones con comités y cinco con administradores chicos, reclutados por conocidos y por el Registro Nacional. Sin producto: solo el libro de su edificio en una planilla nuestra, para validar que el dolor paga.</p></div>
+      </li>
+      <li>
+        <span class="n">S3-6</span>
+        <div><p>Cinco comunidades design partner cargan su mes real: gastos con boleta, prorrateo emitido, primera cobranza automática. Gratis 6 meses a cambio de feedback semanal y de ser referencia.</p></div>
+      </li>
+      <li>
+        <span class="n">S7-10</span>
+        <div><p>Se publican las primeras diez plantillas legales con el abogado. Se instrumenta el embudo: cuántos descargan, cuántos piden demo, cuántos llevan la propuesta a su comité.</p></div>
+      </li>
+      <li>
+        <span class="n">S11-13</span>
+        <div><p>Primera conversión a pago: la asamblea o el comité aprueba el gasto. Si ningún design partner convierte, el precio o la cuña están malos y se corrige antes de escalar (criterio de muerte del hito 2).</p></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== Riesgo ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Qué mataría esto.</h2>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li>
+        <span class="n">R1</span>
+        <div>
+          <h3>El administrador informal no quiere transparencia</h3>
+          <p>El libro expone al que rinde mal, y ese mismo administrador es a veces quien decide qué software se compra. Si el lado B masivamente ve a Prorratia como amenaza y no como credencial, queda solo el canal directo a comités, más lento y más caro. Es el riesgo número uno y es estructural.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">R2</span>
+        <div>
+          <h3>El incumbente baja al nicho</h3>
+          <p>ComunidadFeliz tiene marca y distribución para lanzar un "modo cumplimiento" en un trimestre. Nuestra ventana es de 18 a 24 meses: hay que acumular libro (costo de cambio) antes de que la señal les llegue.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">R3</span>
+        <div>
+          <h3>La venta por asamblea no cierra a tiempo</h3>
+          <p>Si la decisión exige asamblea y las asambleas son cada seis meses, el ciclo de venta promedio puede superar los 90 días y el CAC real duplica el estimado. La mitigación (venta al comité con ratificación posterior) se valida en los hitos 2 y 4; si no funciona, el modelo de precio tiene que cambiar.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <span>Prorratia · negocio</span>
+    <span>Las cifras sin fuente están etiquetadas como estimación, con su aritmética.</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

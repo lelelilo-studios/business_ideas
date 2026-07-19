@@ -1,0 +1,15 @@
+{
+  "folder": "23-energia",
+  "brand": "Tarifana",
+  "domain": "tarifana.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/tarifana.com -> HTTP 404 (disponible), 2026-07-18; tarifana.cl disponible en NIC Chile (\"no existe\") misma fecha. Verificado con _kit/check-domain.sh.",
+  "alternates": ["amperva.com", "vatiora.com", "empalmia.com"],
+  "tagline": "La cuenta de la luz, leída línea por línea, todos los meses.",
+  "category": "SaaS PYME · Energía",
+  "market": "Chile → LatAm con tarifas reguladas por opción (Perú, Colombia)",
+  "icp": "PYME electrointensiva regulada con cuenta de $800.000 a $8.000.000/mes: panaderías industriales, frigoríficos, talleres metalmecánicos, hoteles, minimarkets con frío",
+  "price_clp": "Desde $24.000/mes + 20% del ahorro verificado",
+  "accent": "#f6c700",
+  "problem": "Una PYME con frío, hornos o máquinas paga millones al mes en electricidad con una opción tarifaria y una potencia contratada que nadie revisa hace años; la distribuidora no tiene ningún incentivo para avisar.",
+  "status": "prototipo"
+}

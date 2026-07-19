@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo · Tarifana</title>
+<meta name="description" content="El producto funcionando: la boleta desarmada línea por línea, el simulador de opciones tarifarias, los hallazgos, la carta generada y el libro de ahorro verificado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  .cliente-barra { background: var(--registro); color: #cdd4da; }
+  .cliente-barra .in {
+    display: flex; flex-wrap: wrap; gap: .3rem 1.4rem; padding-block: .7rem;
+    font-family: var(--mono); font-size: .72rem;
+  }
+  .cliente-barra b { color: #fff; font-weight: 600; }
+  .demo-aviso {
+    font-family: var(--mono); font-size: .72rem; color: var(--tinta-2);
+    background: var(--panel-hundido); border-bottom: 1px solid var(--linea);
+    padding-block: .45rem; text-align: center; padding-inline: var(--gutter);
+  }
+  .panel-tab { padding-block: var(--sp-l) var(--sp-2xl); }
+  .linea-boleta.expandible { cursor: pointer; }
+  .linea-boleta.expandible:hover { background: var(--panel-hundido); }
+  .linea-boleta.marcada.expandible:hover { background: var(--amarillo-suave); }
+  .linea-boleta .explica {
+    grid-column: 1 / -1; font-size: var(--step--1); color: var(--tinta-2);
+    padding: .5rem .75rem; background: var(--fondo); border-left: 3px solid var(--linea-2);
+    max-width: 62ch;
+  }
+  .linea-boleta .abre { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); }
+  .cuadratura { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: var(--sp-s); border-top: 2px solid var(--tinta); background: var(--panel); font-size: var(--step--1); }
+  .sim-controles { display: grid; gap: var(--sp-m); margin-block: var(--sp-m); }
+  @media (min-width: 48em) { .sim-controles { grid-template-columns: 1.2fr .8fr; align-items: end; } }
+  .sim-controles output { font-family: var(--mono); font-weight: 600; }
+  .sim-mejor { margin-top: var(--sp-s); }
+  .sim-detalle { margin-top: var(--sp-m); }
+  .radio-fila { cursor: pointer; }
+  .radio-fila:hover td { background: var(--panel-hundido); }
+  .radio-fila input { accent-color: var(--tinta); width: 20px; height: 20px; }
+  .hallazgo-card { border-left: 4px solid var(--amarillo); }
+  .hallazgo-card.resuelto { border-left-color: var(--ok); }
+  .hallazgo-card h3 { display: flex; flex-wrap: wrap; gap: .5rem .8rem; align-items: center; }
+  .hallazgo-card .cifras { display: flex; flex-wrap: wrap; gap: var(--sp-m); margin-block: var(--sp-s); }
+  .hallazgo-card .cifras > div { display: grid; gap: .15rem; }
+  .hallazgo-card p { font-size: var(--step--1); color: var(--tinta-2); max-width: 62ch; }
+  .carta-hoja {
+    background: var(--panel); border: 1px solid var(--linea-2);
+    padding: var(--sp-l) var(--sp-m); font-size: var(--step--1); line-height: 1.7;
+    max-width: 46rem; white-space: pre-wrap; font-family: var(--mono);
+  }
+  @media (min-width: 48em) { .carta-hoja { padding: var(--sp-xl) var(--sp-2xl); } }
+  .carta-acciones { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-block: var(--sp-m); }
+  .libro-resumen { display: grid; gap: var(--sp-m); margin-bottom: var(--sp-m); }
+  @media (min-width: 48em) { .libro-resumen { grid-template-columns: repeat(3, 1fr); } }
+  .libro-resumen .num-grande { font-size: var(--step-2); overflow-wrap: anywhere; }
+  .libro-resumen > div { display: grid; gap: .2rem; align-content: start; }
+  .libro-tabla .ver-calculo {
+    background: none; border: none; cursor: pointer; font-family: var(--mono);
+    font-size: .7rem; color: var(--tinta-2); text-decoration: underline;
+    min-height: 44px; padding: 0 .2rem; text-align: left;
+  }
+  .libro-tabla .calculo { font-family: var(--mono); font-size: .72rem; color: var(--tinta-2); background: var(--fondo); padding: .5rem; }
+</style>
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" stroke="#12161a" stroke-width="1.8"/>
+        <path d="M13.2 4.5 8.5 13h3.4l-1.1 6.5 4.7-8.5h-3.4l1.1-6.5Z" fill="#f6c700" stroke="#12161a" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      TARIFANA
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <nav class="nav-drawer" id="menu" data-nav-drawer aria-label="Principal móvil">
+    <a href="../../index.html">← Ideas</a>
+    <a href="../index.html">Producto</a>
+    <a href="index.html" aria-current="page">Demo</a>
+    <a href="../negocio.html">Negocio</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../stack.html">Arquitectura</a>
+  </nav>
+</header>
+
+<p class="demo-aviso">Demo con datos simulados. La empresa es ficticia y el pliego es referencial: la aritmética es la real.</p>
+
+<div class="cliente-barra">
+  <div class="container in">
+    <span><b>Panificadora Alto Maipo SpA</b></span>
+    <span>RUT <b>76.842.135-6</b></span>
+    <span>N° cliente <b>45.218.907-3</b></span>
+    <span>Enel Distribución · Cerrillos</span>
+    <span>Opción actual: <b>BT4.2</b> · plan Tablero</span>
+  </div>
+</div>
+
+<main class="container">
+
+  <div class="pestanas" role="tablist" aria-label="Secciones del demo" style="margin-top:var(--sp-m);">
+    <button class="pestana" role="tab" id="tab-boleta" aria-controls="panel-boleta" aria-selected="true" data-tab="boleta">La boleta</button>
+    <button class="pestana" role="tab" id="tab-sim" aria-controls="panel-sim" aria-selected="false" data-tab="sim">El simulador</button>
+    <button class="pestana" role="tab" id="tab-hallazgos" aria-controls="panel-hallazgos" aria-selected="false" data-tab="hallazgos">Hallazgos</button>
+    <button class="pestana" role="tab" id="tab-carta" aria-controls="panel-carta" aria-selected="false" data-tab="carta">La carta</button>
+    <button class="pestana" role="tab" id="tab-libro" aria-controls="panel-libro" aria-selected="false" data-tab="libro">El libro</button>
+  </div>
+
+  <!-- ================= LA BOLETA ================= -->
+  <section class="panel-tab" id="panel-boleta" role="tabpanel" aria-labelledby="tab-boleta">
+    <h1 style="font-size:var(--step-3);">La boleta de junio, desarmada.</h1>
+    <p class="nota" style="margin-top:var(--sp-s);">Cada línea reconstruida por el motor contra el pliego. Toca una línea para ver qué significa y de dónde sale el número.</p>
+
+    <div class="boleta" style="margin-top:var(--sp-m); max-width:52rem;">
+      <div class="boleta-cab">
+        <span>BOLETA N° 84.213.556 · JUNIO 2026</span>
+        <span>lectura real 30-06 · 38.640 kWh · BT4.2</span>
+      </div>
+      <div id="boleta-lineas"></div>
+      <div class="cuadratura" id="cuadratura"></div>
+    </div>
+  </section>
+
+  <!-- ================= EL SIMULADOR ================= -->
+  <section class="panel-tab oculto" id="panel-sim" role="tabpanel" aria-labelledby="tab-sim">
+    <h1 style="font-size:var(--step-3);">Las cinco maneras de cobrarte el mismo año.</h1>
+    <p class="nota" style="margin-top:var(--sp-s);">El motor aplica tu consumo real de los últimos 12 meses a cada opción tarifaria del pliego. Mueve la potencia contratada o simula el banco de condensadores: todo se recalcula al instante.</p>
+
+    <div class="sim-controles">
+      <div>
+        <label for="slider-punta">Potencia de punta contratada (afecta BT4.1 y BT4.2) ·
+          <output id="out-punta" for="slider-punta">95 kW</output></label>
+        <input type="range" id="slider-punta" min="45" max="120" step="1" value="95"
+          aria-describedby="nota-exceso">
+        <p class="nota" id="nota-exceso" style="font-size:.74rem;">Tu punta máxima leída fue 61,8 kW: si contratas menos que eso, el motor cobra el exceso recargado, como corresponde.</p>
+      </div>
+      <label class="conmutador">
+        <input type="checkbox" id="check-fp">
+        <span class="pista" aria-hidden="true"></span>
+        <span>Simular banco de condensadores (factor de potencia 0,95)</span>
+      </label>
+    </div>
+
+    <div class="scroll-x">
+      <table id="tabla-sim">
+        <thead>
+          <tr>
+            <th style="width:2.5rem;"><span class="sr-solo">Elegir opción</span></th>
+            <th>Opción</th>
+            <th>Cómo cobra la potencia</th>
+            <th class="num">Costo anual simulado</th>
+            <th class="num">vs tu BT4.2 actual</th>
+          </tr>
+        </thead>
+        <tbody id="sim-cuerpo"></tbody>
+      </table>
+    </div>
+
+    <div class="placa placa-amarilla sim-mejor" id="sim-mejor" aria-live="polite"></div>
+
+    <div class="placa placa-borde sim-detalle" id="sim-detalle" aria-live="polite"></div>
+  </section>
+
+  <!-- ================= HALLAZGOS ================= -->
+  <section class="panel-tab oculto" id="panel-hallazgos" role="tabpanel" aria-labelledby="tab-hallazgos">
+    <h1 style="font-size:var(--step-3);">Tres hallazgos en doce meses de boletas.</h1>
+    <p class="nota" style="margin-top:var(--sp-s);">Cada hallazgo trae el número, la evidencia y la acción concreta. Nada de "podrías optimizar tu consumo".</p>
+
+    <div style="display:grid; gap:var(--sp-m); margin-top:var(--sp-m); max-width:52rem;">
+
+      <div class="placa hallazgo-card resuelto">
+        <h3><span class="mono" style="font-size:.8rem;">H-01</span> Punta contratada sobredimensionada <span class="sello sello-ok">resuelto · dic 2025</span></h3>
+        <div class="cifras">
+          <div><span class="dato-etq">Contratado</span><span class="num-grande">95,0 kW</span></div>
+          <div><span class="dato-etq">Máx. leído en punta (12 m)</span><span class="num-grande">61,8 kW</span></div>
+          <div><span class="dato-etq">Ahorro verificado</span><span class="num-grande" id="h1-ahorro"></span></div>
+        </div>
+        <p>La potencia de punta se declaró en 2019, con los hornos antiguos. El cambio a BT4.3 (que cobra la punta leída, no la declarada) se solicitó por carta el 12-11-2025 y rige desde el ciclo de diciembre. El ahorro entra al libro mes a mes.</p>
+        <p style="margin-top:.6rem;"><button class="btn btn-chico" data-ir-carta type="button">Ver la carta enviada</button></p>
+      </div>
+
+      <div class="placa hallazgo-card resuelto">
+        <h3><span class="mono" style="font-size:.8rem;">H-02</span> Lectura estimada tres meses seguidos <span class="sello sello-ok">refacturado · mar 2026</span></h3>
+        <div class="cifras">
+          <div><span class="dato-etq">Lecturas estimadas</span><span class="num-grande">dic · ene · feb</span></div>
+          <div><span class="dato-etq">Feb 2026 vs feb 2025</span><span class="num-grande">+28%</span></div>
+          <div><span class="dato-etq">Devuelto en boleta</span><span class="num-grande">$412.680</span></div>
+        </div>
+        <p>La norma limita las lecturas estimadas consecutivas; tres seguidas más un salto de consumo sin cambio operacional es motivo de reclamo formal. Se ingresó el 05-03-2026 ante la distribuidora con los antecedentes; la refacturación llegó en la boleta de marzo. Si no hubiera respondido, el paso siguiente era la SEC.</p>
+      </div>
+
+      <div class="placa hallazgo-card">
+        <h3><span class="mono" style="font-size:.8rem;">H-03</span> Factor de potencia bajo el umbral <span class="sello">recomendación abierta</span></h3>
+        <div class="cifras">
+          <div><span class="dato-etq">FP promedio (12 m)</span><span class="num-grande">0,89</span></div>
+          <div><span class="dato-etq">Recargo del año</span><span class="num-grande" id="h3-recargo"></span></div>
+          <div><span class="dato-etq">Banco de condensadores</span><span class="num-grande">$2.890.000</span></div>
+        </div>
+        <p>Los compresores de frío tienen el factor de potencia bajo 0,93 en 10 de 12 meses y el pliego lo recarga al 1% por centésima. Un banco de condensadores lo lleva sobre 0,95: payback <span class="mono" id="h3-payback"></span> meses contra el recargo actual. Es inversión tuya: sobre esto Tarifana no cobra variable. Pruébalo en el simulador con el interruptor de condensadores.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= LA CARTA ================= -->
+  <section class="panel-tab oculto" id="panel-carta" role="tabpanel" aria-labelledby="tab-carta">
+    <h1 style="font-size:var(--step-3);">La carta, lista para firmar.</h1>
+    <p class="nota" style="margin-top:var(--sp-s);">Generada con tus datos y los números del motor. Es la que se envió en noviembre para el hallazgo H-01; si cambias la simulación, la opción solicitada se actualiza sola.</p>
+
+    <div class="carta-acciones">
+      <button class="btn btn-chico" id="btn-copiar" type="button">Copiar texto</button>
+      <a class="btn btn-sec btn-chico" id="btn-descargar" download="solicitud-cambio-opcion-tarifaria.txt" href="#">Descargar .txt</a>
+      <span class="nota" id="copiado-aviso" role="status" style="align-self:center;"></span>
+    </div>
+
+    <div class="carta-hoja" id="carta-texto"></div>
+  </section>
+
+  <!-- ================= EL LIBRO ================= -->
+  <section class="panel-tab oculto" id="panel-libro" role="tabpanel" aria-labelledby="tab-libro">
+    <h1 style="font-size:var(--step-3);">El libro de ahorro verificado.</h1>
+    <p class="nota" style="margin-top:var(--sp-s);">Cada peso se anota cuando aparece en la boleta, no cuando se promete. Toca "ver cálculo" para auditar cualquier mes.</p>
+
+    <div class="libro-resumen" style="margin-top:var(--sp-m);">
+      <div class="registro-caja">
+        <span class="dato-etq" style="color:#aeb8c0;">Ahorro verificado acumulado</span>
+        <span class="num-grande" id="libro-total"></span>
+        <span class="dato-etq" style="color:#aeb8c0;">nov 2025 a jun 2026</span>
+      </div>
+      <div class="placa">
+        <span class="dato-etq">Variable cobrado por Tarifana (20%)</span>
+        <span class="num-grande" id="libro-fee"></span>
+        <span class="dato-etq">más 8 mensualidades Tablero: $352.000</span>
+      </div>
+      <div class="placa">
+        <span class="dato-etq">Quedó en la caja del cliente</span>
+        <span class="num-grande" id="libro-neto"></span>
+        <span class="dato-etq">sin contar el recargo reactivo aún pendiente</span>
+      </div>
+    </div>
+
+    <div class="scroll-x">
+      <table class="libro-tabla">
+        <thead>
+          <tr><th>Mes</th><th>Veredicto</th><th>Acción</th><th class="num">Ahorro verificado</th><th class="num">Acumulado</th></tr>
+        </thead>
+        <tbody id="libro-cuerpo"></tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top:var(--sp-s);">Julio 2026: boleta aún no emitida. Cuando llegue, el motor la cuadra y este libro se actualiza solo.</p>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <strong style="color:#fff;">TARIFANA</strong> · Demo interactivo. Empresa y boletas simuladas; motor tarifario real.
+    </div>
+    <div class="mono" style="font-size:.72rem;">
+      <a href="../index.html">Producto</a> · <a href="../negocio.html">Negocio</a> · <a href="../stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../motor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

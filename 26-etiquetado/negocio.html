@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Etiquaria</title>
+<meta name="description" content="Plan de negocio de Etiquaria: cliente objetivo, tamaño de mercado con la aritmética a la vista, el test del LLM, precios, economía unitaria y canales de adquisición en Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cab { padding-block: var(--sp-xl) var(--sp-l); }
+  .cab h1 { font-size: var(--step-4); max-width: 18ch; }
+  .cab .prosa { margin-top: var(--sp-s); }
+
+  .icp-grid { display: grid; gap: 1px; background: var(--linea); border: 1px solid var(--linea); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .icp-grid { grid-template-columns: repeat(2, 1fr); } }
+  .icp-celda { background: var(--panel); padding: var(--sp-m); }
+  .icp-celda .k { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--acento); }
+  .icp-celda p { margin-top: 6px; max-width: 52ch; }
+
+  .contraste { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .contraste { grid-template-columns: 1fr 1fr; } }
+  .contraste .col { border: 1px solid #2c2c31; padding: var(--sp-m); }
+  .contraste .col.nuestra { border-color: #e0357f; }
+  .contraste h3 { color: #fff; }
+  .contraste ul { list-style: none; padding: 0; margin-top: var(--sp-s); }
+  .contraste li { padding-block: 8px; border-top: 1px solid #26262b; color: #b9b9c2; font-size: var(--step--1); }
+  .contraste li strong { color: #fff; }
+
+  .tiles { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 40em) { .tiles { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 68em) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); }
+  .tile .k { font-size: 0.85rem; font-weight: 600; color: var(--tinta-2); }
+  .tile .v { font-family: var(--mono); font-size: var(--step-2); font-weight: 700; margin-top: 4px; letter-spacing: -0.02em; }
+  .tile .d { font-size: 0.78rem; color: var(--tinta-3); margin-top: 8px; line-height: 1.5; }
+
+  .canales { counter-reset: canal; list-style: none; padding: 0; margin-top: var(--sp-l); max-width: 74ch; }
+  .canales li { counter-increment: canal; display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); padding-block: var(--sp-s); border-bottom: 1px solid var(--linea); }
+  .canales li:first-child { border-top: 1px solid var(--linea); }
+  .canales li::before { content: counter(canal); font-family: var(--mono); font-weight: 700; color: var(--acento); font-size: var(--step-1); min-width: 1.4ch; }
+  .canales p { font-size: var(--step--1); margin-top: 2px; }
+
+  .noventa { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); border-left: 2px solid var(--tinta); padding-left: var(--sp-m); max-width: 66ch; }
+  .noventa h3 { font-size: var(--step-0); }
+  .noventa p { font-size: var(--step--1); margin-top: 4px; }
+
+  .mata { margin-top: var(--sp-l); max-width: 70ch; }
+  .mata li { padding: var(--sp-s) 0; border-bottom: 1px solid var(--linea); display: grid; grid-template-columns: 20px 1fr; gap: var(--sp-s); }
+  .mata li:first-child { border-top: 1px solid var(--linea); }
+  .mata li::before { content: ""; width: 12px; height: 12px; margin-top: 5px; background: var(--tinta); clip-path: var(--octogono); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M10 2.5h12L29.5 10v12L22 29.5H10L2.5 22V10L10 2.5Z" stroke="#0d0d0f" stroke-width="2.4" stroke-linejoin="miter"/>
+        <path d="M11.5 12h9M11.5 16h6.5M11.5 20h9" stroke="#b0135c" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+      <span>Etiquaria</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu">
+      Menú
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="cab">
+  <div class="container">
+    <h1>El negocio: cobrar por certeza regulatoria</h1>
+    <p class="prosa">
+      Etiquaria vende una cosa: que la etiqueta que mandas a imprenta cumple el reglamento, con
+      evidencia. El presupuesto ya existe (hoy se lo llevan asesores y reprocesos); nosotros lo
+      capturamos con software determinista.
+    </p>
+  </div>
+</section>
+
+<!-- ===== ICP ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Cliente objetivo</h2>
+    <div class="icp-grid">
+      <div class="icp-celda">
+        <span class="k">Quién es</span>
+        <p><strong>Fábrica de alimentos PYME, 5 a 100 personas</strong>: mermeladas, granolas, jugos y néctares, pan envasado, conservas, snacks regionales. Segundo segmento: <strong>supermercados regionales con marcas propias</strong> (decenas a cientos de SKUs de terceros que ellos deben responder).</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">Quién firma y quién usa</span>
+        <p>Firma el <strong>dueño o gerente general</strong> (en PYME son la misma persona). Usa el <strong>jefe de calidad</strong> o quien haga sus veces: a veces es el mismo dueño con el PDF del DS 977 abierto a las 11 de la noche.</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">Dónde está hoy</span>
+        <p>En Espacio Food &amp; Service, en los gremios de alimentos, en grupos de WhatsApp de productores regionales, comprando análisis a laboratorios bromatológicos y pagando asesores por SKU cuando el supermercado les rebota un lote.</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">El gatillo de compra</span>
+        <p>Tres momentos: lanzar un SKU nuevo, un rechazo en recepción o sumario en curso, y el ingreso a una cadena (que exige carpeta de rotulado). No es una compra de "mejora continua": es dolor agudo con fecha.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EL TEST DEL LLM ===== -->
+<section class="banda-negra">
+  <div class="container">
+    <span class="rotulo">El test del LLM</span>
+    <h2 style="margin-top: var(--sp-2xs)">¿Por qué esto no lo resuelve ChatGPT?</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Pregúntale a un chatbot el límite de sodio de un alimento líquido. Te va a contestar con total
+      seguridad. A veces correcto. A veces no. Y no te va a decir cuál de las dos veces te tocó.
+      Ninguna fábrica imprime 40.000 envases sobre la palabra de un chatbot, y ningún jefe de calidad
+      le muestra un pantallazo de chat a la SEREMI.
+    </p>
+    <div class="contraste">
+      <div class="col">
+        <h3>El chatbot generalista</h3>
+        <ul>
+          <li><strong>Alucina umbrales</strong> sin avisar, y con la misma seguridad con la que acierta.</li>
+          <li><strong>No sabe qué versión rige hoy</strong>: mezcla etapas transitorias del DS 13/2015 ya superadas.</li>
+          <li><strong>No calcula geometría</strong>: tamaño y posición del sello por cara principal no salen de un chat.</li>
+          <li><strong>No deja registro</strong>: sin libro, sin versión de motor, sin evidencia para una fiscalización.</li>
+          <li><strong>No vigila</strong>: si el decreto cambia mañana, nadie te avisa.</li>
+        </ul>
+      </div>
+      <div class="col nuestra">
+        <h3>Etiquaria</h3>
+        <ul>
+          <li><strong>Determinismo</strong>: los umbrales corren como código con tests contra el texto del decreto.</li>
+          <li><strong>Cada veredicto cita su artículo</strong> y la versión del reglamento con que se evaluó.</li>
+          <li><strong>Etiqueta imprimible</strong> con el sello en el tamaño mínimo legal para tu envase.</li>
+          <li><strong>Libro por SKU</strong>: la historia completa de rotulado, lista para mostrar en fiscalización.</li>
+          <li><strong>Vigilancia</strong>: cambio en el Diario Oficial → re-verificación y aviso con diff.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="nota" style="margin-top: var(--sp-m); color: #8f8f9a; max-width: 74ch">
+      La parte honesta: un LLM con el reglamento en contexto acierta seguido. El foso no es que el
+      modelo no pueda leer el PDF; es determinismo verificable + vigencia + libro auditable +
+      geometría de imprenta + estar metido en el flujo real de la fábrica. Por eso en nuestra
+      arquitectura el modelo redacta y explica, y tiene prohibido calcular (ver Arquitectura).
+    </p>
+  </div>
+</section>
+
+<!-- ===== MERCADO ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Tamaño de mercado, con la aritmética a la vista</h2>
+    <p class="prosa nota" style="margin-top: 6px">
+      No hay un censo público perfecto de "fábricas que rotulan". Todo lo de abajo es estimación con
+      supuestos declarados; el que quiera discutir un supuesto, bienvenido.
+    </p>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 760px">
+        <thead>
+          <tr><th>Capa</th><th>Cuánto</th><th>De dónde sale (supuestos)</th><th class="num">CLP / año</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TAM Chile</strong></td>
+            <td>~5.000 empresas</td>
+            <td>El directorio SII registra del orden de 10.000 empresas en elaboración de alimentos y bebidas (estimación, orden de magnitud); asumimos que la mitad vende envasado con marca propia y por tanto rotula. Ticket $95.000/mes: 5.000 × $95.000 × 12.</td>
+            <td class="num">$5.700 M</td>
+          </tr>
+          <tr>
+            <td><strong>SAM</strong></td>
+            <td>~2.000 empresas + 30 cadenas</td>
+            <td>PYMEs con 5 o más SKUs envasados y renovación de etiquetas frecuente (estimación: 40% del TAM), más ~30 supermercados regionales con marca propia a $390.000/mes: 2.000 × $1,14 M + 30 × $4,7 M.</td>
+            <td class="num">$2.420 M</td>
+          </tr>
+          <tr>
+            <td><strong>SOM 24 meses</strong></td>
+            <td>60 clientes</td>
+            <td>Escenario base del roadmap: 60 clientes a ticket promedio $95.000/mes = MRR $5,7 M en el mes 24. Es el 2,8% del SAM: ambicioso pero no delirante.</td>
+            <td class="num">$68 M ARR</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prosa nota" style="margin-top: var(--sp-s)">
+      La extensión que agranda el techo: Perú usa octógonos desde 2019 y México la NOM-051 desde
+      2020. Es el mismo motor con otra tabla de umbrales y otra vigilancia. Chile es el laboratorio;
+      la tesis regional es "reglas de rotulado como código" para LatAm.
+    </p>
+  </div>
+</section>
+
+<!-- ===== POSICIONAMIENTO Y COMPETENCIA ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Cuña y competencia</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      <strong>Cabecera de playa:</strong> fábricas PYME de la zona centro-sur (Maule, Ñuble, Biobío)
+      que venden a supermercados regionales. Son las que más sufren rechazos de recepción, no tienen
+      asesor de planta, y se conocen entre ellas: la referencia corre por gremio y por feria. Se gana
+      con el caso "me rebotaron el lote" resuelto en horas.
+    </p>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 740px">
+        <thead>
+          <tr><th>Competidor</th><th>Qué hace bien</th><th>Dónde le ganamos</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Asesores y consultoras de rotulado</strong> (el titular real del gasto)</td>
+            <td>Criterio experto, casos borde, respaldo de una firma conocida.</td>
+            <td>Precio (10x), plazo (semanas → minutos), y no vigilan ni llevan libro. Estrategia: convertirlos en canal para casos borde, no en enemigos.</td>
+          </tr>
+          <tr>
+            <td><strong>Laboratorios bromatológicos</strong></td>
+            <td>El número acreditado por 100 g. Son insustituibles y no competimos con eso.</td>
+            <td>Ellos entregan el dato, no el veredicto. Alianza natural: su informe entra directo a Etiquaria.</td>
+          </tr>
+          <tr>
+            <td><strong>Software internacional de etiquetado</strong> (Genesis R&amp;D / Trustwell y similares)</td>
+            <td>Formulación y rotulado multi-país, potente para grandes.</td>
+            <td>Licencias en USD fuera del bolsillo PYME, en inglés, y sin la letra chica chilena al día (tamaños de sello, prohibiciones de la 20.606, vigilancia del Diario Oficial).</td>
+          </tr>
+          <tr>
+            <td><strong>Excel + el PDF del DS 977</strong> (el statu quo)</td>
+            <td>Gratis, y "siempre se ha hecho así".</td>
+            <td>Sin registro, sin certeza, y el costo aparece después: un rechazo de lote o un sumario paga años de Etiquaria. Nuestro marketing es literalmente mostrar este cálculo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ECONOMÍA UNITARIA ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Precio y economía unitaria</h2>
+    <p class="prosa nota" style="margin-top: 6px">
+      Precios: $29.000 por SKU verificado · Vigía $59.000/mes · Fábrica $149.000/mes · Marca propia
+      desde $390.000/mes. Ticket promedio ponderado asumido: $95.000/mes.
+    </p>
+    <div class="tiles">
+      <div class="tile">
+        <span class="k">Ticket promedio</span>
+        <div class="v">$95.000<span style="font-size:.6em">/mes</span></div>
+        <p class="d">Mix asumido: 55% Vigía, 40% Fábrica, 5% marca propia (estimación de mix; se corrige con datos reales).</p>
+      </div>
+      <div class="tile">
+        <span class="k">CAC</span>
+        <div class="v">$282.000</div>
+        <p class="d">Estimación año 1: herramientas $60.000/mes × 12 + ferias $2,0 M + medio SDR $600.000/mes × 3 = $4,52 M / 16 clientes. Sin costear las horas del fundador, declarado.</p>
+      </div>
+      <div class="tile">
+        <span class="k">LTV</span>
+        <div class="v">$2,1 M</div>
+        <p class="d">Churn asumido 4%/mes → vida media 25 meses. $95.000 × 25 × 90% de margen ≈ $2,14 M. LTV/CAC ≈ 7,6.</p>
+      </div>
+      <div class="tile">
+        <span class="k">Payback</span>
+        <div class="v">3,3 meses</div>
+        <p class="d">$282.000 / ($95.000 × 90%) = 3,3 meses de margen para recuperar la adquisición.</p>
+      </div>
+    </div>
+    <p class="prosa" style="margin-top: var(--sp-l)">
+      <strong>Margen bruto:</strong> el costo variable declarado en <a href="stack.html">Arquitectura</a>
+      es de ~$2.800 por cliente al mes a 50 clientes (inferencia IA + infraestructura, aritmética
+      completa allá). Sobre un ticket de $95.000 eso es <strong>~97% de margen bruto</strong>. El
+      negocio no muere por costos: muere o vive por adquisición y churn. Las dos páginas cuadran:
+      mismo costo, mismo ticket, misma curva.
+    </p>
+  </div>
+</section>
+
+<!-- ===== CANALES ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Canales de adquisición, rankeados</h2>
+    <ol class="canales">
+      <li>
+        <div>
+          <strong>Laboratorios bromatológicos como canal de referencia.</strong>
+          <p>El laboratorio entrega los números; adjunta "verifica tus sellos con este informe en Etiquaria" con comisión del 15% del primer año. Llega exactamente en el momento del dolor. Es el canal con mejor timing posible y el primero a construir.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Ferias y gremios del rubro.</strong>
+          <p>Espacio Food &amp; Service (Santiago), ruedas de Chilealimentos y asociaciones regionales de productores. Demo en vivo con el producto del visitante: "tráeme tu informe de laboratorio y te digo tus sellos ahora". Presupuesto ferias año 1: $2,0 M.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Outbound quirúrgico por LinkedIn y WhatsApp.</strong>
+          <p>Lista de fábricas con marca en supermercados regionales (se arma caminando pasillos y fotografiando góndolas, en serio). Mensaje al dueño o jefe de calidad con un hallazgo concreto de su etiqueta pública. Tasa de cierre asumida: 4% de contacto a cliente (pesimista 2%).</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>SEO long-tail en español.</strong>
+          <p>"tamaño sello alto en envase", "límite sodio alimentos líquidos Chile", "multa por rotulado incorrecto". Cientos de preguntas con respuesta determinista que nadie responde bien. Cada página termina en el verificador. Fruto a 6-12 meses.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Imprentas de etiquetas como prescriptores.</strong>
+          <p>La imprenta hoy imprime lo que le mandan y el error lo paga el cliente. Les damos un chequeo gratis por trabajo: si la etiqueta viene mal, la imprenta queda bien avisando. Comisión por conversión.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Google Ads de rescate.</strong>
+          <p>Sólo sobre términos de dolor agudo ("sumario sanitario rotulado", "rechazo etiqueta supermercado"). CPL estimado $18.000-$35.000 (estimación sin data propia; se valida con $300.000 de prueba en el mes 4).</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== IA EN EL MARKETING ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Dónde usamos IA en el marketing, y dónde no</h2>
+    <div class="icp-grid">
+      <div class="icp-celda">
+        <span class="k">Sí: contenido SEO con revisión experta</span>
+        <p>Las páginas long-tail se redactan con el modelo <em>a partir de la salida del motor</em> (la respuesta correcta ya está calculada) y las revisa una persona antes de publicar. Aquí la IA escala lo que ya es cierto.</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">Sí: investigación de prospectos</span>
+        <p>Clasificar fábricas por rubro y tamaño desde fuentes públicas para armar la lista de outbound. Trabajo de hormiga que el modelo hace bien y barato.</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">No: outbound "personalizado" masivo</span>
+        <p>Mensajes generados en masa a jefes de calidad se huelen a la legua y queman el mercado chico chileno. El outbound es artesanal: pocas cuentas, hallazgo real, nombre y apellido.</p>
+      </div>
+      <div class="icp-celda">
+        <span class="k">No: la confianza de feria</span>
+        <p>Este mercado compra mirando a los ojos. Ferias, gremios y referencias entre fabricantes no se automatizan; se caminan. "IA en todo" no es una estrategia, es una excusa.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRIMEROS 90 DÍAS ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Primeros 90 días</h2>
+    <div class="noventa">
+      <div>
+        <h3>Días 1-30: el motor y los 5 design partners</h3>
+        <p>Motor de reglas con tests contra el DS 977/DS 13 verificado por un asesor contratado una vez (validación externa del código). Cinco fábricas del Maule y Ñuble usando gratis a cambio de sus casos reales y una carta de referencia.</p>
+      </div>
+      <div>
+        <h3>Días 31-60: primer peso cobrado</h3>
+        <p>Cobro por SKU verificado ($29.000) a los design partners que quieran seguir y a referidos. Alianza firmada con 2 laboratorios regionales. Primeras 20 páginas SEO publicadas con el motor respondiendo.</p>
+      </div>
+      <div>
+        <h3>Días 61-90: el caso de rescate</h3>
+        <p>Documentar un rechazo de lote real resuelto con Etiquaria (con permiso, con números) y convertirlo en la pieza central de venta. Stand compartido o visita sistemática en la feria del semestre. Meta del día 90: 8 clientes pagando algo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUÉ MATARÍA ESTO ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Qué mataría esto</h2>
+    <ul class="mata lista-limpia">
+      <li><p><strong>Que el MINSAL publique un verificador oficial gratuito.</strong> Riesgo real aunque históricamente el Estado publica el PDF, no la herramienta. Mitigación: el foso no es sólo el cálculo, es libro + vigilancia + imprenta + integración; y la extensión regional diversifica el regulador.</p></li>
+      <li><p><strong>Que el mercado compre respaldo humano, no software.</strong> Si el valor percibido es "alguien responsable que firma", el asesor gana aunque demore semanas. Se testea en los primeros 90 días: si los design partners no imprimen sin una firma humana encima, el producto correcto es "el software del asesor" (B2B2B) y hay que pivotear temprano.</p></li>
+      <li><p><strong>Que Chile solo sea muy chico y la extensión llegue tarde.</strong> SAM de $2.400 M CLP es un negocio bueno para bootstrapping, apretado para venture. Si al mes 24 no hay tracción para Perú/México, esto es un gran negocio chico, no una empresa de venture: decisión explícita en el roadmap.</p></li>
+      <li><p><strong>Que un software PYME instalado (Defontana, Bsale, Nubox) lo agregue como módulo.</strong> Tienen la distribución. Mitigación: profundidad regulatoria difícil de copiar rápido, y estar disponibles para ser el módulo (partnership o adquisición) en vez de competir de frente.</p></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <span><strong style="color: var(--tinta)">Etiquaria</strong> · negocio</span>
+    <span>Cifras citadas o etiquetadas como estimación, con su aritmética</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+/* ============================================================
+   ETIQUARIA, dirección de arte
+   ------------------------------------------------------------
+   Registro visual: "packaging / el sello octogonal".
+   El mundo del octógono negro: blanco neutro de imprenta (nunca
+   crema), negro casi puro dominante, y UN acento: magenta berry
+   (fruta, alimento, tinta de prensa). El octógono es el único
+   motivo recurrente y se usa con freno: marca, sellos renderizados
+   y nada más. Esquinas rectas en todo (radio 0): el sello es
+   geometría legal, no decoración.
+
+   Tipografía: Sora (sans geométrica, pesos 400-800) para display
+   y UI. JetBrains Mono para cada gramo, umbral y peso en CLP.
+   Sin serif. Sin Inter. Sin Space Grotesk (la usa el hub).
+
+   Dials (skill design-taste-frontend):
+   DESIGN_VARIANCE: 7 · MOTION_INTENSITY: 3 · VISUAL_DENSITY: 5
+   Tema: LIGHT, fijo. Una sola banda negra por página, deliberada.
+
+   Paleta (contraste verificado sobre #fcfcfd):
+   fondo   #fcfcfd            tinta    #0d0d0f  (18.9:1)
+   tinta-2 #45454d  (9.3:1)   tinta-3  #6b6b74  (5.2:1)
+   acento  #b0135c  (6.6:1; blanco sobre acento 6.8:1)
+   línea   #e7e7ec            sello    #0b0b0c
+   ============================================================ */
+
+:root {
+  --fondo: #fcfcfd;
+  --panel: #ffffff;
+  --tinta: #0d0d0f;
+  --tinta-2: #45454d;
+  --tinta-3: #6b6b74;
+  --linea: #e7e7ec;
+  --linea-2: #d3d3da;
+  --acento: #b0135c;
+  --acento-osc: #8d0f4a;
+  --acento-suave: #fbeef4;
+  --sello: #0b0b0c;
+  --ok: #1a7a3c;
+  --sans: "Sora", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --octogono: polygon(29.29% 0%, 70.71% 0%, 100% 29.29%, 100% 70.71%, 70.71% 100%, 29.29% 100%, 0% 70.71%, 0% 29.29%);
+}
+
+body {
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+}
+
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.02em; }
+h1 { font-size: var(--step-4); font-weight: 800; }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-1); }
+p { color: var(--tinta-2); }
+strong { color: var(--tinta); }
+
+.mono { font-family: var(--mono); }
+.cifra { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ---------- Navegación (idéntica en las cinco páginas) ---------- */
+.nav {
+  border-bottom: 1px solid var(--linea);
+  background: var(--fondo);
+  position: sticky; top: 0; z-index: 40;
+}
+.nav-fila {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 64px; gap: var(--sp-s);
+}
+.marca {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; font-weight: 800; font-size: 1.05rem;
+  letter-spacing: -0.01em; min-height: 44px;
+}
+.marca svg { width: 26px; height: 26px; flex: none; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 600; font-size: 0.9rem; color: var(--tinta);
+  padding: 0 10px;
+}
+.nav-menu {
+  display: none;
+  border-top: 1px solid var(--linea);
+  padding-block: var(--sp-2xs);
+}
+.nav-menu.abierto { display: block; }
+.nav-menu a {
+  display: flex; align-items: center; min-height: 46px;
+  text-decoration: none; color: var(--tinta-2); font-weight: 500;
+  font-size: 0.95rem;
+}
+.nav-menu a[aria-current="page"] { color: var(--tinta); font-weight: 700; }
+.nav-menu a.volver { color: var(--acento); font-weight: 600; }
+
+@media (min-width: 52em) {
+  .nav-btn { display: none; }
+  .nav-fila { justify-content: flex-start; gap: var(--sp-l); }
+  .nav-menu {
+    display: flex !important; align-items: center; gap: var(--sp-m);
+    border-top: 0; padding-block: 0; margin-left: auto;
+  }
+  .nav-menu a { min-height: 64px; }
+  .nav-menu a:hover { color: var(--tinta); }
+}
+
+/* ---------- Secciones y utilidades ---------- */
+.seccion { padding-block: var(--sp-2xl); }
+.seccion + .seccion { border-top: 1px solid var(--linea); }
+.rotulo {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--acento);
+}
+.prosa { max-width: 62ch; }
+.nota { font-size: var(--step--1); color: var(--tinta-3); }
+.lista-limpia { list-style: none; padding: 0; }
+
+/* ---------- Botones (targets >=48px) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px;
+  font-weight: 600; font-size: 0.95rem; text-decoration: none;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn--pri { background: var(--acento); color: #fff; }
+.btn--pri:hover { background: var(--acento-osc); }
+.btn--neg { background: var(--tinta); color: #fff; }
+.btn--neg:hover { background: #26262b; }
+.btn--sec { border-color: var(--linea-2); color: var(--tinta); background: var(--panel); }
+.btn--sec:hover { border-color: var(--tinta-3); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- El sello octogonal (motivo con freno) ---------- */
+.sello-oct {
+  clip-path: var(--octogono);
+  background: var(--sello); color: #fff;
+  display: inline-flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; aspect-ratio: 1; user-select: none;
+}
+.sello-oct .alto { font-weight: 800; letter-spacing: 0.04em; line-height: 1.05; }
+.sello-oct .que { font-weight: 800; letter-spacing: 0.02em; line-height: 1.05; }
+.sello-oct .minsal { font-weight: 400; opacity: 0.85; }
+
+/* ---------- Banda negra (una por página, deliberada) ---------- */
+.banda-negra {
+  background: var(--sello); color: #f2f2f4;
+  padding-block: var(--sp-2xl);
+}
+.banda-negra h2 { color: #fff; }
+.banda-negra p { color: #b9b9c2; }
+.banda-negra strong { color: #fff; }
+.banda-negra .rotulo { color: #e0357f; }
+
+/* ---------- Código / citas de reglamento ---------- */
+.bloque-codigo {
+  font-family: var(--mono); font-size: 0.8rem; line-height: 1.65;
+  background: #131316; color: #d8d8de;
+  border: 1px solid #26262b;
+  padding: var(--sp-m); overflow-x: auto;
+}
+.bloque-codigo .cmt { color: #7d7d88; }
+.bloque-codigo .num { color: #ff5fa2; }
+.bloque-codigo .str { color: #9ad1a5; }
+.cita-legal {
+  font-family: var(--mono); font-size: 0.74rem; color: var(--tinta-3);
+  letter-spacing: 0.01em;
+}
+
+/* ---------- Tarjetas y tablas ---------- */
+.caja {
+  background: var(--panel); border: 1px solid var(--linea);
+  padding: var(--sp-m);
+}
+.tabla { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.tabla th, .tabla td {
+  text-align: left; padding: 10px 12px;
+  border-bottom: 1px solid var(--linea);
+  vertical-align: top;
+}
+.tabla th {
+  font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--tinta-3); font-weight: 500;
+}
+.tabla td.num, .tabla th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- FAQ ---------- */
+.faq details { border-bottom: 1px solid var(--linea); }
+.faq details:first-of-type { border-top: 1px solid var(--linea); }
+.faq summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+  min-height: 56px; padding-block: 10px; cursor: pointer;
+  font-weight: 600; list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+"; font-family: var(--mono); font-size: 1.2rem;
+  color: var(--acento); flex: none;
+}
+.faq details[open] summary::after { content: "\2212"; }
+.faq details > div { padding-bottom: var(--sp-m); }
+.faq details > div p { max-width: 68ch; }
+.faq details > div p + p { margin-top: 0.6em; }
+
+/* ---------- Controles del demo ---------- */
+.campo { display: grid; gap: 6px; }
+.campo > label { font-weight: 600; font-size: 0.9rem; }
+.campo .valor { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 44px; background: transparent; cursor: pointer;
+  margin: 0;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; background: var(--linea-2);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; margin-top: -10px;
+  background: var(--acento);
+  clip-path: var(--octogono);
+}
+input[type="range"]::-moz-range-track { height: 4px; background: var(--linea-2); }
+input[type="range"]::-moz-range-thumb {
+  width: 24px; height: 24px; border: 0; border-radius: 0;
+  background: var(--acento); clip-path: var(--octogono);
+}
+input[type="range"]:focus-visible { outline: 2px solid var(--acento); outline-offset: 4px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--linea-2); background: var(--panel);
+  font-size: 0.88rem; font-weight: 500; color: var(--tinta-2);
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--tinta-3); }
+.chip[aria-pressed="true"] {
+  background: var(--tinta); border-color: var(--tinta); color: #fff; font-weight: 600;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- Footer ---------- */
+.pie {
+  border-top: 1px solid var(--linea);
+  padding-block: var(--sp-l);
+  font-size: var(--step--1); color: var(--tinta-3);
+}
+.pie .fila { display: flex; flex-wrap: wrap; gap: var(--sp-s) var(--sp-l); justify-content: space-between; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active { transform: none; }
+}

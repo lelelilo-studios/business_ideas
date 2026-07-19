@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: Prorratia con la comunidad Mirador del Parque</title>
+<meta name="description" content="El libro de administración funcionando: rendición con boletas, prorrateo en vivo, morosidad con cobranza y el generador de citaciones y actas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* Cabecera de la comunidad */
+  .comunidad {
+    border-bottom: 1px solid var(--linea);
+    padding-block: var(--sp-m);
+    background: var(--hormigon);
+  }
+  .comunidad h1 { font-size: var(--step-2); }
+  .comunidad .datos {
+    display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin-top: .5rem;
+    font-family: var(--mono); font-size: .74rem; color: var(--tinta-3);
+  }
+
+  /* Pestañas */
+  .tabs {
+    position: sticky; top: 60px; z-index: 30;
+    background: var(--hormigon); border-bottom: 1px solid var(--linea);
+  }
+  .tabs-fila { display: flex; gap: .25rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab {
+    flex: none; display: inline-flex; align-items: center; gap: .45rem;
+    min-height: 52px; padding: 0 1rem;
+    font-weight: 600; font-size: .92rem; color: var(--tinta-2);
+    border-bottom: 3px solid transparent; border-radius: 0;
+    white-space: nowrap;
+  }
+  .tab[aria-selected="true"] { color: var(--verde); border-bottom-color: var(--verde); }
+  .tab:hover { color: var(--tinta); }
+
+  .vista { padding-block: var(--sp-l) var(--sp-2xl); }
+  .vista[hidden] { display: none; }
+  .vista h2 { font-size: var(--step-2); }
+  .vista .sub { color: var(--tinta-3); font-size: var(--step--1); margin-top: .3rem; max-width: 60ch; }
+
+  /* Disposición de dos columnas en escritorio */
+  .dosCol { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); align-items: start; }
+  @media (min-width: 68em) { .dosCol { grid-template-columns: 1.25fr .75fr; } }
+
+  /* KPI */
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-s); margin-top: var(--sp-m); }
+  @media (min-width: 56em) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .kpi { padding: var(--sp-s) var(--sp-m); }
+  .kpi .k-label { font-size: .78rem; color: var(--tinta-3); }
+  .kpi .k-valor { font-family: var(--sans); font-size: var(--step-2); font-weight: 700; letter-spacing: -0.02em; margin-top: .2rem; }
+  .kpi .k-nota { font-family: var(--mono); font-size: .7rem; color: var(--tinta-3); margin-top: .15rem; }
+
+  /* Controles */
+  .campo { display: grid; gap: .3rem; margin-bottom: var(--sp-s); }
+  .campo > label { font-weight: 600; font-size: .85rem; }
+  .campo .ayuda { font-size: .75rem; color: var(--tinta-3); }
+  input[type="text"], input[type="date"], input[type="time"], input[type="number"], select {
+    min-height: 48px; padding: 0 .7rem; width: 100%;
+    border: 1.5px solid var(--linea-2); border-radius: var(--radio);
+    background: var(--placa); color: var(--tinta); font-family: inherit;
+  }
+  input[type="number"] { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  input:focus, select:focus { border-color: var(--verde); outline: none; }
+  .btn--chico { min-height: 44px; padding: 0 .9rem; font-size: .85rem; }
+  .btn[disabled] { opacity: .55; cursor: default; }
+  .btn[disabled]:active { transform: none; }
+
+  fieldset { border: 0; padding: 0; margin: 0 0 var(--sp-s); }
+  legend { font-weight: 600; font-size: .85rem; padding: 0 0 .3rem; }
+  .opciones { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .opcion {
+    display: inline-flex; align-items: center; gap: .45rem;
+    min-height: 44px; padding: 0 .8rem; cursor: pointer;
+    border: 1.5px solid var(--linea-2); border-radius: var(--radio);
+    font-size: .88rem; background: var(--placa);
+  }
+  .opcion:has(input:checked) { border-color: var(--verde); background: var(--verde-tinte); }
+  .opcion input { accent-color: var(--verde); width: 16px; height: 16px; }
+
+  /* Tabla de gastos: fila activa */
+  tr.activa td { background: var(--verde-tinte); }
+  .acc { display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 .7rem; font-weight: 600; font-size: .8rem;
+    color: var(--verde); border-radius: var(--radio); }
+  .acc:hover { background: var(--verde-tinte); }
+
+  /* Documento digitalizado */
+  .doc {
+    font-family: var(--mono); font-size: .8rem;
+    border: 1px solid var(--linea-2); border-radius: var(--radio);
+    background: var(--placa); padding: var(--sp-m);
+  }
+  .doc .doc-tit { font-weight: 600; font-size: .85rem; border-bottom: 1px solid var(--linea-2); padding-bottom: .5rem; margin-bottom: .5rem; }
+  .doc dl { display: grid; grid-template-columns: auto 1fr; gap: .25rem .9rem; margin: 0; }
+  .doc dt { color: var(--tinta-3); }
+  .doc dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .doc .alerta { color: var(--rojo-estado); font-weight: 600; margin-top: .5rem; }
+
+  .listaUnidades { max-height: 430px; overflow-y: auto; border: 1px solid var(--linea); border-radius: var(--radio); }
+  .listaUnidades table { font-size: .8rem; }
+  .listaUnidades thead th { position: sticky; top: 0; background: var(--placa); }
+
+  .nota-ajuste { font-size: .75rem; color: var(--tinta-3); margin-top: .5rem; max-width: 42ch; }
+  .confirmacion {
+    margin-top: var(--sp-s); padding: var(--sp-s) var(--sp-m);
+    background: var(--verde-tinte); border: 1px solid #C2D6CB; border-radius: var(--radio);
+    font-size: .85rem; color: var(--verde-osc); display: flex; gap: .5rem; align-items: baseline;
+  }
+
+  /* Morosidad */
+  .filtros { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: var(--sp-m); }
+  .filtro {
+    min-height: 44px; padding: 0 .95rem; border-radius: var(--radio);
+    border: 1.5px solid var(--linea-2); font-weight: 600; font-size: .85rem;
+    color: var(--tinta-2); background: transparent;
+  }
+  .filtro[aria-pressed="true"] { border-color: var(--verde); background: var(--verde); color: #fff; }
+  .fila-unidad {
+    display: grid; gap: .5rem var(--sp-s); padding: var(--sp-s) 0;
+    border-top: 1px solid var(--linea);
+    grid-template-columns: 1fr auto;
+  }
+  .fila-unidad .quien strong { display: block; }
+  .fila-unidad .quien span { font-size: .78rem; color: var(--tinta-3); }
+  .fila-unidad .saldo { text-align: right; }
+  .fila-unidad .saldo .num { font-weight: 600; display: block; }
+  .fila-unidad .gestion { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+  .fila-unidad .historial { grid-column: 1 / -1; font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); }
+  .convenio-panel { grid-column: 1 / -1; }
+
+  /* Asamblea */
+  .check { display: flex; gap: .6rem; padding: .55rem 0; border-top: 1px solid var(--linea); font-size: .85rem; align-items: baseline; }
+  .check .estado-ico { flex: none; font-family: var(--mono); font-weight: 600; font-size: .72rem; padding: .1rem .45rem; border-radius: var(--radio); }
+  .check.ok .estado-ico { background: var(--verde-tinte); color: var(--verde-osc); }
+  .check.mal .estado-ico { background: var(--rojo-tinte); color: #7C2620; }
+  .check p { font-size: .82rem; color: var(--tinta-2); margin-top: .1rem; }
+
+  .asistencia { display: grid; grid-template-columns: repeat(2, 1fr); gap: .35rem; margin-top: var(--sp-s); }
+  @media (min-width: 40em) { .asistencia { grid-template-columns: repeat(3, 1fr); } }
+  .asiste {
+    display: flex; align-items: center; gap: .45rem; min-height: 44px;
+    padding: 0 .6rem; border: 1px solid var(--linea); border-radius: var(--radio);
+    font-family: var(--mono); font-size: .76rem; cursor: pointer; background: var(--placa);
+  }
+  .asiste:has(input:checked) { border-color: var(--verde); background: var(--verde-tinte); }
+  .asiste input { accent-color: var(--verde); width: 15px; height: 15px; }
+
+  .medidor { margin-top: var(--sp-s); }
+  .medidor .barra { position: relative; height: 14px; background: var(--hormigon-2); border-radius: var(--radio); overflow: hidden; }
+  .medidor .fill { position: absolute; inset: 0 auto 0 0; background: var(--verde); width: 0%; }
+  .medidor .umbral { position: absolute; top: -3px; bottom: -3px; left: 50%; width: 2px; background: var(--tinta); }
+  .medidor .texto { font-family: var(--mono); font-size: .76rem; margin-top: .4rem; color: var(--tinta-2); }
+
+  .acta {
+    background: var(--placa); border: 1px solid var(--linea-2); border-radius: var(--radio);
+    padding: var(--sp-l); margin-top: var(--sp-m);
+    font-size: .88rem; line-height: 1.6;
+  }
+  .acta h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
+  .acta .folio { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); text-align: center; margin-top: .2rem; }
+  .acta p, .acta li { color: var(--tinta-2); }
+  .acta ol { padding-left: 1.2rem; }
+  .acta .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-l); margin-top: var(--sp-l); text-align: center; font-size: .8rem; }
+  .acta .firmas div { border-top: 1px solid var(--tinta-3); padding-top: .4rem; }
+
+  /* Libro */
+  .traspaso-link {
+    font-family: var(--mono); font-size: .82rem; word-break: break-all;
+    padding: var(--sp-s); background: var(--hormigon-2); border: 1px solid var(--linea);
+    border-radius: var(--radio); margin-top: var(--sp-s);
+  }
+  tr.fila-mes { cursor: pointer; }
+  tr.fila-mes td { padding-block: .85rem; }
+  tr.fila-mes:hover td { background: var(--verde-tinte); }
+  tr.detalle-mes td { background: var(--hormigon-2); font-family: var(--mono); font-size: .75rem; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="2" stroke="#0D5E36" stroke-width="1.7"/>
+        <path d="M9.6 2.75v18.5M15.4 2.75v11M2.75 13.75h12.65" stroke="#0D5E36" stroke-width="1.7"/>
+      </svg>
+      <span>Prorratia</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<div class="comunidad">
+  <div class="container">
+    <h1>Comunidad Edificio Mirador del Parque</h1>
+    <div class="datos">
+      <span>Av. Irarrázaval 4120, Ñuñoa</span>
+      <span>RUT 53.312.480-6</span>
+      <span>24 unidades</span>
+      <span>hoy: 18-07-2026 (fecha fija del demo)</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="container tabs-fila" role="tablist" aria-label="Módulos del demo">
+    <button class="tab" id="tab-rendicion" role="tab" aria-selected="true" aria-controls="rendicion">Rendición</button>
+    <button class="tab" id="tab-morosidad" role="tab" aria-selected="false" aria-controls="morosidad">Morosidad</button>
+    <button class="tab" id="tab-asamblea" role="tab" aria-selected="false" aria-controls="asamblea">Asamblea</button>
+    <button class="tab" id="tab-libro" role="tab" aria-selected="false" aria-controls="libro">El libro</button>
+  </div>
+</div>
+
+<main class="container">
+
+<!-- ============ RENDICIÓN ============ -->
+<section class="vista" id="rendicion" role="tabpanel" aria-labelledby="tab-rendicion">
+  <h2>Rendición de julio 2026</h2>
+  <p class="sub">Cada gasto con su documento. Edita un monto o agrega un gasto y el prorrateo de las 24 unidades se recalcula al instante.</p>
+
+  <div class="dosCol">
+    <div>
+      <div class="placa" style="padding: var(--sp-s);">
+        <div class="scroll-x">
+          <table id="tabla-gastos">
+            <thead>
+              <tr><th>Fecha</th><th>Gasto</th><th>Respaldo</th><th class="num">Monto</th><th><span class="visually-hidden">Acciones</span></th></tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr><td colspan="3">Total gastos del mes</td><td class="num" id="total-gastos"></td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div id="panel-doc" style="margin-top: var(--sp-s);" hidden></div>
+
+      <div class="placa" style="margin-top: var(--sp-s);">
+        <h3 style="margin-bottom:.6rem;">Agregar un gasto</h3>
+        <div class="campo">
+          <label for="g-glosa">Glosa</label>
+          <input type="text" id="g-glosa" placeholder="Ej: recarga de extintores">
+        </div>
+        <div class="campo">
+          <label for="g-prov">Proveedor</label>
+          <input type="text" id="g-prov" placeholder="Razón social">
+        </div>
+        <div class="campo">
+          <label for="g-monto">Monto (CLP)</label>
+          <input type="number" id="g-monto" min="0" step="100" placeholder="0">
+          <span class="ayuda">Entra sin documento: quedará marcado hasta adjuntar la boleta.</span>
+        </div>
+        <button class="btn btn--verde btn--chico" id="btn-agregar">Agregar al mes</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="placa">
+        <h3>Prorrateo por alícuota</h3>
+        <div class="widget-cuerpo" style="padding: .4rem 0 0;">
+          <div class="widget-fila"><span>Gastos comunes del mes</span><span class="num" id="p-gastos"></span></div>
+          <div class="widget-fila"><span>Fondo de reserva (5%)</span><span class="num" id="p-fondo"></span></div>
+          <div class="widget-fila widget-fila--total"><span>Total a prorratear</span><span class="num" id="p-total"></span></div>
+        </div>
+        <div class="listaUnidades" style="margin-top: var(--sp-s);">
+          <table id="tabla-prorrateo">
+            <thead><tr><th>Unidad</th><th class="num">Alícuota</th><th class="num">Cobro</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="nota-ajuste" id="nota-ajuste"></p>
+        <button class="btn btn--verde" id="btn-emitir" style="width:100%; margin-top: var(--sp-s);">Emitir gasto común de julio</button>
+        <div class="confirmacion" id="conf-emision" hidden></div>
+        <p class="nota-ajuste">El prorrateo es aritmética determinista: total × alícuota, redondeado al peso. Aquí no interviene ningún modelo de IA.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MOROSIDAD ============ -->
+<section class="vista" id="morosidad" role="tabpanel" aria-labelledby="tab-morosidad" hidden>
+  <h2>Morosidad y cobranza</h2>
+  <p class="sub">Saldo vencido por unidad. El gasto común de julio vence el 25-07; aquí se gestiona lo que ya venció.</p>
+
+  <div class="kpis">
+    <div class="placa kpi">
+      <div class="k-label">Saldo vencido total</div>
+      <div class="k-valor" id="k-deuda"></div>
+      <div class="k-nota">3 de 24 unidades</div>
+    </div>
+    <div class="placa kpi">
+      <div class="k-label">Tasa de morosidad</div>
+      <div class="k-valor">12,5%</div>
+      <div class="k-nota">unidades con saldo vencido</div>
+    </div>
+    <div class="placa kpi">
+      <div class="k-label">Cobranza junio</div>
+      <div class="k-valor">92,8%</div>
+      <div class="k-nota">recaudado al día 30</div>
+    </div>
+    <div class="placa kpi">
+      <div class="k-label">Fondo de reserva</div>
+      <div class="k-valor" id="k-fondo"></div>
+      <div class="k-nota">saldo a hoy</div>
+    </div>
+  </div>
+
+  <div class="filtros" role="group" aria-label="Filtrar unidades">
+    <button class="filtro" data-filtro="todas" aria-pressed="true">Todas</button>
+    <button class="filtro" data-filtro="aldia" aria-pressed="false">Al día</button>
+    <button class="filtro" data-filtro="morosa" aria-pressed="false">Morosas</button>
+    <button class="filtro" data-filtro="convenio" aria-pressed="false">En convenio</button>
+  </div>
+
+  <div class="placa" style="margin-top: var(--sp-s); padding-block: .3rem;" id="lista-morosidad"></div>
+</section>
+
+<!-- ============ ASAMBLEA ============ -->
+<section class="vista" id="asamblea" role="tabpanel" aria-labelledby="tab-asamblea" hidden>
+  <h2>Citación y acta</h2>
+  <p class="sub">La citación se genera con las formalidades verificadas; el quórum se calcula por alícuotas al registrar asistencia.</p>
+
+  <div class="dosCol">
+    <div class="placa">
+      <h3 style="margin-bottom: var(--sp-s);">Datos de la asamblea</h3>
+      <fieldset>
+        <legend>Tipo</legend>
+        <div class="opciones">
+          <label class="opcion"><input type="radio" name="a-tipo" value="ordinaria" checked> Ordinaria</label>
+          <label class="opcion"><input type="radio" name="a-tipo" value="extraordinaria"> Extraordinaria</label>
+        </div>
+      </fieldset>
+      <div class="campo">
+        <label for="a-fecha">Fecha</label>
+        <input type="date" id="a-fecha" value="2026-07-30" min="2026-07-18">
+        <span class="ayuda">La citación se enviaría hoy, 18-07-2026.</span>
+      </div>
+      <div class="campo">
+        <label for="a-hora">Hora</label>
+        <input type="time" id="a-hora" value="19:30">
+      </div>
+      <div class="campo">
+        <label for="a-lugar">Lugar</label>
+        <input type="text" id="a-lugar" value="Salón multiuso del edificio, primer piso">
+      </div>
+      <fieldset>
+        <legend>Modalidad</legend>
+        <div class="opciones">
+          <label class="opcion"><input type="radio" name="a-modo" value="mixta" checked> Mixta</label>
+          <label class="opcion"><input type="radio" name="a-modo" value="presencial"> Presencial</label>
+          <label class="opcion"><input type="radio" name="a-modo" value="telematica"> Telemática</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Materias (tabla)</legend>
+        <div class="opciones" style="flex-direction: column; align-items: stretch;">
+          <label class="opcion"><input type="checkbox" class="a-materia" value="Rendición anual de cuentas del período 2025-2026" checked> Rendición anual de cuentas</label>
+          <label class="opcion"><input type="checkbox" class="a-materia" value="Presupuesto de gastos comunes 2026-2027" checked> Presupuesto 2026-2027</label>
+          <label class="opcion"><input type="checkbox" class="a-materia" value="Uso del fondo de reserva: pintura de fachada"> Uso del fondo de reserva: pintura de fachada</label>
+          <label class="opcion"><input type="checkbox" class="a-materia" value="Renovación del comité de administración"> Renovación del comité</label>
+        </div>
+      </fieldset>
+
+      <h3 style="margin: var(--sp-m) 0 .3rem;">Checklist legal</h3>
+      <p class="ayuda" style="font-size:.75rem; color:var(--tinta-3);">Reglas del reglamento tipo de la Ley 21.442; los plazos se configuran según tu reglamento de copropiedad.</p>
+      <div id="checklist"></div>
+      <button class="btn btn--verde" id="btn-citacion" style="width:100%; margin-top: var(--sp-s);">Generar citación</button>
+    </div>
+
+    <div>
+      <div id="citacion-out"></div>
+
+      <div class="placa" style="margin-top: var(--sp-s);">
+        <h3>Registro de asistencia</h3>
+        <p class="ayuda" style="font-size:.78rem; color:var(--tinta-3); margin-top:.2rem;">Marca las unidades presentes o representadas. El quórum se suma por alícuotas, no por cabezas.</p>
+        <button class="btn btn--borde btn--chico" id="btn-simular" style="margin-top:.6rem;">Simular asistencia típica (15 unidades)</button>
+        <div class="asistencia" id="asistencia"></div>
+        <div class="medidor">
+          <div class="barra"><div class="fill" id="q-fill"></div><div class="umbral" title="50% de los derechos"></div></div>
+          <div class="texto" id="q-texto"></div>
+        </div>
+        <button class="btn btn--verde" id="btn-acta" style="width:100%; margin-top: var(--sp-s);">Generar acta borrador</button>
+      </div>
+
+      <div id="acta-out"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIBRO ============ -->
+<section class="vista" id="libro" role="tabpanel" aria-labelledby="tab-libro" hidden>
+  <h2>El libro de la comunidad</h2>
+  <p class="sub">Lo que hace auditable el edificio: el fondo de reserva graficado, doce rendiciones publicadas y el traspaso en un link.</p>
+
+  <div class="dosCol" style="grid-template-columns: 1fr;">
+    <div class="grafico">
+      <h3>Fondo común de reserva, últimos 12 meses</h3>
+      <p class="sub">Saldo al cierre de cada mes, en pesos. La baja de enero es un uso aprobado en asamblea.</p>
+      <div id="chart-fondo"></div>
+      <details>
+        <summary>Ver los datos en tabla</summary>
+        <div class="scroll-x"><table id="tabla-fondo"><thead><tr><th>Mes</th><th class="num">Saldo</th><th>Movimiento relevante</th></tr></thead><tbody></tbody></table></div>
+      </details>
+    </div>
+
+    <div class="placa">
+      <h3>Rendiciones publicadas</h3>
+      <p class="ayuda" style="font-size:.78rem; color:var(--tinta-3); margin:.2rem 0 .6rem;">Toca un mes para ver su resumen. Cada rendición quedó con sus documentos adjuntos al publicarse.</p>
+      <div class="scroll-x">
+        <table id="tabla-rendiciones">
+          <thead><tr><th>Mes</th><th class="num">Gastos</th><th class="num">Cobranza</th><th>Estado</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="placa">
+      <h3>Traspaso del libro</h3>
+      <p style="font-size: var(--step--1); max-width: 60ch; margin-top:.4rem;">Cambio de administrador o auditoría del comité: todo el historial se entrega en un solo link de lectura, sin depender de la buena voluntad de nadie.</p>
+      <button class="btn btn--verde btn--chico" id="btn-traspaso" style="margin-top: var(--sp-s);">Generar link de traspaso</button>
+      <div id="traspaso-out" hidden>
+        <div class="traspaso-link" id="traspaso-url">prorratia.com/traspaso/mirador-del-parque-x7k2</div>
+        <ul style="list-style:none; padding:0; margin-top: var(--sp-s); font-size: var(--step--1); color: var(--tinta-2); display:grid; gap:.35rem;">
+          <li>· 24 rendiciones mensuales con sus 214 documentos adjuntos</li>
+          <li>· Estado de cuenta y morosidad histórica por unidad</li>
+          <li>· Historial completo del fondo de reserva con sus acuerdos</li>
+          <li>· 6 actas de asamblea con asistencia y quórum registrados</li>
+        </ul>
+        <p class="nota-ajuste">Link de solo lectura, revocable, con registro de quién lo abre. En el demo es ilustrativo: no apunta a ningún servidor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <span>Prorratia · demo con datos ficticios</span>
+    <span>Nombres, RUT y montos son inventados con formato real.</span>
+  </div>
+</footer>
+
+<script src="../sitio.js"></script>
+<script>
+/* =====================================================================
+   Demo Prorratia. Todo el estado vive en el cliente.
+   Regla de la casa: la aritmética (prorrateo, intereses, quórum) es
+   código determinista. En el producto real la IA solo digitaliza
+   documentos y redacta borradores; aquí ni siquiera eso: todo es mock.
+   ===================================================================== */
+(function () {
+"use strict";
+
+var clp = function (n) { return "$" + Math.round(n).toLocaleString("es-CL"); };
+var pct = function (n, d) { return n.toLocaleString("es-CL", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%"; };
+
+/* ---------- Datos ---------- */
+var TIPOS = { A: { m2: 82, ali: 5.2 }, B: { m2: 63, ali: 4.2 }, C: { m2: 45, ali: 3.1 } };
+var UNIDADES = [
+  ["101","A","Marcela Fuenzalida Riquelme","12.418.354-6"],
+  ["102","B","Jorge Espinoza Tapia","10.876.442-1"],
+  ["103","C","Valentina Roa Cifuentes","17.234.918-5"],
+  ["104","A","Héctor Millán Soto","9.645.210-3"],
+  ["201","A","Carmen Gloria Sandoval Pérez","11.302.877-9"],
+  ["202","B","Patricio Núñez Aravena","13.554.671-K"],
+  ["203","C","Camila Ortiz Beltrán","16.887.345-2"],
+  ["204","A","Sucesión Ramírez Vidal","8.412.336-7"],
+  ["301","A","Rodrigo Salazar Mena","14.208.556-4"],
+  ["302","B","Francisca Leiva Guzmán","15.673.240-8"],
+  ["303","C","Andrés Curihual Paine","13.998.412-0"],
+  ["304","B","Paulina Vergara Ossa","12.776.905-2"],
+  ["401","A","Inmobiliaria Los Castaños SpA","76.543.210-K"],
+  ["402","B","Sergio Fica Riffo","9.918.264-5"],
+  ["403","C","Daniela Pino Herrera","18.442.671-3"],
+  ["404","B","Luis Barraza Contreras","10.223.489-6"],
+  ["501","A","Teresa Quiroz Maldonado","8.774.512-9"],
+  ["502","B","Nicolás Fuentes Aguilera","17.665.328-1"],
+  ["503","C","Josefa Antileo Huenchur","19.204.887-4"],
+  ["504","C","Cristián Vega Palma","12.098.334-7"],
+  ["601","A","Gloria Toledo Espina","7.886.421-5"],
+  ["602","B","Marco Reyes Uribe","15.442.786-0"],
+  ["603","C","Antonia Sepúlveda Lagos","20.118.905-6"],
+  ["604","C","Ricardo Alarcón Fuentes","11.560.243-8"]
+].map(function (u) {
+  return { id: u[0], tipo: u[1], m2: TIPOS[u[1]].m2, ali: TIPOS[u[1]].ali, prop: u[2], rut: u[3] };
+});
+// Suma de alícuotas: 8×5,2 + 8×4,2 + 8×3,1 = 100,000 exacto.
+
+var gastos = [
+  { id: 1, fecha: "02-07", glosa: "Remuneración conserjería y aseo", prov: "Servicios Aconcagua Ltda.", rutp: "77.482.156-0", monto: 1780000, doc: { tipo: "Factura electrónica", folio: "8.421", iva: true } },
+  { id: 2, fecha: "04-07", glosa: "Mantención mensual ascensores", prov: "Ascensores Vertical Andes SpA", rutp: "76.905.412-8", monto: 318000, doc: { tipo: "Factura electrónica", folio: "12.077", iva: true } },
+  { id: 3, fecha: "05-07", glosa: "Electricidad espacios comunes", prov: "Distribuidora eléctrica, cuenta 44.213.508", rutp: null, monto: 389210, doc: { tipo: "Boleta de servicio", folio: "44.213.508", iva: false } },
+  { id: 4, fecha: "05-07", glosa: "Agua, cuenta matriz", prov: "Empresa sanitaria, cuenta 90.144.221", rutp: null, monto: 246890, doc: { tipo: "Boleta de servicio", folio: "90.144.221", iva: false } },
+  { id: 5, fecha: "08-07", glosa: "Jardinería mensual", prov: "Jardines Quillay Ltda.", rutp: "78.334.902-K", monto: 140000, doc: { tipo: "Factura electrónica", folio: "1.856", iva: true } },
+  { id: 6, fecha: "11-07", glosa: "Reparación portón de acceso", prov: "Maestranza Ferrometal Ltda.", rutp: "77.120.334-5", monto: 326500, doc: { tipo: "Factura electrónica", folio: "3.409", iva: true } },
+  { id: 7, fecha: "15-07", glosa: "Seguro incendio áreas comunes, cuota 7 de 12", prov: "Seguros Cordillera Corredores SpA", rutp: "76.244.810-3", monto: 168400, doc: { tipo: "Factura electrónica", folio: "22.914", iva: true } },
+  { id: 8, fecha: "15-07", glosa: "Honorarios contables de julio", prov: "Patricia Yáñez Morales", rutp: "8.556.902-1", monto: 120000, doc: { tipo: "Boleta de honorarios", folio: "341", iva: false } },
+  { id: 9, fecha: "16-07", glosa: "Caja chica: ampolletas y artículos de aseo", prov: "Comprobante interno", rutp: null, monto: 47300, doc: null }
+];
+var nextId = 10;
+
+var morosos = {
+  "203": { deuda: 345320, meses: 3, estado: "morosa", historial: "Sin pagos desde abril. Último contacto: 02-07-2026." },
+  "402": { deuda: 155950, meses: 1, estado: "morosa", historial: "Junio impago. Pagó mayo con 6 días de atraso." },
+  "504": { deuda: 232400, meses: 2, estado: "convenio", historial: "Convenio de 4 cuotas firmado el 05-06-2026: 2 de 4 pagadas, al día." }
+};
+
+var FONDO = [
+  ["ago-25", 5612480, ""], ["sep-25", 5776685, ""], ["oct-25", 5946823, ""],
+  ["nov-25", 6112385, ""], ["dic-25", 6304680, ""],
+  ["ene-26", 5069590, "Uso de $1.400.000: reparación techumbre, acta extraordinaria 12-01-2026"],
+  ["feb-26", 5234512, ""], ["mar-26", 5393893, ""], ["abr-26", 5564951, ""],
+  ["may-26", 5736008, ""], ["jun-26", 5911628, ""], ["jul-26", 6086091, "Recargo de julio pendiente de emisión"]
+];
+
+var RENDICIONES = [
+  ["jun-26", 3489270, "92,8%"], ["may-26", 3512400, "90,9%"], ["abr-26", 3421150, "91,7%"],
+  ["mar-26", 3356980, "92,1%"], ["feb-26", 3187620, "93,4%"], ["ene-26", 3298450, "90,2%"],
+  ["dic-25", 3845910, "89,6%"], ["nov-25", 3311240, "92,5%"], ["oct-25", 3402760, "91,8%"],
+  ["sep-25", 3150480, "94,1%"], ["ago-25", 3284100, "93,2%"], ["jul-25", 3226870, "92,0%"]
+];
+
+/* ---------- Pestañas ---------- */
+var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+function activarTab(id, empujarHash) {
+  tabs.forEach(function (t) {
+    var activo = t.getAttribute("aria-controls") === id;
+    t.setAttribute("aria-selected", activo ? "true" : "false");
+  });
+  ["rendicion", "morosidad", "asamblea", "libro"].forEach(function (v) {
+    document.getElementById(v).hidden = v !== id;
+  });
+  if (empujarHash && history.replaceState) history.replaceState(null, "", "#" + id);
+}
+tabs.forEach(function (t) {
+  t.addEventListener("click", function () { activarTab(t.getAttribute("aria-controls"), true); });
+});
+var hash = location.hash.replace("#", "");
+if (["rendicion", "morosidad", "asamblea", "libro"].indexOf(hash) >= 0) activarTab(hash, false);
+
+/* ---------- Prorrateo (aritmética pura) ---------- */
+function calcularProrrateo() {
+  var totalGastos = gastos.reduce(function (s, g) { return s + g.monto; }, 0);
+  var fondo = Math.round(totalGastos * 0.05);
+  var total = totalGastos + fondo;
+  var filas = UNIDADES.map(function (u) {
+    return { u: u, cobro: Math.round(total * u.ali / 100), ajuste: 0 };
+  });
+  var suma = filas.reduce(function (s, f) { return s + f.cobro; }, 0);
+  var dif = total - suma;
+  if (dif !== 0) {
+    var mayor = filas.reduce(function (a, b) { return b.u.ali > a.u.ali ? b : a; }, filas[0]);
+    mayor.cobro += dif; mayor.ajuste = dif;
+  }
+  return { totalGastos: totalGastos, fondo: fondo, total: total, filas: filas, dif: dif };
+}
+
+var gastoActivo = null;
+
+function renderGastos() {
+  var tbody = document.querySelector("#tabla-gastos tbody");
+  tbody.innerHTML = "";
+  gastos.forEach(function (g) {
+    var tr = document.createElement("tr");
+    if (gastoActivo === g.id) tr.className = "activa";
+    var chip = g.doc
+      ? '<span class="chip chip--aldia"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' + g.doc.tipo + "</span>"
+      : '<span class="chip chip--moroso"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v9M12 17.5v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>sin respaldo</span>';
+    tr.innerHTML =
+      '<td class="num">' + g.fecha + "</td>" +
+      "<td><strong>" + g.glosa + "</strong><br><span style='color:var(--tinta-3); font-size:.78rem;'>" + g.prov + "</span></td>" +
+      "<td>" + chip + "</td>" +
+      '<td class="num">' + clp(g.monto) + "</td>" +
+      '<td><button class="acc" data-ver="' + g.id + '">Ver</button></td>';
+    tbody.appendChild(tr);
+  });
+  document.getElementById("total-gastos").textContent = clp(gastos.reduce(function (s, g) { return s + g.monto; }, 0));
+  Array.prototype.forEach.call(tbody.querySelectorAll("[data-ver]"), function (b) {
+    b.addEventListener("click", function () { verGasto(Number(b.getAttribute("data-ver"))); });
+  });
+}
+
+function verGasto(id) {
+  gastoActivo = id;
+  var g = gastos.filter(function (x) { return x.id === id; })[0];
+  var panel = document.getElementById("panel-doc");
+  panel.hidden = false;
+  var docHtml;
+  if (g.doc) {
+    var neto = Math.round(g.monto / 1.19);
+    var iva = g.monto - neto;
+    docHtml =
+      '<div class="doc"><div class="doc-tit">' + g.doc.tipo + " N° " + g.doc.folio + "</div><dl>" +
+      "<dt>Emisor</dt><dd>" + g.prov + "</dd>" +
+      (g.rutp ? "<dt>RUT</dt><dd>" + g.rutp + "</dd>" : "") +
+      "<dt>Fecha</dt><dd>" + g.fecha + "-2026</dd>" +
+      (g.doc.iva ? "<dt>Neto</dt><dd>" + clp(neto) + "</dd><dt>IVA 19%</dt><dd>" + clp(iva) + "</dd>" : "") +
+      "<dt>Total</dt><dd><strong>" + clp(g.monto) + "</strong></dd></dl>" +
+      '<p style="margin-top:.5rem; font-size:.72rem; color:var(--tinta-3);">Digitalizado del documento adjunto y confirmado por el comité. Visible para las 24 unidades.</p></div>';
+  } else {
+    docHtml =
+      '<div class="doc"><div class="doc-tit">Sin documento tributario</div>' +
+      "<p>" + g.glosa + " · " + clp(g.monto) + "</p>" +
+      '<p class="alerta">Este gasto queda marcado en la rendición hasta adjuntar boleta o comprobante.</p></div>';
+  }
+  panel.innerHTML =
+    '<div class="placa"><h3 style="margin-bottom:.6rem;">Detalle del gasto</h3>' + docHtml +
+    '<div class="campo" style="margin-top: var(--sp-s);"><label for="edit-monto">Corregir monto (CLP)</label>' +
+    '<input type="number" id="edit-monto" value="' + g.monto + '" min="0" step="100"></div>' +
+    '<div class="btn-fila"><button class="btn btn--verde btn--chico" id="btn-guardar">Guardar y recalcular</button>' +
+    '<button class="btn btn--borde btn--chico" id="btn-cerrar">Cerrar</button></div>' +
+    '<p class="nota-ajuste">Toda corrección queda en el historial de auditoría con autor y hora.</p></div>';
+  document.getElementById("btn-guardar").addEventListener("click", function () {
+    var v = Math.max(0, Number(document.getElementById("edit-monto").value) || 0);
+    g.monto = v;
+    renderGastos(); renderProrrateo();
+  });
+  document.getElementById("btn-cerrar").addEventListener("click", function () {
+    gastoActivo = null; panel.hidden = true; renderGastos();
+  });
+  renderGastos();
+}
+
+function renderProrrateo() {
+  var p = calcularProrrateo();
+  document.getElementById("p-gastos").textContent = clp(p.totalGastos);
+  document.getElementById("p-fondo").textContent = clp(p.fondo);
+  document.getElementById("p-total").textContent = clp(p.total);
+  var tbody = document.querySelector("#tabla-prorrateo tbody");
+  tbody.innerHTML = "";
+  p.filas.forEach(function (f) {
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>Depto " + f.u.id + "<br><span style='color:var(--tinta-3); font-size:.72rem;'>" + f.u.prop + "</span></td>" +
+      '<td class="num">' + pct(f.u.ali, 3) + "</td>" +
+      '<td class="num">' + clp(f.cobro) + (f.ajuste ? " *" : "") + "</td>";
+    tbody.appendChild(tr);
+  });
+  var nota = document.getElementById("nota-ajuste");
+  nota.textContent = p.dif !== 0
+    ? "* Ajuste por redondeo de " + (p.dif > 0 ? "+" : "") + p.dif + " peso(s), asignado a la unidad de mayor alícuota y declarado en la rendición."
+    : "Sin ajuste por redondeo este mes: la suma calza al peso.";
+}
+
+document.getElementById("btn-agregar").addEventListener("click", function () {
+  var glosa = document.getElementById("g-glosa").value.trim();
+  var prov = document.getElementById("g-prov").value.trim();
+  var monto = Math.max(0, Number(document.getElementById("g-monto").value) || 0);
+  if (!glosa || monto <= 0) {
+    document.getElementById("g-glosa").focus();
+    return;
+  }
+  gastos.push({ id: nextId++, fecha: "18-07", glosa: glosa, prov: prov || "Proveedor por confirmar", rutp: null, monto: monto, doc: null });
+  document.getElementById("g-glosa").value = "";
+  document.getElementById("g-prov").value = "";
+  document.getElementById("g-monto").value = "";
+  renderGastos(); renderProrrateo();
+});
+
+var emitido = false;
+document.getElementById("btn-emitir").addEventListener("click", function () {
+  var p = calcularProrrateo();
+  emitido = true;
+  var conf = document.getElementById("conf-emision");
+  conf.hidden = false;
+  conf.innerHTML = "<strong>Emitido.</strong> 24 boletas de gasto común por " + clp(p.total) +
+    " notificadas por correo y WhatsApp, 18-07-2026 a las 10:42. Vencimiento: 25-07-2026.";
+  this.disabled = true;
+  this.textContent = "Gasto común de julio emitido";
+});
+
+/* ---------- Morosidad ---------- */
+var filtroActual = "todas";
+
+function estadoUnidad(u) {
+  var m = morosos[u.id];
+  if (!m) return "aldia";
+  return m.estado === "convenio" ? "convenio" : "morosa";
+}
+
+function renderMorosidad() {
+  var deudaTotal = Object.keys(morosos).reduce(function (s, k) { return s + morosos[k].deuda; }, 0);
+  document.getElementById("k-deuda").textContent = clp(deudaTotal);
+  document.getElementById("k-fondo").textContent = clp(FONDO[FONDO.length - 1][1]);
+
+  var cont = document.getElementById("lista-morosidad");
+  cont.innerHTML = "";
+  UNIDADES.forEach(function (u) {
+    var est = estadoUnidad(u);
+    if (filtroActual !== "todas" && filtroActual !== est) return;
+    var m = morosos[u.id];
+    var fila = document.createElement("div");
+    fila.className = "fila-unidad";
+    var chip =
+      est === "aldia" ? '<span class="chip chip--aldia"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>al día</span>' :
+      est === "convenio" ? '<span class="chip chip--neutro">en convenio</span>' :
+      '<span class="chip chip--moroso"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v9M12 17.5v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>' + m.meses + (m.meses === 1 ? " mes" : " meses") + "</span>";
+    fila.innerHTML =
+      '<div class="quien"><strong>Depto ' + u.id + " · " + u.prop + "</strong>" +
+      "<span>" + u.rut + " · alícuota " + pct(u.ali, 3) + "</span></div>" +
+      '<div class="saldo"><span class="num">' + (m ? clp(m.deuda) : "$0") + "</span>" + chip + "</div>" +
+      (m ? '<div class="historial">' + m.historial + "</div>" : "");
+    if (m && m.estado === "morosa") {
+      var gestion = document.createElement("div");
+      gestion.className = "gestion";
+      var bRec = document.createElement("button");
+      bRec.className = "btn btn--borde btn--chico";
+      bRec.textContent = m.recordado ? "Recordatorio enviado 10:12" : "Enviar recordatorio";
+      bRec.disabled = !!m.recordado;
+      bRec.addEventListener("click", function () {
+        m.recordado = true;
+        m.historial = "Recordatorio enviado hoy 18-07-2026 10:12 por WhatsApp y correo. " + m.historial;
+        renderMorosidad();
+      });
+      var bConv = document.createElement("button");
+      bConv.className = "btn btn--verde btn--chico";
+      bConv.textContent = "Proponer convenio";
+      bConv.addEventListener("click", function () { abrirConvenio(fila, u, m); });
+      gestion.appendChild(bRec); gestion.appendChild(bConv);
+      fila.appendChild(gestion);
+    }
+    cont.appendChild(fila);
+  });
+  if (!cont.children.length) {
+    cont.innerHTML = '<p style="padding: var(--sp-m) 0; color: var(--tinta-3); font-size: var(--step--1);">Ninguna unidad en esta categoría. Buen problema.</p>';
+  }
+}
+
+function abrirConvenio(fila, u, m) {
+  var previo = fila.querySelector(".convenio-panel");
+  if (previo) { previo.remove(); return; }
+  var panel = document.createElement("div");
+  panel.className = "convenio-panel placa";
+  panel.style.background = "var(--hormigon-2)";
+  panel.innerHTML =
+    '<div class="campo"><label for="conv-n-' + u.id + '">Número de cuotas</label>' +
+    '<select id="conv-n-' + u.id + '"><option value="2">2 cuotas</option><option value="3" selected>3 cuotas</option><option value="4">4 cuotas</option><option value="6">6 cuotas</option></select>' +
+    '<span class="ayuda">Interés simple de 1,5% mensual sobre saldo promedio, según reglamento (tope: interés máximo convencional).</span></div>' +
+    '<div class="doc" style="margin-bottom: var(--sp-s);"><dl id="conv-calc-' + u.id + '"></dl></div>' +
+    '<button class="btn btn--verde btn--chico" id="conv-ok-' + u.id + '">Proponer al copropietario</button>';
+  fila.appendChild(panel);
+  var sel = panel.querySelector("select");
+  function calc() {
+    var n = Number(sel.value);
+    var interes = Math.round(m.deuda * 0.015 * (n + 1) / 2);
+    var total = m.deuda + interes;
+    var cuota = Math.ceil(total / n / 10) * 10;
+    var dl = document.getElementById("conv-calc-" + u.id);
+    dl.innerHTML =
+      "<dt>Saldo vencido</dt><dd>" + clp(m.deuda) + "</dd>" +
+      "<dt>Interés (1,5% × " + n + " meses, saldo promedio)</dt><dd>" + clp(interes) + "</dd>" +
+      "<dt>Total convenio</dt><dd>" + clp(total) + "</dd>" +
+      "<dt>Cuota mensual</dt><dd><strong>" + clp(cuota) + "</strong></dd>";
+    return { n: n, total: total, cuota: cuota };
+  }
+  sel.addEventListener("change", calc);
+  calc();
+  panel.querySelector("#conv-ok-" + u.id).addEventListener("click", function () {
+    var c = calc();
+    m.estado = "convenio";
+    m.historial = "Convenio propuesto hoy 18-07-2026: " + c.n + " cuotas de " + clp(c.cuota) + ". A la espera de aceptación. " + m.historial;
+    renderMorosidad();
+  });
+}
+
+Array.prototype.forEach.call(document.querySelectorAll(".filtro"), function (b) {
+  b.addEventListener("click", function () {
+    filtroActual = b.getAttribute("data-filtro");
+    Array.prototype.forEach.call(document.querySelectorAll(".filtro"), function (x) {
+      x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    });
+    renderMorosidad();
+  });
+});
+
+/* ---------- Asamblea ---------- */
+var HOY = new Date(2026, 6, 18); // fecha fija del demo
+
+function datosAsamblea() {
+  var materias = Array.prototype.slice.call(document.querySelectorAll(".a-materia"))
+    .filter(function (c) { return c.checked; })
+    .map(function (c) { return c.value; });
+  return {
+    tipo: document.querySelector("[name=a-tipo]:checked").value,
+    modo: document.querySelector("[name=a-modo]:checked").value,
+    fecha: document.getElementById("a-fecha").value,
+    hora: document.getElementById("a-hora").value,
+    lugar: document.getElementById("a-lugar").value.trim(),
+    materias: materias
+  };
+}
+
+function fmtFecha(iso) {
+  if (!iso) return "";
+  var p = iso.split("-");
+  var meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  return Number(p[2]) + " de " + meses[Number(p[1]) - 1] + " de " + p[0];
+}
+
+function renderChecklist() {
+  var d = datosAsamblea();
+  var out = document.getElementById("checklist");
+  var checks = [];
+
+  var dias = d.fecha ? Math.round((new Date(d.fecha + "T00:00:00") - HOY) / 86400000) : 0;
+  var okPlazo = dias >= 5 && dias <= 15;
+  checks.push({
+    ok: okPlazo,
+    titulo: "Anticipación de la citación: " + dias + " días",
+    detalle: okPlazo
+      ? "Dentro del rango de 5 a 15 días corridos que fija el reglamento."
+      : "Fuera del rango de 5 a 15 días corridos. Cambia la fecha de la asamblea o programa el envío de la citación."
+  });
+  checks.push({
+    ok: true,
+    titulo: "Medio de citación válido",
+    detalle: "22 unidades con correo registrado; 2 se notifican por carta certificada. Registro de envío queda en el libro."
+  });
+  var okContenido = !!(d.lugar && d.hora && d.materias.length);
+  checks.push({
+    ok: okContenido,
+    titulo: "Contenido mínimo de la citación",
+    detalle: okContenido
+      ? "Lugar, fecha, hora, modalidad y tabla de materias: completo."
+      : "Falta lugar, hora o al menos una materia en tabla."
+  });
+  var especial = d.materias.some(function (m) { return m.indexOf("fondo de reserva") >= 0; });
+  checks.push({
+    ok: true,
+    titulo: "Quórum aplicable",
+    detalle: (d.tipo === "ordinaria"
+      ? "Constitución en primera citación: mayoría absoluta de los derechos (más del 50% de las alícuotas)."
+      : "Asamblea extraordinaria: revisa el quórum reforzado según la materia.") +
+      (especial ? " El uso del fondo de reserva requiere acuerdo expreso de la asamblea." : "")
+  });
+
+  out.innerHTML = "";
+  checks.forEach(function (c) {
+    var div = document.createElement("div");
+    div.className = "check " + (c.ok ? "ok" : "mal");
+    div.innerHTML = '<span class="estado-ico">' + (c.ok ? "OK" : "NO") + "</span><div><strong>" + c.titulo + "</strong><p>" + c.detalle + "</p></div>";
+    out.appendChild(div);
+  });
+  return checks.every(function (c) { return c.ok; });
+}
+
+["a-fecha", "a-hora", "a-lugar"].forEach(function (id) {
+  document.getElementById(id).addEventListener("input", renderChecklist);
+});
+Array.prototype.forEach.call(document.querySelectorAll(".a-materia, [name=a-tipo], [name=a-modo]"), function (el) {
+  el.addEventListener("change", renderChecklist);
+});
+
+document.getElementById("btn-citacion").addEventListener("click", function () {
+  var todoOk = renderChecklist();
+  var d = datosAsamblea();
+  var out = document.getElementById("citacion-out");
+  if (!todoOk) {
+    out.innerHTML = '<div class="placa" style="border-color: var(--rojo-estado);"><strong style="color: var(--rojo-estado);">La citación no cumple el checklist.</strong><p style="font-size: var(--step--1); margin-top:.3rem;">Corrige los puntos marcados NO antes de generar. Prorratia no envía citaciones que nacerían impugnables.</p></div>';
+    return;
+  }
+  var modoTxt = { mixta: "presencial y telemática (mixta)", presencial: "presencial", telematica: "telemática" }[d.modo];
+  out.innerHTML =
+    '<div class="acta"><h3>Citación a asamblea ' + d.tipo + "</h3>" +
+    '<div class="folio">Comunidad Edificio Mirador del Parque · RUT 53.312.480-6</div>' +
+    '<p style="margin-top: var(--sp-s);">Conforme a la Ley 21.442 y al reglamento de copropiedad, el comité de administración cita a asamblea ' + d.tipo + " de copropietarios para el día <strong>" + fmtFecha(d.fecha) + "</strong> a las <strong>" + d.hora + "</strong> horas, en modalidad " + modoTxt + ", en " + d.lugar + ".</p>" +
+    "<p style='margin-top:.6rem;'><strong>Tabla:</strong></p><ol>" +
+    d.materias.map(function (m) { return "<li>" + m + "</li>"; }).join("") +
+    "</ol>" +
+    "<p style='margin-top:.6rem;'>En primera citación la asamblea se constituye con la mayoría absoluta de los derechos del condominio; los copropietarios podrán asistir personalmente o representados con poder simple.</p>" +
+    '<p style="margin-top:.6rem; font-size:.78rem; color:var(--tinta-3);">Enviada el 18-07-2026 a 22 correos registrados y 2 cartas certificadas. Borrador redactado sobre plantilla revisada por abogado; los plazos y quórums los verificó el checklist, no el modelo.</p></div>';
+});
+
+/* Asistencia y acta */
+var asistencia = {};
+function renderAsistencia() {
+  var cont = document.getElementById("asistencia");
+  cont.innerHTML = "";
+  UNIDADES.forEach(function (u) {
+    var lab = document.createElement("label");
+    lab.className = "asiste";
+    var inp = document.createElement("input");
+    inp.type = "checkbox";
+    inp.checked = !!asistencia[u.id];
+    inp.addEventListener("change", function () {
+      asistencia[u.id] = inp.checked;
+      renderQuorum();
+    });
+    lab.appendChild(inp);
+    var span = document.createElement("span");
+    span.textContent = u.id + " · " + pct(u.ali, 1);
+    lab.appendChild(span);
+    cont.appendChild(lab);
+  });
+  renderQuorum();
+}
+
+function quorumActual() {
+  return UNIDADES.reduce(function (s, u) { return s + (asistencia[u.id] ? u.ali : 0); }, 0);
+}
+
+function renderQuorum() {
+  var q = quorumActual();
+  var n = UNIDADES.filter(function (u) { return asistencia[u.id]; }).length;
+  document.getElementById("q-fill").style.width = Math.min(100, q) + "%";
+  document.getElementById("q-texto").textContent =
+    "Quórum: " + pct(q, 1) + " de los derechos (" + n + " de 24 unidades). " +
+    (q > 50 ? "Constituida en primera citación." : "Bajo el 50%: solo podría sesionar en segunda citación.");
+}
+
+document.getElementById("btn-simular").addEventListener("click", function () {
+  asistencia = {};
+  ["101","102","104","201","202","204","301","302","304","401","403","501","502","601","602"].forEach(function (id) { asistencia[id] = true; });
+  renderAsistencia();
+});
+
+document.getElementById("btn-acta").addEventListener("click", function () {
+  var d = datosAsamblea();
+  var q = quorumActual();
+  var presentes = UNIDADES.filter(function (u) { return asistencia[u.id]; });
+  var out = document.getElementById("acta-out");
+  if (!presentes.length) {
+    out.innerHTML = '<div class="placa" style="margin-top: var(--sp-s); border-color: var(--rojo-estado);"><strong style="color: var(--rojo-estado);">Sin asistencia registrada.</strong><p style="font-size: var(--step--1); margin-top:.3rem;">Marca las unidades presentes (o usa la simulación) antes de generar el acta.</p></div>';
+    return;
+  }
+  out.innerHTML =
+    '<div class="acta"><h3>Acta de asamblea ' + d.tipo + " (borrador)</h3>" +
+    '<div class="folio">' + fmtFecha(d.fecha) + ", " + d.hora + " horas · " + (d.lugar || "lugar por definir") + "</div>" +
+    "<p style='margin-top: var(--sp-s);'>Asistieron, personalmente o representadas, <strong>" + presentes.length + " de 24 unidades</strong>, que reúnen el <strong>" + pct(q, 3) + "</strong> de los derechos del condominio. " +
+    (q > 50 ? "La asamblea se constituyó válidamente en primera citación." : "No se alcanzó la mayoría absoluta de los derechos: el acta queda en modalidad de segunda citación.") + "</p>" +
+    "<p style='margin-top:.6rem;'><strong>Acuerdos por materia:</strong></p><ol>" +
+    d.materias.map(function (m) { return "<li>" + m + ". <em>Acuerdo: [aprobar / rechazar / pendiente], por [n] votos que representan [x%] de los derechos presentes.</em></li>"; }).join("") +
+    "</ol>" +
+    "<p style='margin-top:.6rem;'>Asistencia registrada por unidad y alícuota en el anexo del libro. Los espacios entre corchetes se completan durante la asamblea desde el celular.</p>" +
+    '<div class="firmas"><div>Presidenta del comité</div><div>Administrador/a</div></div>' +
+    '<p style="margin-top: var(--sp-m); font-size:.78rem; color:var(--tinta-3);">Borrador generado sobre plantilla legal. El quórum lo calculó código determinista sumando alícuotas; la IA solo redacta, nunca cuenta.</p></div>';
+});
+
+/* ---------- Libro ---------- */
+function renderFondo() {
+  var w = 560, h = 190, padL = 46, padR = 14, padT = 14, padB = 34;
+  var min = 4800000, max = 6600000;
+  var innerW = w - padL - padR, innerH = h - padT - padB;
+  var x = function (i) { return padL + (i * innerW / (FONDO.length - 1)); };
+  var y = function (v) { return padT + innerH - ((v - min) / (max - min)) * innerH; };
+  var pts = FONDO.map(function (d, i) { return [x(i), y(d[1])]; });
+  var linea = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+  var area = linea + " L" + pts[pts.length - 1][0].toFixed(1) + " " + (padT + innerH) + " L" + pts[0][0].toFixed(1) + " " + (padT + innerH) + " Z";
+  var svg = '<svg viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="Saldo del fondo de reserva por mes, de agosto 2025 a julio 2026">';
+  [5000000, 5500000, 6000000, 6500000].forEach(function (v) {
+    svg += '<line x1="' + padL + '" y1="' + y(v) + '" x2="' + (w - padR) + '" y2="' + y(v) + '" stroke="#C9CDCB" stroke-width="1"/>';
+    svg += '<text class="eje" x="' + (padL - 6) + '" y="' + (y(v) + 3) + '" text-anchor="end">' + (v / 1000000).toLocaleString("es-CL", { minimumFractionDigits: 1 }) + "M</text>";
+  });
+  svg += '<path d="' + area + '" fill="#0D5E36" opacity="0.10"/>';
+  svg += '<path d="' + linea + '" fill="none" stroke="#0D5E36" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  pts.forEach(function (p, i) {
+    var esUso = i === 5;
+    svg += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (esUso ? 5 : 3.5) + '" fill="' + (esUso ? "#A63A32" : "#0D5E36") + '" stroke="#F7F8F7" stroke-width="2"><title>' + FONDO[i][0] + ": " + clp(FONDO[i][1]) + (FONDO[i][2] ? " · " + FONDO[i][2] : "") + "</title></circle>";
+  });
+  svg += '<text class="etiqueta" x="' + x(5) + '" y="' + (y(FONDO[5][1]) + 20) + '" text-anchor="middle">uso aprobado</text>';
+  FONDO.forEach(function (d, i) {
+    if (i % 2 === 0) svg += '<text class="eje" x="' + x(i) + '" y="' + (h - 10) + '" text-anchor="middle">' + d[0] + "</text>";
+  });
+  svg += "</svg>";
+  document.getElementById("chart-fondo").innerHTML = svg;
+
+  var tbody = document.querySelector("#tabla-fondo tbody");
+  tbody.innerHTML = FONDO.map(function (d) {
+    return "<tr><td>" + d[0] + '</td><td class="num">' + clp(d[1]) + "</td><td>" + (d[2] || "aporte mensual del 5%") + "</td></tr>";
+  }).join("");
+}
+
+function renderRendiciones() {
+  var tbody = document.querySelector("#tabla-rendiciones tbody");
+  tbody.innerHTML = "";
+  RENDICIONES.forEach(function (r, i) {
+    var tr = document.createElement("tr");
+    tr.className = "fila-mes";
+    tr.setAttribute("tabindex", "0");
+    tr.innerHTML = "<td>" + r[0] + '</td><td class="num">' + clp(r[1]) + '</td><td class="num">' + r[2] + '</td><td><span class="chip chip--aldia">publicada</span></td>';
+    var abierta = false;
+    function toggle() {
+      var sig = tr.nextElementSibling;
+      if (abierta && sig && sig.classList.contains("detalle-mes")) { sig.remove(); abierta = false; return; }
+      var det = document.createElement("tr");
+      det.className = "detalle-mes";
+      var fondo = Math.round(r[1] * 0.05);
+      det.innerHTML = '<td colspan="4">Gastos ' + clp(r[1]) + ", fondo de reserva " + clp(fondo) + ", total emitido " + clp(r[1] + fondo) + ", cobranza " + r[2] + " al cierre. Documentos adjuntos: " + (16 + (i * 7) % 5) + "</td>";
+      tr.after(det);
+      abierta = true;
+    }
+    tr.addEventListener("click", toggle);
+    tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById("btn-traspaso").addEventListener("click", function () {
+  document.getElementById("traspaso-out").hidden = false;
+  this.textContent = "Link generado (solo lectura)";
+  this.disabled = true;
+});
+
+/* ---------- Arranque ---------- */
+renderGastos();
+renderProrrateo();
+renderMorosidad();
+renderChecklist();
+renderAsistencia();
+renderFondo();
+renderRendiciones();
+})();
+</script>
+</body>
+</html>

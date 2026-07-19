@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap: Prorratia</title>
+<meta name="description" content="Del día 1 al mes 24: hitos con criterios de muerte, MRR en tres escenarios, caja y probabilidad de éxito como rango derivado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cabecera { padding-block: var(--sp-xl) var(--sp-l); }
+  .cabecera h1 { max-width: 20ch; font-size: var(--step-3); }
+  .cabecera p { max-width: 58ch; margin-top: var(--sp-s); }
+
+  .grid-graficos { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 68em) { .grid-graficos--2 { grid-template-columns: 1fr 1fr; } }
+
+  .hito { border-top: 1px solid var(--linea); padding: var(--sp-m) 0; display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .hito { grid-template-columns: 9rem 1fr; } }
+  .hito .cuando { font-family: var(--mono); font-size: .8rem; color: var(--verde); font-weight: 600; }
+  .hito h3 { margin-bottom: .35rem; }
+  .hito .meta {
+    display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; margin-top: .5rem;
+    font-family: var(--mono); font-size: .72rem; color: var(--tinta-3);
+  }
+  .hito .muerte {
+    margin-top: .6rem; padding: .6rem .8rem; border-left: 3px solid var(--rojo-estado);
+    background: var(--rojo-tinte); font-size: .84rem; color: #5D1F1A; border-radius: 0 var(--radio) var(--radio) 0;
+  }
+  .hito .muerte strong { color: #7C2620; }
+  .hito p { font-size: var(--step--1); max-width: 62ch; }
+
+  .prob { border-left: 3px solid var(--verde); padding-left: var(--sp-m); }
+  .prob p { font-size: var(--step--1); max-width: 66ch; }
+  .prob .rango { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; color: var(--tinta); }
+  .supuestos { font-family: var(--mono); font-size: .74rem; color: var(--tinta-3); line-height: 1.6; margin-top: var(--sp-s); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="2" stroke="#0D5E36" stroke-width="1.7"/>
+        <path d="M9.6 2.75v18.5M15.4 2.75v11M2.75 13.75h12.65" stroke="#0D5E36" stroke-width="1.7"/>
+      </svg>
+      <span>Prorratia</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<div class="cabecera">
+  <div class="container">
+    <h1>Veinticuatro meses, seis hitos, tres formas de morir a tiempo.</h1>
+    <p>Cada hito declara qué es cierto si se logró, cuánta caja exige y la observación que obliga a parar. Un roadmap sin criterios de muerte es una carta al Viejito Pascuero.</p>
+  </div>
+</div>
+
+<!-- ===== Hitos ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Los hitos.</h2>
+    <div style="margin-top: var(--sp-l);">
+      <div class="hito">
+        <div class="cuando">Mes 0 a 2</div>
+        <div>
+          <h3>H1 · Cinco comunidades design partner</h3>
+          <p>Cinco comités cargan su mes real (gastos, boletas, prorrateo) gratis. Si se logró, es cierto que el dolor existe y que el comité está dispuesto a trabajar con nosotros.</p>
+          <div class="meta"><span>caja: $4,4M</span><span>equipo: 1 fundador</span></div>
+          <div class="muerte"><strong>Muerte:</strong> 60 reuniones sin juntar 5 comités dispuestos a cargar sus datos reales. Si ni gratis quieren orden, no hay negocio.</div>
+        </div>
+      </div>
+      <div class="hito">
+        <div class="cuando">Mes 4</div>
+        <div>
+          <h3>H2 · Primera comunidad pagando</h3>
+          <p>Una asamblea o comité aprueba el gasto y paga. Es cierto que el gasto común absorbe el precio y que el proceso de compra (comité, ratificación) funciona al menos una vez.</p>
+          <div class="meta"><span>caja: $8,8M acum.</span><span>equipo: 1</span></div>
+          <div class="muerte"><strong>Muerte:</strong> ningún design partner convierte a pago tras dos ciclos de asamblea. El producto gusta gratis y no vale plata: pivote de precio o cierre.</div>
+        </div>
+      </div>
+      <div class="hito">
+        <div class="cuando">Mes 8</div>
+        <div>
+          <h3>H3 · Diez comunidades pagando, un administrador Pro</h3>
+          <p>Diez comunidades activas y el primer administrador profesional con 3 o más comunidades adentro. Es cierto que los dos lados compran y que la cobranza del software se paga sola.</p>
+          <div class="meta"><span>caja: $18M acum.</span><span>equipo: 1 + freelance legal</span></div>
+          <div class="muerte"><strong>Muerte:</strong> churn sobre 3% mensual o comunidades que no pagan la suscripción. Si ni el software cobra bien su propia cuenta, la tesis se cae.</div>
+        </div>
+      </div>
+      <div class="hito">
+        <div class="cuando">Mes 12</div>
+        <div>
+          <h3>H4 · Cuarenta comunidades, venta repetible</h3>
+          <p>MRR ~$0,9M. Existe un playbook por canal con CAC medido bajo $150.000 y ciclo de venta promedio bajo 60 días. La venta ya no depende de contactos del fundador.</p>
+          <div class="meta"><span>caja: $32M acum.</span><span>equipo: 2 (se suma dev/CS)</span></div>
+          <div class="muerte"><strong>Muerte:</strong> CAC sostenido sobre $300.000 o ciclo promedio sobre 90 días. La venta por asamblea no cierra a tiempo (riesgo R3 de Negocio).</div>
+        </div>
+      </div>
+      <div class="hito">
+        <div class="cuando">Mes 18</div>
+        <div>
+          <h3>H5 · Noventa comunidades, el canal Pro tracciona</h3>
+          <p>MRR ~$2,1M y al menos la mitad de las altas nuevas llega vía administradores profesionales. Es cierto que el lado B ve a Prorratia como credencial y no como amenaza.</p>
+          <div class="meta"><span>caja: $52M acum.</span><span>equipo: 2,5</span></div>
+          <div class="muerte"><strong>Muerte:</strong> los administradores no adoptan (menos del 25% de las altas). Sin el canal B el crecimiento queda lineal y caro: bootstrapear chico o vender la cartera.</div>
+        </div>
+      </div>
+      <div class="hito">
+        <div class="cuando">Mes 24</div>
+        <div>
+          <h3>H6 · Punto de decisión</h3>
+          <p>150 comunidades, MRR $3,5M, quema mensual ~$0,9M y breakeven proyectado hacia el mes 27. Con esos números: levantar para acelerar LatAm, o bootstrapear a rentabilidad. Sin esos números: vender o cerrar ordenadamente, con el libro exportable de cada cliente intacto.</p>
+          <div class="meta"><span>caja total requerida: $83M</span><span>capital disponible: $55M + ingresos</span></div>
+          <div class="muerte"><strong>Muerte:</strong> MRR bajo $2M al mes 24 con los canales ya probados. Persistir sería terquedad, no convicción.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Gráficos ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Las curvas, con sus supuestos.</h2>
+
+    <div class="grid-graficos">
+      <div class="grafico">
+        <h3>MRR a 24 meses, tres escenarios</h3>
+        <p class="sub">Millones de CLP por mes. La línea verde es el caso base; los escenarios alternativos van en gris de contexto.</p>
+        <div id="chart-mrr"></div>
+        <div class="leyenda">
+          <span><i style="background:#0D5E36; height:3px;"></i>Base</span>
+          <span><i style="background:#8A9094;"></i>Optimista</span>
+          <span><i style="background:#8A9094; height:2px;"></i>Pesimista</span>
+        </div>
+        <p class="supuestos">base: cierre 25% de demos, ticket $23.500, churn 1%/mes<br>
+        pesimista: cierre 12%, churn 2%, sin canal Pro<br>
+        optimista: cada admin Pro trae 5 comunidades, churn 0,7%</p>
+        <details><summary>Ver los datos en tabla</summary><div class="scroll-x"><table id="tabla-mrr"></table></div></details>
+      </div>
+
+      <div class="grafico">
+        <h3>Embudo de adquisición (caso base)</h3>
+        <p class="sub">Por cada 100 leads calificados, en el playbook del mes 12. La restricción real del negocio es el paso por el comité.</p>
+        <div id="chart-funnel"></div>
+        <p class="supuestos">supuestos: lead = descargó plantilla y dejó contacto de comité;<br>conversiones estimadas desde los design partners, se miden en H4</p>
+        <details><summary>Ver los datos en tabla</summary><div class="scroll-x"><table id="tabla-funnel"></table></div></details>
+      </div>
+    </div>
+
+    <div class="grid-graficos grid-graficos--2">
+      <div class="grafico">
+        <h3>Flujo mensual: ingresos vs gastos</h3>
+        <p class="sub">Caso base, millones de CLP por mes. Se cruzan recién hacia el mes 27 (proyección fuera del gráfico).</p>
+        <div id="chart-flujo"></div>
+        <div class="leyenda">
+          <span><i style="background:#0D5E36;"></i>Ingresos</span>
+          <span><i style="background:#454C50;"></i>Gastos</span>
+        </div>
+        <details><summary>Ver los datos en tabla</summary><div class="scroll-x"><table id="tabla-flujo"></table></div></details>
+      </div>
+
+      <div class="grafico">
+        <h3>Caja acumulada y el valle</h3>
+        <p class="sub">Capital inicial $55M (fundador y cercanos $40M + CORFO Semilla Inicia $15M, sujeto a adjudicación). El valle queda en el propio mes 24.</p>
+        <div id="chart-caja"></div>
+        <details><summary>Ver los datos en tabla</summary><div class="scroll-x"><table id="tabla-caja"></table></div></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Probabilidad ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Probabilidad de éxito: un rango, no un aplauso.</h2>
+    <div class="prob" style="margin-top: var(--sp-l);">
+      <p class="rango">~20% a 30%</p>
+      <p style="margin-top: .5rem;"><strong>Definición de éxito:</strong> MRR ≥ $3,5M al mes 24 con economía unitaria que financie el crecimiento (H6 en verde).</p>
+      <p style="margin-top: .8rem;"><strong>1. Clase de referencia.</strong> No existe una tasa base pública para "SaaS vertical chileno llega a $42M ARR", y no la vamos a inventar. Anclas imperfectas que sí existen: la supervivencia a 5 años de las empresas nuevas en Chile ronda el 50% (registros del Ministerio de Economía; la citamos como orden de magnitud, no como cifra fina), y el benchmark de industria de que solo una minoría de los SaaS B2B que parten llega a escala de venta repetible, comúnmente estimado entre 20% y 30%. Ese segundo número es un supuesto declarado, no una cita.</p>
+      <p style="margin-top: .8rem;"><strong>2. Ajustes hacia arriba.</strong> El presupuesto ya existe (el gasto común paga administración hoy); la cuña legal tiene fecha (la ley ya rige y se fiscaliza); el churn es estructuralmente bajo una vez cargado el libro; el costo del producto es marginal para el cliente.</p>
+      <p style="margin-top: .8rem;"><strong>3. Ajustes hacia abajo.</strong> Incumbente fuerte y con marca (R2); ciclo de venta mediado por asambleas (R3); mercado de dos lados donde un lado puede sabotear (R1); TAM chileno acotado que exige LatAm para ser venture-scale.</p>
+      <p style="margin-top: .8rem;"><strong>4. Resultado.</strong> Los ajustes se compensan: nos quedamos en ~20-30%, <strong>condicional a lograr H3 (10 comunidades pagando) en el mes 8</strong>. Si H3 se cumple a tiempo, la condicional sube a ~40-50%, porque los dos riesgos de demanda ya habrían muerto y quedarían los de ejecución.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <span>Prorratia · roadmap</span>
+    <span>Escenarios movidos por supuestos declarados, no por deseo.</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+<script>
+/* Gráficos SVG a mano, según la skill dataviz:
+   grilla sólida de 1px, líneas de 2px, marcadores con anillo de superficie,
+   etiquetas directas selectivas, leyenda para 2+ series y tabla gemela. */
+(function () {
+"use strict";
+var VERDE = "#0D5E36", GRIS = "#8A9094", TINTA2 = "#454C50", GRILLA = "#C9CDCB", SUP = "#F7F8F7";
+
+var BASE = [0,0,0,0.02,0.07,0.19,0.28,0.38,0.47,0.61,0.78,0.94,1.08,1.29,1.53,1.72,1.9,2.1,2.35,2.6,2.8,3.0,3.3,3.53];
+var PES  = [0,0,0,0.02,0.05,0.09,0.14,0.19,0.23,0.28,0.35,0.42,0.5,0.59,0.68,0.76,0.85,0.94,1.02,1.08,1.15,1.2,1.25,1.3];
+var OPT  = [0,0,0,0.05,0.12,0.24,0.4,0.56,0.75,0.99,1.27,1.55,1.9,2.3,2.7,3.2,3.7,4.2,4.8,5.4,6.0,6.5,7.0,7.5];
+var GASTOS = [];
+for (var m = 0; m < 24; m++) GASTOS.push(m < 6 ? 2.2 : m < 12 ? 3.2 : m < 18 ? 4.0 : 4.4);
+var CAJA = []; var saldo = 55;
+for (var i = 0; i < 24; i++) { saldo = saldo - GASTOS[i] + BASE[i]; CAJA.push(Math.round(saldo * 10) / 10); }
+
+function lineas(id, series, opts) {
+  var w = 560, h = 240, padL = 40, padR = 74, padT = 12, padB = 30;
+  var innerW = w - padL - padR, innerH = h - padT - padB;
+  var maxY = opts.maxY, ticks = opts.ticks;
+  var x = function (i) { return padL + i * innerW / 23; };
+  var y = function (v) { return padT + innerH - (v - opts.minY) / (maxY - opts.minY) * innerH; };
+  var svg = '<svg viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="' + opts.aria + '">';
+  ticks.forEach(function (t) {
+    svg += '<line x1="' + padL + '" y1="' + y(t) + '" x2="' + (w - padR) + '" y2="' + y(t) + '" stroke="' + GRILLA + '" stroke-width="1"/>';
+    svg += '<text class="eje" x="' + (padL - 5) + '" y="' + (y(t) + 3) + '" text-anchor="end">' + t.toLocaleString("es-CL") + "</text>";
+  });
+  [0, 6, 12, 18, 23].forEach(function (i) {
+    svg += '<text class="eje" x="' + x(i) + '" y="' + (h - 8) + '" text-anchor="middle">m' + (i + 1) + "</text>";
+  });
+  if (opts.cero) svg += '<line x1="' + padL + '" y1="' + y(0) + '" x2="' + (w - padR) + '" y2="' + y(0) + '" stroke="#AEB4B2" stroke-width="1"/>';
+  series.forEach(function (s) {
+    var d = s.datos.map(function (v, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" ");
+    if (s.area) {
+      var a = d + " L" + x(23).toFixed(1) + " " + y(Math.max(opts.minY, 0)) + " L" + x(0).toFixed(1) + " " + y(Math.max(opts.minY, 0)) + " Z";
+      svg += '<path d="' + a + '" fill="' + s.color + '" opacity="0.10"/>';
+    }
+    svg += '<path d="' + d + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.grosor || 2) + '" stroke-linejoin="round" stroke-linecap="round"/>';
+    var fx = x(23), fy = y(s.datos[23]);
+    svg += '<circle cx="' + fx + '" cy="' + fy + '" r="4" fill="' + s.color + '" stroke="' + SUP + '" stroke-width="2"><title>mes 24: ' + s.datos[23].toLocaleString("es-CL") + " M</title></circle>";
+    svg += '<text class="etiqueta" x="' + (fx + 8) + '" y="' + (fy + 3.5) + '">' + s.nombre + "</text>";
+  });
+  if (opts.valle) {
+    var vx = x(23), vy = y(CAJA[23]);
+    svg += '<text class="etiqueta" x="' + (vx - 8) + '" y="' + (vy - 12) + '" text-anchor="end">valle: $' + CAJA[23].toLocaleString("es-CL") + "M</text>";
+  }
+  svg += "</svg>";
+  document.getElementById(id).innerHTML = svg;
+}
+
+lineas("chart-mrr", [
+  { nombre: "pesimista", datos: PES, color: GRIS, grosor: 2 },
+  { nombre: "optimista", datos: OPT, color: GRIS, grosor: 2 },
+  { nombre: "base", datos: BASE, color: VERDE, grosor: 2.5 }
+], { minY: 0, maxY: 8, ticks: [0, 2, 4, 6, 8], aria: "MRR mensual en tres escenarios, meses 1 a 24" });
+
+lineas("chart-flujo", [
+  { nombre: "gastos", datos: GASTOS, color: TINTA2, grosor: 2 },
+  { nombre: "ingresos", datos: BASE, color: VERDE, grosor: 2.5 }
+], { minY: 0, maxY: 5, ticks: [0, 1, 2, 3, 4, 5], aria: "Ingresos y gastos mensuales del caso base, meses 1 a 24" });
+
+lineas("chart-caja", [
+  { nombre: "caja", datos: CAJA, color: VERDE, grosor: 2.5, area: true }
+], { minY: 0, maxY: 60, ticks: [0, 15, 30, 45, 60], cero: true, valle: true, aria: "Caja acumulada del caso base, meses 1 a 24, con el valle en el mes 24" });
+
+/* Embudo: barras horizontales, rampa ordinal validada (--ordinal PASS). */
+(function () {
+  var pasos = [
+    ["Leads calificados", 100, "#57A47D"],
+    ["Demo con el comité", 38, "#2E8A60"],
+    ["Propuesta en comité o asamblea", 22, "#14714A"],
+    ["Comunidad activa", 14, "#0D5E36"]
+  ];
+  var w = 560, filaH = 46, padT = 6, h = pasos.length * filaH + padT + 8;
+  var maxW = 322, xIni = 218;
+  var svg = '<svg viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="Embudo de adquisición: de 100 leads a 14 comunidades activas">';
+  pasos.forEach(function (p, i) {
+    var yTop = padT + i * filaH;
+    var bw = Math.max(6, p[1] / 100 * maxW);
+    svg += '<text class="eje" x="' + (xIni - 8) + '" y="' + (yTop + 21) + '" text-anchor="end" style="font-size:10.5px; fill:#24282B;">' + p[0] + "</text>";
+    svg += '<rect x="' + xIni + '" y="' + (yTop + 6) + '" width="' + bw + '" height="22" rx="3" fill="' + p[2] + '"><title>' + p[0] + ": " + p[1] + " de cada 100</title></rect>";
+    svg += '<text class="etiqueta" x="' + (xIni + bw + 7) + '" y="' + (yTop + 21) + '">' + p[1] + (i ? " · " + Math.round(p[1] / pasos[i - 1][1] * 100) + "%" : "") + "</text>";
+  });
+  svg += "</svg>";
+  document.getElementById("chart-funnel").innerHTML = svg;
+  document.getElementById("tabla-funnel").innerHTML =
+    "<thead><tr><th>Etapa</th><th class='num'>De cada 100</th><th class='num'>Conversión</th></tr></thead><tbody>" +
+    pasos.map(function (p, i) {
+      return "<tr><td>" + p[0] + "</td><td class='num'>" + p[1] + "</td><td class='num'>" + (i ? Math.round(p[1] / pasos[i - 1][1] * 100) + "%" : "100%") + "</td></tr>";
+    }).join("") + "</tbody>";
+})();
+
+/* Tablas gemelas */
+function tabla(id, cab, filas) {
+  document.getElementById(id).innerHTML =
+    "<thead><tr>" + cab.map(function (c) { return "<th class='num'>" + c + "</th>"; }).join("") + "</tr></thead><tbody>" +
+    filas.map(function (f) { return "<tr>" + f.map(function (v) { return "<td class='num'>" + v + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody>";
+}
+var meses = [3, 6, 9, 12, 15, 18, 21, 24];
+tabla("tabla-mrr", ["Mes", "Pesimista", "Base", "Optimista"], meses.map(function (m) {
+  return ["m" + m, PES[m - 1].toLocaleString("es-CL") + "M", BASE[m - 1].toLocaleString("es-CL") + "M", OPT[m - 1].toLocaleString("es-CL") + "M"];
+}));
+tabla("tabla-flujo", ["Mes", "Ingresos", "Gastos"], meses.map(function (m) {
+  return ["m" + m, BASE[m - 1].toLocaleString("es-CL") + "M", GASTOS[m - 1].toLocaleString("es-CL") + "M"];
+}));
+tabla("tabla-caja", ["Mes", "Caja"], meses.map(function (m) {
+  return ["m" + m, "$" + CAJA[m - 1].toLocaleString("es-CL") + "M"];
+}));
+})();
+</script>
+</body>
+</html>

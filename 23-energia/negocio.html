@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Tarifana</title>
+<meta name="description" content="Plan de negocio de Tarifana: cliente objetivo, tamaño de mercado con la aritmética a la vista, precios, canales de adquisición en Chile y el test del LLM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cabecera { padding-block: var(--sp-xl); }
+  .cabecera h1 { max-width: 18ch; }
+  .bloque { padding-block: var(--sp-l); border-top: 1px solid var(--linea); }
+  .bloque h2 { max-width: 26ch; margin-bottom: var(--sp-m); }
+  .bloque h3 { margin-bottom: var(--sp-2xs); }
+  .aritmetica { font-family: var(--mono); font-size: .78rem; line-height: 1.9; background: var(--panel); border: 1px solid var(--linea); border-left: 4px solid var(--amarillo); padding: var(--sp-s) var(--sp-m); overflow-x: auto; white-space: pre-wrap; }
+  .dos-col { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .dos-col { grid-template-columns: 1fr 1fr; } }
+  .canal { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); padding-block: var(--sp-s); border-top: 1px solid var(--linea); }
+  .canal:last-child { border-bottom: 1px solid var(--linea); }
+  .canal .n { font-family: var(--mono); font-weight: 600; font-size: 1rem; width: 2rem; height: 2rem; display: grid; place-items: center; background: var(--tinta); color: var(--amarillo); flex: none; }
+  .canal p { font-size: var(--step--1); color: var(--tinta-2); max-width: 66ch; }
+  .llm-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .llm-grid { grid-template-columns: 1fr 1fr; } }
+  .llm-grid .placa h3 { display: flex; align-items: center; gap: .6rem; }
+  .llm-grid .placa p { font-size: var(--step--1); color: var(--tinta-2); margin-top: .4rem; }
+  .riesgo { border-left: 4px solid var(--alerta); }
+</style>
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" stroke="#12161a" stroke-width="1.8"/>
+        <path d="M13.2 4.5 8.5 13h3.4l-1.1 6.5 4.7-8.5h-3.4l1.1-6.5Z" fill="#f6c700" stroke="#12161a" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      TARIFANA
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <nav class="nav-drawer" id="menu" data-nav-drawer aria-label="Principal móvil">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html" aria-current="page">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html">Arquitectura</a>
+  </nav>
+</header>
+
+<main class="container">
+
+<section class="cabecera">
+  <h1>El negocio: cobrar poco por vigilar, y un pedazo de lo que aparece.</h1>
+  <p class="lede" style="margin-top:var(--sp-s);">Regla de este documento: toda cifra viene citada o etiquetada como estimación con su aritmética mostrada. Ninguna otra clase de número está permitida aquí.</p>
+</section>
+
+<section class="bloque" id="icp">
+  <h2>Cliente objetivo</h2>
+  <div class="dos-col">
+    <div>
+      <h3>Quién es</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2);">PYME <strong>electrointensiva y regulada</strong>: panadería industrial, frigorífico, taller metalmecánico, hotel, minimarket o supermercado de barrio con cámaras de frío. Entre 5 y 80 empleados, cliente BT o AT de una distribuidora (Enel, CGE, Chilquinta y regionales), con cuenta de electricidad entre <span class="mono">$800.000</span> y <span class="mono">$8.000.000</span> al mes. Es de los tres mayores gastos del negocio después de sueldos e insumos, y nadie lo administra.</p>
+    </div>
+    <div>
+      <h3>Quién firma y quién lo usa</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2);">Firma el dueño o el administrador; en las medianas, la jefa de administración y finanzas. Lo "usa" casi nadie, y ese es el diseño: reenvía un PDF una vez al mes (o le damos acceso de lectura a la oficina virtual) y recibe un veredicto por WhatsApp o correo. Dónde está hoy: en el gremio (Fechipan, ASIMET, hoteleros), en el grupo de WhatsApp de proveedores, y en la cartera de su contador.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="mercado">
+  <h2>Tamaño de mercado, con la aritmética a la vista</h2>
+  <div class="aritmetica">
+TAM Chile (anual)
+  Empresas pequeñas y medianas formales:      ~260.000
+    (orden de magnitud de las estadísticas de empresas del SII;
+     estimación, no cifra citada al decimal)
+  Con cuenta eléctrica &gt; $800.000/mes:        ~13% = ~34.000
+    (supuesto declarado: rubros con frío, hornos o motores;
+     panaderías ~5.000, alojamiento ~6.000, metalmecánica y
+     alimentos ~8.000, comercio con frío ~15.000, estimaciones)
+  ARPU año 1 por cliente:                     $768.000
+    ($39.000/mes promedio × 12 + $312.000 de variable esperado*)
+  TAM = 34.000 × $768.000                     = $26.112 millones/año
+                                              (~US$27M a $950/USD)
+
+SAM  Zonas de concesión donde partimos (Enel + CGE + Chilquinta,
+     ~85% de los clientes regulados, estimación):
+     34.000 × 0,85 = ~29.000 empresas         = $22.272 millones/año
+
+SOM  Meta a 24 meses (roadmap, escenario base):
+     170 clientes = 0,59% del SAM             = $130,6 millones/año run-rate
+
+* variable esperado = 60% de clientes con hallazgo material
+  × $2.600.000 de ahorro/año promedio × 20% = $312.000 (supuestos
+  declarados; el caso del demo, $4,6M de ahorro, está sobre el promedio)</div>
+  <p class="nota" style="margin-top:var(--sp-s);">Extensión posterior: los mercados con tarifas reguladas por opción y medición de punta parecidos al chileno (Perú, Colombia, Ecuador) comparten la mecánica; el motor cambia de pliego, no de lógica. No se cuenta en el TAM de arriba.</p>
+</section>
+
+<section class="bloque" id="cuna">
+  <h2>Posicionamiento y cuña de entrada</h2>
+  <div class="dos-col">
+    <div class="placa placa-borde">
+      <h3>La cabecera de playa: panaderías industriales</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;">Hornos más cámaras de frío: intensidad eléctrica alta con perfil horario "raro" (madrugada), que es exactamente donde las opciones horarias dejan plata sobre la mesa. Es un rubro agremiado (Fechipan y asociaciones regionales), concentrado en pocas comunas industriales, donde los dueños se conocen y una charla con tres casos en pesos verificados corre sola. El demo entero está construido sobre este perfil a propósito.</p>
+    </div>
+    <div class="placa">
+      <h3>El posicionamiento</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;">"El que te lee la cuenta de la luz". No somos consultora de eficiencia energética, no vendemos paneles, no instalamos nada. Un documento que ya recibes, leído completo por primera vez, con un veredicto mensual y cartas que la distribuidora está obligada a procesar. La honestidad es el producto: el veredicto "todo en orden" se entrega igual de orgulloso que el hallazgo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="competencia">
+  <h2>Competencia real, con nombre</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Quién</th><th>Qué es</th><th>Diferencia honesta</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>No hacer nada</strong></td>
+          <td>El verdadero titular del puesto: la boleta se paga por transferencia programada y nadie la abre.</td>
+          <td>Nuestro primer competidor no cobra. Por eso el diagnóstico inicial es gratis y llega en pesos, no en kWh: hay que hacer visible el costo del statu quo.</td>
+        </tr>
+        <tr>
+          <td><strong>Consultores tarifarios y de eficiencia</strong> (ingenieros independientes, consultoras tipo Efizity y similares)</td>
+          <td>Estudios tarifarios y gestión de energía para industria y clientes libres.</td>
+          <td>Atienden cuentas grandes: su modelo de horas-hombre no baja rentablemente a una cuenta de $3M. Y venden estudios puntuales, no vigilancia mensual. En cuentas sobre ~$20M derivamos nosotros a ellos.</td>
+        </tr>
+        <tr>
+          <td><strong>La distribuidora</strong> (Enel, CGE, Chilquinta)</td>
+          <td>Tiene todos los datos y procesa los cambios de opción.</td>
+          <td>Incentivo invertido: cada peso de ahorro del cliente es margen que pierde. Cumple si se lo piden; no avisa.</td>
+        </tr>
+        <tr>
+          <td><strong>Gestores de energía con hardware</strong> (Enel X, Schneider y medidores inteligentes)</td>
+          <td>Monitoreo en tiempo real con equipos instalados.</td>
+          <td>Miden consumo, no leen la boleta ni el pliego: te dicen cuánto gastas, no si te están cobrando bien. Ticket y fricción de instalación altos para PYME. Somos complementarios.</td>
+        </tr>
+        <tr>
+          <td><strong>El contador</strong></td>
+          <td>Ve la factura todos los meses para contabilizarla.</td>
+          <td>La registra como gasto, no la audita: no es su pega ni tiene el pliego. Por eso es canal, no competencia: puede revender el servicio con comisión.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="bloque" id="economia">
+  <h2>Precio y economía unitaria</h2>
+  <p class="nota">Planes: Medidor $24.000, Tablero $44.000, Subestación $79.000 mensuales, más 20% del ahorro verificado durante los primeros 12 meses de cada hallazgo (detalle en <a href="index.html#precios">Producto</a>). Los números de abajo cuadran con el costo de IA e infraestructura declarado en <a href="stack.html">Arquitectura</a>.</p>
+  <div class="aritmetica" style="margin-top:var(--sp-s);">
+Ticket promedio (mix de planes, supuesto):        $39.000/mes
+Costo variable por cliente/mes (stack.html):
+  inferencia IA $240 + WhatsApp/correo/almacen.   ~$900
+Margen bruto unitario: (39.000 - 900)/39.000      = 97,7%
+  usamos 95% en el LTV para absorber reprocesos   → 95%
+Infra fija (stack.html): $114.000/mes; a 100
+  clientes son $1.140/cliente (se diluye sola)
+
+CAC (estimación con aritmética):
+  20 h de fundador por cliente cerrado × $6.000/h = $120.000
+  + ads y herramientas prorrateadas               =  $60.000
+  CAC                                             = $180.000
+Payback del CAC: 180.000 / (39.000 × 0,95)        = 4,9 meses
+  (el variable del primer hallazgo suele pagarlo antes)
+
+Churn mensual (supuesto base):                    2,5%
+LTV (solo mensualidades): 39.000 × 0,95 / 0,025   = $1.482.000
+LTV/CAC                                           = 8,2
+LTV con variable (60% × $520.000 de fee año 1)*   = $1.794.000
+* fee promedio de hallazgo $2,6M × 20% = $520.000</div>
+  <p class="nota" style="margin-top:var(--sp-s);">La trampa conocida del modelo: si la tasa de hallazgo material resulta muy inferior al 60% supuesto, el variable no aparece y el negocio queda parado solo sobre mensualidades chicas. Ese supuesto se valida o se muere en el hito 1 del <a href="roadmap.html">roadmap</a>.</p>
+</section>
+
+<section class="bloque" id="canales">
+  <h2>Canales de adquisición, rankeados</h2>
+  <div>
+    <div class="canal">
+      <span class="n">1</span>
+      <div>
+        <h3>Contadores y software PYME</h3>
+        <p>El contador contabiliza la factura de luz todos los meses: ya la tiene en la mano. Programa de referidos con 20% de la mensualidad del primer año ($93.600 por cliente Tablero) y, más adelante, integración con Defontana, Nubox y Bsale para detectar clientes con gasto eléctrico alto y ofrecer el diagnóstico desde ahí. Es el canal con el CAC más bajo y el único que escala sin nosotros.</p>
+      </div>
+    </div>
+    <div class="canal">
+      <span class="n">2</span>
+      <div>
+        <h3>Gremios: Fechipan, ASIMET, hoteleros, ASECH</h3>
+        <p>Una charla de 40 minutos ("aprende a leer tu boleta") con diagnóstico gratis en el momento: el asistente saca la foto de su boleta y se va con el veredicto. Convenio de beneficio para socios. Los tres primeros casos verificados en pesos son el material de la charla.</p>
+      </div>
+    </div>
+    <div class="canal">
+      <span class="n">3</span>
+      <div>
+        <h3>Outbound quirúrgico por WhatsApp y LinkedIn</h3>
+        <p>A rubros electrointensivos por comuna industrial (Quilicura, Cerrillos, San Bernardo, Concón). El gancho no es una reunión: es "mándanos tu última boleta y te decimos gratis si hay algo". El costo de responder es una foto. Meta: 50 contactos/semana, tasa boleta recibida 20-30% (por validar en los primeros 90 días).</p>
+      </div>
+    </div>
+    <div class="canal">
+      <span class="n">4</span>
+      <div>
+        <h3>SEO long-tail + calculadora pública</h3>
+        <p>Nadie escribe en español chileno sobre "cambio de opción tarifaria BT4.3", "recargo por energía reactiva" o "por qué subió la cuenta de luz de mi negocio". Una calculadora gratuita (el widget de la landing, ampliado) como imán: metes tu boleta, ves el veredicto resumido, el detalle pide correo.</p>
+      </div>
+    </div>
+    <div class="canal">
+      <span class="n">5</span>
+      <div>
+        <h3>Google Ads sobre esas mismas búsquedas</h3>
+        <p>Volumen bajo pero intención altísima y sin competencia de avisadores. CPL estimado $8.000-15.000 (estimación: keywords de nicho en es-CL; se mide en los primeros 90 días y se publica el real).</p>
+      </div>
+    </div>
+    <div class="canal">
+      <span class="n">6</span>
+      <div>
+        <h3>Mercado Público: todavía no</h3>
+        <p>Municipalidades, colegios y hospitales tienen exactamente este problema multiplicado, pero el ciclo de venta B2G no es para el año 1. Queda anotado para la fase de escala.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="ia-marketing">
+  <h2>IA en el marketing mismo: dónde sí y dónde no</h2>
+  <div class="dos-col">
+    <div class="placa">
+      <h3>Sí, con nombre y apellido</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;">(1) El diagnóstico gratis: Claude redacta el veredicto en lenguaje de dueño de panadería a partir de los números que entrega el motor; es lo que permite prometer "respuesta el mismo día" sin un analista. (2) Personalización del outbound con datos públicos (rubro, comuna, distribuidora de la zona). (3) Borradores de las guías SEO técnicas, siempre con revisión humana antes de publicar.</p>
+    </div>
+    <div class="placa riesgo">
+      <h3>No, y es una regla</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;">(1) Ninguna cifra de marketing sale de un modelo: todo peso citado en un correo, charla o aviso viene del motor o del libro de ahorro. (2) Nada de contenido regulatorio publicado sin revisión: citar mal un decreto una sola vez mata la credibilidad que es todo el producto. (3) Nada de "agentes vendedores" autónomos por WhatsApp: el dueño de PYME detecta el bot y no le manda su boleta.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="llm">
+  <h2>El test del LLM: ¿por qué esto no lo hace ChatGPT?</h2>
+  <p class="nota">La pregunta que hay que hacerle a toda idea de esta era. Respuesta en cuatro partes, que son las cuatro fosas del castillo.</p>
+  <div class="llm-grid" style="margin-top:var(--sp-m);">
+    <div class="placa placa-borde">
+      <h3><svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3" stroke="#12161a" stroke-width="1.6"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6" stroke="#12161a" stroke-width="1.6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" stroke="#f6c700" stroke-width="2"/></svg> El dato</h3>
+      <p>Los cuadros tarifarios de cada decreto, por distribuidora y comuna, con sus reajustes: eso no vive confiable dentro de un modelo. Pídele a un chat el cargo por demanda de punta BT4.3 vigente y te dará un número plausible, que es peor que ninguno. Tarifana mantiene los pliegos versionados desde la fuente, con doble validación de ingesta.</p>
+    </div>
+    <div class="placa placa-borde">
+      <h3><svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#12161a" stroke-width="1.6"/><path d="M12 7.5V12l3 2.5" stroke="#f6c700" stroke-width="2" stroke-linecap="round"/></svg> La vigilancia</h3>
+      <p>El valor no está en la respuesta: está en el mes 7, cuando a nadie se le ocurre preguntar y la boleta llega igual. Un chat espera la pregunta; Tarifana lee la boleta aunque todos se hayan olvidado, y por diseño se olvidan: para eso pagan.</p>
+    </div>
+    <div class="placa placa-borde">
+      <h3><svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" stroke="#12161a" stroke-width="1.6"/><path d="M7.5 7.5h9M7.5 11h4" stroke="#12161a" stroke-width="1.5" stroke-linecap="round"/><path d="m7.5 16 2.5 2.5L16.5 12" stroke="#f6c700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> El determinismo</h3>
+      <p>Simular cinco opciones tarifarias sobre 12 meses de consumo es aritmética regulada, y con ella se redactan cartas con efectos legales. Aquí el modelo tiene prohibido calcular: extrae campos y redacta; el motor codificado hace el 100% de los números y se autovalida cuadrando el total de la boleta real al peso. Un LLM que calcula tarifas "casi bien" es una demanda esperando fecha.</p>
+    </div>
+    <div class="placa placa-borde">
+      <h3><svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4Z" stroke="#12161a" stroke-width="1.6"/><path d="M8 9h8M8 13h5" stroke="#12161a" stroke-width="1.5" stroke-linecap="round"/><path d="M4 4v13a3 3 0 0 0 3 3" stroke="#f6c700" stroke-width="2"/></svg> El libro</h3>
+      <p>El libro de ahorro verificado acumula: cada mes, cada carta, cada refacturación, auditables línea por línea. Ese historial es la prueba de valor para renovar, el material de venta para el siguiente cliente del gremio, y un activo que una conversación con un chat no construye nunca.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="90dias">
+  <h2>Primeros 90 días</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Semanas</th><th>Qué pasa</th><th>Sale bien si</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">1-2</td><td>Motor tarifario con los pliegos reales de Enel, CGE y Chilquinta. Validación contra 20 boletas reales conseguidas entre conocidos: la reconstrucción debe cuadrar al peso.</td><td>20 de 20 boletas cuadran o la diferencia está explicada.</td></tr>
+        <tr><td class="mono">3-4</td><td>10 design partners gratis (panaderías vía contactos y Fechipan). Diagnóstico completo a cada uno.</td><td>6 o más tienen hallazgo material (valida el supuesto del 60%).</td></tr>
+        <tr><td class="mono">5-8</td><td>Cartas reales enviadas para al menos 3 design partners. Landing con calculadora pública. Parte el outbound: 50 WhatsApp/semana.</td><td>Primer cambio de opción aplicado en una boleta real: primer peso verificado.</td></tr>
+        <tr><td class="mono">9-12</td><td>Convertir design partners a pago. Primera charla gremial con los casos en pesos. Dos contadores aliados firmados.</td><td>5 clientes pagando y tasa boleta-recibida del outbound sobre 15%.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="bloque" id="riesgos">
+  <h2>Qué mataría esto</h2>
+  <div class="dos-col">
+    <div class="placa riesgo">
+      <h3>El riesgo que mata: la reforma tarifaria</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;">La modernización tarifaria en curso (medidores inteligentes, tarifas más dinámicas) podría terminar asignando la opción óptima automáticamente, u obligando a las distribuidoras a recomendarla. Ese día el hallazgo principal desaparece. Mitigación parcial: quedarían la fiscalización de errores, la reactiva y el libro; pero el negocio se achica. Este riesgo tiene criterio de muerte propio en el roadmap y hay que monitorear cada proceso tarifario de la CNE.</p>
+    </div>
+    <div class="placa riesgo">
+      <h3>Los otros dos honestos</h3>
+      <p style="font-size:var(--step--1); color:var(--tinta-2); margin-top:.4rem;"><strong>La indiferencia:</strong> que $300.000 al mes no duelan lo suficiente para firmar una carta. Se mide en los 90 días con la tasa de conversión diagnóstico-con-hallazgo a cliente: bajo 25%, el dolor no alcanza. <strong>La tasa de hallazgo:</strong> si menos del 40% de las boletas tiene hallazgo material, el variable no financia el modelo y esto se convierte en un SaaS de $24.000 con mercado angosto: se mata o se repiensa el precio.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <strong style="color:#fff;">TARIFANA</strong> · Plan de negocio del prototipo. Supuestos declarados donde se usan.
+    </div>
+    <div class="mono" style="font-size:.72rem;">
+      <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

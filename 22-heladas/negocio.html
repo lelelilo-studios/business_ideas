@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rondalba · Negocio: mercado, precios y canales</title>
+<meta name="description" content="Plan de negocio de Rondalba: cliente objetivo, tamaño de mercado con la aritmética a la vista, competencia real, economía unitaria y canales de venta en Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html" aria-label="Rondalba, inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/><path d="M12 12V6.5"/><path d="M12 12h4.5"/>
+      </svg>
+      Rondalba
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">&larr; Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container doc">
+  <header class="encabezado">
+    <h1>Negocio</h1>
+    <p style="margin-top: var(--sp-s); color: var(--escarcha-2); max-width: 60ch;">Toda cifra de esta página está citada o etiquetada como estimación con su aritmética mostrada. Los costos de infraestructura e inferencia salen de <a href="stack.html">Arquitectura</a> y las dos páginas cuadran entre sí.</p>
+  </header>
+
+  <h2 id="icp">Cliente objetivo (ICP)</h2>
+  <p><strong>Productor mediano de fruta de exportación: 10 a 200 hectáreas</strong>, con cerezos, kiwis, uva de mesa o nogales en zonas de helada de radiación (valle central e interior de O'Higgins, Maule y Ñuble). Ya invirtió en control de heladas (torres de viento, aspersión, calefactores) o perdió fruta por no tenerlo.</p>
+  <ul>
+    <li><strong>Quién firma:</strong> el dueño en campos de 10 a 60 ha; el administrador con presupuesto delegado en campos mayores y sociedades agrícolas.</li>
+    <li><strong>Quién lo usa:</strong> el administrador, el nochero de temporada y el propio dueño (el teléfono de la madrugada suele ser el suyo).</li>
+    <li><strong>Dónde está hoy:</strong> en el grupo de WhatsApp del asesor, en Cherry Tech y Expo Chile Agrícola, comprando en la casa de insumos de Curicó o San Fernando. De noche: con despertador a las 02:00.</li>
+    <li><strong>Fuera del ICP (por ahora):</strong> parceleros bajo 10 ha (ticket no paga la visita), agroindustriales sobre 500 ha (tienen meteorólogo interno o exigen integración a su ERP) y cultivos anuales de bajo valor por hectárea.</li>
+  </ul>
+
+  <h2 id="mercado">Tamaño de mercado</h2>
+  <p>Supuestos declarados: la superficie frutícola nacional ronda las <strong>490 mil ha</strong> (Catastro Frutícola CIREN-ODEPA, agregado de actualizaciones regionales, cifra redondeada) y el cerezo supera las <strong>70 mil ha</strong> como frutal más plantado (ODEPA, cifra gruesa). El resto de la derivación es estimación nuestra y se muestra.</p>
+  <div class="aritmetica">
+<b>TAM Chile</b> (heladas de primavera, especies sensibles)<br>
+~50% de la superficie frutícola con riesgo real de helada de radiación<br>
+= 245.000 ha &times; $30.000/ha promedio = <b>$7.350M CLP/año (~US$7,7M)</b><br>
+<br>
+<b>SAM</b> (O'Higgins + Maule + Ñuble, campos de 10 a 200 ha)<br>
+cerezo entre O'Higgins y Maule (&gt;50% del nacional): ~42.000 ha<br>
++ kiwi (Maule concentra) ~6.000 + uva interior y nogal sensible ~22.000<br>
+= 70.000 ha &times; $30.000 = <b>$2.100M CLP/año</b><br>
+<br>
+<b>SOM a 24 meses</b> (escenario base del roadmap)<br>
+75 campos &times; 40 ha promedio = 3.000 ha &times; $25.000 efectivo<br>
+= <b>$75M por temporada</b> (3,6% del SAM)
+  </div>
+  <p style="margin-top: var(--sp-s);">Lo decimos sin maquillaje: <strong>este es un negocio de nicho en Chile</strong>. US$8M de TAM no financia una empresa de venture capital; financia una empresa rentable y enfocada. La extensión natural multiplica el techo: Argentina (Valle de Uco y Alto Valle), Perú (arándano y palto), y más lejos California y España tienen el mismo problema con la misma física. La decisión de expandir o quedarse chico es el punto de salida del mes 24 en el <a href="roadmap.html">roadmap</a>.</p>
+
+  <h2 id="cuna">Posicionamiento y cuña</h2>
+  <p>Posicionamiento: <strong>el turno de noche del campo</strong>. No vendemos "plataforma agtech" ni "monitoreo satelital": vendemos que alguien conteste el teléfono a las 2:30 y encienda el equipo correcto en el cuartel correcto.</p>
+  <p>La cabecera de playa: <strong>cereceros de 20 a 80 ha entre San Fernando y Longaví que ya tienen torres o aspersión</strong>. Por qué ese segmento primero:</p>
+  <ul>
+    <li>El dolor está monetizado: ya gastaron $30M o más por torre; el fierro sin gatillo oportuno es plata dormida.</li>
+    <li>La cereza es el cultivo donde una noche vale más ($15M a $30M de venta por ha en plena producción, estimación gruesa de rangos públicos de la industria) y donde la flor de septiembre coincide exactamente con las heladas de radiación.</li>
+    <li>Es un rubro hiperlocal y conversador: la torre del vecino se escucha a las 3 AM. Un piloto que funcione se vende solo en un radio de 20 km.</li>
+  </ul>
+
+  <h2 id="competencia">Competencia</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Quién</th><th>Qué ofrece</th><th>Precio referencial</th><th>Diferencia honesta</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>El despertador y el termómetro</td>
+          <td>El titular real del puesto: el productor se levanta a mirar</td>
+          <td class="num">$0</td>
+          <td>Gratis y agotador. Falla la noche 7 de la temporada, cuando el cuerpo no da más. No deja registro.</td>
+        </tr>
+        <tr>
+          <td>Alarmas de temperatura simples (GSM o sirena, casas de insumos)</td>
+          <td>Un punto de medición que suena o manda SMS al cruzar un umbral</td>
+          <td class="num">$120.000 a $350.000 una vez</td>
+          <td>Sin pronóstico (avisa cuando ya está helando), un solo punto, y un SMS a las 3 AM no despierta a nadie. Sin historia.</td>
+        </tr>
+        <tr>
+          <td>Plataformas agtech con estaciones (Wiseconn DropControl, Instacrops)</td>
+          <td>Riego y clima con alertas push/SMS; foco en agronomía general</td>
+          <td class="num">$1,5M a $3M por estación más suscripción (estimación de mercado)</td>
+          <td>Buenas plataformas, pero la helada es una alerta más entre veinte. No llaman ni escalan, y la densidad por cuartel sale cara con estaciones completas. Riesgo real: podrían copiarnos la llamada; nuestra defensa es el foco y el libro acumulado.</td>
+        </tr>
+        <tr>
+          <td>Asesores agroclimáticos por WhatsApp</td>
+          <td>Boletín de riesgo por zona, la tarde anterior</td>
+          <td class="num">$150.000 a $300.000 por temporada</td>
+          <td>Valioso y barato, pero es un pronóstico por comuna: no mide el cuartel, no llama de madrugada, no registra. Los queremos de canal, no de rival.</td>
+        </tr>
+        <tr>
+          <td>Agromet (INIA) y DMC</td>
+          <td>Estaciones públicas y pronóstico nacional, gratis</td>
+          <td class="num">$0</td>
+          <td>Nuestra propia materia prima. La estación queda a 10 o 20 km del cuartel: sirve de contexto, no de alarma.</td>
+        </tr>
+        <tr>
+          <td>Seguro agrícola (con subsidio Agroseguros)</td>
+          <td>Indemniza parte de la pérdida, después</td>
+          <td class="num">Prima anual variable</td>
+          <td>No evita el daño ni salva la temporada comercial. Es complemento: nuestra bitácora es la evidencia que el liquidador pide.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="precio">Precio y economía unitaria</h2>
+  <p>Dos planes por temporada (agosto a noviembre): <strong>Ronda</strong> a $28.000/ha (mínimo $290.000 por campo) y <strong>Ronda Completa</strong> a $42.000/ha (mínimo $450.000), hardware en comodato. El detalle de qué incluye cada uno está en la <a href="index.html#precios">página de producto</a>. La unidad de análisis es el campo tipo: 40 ha en plan Ronda.</p>
+  <div class="aritmetica">
+<b>Campo tipo: 40 ha, plan Ronda, temporada 2027</b><br>
+Ingreso: 40 &times; $28.000 = <b>$1.120.000</b> (prepago a la firma, jun-jul)<br>
+<br>
+Costos directos por campo-temporada:<br>
+&nbsp; hardware amortizado ........... $219.000<br>
+&nbsp;&nbsp;&nbsp; (12 nodos &times; $58.000 + gateway $180.000 = $876.000, a 4 temporadas)<br>
+&nbsp; instalación, retiro, mantención $150.000 (1,5 jornadas técnico + viáticos, estimación)<br>
+&nbsp; conectividad 4G gateway ....... $72.000 ($6.000/mes &times; 12, estimación plan IoT)<br>
+&nbsp; llamadas, SMS y WhatsApp ...... $35.000 (aritmética en <a href="stack.html#costos">stack</a>)<br>
+&nbsp; inferencia IA ................. $5.000 (stack calcula ~$3.500; colchón)<br>
+&nbsp; infraestructura prorrateada ... $15.000<br>
+Total costo directo ............... $496.000<br>
+<b>Margen bruto: $624.000 por campo-temporada (56%)</b><br>
+<br>
+<b>CAC estimado: $350.000</b> = 3 visitas a terreno por cierre &times; $60.000<br>
+&nbsp; + $100.000 de tiempo comercial + $70.000 de ferias y material prorrateado<br>
+<b>LTV: ~$2,2M</b> = margen $624.000 &times; 3,5 temporadas de vida media<br>
+&nbsp; (supuesto: 15% de no-renovación anual; upsell a Ronda Completa no contado)<br>
+<b>LTV/CAC ~6. Payback: dentro de la primera temporada</b>, porque el prepago<br>
+de la firma llega antes de comprar el hardware de ese campo.
+  </div>
+  <p class="nota" style="margin-top: var(--sp-m);">La estacionalidad es la trampa de caja de este negocio: se vende en invierno, se cobra a la firma y se gasta hardware e instalación antes de la primera helada. El prepago no es una preferencia comercial, es la condición de sobrevivencia. El valle de caja está dibujado en el <a href="roadmap.html">roadmap</a>.</p>
+
+  <h2 id="canales">Canales de adquisición, rankeados</h2>
+  <ol>
+    <li><strong>Asesores agrícolas y agrónomos consultores.</strong> El productor mediano le cree a su asesor, no a un aviso. Comisión del 10% de la primera temporada por campo referido, y el asesor recibe acceso a la bitácora de sus clientes (le sirve para su propio trabajo). Meta: 8 asesores activos al invierno 2027.</li>
+    <li><strong>Referidos hiperlocales.</strong> Evento "venga a ver la bitácora" en el campo piloto tras cada helada importante: los vecinos escucharon la torre a las 3 AM y quieren saber por qué partió sola. Es el canal más barato y el más creíble.</li>
+    <li><strong>Gremios y ferias del rubro.</strong> Comité de Cerezas de Frutas de Chile, Fedefruta, Cherry Tech en Curicó, Expo Chile Agrícola. No para vender en el stand: para juntar los 60 números de WhatsApp que se visitan en invierno.</li>
+    <li><strong>Distribuidores de torres y riego.</strong> Quien vende la torre de $30M no tiene qué ofrecer para encenderla a tiempo: nos suma valor a su venta. Acuerdo de co-oferta con 1 o 2 dealers regionales.</li>
+    <li><strong>Outbound por WhatsApp y LinkedIn</strong> a administradores de sociedades agrícolas (listas armadas desde directorios de exportadoras y catastro público). Mensaje corto con el parte de SU comuna adjunto.</li>
+    <li><strong>SEO long-tail en español.</strong> "temperatura crítica flor cerezo", "alarma heladas kiwi", "pronóstico helada Curicó": contenido técnico con tablas de umbrales, revisado por agrónomo. Cosecha lenta, intención altísima.</li>
+    <li><strong>Google y Meta estacionales</strong> (junio a agosto, solo regiones objetivo). CPL estimado $8.000 a $15.000 (estimación, sin histórico propio; se valida con $500.000 de prueba el primer invierno).</li>
+  </ol>
+  <p>Mercado Público no aplica: el comprador es privado. Contadores y software PYME tampoco: la decisión es agronómica, no contable.</p>
+
+  <h2 id="test-llm">El test del LLM</h2>
+  <p>La prueba ácida del repositorio: ¿por qué esto no lo resuelve el productor preguntándole a ChatGPT?</p>
+  <ul>
+    <li><strong>ChatGPT no hace vigilia.</strong> Puede explicar qué temperatura daña la flor, pero a las 02:47 de un martes no está mirando el cuartel de nadie. La mitad del producto es un sensor barato en el bajo junto al estero y un proceso que no duerme. <em>Vigilancia continua.</em></li>
+    <li><strong>ChatGPT no llama por teléfono.</strong> No marca el número del nochero, no insiste tres veces, no escala al dueño, no hace sonar una sirena en el campo. El valor está en despertar a un humano y decirle qué encender. <em>Actuación sobre el mundo.</em></li>
+    <li><strong>ChatGPT no acumula el libro.</strong> La historia de frío de un cuartel específico (predicho, medido, actuado, salvado, noche tras noche) no existe en ningún corpus: se construye estando ahí. Con dos temporadas, ese libro calibra el modelo local y vale para el seguro y el replante. <em>El libro.</em></li>
+  </ul>
+  <p>El LLM sí es un ingrediente: redacta el parte de las 20:00, el guión de voz y el borrador del informe post evento (modelos y costos en <a href="stack.html#agentes">Arquitectura</a>). Pero si mañana los LLM fueran gratis y perfectos, este negocio quedaría intacto: lo defendible es el fierro en el cuartel, la llamada que insiste y los datos que solo nosotros tenemos.</p>
+
+  <h2 id="ia-marketing">IA en el marketing mismo</h2>
+  <p>Dónde ayuda de verdad:</p>
+  <ul>
+    <li><strong>El parte de demostración.</strong> Durante julio, a cada prospecto le mandamos por WhatsApp el parte nocturno de SU comuna, generado desde datos públicos de Agromet y DMC con Claude Haiku. Costo marginal cercano a cero, y el producto se demuestra solo antes de comprar. Es nuestra mejor arma de venta y es IA de punta a punta.</li>
+    <li><strong>Contenido SEO técnico.</strong> Borradores de tablas de umbrales por especie y variedad, siempre revisados por agrónomo antes de publicar (un umbral malo publicado destruye la credibilidad que vendemos).</li>
+    <li><strong>Primera respuesta en WhatsApp comercial</strong> fuera de horario, con derivación a humano al primer indicio de visita.</li>
+  </ul>
+  <p>Dónde no: la visita a terreno, el cierre y la relación de postventa. Este cliente compra confianza de bototos embarrados; automatizar eso no es una opción, es un suicidio comercial. "IA en todo" no es una respuesta aceptable y aquí no la usamos.</p>
+
+  <h2 id="noventa">Primeros 90 días (20 de julio al 20 de octubre de 2026)</h2>
+  <ul>
+    <li><strong>Semanas 1 y 2 (fines de julio).</strong> Construir 20 nodos y 2 gateways. Lista de 60 campos objetivo entre San Fernando y Longaví armada con 3 asesores conocidos. Guión de voz grabado y probado con Twilio.</li>
+    <li><strong>Semanas 3 a 6 (agosto).</strong> 30 visitas a terreno. Cerrar 5 pilotos gratis para la temporada 2026 con carta de intención de pago 2027 firmada. Instalar antes del 5 de septiembre.</li>
+    <li><strong>Semanas 7 a 10 (septiembre).</strong> Operar las primeras heladas reales. Cada noche de evento: llamadas en vivo, medición de detección y tiempos de respuesta, iteración del guión. Fundador despierto en paralelo al sistema, todas las noches de riesgo.</li>
+    <li><strong>Semanas 11 a 13 (octubre).</strong> Informes post evento a cada piloto. Dos eventos de vecinos en campos piloto. Primeras conversaciones de renovación pagada 2027 con la bitácora sobre la mesa.</li>
+  </ul>
+  <p>KPI del trimestre: 5 pilotos operando, 90% o más de las noches de helada reales detectadas con al menos 60 minutos de anticipación, cero heladas con daño sin alerta, y al menos una activación de equipo gatillada por nuestra llamada.</p>
+
+  <h2 id="riesgos">Qué mataría esto</h2>
+  <ul>
+    <li><strong>Una primavera sin heladas.</strong> El riesgo número uno y no es técnico: si no suena el teléfono en toda la temporada, la renovación se cae. Mitigación parcial: el parte diario y el libro dan valor visible aunque no hiele, y el cobro es anticipado. Pero dos primaveras benignas seguidas matan la empresa, y eso hay que decirlo.</li>
+    <li><strong>Una helada con daño sin alerta nuestra.</strong> En un rubro donde todos se conocen, un solo campo quemado con Rondalba instalado destruye la marca en toda la zona. Por eso la llamada se gatilla por sensor aunque el pronóstico falle, y por eso hay sirena de respaldo local sin internet.</li>
+    <li><strong>Perder la ventana de venta.</strong> Se vende de mayo a agosto o no se vende hasta el próximo año. Un invierno comercial malo cuesta 12 meses de caja.</li>
+    <li><strong>El hardware en terreno.</strong> Robo, tractores, agua y baterías. Se mitiga con comodato, reposición pagada y diseño simple, pero es costo operativo real que ya está en la economía unitaria.</li>
+    <li><strong>Un incumbente que copia la llamada.</strong> Wiseconn o Instacrops tienen base instalada y podrían agregar escalamiento telefónico. Nuestra apuesta: el foco (somos el turno de noche, no una plataforma), el precio por temporada y el libro por cuartel que ya quedó escrito con nosotros.</li>
+  </ul>
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <div><strong style="color: var(--escarcha);">Rondalba</strong> &middot; vigilia de heladas por cuartel<br>hola@rondalba.com &middot; San Fernando, Región de O'Higgins</div>
+    <div><a href="demo/index.html">Demo</a> &nbsp;&nbsp; <a href="roadmap.html">Roadmap</a> &nbsp;&nbsp; <a href="stack.html">Arquitectura</a></div>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

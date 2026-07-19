@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Tarifana</title>
+<meta name="description" content="Qué habría que configurar para que Tarifana funcione de verdad: modelo de datos, agentes de IA y dónde la IA está prohibida, APIs, costo mensual con aritmética y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cabecera { padding-block: var(--sp-xl); }
+  .cabecera h1 { max-width: 20ch; }
+  .bloque { padding-block: var(--sp-l); border-top: 1px solid var(--linea); }
+  .bloque h2 { max-width: 28ch; margin-bottom: var(--sp-s); }
+  .codigo { font-family: var(--mono); font-size: .74rem; line-height: 1.8; color: var(--tinta-2); background: var(--panel); border: 1px solid var(--linea); border-left: 4px solid var(--amarillo); padding: var(--sp-s) var(--sp-m); overflow-x: auto; white-space: pre; }
+  .agente { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); }
+  .agente h3 { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: center; }
+  .agente .modelo { font-family: var(--mono); font-size: .7rem; background: var(--registro); color: var(--amarillo); padding: .2rem .5rem; }
+  .agente p, .agente li { font-size: var(--step--1); color: var(--tinta-2); }
+  .agente ul { padding-left: 1.1rem; margin-top: .4rem; }
+  .agentes-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .agentes-grid { grid-template-columns: 1fr 1fr; } }
+  .prohibido { border-left: 4px solid var(--alerta); }
+  .prohibido h3 { color: var(--alerta); }
+  .falso li { font-size: var(--step--1); color: var(--tinta-2); padding-block: .45rem; border-top: 1px solid var(--linea); list-style: none; }
+  .falso li strong { color: var(--tinta); }
+</style>
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" stroke="#12161a" stroke-width="1.8"/>
+        <path d="M13.2 4.5 8.5 13h3.4l-1.1 6.5 4.7-8.5h-3.4l1.1-6.5Z" fill="#f6c700" stroke="#12161a" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      TARIFANA
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <nav class="nav-drawer" id="menu" data-nav-drawer aria-label="Principal móvil">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html" aria-current="page">Arquitectura</a>
+  </nav>
+</header>
+
+<main class="container">
+
+<section class="cabecera">
+  <h1>Nada de esto está aprovisionado. Está documentado para poder aprovisionarlo.</h1>
+  <p class="lede" style="margin-top:var(--sp-s);">La regla de diseño de todo el sistema: la IA lee y redacta; el código calcula. Un error de un peso en una carta a la distribuidora cuesta más que todo el presupuesto de inferencia.</p>
+</section>
+
+<section class="bloque">
+  <h2>Modelo de datos</h2>
+  <div class="codigo">empresas         id · razon_social · rut · comuna · rubro · plan · contacto_whatsapp
+empalmes         id · empresa_id · distribuidora · n_cliente · opcion_actual
+                 potencia_conectada_kw · ctr_punta_kw · ctr_fuera_kw · fecha_ult_cambio_opcion
+boletas          id · empalme_id · periodo · pdf_url · total_facturado_clp
+                 kwh · dda_leida_kw · dda_punta_kw · fp · tipo_lectura (real|estimada)
+                 estado (recibida|extraida|cuadrada|discrepante)
+boleta_lineas    id · boleta_id · concepto · cantidad · precio_unitario · monto_clp
+pliegos          id · distribuidora · vigencia_desde · fuente_url · hash_documento
+pliego_cargos    id · pliego_id · opcion (BT2..AT4.3) · cargo (fijo|energia|punta|...)
+                 unidad ($/mes | $/kWh | $/kW/mes) · valor_clp · comuna_grupo
+simulaciones     id · empalme_id · fecha · pliego_id · resultados_json · mejor_opcion
+hallazgos        id · empalme_id · tipo (potencia|opcion|reactiva|error_facturacion)
+                 monto_estimado_anual · estado (abierto|carta_enviada|aplicado|descartado)
+cartas           id · hallazgo_id · tipo (cambio_opcion|ajuste_potencia|reclamo)
+                 texto · fecha_envio · fecha_respuesta · resultado
+libro_ahorro     id · empalme_id · periodo · hallazgo_id · calculo_json
+                 ahorro_verificado_clp · fee_clp (20%) · boleta_evidencia_id
+eventos          id · empresa_id · tipo · payload · creado_en   (auditoría completa)</div>
+</section>
+
+<section class="bloque">
+  <h2>Los agentes de IA, y la pieza donde la IA está prohibida</h2>
+  <div class="agentes-grid" style="margin-top:var(--sp-s);">
+
+    <div class="agente">
+      <h3>Extractor de boletas <span class="modelo">claude-haiku-4-5-20251001</span></h3>
+      <p style="margin-top:.4rem;">Convierte el PDF de la boleta en campos estructurados (JSON con esquema estricto): consumos, demandas, factor de potencia, cada línea de cobro, tipo de lectura.</p>
+      <ul>
+        <li>Dos pasadas independientes; si difieren en cualquier campo, reintento y luego cola humana.</li>
+        <li>Validación dura: el motor recalcula la boleta con lo extraído y debe cuadrar al peso con el total facturado. No cuadra = no se le muestra nada al cliente.</li>
+        <li>Prohibido para este agente: sumar, restar o "corregir" un número. Extrae lo que dice el papel.</li>
+      </ul>
+    </div>
+
+    <div class="agente">
+      <h3>Redactor <span class="modelo">claude-sonnet-5</span></h3>
+      <p style="margin-top:.4rem;">Escribe el veredicto mensual en lenguaje de dueño de negocio, las cartas de cambio de opción, los reclamos y el informe del libro de ahorro.</p>
+      <ul>
+        <li>Recibe los números ya calculados por el motor como datos inmutables; el prompt le prohíbe generar o modificar cifras y la salida se verifica: toda cifra del texto debe existir en el JSON de entrada.</li>
+        <li>Plantillas legales revisadas por abogado como esqueleto; el agente adapta el relato, no la estructura.</li>
+      </ul>
+    </div>
+
+    <div class="agente">
+      <h3>Vigía de pliegos <span class="modelo">claude-sonnet-5</span></h3>
+      <p style="margin-top:.4rem;">Cuando la distribuidora o la CNE publica un pliego o reajuste, extrae los cuadros tarifarios a <span class="mono">pliego_cargos</span> versionado.</p>
+      <ul>
+        <li>Doble extracción independiente + diff automático; cualquier diferencia va a revisión humana antes de activar el pliego.</li>
+        <li>Un pliego nuevo jamás se activa solo: lo aprueba una persona comparando contra el documento fuente.</li>
+        <li>Además monitorea los procesos tarifarios de la CNE: es el sistema de alerta temprana del riesgo regulatorio declarado en el roadmap.</li>
+      </ul>
+    </div>
+
+    <div class="agente prohibido">
+      <h3>Donde la IA está prohibida: el motor tarifario</h3>
+      <p style="margin-top:.4rem;">TypeScript puro, determinista, con suite de tests contra casos calculados a mano desde los pliegos. Hace el 100% de la aritmética: reconstrucción de boletas, simulación de las cinco opciones, recargos por reactiva, cálculo de ahorro verificado y del fee del 20%.</p>
+      <ul>
+        <li>Ningún número generado por un modelo llega jamás al cliente, a una carta ni al libro.</li>
+        <li>El demo de este sitio usa exactamente esta arquitectura: <span class="mono">motor.js</span> calcula, el resto pinta.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<section class="bloque">
+  <h2>APIs de terceros y qué hay que contratar</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Servicio</th><th>Para qué</th><th>Nota honesta</th></tr></thead>
+      <tbody>
+        <tr><td><strong>API de Claude (Anthropic)</strong></td><td>Los tres agentes de arriba.</td><td>Costo abajo, con aritmética.</td></tr>
+        <tr><td><strong>Postmark (inbound email)</strong></td><td>Cada cliente reenvía su boleta a su-empresa@boletas.tarifana.com.</td><td>La vía de ingesta más simple y la que menos fricción le pone al dueño.</td></tr>
+        <tr><td><strong>WhatsApp Business API (Meta)</strong></td><td>Veredicto mensual, alertas de hallazgo, recordatorio si no llegó la boleta.</td><td>Requiere plantillas aprobadas por Meta; se contrata vía BSP (por ejemplo 360dialog).</td></tr>
+        <tr><td><strong>Transbank / Flow</strong></td><td>Cobro de la mensualidad (suscripción) y del variable.</td><td>El variable se factura contra el libro, con el cálculo adjunto.</td></tr>
+        <tr><td><strong>Oficinas virtuales de distribuidoras</strong></td><td>Descarga del historial de 12 meses con credenciales delegadas por el cliente.</td><td>El punto frágil del stack: no hay API pública; es scraping con consentimiento que se rompe cuando cambian la maqueta. Plan B permanente: el reenvío por correo.</td></tr>
+        <tr><td><strong>Supabase (o Postgres gestionado) + S3</strong></td><td>Base de datos, autenticación del panel y archivo de PDFs.</td><td>Nada exótico a propósito.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="codigo" style="margin-top:var(--sp-m);">ANTHROPIC_API_KEY        inferencia de los tres agentes
+POSTMARK_SERVER_TOKEN    correo entrante y saliente
+WHATSAPP_TOKEN           API de Meta via BSP
+WHATSAPP_PHONE_ID        número emisor verificado
+DATABASE_URL             Postgres
+S3_BUCKET / S3_KEY / S3_SECRET   archivo de boletas PDF
+TRANSBANK_API_KEY        cobros
+SENTRY_DSN               errores; una boleta mal parseada es incidente, no log</div>
+</section>
+
+<section class="bloque">
+  <h2>Costo mensual estimado, con la aritmética</h2>
+  <div class="codigo">INFERENCIA POR CLIENTE/MES (precios de lista, USD por millón de tokens:
+Haiku 4.5 $1 entrada / $5 salida · Sonnet 5 $3 entrada / $15 salida)
+
+extractor (Haiku 4.5)   boleta ~4 págs ≈ 8k in / 1,5k out, doble pasada
+                        16k × $1/M = $0,016  +  3k × $5/M = $0,015   = $0,031
+redactor (Sonnet 5)     veredicto mensual ≈ 6k in / 1,2k out
+                        6k × $3/M = $0,018  +  1,2k × $15/M = $0,018 = $0,036
+cartas y reclamos       solo meses con hallazgo, amortizado           ≈ $0,020
+subtotal                                                              ≈ $0,087
+× 2 de holgura (reintentos, boletas de 8 páginas, revisiones)         ≈ $0,17
+en pesos, a $950/USD (supuesto declarado)                             ≈ $165
+presupuestado por cliente/mes (redondeo conservador)                  = $240
+
+vigía de pliegos (Sonnet 5): ~300k tokens en meses con reajuste
+                        ≈ US$1,5/mes TOTAL, fijo, despreciable
+
+VARIABLE NO-IA POR CLIENTE/MES
+WhatsApp (~4 conversaciones de servicio) ≈ US$0,30                    ≈ $285
+correo, storage, procesamiento PDF                                    ≈ $150
+total variable por cliente/mes (con el margen de Negocio)             ≈ $900
+
+INFRA FIJA MENSUAL
+hosting + Postgres (Supabase/Fly)  US$60
+S3 + tráfico                       US$10
+Postmark                           US$15
+monitoreo (Sentry)                 US$15
+dominio, varios                    US$20
+total fijo: US$120 × $950                                             = $114.000
+
+Estos son los números que Negocio descuenta del margen: variable ~$900
+(margen bruto unitario 97,7%, usamos 95%) e infra fija $114.000.</div>
+</section>
+
+<section class="bloque">
+  <h2>Qué está falseado en el demo</h2>
+  <ul class="falso" style="margin-top:var(--sp-s); max-width:56rem;">
+    <li><strong>El pliego es referencial.</strong> Las magnitudes son plausibles para BT 2026 pero inventadas; en producción, <span class="mono">pliego_cargos</span> se carga desde los decretos y pliegos publicados de cada distribuidora, versionado y con doble validación.</li>
+    <li><strong>La regla de reactiva está simplificada</strong> al recargo del 1% por centésima bajo 0,93. Los pliegos vigentes definen cargos explícitos por energía reactiva; el motor real codifica la regla exacta del pliego aplicable, no una aproximación.</li>
+    <li><strong>La calificación "presente en punta" usa un proxy</strong> (razón de demandas máximas). La regla real usa demandas medias en horas de punta; requiere el detalle horario que la distribuidora registra.</li>
+    <li><strong>El recargo por exceso sobre potencia contratada</strong> (2x en el simulador) es una convención del demo; el tratamiento real del exceso depende del reglamento y del contrato.</li>
+    <li><strong>No hay parser de PDF corriendo:</strong> los datos del demo ya están estructurados en JS. El flujo real es PDF → extractor → validación de cuadratura.</li>
+    <li><strong>La empresa, el RUT, la boleta y la refacturación de $412.680 son ficticios,</strong> construidos para ser verosímiles. Los plazos administrativos reales de un cambio de opción o un reclamo varían por distribuidora.</li>
+    <li><strong>Para que fuera real:</strong> pliegos reales de Enel/CGE/Chilquinta cargados y testeados (semanas 1-2 del roadmap), el pipeline de ingesta, el panel de cliente con autenticación, y los cobros. Nada de eso es investigación: es construcción.</li>
+  </ul>
+</section>
+
+<section class="bloque">
+  <h2>Dominio verificado</h2>
+  <div class="codigo">marca:      Tarifana
+dominio:    tarifana.com
+evidencia:  rdap.verisign.com/com/v1/domain/tarifana.com -> HTTP 404
+            (disponible), verificado con _kit/check-domain.sh el 2026-07-18.
+            tarifana.cl tambien disponible en NIC Chile ("no existe"), misma fecha.
+alternas:   amperva.com  (HTTP 404, 2026-07-18)
+            vatiora.com  (HTTP 404, 2026-07-18)
+            empalmia.com (HTTP 404, 2026-07-18)</div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <strong style="color:#fff;">TARIFANA</strong> · Arquitectura documentada, no aprovisionada.
+    </div>
+    <div class="mono" style="font-size:.72rem;">
+      <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a>
+    </div>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+/* ============================================================================
+   AFORQUA: hoja de estilo única
+   ----------------------------------------------------------------------------
+   DIRECCIÓN DE ARTE: "manifiesto de carga / patio de contenedores".
+   La referencia es el documento operativo del puerto de noche: el manifiesto,
+   la señalética del patio de contenedores, la pantalla de la grúa. Fondo de
+   mar profundo (azul-verdoso casi negro), tipografía pálida y fría, y UN solo
+   acento: el naranja internacional de los contenedores (#ed6a1f). Todo código,
+   partida y monto va en monoespaciada, porque en aduana el código ES el dato.
+   El guiño al contenedor son las esquinas marcadas de los paneles (los corner
+   castings) y las etiquetas en mayúscula tipo estarcido. Nada más: motivo, no
+   disfraz.
+
+   Lectura de brief (skill design-taste-frontend §0.B): landing + producto B2B
+   para importadores PYME y agencias de aduana, registro técnico/sala de
+   control, oscuro, denso pero respirable.
+   Diales: DESIGN_VARIANCE 6 · MOTION_INTENSITY 3 · VISUAL_DENSITY 6.
+   (Motion 3: transiciones discretas y nada automático; el demo ya tiene
+   suficiente movimiento propio al recorrer el árbol de reglas.)
+
+   Tipografía: Archivo (grotesca robusta, dibujada para señalética y titulares
+   densos; no es Inter ni Space Grotesk) + JetBrains Mono para códigos,
+   partidas, RUT y montos.
+
+   Contraste (WCAG, medido contra #0b1b26): hielo 14,0:1 · hielo-2 8,9:1 ·
+   hielo-3 6,6:1 · naranja 5,6:1 · tinta #071219 sobre naranja 5,6:1. Todo AA.
+
+   Prohibido y no usado: papel crema, acentos óxido/bermellón, serif editorial
+   sobre fondo claro, degradado violeta, glassmorphism, emojis como iconos,
+   guiones largos en el texto.
+   ========================================================================== */
+
+:root {
+  /* Mar profundo (superficies) */
+  --mar-0: #071219;   /* página */
+  --mar-1: #0b1b26;   /* panel base */
+  --mar-2: #102531;   /* panel elevado, celdas */
+  --mar-3: #16303f;   /* hover, chips activos */
+  --linea:   #1c3442; /* filete 1px */
+  --linea-2: #2a4a5c; /* filete fuerte */
+
+  /* Tipo pálido y frío */
+  --hielo:   #dce8ee; /* primario */
+  --hielo-2: #a7bcc9; /* secundario */
+  --hielo-3: #8aa2b0; /* atenuado: 6,6:1 sobre --mar-1, AA */
+
+  /* EL acento: naranja contenedor */
+  --naranja:       #ed6a1f;
+  --naranja-claro: #f58a45;              /* para texto acento sobre paneles elevados */
+  --naranja-velo:  rgba(237, 106, 31, .12);
+  --tinta-boton:   #071219;              /* tinta sobre naranja: 5,6:1 */
+
+  /* Estado (semántico, siempre con icono + texto, nunca color solo) */
+  --ok:     #4fc06a;  /* 7,6:1 sobre --mar-1 */
+  --alerta: #f2b33d;  /* 9,4:1 */
+  --falla:  #f0655f;  /* 5,6:1 */
+  --ok-velo:     rgba(79, 192, 106, .12);
+  --alerta-velo: rgba(242, 179, 61, .12);
+  --falla-velo:  rgba(240, 101, 95, .12);
+
+  /* Series de gráficos (roadmap): forma "énfasis" del skill dataviz.
+     La serie que importa va en el acento; el contexto, en grises fríos con
+     etiqueta directa al final de línea. Rampa ordinal del embudo validada con
+     validate_palette.js --ordinal (PASS): #f7c59a #f39a55 #ed6a1f #b5510f. */
+  --s-enfasis:  #ed6a1f;
+  --s-contexto: #7fa8c2;
+  --s-contexto-2: #5f8299;
+  --ord-1: #f7c59a; --ord-2: #f39a55; --ord-3: #ed6a1f; --ord-4: #b5510f;
+  --grid-linea: #16303f;
+
+  --radio: 4px;       /* una sola escala de esquinas: 4px en todo */
+  --nav-alto: 60px;
+
+  --sans: "Archivo", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-alto) + 16px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--mar-0);
+  color: var(--hielo);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+}
+
+::selection { background: var(--naranja); color: var(--tinta-boton); }
+
+h1, h2, h3 { font-weight: 700; letter-spacing: -.015em; color: var(--hielo); }
+h1 { font-size: var(--step-4); line-height: 1.05; font-weight: 800; }
+h2 { font-size: var(--step-3); line-height: 1.1; }
+h3 { font-size: var(--step-1); }
+p  { color: var(--hielo-2); }
+strong { color: var(--hielo); font-weight: 600; }
+a { text-decoration-color: var(--linea-2); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--naranja); }
+
+code, .mono { font-family: var(--mono); }
+
+:focus-visible { outline: 2px solid var(--naranja); outline-offset: 2px; }
+
+/* ---- etiqueta estarcida (uso racionado: máx. 1 por cada 3 secciones) ---- */
+.estarcido {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--naranja-claro);
+}
+
+/* ---- navegación ---------------------------------------------------------- */
+.nav {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(7, 18, 25, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linea);
+}
+.nav-fila {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: var(--nav-alto);
+}
+.marca {
+  display: inline-flex; align-items: center; gap: .55rem;
+  text-decoration: none; font-weight: 700; font-size: 1.05rem;
+  letter-spacing: -.01em; min-height: 44px;
+}
+.marca svg { width: 26px; height: 26px; flex: none; }
+.nav-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--hielo-2); border-radius: var(--radio);
+}
+.nav-btn:hover { background: var(--mar-2); color: var(--hielo); }
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-menu {
+  display: none; flex-direction: column; gap: .1rem;
+  padding-bottom: var(--sp-s);
+}
+.nav-menu.abierto { display: flex; }
+.nav-menu a {
+  text-decoration: none; color: var(--hielo-2);
+  font-size: .95rem; font-weight: 500;
+  padding: .65rem .8rem; border-radius: var(--radio);
+  min-height: 44px; display: flex; align-items: center;
+}
+.nav-menu a:hover { background: var(--mar-2); color: var(--hielo); }
+.nav-menu a[aria-current="page"] { color: var(--naranja-claro); background: var(--naranja-velo); }
+@media (min-width: 48em) {
+  .nav-btn { display: none; }
+  .nav-menu {
+    display: flex; flex-direction: row; align-items: center; gap: .15rem;
+    padding: 0;
+  }
+  .nav-menu a { padding: .5rem .7rem; font-size: .9rem; }
+  .nav-envuelto { display: flex; align-items: center; justify-content: space-between; min-height: var(--nav-alto); }
+}
+
+/* ---- panel con esquinas de contenedor (corner castings) ------------------ */
+.panel {
+  background: var(--mar-1);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+.esquinas { position: relative; }
+.esquinas::before, .esquinas::after {
+  content: ""; position: absolute; width: 14px; height: 14px;
+  border: 2px solid var(--naranja);
+  opacity: .8; pointer-events: none;
+}
+.esquinas::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; border-top-left-radius: var(--radio); }
+.esquinas::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-bottom-right-radius: var(--radio); }
+
+/* ---- botones ------------------------------------------------------------- */
+.btn, .btn-sec {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 48px; padding: .7rem 1.3rem;
+  border-radius: var(--radio); font-weight: 600; font-size: .95rem;
+  text-decoration: none; cursor: pointer; border: 1px solid transparent;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+.btn { background: var(--naranja); color: var(--tinta-boton); }
+.btn:hover { background: var(--naranja-claro); }
+.btn:active { transform: translateY(1px); }
+.btn-sec { background: transparent; color: var(--hielo); border-color: var(--linea-2); }
+.btn-sec:hover { border-color: var(--hielo-3); background: var(--mar-2); }
+.btn-sec:active { transform: translateY(1px); }
+
+/* ---- secciones ----------------------------------------------------------- */
+.seccion { padding-block: var(--sp-2xl); }
+.seccion-borde { border-top: 1px solid var(--linea); }
+.lede { font-size: var(--step-1); line-height: 1.45; color: var(--hielo-2); }
+
+/* ---- tablas de datos ----------------------------------------------------- */
+.tabla { width: 100%; font-size: var(--step--1); }
+.tabla th {
+  text-align: left; font-family: var(--mono); font-weight: 500;
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--hielo-3); padding: .55rem .75rem;
+  border-bottom: 1px solid var(--linea-2);
+  white-space: nowrap;
+}
+.tabla td {
+  padding: .6rem .75rem; border-bottom: 1px solid var(--linea);
+  color: var(--hielo-2); vertical-align: top;
+}
+.tabla td.mono, .tabla th.num, .tabla td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.tabla td.num, .tabla th.num { text-align: right; }
+.tabla tr:hover td { background: var(--mar-2); }
+
+/* ---- chips y badges ------------------------------------------------------ */
+.chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  min-height: 44px; padding: .45rem .85rem;
+  border: 1px solid var(--linea-2); border-radius: var(--radio);
+  background: var(--mar-1); color: var(--hielo-2);
+  font-family: var(--mono); font-size: .78rem; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.chip:hover { border-color: var(--hielo-3); color: var(--hielo); }
+.chip[aria-pressed="true"] {
+  border-color: var(--naranja); background: var(--naranja-velo);
+  color: var(--naranja-claro);
+}
+.badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .15rem .5rem; border-radius: var(--radio);
+  font-family: var(--mono); font-size: .68rem; font-weight: 500;
+  letter-spacing: .04em; white-space: nowrap;
+}
+.badge svg { width: 12px; height: 12px; flex: none; }
+.badge--ok     { background: var(--ok-velo);     color: var(--ok); }
+.badge--alerta { background: var(--alerta-velo); color: var(--alerta); }
+.badge--falla  { background: var(--falla-velo);  color: var(--falla); }
+.badge--neutro { background: var(--mar-3);       color: var(--hielo-2); }
+.badge--acento { background: var(--naranja-velo); color: var(--naranja-claro); }
+
+/* ---- pie ----------------------------------------------------------------- */
+.pie {
+  border-top: 1px solid var(--linea);
+  padding-block: var(--sp-l);
+  font-size: var(--step--1); color: var(--hielo-3);
+}
+.pie a { color: var(--hielo-2); }
+.pie-fila { display: flex; flex-wrap: wrap; gap: var(--sp-s) var(--sp-l); justify-content: space-between; align-items: baseline; }
+
+/* ---- utilidades ---------------------------------------------------------- */
+.num-tab { font-variant-numeric: tabular-nums; }
+.atenuado { color: var(--hielo-3); }
+.acento { color: var(--naranja-claro); }
+.aparece { animation: aparece .35s ease both; }
+@keyframes aparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .aparece { animation: none; }
+}

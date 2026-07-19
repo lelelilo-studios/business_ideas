@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo · Etiquaria, verificador de rotulado</title>
+<meta name="description" content="Verificador de rotulado en vivo: mueve los nutrientes del informe de laboratorio y mira los sellos ALTO EN aparecer con su artículo, la etiqueta con geometría legal y el simulador de reformulación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_kit/reset.css">
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  .demo-cab { padding-block: var(--sp-l); }
+  .demo-cab h1 { font-size: var(--step-3); }
+  .demo-cab .fabrica { font-family: var(--mono); font-size: 0.76rem; color: var(--tinta-3); margin-top: 6px; }
+  .demo-cab .chips { margin-top: var(--sp-m); }
+
+  .panel-doble { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .panel-doble { grid-template-columns: 0.9fr 1.1fr; align-items: start; } }
+
+  .sliders { display: grid; gap: var(--sp-m); margin-top: var(--sp-s); }
+  .check-anadidos { display: flex; gap: 10px; align-items: flex-start; margin-top: var(--sp-m); padding-top: var(--sp-s); border-top: 1px solid var(--linea); }
+  .check-anadidos input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--acento); cursor: pointer; }
+  .check-anadidos label { font-size: 0.88rem; color: var(--tinta-2); cursor: pointer; }
+
+  .resumen { font-weight: 700; font-size: var(--step-1); }
+  .resumen .exento { color: var(--ok); }
+  .veredictos { display: grid; gap: 10px; margin-top: var(--sp-s); }
+  @media (min-width: 40em) { .veredictos { grid-template-columns: 1fr 1fr; } }
+  .veredicto { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-s); display: grid; grid-template-columns: 64px 1fr; gap: var(--sp-s); align-items: center; }
+  .veredicto.lleva { border-color: var(--tinta); }
+  .veredicto svg { width: 64px; height: 64px; }
+  .veredicto.libre svg { opacity: 0.14; filter: grayscale(1); }
+  .veredicto .estado { font-weight: 700; font-size: 0.9rem; }
+  .veredicto.libre .estado { color: var(--ok); }
+  .veredicto .datos { font-family: var(--mono); font-size: 0.74rem; color: var(--tinta-2); margin-top: 2px; }
+  .veredicto .cita-legal { display: block; margin-top: 4px; }
+
+  .etiqueta-grid { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  @media (min-width: 62em) { .etiqueta-grid { grid-template-columns: 1.05fr 0.95fr; align-items: start; } }
+  .lienzo { background: #f1f1f4; border: 1px solid var(--linea); padding: var(--sp-m); display: grid; place-items: center; }
+  .lienzo svg { max-width: 100%; height: auto; max-height: 420px; box-shadow: 0 8px 24px rgba(13,13,15,0.12); }
+  .anota { font-family: var(--mono); font-size: 0.76rem; color: var(--tinta-2); margin-top: var(--sp-s); }
+  .anota strong { color: var(--tinta); }
+
+  .sim-grid { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  @media (min-width: 62em) { .sim-grid { grid-template-columns: 0.9fr 1.1fr; align-items: start; } }
+  select {
+    width: 100%; min-height: 48px; padding: 0 12px;
+    border: 1px solid var(--linea-2); background: var(--panel); color: var(--tinta);
+    font: inherit; cursor: pointer;
+  }
+  .sim-resultado p + p { margin-top: 8px; }
+  .sim-resultado .grande { font-weight: 700; color: var(--tinta); }
+  .sim-costo { margin-top: var(--sp-s); border-top: 1px solid var(--linea); padding-top: var(--sp-s); }
+  .sim-costo table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.78rem; }
+  .sim-costo td { padding: 5px 0; color: var(--tinta-2); }
+  .sim-costo td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--tinta); }
+  .sim-costo tr.total td { border-top: 1px solid var(--linea-2); font-weight: 700; padding-top: 8px; }
+
+  .prohibiciones li { display: grid; gap: 4px; padding-block: var(--sp-s); border-bottom: 1px solid var(--linea); }
+  .prohibiciones li:first-child { border-top: 1px solid var(--linea); }
+  .prohibiciones p { color: var(--tinta); font-weight: 500; max-width: 70ch; }
+  .sin-sellos { color: var(--ok); font-weight: 600; }
+
+  .libro-acciones { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: var(--sp-s); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="../index.html">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M10 2.5h12L29.5 10v12L22 29.5H10L2.5 22V10L10 2.5Z" stroke="#0d0d0f" stroke-width="2.4" stroke-linejoin="miter"/>
+        <path d="M11.5 12h9M11.5 16h6.5M11.5 20h9" stroke="#b0135c" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+      <span>Etiquaria</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu">
+      Menú
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a class="volver" href="../../index.html">← Ideas</a>
+      <a href="../index.html">Producto</a>
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="../negocio.html">Negocio</a>
+      <a href="../roadmap.html">Roadmap</a>
+      <a href="../stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== Cabecera: elegir SKU ===== -->
+<section class="demo-cab">
+  <div class="container">
+    <h1>Verificador de rotulado</h1>
+    <p class="prosa" style="margin-top: 8px">Elige un SKU, mueve el informe de laboratorio y mira el veredicto cambiar en vivo. Todo corre en tu navegador con datos de ejemplo.</p>
+    <div class="chips" role="group" aria-label="Elegir producto" id="chipsProducto"></div>
+    <p class="fabrica" id="fabricaInfo"></p>
+  </div>
+</section>
+
+<!-- ===== Informe + Veredictos ===== -->
+<section class="seccion" style="padding-top: var(--sp-l)">
+  <div class="container panel-doble">
+    <div class="caja">
+      <h2 style="font-size: var(--step-1)">Informe de laboratorio</h2>
+      <p class="nota" style="margin-top: 4px">Valores por <span id="basePor">100 g</span>. Muévelos para simular otro análisis.</p>
+      <div class="sliders" id="sliders"></div>
+      <div class="check-anadidos">
+        <input type="checkbox" id="chkAnadidos" checked>
+        <label for="chkAnadidos">El alimento tiene <strong>azúcares, miel, jarabes, sodio o grasas saturadas añadidos</strong> (<span id="anadidosTexto"></span>). Sin adición, el art. 120 bis no aplica y el producto queda exento de sellos.</label>
+      </div>
+      <div style="margin-top: var(--sp-s)">
+        <button class="btn btn--sec" id="btnRestaurar" type="button">Restaurar informe original</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="resumen" id="resumen" aria-live="polite"></p>
+      <div class="veredictos" id="veredictos"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Etiqueta ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Etiqueta para imprenta</h2>
+    <p class="prosa nota" style="margin-top: 6px">El tamaño del sello depende de la superficie de la cara principal del envase. Elige el formato y la geometría se recalcula.</p>
+    <div class="chips" role="group" aria-label="Elegir envase" id="chipsEnvase" style="margin-top: var(--sp-s)"></div>
+
+    <div class="etiqueta-grid">
+      <div>
+        <div class="lienzo" id="lienzoEtiqueta"></div>
+        <p class="anota" id="anotaSello"></p>
+      </div>
+      <div class="caja">
+        <h3>Declaración nutricional</h3>
+        <p class="cita-legal" style="margin-top: 4px">art. 115 RSA · por <span id="declBase">100 g</span> y por porción</p>
+        <p class="nota" style="margin-top: 6px" id="declPorcion"></p>
+        <div class="scroll-x" style="margin-top: var(--sp-s)">
+          <table class="tabla" id="tablaDecl">
+            <thead>
+              <tr><th>Nutriente</th><th class="num" id="thBase">100 g</th><th class="num">Porción</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Simulador ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Simulador de reformulación</h2>
+    <p class="prosa nota" style="margin-top: 6px">Cuánto tendrías que bajar para soltar un sello, y qué le hace ese cambio al costo de la receta. Precios de ingredientes: estimación mercado mayorista 2026.</p>
+    <div class="sim-grid">
+      <div class="caja">
+        <div class="campo">
+          <label for="simNutriente">Descriptor a simular</label>
+          <select id="simNutriente"></select>
+        </div>
+        <div class="campo" style="margin-top: var(--sp-m)">
+          <label for="simReduccion">Reducción: <span class="valor" id="simReduccionValor"></span></label>
+          <input type="range" id="simReduccion" min="0" max="60" step="0.5" value="0">
+        </div>
+      </div>
+      <div class="caja sim-resultado" id="simResultado" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Prohibiciones ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Lo que el sello arrastra</h2>
+    <p class="prosa nota" style="margin-top: 6px">Llevar al menos un sello ALTO EN gatilla prohibiciones que van más allá de la etiqueta.</p>
+    <div id="zonaProhibiciones" style="margin-top: var(--sp-s)"></div>
+  </div>
+</section>
+
+<!-- ===== Libro del SKU ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Libro del SKU</h2>
+    <p class="prosa nota" style="margin-top: 6px">Cada verificación queda registrada: fecha, versión de receta, veredicto y versión del motor. Esto es lo que le muestras a la SEREMI en una fiscalización.</p>
+    <div class="scroll-x" style="margin-top: var(--sp-s)">
+      <table class="tabla" style="min-width: 640px" id="tablaLibro">
+        <thead>
+          <tr><th>Fecha</th><th>Receta</th><th>Detalle</th><th>Sellos</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="libro-acciones">
+      <button class="btn btn--pri" id="btnGuardar" type="button">Guardar esta verificación en el libro</button>
+      <span class="nota" id="guardadoOk" hidden>Guardada.</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <span><strong style="color: var(--tinta)">Etiquaria</strong> · demo con datos de ejemplo, sin backend</span>
+    <span>Umbrales: art. 120 bis RSA · DS 13/2015</span>
+  </div>
+</footer>
+
+<script src="../sitio.js"></script>
+<script src="motor.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

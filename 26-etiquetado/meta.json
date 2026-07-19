@@ -1,0 +1,15 @@
+{
+  "folder": "26-etiquetado",
+  "brand": "Etiquaria",
+  "domain": "etiquaria.com",
+  "domain_evidence": "rdap.verisign.com -> HTTP 404 (disponible), 2026-07-18",
+  "alternates": ["porcionia.com", "rotulida.com", "nutrogia.com"],
+  "tagline": "El sello no se discute. Se calcula, con su artículo al lado.",
+  "category": "RegTech · alimentos",
+  "market": "Chile → LatAm (Perú y México ya usan sellos)",
+  "icp": "Jefe de calidad o dueño de fábrica de alimentos PYME, 5-100 personas; supermercados regionales con marcas propias",
+  "price_clp": "Desde $29.000 por SKU · planes desde $59.000/mes",
+  "accent": "#b0135c",
+  "problem": "El laboratorio entrega nutrientes por 100 g y nadie en la fábrica sabe aplicar con confianza la cadena de reglas que decide sellos, tamaños y prohibiciones: equivocarse es sumario, rechazo de lote o recall.",
+  "status": "prototipo"
+}

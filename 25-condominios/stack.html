@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura: Prorratia</title>
+<meta name="description" content="Modelo de datos, agentes de IA con sus límites, APIs a contratar, costo mensual con la aritmética y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cabecera { padding-block: var(--sp-xl) var(--sp-l); }
+  .cabecera h1 { max-width: 22ch; font-size: var(--step-3); }
+  .cabecera p { max-width: 58ch; margin-top: var(--sp-s); }
+
+  .tablas-modelo { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .tablas-modelo { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 75em) { .tablas-modelo { grid-template-columns: repeat(3, 1fr); } }
+  .tabla-modelo { padding: var(--sp-s) var(--sp-m); }
+  .tabla-modelo h3 { font-family: var(--mono); font-size: .85rem; color: var(--verde); }
+  .tabla-modelo p { font-family: var(--mono); font-size: .72rem; color: var(--tinta-2); margin-top: .35rem; line-height: 1.7; }
+
+  .agente { border-top: 1px solid var(--linea); padding: var(--sp-m) 0; display: grid; gap: var(--sp-s); }
+  @media (min-width: 56em) { .agente { grid-template-columns: 13rem 1fr; } }
+  .agente .modelo { font-family: var(--mono); font-size: .74rem; color: var(--verde); font-weight: 600; word-break: break-all; }
+  .agente h3 { margin-bottom: .3rem; }
+  .agente p { font-size: var(--step--1); max-width: 62ch; }
+  .agente .detalle { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); margin-top: .5rem; line-height: 1.7; }
+
+  .veto {
+    border-left: 3px solid var(--rojo-estado); background: var(--rojo-tinte);
+    padding: var(--sp-m); border-radius: 0 var(--radio) var(--radio) 0;
+    margin-top: var(--sp-l); max-width: 46rem;
+  }
+  .veto h3 { color: #7C2620; }
+  .veto p, .veto li { color: #5D1F1A; font-size: var(--step--1); }
+  .veto ul { margin: .5rem 0 0; padding-left: 1.2rem; }
+
+  .costo-tabla td:first-child { color: var(--tinta); font-weight: 500; }
+  .costo-tabla .calculo { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); }
+
+  code {
+    font-family: var(--mono); font-size: .8em;
+    background: var(--hormigon-2); padding: .1rem .35rem; border-radius: var(--radio);
+  }
+  .evidencia {
+    font-family: var(--mono); font-size: .78rem; line-height: 1.8;
+    background: var(--placa); border: 1px solid var(--linea); border-radius: var(--radio);
+    padding: var(--sp-m); margin-top: var(--sp-s); overflow-wrap: anywhere;
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="2" stroke="#0D5E36" stroke-width="1.7"/>
+        <path d="M9.6 2.75v18.5M15.4 2.75v11M2.75 13.75h12.65" stroke="#0D5E36" stroke-width="1.7"/>
+      </svg>
+      <span>Prorratia</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<div class="cabecera">
+  <div class="container">
+    <h1>Arquitectura: un libro contable con IA en los bordes.</h1>
+    <p>Nada de esto está aprovisionado: se documenta lo que habría que montar. El corazón es un libro de doble registro con auditoría append-only; la IA digitaliza y redacta en los bordes, nunca suma en el centro.</p>
+  </div>
+</div>
+
+<!-- ===== Modelo de datos ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Modelo de datos.</h2>
+    <p class="intro">Postgres. Los montos en enteros de pesos (sin decimales flotantes jamás). Todo lo que toca plata o quórum se escribe con doble registro y queda en el log de auditoría.</p>
+    <div class="tablas-modelo">
+      <div class="placa tabla-modelo"><h3>comunidades</h3><p>id · nombre · rut · direccion · comuna · reglamento_params (jsonb: plazos de citación, interés, día de emisión) · plan · estado</p></div>
+      <div class="placa tabla-modelo"><h3>unidades</h3><p>id · comunidad_id · codigo · tipo · m2 · alicuota (numeric 6,3; la suma por comunidad se valida = 100,000) · bodega/estac asociados</p></div>
+      <div class="placa tabla-modelo"><h3>personas</h3><p>id · nombre · rut · email · telefono · rol por unidad (propietario / arrendatario / representante) · consentimiento_whatsapp</p></div>
+      <div class="placa tabla-modelo"><h3>gastos</h3><p>id · comunidad_id · periodo · fecha · glosa · proveedor · rut_proveedor · monto · categoria · documento_id (null ⇒ marcado "sin respaldo") · creado_por</p></div>
+      <div class="placa tabla-modelo"><h3>documentos</h3><p>id · tipo (factura / boleta / honorarios / comprobante) · folio · archivo (S3) · json_extraido · confianza_extraccion · confirmado_por · hash</p></div>
+      <div class="placa tabla-modelo"><h3>emisiones</h3><p>id · comunidad_id · periodo · total_gastos · recargo_fondo · total · ajuste_redondeo · emitida_en · snapshot de alícuotas usado (inmutable)</p></div>
+      <div class="placa tabla-modelo"><h3>cargos_y_pagos</h3><p>cargo: emision_id · unidad_id · monto · vencimiento. pago: unidad_id · monto · medio (khipu / webpay / transferencia) · conciliado_con</p></div>
+      <div class="placa tabla-modelo"><h3>convenios</h3><p>id · unidad_id · saldo_base · interes_mensual · n_cuotas · cuotas (tabla hija con vencimiento y estado) · aceptado_en · firmado_por</p></div>
+      <div class="placa tabla-modelo"><h3>fondo_reserva_mov</h3><p>id · comunidad_id · tipo (aporte / uso / rentabilidad) · monto · acta_id que lo autoriza (obligatorio para usos) · saldo_resultante</p></div>
+      <div class="placa tabla-modelo"><h3>asambleas</h3><p>id · tipo · fecha · modalidad · citacion_id · asistencia (unidad, alícuota, representación) · quorum_constitucion · estado</p></div>
+      <div class="placa tabla-modelo"><h3>citaciones_y_actas</h3><p>citación: contenido · checklist_resultado (jsonb) · enviada_a · medios. acta: borrador · versión firmada (PDF + hash) · acuerdos por materia con votación</p></div>
+      <div class="placa tabla-modelo"><h3>eventos_auditoria</h3><p>append-only: quién · qué · cuándo · valor_anterior · valor_nuevo. Sin UPDATE ni DELETE: las correcciones son eventos nuevos. Esto es el producto.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Agentes ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Los agentes de IA, con nombre y límites.</h2>
+    <div style="margin-top: var(--sp-l);">
+      <div class="agente">
+        <div class="modelo">claude-haiku-4-5-20251001</div>
+        <div>
+          <h3>Digitalizador de documentos</h3>
+          <p>Recibe la foto o PDF de la boleta y devuelve JSON estructurado: emisor, RUT, folio, fecha, neto, IVA, total. Validación por esquema, y el humano confirma antes de que el gasto entre al libro.</p>
+          <div class="detalle">herramientas: ninguna; salida: JSON schema estricto; si confianza &lt; umbral, cae a revisión manual; nunca escribe en la base directamente</div>
+        </div>
+      </div>
+      <div class="agente">
+        <div class="modelo">claude-sonnet-5</div>
+        <div>
+          <h3>Escribano legal</h3>
+          <p>Redacta borradores de citaciones, actas y comunicados sobre plantillas revisadas por abogado, rellenas con datos del libro. El checklist de formalidades (plazos, contenido, quórum) es código determinista que corre después: el modelo redacta, el código veta.</p>
+          <div class="detalle">herramientas: lectura del libro (solo lectura); toda cifra en el texto se inyecta desde la base, no la genera el modelo; nada se envía sin aprobación humana</div>
+        </div>
+      </div>
+      <div class="agente">
+        <div class="modelo">claude-sonnet-5</div>
+        <div>
+          <h3>Respondedor del copropietario</h3>
+          <p>"¿Por qué subió mi gasto común?" se contesta con el libro de su comunidad a la vista: compara emisiones, apunta al gasto que cambió y enlaza la boleta. Solo lectura, solo su comunidad.</p>
+          <div class="detalle">herramientas: consultas read-only acotadas por comunidad; las cifras citadas vienen de la consulta, con link al registro; deriva a humano si detecta reclamo formal</div>
+        </div>
+      </div>
+      <div class="agente">
+        <div class="modelo">claude-haiku-4-5-20251001</div>
+        <div>
+          <h3>Redactor de cobranza</h3>
+          <p>Borradores de recordatorios y propuestas de convenio con el tono correcto (vecino, no cobrador judicial). Los montos, intereses y fechas los pone el motor determinista; el modelo solo escribe alrededor.</p>
+          <div class="detalle">plantillas por severidad (1 mes / 3 meses / convenio); envío programado por el sistema, no por el modelo</div>
+        </div>
+      </div>
+      <div class="agente">
+        <div class="modelo">claude-opus-4-8</div>
+        <div>
+          <h3>Auditor de plantillas (batch, trimestral)</h3>
+          <p>No corre en producción. Una vez por trimestre revisa en lote la calidad de los borradores del Escribano contra la ley y el reglamento tipo, y propone mejoras de plantilla que el abogado aprueba o descarta.</p>
+          <div class="detalle">costo marginal: corre 4 veces al año sobre una muestra; no entra en el costo mensual por comunidad</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="veto">
+      <h3>Donde la IA no entra, por diseño</h3>
+      <ul>
+        <li><strong>El prorrateo.</strong> Total × alícuota, redondeo declarado, suma que calza al peso. Función pura con tests de propiedad (la suma de cargos siempre es igual al total emitido).</li>
+        <li><strong>Intereses, saldos y conciliación.</strong> Aritmética entera, doble registro, sin flotantes y sin modelos.</li>
+        <li><strong>El quórum.</strong> Suma de alícuotas de los presentes. Punto.</li>
+        <li><strong>Escrituras en el libro.</strong> Ningún agente tiene permiso de escritura sobre gastos, cargos, pagos ni actas firmadas. La IA propone; una persona o una regla determinista dispone.</li>
+      </ul>
+      <p style="margin-top:.6rem;">La razón es de negocio, no de purismo: este libro se audita y se impugna. Un peso mal sumado por un modelo destruye la única cosa que vendemos, que es confianza verificable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APIs ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>APIs de terceros y qué hay que contratar.</h2>
+    <div class="scroll-x" style="margin-top: var(--sp-l);">
+      <table>
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Condición comercial</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Khipu</strong></td><td>Recaudación por transferencia simplificada del gasto común.</td><td>Comisión por transacción; se traspasa como costo de recaudación de la comunidad, no sale de nuestro margen (declarado en Negocio).</td></tr>
+          <tr><td><strong>Transbank Webpay</strong></td><td>Pago con tarjeta para quien lo prefiera.</td><td>Comisión por transacción, mismo tratamiento. Requiere contrato de comercio.</td></tr>
+          <tr><td><strong>WhatsApp Business API (Meta)</strong></td><td>Boleta de gasto común, recordatorios y citaciones a quien dio consentimiento.</td><td>Pago por conversación de utilidad; es el mayor costo variable después de la inferencia (aritmética abajo).</td></tr>
+          <tr><td><strong>SII / DTE (via proveedor tipo LibreDTE)</strong></td><td>Validar facturas recibidas contra el registro de compras de la comunidad con RUT propio.</td><td>Plan según volumen; fase 2, no bloquea el MVP.</td></tr>
+          <tr><td><strong>Correo transaccional (SES)</strong></td><td>Canal por defecto de boletas, citaciones y rendiciones.</td><td>Centavos de dólar por mil correos.</td></tr>
+          <tr><td><strong>Firma electrónica simple</strong></td><td>Actas y convenios de pago firmados sin papel.</td><td>Por documento firmado; proveedor local por definir en fase 2.</td></tr>
+          <tr><td><strong>Anthropic API</strong></td><td>Los cuatro agentes de arriba.</td><td>Pago por token; aritmética en la tabla de costos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: var(--sp-m); font-size: var(--step--1); max-width: 62ch;">Hosting: una app monolítica (Rails o Django) en Fly.io o Railway, Postgres administrado, S3 compatible para documentos. Aburrido a propósito: el producto es el libro, no la infraestructura.</p>
+    <h3 style="margin-top: var(--sp-l);">Variables de entorno</h3>
+    <p style="margin-top:.5rem; font-size: var(--step--1); max-width: 68ch;"><code>DATABASE_URL</code> <code>S3_BUCKET_DOCS</code> <code>S3_ACCESS_KEY</code> <code>S3_SECRET</code> <code>ANTHROPIC_API_KEY</code> <code>KHIPU_RECEIVER_ID</code> <code>KHIPU_SECRET</code> <code>TBK_COMMERCE_CODE</code> <code>TBK_API_KEY</code> <code>WHATSAPP_TOKEN</code> <code>WHATSAPP_PHONE_ID</code> <code>SES_SMTP_USER</code> <code>SES_SMTP_PASS</code> <code>APP_SECRET_KEY</code> <code>SENTRY_DSN</code></p>
+  </div>
+</section>
+
+<!-- ===== Costos ===== -->
+<section class="seccion seccion--hundida">
+  <div class="container">
+    <h2>Costo mensual, con la aritmética.</h2>
+    <p class="intro">Por comunidad tipo (45 unidades), a escala de 150 comunidades. Este es el $3.040 que Negocio descuenta del margen. Dólar a $950 (estimación julio 2026). Precios de token: Haiku 4.5 US$1/MTok entrada y US$5/MTok salida; Sonnet 5 supuesto en US$3/US$15 (se verifica al contratar).</p>
+    <div class="scroll-x" style="margin-top: var(--sp-l);">
+      <table class="costo-tabla">
+        <thead><tr><th>Partida</th><th class="num">CLP/mes</th><th>Aritmética</th></tr></thead>
+        <tbody>
+          <tr><td>Digitalizador (Haiku 4.5)</td><td class="num">$95</td><td><span class="calculo">25 docs × (2.000 in + 400 out) = 50k in + 10k out ⇒ US$0,05 + US$0,05 = US$0,10</span></td></tr>
+          <tr><td>Escribano legal (Sonnet 5)</td><td class="num">$133</td><td><span class="calculo">3 documentos × (6.000 in + 2.000 out) = 18k in + 6k out ⇒ US$0,054 + US$0,09 = US$0,14</span></td></tr>
+          <tr><td>Respondedor (Sonnet 5)</td><td class="num">$542</td><td><span class="calculo">40 consultas × (3.000 in + 350 out) = 120k in + 14k out ⇒ US$0,36 + US$0,21 = US$0,57</span></td></tr>
+          <tr><td>Redactor de cobranza (Haiku 4.5)</td><td class="num">$88</td><td><span class="calculo">60 mensajes × (800 in + 150 out) = 48k in + 9k out ⇒ US$0,048 + US$0,045 = US$0,09</span></td></tr>
+          <tr><td>WhatsApp Business</td><td class="num">$1.430</td><td><span class="calculo">65 conversaciones de utilidad × ~$22 CLP (tarifa Chile estimada; el resto va por correo, que es marginal)</span></td></tr>
+          <tr><td>Infraestructura prorrateada</td><td class="num">$760</td><td><span class="calculo">US$120/mes total (app + Postgres + S3 + SES + monitoreo) ÷ 150 comunidades = US$0,80</span></td></tr>
+        </tbody>
+        <tfoot><tr><td>Total por comunidad</td><td class="num">$3.048</td><td><span class="calculo">≈ $3.040 usado en Negocio ⇒ margen bruto 87% sobre ARPA $23.500</span></td></tr></tfoot>
+      </table>
+    </div>
+    <p style="margin-top: var(--sp-m); font-size: var(--step--1); max-width: 62ch;">Con 10 comunidades la infra prorrateada sube a ~$7.600 y el margen baja al 68%: por eso el modelo recién respira desde las decenas de comunidades, y por eso H3 (10 pagando al mes 8) es el hito bisagra.</p>
+  </div>
+</section>
+
+<!-- ===== Qué está falseado ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Qué está falseado en el demo.</h2>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li><span class="n">F1</span><div><p><strong>Todo corre en el navegador.</strong> No hay servidor, base de datos ni sesiones: el estado vive en JS y se reinicia al recargar. Real: la app monolítica con Postgres descrita arriba.</p></div></li>
+      <li><span class="n">F2</span><div><p><strong>La digitalización no ocurre.</strong> Los documentos ya vienen estructurados en el mock; el visor muestra los campos como si el Digitalizador los hubiera extraído y un humano confirmado. Real: Haiku 4.5 con validación por esquema.</p></div></li>
+      <li><span class="n">F3</span><div><p><strong>Los envíos son teatro.</strong> "Emitir", "enviar recordatorio" y "generar citación" cambian estado local con hora fija (18-07-2026); no sale ningún WhatsApp ni correo. Real: colas programadas + WhatsApp Business API + SES.</p></div></li>
+      <li><span class="n">F4</span><div><p><strong>El checklist legal está simplificado.</strong> Usa los plazos del reglamento tipo (5 a 15 días) y quórums generales. Real: parametrizado por el reglamento de cada copropiedad y revisado por abogado; el demo lo dice en pantalla.</p></div></li>
+      <li><span class="n">F5</span><div><p><strong>No hay pagos.</strong> Los saldos y convenios se simulan; no hay integración Khipu/Webpay ni conciliación. Real: webhooks de pago contra cargos emitidos.</p></div></li>
+      <li><span class="n">F6</span><div><p><strong>Los datos son inventados con formato real.</strong> Nombres, RUT (módulo 11 no verificado), proveedores y montos son ficticios; las alícuotas sí suman 100,000% y el prorrateo del demo es la aritmética real del producto.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== Dominio ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Evidencia del dominio.</h2>
+    <p class="intro">Verificado con <code>_kit/check-domain.sh</code> (RDAP de Verisign para .com, NIC Chile para .cl), 18 de julio de 2026.</p>
+    <div class="evidencia">
+      rdap.verisign.com/com/v1/domain/prorratia.com -> HTTP 404 (disponible), 2026-07-18<br>
+      nic.cl: prorratia.cl -> "no existe" (disponible), 2026-07-18<br><br>
+      Alternativas verificadas el mismo día, todas .com HTTP 404 (disponibles):<br>
+      alicuotia.com, rendicia.com, alicuora.com, prorratea.com
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <span>Prorratia · arquitectura</span>
+    <span>Documentado, no aprovisionado.</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

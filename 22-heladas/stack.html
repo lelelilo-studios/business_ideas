@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rondalba · Arquitectura: sensores, modelo, agentes y costos</title>
+<meta name="description" content="Arquitectura de Rondalba: nodos LoRa por cuartel, modelo de inversión térmica, agentes con Claude, Twilio Voice, y el costo mensual con la aritmética completa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html" aria-label="Rondalba, inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/><path d="M12 12V6.5"/><path d="M12 12h4.5"/>
+      </svg>
+      Rondalba
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">&larr; Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container doc">
+  <header class="encabezado">
+    <h1>Arquitectura</h1>
+    <p style="margin-top: var(--sp-s); color: var(--escarcha-2); max-width: 62ch;">Nada de esto está aprovisionado: se documenta lo que habría que montar para que funcione de verdad, con los costos que <a href="negocio.html#precio">Negocio</a> descuenta del margen. Al final: qué está falseado en el demo.</p>
+  </header>
+
+  <h2 id="vista">La cadena completa, del cuartel al teléfono</h2>
+  <div class="aritmetica">
+nodo sensor (cuartel) --LoRa--&gt; gateway del campo --4G--&gt; servidor central<br>
+&nbsp;&nbsp;cada 5 min&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChirpStack + Postgres<br>
+<br>
+servidor: modelo de inversión (cada 10 min) + reglas de umbral<br>
+&nbsp;&nbsp;&darr; parte 20:00 (WhatsApp) &nbsp;&darr; ALARMA &rarr; Twilio Voice &rarr; árbol de llamadas<br>
+&nbsp;&nbsp;&darr; bitácora por cuartel &nbsp;&nbsp;&darr; respaldo sin internet: sirena del gateway<br>
+<br>
+La regla de oro del diseño: <b>la llamada nunca depende de un LLM ni del<br>
+pronóstico</b>. Umbral cruzado en el sensor = llamada con plantilla dura,<br>
+aunque la API de IA esté caída y el modelo se haya equivocado.
+  </div>
+
+  <h2 id="hardware">Hardware por campo (en comodato)</h2>
+  <div class="scroll-x">
+    <table>
+      <caption>BOM del nodo sensor: $58.000 por unidad (estimación con precios de importación 2026)</caption>
+      <thead><tr><th>Componente</th><th>Detalle</th><th class="num">Costo</th></tr></thead>
+      <tbody>
+        <tr><td>ESP32-S3</td><td>micro con deep sleep, 2 años con panel</td><td class="num">$6.500</td></tr>
+        <tr><td>SHT31 (x2 en Ronda Completa)</td><td>temperatura y humedad, a altura de yema; bulbo húmedo psicrométrico</td><td class="num">$9.000</td></tr>
+        <tr><td>Módulo LoRa SX1276</td><td>915 MHz, alcance rural 3 a 8 km al gateway</td><td class="num">$8.500</td></tr>
+        <tr><td>Panel solar 2W + batería 18650 + cargador</td><td></td><td class="num">$18.000</td></tr>
+        <tr><td>Caja IP65 + mástil 1,5 m + abrigo radiativo</td><td></td><td class="num">$12.000</td></tr>
+        <tr><td>Ensamblaje y calibración contra patrón</td><td></td><td class="num">$4.000</td></tr>
+        <tr><td colspan="2"><strong>Total nodo</strong></td><td class="num"><strong>$58.000</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top: var(--sp-s);">Gateway por campo: RAK7268 con SIM 4G, antena exterior, caja y <strong>sirena de 110 dB</strong> como respaldo local (si el árbol de llamadas se agota o el campo pierde internet, el gateway igual sabe la temperatura y puede sonar): <span class="dato">$180.000</span>. El bulbo húmedo del plan Ronda Completa se calcula por psicrometría desde temperatura y humedad; no usamos mecha física (mantención imposible en terreno). Para la decisión de aspersión con margen de 0,5 &deg;C es suficiente, y se declara así al cliente.</p>
+
+  <h2 id="modelo">El modelo predictivo no es un LLM</h2>
+  <p>La predicción de la curva de enfriamiento es física y estadística, no generativa: un modelo de enfriamiento radiativo (tasa de caída en función de cielo despejado, viento y humedad, al estilo de los métodos clásicos FAO) más una regresión por cuartel entrenada con las noches del propio sensor. El sesgo local de cada cuartel (cuánto más hiela el bajo que la loma) <strong>es</strong> el producto: se aprende estando ahí, y por eso el libro de datos es la barrera de entrada. Entradas: lecturas propias cada 5 min, estaciones Agromet de INIA cercanas como contraste (red pública, agrometeorologia.cl), pronóstico de la Dirección Meteorológica de Chile (DMC) para viento y nubosidad. Corre cada 10 minutos en el servidor; sin GPU, sin inferencia pagada.</p>
+
+  <h2 id="agentes">Agentes de IA (y qué modelo usa cada uno)</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Agente</th><th>Modelo</th><th>Qué hace</th><th>Herramientas / conexión</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Parte de las 20:00</td>
+          <td class="dato">claude-haiku-4-5-20251001</td>
+          <td>Redacta el parte nocturno en español chileno desde la salida numérica del modelo (riesgo, horas de cruce, acción sugerida por cuartel). Plantilla dura si la API falla.</td>
+          <td>Salida del modelo predictivo + WhatsApp Business API</td>
+        </tr>
+        <tr>
+          <td>Guión de llamada</td>
+          <td class="dato">claude-haiku-4-5-20251001</td>
+          <td>Convierte la alarma en un guión de voz de 30 segundos: qué cuartel, qué temperatura, qué encender. Se lee por TTS. <strong>Respaldo:</strong> plantilla fija con los números interpolados; la llamada sale igual sin LLM.</td>
+          <td>Twilio Programmable Voice (TTS es-CL)</td>
+        </tr>
+        <tr>
+          <td>Informe post evento</td>
+          <td class="dato">claude-sonnet-5</td>
+          <td>Borrador del informe por cuartel para la bitácora y el seguro: predicho vs medido, acciones, daño evitado estimado con aritmética. En Ronda Completa lo revisa un agrónomo antes de enviarse.</td>
+          <td>Bitácora (Postgres) + generador de PDF</td>
+        </tr>
+        <tr>
+          <td>Onboarding de campo</td>
+          <td class="dato">claude-sonnet-5</td>
+          <td>Desde el KMZ del campo y las notas de la visita propone cuarteles, posiciones de sensores, umbrales por especie y estado fenológico (tablas WSU precargadas) y el árbol de llamadas. Un humano confirma todo antes de activar.</td>
+          <td>Lectura de KMZ/planos, tabla de umbrales, panel interno</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top: var(--sp-s);">Sin Opus: ninguna tarea lo amerita. Los prompts son cortos, con la salida numérica del modelo como única fuente de verdad y la instrucción explícita de no inventar cifras: todo número del texto debe venir del JSON de entrada, o el mensaje se descarta y sale la plantilla.</p>
+
+  <h2 id="datos">Modelo de datos</h2>
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Tabla</th><th>Campos principales</th></tr></thead>
+      <tbody>
+        <tr><td class="dato">campos</td><td>id, razon_social, rut, comuna, coordenadas, plan, temporada_activa, fecha_instalacion</td></tr>
+        <tr><td class="dato">cuarteles</td><td>id, campo_id, nombre, especie, variedad, hectareas, equipo_control (torre | aspersion | calefactor | ninguno), cota_relativa_m</td></tr>
+        <tr><td class="dato">sensores</td><td>id, cuartel_id, dev_eui, tipo (seco | seco+humedo), altura_cm, fecha_calibracion, estado_bateria</td></tr>
+        <tr><td class="dato">lecturas</td><td>sensor_id, ts, temp_c, hr_pct, bulbo_humedo_c (calculado), rssi (particionada por mes)</td></tr>
+        <tr><td class="dato">umbrales</td><td>cuartel_id, estado_fenologico, temp_critica_10, temp_critica_90, fuente (WSU | ajuste local), vigente_desde</td></tr>
+        <tr><td class="dato">pronosticos</td><td>cuartel_id, ts_emision, curva_proyectada (jsonb), min_proyectada, ts_cruce_umbral, fuentes (agromet, dmc)</td></tr>
+        <tr><td class="dato">eventos</td><td>id, campo_id, fecha, tipo (vigilancia | alarma | critico), min_proyectada, min_medida, cerrado_ts</td></tr>
+        <tr><td class="dato">llamadas</td><td>evento_id, contacto_id, ts, intento, resultado (contesto | no_contesto | buzon), duracion_s, confirmaciones (jsonb), twilio_sid</td></tr>
+        <tr><td class="dato">contactos</td><td>campo_id, nombre, rol, telefono, orden, horario (jsonb), activo</td></tr>
+        <tr><td class="dato">acciones</td><td>evento_id, cuartel_id, equipo, ts_confirmacion, ts_verificacion, origen (llamada | manual | sirena)</td></tr>
+        <tr><td class="dato">bitacora</td><td>evento_id, cuartel_id, resumen, dano_evitado_est, informe_pdf_url, export_csv_url, revisado_por</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="terceros">APIs de terceros y qué hay que contratar</h2>
+  <ul>
+    <li><strong>Twilio Programmable Voice + SMS:</strong> número chileno, llamadas salientes con TTS en español y captura DTMF ("marque uno para confirmar"). Es el corazón del producto. Alternativa local si Twilio encarece: troncal SIP con proveedor nacional.</li>
+    <li><strong>WhatsApp Business API</strong> (vía Twilio o Meta directo): parte de las 20:00, avisos de vigilancia y término, resumen matinal. Plantillas HSM pre-aprobadas.</li>
+    <li><strong>Agromet (INIA):</strong> datos públicos de estaciones para contraste y arranque en frío de cuarteles nuevos. Sin SLA: se consume con tolerancia a caídas y caché local. Riesgo declarado: si el acceso público cambia, el producto degrada elegante (los sensores propios bastan para la alarma).</li>
+    <li><strong>DMC:</strong> pronóstico público de viento y nubosidad para el modelo. Mismo tratamiento.</li>
+    <li><strong>ChirpStack</strong> (open source, self-hosted): servidor LoRaWAN propio. Sin costo de licencia; evita depender de The Things Network para un servicio donde la latencia de madrugada es crítica.</li>
+    <li><strong>Anthropic API:</strong> los tres agentes de arriba. Cuenta con retención estándar; los datos de lecturas nunca salen del servidor propio, a la API solo van agregados del evento.</li>
+    <li><strong>SIM 4G IoT</strong> por gateway (Entel o WOM empresa, plan datos 5 GB).</li>
+  </ul>
+
+  <h2 id="env">Variables de entorno</h2>
+  <div class="aritmetica">
+DATABASE_URL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; postgres://rondalba:...@db:5432/rondalba<br>
+ANTHROPIC_API_KEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sk-ant-...<br>
+TWILIO_ACCOUNT_SID&nbsp;&nbsp;&nbsp;&nbsp; AC...<br>
+TWILIO_AUTH_TOKEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+TWILIO_FROM_NUMBER&nbsp;&nbsp;&nbsp;&nbsp; +56 2 ...<br>
+WHATSAPP_TEMPLATE_NS&nbsp;&nbsp; namespace de plantillas aprobadas<br>
+CHIRPSTACK_API_KEY&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+CHIRPSTACK_URL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lora.interno:8080<br>
+AGROMET_CACHE_TTL_MIN&nbsp; 30<br>
+UMBRAL_MARGEN_C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.5&nbsp;&nbsp; (colchón sobre umbral WSU)<br>
+ALERTA_VENTANA_MIN&nbsp;&nbsp;&nbsp;&nbsp; 90&nbsp;&nbsp;&nbsp; (llamar N min antes del cruce proyectado)<br>
+SENTRY_DSN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...
+  </div>
+
+  <h2 id="costos">Costo mensual estimado (temporada 2027, 40 campos)</h2>
+  <div class="aritmetica">
+<b>Inferencia IA por campo-temporada</b> (dólar a $960, referencial jul 2026):<br>
+&nbsp; partes 20:00 (Haiku 4.5, US$1 in / US$5 out por MTok):<br>
+&nbsp;&nbsp;&nbsp; 120 tardes &times; (3.000 in + 1.200 out tokens) = 120 &times; US$0,009 = US$1,08<br>
+&nbsp; guiones de llamada (Haiku 4.5):<br>
+&nbsp;&nbsp;&nbsp; 12 noches &times; 6 llamadas &times; (1.500 in + 400 out) = US$0,25<br>
+&nbsp; informes post evento (Sonnet 5, US$3 / US$15 por MTok):<br>
+&nbsp;&nbsp;&nbsp; 12 eventos &times; (12.000 in + 3.000 out) = 12 &times; US$0,081 = US$0,97<br>
+&nbsp; onboarding (Sonnet 5, una vez) &asymp; US$1,00<br>
+&nbsp; <b>Total &asymp; US$3,3 &asymp; $3.200 por campo-temporada.</b><br>
+&nbsp; Negocio descuenta $5.000: cuadra, con colchón.<br>
+<br>
+<b>Telefonía por campo-temporada</b> (tarifas Twilio de lista, estimación):<br>
+&nbsp; 12 noches &times; 5 llamadas &times; 1,7 min &times; US$0,15/min &asymp; US$15,3<br>
+&nbsp; + SMS y WhatsApp de temporada &asymp; US$6 &rarr; &asymp; $21.000<br>
+&nbsp; Negocio descuenta $35.000: cuadra, con colchón para reintentos<br>
+&nbsp; y llamadas de verificación del plan Ronda Completa.<br>
+<br>
+<b>Infraestructura fija mensual</b> (todo el año):<br>
+&nbsp; VPS (Hetzner CPX31, app + Postgres + ChirpStack) US$14 &asymp; $13.500<br>
+&nbsp; respaldos S3 $3.000 &middot; dominio y correo $2.500 &middot; número Twilio $5.800<br>
+&nbsp; <b>Total &asymp; $25.000/mes &asymp; $300.000/año</b><br>
+&nbsp; Prorrateado en 40 campos: $7.500/campo/año.<br>
+&nbsp; Negocio descuenta $15.000 por campo: cuadra, con colchón.<br>
+<br>
+<b>Total temporada 40 campos:</b> inferencia $128.000 + telefonía $840.000<br>
++ infra $300.000 &asymp; <b>$1,27M contra $44,8M de ingreso: 2,8% de la venta.</b><br>
+El costo que manda no es el software: es hardware + visitas a terreno<br>
+(ver economía unitaria en <a href="negocio.html#precio">Negocio</a>).
+  </div>
+
+  <h2 id="falseado">Qué está falseado en el demo</h2>
+  <ul>
+    <li><strong>Todo corre en su navegador.</strong> No hay servidor, ni base de datos, ni sensores: la noche del 22 de septiembre de 2026 es una función de enfriamiento exponencial con ruido determinista, elegida para que se parezca a una helada de radiación real del valle central.</li>
+    <li><strong>Las llamadas son una hoja en pantalla.</strong> En producción son llamadas Twilio reales con TTS y confirmación por teclado. El escalamiento, los reintentos y la sirena están simulados con la misma lógica que tendría el servidor.</li>
+    <li><strong>El "modelo predictivo" del demo es la propia curva.</strong> El real proyecta con incertidumbre desde datos vivos y se equivoca a veces; por eso la llamada se gatilla por sensor, no por pronóstico.</li>
+    <li><strong>La bitácora 2025 es inventada</strong> con rangos plausibles para San Fernando. Los umbrales de daño sí son los publicados (tablas de temperaturas críticas de WSU); las cifras de daño evitado son estimaciones gruesas y así se etiquetan en pantalla.</li>
+    <li><strong>Para que fuera real faltaría:</strong> construir y calibrar los nodos, montar ChirpStack + ingesta, implementar el modelo de inversión y entrenarlo al menos una temporada por cuartel, integrar Twilio y WhatsApp con plantillas aprobadas, y el panel de operación interno. Estimación honesta: 4 a 5 meses de dos personas hasta el primer piloto operando, que es exactamente lo que el <a href="roadmap.html">roadmap</a> compromete.</li>
+  </ul>
+
+  <h2 id="dominio">Dominio</h2>
+  <p class="aritmetica" style="margin-top: var(--sp-s);">
+rondalba.com &rarr; rdap.verisign.com/com/v1/domain/rondalba.com &rarr; HTTP 404 (DISPONIBLE)<br>
+rondalba.cl &rarr; NIC Chile: "no existe" (DISPONIBLE)<br>
+Verificado con _kit/check-domain.sh el 2026-07-18.<br>
+Alternativas verificadas el mismo día: escarchia.com (404), brumatia.com (404), heladia.com (404).
+  </p>
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <div><strong style="color: var(--escarcha);">Rondalba</strong> &middot; vigilia de heladas por cuartel<br>hola@rondalba.com &middot; San Fernando, Región de O'Higgins</div>
+    <div><a href="demo/index.html">Demo</a> &nbsp;&nbsp; <a href="negocio.html">Negocio</a> &nbsp;&nbsp; <a href="roadmap.html">Roadmap</a></div>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

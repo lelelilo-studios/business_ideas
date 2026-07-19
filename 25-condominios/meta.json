@@ -1,0 +1,15 @@
+{
+  "folder": "25-condominios",
+  "brand": "Prorratia",
+  "domain": "prorratia.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/prorratia.com -> HTTP 404 (disponible), 2026-07-18. prorratia.cl tambien disponible (NIC Chile: no existe).",
+  "alternates": ["alicuotia.com", "rendicia.com", "alicuora.com", "prorratea.com"],
+  "tagline": "Cada peso con su boleta, cada cobro por su alícuota, cada asamblea conforme a la Ley 21.442.",
+  "category": "PropTech / SaaS vertical",
+  "market": "Chile → LatAm (Perú, Colombia)",
+  "icp": "Comité de administración de condominios de 20-80 unidades (Ley 21.442) y administrador profesional chico con 3-10 comunidades.",
+  "price_clp": "Desde $590/unidad/mes (comités, mín. $19.900) · $450/unidad/mes (administradores desde 150 unidades, mín. $59.000) · Traspaso histórico: $190.000 por una vez",
+  "accent": "#0D5E36",
+  "problem": "El condominio mediano lo administra un amateur: gastos comunes que nadie puede auditar, morosos que financian el edificio sin querer y asambleas que legalmente nunca existieron.",
+  "status": "prototipo"
+}

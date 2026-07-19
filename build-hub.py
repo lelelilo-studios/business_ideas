@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera el index.html del hub a partir de los meta.json de las 15 ideas.
+"""Genera el index.html del hub a partir de los meta.json de las ideas.
 Correr desde la raíz del repo:  python3 build-hub.py
 
 El HTML y el CSS del hub viven acá dentro, en el f-string de abajo.
@@ -12,7 +12,7 @@ rank    = json.load(open("ranking/ranking.json"))
 por_folder = {r["folder"]: r for r in rank["ideas"]}
 sistema = next(d for d in todo if d.get("kind") == "sistema")
 ideas   = [d for d in todo if d.get("kind") != "sistema"]
-assert len(ideas) == 21, f"esperaba 21 ideas, encontré {len(ideas)}"
+assert len(ideas) == 26, f"esperaba 26 ideas, encontré {len(ideas)}"
 
 # Dos familias: las 10 de PYME y las 5 de minería. Se separan porque el comprador
 # es otro (una dueña que contesta el WhatsApp vs. un gerente de operaciones), el
@@ -23,7 +23,8 @@ assert len(ideas) == 21, f"esperaba 21 ideas, encontré {len(ideas)}"
 pyme      = [d for d in ideas if int(d["folder"][:2]) <= 10]
 minera    = [d for d in ideas if 11 <= int(d["folder"][:2]) <= 15]
 consumo   = [d for d in ideas if int(d["folder"][:2]) == 16]
-autonomas = [d for d in ideas if int(d["folder"][:2]) >= 17]
+autonomas = [d for d in ideas if 17 <= int(d["folder"][:2]) <= 21]
+fable     = [d for d in ideas if int(d["folder"][:2]) >= 22]
 
 
 # ---------------------------------------------------------------- color derivado
@@ -148,7 +149,7 @@ def family(fid, orden, titulo, bajada, rows, items, bg, show_market=False):
     <section class="fam fam--{fid}" id="{fid}" aria-labelledby="h-{fid}">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 4</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia {orden} de 5</p>
           <h2 class="fam__title" id="h-{fid}">{titulo}</h2>
           <p class="fam__count mono"><b>{len(items):02d}</b><span>ideas</span></p>
           <p class="fam__lede">{bajada}</p>
@@ -225,7 +226,7 @@ def banda_sistema(d):
         <dl class="sis__facts mono">
           <div><dt>El juez</dt><dd>Aplica los criterios de muerte que cada idea firmó <em>antes</em> de recibir el primer peso. No puede editarlos, ni levantarse un tope.</dd></div>
           <div><dt>El kernel</dt><dd>Bloquea la acción antes de que toque una API. Nada de cuentas falsas, reseñas inventadas ni llamadas en frío con voz sintética.</dd></div>
-          <div><dt>Se enchufan</dt><dd>8 de las 16 viejas, del todo. 3 a medias. Las 5 de minería, no. Las 5 nuevas nacen enchufadas.</dd></div>
+          <div><dt>Se enchufan</dt><dd>8 de las 16 viejas, del todo. 3 a medias. Las 5 de minería, no. Las 5 autónomas nacen enchufadas.</dd></div>
           <div><dt>Se paga solo</dt><dd>Con 15 ideas, no con 2. La cuenta cómoda está descartada en su propia página.</dd></div>
         </dl>
         <nav class="sis__links" aria-label="{e(d['brand'])}">
@@ -244,6 +245,7 @@ def banda_sistema(d):
 
 
 BG_PYME, BG_MINERA, BG_CONSUMO, BG_AUTO = "#191612", "#111922", "#181428", "#12171B"
+BG_FABLE = "#141C16"
 
 secciones = (
     banda_sistema(sistema)
@@ -287,6 +289,16 @@ secciones = (
          ("El humano que queda", "Casi ninguno — y cada idea declara cuál, en vez de decir cero."),
          ("El cuello real", "No el CAC. La demanda: el mercado chileno es chico y lo dicen.")],
         autonomas, BG_AUTO, show_market=True)
+    + family(
+        "fable", "05", "Creadas por Fable",
+        "Cinco ideas que nadie pidió por su nombre: se le pidió al modelo que hubiera "
+        "cinco más, y Fable leyó las 21 anteriores, el ranking y sus huecos. Eligió "
+        "cinco verticales sin tocar donde el foso del cable ya estaba probado.",
+        [("Quién las eligió", "Fable. El encargo fue el número; los problemas, las marcas y el diseño los puso el modelo."),
+         ("El criterio", "El ranking al revés: primero el foso (dato, vigilancia, actuación, libro, determinismo), después la idea."),
+         ("Los verticales", "Los que las 21 no tocaban: el campo, la cuenta de luz, la aduana, el edificio y la etiqueta."),
+         ("El ranking", "Todavía no las incluye: cada una rinde el test del LLM en su propia página de negocio.")],
+        fable, BG_FABLE, show_market=True)
 )
 
 doc = f'''<!doctype html>
@@ -294,8 +306,8 @@ doc = f'''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>21 ideas + el sistema que las opera — lelelilo studios</title>
-<meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
+<title>26 ideas + el sistema que las opera · lelelilo studios</title>
+<meta name="description" content="Veintiséis productos de negocio para Chile: PYME, minería, consumo, cinco autónomas y cinco creadas por Fable. Cada uno con demo funcionando, plan de negocio, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -634,6 +646,20 @@ body {{
   --bg:#0F0C18; --card:#181428; --line:#2F2A45; --hair:#1E1930;
   --mute:#A199B8; --mute-2:#8C84A3; --sig:#E4DFF0;
 }}
+/* Creadas por Fable: tinta verde botella. La cuarta temperatura del índice:
+   ni el café de la PYME, ni el acero de la faena, ni la tinta riso del consumo.
+   El verde es la firma de la tanda que eligió el modelo, no un semáforo. */
+.fam--fable {{
+  --bg:#0C120E; --card:#141C16; --line:#2B392F; --hair:#1A241D;
+  --mute:#97A79B; --mute-2:#7F9185; --sig:#DDEAE0;
+}}
+.fam--fable .fam__tick {{
+  background:
+    linear-gradient(var(--sig) 0 0) left  top    / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) right top    / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) left  bottom / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) right bottom / 45% 45% no-repeat;
+}}
 
 .fam__head {{
   padding-block:var(--sp-2xl) var(--sp-xl);
@@ -881,13 +907,14 @@ body {{
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>21 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
-    <h1>Veintiún negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Veintiún problemas reales —PYME, minería, consumo, y cinco que se operan solas— con
-      un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
-      arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>26 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
+    <h1>Veintiséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Veintiséis problemas reales: PYME, minería, consumo, cinco que se operan solas
+      y cinco elegidas por Fable. Cada uno con un producto que funciona en el navegador, un plan de
+      marketing, un roadmap a 24 meses y la arquitectura que habría que configurar para que dejara
+      de ser una maqueta.</p>
 
-    <nav class="jump" aria-label="Las tres familias">
+    <nav class="jump" aria-label="Las cinco familias">
       <a href="#pyme">
         <span class="jump__n mono">{len(pyme):02d}</span>
         <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
@@ -913,6 +940,11 @@ body {{
         <span class="jump__t">Autónomas<small>Se operan solas · nadie en el loop</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
+      <a href="#fable">
+        <span class="jump__n mono">{len(fable):02d}</span>
+        <span class="jump__t">Creadas por Fable<small>Los huecos que las 21 dejaron · las eligió el modelo</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
     </nav>
 
     <div class="note">
@@ -925,10 +957,11 @@ body {{
       </div>
       <div>
         <h2>Dominios</h2>
-        <p><em>Los veintidós dominios están verificados como libres</em> al 13 de julio de 2026
+        <p><em>Los veintisiete dominios están verificados como libres</em> a julio de 2026
           (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
-          <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
-          antes de comprarlo.</p>
+          <span class="mono">.cl</span>; cada tanda con su fecha en su propio
+          <span class="mono">meta.json</span>). Eso caduca: si vas a usar uno, verifícalo de
+          nuevo antes de comprarlo.</p>
       </div>
       <div>
         <h2>Números</h2>
@@ -950,7 +983,7 @@ body {{
     <p>HTML, CSS y JavaScript escritos a mano. Sin build, sin framework, sin CDN: se abre el archivo
       y funciona. Los gráficos son SVG dibujado a mano, no una librería. La única petición externa
       son las tipografías de Google.</p>
-    <p>Las quince ideas se construyeron en paralelo, cada una por un agente distinto, siguiendo
+    <p>Las ideas se construyeron por tandas en paralelo, cada una por un agente distinto, siguiendo
       <a href="_kit/README.md">un contrato común</a> que fija el piso de accesibilidad, el mobile-first,
       la verificación de dominio y la regla que más importa: toda cifra va citada o va con su
       derivación a la vista.</p>
@@ -963,10 +996,12 @@ body {{
 '''
 
 open("index.html", "w").write(doc)
-print(f"hub generado: {len(ideas)} ideas + sistema ({len(pyme)} PYME, {len(minera)} minería, {len(consumo)} consumo, {len(autonomas)} autónomas)")
+print(f"hub generado: {len(ideas)} ideas + sistema ({len(pyme)} PYME, {len(minera)} minería, "
+      f"{len(consumo)} consumo, {len(autonomas)} autónomas, {len(fable)} de Fable)")
 for d in ideas:
     n = int(d["folder"][:2])
-    bg = BG_PYME if n <= 10 else BG_MINERA
+    bg = (BG_PYME if n <= 10 else BG_MINERA if n <= 15 else
+          BG_CONSUMO if n == 16 else BG_AUTO if n <= 21 else BG_FABLE)
     acc = accent_safe(d["accent"], bg)
     flag = "" if acc.lower() == d["accent"].lower() else f"  acento {d['accent']} → {acc} (AA)"
     print(f"  {d['folder']:18} {d['brand']:11} {d['domain']:18}{flag}")

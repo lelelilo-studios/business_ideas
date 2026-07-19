@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarifana: la cuenta de la luz, leída completa</title>
+<meta name="description" content="Reenvías la boleta de electricidad de tu PYME. Tarifana reconstruye cada línea contra la tarifa publicada, simula todas las opciones tarifarias y cada mes dicta veredicto: todo en orden, o la carta lista para firmar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); display: grid; gap: var(--sp-l); }
+  @media (min-width: 62em) {
+    .hero { grid-template-columns: 1.1fr .9fr; align-items: center; gap: var(--sp-2xl); }
+  }
+  .hero h1 { max-width: 16ch; }
+  .hero .lede { margin-top: var(--sp-s); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-top: var(--sp-m); }
+  .veredicto-card { max-width: 30rem; }
+  .veredicto-card .cab {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    font-family: var(--mono); font-size: .72rem; color: #aeb8c0;
+    padding-bottom: .8rem; border-bottom: 1px solid #2a323a; margin-bottom: .9rem;
+  }
+  .veredicto-card .linea {
+    display: flex; justify-content: space-between; gap: 1rem;
+    font-family: var(--mono); font-size: .78rem; padding: .35rem 0; color: #cdd4da;
+  }
+  .veredicto-card .linea b { color: #fff; font-weight: 600; }
+  .veredicto-card .hallazgo { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid #2a323a; }
+  .veredicto-card a { color: #e8ecef; }
+  .fuga { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); padding: var(--sp-m) 0; border-top: 1px solid var(--linea); align-items: start; }
+  .fuga:last-of-type { border-bottom: 1px solid var(--linea); }
+  .fuga .icono { width: 34px; height: 34px; margin-top: .2rem; }
+  .fuga h3 { margin-bottom: .25rem; }
+  .fuga p { color: var(--tinta-2); font-size: var(--step--1); }
+  .fuga .cifra { font-family: var(--mono); font-size: .74rem; color: var(--tinta); background: var(--amarillo-suave); padding: .1rem .4rem; }
+  .pasos { display: grid; gap: 0; counter-reset: paso; }
+  .paso { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); padding: var(--sp-m) 0; border-top: 1px solid var(--linea); }
+  .paso .icono { width: 40px; height: 40px; }
+  .paso h3 { margin-bottom: .3rem; }
+  .paso p { color: var(--tinta-2); font-size: var(--step--1); max-width: 58ch; }
+  @media (min-width: 62em) {
+    .pasos { grid-template-columns: repeat(3, 1fr); gap: var(--sp-l); }
+    .paso { border-top: 4px solid var(--tinta); grid-template-columns: 1fr; }
+  }
+  .widget-botones { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: var(--sp-s); }
+  .widget-botones button {
+    min-height: 48px; padding: .5rem 1rem; cursor: pointer;
+    border: 1px solid var(--linea-2); background: var(--panel);
+    font-family: var(--sans); font-weight: 500; font-size: var(--step--1);
+  }
+  .widget-botones button:hover { border-color: var(--tinta); }
+  .widget-botones button[aria-pressed="true"] {
+    background: var(--tinta); color: var(--amarillo); border-color: var(--tinta); font-weight: 700;
+  }
+  .widget-cifras { display: grid; gap: var(--sp-s); margin-block: var(--sp-s); }
+  @media (min-width: 48em) { .widget-cifras { grid-template-columns: 1fr 1fr; } }
+  .widget-cifras > div { display: grid; gap: .2rem; }
+  .widget-veredicto { max-width: 62ch; font-size: var(--step--1); }
+  .widget-veredicto .sello { margin-right: .4rem; vertical-align: middle; }
+  .derecho { display: grid; gap: var(--sp-m); }
+  @media (min-width: 62em) { .derecho { grid-template-columns: 1fr 1fr; align-items: stretch; } }
+  .derecho blockquote { font-size: var(--step-1); font-weight: 700; line-height: 1.3; max-width: 26ch; }
+  .derecho .placa-amarilla { display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-m); }
+  .derecho .firma { font-family: var(--mono); font-size: .74rem; }
+  .plan-tabla td:first-child { font-weight: 700; }
+  .plan-tabla .precio { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  .cuenta-ejemplo { margin-top: var(--sp-m); }
+  .cuenta-ejemplo .linea-boleta { grid-template-columns: 1fr auto; }
+  .comp-tabla td:first-child { font-weight: 600; white-space: nowrap; }
+  .faq details { border-bottom: 1px solid var(--linea); }
+  .faq summary {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--sp-s);
+    min-height: 56px; padding-block: var(--sp-xs); cursor: pointer; font-weight: 600; list-style: none;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); font-size: 1.3rem; flex: none; }
+  .faq details[open] summary::after { content: "\2212"; }
+  .faq details > div { padding-bottom: var(--sp-m); }
+  .faq p { color: var(--tinta-2); font-size: var(--step--1); }
+  .cta-final { text-align: center; padding-block: var(--sp-2xl); }
+  .cta-final h2 { max-width: 22ch; margin-inline: auto; }
+  .cta-final p { margin: var(--sp-s) auto var(--sp-m); }
+</style>
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" stroke="#12161a" stroke-width="1.8"/>
+        <path d="M13.2 4.5 8.5 13h3.4l-1.1 6.5 4.7-8.5h-3.4l1.1-6.5Z" fill="#f6c700" stroke="#12161a" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      TARIFANA
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <nav class="nav-drawer" id="menu" data-nav-drawer aria-label="Principal móvil">
+    <a href="../index.html">← Ideas</a>
+    <a href="index.html" aria-current="page">Producto</a>
+    <a href="demo/index.html">Demo</a>
+    <a href="negocio.html">Negocio</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="stack.html">Arquitectura</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="container hero">
+  <div>
+    <h1>Tu cuenta de la luz esconde plata todos los meses.</h1>
+    <p class="lede">Reenvías el PDF de la boleta. El motor reconstruye cada línea contra la tarifa publicada y dicta veredicto mensual: todo en orden, o carta lista.</p>
+    <div class="hero-cta">
+      <a class="btn" href="demo/index.html">Probar el demo</a>
+      <a class="btn btn-sec" href="#como">Cómo funciona</a>
+    </div>
+  </div>
+  <div class="registro-caja veredicto-card">
+    <div class="cab">
+      <span>VEREDICTO · JUNIO 2026</span>
+      <span>Panificadora Alto Maipo SpA</span>
+    </div>
+    <div class="linea"><span>Boleta del mes (BT4.2)</span><b>$6.006.877</b></div>
+    <div class="linea"><span>Punta contratada</span><b>95,0 kW</b></div>
+    <div class="linea"><span>Punta máxima leída (12 meses)</span><b>61,8 kW</b></div>
+    <p class="hallazgo"><span class="sello">hallazgo</span><br>
+      Pagas la punta que declaraste en 2019, no la que usas. Cambiando a BT4.3:
+      <b class="num-grande" style="display:block; margin-top:.3rem;">$371.083<span style="font-size:.55em;">/mes menos</span></b>
+    </p>
+    <p style="margin-top:.9rem; font-size:var(--step--1);"><a href="demo/index.html">Recorrer este caso en el demo</a></p>
+  </div>
+</section>
+
+<section class="seccion seccion-borde">
+  <div class="container">
+    <span class="rotulo">las cuatro fugas</span>
+    <h2 style="margin-top:var(--sp-s); max-width:24ch;">Nadie en la empresa ha leído la boleta más allá del total.</h2>
+    <p class="nota" style="margin-top:var(--sp-s);">La boleta no es un precio: es un contrato que se ejecuta cada mes con parámetros que alguien fijó hace años y nadie volvió a mirar. Ahí se fuga la plata.</p>
+
+    <div style="margin-top:var(--sp-l); max-width:52rem;">
+      <div class="fuga">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#12161a" stroke-width="1.6"/><path d="M12 12 12 6.5" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12l3.5 3" stroke="#f6c700" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="1.3" fill="#12161a"/></svg>
+        <div>
+          <h3>Potencia contratada de otra época</h3>
+          <p>Declaraste 95 kW cuando tenías los hornos viejos. Hoy tu punta real es 61,8 kW y sigues pagando el peak completo, mes a mes. <span class="cifra">caso demo: $371.083/mes</span></p>
+        </div>
+      </div>
+      <div class="fuga">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V5.5" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M4 19h16" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M7.5 15.5v-4M11.5 15.5V8M15.5 15.5v-5.5" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M19.5 15.5V6" stroke="#f6c700" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <div>
+          <h3>La opción tarifaria equivocada</h3>
+          <p>BT2, BT3, BT4.1, BT4.2, BT4.3: cinco maneras distintas de cobrarte la misma energía. La correcta depende de tu perfil horario, y casi nadie la eligió a propósito.</p>
+        </div>
+      </div>
+      <div class="fuga">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12c2-4.5 4-4.5 6 0s4 4.5 6 0" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M4 19h16" stroke="#f6c700" stroke-width="2" stroke-linecap="round"/></svg>
+        <div>
+          <h3>Energía reactiva penalizada</h3>
+          <p>Motores y compresores con factor de potencia bajo 0,93 pagan recargo. En el caso del demo son <span class="cifra">$2.339.775 al año</span> que un banco de condensadores elimina.</p>
+        </div>
+      </div>
+      <div class="fuga">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="3" width="16" height="18" stroke="#12161a" stroke-width="1.6"/><path d="M8 8h8M8 12h8M8 16h4" stroke="#12161a" stroke-width="1.4" stroke-linecap="round"/><path d="m14.5 15 2 2 3.5-3.5" stroke="#f6c700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <h3>Errores que nadie reclama</h3>
+          <p>Lecturas estimadas tres meses seguidos, refacturaciones, cobros duplicados. Reclamar funciona: en el caso del demo la distribuidora devolvió <span class="cifra">$412.680</span>. Pero alguien tiene que darse cuenta.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion-borde" id="como">
+  <div class="container">
+    <h2 style="max-width:20ch;">Cómo funciona, sin humo.</h2>
+    <div class="pasos" style="margin-top:var(--sp-l);">
+      <div class="paso">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" stroke="#12161a" stroke-width="1.6"/><path d="m3.5 6 8.5 7 8.5-7" stroke="#12161a" stroke-width="1.6" stroke-linejoin="round"/><path d="M17 15.5h3" stroke="#f6c700" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <div>
+          <h3>Reenvía la boleta</h3>
+          <p>Un correo con el PDF, o la descargamos nosotros de la oficina virtual de tu distribuidora. Sin instalar nada, sin tocar tu empalme.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M5 7h14" stroke="#12161a" stroke-width="1.6" stroke-linecap="round"/><path d="M5 7 3.5 11a2.6 2.6 0 0 0 5 0L7 7M19 7l-1.5 4a2.6 2.6 0 0 0 5 0L21 7" stroke="#12161a" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 20h6" stroke="#f6c700" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <div>
+          <h3>Reconstruye y simula</h3>
+          <p>El motor tarifario rehace tu boleta línea por línea contra el pliego vigente y simula las cinco opciones con tu consumo real de 12 meses. La IA extrae texto; la aritmética es código, siempre.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <svg class="icono" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" stroke="#12161a" stroke-width="1.6"/><path d="M7 9h10M7 13h6" stroke="#12161a" stroke-width="1.5" stroke-linecap="round"/><rect x="13" y="14" width="6" height="4" fill="#f6c700" stroke="#12161a" stroke-width="1.3"/></svg>
+        <div>
+          <h3>Veredicto mensual</h3>
+          <p>O "todo en orden", o el hallazgo con su carta lista: cambio de opción, ajuste de potencia o reclamo. Cada peso recuperado queda anotado en tu libro de ahorro verificado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion-borde">
+  <div class="container" data-widget>
+    <span class="rotulo">producto en vivo</span>
+    <h2 style="margin-top:var(--sp-s); max-width:22ch;">Elige un perfil y mira el veredicto.</h2>
+    <p class="nota" style="margin-top:var(--sp-s);">Esto no es una animación: es el mismo motor tarifario del demo corriendo aquí, con el pliego referencial y tres perfiles de consumo reales de PYME.</p>
+    <div class="widget-botones" role="group" aria-label="Perfiles de ejemplo">
+      <button type="button" data-perfil="panaderia" aria-pressed="true">Panadería industrial</button>
+      <button type="button" data-perfil="frigorifico" aria-pressed="false">Frigorífico</button>
+      <button type="button" data-perfil="taller" aria-pressed="false">Taller metalmecánico</button>
+    </div>
+    <div class="placa placa-borde" data-widget-salida aria-live="polite"></div>
+    <p class="nota" style="margin-top:var(--sp-s);">¿Quieres ver la boleta desarmada, el simulador completo y la carta generada? <a href="demo/index.html">Está todo en el demo</a>.</p>
+  </div>
+</section>
+
+<section class="seccion seccion-borde">
+  <div class="container derecho">
+    <div>
+      <h2 style="max-width:18ch;">El derecho que nadie usa.</h2>
+      <p style="margin-top:var(--sp-s); color:var(--tinta-2);">Todo cliente regulado puede <strong>elegir libremente su opción tarifaria</strong> dentro de las que le corresponden, con una permanencia mínima de 12 meses. Es una solicitud escrita que la distribuidora está obligada a aceptar. No exige abogado, ni cambio de medidor, ni dejar de ser su cliente.</p>
+      <p style="margin-top:var(--sp-s); color:var(--tinta-2);">La distribuidora no tiene ningún incentivo para recordártelo: cada mes que sigues en la opción cara, la diferencia queda en su caja. Tarifana existe para ejercer ese derecho por ti, cada vez que los números lo justifiquen.</p>
+    </div>
+    <div class="placa-amarilla">
+      <blockquote>"Solicito el cambio de mi suministro a la opción tarifaria BT4.3, conforme a mi derecho como cliente regulado."</blockquote>
+      <p class="firma">La carta completa, con tus datos y tus números, la escribe Tarifana. Tú la firmas.<br>Modelo real en el demo, pestaña "La carta".</p>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion-borde" id="precios">
+  <div class="container">
+    <span class="rotulo">precios en pesos, sin letra chica</span>
+    <h2 style="margin-top:var(--sp-s); max-width:24ch;">Una mensualidad fija más un pedazo del ahorro que te encontramos.</h2>
+
+    <div class="scroll-x" style="margin-top:var(--sp-l);">
+      <table class="plan-tabla">
+        <thead>
+          <tr><th>Plan</th><th>Para quién</th><th class="num">Mensualidad</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Medidor</td>
+            <td>1 empalme, cuenta hasta $1.500.000/mes</td>
+            <td class="num precio">$24.000/mes</td>
+          </tr>
+          <tr>
+            <td>Tablero</td>
+            <td>Hasta 3 empalmes, cuentas de $1.500.000 a $6.000.000/mes</td>
+            <td class="num precio">$44.000/mes</td>
+          </tr>
+          <tr>
+            <td>Subestación</td>
+            <td>Hasta 8 empalmes o cuentas sobre $6.000.000/mes, con gestor de reclamos prioritario</td>
+            <td class="num precio">$79.000/mes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2" style="margin-top:var(--sp-m);">
+      <div class="placa placa-borde">
+        <h3>El variable: 20% del ahorro verificado</h3>
+        <p style="margin-top:.5rem; font-size:var(--step--1); color:var(--tinta-2);">Solo sobre ahorro que aparece <strong>en tu boleta</strong> (cambio de opción, ajuste de potencia, refacturación ganada), solo durante los primeros 12 meses de cada hallazgo. Si el veredicto es "todo en orden" todos los meses, pagas la mensualidad y nada más. Las recomendaciones de inversión (como un banco de condensadores) no pagan variable: son tuyas.</p>
+      </div>
+      <div class="boleta cuenta-ejemplo">
+        <div class="boleta-cab"><span>EJEMPLO CON LA ARITMÉTICA A LA VISTA</span><span>plan Tablero · caso del demo</span></div>
+        <div class="linea-boleta"><span class="concepto">Mensualidad<span class="detalle">$44.000 × 12</span></span><span class="monto">$528.000</span></div>
+        <div class="linea-boleta"><span class="concepto">20% del ahorro verificado<span class="detalle">20% × $4.616.270/año</span></span><span class="monto">$923.254</span></div>
+        <div class="linea-boleta total"><span class="concepto">Tarifana, año 1</span><span class="monto">$1.451.254</span></div>
+        <div class="linea-boleta"><span class="concepto">Ahorro que queda en tu caja<span class="detalle">$4.616.270 menos el variable</span></span><span class="monto">$3.693.016</span></div>
+        <div class="linea-boleta"><span class="concepto">Costo total sobre tu gasto eléctrico anual<span class="detalle">$1.451.254 / $72.082.524</span></span><span class="monto">2,0%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion-borde">
+  <div class="container">
+    <h2 style="max-width:22ch;">Contra qué compites cuando nos contratas.</h2>
+    <div class="scroll-x" style="margin-top:var(--sp-l);">
+      <table class="comp-tabla">
+        <thead>
+          <tr><th>Alternativa</th><th>Qué hace bien</th><th>Dónde falla para una PYME</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No hacer nada</td>
+            <td>Gratis y sin fricción. Es lo que hace casi todo el mundo.</td>
+            <td>El caso del demo regalaba $4,6 millones al año sin saberlo. El statu quo no es neutro: tiene precio.</td>
+          </tr>
+          <tr>
+            <td>Consultor tarifario tradicional</td>
+            <td>Sabe de verdad; negocia bien contratos grandes.</td>
+            <td>Cobra por estudio y vive de clientes libres e industrias; una cuenta de $3 millones no le da para la bencina. Y pasa una vez: no vigila tu boleta cada mes.</td>
+          </tr>
+          <tr>
+            <td>La distribuidora</td>
+            <td>Tiene todos tus datos y está obligada a aceptar el cambio de opción.</td>
+            <td>Cada peso que ahorras es un peso menos para ella. No te va a llamar para avisarte.</td>
+          </tr>
+          <tr>
+            <td>Tarifana</td>
+            <td>Lee la boleta completa cada mes, simula las cinco opciones con motor codificado y redacta la carta. Cobra poco fijo y gana cuando tú ganas.</td>
+            <td>No negocia contratos de cliente libre ni hace ingeniería eléctrica: si necesitas eso, te lo decimos y te derivamos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion-borde">
+  <div class="container">
+    <h2>Preguntas que nos hacen los dueños.</h2>
+    <div class="faq" style="margin-top:var(--sp-m); max-width:52rem;">
+      <details>
+        <summary>¿Cambiar de opción tarifaria es legal? ¿No me van a cortar la luz?</summary>
+        <div><p>Es un derecho del cliente regulado: eliges tu opción tarifaria dentro de las disponibles para tu tipo de empalme, con permanencia mínima de 12 meses. Se pide por escrito, la distribuidora la aplica en tu siguiente ciclo de facturación y tu suministro no se toca. Por lo mismo la solicitud es reversible al año siguiente si tu perfil cambia.</p></div>
+      </details>
+      <details>
+        <summary>¿Qué necesitan de mí para empezar?</summary>
+        <div><p>La última boleta en PDF y, si quieres el diagnóstico completo de inmediato, acceso de lectura a la oficina virtual de tu distribuidora para bajar los 12 meses de historial. No instalamos equipos ni tocamos tu instalación.</p></div>
+      </details>
+      <details>
+        <summary>¿Y si no encuentran nada?</summary>
+        <div><p>Pagas solo la mensualidad, y el veredicto "todo en orden" es exactamente lo que compraste: la certeza mensual de que nadie te está cobrando de más. El variable existe solo cuando hay ahorro verificado en tu boleta.</p></div>
+      </details>
+      <details>
+        <summary>¿Cómo se "verifica" el ahorro? ¿Quién decide cuánto fue?</summary>
+        <div><p>Contra tu boleta siguiente, con el motor a la vista: mismo consumo, tarifa nueva versus tarifa anterior del pliego vigente ese mes. El libro de ahorro registra cada mes el cálculo completo y puedes auditarlo línea por línea. Si el pliego cambia, la comparación usa siempre el pliego del mes, nunca uno antiguo.</p></div>
+      </details>
+      <details>
+        <summary>¿Sirve si soy cliente libre o estoy pensando en serlo?</summary>
+        <div><p>Tarifana trabaja con clientes regulados, que es donde está la PYME típica y donde las opciones tarifarias existen. Si tu potencia conectada te permite evaluar el mercado libre, el diagnóstico lo dice honestamente y te derivamos a un consultor de contratos: ese no es nuestro negocio.</p></div>
+      </details>
+      <details>
+        <summary>¿La IA no se puede equivocar en un cálculo?</summary>
+        <div><p>La IA tiene prohibido calcular. Extrae los campos del PDF y redacta cartas; toda la aritmética la hace un motor tarifario codificado y determinista, que además se valida cuadrando el total de tu boleta real. Si la reconstrucción no cuadra al peso, el caso pasa a revisión antes de decirte nada.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="franja" aria-hidden="true"></div>
+
+<section class="cta-final container">
+  <h2>Manda tu última boleta. Te decimos qué esconde.</h2>
+  <p class="nota" style="margin-inline:auto;">El primer diagnóstico es gratis y sin compromiso: veredicto completo sobre tu opción tarifaria, tu potencia y tus recargos. Si hay algo, ahí conversamos.</p>
+  <a class="btn" href="demo/index.html">Probar el demo</a>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <strong style="color:#fff;">TARIFANA</strong> · La cuenta de la luz, leída línea por línea, todos los meses.<br>
+      Prototipo de idea de negocio. Los datos del sitio son simulados; el pliego es referencial.
+    </div>
+    <div class="mono" style="font-size:.72rem;">
+      tarifana.com · verificado libre el 2026-07-18<br>
+      <a href="negocio.html">Negocio</a> · <a href="roadmap.html">Roadmap</a> · <a href="stack.html">Arquitectura</a>
+    </div>
+  </div>
+</footer>
+
+<script src="motor.js"></script>
+<script src="sitio.js"></script>
+</body>
+</html>

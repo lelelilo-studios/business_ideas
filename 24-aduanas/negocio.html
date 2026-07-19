@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negocio · Aforqua</title>
+<meta name="description" content="Cliente objetivo, tamaño de mercado con la aritmética a la vista, competencia real, precios en CLP, canales de adquisición en Chile y el riesgo honesto que puede matar Aforqua.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cab-pagina { padding-block: var(--sp-xl) var(--sp-l); }
+  .cab-pagina h1 { font-size: var(--step-3); max-width: 24ch; }
+  .cab-pagina .lede { max-width: 58ch; margin-top: var(--sp-s); }
+
+  .bloque { padding-block: var(--sp-xl); border-top: 1px solid var(--linea); }
+  .bloque h2 { margin-bottom: var(--sp-m); }
+  .bloque .prosa { max-width: 68ch; }
+  .bloque .prosa p + p { margin-top: var(--sp-s); }
+  .bloque .prosa p { font-size: var(--step-0); }
+
+  /* bloque de cálculo estilo manifiesto */
+  .calculo { background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); padding: var(--sp-m); font-family: var(--mono); font-size: .82rem; margin-top: var(--sp-m); overflow-x: auto; }
+  .calculo .linea { display: flex; justify-content: space-between; gap: var(--sp-l); padding: .4rem 0; border-bottom: 1px dotted var(--linea); white-space: nowrap; }
+  .calculo .linea:last-child { border-bottom: 0; }
+  .calculo .et { color: var(--hielo-2); }
+  .calculo .et .sup { color: var(--hielo-3); font-size: .72rem; }
+  .calculo .num { color: var(--hielo); font-variant-numeric: tabular-nums; }
+  .calculo .linea--total { border-top: 1px solid var(--linea-2); }
+  .calculo .linea--total .et, .calculo .linea--total .num { color: var(--naranja-claro); font-weight: 600; }
+
+  .icp-grid { display: grid; gap: var(--sp-m); }
+  @media (min-width: 64em) { .icp-grid { grid-template-columns: 1fr 1fr; } }
+  .ficha-icp { padding: var(--sp-m); }
+  .ficha-icp h3 { margin-bottom: var(--sp-2xs); }
+  .ficha-icp dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem .9rem; font-size: var(--step--1); margin-top: var(--sp-s); }
+  .ficha-icp dt { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); padding-top: .15rem; }
+  .ficha-icp dd { color: var(--hielo-2); }
+  .ficha-icp dd b { color: var(--hielo); }
+
+  .comp-item { border-top: 1px solid var(--linea); padding: var(--sp-m) 0; display: grid; gap: .4rem var(--sp-l); }
+  @media (min-width: 48em) { .comp-item { grid-template-columns: minmax(14rem, 1fr) 2fr; } }
+  .comp-item:last-child { border-bottom: 1px solid var(--linea); }
+  .comp-item h3 { font-size: var(--step-0); }
+  .comp-item .quien { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); margin-top: .2rem; }
+  .comp-item p { font-size: var(--step--1); }
+
+  /* test del LLM */
+  .llm-test { border: 1px solid var(--naranja); border-radius: var(--radio); overflow: hidden; margin-top: var(--sp-m); }
+  .llm-col { padding: var(--sp-m); }
+  .llm-col + .llm-col { border-top: 1px solid var(--linea); }
+  @media (min-width: 48em) {
+    .llm-test { display: grid; grid-template-columns: 1fr 1fr; }
+    .llm-col + .llm-col { border-top: 0; border-left: 1px solid var(--linea); }
+  }
+  .llm-col h3 { display: flex; align-items: center; gap: .6rem; margin-bottom: var(--sp-s); }
+  .llm-col h3 svg { width: 22px; height: 22px; flex: none; }
+  .llm-col ul { list-style: none; padding: 0; }
+  .llm-col li { padding: .5rem 0 .5rem 1.3rem; position: relative; font-size: var(--step--1); color: var(--hielo-2); border-top: 1px dotted var(--linea); }
+  .llm-col li::before { content: ""; position: absolute; left: 0; top: 1rem; width: .55rem; height: 1px; background: currentColor; opacity: .5; }
+  .llm-col--chat { background: var(--mar-1); }
+  .llm-col--afq { background: linear-gradient(160deg, var(--mar-2), var(--mar-1) 75%); }
+
+  .canales { counter-reset: canal; margin-top: var(--sp-m); }
+  .canal { border-top: 1px solid var(--linea); padding: var(--sp-m) 0; display: grid; grid-template-columns: 2.6rem 1fr; gap: var(--sp-s); }
+  .canal:last-child { border-bottom: 1px solid var(--linea); }
+  .canal::before { counter-increment: canal; content: counter(canal, decimal-leading-zero); font-family: var(--mono); color: var(--naranja-claro); font-weight: 600; font-size: .95rem; padding-top: .15rem; }
+  .canal h3 { font-size: var(--step-0); }
+  .canal p { font-size: var(--step--1); margin-top: .3rem; max-width: 64ch; }
+  .canal .dato { font-family: var(--mono); font-size: .74rem; color: var(--hielo-3); margin-top: .35rem; }
+
+  .dias { display: grid; gap: var(--sp-m); margin-top: var(--sp-m); }
+  @media (min-width: 64em) { .dias { grid-template-columns: repeat(3, 1fr); } }
+  .mesq { padding: var(--sp-m); }
+  .mesq h3 { font-family: var(--mono); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--naranja-claro); }
+  .mesq ul { list-style: none; padding: 0; margin-top: var(--sp-s); font-size: var(--step--1); color: var(--hielo-2); }
+  .mesq li { padding: .4rem 0; border-top: 1px solid var(--linea); }
+  .mesq .meta { margin-top: var(--sp-s); font-size: .78rem; color: var(--hielo); font-weight: 600; }
+
+  .riesgo { border-left: 3px solid var(--falla); padding: var(--sp-s) var(--sp-m); background: var(--falla-velo); border-radius: 0 var(--radio) var(--radio) 0; margin-top: var(--sp-m); }
+  .riesgo + .riesgo { margin-top: var(--sp-s); }
+  .riesgo h3 { font-size: var(--step-0); color: var(--hielo); }
+  .riesgo p { font-size: var(--step--1); margin-top: .3rem; max-width: 70ch; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-envuelto">
+    <div class="nav-fila">
+      <a class="marca" href="index.html" aria-label="Aforqua, inicio">
+        <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="2" y="6.5" width="22" height="13" rx="1.5" stroke="#ed6a1f" stroke-width="1.8"/>
+          <path d="M7 6.5v13M11 6.5v13M15 6.5v13M19 6.5v13" stroke="#ed6a1f" stroke-width="1.3" opacity=".55"/>
+        </svg>
+        <span>Aforqua</span>
+      </a>
+      <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html" aria-current="page">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<div class="container cab-pagina">
+  <h1>El negocio: vender defensa, no códigos</h1>
+  <p class="lede">Un código plausible vale cero. Un código defendible vale exactamente lo que cuesta la multa que evita. Este documento muestra quién paga por eso, cuánto, y qué puede matar la idea.</p>
+</div>
+
+<!-- ============ ICP ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Cliente objetivo</h2>
+    <div class="icp-grid">
+      <div class="panel ficha-icp esquinas">
+        <h3>El comprador principal: importador PYME recurrente</h3>
+        <dl>
+          <dt>quién es</dt><dd>Ferretería importadora, retail especializado, e-commerce que trae contenedores propios. <b>200 a 2.000 SKU</b>, 2 a 10 contenedores al mes.</dd>
+          <dt>quién firma</dt><dd>El dueño o el gerente de administración y finanzas. En estas empresas comprar es decisión de una persona.</dd>
+          <dt>quién lo usa</dt><dd>El encargado de comercio exterior o el mismo gerente; comparte el dossier con su agente de aduana.</dd>
+          <dt>dónde está</dt><dd>Región Metropolitana, Valparaíso, Biobío; socios de la Cámara de Comercio de Santiago; clientes de agencias de aduana medianas.</dd>
+          <dt>qué usa hoy</dt><dd>El criterio del agente, planillas Excel, una carpeta de PDFs y la memoria de "cómo lo hemos hecho siempre".</dd>
+        </dl>
+      </div>
+      <div class="panel ficha-icp">
+        <h3>El segundo comprador: la agencia de aduana chica</h3>
+        <dl>
+          <dt>quién es</dt><dd>Agencia de <b>3 a 20 personas</b> que despacha para decenas de importadores y clasifica a mano contra el arancel en PDF.</dd>
+          <dt>por qué compra</dt><dd>El agente responde con su patente por cada clasificación. Un dossier citado por despacho es un seguro profesional y un argumento comercial ante sus clientes.</dd>
+          <dt>qué significa</dt><dd>No competimos con el agente: le vendemos la herramienta. La agencia es además el canal que llega a cientos de importadores de una vez.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MERCADO ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Tamaño de mercado, con la aritmética a la vista</h2>
+    <div class="prosa">
+      <p>No hay un número público y limpio de "importadores recurrentes PYME", así que cada supuesto va declarado y es verificable con los registros de importación que Aduanas publica como datos abiertos. Antes de escalar, el supuesto A1 se valida contra esos registros.</p>
+    </div>
+    <div class="calculo">
+      <div class="linea"><span class="et">A1 · empresas que importan de forma recurrente en Chile <span class="sup">(supuesto: ≥10 despachos/año; orden de magnitud)</span></span><span class="num">25.000</span></div>
+      <div class="linea"><span class="et">A2 · fracción con carga multi-SKU de clasificación no trivial <span class="sup">(supuesto: 40%)</span></span><span class="num">× 0,40</span></div>
+      <div class="linea"><span class="et">SAM importadores <span class="sup">(25.000 × 0,40)</span></span><span class="num">10.000 empresas</span></div>
+      <div class="linea"><span class="et">Ticket anual Plan Importador <span class="sup">($79.000 × 12)</span></span><span class="num">$948.000</span></div>
+      <div class="linea"><span class="et">SAM importadores en plata <span class="sup">(10.000 × $948.000)</span></span><span class="num">$9.480 millones/año</span></div>
+      <div class="linea"><span class="et">SAM agencias <span class="sup">(≈230 agencias activas, estimación gremial × $3.480.000/año)</span></span><span class="num">$800 millones/año</span></div>
+      <div class="linea linea--total"><span class="et">SAM Chile total</span><span class="num">≈ $10.280 millones/año</span></div>
+      <div class="linea"><span class="et">SOM a 3 años <span class="sup">(180 importadores, 1,8% del SAM + 12 agencias)</span></span><span class="num">≈ $212 millones ARR</span></div>
+    </div>
+    <div class="prosa" style="margin-top: var(--sp-m);">
+      <p>La extensión natural no es "más países al tiro": es más profundidad por cliente (dossiers sueltos, resoluciones anticipadas gestionadas) y después Perú y Colombia, que comparten la nomenclatura del Sistema Armonizado pero tienen aranceles, acuerdos y jurisprudencia propios. Cada país es un corpus nuevo; el árbol RGI se reutiliza casi entero.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUÑA ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Posicionamiento y cuña</h2>
+    <div class="prosa">
+      <p><strong>Cabecera de playa: el importador ferretero y eléctrico.</strong> Capítulos 82, 84, 85 y 94 del arancel: herramientas, máquinas, aparatos eléctricos, luminarias. Es el segmento con la mayor densidad de partidas ambiguas por SKU, donde el mismo contenedor mezcla veinte partidas distintas y donde una formulación de cargos duele de verdad.</p>
+      <p>Ganamos ahí primero porque el dolor es frecuente (importan todos los meses), el ahorro es demostrable en la primera auditoría del historial, y el segmento se habla entre sí: ferias, proveedores comunes y las mismas tres o cuatro agencias de aduana medianas. Con la cuña tomada, el mismo corpus cubre retail especializado y e-commerce importador sin rehacer nada.</p>
+      <p>El posicionamiento es una frase: <strong>Aforqua es el dossier que tu agente firma.</strong> No "IA para aduanas": un documento defendible, con las reglas recorridas y las resoluciones citadas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPETENCIA ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Competencia real</h2>
+    <div class="comp-item">
+      <div>
+        <h3>El agente de aduana clasificando al vuelo</h3>
+        <p class="quien">el verdadero titular del puesto</p>
+      </div>
+      <p>Clasifica "gratis" dentro del despacho, en minutos, sin dossier ni citas, porque ese día tiene cuarenta despachos más. No podemos competir en precio contra gratis: competimos en respaldo. Y mejor todavía: convertimos al agente en usuario con el Plan Agencia, para que su clasificación de cinco minutos salga con respaldo de media hora.</p>
+    </div>
+    <div class="comp-item">
+      <div>
+        <h3>Consultores y abogados aduaneros</h3>
+        <p class="quien">estudios especializados y Big4</p>
+      </div>
+      <p>Un estudio de clasificación por producto ronda $300.000 a $800.000 y demora semanas (estimación de mercado, honorarios profesionales). Excelentes para el caso de un millón de dólares; inviables para 400 SKU. Somos su versión industrializada, y para litigios complejos derivamos: no hacemos defensa jurídica.</p>
+    </div>
+    <div class="comp-item">
+      <div>
+        <h3>Herramientas globales de clasificación</h3>
+        <p class="quien">Avalara, Zonos Classify, Thomson Reuters ONESOURCE, Descartes CustomsInfo</p>
+      </div>
+      <p>Clasifican a 6 dígitos del Sistema Armonizado con foco en e-commerce transfronterizo y compliance corporativo, en dólares y en inglés. Ninguna baja a la apertura nacional chilena de 8 dígitos, ni cita resoluciones de la DNA, ni conoce las reglas de origen de los TLC de Chile. Esa última milla regulatoria es exactamente nuestro producto.</p>
+    </div>
+    <div class="comp-item">
+      <div>
+        <h3>El Excel y la carpeta de PDFs</h3>
+        <p class="quien">el statu quo en la importadora</p>
+      </div>
+      <p>La planilla con "los códigos que siempre usamos", heredada de un ex empleado. Sin fecha, sin fuente, sin aviso cuando el arancel cambia. Es barato hasta la primera fiscalización; nuestra auditoría gratuita del historial existe para ponerle precio a ese riesgo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EL TEST DEL LLM ============ -->
+<section class="bloque" id="test-llm">
+  <div class="container">
+    <h2>El test del LLM</h2>
+    <div class="prosa">
+      <p>La pregunta que toda idea con IA debe sobrevivir: ¿por qué esto no lo resuelve ChatGPT? Respuesta corta: sí te da un código. Plausible, gratis, en veinte segundos. El problema es todo lo que ese código no trae.</p>
+    </div>
+    <div class="llm-test">
+      <div class="llm-col llm-col--chat">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5z" stroke="#8aa2b0" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          Un chat generalista
+        </h3>
+        <ul>
+          <li>Muestrea el código: la misma ficha puede dar respuestas distintas en dos corridas.</li>
+          <li>Cita resoluciones que no puede verificar, o derechamente las inventa.</li>
+          <li>No conoce la apertura nacional de 8 dígitos ni el arancel chileno vigente.</li>
+          <li>No sabe qué importaste antes ni si te contradices con tu propio historial.</li>
+          <li>Cuando cambia el arancel o sale una resolución nueva, no te avisa.</li>
+          <li>Ante Aduanas, "me lo dijo un chat" no es un criterio de clasificación.</li>
+        </ul>
+      </div>
+      <div class="llm-col llm-col--afq">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="9" width="17" height="10" rx="1.5" stroke="#ed6a1f" stroke-width="1.6"/><path d="M7 9v10M11 9v10M15 9v10" stroke="#ed6a1f" stroke-width="1.2" opacity=".55"/><path d="m8 5.5 4-2.5 4 2.5" stroke="#ed6a1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Aforqua: los tres fosos
+        </h3>
+        <ul>
+          <li><strong>Determinismo.</strong> El modelo sólo extrae atributos; la partida sale de un árbol de reglas auditable. Misma ficha, mismo código, siempre.</li>
+          <li><strong>El libro.</strong> El corpus de resoluciones y dictámenes curado y al día, más tu historial de clasificaciones defendidas: lo que muestras en una fiscalización.</li>
+          <li><strong>Vigilancia.</strong> Arancel, TLC y resoluciones nuevas cruzados a diario contra tus SKU. El valor no es la respuesta de hoy: es que la respuesta siga siendo cierta en marzo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="prosa" style="margin-top: var(--sp-m);">
+      <p>Y la versión honesta: si importas una vez al año y tu tolerancia al riesgo es alta, usa el chat. Aforqua existe para el que firma declaraciones todos los meses, donde el costo de equivocarse se mide en millones y en carga detenida.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRECIO Y ECONOMÍA UNITARIA ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Precio y economía unitaria</h2>
+    <div class="prosa">
+      <p>Tres precios: dossier suelto a <strong>$45.000</strong>, Plan Importador a <strong>$79.000/mes</strong> (8 dossiers, vigilancia de 300 SKU, libro) y Plan Agencia a <strong>$290.000/mes</strong>. El ancla de valor no es el software: son los $80.000 a $150.000 de honorarios por despacho (estimación de mercado) y las multas de la Ordenanza que un dossier evita.</p>
+    </div>
+    <div class="calculo">
+      <div class="linea"><span class="et">Plan Importador, precio mensual</span><span class="num">$79.000</span></div>
+      <div class="linea"><span class="et">Costo de inferencia: 8 dossiers × $570 <span class="sup">(aritmética en arquitectura)</span></span><span class="num">− $4.560</span></div>
+      <div class="linea"><span class="et">Vigilancia diaria de la cuenta <span class="sup">(embeddings + triage, arquitectura)</span></span><span class="num">− $1.520</span></div>
+      <div class="linea"><span class="et">Infra prorrateada <span class="sup">(US$3,2/cliente a 100 clientes × $950)</span></span><span class="num">− $3.040</span></div>
+      <div class="linea linea--total"><span class="et">Margen bruto mensual por cliente</span><span class="num">$69.880 (88%)</span></div>
+      <div class="linea"><span class="et">CAC estimado <span class="sup">(outbound + gremios: 20-30 h de venta, estimación)</span></span><span class="num">$250.000 a $400.000</span></div>
+      <div class="linea"><span class="et">Payback <span class="sup">(CAC ÷ margen mensual)</span></span><span class="num">4 a 6 meses</span></div>
+      <div class="linea"><span class="et">LTV <span class="sup">(churn 2,5-3%/mes → vida 33-40 meses × $69.880)</span></span><span class="num">$2,3M a $2,8M</span></div>
+      <div class="linea linea--total"><span class="et">LTV / CAC</span><span class="num">≈ 6× a 11×</span></div>
+    </div>
+    <div class="prosa" style="margin-top: var(--sp-m);">
+      <p>El churn es el número a vigilar: el riesgo de este producto es que el susto pase y el cliente se vaya. Por eso la vigilancia y el libro viven en el plan mensual y no se venden sueltos: el valor acumulado (tu historial defendido) es lo que hace caro irse.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CANALES ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Canales de adquisición, rankeados</h2>
+    <div class="canales">
+      <div class="canal">
+        <div>
+          <h3>Agencias de aduana como canal</h3>
+          <p>El Plan Agencia no es sólo un segmento: es distribución. Una agencia de 10 personas despacha para 40 a 200 importadores; cada dossier que emite con Aforqua es una demo frente al cliente final. Meta: 12 agencias activas al mes 24.</p>
+          <p class="dato">≈230 agencias en Chile (estimación gremial) · ciclo de venta 1-3 meses</p>
+        </div>
+      </div>
+      <div class="canal">
+        <div>
+          <h3>Outbound quirúrgico con auditoría gratis</h3>
+          <p>Los registros de importación son datos públicos: se puede llegar a un gerente con "estas 5 partidas de tus últimas 50 declaraciones merecen revisión" en vez de un cold email genérico. LinkedIn más WhatsApp, 30 cuentas nuevas por semana.</p>
+          <p class="dato">tasa de reunión esperada 8-12% con gancho de datos propios (estimación)</p>
+        </div>
+      </div>
+      <div class="canal">
+        <div>
+          <h3>SEO programático por partida</h3>
+          <p>Miles de búsquedas long-tail del tipo "partida arancelaria taladro" o "arancel importar luminarias Chile". Una página por capítulo y por familia de productos, generada desde el corpus y revisada por humano, con el clasificador de la portada embebido.</p>
+          <p class="dato">compuesto: lento los primeros 6 meses, dominante después</p>
+        </div>
+      </div>
+      <div class="canal">
+        <div>
+          <h3>Gremios y ferias</h3>
+          <p>Cámara de Comercio de Santiago, Cámara Aduanera, seminarios de comercio exterior: charlas técnicas sobre fiscalización y resoluciones anticipadas, no pitch de venta. El contenido es el mismo corpus que ya mantenemos.</p>
+          <p class="dato">2 charlas/mes desde el mes 6</p>
+        </div>
+      </div>
+      <div class="canal">
+        <div>
+          <h3>Contadores y software PYME</h3>
+          <p>El contador del importador ve el giro de Aduanas antes que nadie. Programa de referidos simple; integración posterior con ERPs (Defontana, Nubox) para leer las importaciones y ofrecer la auditoría del historial con un clic.</p>
+          <p class="dato">canal de maduración: activarlo desde el mes 12</p>
+        </div>
+      </div>
+      <div class="canal">
+        <div>
+          <h3>Google Ads en cola larga</h3>
+          <p>Sólo en términos transaccionales ("clasificación arancelaria Chile", "resolución anticipada aduana"). Volumen chico, intención altísima.</p>
+          <p class="dato">CPL estimado $18.000-$35.000 (CPC $600-$1.200, conversión 3-4%; estimación)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IA EN EL MARKETING ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Dónde la IA ayuda a vender, y dónde no</h2>
+    <div class="prosa">
+      <p><strong>Sí, con nombre y apellido.</strong> El SEO programático: borradores por partida generados desde el corpus (el mismo activo del producto) y revisados por humano antes de publicar. Y la priorización de outbound: cruzar registros públicos de importación para detectar a quién le duele hoy, que es trabajo de datos, no de redacción.</p>
+      <p><strong>No.</strong> Redacción "personalizada" masiva de cold emails: en un mercado donde todos se conocen, un mail que huele a máquina quema el canal. Tampoco IA vendiendo en gremios y ferias: la confianza aduanera se construye cara a cara, con contenido técnico que resista preguntas de agentes con 30 años de oficio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRIMEROS 90 DÍAS ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Primeros 90 días</h2>
+    <div class="dias">
+      <div class="panel mesq">
+        <h3>Días 1-30 · entender y armar</h3>
+        <ul>
+          <li>15 entrevistas: 10 importadores ferreteros, 5 agentes de aduana</li>
+          <li>Corpus v0: capítulos 82, 84, 85 y 94 + resoluciones asociadas</li>
+          <li>Árbol RGI operativo para esos capítulos</li>
+          <li>Auditoría de historial como PDF vendible</li>
+        </ul>
+        <p class="meta">salida: 5 candidatos a design partner</p>
+      </div>
+      <div class="panel mesq esquinas">
+        <h3>Días 31-60 · probar con carga real</h3>
+        <ul>
+          <li>5 design partners con auditoría gratis del historial</li>
+          <li>Primer dossier firmado por un agente aliado</li>
+          <li>Medir: ¿el agente firma sin re-hacer el trabajo?</li>
+          <li>Vigilancia v0 sobre los SKU de los partners</li>
+        </ul>
+        <p class="meta">salida: 3 dossiers firmados sin reproceso</p>
+      </div>
+      <div class="panel mesq">
+        <h3>Días 61-90 · cobrar</h3>
+        <ul>
+          <li>Primeros dossiers sueltos cobrados a $45.000</li>
+          <li>2 design partners convertidos a Plan Importador</li>
+          <li>Landing con 200 páginas de partidas indexables</li>
+          <li>Primera charla en gremio</li>
+        </ul>
+        <p class="meta">salida: 3 clientes pagando, la señal de M1</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUÉ MATARÍA ESTO ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Qué mataría esto</h2>
+    <div class="riesgo">
+      <h3>1 · Que el dolor sea agudo pero infrecuente</h3>
+      <p>El escenario churn: el importador compra tras el susto de una fiscalización, clasifica sus 400 SKU en tres meses y se va. Si la vigilancia no logra sostener la suscripción (pocos eventos relevantes al año por cliente), esto es un producto de compra única de $500.000, no un SaaS. Se mide desde el día uno: eventos de vigilancia accionables por cliente por trimestre.</p>
+    </div>
+    <div class="riesgo">
+      <h3>2 · Que el canal natural nos vea como enemigo</h3>
+      <p>Si los agentes de aduana perciben a Aforqua como el intento de reemplazarlos, bloquean el acceso al cliente que hoy confía en ellos. Mitigación estructural: el dossier siempre termina en la firma del agente, y el Plan Agencia les da margen, no competencia. Si esta tesis falla, el CAC se duplica.</p>
+    </div>
+    <div class="riesgo">
+      <h3>3 · Que el LLM generalista se vuelva suficientemente bueno</h3>
+      <p>Con búsqueda web y razonamiento largo, un chat de frontera podrá dar códigos citados decentes. Nuestra apuesta es que la defensa exige determinismo, corpus curado y vigilancia continua, que son producto y operación, no una respuesta. Si Aduanas acepta "criterios de chat" en la práctica, el foso se angosta.</p>
+    </div>
+    <div class="riesgo">
+      <h3>4 · Dependencia regulatoria de una sola fuente</h3>
+      <p>Todo el corpus nace de publicaciones del Estado. Si la DNA publica un clasificador oficial gratuito y bueno, o restringe el acceso masivo a resoluciones, el libro pierde exclusividad. Lo primero es improbable a corto plazo (y lo celebraríamos como validación); lo segundo se mitiga porque los documentos son públicos por ley.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-fila">
+    <span>Aforqua · prototipo. Cifras citadas o marcadas como estimación con su aritmética.</span>
+    <span class="mono">las cuentas cuadran con roadmap y arquitectura</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

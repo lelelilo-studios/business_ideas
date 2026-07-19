@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiquaria: el sello ALTO EN no se discute, se calcula</title>
+<meta name="description" content="Del informe de laboratorio a la etiqueta lista para imprenta: Etiquaria calcula la declaración nutricional, determina cada sello ALTO EN citando su artículo, y simula la reformulación. Reglamento hecho código.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* Hero: split asimétrico, copy izquierda, widget vivo derecha */
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); }
+  .hero-grid { display: grid; gap: var(--sp-l); }
+  @media (min-width: 62em) {
+    .hero { padding-block: var(--sp-2xl) var(--sp-3xl); }
+    .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: var(--sp-2xl); align-items: center; }
+  }
+  .hero h1 { max-width: 13ch; margin-top: var(--sp-2xs); }
+  .hero .bajada { max-width: 44ch; margin-top: var(--sp-s); font-size: var(--step-1); }
+  .hero .btns { margin-top: var(--sp-m); }
+
+  /* Widget vivo */
+  .widget { background: var(--panel); border: 1px solid var(--linea); padding: var(--sp-m); }
+  .widget-prod { display: flex; justify-content: space-between; gap: var(--sp-s); flex-wrap: wrap; align-items: baseline; }
+  .widget-prod .nombre { font-weight: 700; }
+  .widget-prod .rut { font-family: var(--mono); font-size: 0.74rem; color: var(--tinta-3); }
+  .widget-cuerpo { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-m); align-items: center; margin-top: var(--sp-m); }
+  .widget svg.sello-svg { width: 108px; height: 108px; transition: opacity .2s ease, filter .2s ease; }
+  .widget svg.sello-svg.apagado { opacity: 0.12; filter: grayscale(1); }
+  .hero-veredicto { font-weight: 700; margin-top: 10px; }
+  .hero-veredicto.lleva { color: var(--tinta); }
+  .hero-veredicto.libre { color: var(--ok); }
+  .widget .cita-legal { margin-top: 4px; display: block; }
+
+  /* El problema */
+  .consecuencias { margin-top: var(--sp-m); }
+  .consecuencias li { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-s); padding-block: var(--sp-s); border-bottom: 1px solid var(--linea); align-items: baseline; }
+  .consecuencias li:first-child { border-top: 1px solid var(--linea); }
+  .consecuencias .quien { font-family: var(--mono); font-size: 0.74rem; color: var(--acento); min-width: 12ch; }
+  .consecuencias p { max-width: 60ch; }
+
+  /* Cadena de reglas: riel vertical */
+  .cadena { margin-top: var(--sp-l); border-left: 2px solid var(--tinta); padding-left: var(--sp-m); display: grid; gap: var(--sp-l); max-width: 62ch; }
+  .cadena h3 { font-size: var(--step-0); }
+  .cadena p { font-size: var(--step--1); margin-top: 4px; }
+  .cadena .paso { position: relative; }
+  .cadena .paso::before {
+    content: ""; position: absolute; left: calc(-1 * var(--sp-m) - 7px); top: 4px;
+    width: 12px; height: 12px; background: var(--acento); clip-path: var(--octogono);
+  }
+
+  /* Comparación */
+  .comp-envoltorio { margin-top: var(--sp-l); }
+  .tabla .si { color: var(--ok); font-weight: 600; }
+  .tabla .no { color: var(--tinta-3); }
+
+  /* Precios: 1 destacado ancho + 3 planes */
+  .precio-sku {
+    margin-top: var(--sp-l); border: 1px solid var(--tinta); background: var(--panel);
+    padding: var(--sp-m); display: grid; gap: var(--sp-s);
+  }
+  @media (min-width: 56em) { .precio-sku { grid-template-columns: 1fr auto; align-items: center; } }
+  .precio-sku .monto { font-family: var(--mono); font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; }
+  .planes { display: grid; gap: var(--sp-s); margin-top: var(--sp-s); }
+  @media (min-width: 56em) { .planes { grid-template-columns: repeat(3, 1fr); } }
+  .plan { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); display: flex; flex-direction: column; gap: 10px; }
+  .plan.destacado { border-color: var(--acento); box-shadow: 0 0 0 1px var(--acento); }
+  .plan .nombre { font-weight: 700; }
+  .plan .monto { font-family: var(--mono); font-size: var(--step-2); font-weight: 700; }
+  .plan .unidad { font-size: var(--step--1); color: var(--tinta-3); }
+  .plan ul { list-style: none; padding: 0; font-size: var(--step--1); color: var(--tinta-2); }
+  .plan ul li { padding-block: 6px; border-top: 1px solid var(--linea); }
+
+  /* CTA final */
+  .cierre { text-align: left; }
+  .cierre h2 { max-width: 22ch; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M10 2.5h12L29.5 10v12L22 29.5H10L2.5 22V10L10 2.5Z" stroke="#0d0d0f" stroke-width="2.4" stroke-linejoin="miter"/>
+        <path d="M11.5 12h9M11.5 16h6.5M11.5 20h9" stroke="#b0135c" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+      <span>Etiquaria</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu">
+      Menú
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="rotulo">Rotulado de alimentos · Ley 20.606</span>
+      <h1>El sello no se discute. Se calcula.</h1>
+      <p class="bajada">Del informe de laboratorio a una etiqueta lista para imprenta, con cada sello citando el artículo que lo exige.</p>
+      <div class="btns">
+        <a class="btn btn--pri" href="demo/index.html">Probar el demo</a>
+        <a class="btn btn--sec" href="#precios">Ver precios</a>
+      </div>
+    </div>
+
+    <div class="widget" aria-label="Ejemplo vivo: sellos según azúcares">
+      <div class="widget-prod">
+        <span class="nombre">Mermelada de frambuesa 250 g</span>
+        <span class="rut">Conservas Ñuble Puro Ltda. · 77.215.640-5</span>
+      </div>
+      <div class="campo" style="margin-top: var(--sp-m)">
+        <label for="heroAzucar">Azúcares totales según informe de laboratorio: <span class="valor"><span id="heroValor">48,0</span> g/100 g</span></label>
+        <input type="range" id="heroAzucar" min="0" max="60" step="0.5" value="48">
+      </div>
+      <div class="widget-cuerpo">
+        <div>
+          <p class="hero-veredicto lleva" id="heroVeredicto">LLEVA sello ALTO EN AZÚCARES</p>
+          <span class="cita-legal" id="heroDistancia">48,0 g ≥ límite de 10 g/100 g · art. 120 bis RSA (DS 13/2015)</span>
+        </div>
+        <svg class="sello-svg" id="heroSello" viewBox="0 0 100 100" role="img" aria-label="Sello ALTO EN AZÚCARES">
+          <path d="M29.29 0H70.71L100 29.29V70.71L70.71 100H29.29L0 70.71V29.29Z" fill="#0b0b0c"/>
+          <path d="M31 4H69L96 31V69L69 96H31L4 69V31L31 4Z" fill="none" stroke="#fff" stroke-width="2"/>
+          <text x="50" y="42" text-anchor="middle" fill="#fff" font-family="Sora, sans-serif" font-weight="800" font-size="12.5">ALTO EN</text>
+          <text x="50" y="60" text-anchor="middle" fill="#fff" font-family="Sora, sans-serif" font-weight="800" font-size="12.5">AZÚCARES</text>
+          <text x="50" y="80" text-anchor="middle" fill="#fff" font-family="Sora, sans-serif" font-size="6">Ministerio de Salud</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EL PROBLEMA ============ -->
+<section class="seccion">
+  <div class="container">
+    <h2>El informe del laboratorio llega. Y ahí empieza el problema.</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      El laboratorio te entrega nutrientes por 100 gramos. Lo que viene después es una cadena de
+      reglas deterministas que nadie en la fábrica sabe aplicar con confianza: formato de la
+      declaración, porciones, cuáles de los cuatro sellos corresponden, de qué tamaño según la cara
+      principal del envase, y las prohibiciones que se gatillan con cada sello. Equivocarse no es
+      gratis:
+    </p>
+    <ul class="consecuencias lista-limpia">
+      <li>
+        <span class="quien">SEREMI Salud</span>
+        <p><strong>Sumario sanitario.</strong> Un sello que faltaba, mal ubicado o más chico que el mínimo es una infracción al Reglamento Sanitario de los Alimentos, con multa y eventual retiro del producto.</p>
+      </li>
+      <li>
+        <span class="quien">Supermercado</span>
+        <p><strong>Rechazo en recepción.</strong> El control de calidad de la cadena devuelve el lote completo por una etiqueta no conforme. El flete y el reproceso los pagas tú.</p>
+      </li>
+      <li>
+        <span class="quien">Tu cliente</span>
+        <p><strong>Recall.</strong> Retirar 40.000 envases del mercado por un error de rotulado cuesta más que un año de asesorías. Y la marca queda marcada.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ CÓMO FUNCIONA ============ -->
+<section class="seccion">
+  <div class="container">
+    <h2>De la receta a la imprenta, en una cadena</h2>
+    <div class="cadena">
+      <div class="paso">
+        <h3>Declara</h3>
+        <p>Cargas el informe de laboratorio o la receta. Etiquaria arma la declaración nutricional en el formato del art. 115 del RSA, por 100 g y por porción.</p>
+      </div>
+      <div class="paso">
+        <h3>Sella</h3>
+        <p>El motor evalúa los cuatro descriptores contra los límites del art. 120 bis. Cada veredicto sale con el artículo, el límite y tu valor medido, lado a lado.</p>
+      </div>
+      <div class="paso">
+        <h3>Imprime</h3>
+        <p>Eliges el envase, Etiquaria calcula la superficie de la cara principal y entrega la etiqueta con los sellos en el tamaño mínimo legal, lista para la imprenta.</p>
+      </div>
+      <div class="paso">
+        <h3>Reformula</h3>
+        <p>El simulador te dice cuántos gramos tendrías que bajar para soltar un sello, y qué le hace ese cambio al costo de la receta, con la aritmética a la vista.</p>
+      </div>
+      <div class="paso">
+        <h3>Vigila</h3>
+        <p>Si el MINSAL modifica el reglamento, tus SKUs afectados se re-verifican y te llega el aviso con el diff del cambio. Cada verificación queda en el libro del SKU.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BANDA NEGRA: REGLAMENTO HECHO CÓDIGO ============ -->
+<section class="banda-negra">
+  <div class="container">
+    <h2>El reglamento, hecho código</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Los umbrales y la geometría del sello <strong>no los calcula un modelo de lenguaje</strong>.
+      Corren como código con tests contra el texto vigente del decreto. La IA redacta y explica;
+      el veredicto lo da una función que puedes auditar.
+    </p>
+    <pre class="bloque-codigo" style="margin-top: var(--sp-m)"><code><span class="cmt">// Art. 120 bis RSA (DS 977/96, incorporado por DS 13/2015).</span>
+<span class="cmt">// Límites de la etapa final, vigentes desde junio de 2019.</span>
+const LIMITES = {
+  solido:  { energia: <span class="num">275</span>, sodio: <span class="num">400</span>, azucares: <span class="num">10</span>, gsat: <span class="num">4</span> },  <span class="cmt">// por 100 g</span>
+  liquido: { energia: <span class="num">70</span>,  sodio: <span class="num">100</span>, azucares: <span class="num">5</span>,  gsat: <span class="num">3</span> },  <span class="cmt">// por 100 ml</span>
+};
+
+function veredicto(valor, limite) {
+  return {
+    lleva: valor &gt;= limite,
+    cita: <span class="str">"art. 120 bis RSA · DS 13/2015"</span>,
+    margen: limite - valor,
+  };
+}</code></pre>
+    <p class="nota" style="margin-top: var(--sp-s); color: #8f8f9a;">
+      Cada versión del motor está amarrada a una versión del reglamento. Si el decreto cambia, el motor
+      versiona, tus SKUs se re-verifican y el libro registra con qué versión se aprobó cada etiqueta.
+    </p>
+  </div>
+</section>
+
+<!-- ============ COMPARACIÓN ============ -->
+<section class="seccion">
+  <div class="container">
+    <h2>Contra lo que hoy existe, honestamente</h2>
+    <div class="comp-envoltorio scroll-x">
+      <table class="tabla" style="min-width: 720px">
+        <thead>
+          <tr>
+            <th>Alternativa</th>
+            <th>Qué entrega</th>
+            <th>Plazo</th>
+            <th class="num">Costo por SKU</th>
+            <th>Cita el artículo</th>
+            <th>Vigila cambios</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Asesor de etiquetado</strong></td>
+            <td>Informe y etiqueta revisada. Bueno en casos borde.</td>
+            <td>2 a 4 semanas</td>
+            <td class="num">$150.000 a $400.000 <span class="nota">(estimación de mercado)</span></td>
+            <td class="si">A veces</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td><strong>Laboratorio</strong></td>
+            <td>Los números por 100 g. El veredicto es problema tuyo.</td>
+            <td>1 a 2 semanas</td>
+            <td class="num">$120.000 a $250.000 el análisis <span class="nota">(estimación)</span></td>
+            <td class="no">No</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td><strong>El PDF del reglamento, en la casa</strong></td>
+            <td>Horas del jefe de calidad leyendo el DS 977 y rezando.</td>
+            <td>Días, con dudas</td>
+            <td class="num">"Gratis"</td>
+            <td class="no">Sin registro</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td><strong>Etiquaria</strong></td>
+            <td>Declaración, sellos con cita, etiqueta imprimible, simulador, libro.</td>
+            <td>Minutos</td>
+            <td class="num">$29.000</td>
+            <td class="si">Siempre</td>
+            <td class="si">Sí</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" style="margin-top: var(--sp-s)">
+      El asesor no desaparece: para casos borde (alegaciones saludables, alimentos para regímenes
+      especiales) te vamos a decir "esto llévalo a un asesor", con el punto exacto de la duda.
+    </p>
+  </div>
+</section>
+
+<!-- ============ PRECIOS ============ -->
+<section class="seccion" id="precios">
+  <div class="container">
+    <h2>Precios en pesos, sin llamada de ventas</h2>
+
+    <div class="precio-sku">
+      <div>
+        <p style="font-weight:700; color: var(--tinta); font-size: var(--step-1)">Verificación por SKU</p>
+        <p style="margin-top:6px; max-width: 56ch">Informe con citas, declaración nutricional, etiqueta lista para imprenta y certificado interno. Cada versión de receta es una verificación nueva y queda en el libro.</p>
+      </div>
+      <div>
+        <span class="monto">$29.000</span>
+        <span class="unidad nota"> / SKU verificado</span>
+      </div>
+    </div>
+
+    <div class="planes">
+      <div class="plan">
+        <span class="nombre">Vigía</span>
+        <div><span class="monto">$59.000</span><span class="unidad"> /mes</span></div>
+        <ul>
+          <li>Hasta 15 SKUs vigilados</li>
+          <li>Re-verificación ilimitada de SKUs vigilados</li>
+          <li>Simulador de reformulación</li>
+          <li>Libro de rotulado por SKU</li>
+          <li>Alerta de cambios del reglamento</li>
+        </ul>
+      </div>
+      <div class="plan destacado">
+        <span class="nombre">Fábrica</span>
+        <div><span class="monto">$149.000</span><span class="unidad"> /mes</span></div>
+        <ul>
+          <li>Hasta 60 SKUs vigilados</li>
+          <li>Todo lo de Vigía</li>
+          <li>3 usuarios (calidad, gerencia, diseño)</li>
+          <li>API para tu ERP</li>
+          <li>Carpeta de fiscalización para la SEREMI</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <span class="nombre">Marca propia</span>
+        <div><span class="monto">Desde $390.000</span><span class="unidad"> /mes</span></div>
+        <ul>
+          <li>Supermercados regionales con marcas propias</li>
+          <li>Cientos de SKUs, carga masiva</li>
+          <li>Veredicto por proveedor y por lote</li>
+          <li>SLA y soporte dedicado</li>
+        </ul>
+      </div>
+    </div>
+    <p class="nota" style="margin-top: var(--sp-s)">
+      Referencia: un asesor cobra $150.000 a $400.000 por SKU y demora semanas (estimación de mercado,
+      cotizaciones 2025-2026). Con 15 SKUs al año, Vigía cuesta menos que dos SKUs asesorados.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="seccion">
+  <div class="container">
+    <h2>Preguntas que nos harías</h2>
+    <div class="faq" style="margin-top: var(--sp-l); max-width: 72ch">
+      <details>
+        <summary>¿Cómo sé que el veredicto es correcto?</summary>
+        <div>
+          <p>Porque no depende de nadie "acordándose" del reglamento. Los límites, las reglas de porción y la geometría del sello corren como código con tests escritos contra el texto del DS 977 y del DS 13/2015. Cada veredicto muestra el artículo, el límite y tu valor, lado a lado.</p>
+          <p>Y si igual quieres una segunda opinión, el informe está redactado para que un asesor o la SEREMI lo pueda revisar línea por línea.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Esto reemplaza a mi asesor de etiquetado?</summary>
+        <div>
+          <p>Para el 90% determinista (declaración, sellos, tamaños, prohibiciones), sí. Para casos borde como alegaciones saludables o alimentos para regímenes especiales, el sistema te dice explícitamente "esto requiere criterio experto" y con qué artículo está la duda. No inventamos certezas.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Qué pasa cuando cambia el reglamento?</summary>
+        <div>
+          <p>La vigilancia regulatoria revisa el Diario Oficial y las resoluciones del MINSAL. Si un cambio afecta tus SKUs, se re-verifican contra la nueva versión del motor y te llega el aviso con el diff: qué sello cambia, desde cuándo, y qué stock de etiquetas puedes seguir usando.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿La etiqueta sirve directo para la imprenta?</summary>
+        <div>
+          <p>Entregamos la cara principal en PDF y SVG con los sellos en el tamaño mínimo legal para tu envase, en la posición correcta. Tu diseñador la integra al arte final; las dimensiones ya vienen resueltas y anotadas en centímetros.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Qué pasa con mis recetas?</summary>
+        <div>
+          <p>Tu receta es tuya. Se usa sólo para calcular tu declaración y tus veredictos, cifrada en reposo, y no entrena ningún modelo. Puedes exportar y borrar todo cuando quieras.</p>
+        </div>
+      </details>
+      <details>
+        <summary>¿Sirve para exportar a Perú o México?</summary>
+        <div>
+          <p>Todavía no, y no te vamos a decir que sí. Perú (octógonos) y México (NOM-051) usan la misma lógica de reglas deterministas y están en el roadmap; hoy el motor cubre Chile.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CIERRE ============ -->
+<section class="seccion cierre">
+  <div class="container">
+    <h2>Verifica tu primer SKU antes de mandar la próxima tirada a imprenta.</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">El demo corre completo en tu navegador, con una granola, una mermelada, un jugo y un pan de molde de ejemplo.</p>
+    <div class="btns" style="margin-top: var(--sp-m)">
+      <a class="btn btn--pri" href="demo/index.html">Probar el demo</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <span><strong style="color: var(--tinta)">Etiquaria</strong> · el reglamento de rotulado, hecho código</span>
+    <span>etiquaria.com · Chile · 2026 · prototipo</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

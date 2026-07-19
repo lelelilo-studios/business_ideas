@@ -1,0 +1,15 @@
+{
+  "folder": "22-heladas",
+  "brand": "Rondalba",
+  "domain": "rondalba.com",
+  "domain_evidence": "rdap.verisign.com/com/v1/domain/rondalba.com -> HTTP 404 (disponible); NIC Chile: rondalba.cl disponible. Verificado con _kit/check-domain.sh el 2026-07-18.",
+  "alternates": ["escarchia.com", "brumatia.com", "heladia.com"],
+  "tagline": "La vigilia de heladas que llama a las 3 AM y no corta hasta que alguien conteste.",
+  "category": "AgTech · Control de heladas",
+  "market": "Chile (O'Higgins a Ñuble) → Argentina y Perú",
+  "icp": "Productor mediano de fruta de exportación, 10 a 200 ha (cerezos, kiwis, uva), con torres o aspersión ya instaladas; firma el dueño o el administrador del campo.",
+  "price_clp": "Desde $28.000/ha por temporada (mín. $290.000 por campo)",
+  "accent": "#ff9d2e",
+  "problem": "Una helada de radiación en septiembre borra la temporada, y el sistema de alerta real es un despertador a las 2 AM y un termómetro colgado en el cuartel.",
+  "status": "prototipo"
+}

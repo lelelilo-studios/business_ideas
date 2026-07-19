@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>21 ideas + el sistema que las opera — lelelilo studios</title>
-<meta name="description" content="Quince productos —diez para PYMEs chilenas, cinco para la minería— cada uno con demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura que habría que configurar.">
+<title>26 ideas + el sistema que las opera · lelelilo studios</title>
+<meta name="description" content="Veintiséis productos de negocio para Chile: PYME, minería, consumo, cinco autónomas y cinco creadas por Fable. Cada uno con demo funcionando, plan de negocio, roadmap a 24 meses y la arquitectura que habría que configurar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -343,6 +343,20 @@ body {
   --bg:#0F0C18; --card:#181428; --line:#2F2A45; --hair:#1E1930;
   --mute:#A199B8; --mute-2:#8C84A3; --sig:#E4DFF0;
 }
+/* Creadas por Fable: tinta verde botella. La cuarta temperatura del índice:
+   ni el café de la PYME, ni el acero de la faena, ni la tinta riso del consumo.
+   El verde es la firma de la tanda que eligió el modelo, no un semáforo. */
+.fam--fable {
+  --bg:#0C120E; --card:#141C16; --line:#2B392F; --hair:#1A241D;
+  --mute:#97A79B; --mute-2:#7F9185; --sig:#DDEAE0;
+}
+.fam--fable .fam__tick {
+  background:
+    linear-gradient(var(--sig) 0 0) left  top    / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) right top    / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) left  bottom / 45% 45% no-repeat,
+    linear-gradient(var(--sig) 0 0) right bottom / 45% 45% no-repeat;
+}
 
 .fam__head {
   padding-block:var(--sp-2xl) var(--sp-xl);
@@ -590,13 +604,14 @@ body {
 
 <header class="masthead">
   <div class="container">
-    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>21 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
-    <h1>Veintiún negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
-    <p class="lede">Veintiún problemas reales —PYME, minería, consumo, y cinco que se operan solas— con
-      un producto que funciona en el navegador, un plan de marketing, un roadmap a 24 meses y la
-      arquitectura que habría que configurar para que dejara de ser una maqueta.</p>
+    <p class="eyebrow"><span>lelelilo studios</span><span>·</span><span>26 ideas + 1 sistema</span><span>·</span><span>2026</span></p>
+    <h1>Veintiséis negocios que podrían existir<em>, llevados hasta donde se pueden tocar.</em></h1>
+    <p class="lede">Veintiséis problemas reales: PYME, minería, consumo, cinco que se operan solas
+      y cinco elegidas por Fable. Cada uno con un producto que funciona en el navegador, un plan de
+      marketing, un roadmap a 24 meses y la arquitectura que habría que configurar para que dejara
+      de ser una maqueta.</p>
 
-    <nav class="jump" aria-label="Las tres familias">
+    <nav class="jump" aria-label="Las cinco familias">
       <a href="#pyme">
         <span class="jump__n mono">10</span>
         <span class="jump__t">PYME chilena<small>Ticket bajo · decide la dueña · venta en días</small></span>
@@ -622,6 +637,11 @@ body {
         <span class="jump__t">Autónomas<small>Se operan solas · nadie en el loop</small></span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       </a>
+      <a href="#fable">
+        <span class="jump__n mono">05</span>
+        <span class="jump__t">Creadas por Fable<small>Los huecos que las 21 dejaron · las eligió el modelo</small></span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
     </nav>
 
     <div class="note">
@@ -634,10 +654,11 @@ body {
       </div>
       <div>
         <h2>Dominios</h2>
-        <p><em>Los veintidós dominios están verificados como libres</em> al 13 de julio de 2026
+        <p><em>Los veintisiete dominios están verificados como libres</em> a julio de 2026
           (RDAP de Verisign para <span class="mono">.com</span>, NIC Chile para
-          <span class="mono">.cl</span>). Eso caduca: si vas a usar uno, verifícalo de nuevo
-          antes de comprarlo.</p>
+          <span class="mono">.cl</span>; cada tanda con su fecha en su propio
+          <span class="mono">meta.json</span>). Eso caduca: si vas a usar uno, verifícalo de
+          nuevo antes de comprarlo.</p>
       </div>
       <div>
         <h2>Números</h2>
@@ -665,7 +686,7 @@ body {
         <dl class="sis__facts mono">
           <div><dt>El juez</dt><dd>Aplica los criterios de muerte que cada idea firmó <em>antes</em> de recibir el primer peso. No puede editarlos, ni levantarse un tope.</dd></div>
           <div><dt>El kernel</dt><dd>Bloquea la acción antes de que toque una API. Nada de cuentas falsas, reseñas inventadas ni llamadas en frío con voz sintética.</dd></div>
-          <div><dt>Se enchufan</dt><dd>8 de las 16 viejas, del todo. 3 a medias. Las 5 de minería, no. Las 5 nuevas nacen enchufadas.</dd></div>
+          <div><dt>Se enchufan</dt><dd>8 de las 16 viejas, del todo. 3 a medias. Las 5 de minería, no. Las 5 autónomas nacen enchufadas.</dd></div>
           <div><dt>Se paga solo</dt><dd>Con 15 ideas, no con 2. La cuenta cómoda está descartada en su propia página.</dd></div>
         </dl>
         <nav class="sis__links" aria-label="Cuantario">
@@ -705,7 +726,7 @@ body {
     <section class="fam fam--pyme" id="pyme" aria-labelledby="h-pyme">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 01 de 4</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 01 de 5</p>
           <h2 class="fam__title" id="h-pyme">PYME chilena</h2>
           <p class="fam__count mono"><b>10</b><span>ideas</span></p>
           <p class="fam__lede">Diez problemas que hoy se resuelven en Excel, en un cuaderno o no se resuelven. Se venden solos: la dueña prueba el demo y decide.</p>
@@ -1009,7 +1030,7 @@ body {
     <section class="fam fam--mineria" id="mineria" aria-labelledby="h-mineria">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 02 de 4</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 02 de 5</p>
           <h2 class="fam__title" id="h-mineria">Minería</h2>
           <p class="fam__count mono"><b>05</b><span>ideas</span></p>
           <p class="fam__lede">Cinco problemas de faena, donde una hora de planta detenida cuesta más que un año de cualquiera de las diez de arriba. El comprador tiene plata y miedo, pero compra lento.</p>
@@ -1183,7 +1204,7 @@ body {
     <section class="fam fam--consumo" id="consumo" aria-labelledby="h-consumo">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 03 de 4</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 03 de 5</p>
           <h2 class="fam__title" id="h-consumo">Consumo</h2>
           <p class="fam__count mono"><b>01</b><span>ideas</span></p>
           <p class="fam__lede">La única idea del set que no le vende a una empresa: le vende a una familia. El niño juega, el papá paga y el banco termina financiando la cuenta — y esa cadena de tres es la idea, no un detalle del modelo.</p>
@@ -1229,7 +1250,7 @@ body {
     <section class="fam fam--autonomas" id="autonomas" aria-labelledby="h-autonomas">
       <div class="container">
         <header class="fam__head">
-          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 04 de 4</p>
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 04 de 5</p>
           <h2 class="fam__title" id="h-autonomas">Autónomas</h2>
           <p class="fam__count mono"><b>05</b><span>ideas</span></p>
           <p class="fam__lede">Cinco ideas elegidas por una sola razón: se venden, se entregan, se cobran y se soportan sin que una persona intervenga. Son las que el sistema de arriba puede operar de verdad — y la razón por la que existe.</p>
@@ -1400,6 +1421,180 @@ body {
         </div>
       </div>
     </section>
+    <section class="fam fam--fable" id="fable" aria-labelledby="h-fable">
+      <div class="container">
+        <header class="fam__head">
+          <p class="fam__kicker mono"><span class="fam__tick"></span>Familia 05 de 5</p>
+          <h2 class="fam__title" id="h-fable">Creadas por Fable</h2>
+          <p class="fam__count mono"><b>05</b><span>ideas</span></p>
+          <p class="fam__lede">Cinco ideas que nadie pidió por su nombre: se le pidió al modelo que hubiera cinco más, y Fable leyó las 21 anteriores, el ranking y sus huecos. Eligió cinco verticales sin tocar donde el foso del cable ya estaba probado.</p>
+          <dl class="fam__facts mono"><div><dt>Quién las eligió</dt><dd>Fable. El encargo fue el número; los problemas, las marcas y el diseño los puso el modelo.</dd></div><div><dt>El criterio</dt><dd>El ranking al revés: primero el foso (dato, vigilancia, actuación, libro, determinismo), después la idea.</dd></div><div><dt>Los verticales</dt><dd>Los que las 21 no tocaban: el campo, la cuenta de luz, la aduana, el edificio y la etiqueta.</dd></div><div><dt>El ranking</dt><dd>Todavía no las incluye: cada una rinde el test del LLM en su propia página de negocio.</dd></div></dl>
+        </header>
+        <div class="ideas">
+
+      <article class="idea" style="--acc:#FF9D2E;--acc-on:#0B0A09;--acc-soft:rgba(255,157,46,0.1);--acc-line:rgba(255,157,46,0.35)">
+        <a class="idea__hit" href="22-heladas/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">22</p>
+        
+        <div class="idea__head">
+          <p class="idea__cat mono">AgTech · Control de heladas</p>
+          <h3 class="idea__brand"><a href="22-heladas/index.html">Rondalba</a></h3>
+          <p class="idea__domain mono">rondalba.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile (O&#x27;Higgins a Ñuble) → Argentina y Perú</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La vigilia de heladas que llama a las 3 AM y no corta hasta que alguien conteste.</p>
+          <p class="idea__problem">Una helada de radiación en septiembre borra la temporada, y el sistema de alerta real es un despertador a las 2 AM y un termómetro colgado en el cuartel.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $28.000/ha por temporada (mín. $290.000 por campo)</p>
+          <a class="idea__demo" href="22-heladas/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Rondalba">
+            <a href="22-heladas/index.html">Producto</a>
+            <a href="22-heladas/negocio.html">Negocio</a>
+            <a href="22-heladas/roadmap.html">Roadmap</a>
+            <a href="22-heladas/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#F6C700;--acc-on:#0B0A09;--acc-soft:rgba(246,199,0,0.1);--acc-line:rgba(246,199,0,0.35)">
+        <a class="idea__hit" href="23-energia/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">23</p>
+        
+        <div class="idea__head">
+          <p class="idea__cat mono">SaaS PYME · Energía</p>
+          <h3 class="idea__brand"><a href="23-energia/index.html">Tarifana</a></h3>
+          <p class="idea__domain mono">tarifana.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → LatAm con tarifas reguladas por opción (Perú, Colombia)</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La cuenta de la luz, leída línea por línea, todos los meses.</p>
+          <p class="idea__problem">Una PYME con frío, hornos o máquinas paga millones al mes en electricidad con una opción tarifaria y una potencia contratada que nadie revisa hace años; la distribuidora no tiene ningún incentivo para avisar.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $24.000/mes + 20% del ahorro verificado</p>
+          <a class="idea__demo" href="23-energia/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Tarifana">
+            <a href="23-energia/index.html">Producto</a>
+            <a href="23-energia/negocio.html">Negocio</a>
+            <a href="23-energia/roadmap.html">Roadmap</a>
+            <a href="23-energia/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#ED6A1F;--acc-on:#0B0A09;--acc-soft:rgba(237,106,31,0.1);--acc-line:rgba(237,106,31,0.35)">
+        <a class="idea__hit" href="24-aduanas/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">24</p>
+        
+        <div class="idea__head">
+          <p class="idea__cat mono">LegalTech comercio exterior</p>
+          <h3 class="idea__brand"><a href="24-aduanas/index.html">Aforqua</a></h3>
+          <p class="idea__domain mono">aforqua.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → Perú y Colombia</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">La partida arancelaria correcta, con respaldo que se firma.</p>
+          <p class="idea__problem">La partida arancelaria la elige en cinco minutos un agente apurado: o pagas derechos de más por años, o Aduanas te formula cargos con multa y carga retenida.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Dossier $45.000<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="24-aduanas/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Aforqua">
+            <a href="24-aduanas/index.html">Producto</a>
+            <a href="24-aduanas/negocio.html">Negocio</a>
+            <a href="24-aduanas/roadmap.html">Roadmap</a>
+            <a href="24-aduanas/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#159757;--acc-on:#0B0A09;--acc-soft:rgba(21,151,87,0.1);--acc-line:rgba(21,151,87,0.35)">
+        <a class="idea__hit" href="25-condominios/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">25</p>
+        
+        <div class="idea__head">
+          <p class="idea__cat mono">PropTech / SaaS vertical</p>
+          <h3 class="idea__brand"><a href="25-condominios/index.html">Prorratia</a></h3>
+          <p class="idea__domain mono">prorratia.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → LatAm (Perú, Colombia)</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">Cada peso con su boleta, cada cobro por su alícuota, cada asamblea conforme a la Ley 21.442.</p>
+          <p class="idea__problem">El condominio mediano lo administra un amateur: gastos comunes que nadie puede auditar, morosos que financian el edificio sin querer y asambleas que legalmente nunca existieron.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $590/unidad/mes (comités, mín. $19.900)<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="25-condominios/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Prorratia">
+            <a href="25-condominios/index.html">Producto</a>
+            <a href="25-condominios/negocio.html">Negocio</a>
+            <a href="25-condominios/roadmap.html">Roadmap</a>
+            <a href="25-condominios/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+      <article class="idea" style="--acc:#EA3E8E;--acc-on:#0B0A09;--acc-soft:rgba(234,62,142,0.1);--acc-line:rgba(234,62,142,0.35)">
+        <a class="idea__hit" href="26-etiquetado/index.html" tabindex="-1" aria-hidden="true"></a>
+        <p class="idea__num mono">26</p>
+        
+        <div class="idea__head">
+          <p class="idea__cat mono">RegTech · alimentos</p>
+          <h3 class="idea__brand"><a href="26-etiquetado/index.html">Etiquaria</a></h3>
+          <p class="idea__domain mono">etiquaria.com<span class="idea__free">libre</span></p>
+          <dl class="idea__ext mono">
+            <div><dt>Mercado</dt><dd>Chile → LatAm (Perú y México ya usan sellos)</dd></div>
+          </dl>
+        </div>
+        <div class="idea__pitch">
+          <p class="idea__tagline">El sello no se discute. Se calcula, con su artículo al lado.</p>
+          <p class="idea__problem">El laboratorio entrega nutrientes por 100 g y nadie en la fábrica sabe aplicar con confianza la cadena de reglas que decide sellos, tamaños y prohibiciones: equivocarse es sumario, rechazo de lote o recall.</p>
+        </div>
+        <div class="idea__foot">
+          <p class="idea__price mono">Desde $29.000 por SKU<span class="idea__more">+ tramos</span></p>
+          <a class="idea__demo" href="26-etiquetado/demo/index.html">
+            <span>Ver el demo</span>
+            <svg class="idea__arrow" viewBox="0 0 20 12" width="20" height="12" aria-hidden="true" focusable="false">
+              <path d="M0 6h18M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+          <nav class="idea__docs mono" aria-label="Documentos de Etiquaria">
+            <a href="26-etiquetado/index.html">Producto</a>
+            <a href="26-etiquetado/negocio.html">Negocio</a>
+            <a href="26-etiquetado/roadmap.html">Roadmap</a>
+            <a href="26-etiquetado/stack.html">Arquitectura</a>
+          </nav>
+        </div>
+      </article>
+        </div>
+      </div>
+    </section>
 </main>
 
 <footer class="colofon">
@@ -1408,7 +1603,7 @@ body {
     <p>HTML, CSS y JavaScript escritos a mano. Sin build, sin framework, sin CDN: se abre el archivo
       y funciona. Los gráficos son SVG dibujado a mano, no una librería. La única petición externa
       son las tipografías de Google.</p>
-    <p>Las quince ideas se construyeron en paralelo, cada una por un agente distinto, siguiendo
+    <p>Las ideas se construyeron por tandas en paralelo, cada una por un agente distinto, siguiendo
       <a href="_kit/README.md">un contrato común</a> que fija el piso de accesibilidad, el mobile-first,
       la verificación de dominio y la regla que más importa: toda cifra va citada o va con su
       derivación a la vista.</p>

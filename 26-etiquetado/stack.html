@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Etiquaria</title>
+<meta name="description" content="Arquitectura de Etiquaria: modelo de datos, el motor de reglas como código, agentes de IA con su línea dura (el modelo no calcula umbrales), APIs, costos mensuales con aritmética y qué está falseado en el demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cab { padding-block: var(--sp-xl) var(--sp-l); }
+  .cab h1 { font-size: var(--step-4); max-width: 18ch; }
+  .esquema { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  @media (min-width: 62em) { .esquema { grid-template-columns: 1fr 1fr; } }
+  .agente { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); margin-top: var(--sp-s); }
+  .agente .modelo { font-family: var(--mono); font-size: 0.74rem; color: var(--acento); }
+  .agente h3 { margin-top: 4px; }
+  .agente dl { display: grid; gap: 8px; margin-top: var(--sp-s); }
+  @media (min-width: 48em) { .agente dl { grid-template-columns: 1fr 1fr; } }
+  .agente dt { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--tinta-3); }
+  .agente dd { font-size: var(--step--1); color: var(--tinta-2); margin-top: 2px; }
+  .linea-dura ul { list-style: none; padding: 0; margin-top: var(--sp-s); max-width: 74ch; }
+  .linea-dura li { padding-block: 9px; border-top: 1px solid #26262b; color: #b9b9c2; font-size: var(--step--1); display: grid; grid-template-columns: 20px 1fr; gap: 10px; }
+  .linea-dura li::before { content: ""; width: 12px; height: 12px; margin-top: 4px; background: #e0357f; clip-path: var(--octogono); }
+  .linea-dura strong { color: #fff; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M10 2.5h12L29.5 10v12L22 29.5H10L2.5 22V10L10 2.5Z" stroke="#0d0d0f" stroke-width="2.4" stroke-linejoin="miter"/>
+        <path d="M11.5 12h9M11.5 16h6.5M11.5 20h9" stroke="#b0135c" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+      <span>Etiquaria</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu">
+      Menú
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="cab">
+  <div class="container">
+    <h1>Arquitectura: el motor manda, el modelo redacta</h1>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Nada de esto está aprovisionado: es lo que habría que configurar para que Etiquaria funcione de
+      verdad. La decisión central de diseño es una sola: <strong>todo veredicto sale de código
+      determinista versionado; los modelos de lenguaje explican, extraen y vigilan, y tienen
+      prohibido calcular.</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ===== MOTOR ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>El motor de reglas como código</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Un paquete TypeScript puro (<span class="mono">motor-rsa</span>), sin red y sin IA adentro.
+      Entrada: nutrientes por 100 g/ml + metadatos del envase. Salida: veredictos con cita, geometría
+      de sellos y declaración del art. 115. Cada release del motor queda amarrada a una fila de
+      <span class="mono">reglamento_versiones</span> (hash del texto legal incluido), y trae una
+      suite de tests por artículo: casos límite (valor == límite), líquidos vs sólidos, envases bajo
+      30 cm², alimentos sin nutrientes añadidos. Si el decreto cambia, se escribe primero el test
+      contra el texto nuevo, después el código.
+    </p>
+    <pre class="bloque-codigo" style="margin-top: var(--sp-m)"><code><span class="cmt">// El contrato del motor: puro, versionado, auditable</span>
+verificar(informe: InformeLab, envase: Envase, opts: { versionReglamento: string })
+  → {
+      veredictos: Veredicto[],      <span class="cmt">// { descriptor, valor, limite, lleva, cita }</span>
+      etiqueta: GeometriaEtiqueta,  <span class="cmt">// sellos en cm, posición, cara principal</span>
+      declaracion: FilaArt115[],
+      versionMotor: string,         <span class="cmt">// p. ej. "rsa-2026.07.1"</span>
+      hashReglamento: string,
+    }</code></pre>
+  </div>
+</section>
+
+<!-- ===== MODELO DE DATOS ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Modelo de datos (Postgres)</h2>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 760px">
+        <thead><tr><th>Tabla</th><th>Campos principales</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">empresas</td><td class="mono" style="font-size:.74rem">id, razon_social, rut, comuna, plan, created_at</td><td>El cliente: fábrica o cadena.</td></tr>
+          <tr><td class="mono">usuarios</td><td class="mono" style="font-size:.74rem">id, empresa_id, email, rol [calidad|gerencia|diseno]</td><td>Quién verifica y quién firma.</td></tr>
+          <tr><td class="mono">skus</td><td class="mono" style="font-size:.74rem">id, empresa_id, nombre, estado_fisico, porcion, envases jsonb</td><td>Cada producto rotulable.</td></tr>
+          <tr><td class="mono">informes_lab</td><td class="mono" style="font-size:.74rem">id, sku_id, fuente [pdf|manual], nutrientes jsonb, laboratorio, fecha_analisis, archivo_url</td><td>El origen de cada número.</td></tr>
+          <tr><td class="mono">verificaciones</td><td class="mono" style="font-size:.74rem">id, sku_id, informe_id, version_motor, version_reglamento, veredictos jsonb, etiqueta_svg_url, informe_pdf_url, creada_por, created_at</td><td><strong>El libro</strong>: inmutable, exportable para la SEREMI.</td></tr>
+          <tr><td class="mono">reglamento_versiones</td><td class="mono" style="font-size:.74rem">id, decreto, fecha_vigencia, tablas jsonb, fuente_url, hash_texto</td><td>Contra qué texto se verificó.</td></tr>
+          <tr><td class="mono">eventos_regulatorios</td><td class="mono" style="font-size:.74rem">id, fuente, url, fecha, clasificacion, relevante bool, resumen, estado [nuevo|revisado|aplicado]</td><td>La cola de vigilancia.</td></tr>
+          <tr><td class="mono">simulaciones</td><td class="mono" style="font-size:.74rem">id, sku_id, descriptor, reduccion, resultado jsonb, created_at</td><td>Reformulaciones exploradas.</td></tr>
+          <tr><td class="mono">suscripciones</td><td class="mono" style="font-size:.74rem">empresa_id, plan, monto_clp, medio [webpay|flow|transferencia], estado, dte_folio</td><td>Cobro y facturación.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LÍNEA DURA ===== -->
+<section class="banda-negra linea-dura">
+  <div class="container">
+    <h2>La línea dura: lo que el modelo tiene prohibido</h2>
+    <ul>
+      <li><p><strong>Calcular umbrales o decidir si un sello aplica.</strong> Eso es <span class="mono">motor-rsa</span>. Punto.</p></li>
+      <li><p><strong>Calcular tamaños o posición de sellos.</strong> La geometría sale de la tabla del decreto, en código con tests.</p></li>
+      <li><p><strong>Introducir cifras nuevas en un informe.</strong> Los textos generados pasan por un post-chequeo que extrae todo número del borrador y lo compara contra la salida del motor: si aparece una cifra que el motor no produjo, el borrador se descarta y se regenera.</p></li>
+      <li><p><strong>Publicar sin humano cuando hay cambio regulatorio.</strong> La vigilancia clasifica y resume, pero un cambio de reglamento lo confirma una persona antes de tocar el motor o avisar a clientes.</p></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== AGENTES ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Los agentes de IA, uno por pega</h2>
+
+    <div class="agente">
+      <span class="modelo">claude-sonnet-5 · structured outputs</span>
+      <h3>Lector de informes de laboratorio</h3>
+      <dl>
+        <dt>Qué hace</dt><dd>Extrae nutrientes por 100 g/ml desde el PDF del laboratorio a un JSON con schema estricto (energía, azúcares, g. saturadas, sodio, y el resto del art. 115).</dd>
+        <dt>Prompt (esencia)</dt><dd>"Extrae exactamente lo que dice el documento. Si un valor no está o es ambiguo, deja null y márcalo: no completes."</dd>
+        <dt>Herramientas</dt><dd>Ninguna: entrada PDF, salida JSON validado contra schema.</dd>
+        <dt>Control</dt><dd>El usuario confirma los valores extraídos en pantalla antes de que el motor verifique. La cifra confirmada es la que manda.</dd>
+      </dl>
+    </div>
+
+    <div class="agente">
+      <span class="modelo">claude-sonnet-5</span>
+      <h3>Redactor y copiloto</h3>
+      <dl>
+        <dt>Qué hace</dt><dd>Redacta la prosa del informe de verificación y responde preguntas del jefe de calidad ("¿por qué mi néctar lleva sello y el de la competencia no?").</dd>
+        <dt>Prompt (esencia)</dt><dd>Recibe la salida JSON del motor + los artículos citados. "Explica usando SOLO estos números y estas citas. Si la pregunta requiere un cálculo que no está en la salida, responde que se debe correr una verificación."</dd>
+        <dt>Herramientas</dt><dd>Una: invocar el motor (tool use) para re-verificar con otros parámetros. El modelo pide el cálculo; nunca lo hace.</dd>
+        <dt>Control</dt><dd>Post-chequeo numérico (ver línea dura) + citas obligatorias en cada respuesta.</dd>
+      </dl>
+    </div>
+
+    <div class="agente">
+      <span class="modelo">claude-haiku-4-5-20251001</span>
+      <h3>Vigía regulatorio</h3>
+      <dl>
+        <dt>Qué hace</dt><dd>Cada mañana clasifica la edición del Diario Oficial y las resoluciones MINSAL/ISP del día: ¿toca rotulado de alimentos? Salida: relevante sí/no + resumen de 3 líneas + artículos aludidos.</dd>
+        <dt>Prompt (esencia)</dt><dd>"Clasifica con recall alto: ante la duda, marca relevante. El costo de un falso positivo es una revisión humana de 2 minutos; el de un falso negativo es un cliente multado."</dd>
+        <dt>Herramientas</dt><dd>Ninguna: texto entra, clasificación sale. Los relevantes van a la cola <span class="mono">eventos_regulatorios</span>.</dd>
+        <dt>Control</dt><dd>Revisión humana de todo lo marcado relevante. Nada llega a clientes sin confirmación.</dd>
+      </dl>
+    </div>
+
+    <div class="agente">
+      <span class="modelo">claude-opus-4-8</span>
+      <h3>Analista de impacto (sólo con cambio real)</h3>
+      <dl>
+        <dt>Qué hace</dt><dd>Cuando un cambio regulatorio se confirma, redacta el análisis de impacto por cliente: qué SKUs cambian de veredicto (con el motor nuevo ya corrido sobre toda la base), desde cuándo, y qué hacer con el stock de etiquetas.</dd>
+        <dt>Prompt (esencia)</dt><dd>Recibe el diff de veredictos motor-viejo vs motor-nuevo, por SKU. "Redacta el aviso; cada afirmación numérica debe venir del diff adjunto."</dd>
+        <dt>Herramientas</dt><dd>Ninguna: el diff ya viene calculado por el motor.</dd>
+        <dt>Control</dt><dd>Es el evento de más riesgo del producto, por eso usa el modelo más capaz y sale con revisión humana siempre. Ocurre pocas veces al año.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APIS Y ENV ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>APIs de terceros y qué hay que contratar</h2>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 720px">
+        <thead><tr><th>Servicio</th><th>Para qué</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Diario Oficial</strong> (scraping) + <strong>API LeyChile/BCN</strong></td><td>Vigilancia diaria + texto consolidado del DS 977</td><td>El Diario Oficial no tiene API: scraping del índice diario con respaldo manual. LeyChile expone XML de normas consolidadas.</td></tr>
+          <tr><td><strong>Anthropic API</strong></td><td>Los 4 agentes de arriba</td><td>Modelos actuales: claude-sonnet-5, claude-haiku-4-5-20251001, claude-opus-4-8.</td></tr>
+          <tr><td><strong>Transbank Webpay / Flow</strong></td><td>Cobro de planes y verificaciones</td><td>Flow parte más rápido para una SpA nueva; Webpay al crecer.</td></tr>
+          <tr><td><strong>Haulmer/OpenFactura u similar</strong></td><td>Boleta y factura electrónica SII (DTE)</td><td>Obligatorio para cobrar en Chile como corresponde.</td></tr>
+          <tr><td><strong>Postmark o Resend</strong></td><td>Correos transaccionales y alertas regulatorias</td><td>La alerta de cambio de reglamento es el correo que nadie puede perderse: dominio dedicado, DMARC.</td></tr>
+          <tr><td><strong>Cloudflare R2</strong></td><td>PDFs de laboratorio, SVG/PDF de etiquetas, informes</td><td>S3-compatible, sin costo de egreso.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top: var(--sp-xl)">Variables de entorno</h3>
+    <pre class="bloque-codigo" style="margin-top: var(--sp-s)"><code>DATABASE_URL            <span class="cmt"># Postgres gestionado</span>
+ANTHROPIC_API_KEY       <span class="cmt"># agentes</span>
+R2_ACCOUNT_ID / R2_ACCESS_KEY / R2_SECRET  <span class="cmt"># archivos</span>
+FLOW_API_KEY / FLOW_SECRET                 <span class="cmt"># pagos</span>
+OPENFACTURA_API_KEY     <span class="cmt"># DTE</span>
+POSTMARK_TOKEN          <span class="cmt"># correo</span>
+MOTOR_VERSION_PIN       <span class="cmt"># versión del motor en producción</span>
+SENTRY_DSN              <span class="cmt"># errores</span></code></pre>
+  </div>
+</section>
+
+<!-- ===== COSTOS ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Costo mensual estimado, con la aritmética</h2>
+    <p class="prosa nota" style="margin-top: 6px">
+      Escenario: 50 clientes activos. Tipo de cambio asumido: US$1 ≈ $950 CLP (estimación julio 2026).
+      Precios de API: Sonnet 5 US$3/M tokens entrada y US$15/M salida; Haiku 4.5 US$1/US$5;
+      Opus 4.8 US$5/US$25.
+    </p>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 760px">
+        <thead><tr><th>Ítem</th><th>Aritmética</th><th class="num">US$/mes</th></tr></thead>
+        <tbody>
+          <tr><td>Verificaciones (redactor)</td><td class="mono" style="font-size:.76rem">50 clientes × 8 verif. = 400 × (18k in × $3/M + 2,5k out × $15/M ≈ $0,092)</td><td class="num">36,6</td></tr>
+          <tr><td>Copiloto (preguntas)</td><td class="mono" style="font-size:.76rem">50 × 20 preguntas = 1.000 × (6k in + 1k out ≈ $0,033)</td><td class="num">33,0</td></tr>
+          <tr><td>Vigía (Haiku, diario)</td><td class="mono" style="font-size:.76rem">30 días × (60k in × $1/M + 2k out × $5/M ≈ $0,07)</td><td class="num">2,1</td></tr>
+          <tr><td>Analista de impacto (Opus)</td><td class="mono" style="font-size:.76rem">~2 eventos × (30k in × $5/M + 5k out × $25/M ≈ $0,28)</td><td class="num">0,6</td></tr>
+          <tr><td>VPS (app + motor)</td><td class="mono" style="font-size:.76rem">Hetzner/DO mediano</td><td class="num">24,0</td></tr>
+          <tr><td>Postgres gestionado</td><td class="mono" style="font-size:.76rem">plan base con backups</td><td class="num">25,0</td></tr>
+          <tr><td>R2 + correo + dominio</td><td class="mono" style="font-size:.76rem">$5 + $15 + $5</td><td class="num">25,0</td></tr>
+          <tr><td><strong>Total</strong></td><td class="mono" style="font-size:.76rem"><strong>≈ $138.700 CLP/mes → $2.774 ≈ $2.800 por cliente</strong></td><td class="num"><strong>146,3</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Este es el número que <a href="negocio.html">Negocio</a> descuenta del margen: $2.800 por
+      cliente al mes sobre un ticket de $95.000 → ~97% de margen bruto. La inferencia es el 49% del
+      costo y escala sublineal (la vigilancia es fija para todo el sistema).
+    </p>
+  </div>
+</section>
+
+<!-- ===== FALSEADO ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Qué está falseado en el demo</h2>
+    <div class="scroll-x" style="margin-top: var(--sp-l)">
+      <table class="tabla" style="min-width: 700px">
+        <thead><tr><th>En el demo</th><th>En producción haría falta</th></tr></thead>
+        <tbody>
+          <tr><td>4 productos con nutrientes precargados; sólo los 4 descriptores del 120 bis.</td><td>Alta de SKUs reales, extracción desde PDF de laboratorio, y el resto del art. 115 completo (vitaminas, alegaciones, ingredientes).</td></tr>
+          <tr><td>Tabla de tamaños de sello marcada como estimación en <span class="mono">motor.js</span>.</td><td>Tabla oficial del DS 13/2015 transcrita con doble control y tests; posiciones y excepciones completas (envases &lt;30 cm², exenciones del 120 bis, fórmulas y suplementos).</td></tr>
+          <tr><td>El "libro" vive en memoria y se pierde al recargar.</td><td>Tabla <span class="mono">verificaciones</span> inmutable con export PDF firmado para fiscalización.</td></tr>
+          <tr><td>Sin cuentas, sin pagos, sin vigilancia: todo corre en el navegador.</td><td>Auth, Flow/Webpay + DTE, y el pipeline de vigilancia con los agentes de arriba.</td></tr>
+          <tr><td>Precios de ingredientes del simulador: estimaciones fijas.</td><td>Precios del cliente (su ERP o carga manual) y curvas sensoriales reales por categoría.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DOMINIO ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Evidencia de dominio</h2>
+    <div class="caja" style="margin-top: var(--sp-l)">
+      <p class="mono" style="font-size:.8rem; line-height: 2">
+        etiquaria.com → rdap.verisign.com -> HTTP 404 (disponible), 2026-07-18<br>
+        etiquaria.cl &nbsp;→ NIC Chile "no existe" (disponible), 2026-07-18<br>
+        Alternativas verificadas el mismo día (todas .com HTTP 404, disponibles):<br>
+        porcionia.com · rotulida.com · nutrogia.com · octogria.com · rotulena.com
+      </p>
+      <p class="nota" style="margin-top: var(--sp-s)">Verificado con <span class="mono">_kit/check-domain.sh</span> (RDAP Verisign para .com, whois NIC Chile para .cl).</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <span><strong style="color: var(--tinta)">Etiquaria</strong> · arquitectura</span>
+    <span>Nada aprovisionado: documentado para construirse</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

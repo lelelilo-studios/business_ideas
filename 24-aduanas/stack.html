@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Aforqua</title>
+<meta name="description" content="Modelo de datos, pipeline del corpus, agentes de IA con la línea dura (el modelo no elige el código), APIs, costo mensual con aritmética, qué está falseado en el demo y la evidencia del dominio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cab-pagina { padding-block: var(--sp-xl) var(--sp-l); }
+  .cab-pagina h1 { font-size: var(--step-3); max-width: 26ch; }
+  .cab-pagina .lede { max-width: 60ch; margin-top: var(--sp-s); }
+
+  .bloque { padding-block: var(--sp-xl); border-top: 1px solid var(--linea); }
+  .bloque h2 { margin-bottom: var(--sp-m); }
+  .bloque .prosa { max-width: 68ch; }
+  .bloque .prosa p + p { margin-top: var(--sp-s); }
+
+  .linea-dura {
+    border: 1px solid var(--naranja); border-radius: var(--radio);
+    background: var(--naranja-velo); padding: var(--sp-m);
+    max-width: 76ch; margin-bottom: var(--sp-l);
+  }
+  .linea-dura h3 { display: flex; gap: .6rem; align-items: center; color: var(--naranja-claro); }
+  .linea-dura h3 svg { width: 22px; height: 22px; flex: none; }
+  .linea-dura p { margin-top: .5rem; font-size: var(--step--1); color: var(--hielo); }
+
+  .caja-t { background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+  .caja-t + .caja-t { margin-top: var(--sp-m); }
+  .caja-t .cab { padding: .6rem .9rem; border-bottom: 1px solid var(--linea); background: var(--mar-2); font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--hielo-3); }
+
+  .agentes { display: grid; gap: var(--sp-m); }
+  @media (min-width: 64em) { .agentes { grid-template-columns: 1fr 1fr; } }
+  .agente { padding: var(--sp-m); display: flex; flex-direction: column; gap: .5rem; }
+  .agente h3 { font-size: var(--step-0); }
+  .agente .modelo { font-family: var(--mono); font-size: .74rem; color: var(--naranja-claro); }
+  .agente p { font-size: var(--step--1); }
+  .agente dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; font-size: .8rem; margin-top: .3rem; }
+  .agente dt { font-family: var(--mono); font-size: .7rem; color: var(--hielo-3); padding-top: .1rem; }
+  .agente dd { color: var(--hielo-2); }
+
+  .pipeline { counter-reset: pl; margin-top: var(--sp-s); max-width: 72ch; }
+  .pl-paso { border-top: 1px solid var(--linea); padding: var(--sp-s) 0 var(--sp-s) 2.6rem; position: relative; }
+  .pl-paso::before { counter-increment: pl; content: counter(pl); position: absolute; left: 0; top: var(--sp-s); font-family: var(--mono); color: var(--naranja-claro); font-weight: 600; border: 1px solid var(--naranja); width: 1.7rem; height: 1.7rem; border-radius: var(--radio); display: flex; align-items: center; justify-content: center; font-size: .8rem; }
+  .pl-paso h3 { font-size: var(--step-0); margin-bottom: .25rem; }
+  .pl-paso p { font-size: var(--step--1); }
+  .pl-paso .freq { font-family: var(--mono); font-size: .7rem; color: var(--hielo-3); margin-top: .3rem; }
+
+  .calculo { background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); padding: var(--sp-m); font-family: var(--mono); font-size: .8rem; overflow-x: auto; }
+  .calculo + .calculo { margin-top: var(--sp-m); }
+  .calculo .tit-c { color: var(--hielo); font-weight: 600; margin-bottom: .5rem; font-size: .85rem; }
+  .calculo .linea { display: flex; justify-content: space-between; gap: var(--sp-l); padding: .35rem 0; border-bottom: 1px dotted var(--linea); white-space: nowrap; }
+  .calculo .linea:last-child { border-bottom: 0; }
+  .calculo .et { color: var(--hielo-2); }
+  .calculo .et .sup { color: var(--hielo-3); font-size: .7rem; }
+  .calculo .num { color: var(--hielo); font-variant-numeric: tabular-nums; }
+  .calculo .linea--total { border-top: 1px solid var(--linea-2); }
+  .calculo .linea--total .et, .calculo .linea--total .num { color: var(--naranja-claro); font-weight: 600; }
+
+  pre.env {
+    background: var(--mar-0); border: 1px solid var(--linea-2); border-radius: var(--radio);
+    padding: var(--sp-s); font-family: var(--mono); font-size: .76rem; line-height: 1.8;
+    color: var(--hielo-2); overflow-x: auto;
+  }
+  pre.env .c { color: var(--hielo-3); }
+
+  .falso { display: grid; gap: var(--sp-m); }
+  @media (min-width: 64em) { .falso { grid-template-columns: 1fr 1fr; } }
+  .falso .col { padding: var(--sp-m); }
+  .falso h3 { display: flex; align-items: center; gap: .6rem; margin-bottom: var(--sp-s); font-size: var(--step-0); }
+  .falso h3 svg { width: 20px; height: 20px; flex: none; }
+  .falso ul { list-style: none; padding: 0; font-size: var(--step--1); color: var(--hielo-2); }
+  .falso li { padding: .45rem 0 .45rem 1.2rem; border-top: 1px solid var(--linea); position: relative; }
+  .falso li::before { content: ""; position: absolute; left: 0; top: 1rem; width: .5rem; height: 1px; background: var(--hielo-3); }
+
+  .dominio { padding: var(--sp-m); max-width: 76ch; }
+  .dominio .ev { font-family: var(--mono); font-size: .78rem; color: var(--hielo-2); background: var(--mar-0); border: 1px solid var(--linea-2); border-radius: var(--radio); padding: var(--sp-s); margin-top: var(--sp-s); overflow-x: auto; line-height: 1.8; }
+  .dominio .ev b { color: var(--ok); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-envuelto">
+    <div class="nav-fila">
+      <a class="marca" href="index.html" aria-label="Aforqua, inicio">
+        <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="2" y="6.5" width="22" height="13" rx="1.5" stroke="#ed6a1f" stroke-width="1.8"/>
+          <path d="M7 6.5v13M11 6.5v13M15 6.5v13M19 6.5v13" stroke="#ed6a1f" stroke-width="1.3" opacity=".55"/>
+        </svg>
+        <span>Aforqua</span>
+      </a>
+      <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html" aria-current="page">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<div class="container cab-pagina">
+  <h1>Arquitectura: lo que habría que construir de verdad</h1>
+  <p class="lede">Nada de esto está aprovisionado; está documentado para que cualquiera pueda auditar si la idea se sostiene técnicamente y cuánto costaría operarla.</p>
+</div>
+
+<!-- ============ LA LÍNEA DURA ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>El principio de diseño</h2>
+    <div class="linea-dura esquinas">
+      <h3>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7"/></svg>
+        El modelo tiene prohibido elegir el código
+      </h3>
+      <p>No es un prompt pidiendo por favor: es arquitectura. El esquema JSON de salida del extractor no tiene ningún campo donde quepa una partida. El código arancelario sólo puede producirlo el motor de reglas: funciones puras, versionadas, que implementan las RGI y las notas legales por capítulo. Cada cambio del árbol corre en CI contra un set dorado de clasificaciones conocidas (resoluciones históricas); si una regresión cambia un resultado validado, el deploy no sale. La IA extrae, busca y redacta. Clasificar, clasifica el código.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELO DE DATOS ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Modelo de datos</h2>
+    <div class="caja-t">
+      <p class="cab">Postgres · tablas principales</p>
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Tabla</th><th>Campos clave</th><th>Para qué</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">cuentas</td><td class="mono">rut, razon_social, plan, comuna, agencia_id</td><td>Importadores y agencias; una agencia ve carpetas de sus clientes.</td></tr>
+            <tr><td class="mono">skus</td><td class="mono">cuenta_id, codigo_interno, nombre, ficha_texto, fotos[], atributos jsonb, pais_origen</td><td>El catálogo del importador; los atributos extraídos viven aquí con sus citas.</td></tr>
+            <tr><td class="mono">clasificaciones</td><td class="mono">sku_id, codigo8, version_arancel, recorrido jsonb, estado, creada_en</td><td>Cada corrida del árbol: nodo a nodo, con la versión de reglas usada. Inmutable.</td></tr>
+            <tr><td class="mono">dossiers</td><td class="mono">folio, clasificacion_id, pdf_url, agente_firmante, estado</td><td>El documento entregable; el folio es el que aparece ante una fiscalización.</td></tr>
+            <tr><td class="mono">corpus_docs</td><td class="mono">tipo, numero, fecha, fuente_url, texto, partidas[], embedding</td><td>Resoluciones anticipadas, dictámenes, circulares y fallos. La cita sólo puede apuntar aquí.</td></tr>
+            <tr><td class="mono">arancel_lineas</td><td class="mono">codigo8, glosa, advalorem, version, vigente_desde/hasta</td><td>El arancel completo, versionado: las enmiendas son filas nuevas, no updates.</td></tr>
+            <tr><td class="mono">tlc_preferencias</td><td class="mono">acuerdo, codigo8, tasa, regla_origen, fase, vigencia</td><td>Listas de desgravación por acuerdo y código, con su regla de origen.</td></tr>
+            <tr><td class="mono">reglas_arbol</td><td class="mono">capitulo, version, definicion jsonb, casos_dorados[]</td><td>El árbol RGI por capítulo, versionado, con su suite de regresión.</td></tr>
+            <tr><td class="mono">eventos_vigilancia</td><td class="mono">tipo, doc_id, diff jsonb, fecha</td><td>Todo lo nuevo que entra al corpus o cambia en arancel/TLC.</td></tr>
+            <tr><td class="mono">eventos_cuenta</td><td class="mono">evento_id, cuenta_id, sku_id, relevancia, estado</td><td>El cruce evento × SKU: lo que ve el cliente en su feed.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PIPELINE DEL CORPUS ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>El pipeline del corpus, que es el foso</h2>
+    <div class="pipeline">
+      <div class="pl-paso">
+        <h3>Recolección</h3>
+        <p>Scrapers estructurados sobre las publicaciones del Servicio Nacional de Aduanas (resoluciones anticipadas, dictámenes de clasificación, circulares), el Diario Oficial (decretos de arancel y TLC) y los datasets abiertos de comercio exterior. No existe API pública: es scraping cuidadoso, con caché y respeto de robots.</p>
+        <p class="freq">diario, 06:00 · Playwright + parsers por fuente</p>
+      </div>
+      <div class="pl-paso">
+        <h3>Normalización y triage</h3>
+        <p>Cada documento nuevo pasa por el agente bibliotecario: tipo, número, fecha, partidas mencionadas, resumen de tres líneas. OCR previo para los PDF escaneados viejos.</p>
+        <p class="freq">claude-haiku-4-5 · escala a sonnet si el documento es ambiguo</p>
+      </div>
+      <div class="pl-paso">
+        <h3>Indexación</h3>
+        <p>Texto completo + embeddings por documento y por considerando. La búsqueda de respaldos es híbrida: filtro determinista por partida primero, semántica después. Una cita que no exista como fila en <span class="mono">corpus_docs</span> no puede entrar a un dossier.</p>
+        <p class="freq">pgvector en el mismo Postgres · sin infra extra</p>
+      </div>
+      <div class="pl-paso">
+        <h3>Vigilancia</h3>
+        <p>Diff diario de arancel y TLC más los documentos nuevos, cruzados contra los atributos y códigos de todos los SKU de todas las cuentas. Coincidencias generan <span class="mono">eventos_cuenta</span> con relevancia calculada; las de alta relevancia disparan alerta.</p>
+        <p class="freq">diario, 07:30 · el cruce es SQL + un triage LLM de relevancia</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AGENTES ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Los agentes de IA</h2>
+    <div class="agentes">
+      <div class="panel agente">
+        <h3>Extractor de atributos</h3>
+        <p class="modelo">claude-sonnet-5 · visión + texto</p>
+        <p>Recibe ficha técnica y fotos; devuelve JSON con esquema estricto: atributo, valor, cita textual y posición en la fuente. El esquema de salida no contiene ningún campo de código arancelario.</p>
+        <dl>
+          <dt>prompt</dt><dd>"Extrae los atributos del esquema del capítulo candidato. Cada valor exige cita textual. No menciones partidas ni códigos."</dd>
+          <dt>conecta</dt><dd>skus, reglas_arbol (esquema de atributos requeridos por capítulo)</dd>
+        </dl>
+      </div>
+      <div class="panel agente">
+        <h3>Bibliotecario del corpus</h3>
+        <p class="modelo">claude-haiku-4-5-20251001</p>
+        <p>Triage diario de documentos nuevos: tipo, metadatos, partidas mencionadas, resumen. Barato porque corre sobre todo lo que se publica, relevante o no.</p>
+        <dl>
+          <dt>prompt</dt><dd>"Clasifica el documento y extrae metadatos verificables; si el tipo no es claro, márcalo para escalar."</dd>
+          <dt>conecta</dt><dd>corpus_docs, eventos_vigilancia</dd>
+        </dl>
+      </div>
+      <div class="panel agente">
+        <h3>Redactor del dossier</h3>
+        <p class="modelo">claude-sonnet-5</p>
+        <p>Recibe el recorrido ya decidido por el árbol y los respaldos ya seleccionados, y redacta el dossier. Un verificador de citas (código, no LLM) comprueba que cada número de resolución exista en el corpus y que todo texto citado sea literal del documento; si algo falla, el dossier se rechaza y se regenera.</p>
+        <dl>
+          <dt>prompt</dt><dd>"Redacta sobre estos hechos y sólo estos hechos. No agregues fuentes ni alteres el código recibido."</dd>
+          <dt>conecta</dt><dd>clasificaciones, corpus_docs, dossiers</dd>
+        </dl>
+      </div>
+      <div class="panel agente">
+        <h3>Revisor de casos difíciles</h3>
+        <p class="modelo">claude-opus-4-8 · ~15% de los casos</p>
+        <p>Cuando el árbol termina en ambigüedad real (dos hojas defendibles), redacta el análisis comparado de ambas y el caso queda marcado para decisión humana experta. Nunca desempata solo: la ambigüedad es información para el cliente, no un dado que tirar.</p>
+        <dl>
+          <dt>conecta</dt><dd>clasificaciones (estado: revision_experta), cola de revisión</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APIS Y CONTRATOS ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>APIs de terceros y qué hay que contratar</h2>
+    <div class="caja-t">
+      <p class="cab">Servicios externos</p>
+      <div class="scroll-x">
+        <table class="tabla">
+          <thead><tr><th>Servicio</th><th>Para qué</th><th>Contrato</th></tr></thead>
+          <tbody>
+            <tr><td>Anthropic API</td><td>Los cuatro agentes</td><td class="mono">pago por uso</td></tr>
+            <tr><td>Banco Central / series públicas</td><td>Dólar aduanero de referencia</td><td class="mono">gratuito</td></tr>
+            <tr><td>WhatsApp Business API (Meta o BSP)</td><td>Alertas de vigilancia de alta relevancia</td><td class="mono">BSP tipo Twilio, por conversación</td></tr>
+            <tr><td>Postmark o similar</td><td>Dossiers y digest semanal por correo</td><td class="mono">~US$15/mes</td></tr>
+            <tr><td>Webpay / Flow</td><td>Cobro de planes y dossiers sueltos</td><td class="mono">comisión por transacción</td></tr>
+            <tr><td>Haulmer u Openfactura</td><td>Emisión de boletas y facturas (DTE, SII)</td><td class="mono">~US$20/mes</td></tr>
+            <tr><td>Fly.io o similar + Postgres gestionado</td><td>App, workers de scraping, base con pgvector</td><td class="mono">~US$120/mes al inicio</td></tr>
+            <tr><td>S3 compatible (R2)</td><td>PDF de dossiers y documentos fuente</td><td class="mono">~US$10/mes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <pre class="env" style="margin-top: var(--sp-m);"><span class="c"># variables de entorno del backend</span>
+ANTHROPIC_API_KEY=
+DATABASE_URL=            <span class="c"># Postgres + pgvector</span>
+S3_ENDPOINT= S3_BUCKET= S3_KEY= S3_SECRET=
+WHATSAPP_TOKEN= WHATSAPP_PHONE_ID=
+POSTMARK_TOKEN=
+WEBPAY_COMMERCE_CODE= WEBPAY_API_KEY=
+DTE_PROVIDER_TOKEN=
+SCRAPER_UA=              <span class="c"># user-agent identificado, con contacto</span>
+CRON_CORPUS=0 6 * * *    <span class="c"># recolección diaria</span>
+CRON_VIGILANCIA=30 7 * * *</pre>
+  </div>
+</section>
+
+<!-- ============ COSTOS ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Costo mensual estimado, con la aritmética</h2>
+    <div class="prosa" style="margin-bottom: var(--sp-m);">
+      <p>Precios de lista referenciales a julio 2026: Sonnet 5 US$3/M tokens de entrada y US$15/M de salida; Haiku 4.5 US$1/US$5; Opus 4.8 US$5/US$25. Dólar a $950 (supuesto declarado, el mismo del demo). Estos números son los que <a href="negocio.html">negocio</a> descuenta del margen.</p>
+    </div>
+    <div class="calculo">
+      <p class="tit-c">Costo de inferencia por dossier</p>
+      <div class="linea"><span class="et">Extracción (sonnet-5: 20k entrada / 2k salida)</span><span class="num">US$0,09</span></div>
+      <div class="linea"><span class="et">Triage de respaldos (haiku-4-5: 60k / 2k)</span><span class="num">US$0,07</span></div>
+      <div class="linea"><span class="et">Redacción + regeneraciones (sonnet-5: 35k / 6k)</span><span class="num">US$0,20</span></div>
+      <div class="linea"><span class="et">Revisión Opus en 15% de los casos (40k / 3k × 0,15)</span><span class="num">US$0,04</span></div>
+      <div class="linea"><span class="et">Factor 1,5 por visión de fotos y reintentos <span class="sup">(subtotal US$0,40 × 1,5)</span></span><span class="num">US$0,60</span></div>
+      <div class="linea linea--total"><span class="et">Por dossier, en pesos <span class="sup">(× $950)</span></span><span class="num">≈ $570</span></div>
+    </div>
+    <div class="calculo">
+      <p class="tit-c">Vigilancia, por cuenta al mes</p>
+      <div class="linea"><span class="et">Cruce diario de documentos nuevos vs 300 SKU (haiku)</span><span class="num">US$1,00</span></div>
+      <div class="linea"><span class="et">Re-verificación semanal de coincidencias (sonnet)</span><span class="num">US$0,60</span></div>
+      <div class="linea linea--total"><span class="et">Por cuenta, en pesos</span><span class="num">≈ $1.520</span></div>
+    </div>
+    <div class="calculo">
+      <p class="tit-c">Total mensual con 100 clientes</p>
+      <div class="linea"><span class="et">Infra (hosting $120 + scraping $60 + corpus LLM $25 + mensajería $45 + otros $70)</span><span class="num">US$320</span></div>
+      <div class="linea"><span class="et">Dossiers (100 clientes × 6 promedio × US$0,60)</span><span class="num">US$360</span></div>
+      <div class="linea"><span class="et">Vigilancia (100 × US$1,60)</span><span class="num">US$160</span></div>
+      <div class="linea linea--total"><span class="et">Total <span class="sup">(≈ $798.000 CLP; ~10% del MRR de $7,9M a 100 cuentas)</span></span><span class="num">US$840</span></div>
+      <div class="linea"><span class="et">Infra prorrateada por cliente <span class="sup">(US$320 ÷ 100, la cifra usada en negocio)</span></span><span class="num">US$3,20 ≈ $3.040</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUÉ ESTÁ FALSEADO ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Qué está falseado en el demo</h2>
+    <div class="falso">
+      <div class="panel col">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#f2b33d" stroke-width="1.6"/><path d="M12 8v4.5M12 15.8v.2" stroke="#f2b33d" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Falseado hoy
+        </h3>
+        <ul>
+          <li>Los tres productos, sus atributos y su recorrido RGI son datos precargados en JS, no un motor corriendo.</li>
+          <li>Los números de resoluciones y dictámenes son inventados (verosímiles y marcados como ejemplo).</li>
+          <li>La "extracción" es instantánea porque no llama a ningún modelo.</li>
+          <li>El tipo de cambio es fijo; el dossier "PDF" es la vista imprimible del navegador.</li>
+          <li>Libro y vigilancia viven en memoria: recargar la página los reinicia.</li>
+          <li>No hay backend, autenticación ni cobro.</li>
+        </ul>
+      </div>
+      <div class="panel col">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5" stroke="#4fc06a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Qué haría falta para que fuera real
+        </h3>
+        <ul>
+          <li>Motor de reglas de los capítulos 82, 84, 85 y 94 con suite de casos dorados: 6-8 semanas de trabajo experto + ingeniería.</li>
+          <li>Scrapers de las tres fuentes públicas y el corpus indexado: 3-4 semanas.</li>
+          <li>Los cuatro agentes con verificador de citas: 2-3 semanas.</li>
+          <li>Generación de PDF con folio y firma del agente: 1 semana.</li>
+          <li>Auth, cuentas, Webpay y DTE: 2 semanas.</li>
+          <li>Un agente de aduana asesor revisando los casos dorados: crítico y no es software.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOMINIO ============ -->
+<section class="bloque">
+  <div class="container">
+    <h2>Evidencia del dominio</h2>
+    <div class="panel dominio esquinas">
+      <p>Verificado con <span class="mono">_kit/check-domain.sh</span> el 18-07-2026. RDAP de Verisign responde 404 cuando el dominio no existe (disponible) y 200 cuando está tomado.</p>
+      <div class="ev">
+        rdap.verisign.com/com/v1/domain/aforqua.com → HTTP 404 <b>(.com disponible)</b><br>
+        NIC Chile: aforqua.cl → "no existe" <b>(.cl disponible)</b><br>
+        <br>
+        alternativas verificadas el mismo día, también HTTP 404 en .com:<br>
+        partiqua.com · glosavia.com · aranquia.com
+      </div>
+      <p style="margin-top: var(--sp-s); font-size: var(--step--1);">Los cinco candidatos originales del brief (glosaria, aranzia, aforvia, arancelia, partivia) estaban todos tomados en .com; Aforqua nace de "aforo", el acto aduanero de clasificar y valorar la mercancía.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-fila">
+    <span>Aforqua · prototipo. Arquitectura documentada, no aprovisionada.</span>
+    <span class="mono">aforqua.com verificado libre el 18-07-2026</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+</body>
+</html>

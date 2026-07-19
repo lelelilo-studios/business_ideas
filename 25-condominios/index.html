@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prorratia: el libro del condominio, en regla</title>
+<meta name="description" content="Cada gasto con su boleta, cada cobro por su alícuota, cada asamblea conforme a la Ley 21.442. El libro de administración que cualquier copropietario puede auditar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* Héroe partido: copy a la izquierda, producto vivo a la derecha */
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); }
+  .hero-grid { display: grid; gap: var(--sp-l); }
+  .hero h1 { max-width: 16ch; }
+  .hero .lede { max-width: 44ch; margin-top: var(--sp-s); font-size: var(--step-1); }
+  .hero .btn-fila { margin-top: var(--sp-m); }
+  @media (min-width: 62em) {
+    .hero { padding-block: var(--sp-2xl) var(--sp-3xl); }
+    .hero-grid { grid-template-columns: 1.05fr .95fr; align-items: start; gap: var(--sp-2xl); }
+  }
+
+  /* Widget de prorrateo en vivo */
+  .widget { padding: 0; overflow: hidden; }
+  .widget-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+    padding: var(--sp-s) var(--sp-m); border-bottom: 1px solid var(--linea);
+  }
+  .widget-cab strong { font-size: .95rem; }
+  .widget input[type="number"] {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    width: 8.5rem; min-height: 44px; padding: 0 .6rem; text-align: right;
+    border: 1.5px solid var(--linea-2); border-radius: var(--radio);
+    background: var(--placa); color: var(--tinta);
+  }
+  .widget input[type="number"]:focus { border-color: var(--verde); outline: none; }
+  .widget-unidades { margin-top: var(--sp-s); }
+  .widget-nota { font-size: .78rem; color: var(--tinta-3); margin-top: var(--sp-s); max-width: 46ch; }
+
+  /* La ley exige / Prorratia responde */
+  .ley-fila {
+    display: grid; gap: .35rem var(--sp-l); padding: var(--sp-m) 0;
+    border-top: 1px solid var(--linea);
+  }
+  .ley-fila:last-child { border-bottom: 1px solid var(--linea); }
+  .ley-fila .exige { font-weight: 600; color: var(--tinta); }
+  .ley-fila .exige .art { font-family: var(--mono); font-size: .72rem; color: var(--tinta-3); font-weight: 400; display: block; margin-top: .15rem; }
+  .ley-fila .responde { color: var(--tinta-2); font-size: var(--step--1); max-width: 56ch; }
+  @media (min-width: 56em) { .ley-fila { grid-template-columns: minmax(0, 20rem) 1fr; } }
+
+  /* Módulos del demo: mosaico 2x2 con variación */
+  .modulos { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  .modulo { display: block; text-decoration: none; color: inherit; padding: var(--sp-m); }
+  .modulo:hover { border-color: var(--tinta-3); }
+  .modulo h3 { display: flex; align-items: center; gap: .55rem; margin-bottom: .4rem; color: var(--tinta); }
+  .modulo h3 svg { width: 20px; height: 20px; flex: none; color: var(--verde); }
+  .modulo p { font-size: var(--step--1); max-width: 48ch; }
+  .modulo--tinte { background: var(--verde-tinte); border-color: #C2D6CB; }
+  .modulo--hundido { background: var(--hormigon-2); }
+  @media (min-width: 56em) { .modulos { grid-template-columns: 1fr 1fr; } }
+
+  /* Precios */
+  .planes { display: grid; gap: var(--sp-s); margin-top: var(--sp-l); }
+  .plan { display: flex; flex-direction: column; }
+  .plan--destacado { border-color: var(--verde); box-shadow: 0 0 0 1px var(--verde); }
+  .plan .quien { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-3); }
+  .plan--destacado .quien { color: var(--verde); }
+  .plan .precio { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; margin-top: .4rem; }
+  .plan .precio small { font-size: var(--step--1); font-weight: 400; color: var(--tinta-3); letter-spacing: 0; }
+  .plan ul { list-style: none; margin: var(--sp-s) 0 0; padding: 0; font-size: var(--step--1); color: var(--tinta-2); }
+  .plan ul li { padding: .45rem 0; border-top: 1px solid var(--linea); display: flex; gap: .5rem; }
+  .plan ul li svg { width: 15px; height: 15px; flex: none; color: var(--verde); margin-top: .2rem; }
+  .plan .btn { margin-top: var(--sp-m); }
+  @media (min-width: 56em) { .planes { grid-template-columns: 1fr 1fr; } }
+  .cuenta {
+    margin-top: var(--sp-m); padding: var(--sp-m);
+    background: var(--hormigon-2); border: 1px solid var(--linea); border-radius: var(--radio);
+    font-size: var(--step--1); color: var(--tinta-2); max-width: 62ch;
+  }
+
+  /* Comparación honesta */
+  .tabla-comp td:first-child { color: var(--tinta); font-weight: 500; }
+  .tabla-comp .si { color: var(--verde); font-weight: 600; }
+  .tabla-comp .parcial { color: var(--tinta-2); }
+  .tabla-comp .no { color: var(--tinta-3); }
+
+  .cta-final { text-align: left; }
+  .cta-final h2 { max-width: 24ch; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="2" stroke="#0D5E36" stroke-width="1.7"/>
+        <path d="M9.6 2.75v18.5M15.4 2.75v11M2.75 13.75h12.65" stroke="#0D5E36" stroke-width="1.7"/>
+      </svg>
+      <span>Prorratia</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== Héroe ===== -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>El gasto común que cualquier vecino puede auditar.</h1>
+      <p class="lede">Cada peso con su boleta, cada cobro por su alícuota, cada asamblea conforme a la Ley 21.442.</p>
+      <div class="btn-fila">
+        <a class="btn btn--verde" href="demo/index.html">Recorrer el demo</a>
+        <a class="btn btn--borde" href="#precios">Ver precios</a>
+      </div>
+    </div>
+
+    <!-- Producto en vivo: el prorrateo recalcula al editar un gasto -->
+    <div class="placa widget" id="widget">
+      <div class="widget-cab">
+        <strong>Prorrateo en vivo</strong>
+        <span class="chip chip--neutro">julio 2026</span>
+      </div>
+      <div class="widget-cuerpo">
+        <div class="widget-fila">
+          <span>Conserjería y aseo</span>
+          <span class="num">$1.780.000</span>
+        </div>
+        <div class="widget-fila">
+          <label for="w-asc" style="color:var(--tinta-2)">Mantención ascensores</label>
+          <input type="number" id="w-asc" value="318000" min="0" step="1000" aria-describedby="w-nota">
+        </div>
+        <div class="widget-fila">
+          <span>Resto de gastos del mes</span>
+          <span class="num">$1.438.300</span>
+        </div>
+        <div class="widget-fila">
+          <span>Fondo de reserva (5%)</span>
+          <span class="num" id="w-fondo">$176.815</span>
+        </div>
+        <div class="widget-fila widget-fila--total">
+          <span>Total a prorratear</span>
+          <span class="num" id="w-total">$3.713.115</span>
+        </div>
+        <div class="widget-unidades scroll-x">
+          <table>
+            <thead>
+              <tr><th>Unidad</th><th class="num">Alícuota</th><th class="num">Gasto común</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Depto 101</td><td class="num">5,200%</td><td class="num" id="w-u1">$193.082</td></tr>
+              <tr><td>Depto 302</td><td class="num">4,200%</td><td class="num" id="w-u2">$155.951</td></tr>
+              <tr><td>Depto 503</td><td class="num">3,100%</td><td class="num" id="w-u3">$115.107</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="widget-nota" id="w-nota">Cambia el monto y mira el cobro recalcularse. La aritmética es código verificable, nunca un modelo de lenguaje.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== El problema ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>El edificio mediano se administra a pulso.</h2>
+    <p class="intro">En Chile, el condominio de 20 a 80 unidades rara vez tiene administración profesional de verdad. Tiene alguna de estas tres cosas:</p>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li>
+        <span class="n">01</span>
+        <div>
+          <h3>El vecino con Excel</h3>
+          <p>Le tocó a él. Lleva la planilla de buena fe, pero nadie más la entiende, las boletas viven en una caja, y cuando se cansa o se muda, el libro se va con él.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">02</span>
+        <div>
+          <h3>El administrador de ocho comunidades por WhatsApp</h3>
+          <p>Una persona sola, sin sistema. Cobra tarde, rinde cuando puede, y la rendición es un PDF sin respaldos que el comité no tiene cómo revisar.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">03</span>
+        <div>
+          <h3>La pelea de todos los años</h3>
+          <p>Gastos que nadie puede auditar, morosos que financian el edificio sin querer, asambleas citadas por un papel en el ascensor que legalmente nunca existieron. Y al final, la desconfianza.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== Cómo funciona ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Un libro que se lleva solo, a la vista de todos.</h2>
+    <ul class="registro" style="margin-top: var(--sp-l);">
+      <li>
+        <span class="n">1</span>
+        <div>
+          <h3>Cada gasto entra con su documento</h3>
+          <p>Foto de la boleta o factura, y el sistema la digitaliza: proveedor, RUT, folio, monto. Un gasto sin respaldo queda marcado en rojo hasta que alguien lo explique.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <div>
+          <h3>El prorrateo es aritmética, no criterio</h3>
+          <p>Total del mes por la alícuota de cada unidad, más el 5% de fondo de reserva. Determinista, auditable, con el ajuste por redondeo declarado. Aquí no opina nadie: ni el administrador ni la IA.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <div>
+          <h3>El cobro sale solo el día 5</h3>
+          <p>Cada copropietario recibe su boleta de gasto común con el detalle completo y un botón para pagar. Recordatorios, convenios de pago e interés según tu reglamento, sin que nadie persiga a nadie.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <div>
+          <h3>La asamblea queda en regla</h3>
+          <p>Citación con las formalidades verificadas, quórum calculado por alícuotas al registrar asistencia, y acta borrador lista para firmar. Lo que la Ley 21.442 pide, verificado punto por punto.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">5</span>
+        <div>
+          <h3>El libro queda para siempre</h3>
+          <p>Años de rendiciones, morosidad y fondo de reserva en un solo lugar. Cuando cambie el administrador o llegue la asamblea, todo se entrega en un link.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== La ley ===== -->
+<section class="seccion seccion--hundida">
+  <div class="container">
+    <span class="ojal">Ley 21.442 de Copropiedad Inmobiliaria</span>
+    <h2>La ley ya te obliga. Prorratia te deja en regla.</h2>
+    <p class="intro">Desde 2022 la administración de un condominio tiene obligaciones concretas. Incumplirlas no es un detalle: invalida acuerdos y expone al comité.</p>
+    <div style="margin-top: var(--sp-l);">
+      <div class="ley-fila">
+        <div class="exige">Rendición de cuentas documentada
+          <span class="art">obligación del administrador ante la asamblea</span>
+        </div>
+        <div class="responde">Cada gasto queda con su boleta adjunta y visible para todos los copropietarios, todos los meses. La rendición anual se arma sola.</div>
+      </div>
+      <div class="ley-fila">
+        <div class="exige">Fondo común de reserva
+          <span class="art">recargo mínimo del 5% sobre los gastos comunes</span>
+        </div>
+        <div class="responde">Se recauda, se contabiliza aparte y su historial completo queda graficado. Cada uso queda amarrado al acuerdo de asamblea que lo autorizó.</div>
+      </div>
+      <div class="ley-fila">
+        <div class="exige">Asambleas citadas conforme a la ley
+          <span class="art">anticipación, medios de citación y quórums</span>
+        </div>
+        <div class="responde">El generador de citaciones verifica plazos y contenido antes de enviar, y calcula el quórum por alícuotas al registrar la asistencia.</div>
+      </div>
+      <div class="ley-fila">
+        <div class="exige">Actas de asamblea
+          <span class="art">registro de acuerdos y asistencia</span>
+        </div>
+        <div class="responde">El acta borrador se genera con asistencia, quórum y acuerdos por materia. La firma sigue siendo humana; el formato ya viene en regla.</div>
+      </div>
+      <div class="ley-fila">
+        <div class="exige">Plan de emergencia
+          <span class="art">elaboración y actualización periódica</span>
+        </div>
+        <div class="responde">Checklist de vigencia con recordatorio anual y respaldo del documento en el libro de la comunidad.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Producto en vivo (demo) ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Recórrelo con un edificio real adentro.</h2>
+    <p class="intro">El demo trae la comunidad Mirador del Parque, de Ñuñoa: 24 unidades con sus alícuotas, el mes de julio cargado con boletas, tres morosos y una asamblea por citar.</p>
+    <div class="modulos">
+      <a class="placa modulo modulo--tinte" href="demo/index.html#rendicion">
+        <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 10h6M9 13.5h6M9 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Rendición del mes</h3>
+        <p>Todos los gastos de julio con su documento adjunto. Edita un monto y mira el prorrateo recalcularse en vivo.</p>
+      </a>
+      <a class="placa modulo" href="demo/index.html#morosidad">
+        <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19.5V8l8-4.5L20 8v11.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 19.5v-5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Morosidad y cobranza</h3>
+        <p>Saldo por unidad, recordatorios, y convenios de pago con interés calculado según reglamento.</p>
+      </a>
+      <a class="placa modulo modulo--hundido" href="demo/index.html#asamblea">
+        <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Citación y acta</h3>
+        <p>Genera la citación con el checklist legal en verde, registra asistencia y obtén el acta con quórum por alícuotas.</p>
+      </a>
+      <a class="placa modulo" href="demo/index.html#libro">
+        <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 4.5h6.5a2.5 2.5 0 0 1 2.5 2.5v12.5a2 2 0 0 0-2-2h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M19.5 4.5h-6v13h6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" opacity=".55"/></svg>El libro y el traspaso</h3>
+        <p>Fondo de reserva graficado, doce rendiciones publicadas y el link que le entrega todo al próximo administrador.</p>
+      </a>
+    </div>
+    <div class="btn-fila" style="margin-top: var(--sp-l);">
+      <a class="btn btn--verde" href="demo/index.html">Recorrer el demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Precios ===== -->
+<section class="seccion seccion--placa" id="precios">
+  <div class="container">
+    <h2>Se paga como se paga todo en el edificio: por el gasto común.</h2>
+    <div class="planes">
+      <div class="placa plan plan--destacado">
+        <span class="quien">Comité de administración</span>
+        <div class="precio">$590 <small>por unidad al mes, mínimo $19.900</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Libro completo: gastos con boleta, prorrateo, cobranza, asambleas</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Acceso de lectura para todos los copropietarios, sin costo extra</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Cobro por transferencia o tarjeta, conciliado automáticamente</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Sin contrato anual: la asamblea decide y la asamblea se puede ir</li>
+        </ul>
+        <a class="btn btn--verde" href="demo/index.html">Probar con tu edificio</a>
+      </div>
+      <div class="placa plan">
+        <span class="quien">Administrador profesional</span>
+        <div class="precio">$450 <small>por unidad al mes desde 150 unidades, mínimo $59.000</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Panel multi-comunidad: todas tus copropiedades en una vista</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Rendiciones con tu nombre y tu logo: te ves profesional porque lo eres</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Cobranza y recordatorios corriendo solos en cada comunidad</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>El traspaso auditable es tu carta de presentación para ganar edificios</li>
+        </ul>
+        <a class="btn btn--borde" href="negocio.html">Ver el caso de negocio</a>
+      </div>
+    </div>
+    <div class="cuenta">
+      <strong>La cuenta, honesta:</strong> un edificio de 40 unidades paga 40 × $590 = <span class="num">$23.600</span> al mes, cargado al gasto común. Son <span class="num">$590</span> por departamento: cerca del 0,6% de un gasto común típico de <span class="num">$95.000</span> (estimación nuestra, no hay cifra oficial). El traspaso del libro histórico (hasta 24 meses de respaldos digitalizados) cuesta <span class="num">$190.000</span> por una vez.
+    </div>
+  </div>
+</section>
+
+<!-- ===== Comparación honesta ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Contra lo que ya existe, sin caricaturas.</h2>
+    <p class="intro">ComunidadFeliz, Edipro y Kastor existen hace años y cobran bien. La diferencia de Prorratia no es que el espacio esté vacío: es dónde ponemos el peso.</p>
+    <div class="scroll-x" style="margin-top: var(--sp-l);">
+      <table class="tabla-comp">
+        <thead>
+          <tr>
+            <th>Qué importa</th>
+            <th>Excel + transferencias</th>
+            <th>Incumbentes (ComunidadFeliz y similares)</th>
+            <th>Prorratia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cobro de gastos comunes</td>
+            <td class="no">Manual, persiguiendo</td>
+            <td class="si">Sí, resuelto y maduro</td>
+            <td class="si">Sí, automático el día 5</td>
+          </tr>
+          <tr>
+            <td>Boleta adjunta en cada gasto</td>
+            <td class="no">Caja de zapatos</td>
+            <td class="parcial">Opcional, si el admin la sube</td>
+            <td class="si">Obligatoria: sin respaldo queda en rojo</td>
+          </tr>
+          <tr>
+            <td>Formalidades de la Ley 21.442</td>
+            <td class="no">Nadie las revisa</td>
+            <td class="parcial">Plantillas, sin verificación</td>
+            <td class="si">Checklist verificado antes de citar</td>
+          </tr>
+          <tr>
+            <td>Traspaso a otro administrador</td>
+            <td class="no">Se pierde el historial</td>
+            <td class="parcial">Exportes parciales</td>
+            <td class="si">El libro completo en un link</td>
+          </tr>
+          <tr>
+            <td>Precio por unidad</td>
+            <td class="parcial">$0 más las peleas</td>
+            <td class="parcial">Rango similar al nuestro</td>
+            <td class="si">$450 a $590</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: var(--sp-m); font-size: var(--step--1); max-width: 62ch;">Y la alternativa más común sigue siendo no hacer nada. Eso también tiene precio: morosidad sin gestión, fondo de reserva que no existe y un comité expuesto cuando algo pasa.</p>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="seccion seccion--placa">
+  <div class="container">
+    <h2>Preguntas que nos hacen en la primera reunión.</h2>
+    <div class="faq" style="margin-top: var(--sp-l); max-width: 46rem;">
+      <details>
+        <summary>¿Quién contrata y quién paga?</summary>
+        <div><p>Contrata la comunidad (lo aprueba la asamblea o el comité según tu reglamento) o el administrador para su cartera. El costo se carga al gasto común, igual que el ascensor o el aseo: por unidad queda en el orden de los $590 mensuales.</p></div>
+      </details>
+      <details>
+        <summary>Ya tenemos administrador. ¿Esto lo reemplaza?</summary>
+        <div><p>No. Prorratia es el libro, no el administrador. Si tu administrador es bueno, con esto rinde mejor y pierde menos tiempo. Si no rinde, el comité lo va a notar en el primer mes, y esa también es una función del sistema.</p></div>
+      </details>
+      <details>
+        <summary>¿La IA redacta actas legalmente válidas?</summary>
+        <div>
+          <p>La IA redacta el borrador de citaciones y actas sobre plantillas revisadas por abogado, y un checklist verifica las formalidades (plazos, contenido, quórums). La firma y la decisión siguen siendo de personas.</p>
+          <p>Donde la IA no entra nunca: la aritmética. Prorrateos, intereses, saldos y quórums los calcula código determinista y auditable.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Venimos de Excel o de otro software. ¿Cómo se migra?</summary>
+        <div><p>El traspaso histórico ($190.000 por una vez) digitaliza hasta 24 meses de planillas y respaldos: unidades, alícuotas, saldos y documentos quedan cargados en el libro. Desde otro software, importamos los exportes disponibles y documentamos qué no vino.</p></div>
+      </details>
+      <details>
+        <summary>¿Y si después queremos irnos?</summary>
+        <div><p>El libro es de la comunidad, no nuestro. Se exporta completo (movimientos, documentos, actas) en formatos abiertos, y el link de traspaso queda activo 12 meses después del término. Retener datos para retener clientes es exactamente el vicio que vinimos a corregir.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA final ===== -->
+<section class="seccion cta-final">
+  <div class="container">
+    <h2>La próxima asamblea puede ser la primera sin pelea.</h2>
+    <p class="intro">Recorre el demo con datos de un edificio como el tuyo. Sin registro, sin correo, sin vendedor.</p>
+    <div class="btn-fila" style="margin-top: var(--sp-m);">
+      <a class="btn btn--verde" href="demo/index.html">Recorrer el demo</a>
+      <a class="btn btn--borde" href="roadmap.html">Ver el roadmap</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container">
+    <span>Prorratia · prototipo de la serie business_ideas</span>
+    <span>Ñuñoa aparece en el demo; la ley aplica en todo Chile.</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+<script>
+// Widget de prorrateo en vivo. Aritmética determinista: nunca un modelo.
+(function () {
+  var FIJOS = 1780000 + 1438300; // conserjería + resto del mes
+  var input = document.getElementById("w-asc");
+  if (!input) return;
+  var clp = function (n) { return "$" + Math.round(n).toLocaleString("es-CL"); };
+  function recalcular() {
+    var asc = Math.max(0, Number(input.value) || 0);
+    var gastos = FIJOS + asc;
+    var fondo = Math.round(gastos * 0.05);
+    var total = gastos + fondo;
+    document.getElementById("w-fondo").textContent = clp(fondo);
+    document.getElementById("w-total").textContent = clp(total);
+    document.getElementById("w-u1").textContent = clp(total * 0.052);
+    document.getElementById("w-u2").textContent = clp(total * 0.042);
+    document.getElementById("w-u3").textContent = clp(total * 0.031);
+  }
+  input.addEventListener("input", recalcular);
+  recalcular();
+})();
+</script>
+</body>
+</html>

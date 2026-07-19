@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · Etiquaria</title>
+<meta name="description" content="Roadmap de Etiquaria del día 1 al mes 24: seis hitos con criterios de muerte, MRR en tres escenarios con supuestos declarados, caja con valle de runway, y probabilidad de éxito como rango con derivación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .cab { padding-block: var(--sp-xl) var(--sp-l); }
+  .cab h1 { font-size: var(--step-4); max-width: 16ch; }
+
+  /* Hitos */
+  .hito { display: grid; gap: var(--sp-s); padding-block: var(--sp-l); border-bottom: 1px solid var(--linea); }
+  .hito:first-of-type { border-top: 1px solid var(--linea); }
+  @media (min-width: 62em) { .hito { grid-template-columns: 200px 1fr; gap: var(--sp-l); } }
+  .hito .cuando { font-family: var(--mono); font-size: 0.78rem; color: var(--acento); font-weight: 700; }
+  .hito h3 { margin-top: 2px; }
+  .hito dl { display: grid; gap: 8px; margin-top: var(--sp-s); }
+  @media (min-width: 48em) { .hito dl { grid-template-columns: 1fr 1fr; } }
+  .hito dt { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--tinta-3); }
+  .hito dd { font-size: var(--step--1); color: var(--tinta-2); margin-top: 2px; }
+  .muerte {
+    grid-column: 1 / -1; margin-top: var(--sp-2xs);
+    display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start;
+    background: var(--acento-suave); padding: var(--sp-s);
+  }
+  .muerte::before { content: ""; width: 14px; height: 14px; margin-top: 3px; background: var(--sello); clip-path: var(--octogono); }
+  .muerte p { font-size: var(--step--1); color: var(--tinta); }
+  .muerte strong { color: var(--acento-osc); }
+
+  /* Gráficos */
+  .grafico { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); margin-top: var(--sp-l); }
+  .grafico h3 { font-size: var(--step-1); }
+  .grafico .sub { font-size: var(--step--1); color: var(--tinta-3); margin-top: 4px; max-width: 74ch; }
+  .grafico .marco { position: relative; margin-top: var(--sp-s); }
+  .grafico svg { width: 100%; height: auto; display: block; }
+  .grafico svg text { font-family: "JetBrains Mono", monospace; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: var(--sp-s) var(--sp-m); margin-top: var(--sp-s); font-size: 0.8rem; color: var(--tinta-2); }
+  .leyenda span { display: inline-flex; align-items: center; gap: 8px; }
+  .leyenda i { width: 18px; height: 3px; display: inline-block; }
+  .tt {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--tinta); color: #fff; font-family: var(--mono); font-size: 0.72rem;
+    padding: 8px 10px; line-height: 1.6; white-space: nowrap; z-index: 5;
+  }
+  .grafico details { margin-top: var(--sp-s); }
+  .grafico summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--tinta-2); min-height: 44px; display: flex; align-items: center; }
+  .grafico details .tabla { margin-top: 4px; }
+
+  /* Probabilidad */
+  .prob-rango { font-family: var(--mono); font-size: var(--step-4); font-weight: 700; letter-spacing: -0.03em; }
+  .ajustes { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); }
+  @media (min-width: 56em) { .ajustes { grid-template-columns: 1fr 1fr; } }
+  .ajustes .lado { border: 1px solid var(--linea); background: var(--panel); padding: var(--sp-m); }
+  .ajustes ul { list-style: none; padding: 0; margin-top: var(--sp-s); }
+  .ajustes li { padding-block: 7px; border-top: 1px solid var(--linea); font-size: var(--step--1); color: var(--tinta-2); display: grid; grid-template-columns: 24px 1fr; gap: 8px; }
+  .ajustes .mas li::before { content: "+"; font-family: var(--mono); font-weight: 700; color: var(--ok); }
+  .ajustes .menos li::before { content: "-"; font-family: var(--mono); font-weight: 700; color: var(--acento); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-fila">
+    <a class="marca" href="index.html">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M10 2.5h12L29.5 10v12L22 29.5H10L2.5 22V10L10 2.5Z" stroke="#0d0d0f" stroke-width="2.4" stroke-linejoin="miter"/>
+        <path d="M11.5 12h9M11.5 16h6.5M11.5 20h9" stroke="#b0135c" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+      <span>Etiquaria</span>
+    </a>
+    <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu">
+      Menú
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+  <div class="container">
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a class="volver" href="../index.html">← Ideas</a>
+      <a href="index.html">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html" aria-current="page">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="cab">
+  <div class="container">
+    <h1>Del día 1 al mes 24, con criterios de muerte</h1>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      Arranque asumido: agosto 2026, un fundador, bootstrapped con ~$32 M de colchón (ahorro +
+      eventual CORFO Semilla). Cada hito declara qué tiene que ser cierto y, más importante, qué
+      observación obliga a parar. Un roadmap sin criterios de muerte es una carta al Viejito Pascuero.
+    </p>
+  </div>
+</section>
+
+<!-- ===== HITOS ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Seis hitos</h2>
+
+    <div class="hito">
+      <div><span class="cuando">M0-M2 · ago-oct 2026</span><h3>Validación con design partners</h3></div>
+      <div>
+        <p class="prosa">Motor de reglas con tests contra el DS 977 y el DS 13/2015, validado por un asesor de rotulado contratado por horas. Cinco fábricas de Maule y Ñuble cargan SKUs reales gratis.</p>
+        <dl>
+          <dt>Es cierto si</dt><dd>0 discrepancias de fondo entre el motor y el asesor en 50 SKUs reales; 5 fábricas entregaron sus datos.</dd>
+          <dt>Caja y equipo</dt><dd>Quema acumulada ~$7,2 M · 1 fundador + asesor por horas.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte:</strong> si el asesor encuentra errores que el motor no puede resolver de forma determinista, o si ni gratis las fábricas entregan sus datos, el problema no es como lo pensamos: parar antes de escribir una línea de venta.</p></div>
+      </div>
+    </div>
+
+    <div class="hito">
+      <div><span class="cuando">M4 · dic 2026</span><h3>Primer cliente pagando</h3></div>
+      <div>
+        <p class="prosa">Alguien que no es amigo del fundador paga una verificación de $29.000 o un mes de Vigía, porque le duele de verdad.</p>
+        <dl>
+          <dt>Es cierto si</dt><dd>Al menos 3 clientes pagaron algo; 1 vino de un laboratorio aliado.</dd>
+          <dt>Caja y equipo</dt><dd>Caja acumulada ~-$11,6 M · 1 fundador.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte:</strong> 3 meses de demos sin que nadie pague ni $29.000 significa que el dolor se resuelve con miedo y Excel, no con plata: pivotear a venderle el motor a asesores (B2B2B) o matar.</p></div>
+      </div>
+    </div>
+
+    <div class="hito">
+      <div><span class="cuando">M9 · abr 2027</span><h3>Primeros 10 pagando</h3></div>
+      <div>
+        <p class="prosa">Diez clientes de pago recurrente, con al menos dos llegados por referencia o por el canal de laboratorios: la señal de que el producto se recomienda solo.</p>
+        <dl>
+          <dt>Es cierto si</dt><dd>10 clientes · churn &lt;5%/mes · 2+ por canal indirecto.</dd>
+          <dt>Caja y equipo</dt><dd>Caja acumulada ~-$20,4 M · 1 fundador; medio SDR se contrata en M10 sólo si este hito se cumple.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte:</strong> churn temprano sobre 8%/mes o CAC real sobre $600.000: la economía unitaria no existe, y contratarse un SDR encima sería financiar la negación. Matar o volver a diseño de producto.</p></div>
+      </div>
+    </div>
+
+    <div class="hito">
+      <div><span class="cuando">M14 · sep 2027</span><h3>Venta repetible</h3></div>
+      <div>
+        <p class="prosa">Más de 20 clientes y un playbook que cierra sin que el fundador esté en cada demo. El canal de laboratorios aporta al menos el 30% de las altas.</p>
+        <dl>
+          <dt>Es cierto si</dt><dd>20+ clientes · ciclo de venta &lt;30 días · 30% de altas por canal.</dd>
+          <dt>Caja y equipo</dt><dd>Caja acumulada ~-$28,6 M · fundador + medio SDR.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte:</strong> si cada venta sigue exigiendo semanas del fundador, esto es una consultoría con página web. Decidir en frío: negocio chico rentable a propósito, o parar.</p></div>
+      </div>
+    </div>
+
+    <div class="hito">
+      <div><span class="cuando">M18 · ene 2028</span><h3>Caja mensual positiva</h3></div>
+      <div>
+        <p class="prosa">36 clientes y MRR $3,4 M contra gastos de $3,2 M: el primer mes en que el negocio se paga solo. El valle quedó atrás en M17 con -$30,2 M acumulados.</p>
+        <dl>
+          <dt>Es cierto si</dt><dd>MRR &gt; gastos por 2 meses seguidos · valle acumulado ≤ $32 M (el colchón).</dd>
+          <dt>Caja y equipo</dt><dd>Valle -$30,2 M en M17, recuperando · fundador + medio SDR.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte:</strong> si en M18 los ingresos siguen bajo los gastos y el valle sigue profundizándose, no se financia con deuda ni con fe: recortar a rentabilidad con la base instalada o cerrar ordenadamente.</p></div>
+      </div>
+    </div>
+
+    <div class="hito">
+      <div><span class="cuando">M24 · jul 2028</span><h3>Punto de decisión</h3></div>
+      <div>
+        <p class="prosa">60 clientes, MRR $5,7 M, ARR $68 M. Con el libro de casos chileno en la mano, decidir el camino con datos y no con ego.</p>
+        <dl>
+          <dt>Levantar</dt><dd>Si hay 2+ señales: inbound real desde Perú/México, 2+ cadenas de marca propia, churn &lt;3%/mes → capital para LatAm.</dd>
+          <dt>Bootstrapear o salir</dt><dd>Sin esas señales: negocio rentable de nicho a propósito, o venderle el activo a un software PYME grande. Ambas son victorias; empatarse dos años más sin señales no.</dd>
+        </dl>
+        <div class="muerte"><p><strong>Criterio de muerte del camino venture:</strong> sin señales de extensión regional al M24, dejar de gastar como si fuera venture. El código y el libro valen más vendidos que zombis.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GRÁFICOS ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Las curvas, con sus supuestos</h2>
+
+    <!-- MRR -->
+    <div class="grafico">
+      <h3>MRR a 24 meses, tres escenarios</h3>
+      <p class="sub">Supuestos declarados: ticket promedio $95.000/mes. Base: cierre 4% de outbound + canal laboratorios, churn 4%/mes → 60 clientes en M24. Pesimista: cierre 2%, churn 6% → 25 clientes. Optimista: cierre 6%, churn 2,5% + 2 contratos de marca propia ($390.000) desde M18 → 110 clientes.</p>
+      <div class="marco">
+        <svg viewBox="0 0 720 290" role="img" aria-label="Gráfico de líneas: MRR mensual a 24 meses en tres escenarios; los valores están en la tabla bajo el gráfico" data-linea data-escala="12000000">
+          <!-- grilla -->
+          <g stroke="#e7e7ec" stroke-width="1">
+            <line x1="56" y1="16" x2="704" y2="16"/><line x1="56" y1="75" x2="704" y2="75"/>
+            <line x1="56" y1="134" x2="704" y2="134"/><line x1="56" y1="193" x2="704" y2="193"/>
+          </g>
+          <line x1="56" y1="252" x2="704" y2="252" stroke="#c9c9d0" stroke-width="1"/>
+          <g fill="#8a8a93" font-size="11">
+            <text x="48" y="256" text-anchor="end">0</text>
+            <text x="48" y="197" text-anchor="end">3M</text>
+            <text x="48" y="138" text-anchor="end">6M</text>
+            <text x="48" y="79" text-anchor="end">9M</text>
+            <text x="48" y="20" text-anchor="end">12M</text>
+            <text x="56" y="274" text-anchor="middle">M0</text>
+            <text x="218" y="274" text-anchor="middle">M6</text>
+            <text x="380" y="274" text-anchor="middle">M12</text>
+            <text x="542" y="274" text-anchor="middle">M18</text>
+            <text x="704" y="274" text-anchor="middle">M24</text>
+          </g>
+          <!-- series (ramp ordinal magenta: claro=pesimista, medio=base, oscuro=optimista) -->
+          <polyline fill="none" stroke="#e0357f" stroke-width="2" stroke-linejoin="round" points="56.0,252.0 83.0,252.0 110.0,252.0 137.0,250.1 164.0,250.1 191.0,250.1 218.0,250.1 245.0,248.3 272.0,248.3 299.0,246.4 326.0,244.5 353.0,242.7 380.0,240.8 407.0,238.9 434.0,235.2 461.0,233.3 488.0,231.4 515.0,227.7 542.0,225.8 569.0,222.1 596.0,220.2 623.0,216.5 650.0,212.8 677.0,209.0 704.0,205.3"/>
+          <polyline fill="none" stroke="#b0135c" stroke-width="2.5" stroke-linejoin="round" points="56.0,252.0 83.0,252.0 110.0,250.1 137.0,250.1 164.0,248.3 191.0,244.5 218.0,242.7 245.0,238.9 272.0,237.1 299.0,233.3 326.0,229.6 353.0,225.8 380.0,222.1 407.0,216.5 434.0,212.8 461.0,207.2 488.0,199.7 515.0,192.2 542.0,184.7 569.0,177.3 596.0,169.8 623.0,162.3 650.0,154.8 677.0,147.4 704.0,139.9"/>
+          <polyline fill="none" stroke="#70093f" stroke-width="2" stroke-linejoin="round" points="56.0,252.0 83.0,250.1 110.0,250.1 137.0,248.3 164.0,244.5 191.0,240.8 218.0,237.1 245.0,231.4 272.0,224.0 299.0,218.4 326.0,209.0 353.0,201.6 380.0,192.2 407.0,179.1 434.0,167.9 461.0,154.8 488.0,141.8 515.0,130.6 542.0,109.8 569.0,98.6 596.0,87.4 623.0,76.2 650.0,55.4 677.0,44.2 704.0,31.1"/>
+          <!-- marcadores y etiquetas directas al final -->
+          <circle cx="704" cy="205.3" r="4" fill="#e0357f" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="704" cy="139.9" r="4" fill="#b0135c" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="704" cy="31.1" r="4" fill="#70093f" stroke="#ffffff" stroke-width="2"/>
+          <g font-size="11" fill="#45454d" text-anchor="end">
+            <text x="700" y="200">pesimista $2,4M</text>
+            <text x="700" y="132">base $5,7M</text>
+            <text x="700" y="56">optimista $11,2M</text>
+          </g>
+          <line data-cursor x1="-10" y1="16" x2="-10" y2="252" stroke="#c9c9d0" stroke-width="1"/>
+        </svg>
+        <div class="tt" data-tt></div>
+      </div>
+      <div class="leyenda" aria-hidden="false">
+        <span><i style="background:#e0357f"></i> Pesimista</span>
+        <span><i style="background:#b0135c"></i> Base</span>
+        <span><i style="background:#70093f"></i> Optimista</span>
+      </div>
+      <details>
+        <summary>Ver como tabla</summary>
+        <div class="scroll-x"><table class="tabla">
+          <thead><tr><th>Mes</th><th class="num">Pesimista</th><th class="num">Base</th><th class="num">Optimista</th></tr></thead>
+          <tbody>
+            <tr><td>M6</td><td class="num">$95.000</td><td class="num">$475.000</td><td class="num">$760.000</td></tr>
+            <tr><td>M12</td><td class="num">$570.000</td><td class="num">$1.520.000</td><td class="num">$3.040.000</td></tr>
+            <tr><td>M18</td><td class="num">$1.330.000</td><td class="num">$3.420.000</td><td class="num">$7.230.000</td></tr>
+            <tr><td>M24</td><td class="num">$2.375.000</td><td class="num">$5.700.000</td><td class="num">$11.230.000</td></tr>
+          </tbody>
+        </table></div>
+      </details>
+    </div>
+
+    <!-- CAJA -->
+    <div class="grafico">
+      <h3>Quema vs ingresos (escenario base)</h3>
+      <p class="sub">Gastos: $2,4 M/mes con 1 fundador (M0-M9), $3,2 M/mes con medio SDR (M10+). Los ingresos cruzan los gastos en M18; el valle de caja acumulada es -$30,2 M en M17, contra un colchón de $32 M. Apretado y declarado.</p>
+      <div class="marco">
+        <svg viewBox="0 0 720 290" role="img" aria-label="Gráfico de líneas: ingresos mensuales contra gastos mensuales, con el valle de caja marcado en el mes 17" data-linea data-escala="6000000">
+          <g stroke="#e7e7ec" stroke-width="1">
+            <line x1="56" y1="16" x2="704" y2="16"/><line x1="56" y1="94.7" x2="704" y2="94.7"/>
+            <line x1="56" y1="173.3" x2="704" y2="173.3"/>
+          </g>
+          <line x1="56" y1="252" x2="704" y2="252" stroke="#c9c9d0" stroke-width="1"/>
+          <g fill="#8a8a93" font-size="11">
+            <text x="48" y="256" text-anchor="end">0</text>
+            <text x="48" y="177" text-anchor="end">2M</text>
+            <text x="48" y="99" text-anchor="end">4M</text>
+            <text x="48" y="20" text-anchor="end">6M</text>
+            <text x="56" y="274" text-anchor="middle">M0</text>
+            <text x="218" y="274" text-anchor="middle">M6</text>
+            <text x="380" y="274" text-anchor="middle">M12</text>
+            <text x="542" y="274" text-anchor="middle">M18</text>
+            <text x="704" y="274" text-anchor="middle">M24</text>
+          </g>
+          <!-- valle en M17 -->
+          <line x1="515" y1="16" x2="515" y2="252" stroke="#e0357f" stroke-width="1" stroke-dasharray="none" opacity="0.5"/>
+          <text x="511" y="30" text-anchor="end" font-size="11" fill="#8d0f4a">valle M17: caja -$30,2M</text>
+          <!-- gastos -->
+          <polyline fill="none" stroke="#45454d" stroke-width="2" stroke-linejoin="round" points="56.0,157.6 83.0,157.6 110.0,157.6 137.0,157.6 164.0,157.6 191.0,157.6 218.0,157.6 245.0,157.6 272.0,157.6 299.0,157.6 326.0,126.1 353.0,126.1 380.0,126.1 407.0,126.1 434.0,126.1 461.0,126.1 488.0,126.1 515.0,126.1 542.0,126.1 569.0,126.1 596.0,126.1 623.0,126.1 650.0,126.1 677.0,126.1 704.0,126.1"/>
+          <!-- ingresos -->
+          <polyline fill="none" stroke="#b0135c" stroke-width="2.5" stroke-linejoin="round" points="56.0,252.0 83.0,252.0 110.0,248.3 137.0,248.3 164.0,244.5 191.0,237.1 218.0,233.3 245.0,225.8 272.0,222.1 299.0,214.6 326.0,207.2 353.0,199.7 380.0,192.2 407.0,181.0 434.0,173.5 461.0,162.3 488.0,147.4 515.0,132.4 542.0,117.5 569.0,102.5 596.0,87.6 623.0,72.6 650.0,57.7 677.0,42.7 704.0,27.8"/>
+          <circle cx="704" cy="27.8" r="4" fill="#b0135c" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="704" cy="126.1" r="4" fill="#45454d" stroke="#ffffff" stroke-width="2"/>
+          <g font-size="11" fill="#45454d" text-anchor="end">
+            <text x="700" y="22">ingresos $5,7M</text>
+            <text x="700" y="146">gastos $3,2M</text>
+          </g>
+          <line data-cursor x1="-10" y1="16" x2="-10" y2="252" stroke="#c9c9d0" stroke-width="1"/>
+        </svg>
+        <div class="tt" data-tt></div>
+      </div>
+      <div class="leyenda">
+        <span><i style="background:#b0135c"></i> Ingresos (MRR base)</span>
+        <span><i style="background:#45454d"></i> Gastos</span>
+      </div>
+      <details>
+        <summary>Ver como tabla</summary>
+        <div class="scroll-x"><table class="tabla">
+          <thead><tr><th>Mes</th><th class="num">Ingresos</th><th class="num">Gastos</th><th class="num">Caja acumulada</th></tr></thead>
+          <tbody>
+            <tr><td>M6</td><td class="num">$475.000</td><td class="num">$2.400.000</td><td class="num">-$15.565.000</td></tr>
+            <tr><td>M12</td><td class="num">$1.520.000</td><td class="num">$3.200.000</td><td class="num">-$26.000.000</td></tr>
+            <tr><td>M17 (valle)</td><td class="num">$3.040.000</td><td class="num">$3.200.000</td><td class="num">-$30.220.000</td></tr>
+            <tr><td>M24</td><td class="num">$5.700.000</td><td class="num">$3.200.000</td><td class="num">-$20.700.000</td></tr>
+          </tbody>
+        </table></div>
+      </details>
+    </div>
+
+    <!-- EMBUDO -->
+    <div class="grafico">
+      <h3>Embudo de adquisición, año 1</h3>
+      <p class="sub">La restricción real del negocio: convertir contacto frío en fábrica pagando. Números del escenario base para los primeros 12 meses; las tasas son los supuestos que los hitos ponen a prueba.</p>
+      <div class="scroll-x">
+        <svg viewBox="0 0 720 240" role="img" aria-label="Embudo horizontal: de 1.500 contactados a 16 clientes pagando en el año 1" style="min-width: 560px">
+          <g font-size="12" fill="#45454d">
+            <text x="132" y="36" text-anchor="end">Contactados</text>
+            <text x="132" y="76" text-anchor="end">Conversaciones</text>
+            <text x="132" y="116" text-anchor="end">Demos</text>
+            <text x="132" y="156" text-anchor="end">Pilotos</text>
+            <text x="132" y="196" text-anchor="end" font-weight="700">Pagando</text>
+          </g>
+          <!-- barras: rampa ordinal magenta claro→oscuro; fin de dato redondeado, base recta -->
+          <path d="M140 21 h541.6 a4 4 0 0 1 4 4 v14 a4 4 0 0 1 -4 4 H140 Z" fill="#f0b7d0"/>
+          <path d="M140 61 h105.2 a4 4 0 0 1 4 4 v14 a4 4 0 0 1 -4 4 H140 Z" fill="#e587ae"/>
+          <path d="M140 101 h39.7 a4 4 0 0 1 4 4 v14 a4 4 0 0 1 -4 4 H140 Z" fill="#d75590"/>
+          <path d="M140 141 h10.6 a4 4 0 0 1 4 4 v14 a4 4 0 0 1 -4 4 H140 Z" fill="#b0135c"/>
+          <path d="M140 181 h1.8 a4 4 0 0 1 4 4 v14 a4 4 0 0 1 -4 4 H140 Z" fill="#8d0f4a"/>
+          <g font-size="12" fill="#0d0d0f" font-weight="700">
+            <text x="694" y="36" text-anchor="end">1.500</text>
+            <text x="258" y="76">300 · 20%</text>
+            <text x="192" y="116">120 · 8%</text>
+            <text x="163" y="156">40 · 2,7%</text>
+            <text x="155" y="196">16 · 1,1%</text>
+          </g>
+          <line x1="140" y1="12" x2="140" y2="208" stroke="#c9c9d0" stroke-width="1"/>
+          <text x="140" y="228" font-size="10" fill="#8a8a93">porcentajes sobre los 1.500 contactados</text>
+        </svg>
+      </div>
+      <details>
+        <summary>Ver como tabla</summary>
+        <div class="scroll-x"><table class="tabla">
+          <thead><tr><th>Etapa</th><th class="num">Cantidad</th><th class="num">% del total</th></tr></thead>
+          <tbody>
+            <tr><td>Contactados (outbound + feria + canal)</td><td class="num">1.500</td><td class="num">100%</td></tr>
+            <tr><td>Conversaciones reales</td><td class="num">300</td><td class="num">20%</td></tr>
+            <tr><td>Demos con datos del cliente</td><td class="num">120</td><td class="num">8%</td></tr>
+            <tr><td>Pilotos (SKU verificado pagado)</td><td class="num">40</td><td class="num">2,7%</td></tr>
+            <tr><td>Clientes recurrentes M12</td><td class="num">16</td><td class="num">1,1%</td></tr>
+          </tbody>
+        </table></div>
+      </details>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="grafico">
+      <h3>Línea de tiempo con los criterios de muerte marcados</h3>
+      <p class="sub">Cada octógono negro es un punto donde este plan se puede matar. Está diseñado así a propósito: la alternativa es enterarse en el mes 23.</p>
+      <div class="scroll-x">
+        <svg viewBox="0 0 760 150" role="img" aria-label="Línea de tiempo de los seis hitos entre agosto 2026 y julio 2028, cada uno con su criterio de muerte" style="min-width: 640px">
+          <line x1="40" y1="75" x2="720" y2="75" stroke="#0d0d0f" stroke-width="2"/>
+          <g fill="#8a8a93" font-size="10">
+            <text x="40" y="140" text-anchor="middle">ago 26</text>
+            <text x="380" y="140" text-anchor="middle">ago 27</text>
+            <text x="720" y="140" text-anchor="middle">jul 28</text>
+          </g>
+          <!-- hitos: M2, M4, M9, M14, M18, M24 → x = 40 + m/24*680 -->
+          <g>
+            <path d="M89.6 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#0b0b0c"/>
+            <text x="96.7" y="46" text-anchor="middle" font-size="10.5" fill="#45454d">M2 validación</text>
+            <text x="96.7" y="58" text-anchor="middle" font-size="9.5" fill="#8d0f4a">muerte: motor no determinista</text>
+          </g>
+          <g>
+            <path d="M146.3 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#0b0b0c"/>
+            <text x="153.3" y="103" text-anchor="middle" font-size="10.5" fill="#45454d">M4 primer pago</text>
+            <text x="153.3" y="115" text-anchor="middle" font-size="9.5" fill="#8d0f4a">muerte: nadie paga $29.000</text>
+          </g>
+          <g>
+            <path d="M288 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#0b0b0c"/>
+            <text x="295" y="46" text-anchor="middle" font-size="10.5" fill="#45454d">M9 · 10 clientes</text>
+            <text x="295" y="58" text-anchor="middle" font-size="9.5" fill="#8d0f4a">muerte: churn &gt;8% o CAC &gt;$600 mil</text>
+          </g>
+          <g>
+            <path d="M429.6 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#0b0b0c"/>
+            <text x="436.7" y="103" text-anchor="middle" font-size="10.5" fill="#45454d">M14 venta repetible</text>
+            <text x="436.7" y="115" text-anchor="middle" font-size="9.5" fill="#8d0f4a">muerte: consultoría disfrazada</text>
+          </g>
+          <g>
+            <path d="M543 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#0b0b0c"/>
+            <text x="550" y="46" text-anchor="middle" font-size="10.5" fill="#45454d">M18 caja positiva</text>
+            <text x="550" y="58" text-anchor="middle" font-size="9.5" fill="#8d0f4a">muerte: valle pasa el colchón</text>
+          </g>
+          <g>
+            <path d="M713 67 h9.4 l4.7 4.7 v6.6 l-4.7 4.7 h-9.4 l-4.7 -4.7 v-6.6 Z" transform="translate(2,-7)" fill="#b0135c"/>
+            <text x="700" y="103" text-anchor="end" font-size="10.5" fill="#45454d">M24 decisión</text>
+            <text x="700" y="115" text-anchor="end" font-size="9.5" fill="#45454d">levantar / bootstrapear / salir</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBABILIDAD ===== -->
+<section class="seccion">
+  <div class="container">
+    <h2>Probabilidad de éxito: un rango, no un número inventado</h2>
+    <p class="prosa" style="margin-top: var(--sp-s)">
+      <strong>Clase de referencia, con honestidad:</strong> no existe una tasa base limpia para "SaaS
+      regulatorio PYME en Chile", y no la vamos a inventar. Usamos dos anclas imperfectas y lo
+      declaramos: benchmarks de la industria SaaS sitúan en el orden de 1 de cada 5 los B2B con
+      primeros clientes que llegan a US$1M ARR (orden de magnitud repetido por fondos y por datos de
+      ChartMogul/OpenView; no es una cifra auditada), y la supervivencia de empresas chilenas nuevas
+      a 5 años ronda el 50% según cifras del Ministerio de Economía (orden de magnitud). Definimos
+      "éxito" aquí como: <strong>MRR sobre $5 M sostenido con margen, al mes 24</strong>.
+    </p>
+    <div class="ajustes">
+      <div class="lado mas">
+        <h3>Ajustes hacia arriba</h3>
+        <ul>
+          <li>El presupuesto ya existe: hoy se paga a asesores por SKU y se pagan reprocesos. No hay que crear la categoría de gasto.</li>
+          <li>Dolor agudo con fecha (rechazo de lote, sumario), no "mejora continua".</li>
+          <li>Canal con timing perfecto: el laboratorio entrega el informe justo cuando nace la duda.</li>
+          <li>Producto verificable objetivamente: el motor está bien o está mal, y se puede auditar. La demo se gana o se pierde en 10 minutos.</li>
+        </ul>
+      </div>
+      <div class="lado menos">
+        <h3>Ajustes hacia abajo</h3>
+        <ul>
+          <li>Mercado chileno chico: SAM ~$2.400 M CLP/año. El techo local llega rápido.</li>
+          <li>Venta a PYME tradicional: lenta, presencial, sensible al precio.</li>
+          <li>Riesgo de un verificador estatal gratuito o de que un software PYME grande lo agregue como módulo.</li>
+          <li>Ventas dependientes del fundador más tiempo del que el plan admite (el modo de falla más común de este perfil de negocio).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="caja" style="margin-top: var(--sp-l)">
+      <span class="prob-rango">~20-30%</span>
+      <p class="prosa" style="margin-top: var(--sp-s)">
+        <strong>condicional a lograr el hito de 10 clientes pagando entre el mes 9 y el 12.</strong>
+        Antes de ese hito la incertidumbre dominante es de demanda, y la probabilidad incondicional
+        desde el día 1 es menor (~15-25%). Si H3 no se logra al mes 12, el plan no es insistir: es
+        ejecutar el criterio de muerte. La derivación completa está arriba; discutir los supuestos
+        es bienvenido, discutir el rango sin tocar los supuestos no.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container fila">
+    <span><strong style="color: var(--tinta)">Etiquaria</strong> · roadmap</span>
+    <span>Escenarios movidos por supuestos declarados de cierre, ticket y churn</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+<script>
+/* Tooltips de los gráficos de línea: crosshair + valores por mes.
+   Los datos se recalculan con la misma interpolación del modelo
+   (ticket $95.000; ver supuestos en cada gráfico). */
+(function () {
+  "use strict";
+  var TICKET = 95000;
+  function interp(pts, m) {
+    for (var i = 0; i < pts.length - 1; i++) {
+      var a = pts[i], b = pts[i + 1];
+      if (m >= a[0] && m <= b[0]) return a[1] + (b[1] - a[1]) * (m - a[0]) / (b[0] - a[0]);
+    }
+    return pts[pts.length - 1][1];
+  }
+  var basePts = [[0,0],[3,1],[6,5],[9,10],[12,16],[15,24],[18,36],[21,48],[24,60]];
+  var pesPts = [[0,0],[6,1],[9,3],[12,6],[15,10],[18,14],[21,19],[24,25]];
+  var optPts = [[0,0],[3,2],[6,8],[9,18],[12,32],[15,52],[18,72],[21,90],[24,110]];
+  var meses = []; for (var m = 0; m <= 24; m++) meses.push(m);
+  var mrrBase = meses.map(function (m) { return Math.round(interp(basePts, m)) * TICKET; });
+  var mrrPes = meses.map(function (m) { return Math.round(interp(pesPts, m)) * TICKET; });
+  var mrrOpt = meses.map(function (m) {
+    var v = Math.round(interp(optPts, m)) * TICKET;
+    if (m >= 18) v += 390000; if (m >= 22) v += 390000; return v;
+  });
+  var gastos = meses.map(function (m) { return m <= 9 ? 2400000 : 3200000; });
+
+  var DATOS = [
+    { series: [["Pesimista", mrrPes], ["Base", mrrBase], ["Optimista", mrrOpt]] },
+    { series: [["Ingresos", mrrBase], ["Gastos", gastos]] },
+  ];
+
+  function clp(n) { return "$" + Math.round(n).toLocaleString("es-CL"); }
+
+  document.querySelectorAll("svg[data-linea]").forEach(function (svg, idx) {
+    var marco = svg.closest(".marco");
+    var tt = marco.querySelector("[data-tt]");
+    var cursor = svg.querySelector("[data-cursor]");
+    var datos = DATOS[idx];
+    if (!datos) return;
+
+    function mover(ev) {
+      var r = svg.getBoundingClientRect();
+      var px = (ev.clientX - r.left) * (720 / r.width);
+      var mes = Math.round((px - 56) / 27);
+      if (mes < 0) mes = 0; if (mes > 24) mes = 24;
+      var x = 56 + mes * 27;
+      cursor.setAttribute("x1", x); cursor.setAttribute("x2", x);
+      var html = "<strong>M" + mes + "</strong><br>";
+      datos.series.forEach(function (s) { html += s[0] + ": " + clp(s[1][mes]) + "<br>"; });
+      tt.innerHTML = html;
+      tt.style.display = "block";
+      var ttx = (x / 720) * r.width;
+      if (ttx > r.width - 150) ttx -= 150; else ttx += 12;
+      tt.style.left = ttx + "px";
+      tt.style.top = "18px";
+    }
+    function salir() {
+      tt.style.display = "none";
+      cursor.setAttribute("x1", -10); cursor.setAttribute("x2", -10);
+    }
+    svg.addEventListener("pointermove", mover);
+    svg.addEventListener("pointerdown", mover);
+    svg.addEventListener("pointerleave", salir);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 # business_ideas
 
-Quince productos de negocio, cada uno llevado hasta una web que se puede recorrer:
+Veintiséis productos de negocio, cada uno llevado hasta una web que se puede recorrer:
 landing, demo funcionando, plan de marketing, roadmap a 24 meses y la arquitectura
 que habría que configurar para que existiera de verdad.
 
 **En vivo:** https://lelelilo-studios.github.io/business_ideas/
 
-Los quince dominios `.com` y `.cl` están verificados como libres (RDAP de Verisign,
-NIC Chile) al 13 de julio de 2026. Eso caduca: verifica de nuevo antes de comprar.
+Los veintisiete dominios `.com` y `.cl` están verificados como libres (RDAP de Verisign,
+NIC Chile) a julio de 2026; cada tanda registra su fecha en su `meta.json`. Eso caduca:
+verifica de nuevo antes de comprar.
 
 ## PYME chilena
 
@@ -64,6 +65,21 @@ y es operada por el sistema de abajo.
 | 20 | [Fonalta](20-recepcion/) | fonalta.com | El teléfono que siempre contesta — y que se declara IA en los primeros 5 segundos |
 | 21 | [Caprato](21-inmuebles/) | caprato.com | Arriendo × 12 ÷ precio no es la rentabilidad. La mayoría de las semanas no te avisa nada |
 
+## Creadas por Fable
+
+Cinco ideas que nadie pidió por su nombre: se le pidió al modelo que hubiera cinco más,
+y Fable leyó las 21 anteriores, el ranking y sus huecos. Eligió cinco verticales sin
+tocar donde el foso del cable ya estaba probado. El ranking todavía no las incluye:
+cada una rinde el test del LLM en su propia página de negocio.
+
+| # | Marca | Dominio | Problema |
+|---|------|---------|----------|
+| 22 | [Rondalba](22-heladas/) | rondalba.com | Una helada de radiación en septiembre borra la temporada; el sistema de alerta real es un despertador a las 2 AM |
+| 23 | [Tarifana](23-energia/) | tarifana.com | La PYME paga millones al mes de luz con una opción tarifaria y una potencia contratada que nadie revisa hace años |
+| 24 | [Aforqua](24-aduanas/) | aforqua.com | La partida arancelaria la elige en cinco minutos un agente apurado: o pagas de más por años, o Aduanas formula cargos |
+| 25 | [Prorratia](25-condominios/) | prorratia.com | El condominio mediano lo administra un amateur: gastos comunes que nadie puede auditar y morosos que financian el edificio |
+| 26 | [Etiquaria](26-etiquetado/) | etiquaria.com | El laboratorio entrega los nutrientes; nadie en la fábrica sabe aplicar la cadena de reglas que decide los sellos ALTO EN |
+
 ## El [ranking](ranking/): ¿por qué te pagarían a ti, y no US$20 al mes a ChatGPT?
 
 Las 21 ideas rinden esa pregunta como examen, porque es la que mata a la mitad de las
@@ -105,7 +121,7 @@ y sobre las que vengan. Veintiuna ideas, un dueño, cero personas en el loop.
 
 HTML/CSS/JS a mano. Sin build, sin framework, sin CDN — se abre el archivo y funciona.
 `_kit/` tiene el reset compartido, la escala tipográfica y [el contrato](_kit/README.md)
-que siguen las diez ideas. Cada idea es dueña de su propia identidad visual.
+que siguen todas las ideas. Cada idea es dueña de su propia identidad visual.
 
 Nada de infraestructura está aprovisionado: cada idea documenta en su página
 *Arquitectura* qué base de datos, agentes de IA y APIs habría que configurar,

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aforqua · La partida arancelaria, clasificada como código</title>
+<meta name="description" content="Describe tu producto y Aforqua recorre las Reglas Generales de Interpretación como código: partida citada con resoluciones, derechos calculados con TLC, y el dossier que tu agente de aduana firma.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_kit/reset.css">
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* ---- portada ---- */
+  .hero { padding-block: var(--sp-xl) var(--sp-2xl); display: grid; gap: var(--sp-xl); }
+  @media (min-width: 64em) {
+    .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; gap: var(--sp-2xl); padding-block: var(--sp-2xl) var(--sp-3xl); }
+  }
+  .hero h1 { max-width: 14ch; }
+  .hero .lede { max-width: 44ch; margin-top: var(--sp-m); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-l); }
+
+  /* consola viva de la portada */
+  .consola { overflow: hidden; }
+  .consola-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-s);
+    padding: .7rem .9rem; border-bottom: 1px solid var(--linea); background: var(--mar-2);
+  }
+  .consola-cab span { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--hielo-3); }
+  .consola-cue { padding: var(--sp-s); }
+  .consola-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: var(--sp-s); }
+  .traza { font-family: var(--mono); font-size: .78rem; line-height: 1.7; }
+  .traza-l { display: flex; gap: .6rem; padding: .28rem 0; border-bottom: 1px dotted var(--linea); align-items: baseline; }
+  .traza-l:last-child { border-bottom: 0; }
+  .traza-l .r { flex: none; width: 5.2rem; color: var(--hielo-3); }
+  .traza-l .d { color: var(--hielo-2); min-width: 0; }
+  .traza-l .d b { color: var(--hielo); font-weight: 600; }
+  .traza-res {
+    margin-top: var(--sp-s); padding: var(--sp-s);
+    background: var(--naranja-velo); border: 1px solid var(--naranja);
+    border-radius: var(--radio); display: flex; flex-wrap: wrap; gap: .35rem var(--sp-m);
+    align-items: baseline;
+  }
+  .traza-res .codigo { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; color: var(--naranja-claro); letter-spacing: .02em; }
+  .traza-res .glosa { font-size: var(--step--1); color: var(--hielo-2); flex: 1 1 14rem; }
+  .traza-duty { margin-top: .6rem; font-family: var(--mono); font-size: .78rem; color: var(--hielo-2); display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; }
+  .traza-duty b { color: var(--hielo); }
+
+  /* ---- el problema ---- */
+  .prob-grid { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); }
+  @media (min-width: 48em) { .prob-grid { grid-template-columns: 1fr 1fr; } }
+  .prob-carta { padding: var(--sp-m); }
+  .prob-carta h3 { display: flex; gap: .6rem; align-items: center; }
+  .prob-carta h3 svg { width: 22px; height: 22px; flex: none; }
+  .prob-carta p { margin-top: var(--sp-2xs); font-size: var(--step--1); }
+  .prob-carta .cifra { font-family: var(--mono); font-size: var(--step-2); font-weight: 600; color: var(--hielo); margin-top: var(--sp-s); }
+  .prob-carta .fuente { font-size: .72rem; color: var(--hielo-3); margin-top: .25rem; font-family: var(--mono); }
+  .cita-imp { margin-top: var(--sp-l); border-left: 3px solid var(--naranja); padding-left: var(--sp-m); max-width: 62ch; }
+  .cita-imp p { font-size: var(--step-1); line-height: 1.5; color: var(--hielo); font-style: italic; }
+  .cita-imp footer { margin-top: var(--sp-2xs); font-family: var(--mono); font-size: .75rem; color: var(--hielo-3); }
+
+  /* ---- cómo funciona: riel numerado ---- */
+  .riel { margin-top: var(--sp-l); position: relative; display: grid; gap: var(--sp-l); }
+  @media (min-width: 48em) {
+    .riel { padding-left: 3.4rem; }
+    .riel::before { content: ""; position: absolute; left: 1.05rem; top: .5rem; bottom: .5rem; width: 1px; background: var(--linea-2); }
+  }
+  .paso { position: relative; max-width: 62ch; }
+  .paso .n {
+    font-family: var(--mono); font-weight: 600; font-size: .85rem;
+    color: var(--naranja-claro); border: 1px solid var(--naranja);
+    width: 2.1rem; height: 2.1rem; border-radius: var(--radio);
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--mar-0); margin-bottom: .5rem;
+  }
+  @media (min-width: 48em) {
+    .paso .n { position: absolute; left: -3.4rem; top: 0; margin-bottom: 0; }
+  }
+  .paso h3 { margin-bottom: .3rem; }
+  .paso p { font-size: var(--step--1); }
+  .paso .det { margin-top: .5rem; font-family: var(--mono); font-size: .74rem; color: var(--hielo-3); background: var(--mar-1); border: 1px solid var(--linea); border-radius: var(--radio); padding: .55rem .7rem; }
+
+  /* ---- por qué no un chatbot: bento 1+2 ---- */
+  .foso-grid { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); }
+  @media (min-width: 64em) {
+    .foso-grid { grid-template-columns: repeat(2, 1fr); }
+    .foso-grande { grid-row: span 2; }
+  }
+  .foso { padding: var(--sp-m); display: flex; flex-direction: column; gap: var(--sp-2xs); }
+  .foso h3 { display: flex; align-items: center; gap: .6rem; }
+  .foso h3 svg { width: 22px; height: 22px; flex: none; }
+  .foso p { font-size: var(--step--1); }
+  .foso-grande { background: linear-gradient(160deg, var(--mar-2), var(--mar-1) 70%); }
+  .foso-grande .arbolito { margin-top: auto; padding-top: var(--sp-m); }
+  .foso-grande .arbolito svg { width: 100%; height: auto; max-width: 420px; }
+
+  /* ---- vigilancia: consola de eventos ---- */
+  .feed { margin-top: var(--sp-l); overflow: hidden; }
+  .feed-fila {
+    display: grid; grid-template-columns: auto 1fr; gap: .35rem .9rem;
+    padding: var(--sp-s); border-bottom: 1px solid var(--linea);
+    align-items: baseline;
+  }
+  .feed-fila:last-child { border-bottom: 0; }
+  .feed-fila .fecha { font-family: var(--mono); font-size: .72rem; color: var(--hielo-3); white-space: nowrap; }
+  .feed-fila .cuerpo { min-width: 0; }
+  .feed-fila .cuerpo p { font-size: var(--step--1); color: var(--hielo); }
+  .feed-fila .cuerpo .sub { color: var(--hielo-3); font-family: var(--mono); font-size: .72rem; margin-top: .2rem; }
+  .feed-fila .badge { justify-self: start; grid-column: 2; }
+  @media (min-width: 48em) {
+    .feed-fila { grid-template-columns: 7.5rem 1fr auto; }
+    .feed-fila .badge { grid-column: auto; justify-self: end; }
+  }
+
+  /* ---- precios ---- */
+  .planes { display: grid; gap: var(--sp-m); margin-top: var(--sp-l); }
+  @media (min-width: 64em) { .planes { grid-template-columns: repeat(3, 1fr); } }
+  .plan { padding: var(--sp-m); display: flex; flex-direction: column; }
+  .plan--destacado { border-color: var(--naranja); }
+  .plan .nombre { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--hielo-3); }
+  .plan--destacado .nombre { color: var(--naranja-claro); }
+  .plan .precio { font-size: var(--step-3); font-weight: 700; margin-top: .4rem; font-family: var(--mono); letter-spacing: -.02em; }
+  .plan .unidad { font-size: var(--step--1); color: var(--hielo-3); }
+  .plan ul { list-style: none; margin: var(--sp-s) 0 var(--sp-m); padding: 0; font-size: var(--step--1); color: var(--hielo-2); }
+  .plan ul li { padding: .4rem 0 .4rem 1.1rem; border-top: 1px solid var(--linea); position: relative; }
+  .plan ul li::before { content: ""; position: absolute; left: 0; top: .95rem; width: .45rem; height: 1px; background: var(--naranja); }
+  .plan .btn, .plan .btn-sec { margin-top: auto; }
+  .plan-nota { margin-top: var(--sp-m); font-size: var(--step--1); color: var(--hielo-3); max-width: 68ch; }
+
+  /* ---- FAQ ---- */
+  .faq { margin-top: var(--sp-l); border-top: 1px solid var(--linea); max-width: 76ch; }
+  .faq details { border-bottom: 1px solid var(--linea); }
+  .faq summary {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--sp-s);
+    min-height: 56px; padding: var(--sp-s) 0; cursor: pointer;
+    font-weight: 600; color: var(--hielo); list-style: none;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); color: var(--naranja-claro); font-size: 1.3rem; flex: none; }
+  .faq details[open] summary::after { content: "\2212"; }
+  .faq details div { padding-bottom: var(--sp-m); }
+  .faq details p { font-size: var(--step--1); max-width: 66ch; }
+  .faq details p + p { margin-top: .6rem; }
+
+  /* ---- CTA final ---- */
+  .cierre { text-align: center; padding-block: var(--sp-3xl); }
+  .cierre h2 { max-width: 22ch; margin-inline: auto; }
+  .cierre p { max-width: 46ch; margin: var(--sp-s) auto 0; }
+  .cierre .btn { margin-top: var(--sp-l); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-envuelto">
+    <div class="nav-fila">
+      <a class="marca" href="index.html" aria-label="Aforqua, inicio">
+        <!-- isotipo: contenedor de trazo, dibujado a mano -->
+        <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="2" y="6.5" width="22" height="13" rx="1.5" stroke="#ed6a1f" stroke-width="1.8"/>
+          <path d="M7 6.5v13M11 6.5v13M15 6.5v13M19 6.5v13" stroke="#ed6a1f" stroke-width="1.3" opacity=".55"/>
+        </svg>
+        <span>Aforqua</span>
+      </a>
+      <button class="nav-btn" data-nav-btn aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="nav-menu" id="menu" data-nav-menu aria-label="Principal">
+      <a href="../index.html">← Ideas</a>
+      <a href="index.html" aria-current="page">Producto</a>
+      <a href="demo/index.html">Demo</a>
+      <a href="negocio.html">Negocio</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="stack.html">Arquitectura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ PORTADA ============================ -->
+<div class="container hero">
+  <div>
+    <h1>La partida arancelaria no es una opinión.</h1>
+    <p class="lede">Describe tu producto. Aforqua recorre las Reglas de Interpretación como código, cita las resoluciones y arma el dossier firmable.</p>
+    <div class="hero-cta">
+      <a class="btn" href="demo/index.html">Clasificar un producto</a>
+      <a class="btn-sec" href="#precios">Ver precios</a>
+    </div>
+  </div>
+
+  <!-- Producto en vivo: clasificador compacto. Datos mock, ver comentarios. -->
+  <div class="panel esquinas consola" id="consola-viva">
+    <div class="consola-cab">
+      <span>Clasificador · en vivo</span>
+      <span class="badge badge--acento">arancel 2026</span>
+    </div>
+    <div class="consola-cue">
+      <div class="consola-chips" role="group" aria-label="Elige un producto de ejemplo">
+        <button class="chip" data-prod="tal" aria-pressed="true">Taladro 20V</button>
+        <button class="chip" data-prod="led" aria-pressed="false">Panel LED 48W</button>
+        <button class="chip" data-prod="zap" aria-pressed="false">Zapatilla textil</button>
+      </div>
+      <div class="traza" id="traza" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ EL PROBLEMA ============================ -->
+<section class="seccion seccion-borde">
+  <div class="container">
+    <h2>Un código de ocho dígitos que nadie en tu empresa entiende</h2>
+    <p class="lede" style="max-width:62ch; margin-top: var(--sp-s);">Cada producto que importas entra a Chile bajo una partida del Arancel Aduanero. Ese código decide cuánto pagas y qué tratado te cubre. Y casi siempre lo eligió, en cinco minutos, alguien que ese día tenía cuarenta despachos más.</p>
+
+    <div class="prob-grid">
+      <div class="panel prob-carta">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v14m0 0-4.5-4.5M12 17l4.5-4.5" stroke="#f0655f" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21h14" stroke="#f0655f" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Perder de a poco
+        </h3>
+        <p>Clasificaste en una partida con arancel general cuando el TLC dejaba tu producto en cero. Nadie reclama: se paga de más, contenedor tras contenedor, por años.</p>
+        <p class="cifra num-tab">$1.048.800</p>
+        <p class="fuente">derechos de un contenedor CIF USD 18.400 al 6%, que un TLC vigente dejaba en $0 (ejemplo ilustrativo)</p>
+      </div>
+      <div class="panel prob-carta">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4 3 19h18L12 4z" stroke="#f2b33d" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.2M12 16.8v.2" stroke="#f2b33d" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Perder de golpe
+        </h3>
+        <p>Aduanas fiscaliza, no comparte tu criterio y formula cargos: diferencias de derechos retroactivas, multa según la Ordenanza de Aduanas y carga retenida en puerto mientras tanto.</p>
+        <p class="cifra num-tab">3 años</p>
+        <p class="fuente">plazo general de revisión retroactiva de las declaraciones ya tramitadas (Ordenanza de Aduanas)</p>
+      </div>
+    </div>
+
+    <blockquote class="cita-imp">
+      <p>"El agente me dijo que la partida la había usado siempre. Cuando llegó la formulación de cargos, el que tuvo que pagar fui yo."</p>
+      <footer>Gerente de una importadora ferretera, Santiago (testimonio compuesto a partir de casos típicos)</footer>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============================ CÓMO FUNCIONA ============================ -->
+<section class="seccion seccion-borde" id="como">
+  <div class="container">
+    <p class="estarcido">Procedimiento</p>
+    <h2 style="margin-top:.4rem;">De la ficha técnica al dossier firmable</h2>
+
+    <div class="riel">
+      <div class="paso">
+        <span class="n">1</span>
+        <h3>Describes el producto</h3>
+        <p>Ficha técnica, composición, fotos, uso previsto. Lo que le mandarías a tu agente, tal cual.</p>
+      </div>
+      <div class="paso">
+        <span class="n">2</span>
+        <h3>La IA extrae atributos, no códigos</h3>
+        <p>El modelo identifica material, función, presentación y origen, cada atributo con su cita textual en tu ficha. Aquí termina su trabajo.</p>
+        <p class="det">regla dura: el modelo tiene prohibido proponer la partida final</p>
+      </div>
+      <div class="paso">
+        <span class="n">3</span>
+        <h3>El árbol de reglas clasifica</h3>
+        <p>Las Reglas Generales de Interpretación y las Notas de Sección y Capítulo están implementadas como código determinista. La misma ficha da siempre el mismo resultado, con cada paso del recorrido a la vista.</p>
+      </div>
+      <div class="paso">
+        <span class="n">4</span>
+        <h3>Sale el dossier, con plata calculada</h3>
+        <p>Partida citada con resoluciones anticipadas y dictámenes que la respaldan, derechos e IVA calculados, preferencia TLC con su regla de origen, y el documento que tu agente de aduana revisa y firma.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ POR QUÉ NO UN CHATBOT ============================ -->
+<section class="seccion seccion-borde">
+  <div class="container">
+    <h2>Un chatbot te da un código plausible. Eso es exactamente el problema.</h2>
+    <p class="lede" style="max-width:60ch; margin-top: var(--sp-s);">Cualquier LLM sugiere una partida que suena bien. Ninguno responde por ella ante Aduanas. Aforqua se construye sobre tres cosas que un chat no tiene:</p>
+
+    <div class="foso-grid">
+      <div class="panel foso foso-grande esquinas">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v5m0 0H6v5m6-5h6v5M6 13v4H4v4h4v-4H6zm12 0v4h-2v4h4v-4h-2z" stroke="#ed6a1f" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          Determinismo
+        </h3>
+        <p>La clasificación no sale de un muestreo probabilístico: sale de un árbol de reglas que implementa las RGI 1 a 6 y las notas legales. Se puede auditar, repetir y defender paso por paso. Si dos productos iguales dieran códigos distintos, eso sería un bug, no una respuesta.</p>
+        <div class="arbolito">
+          <!-- esquema de árbol de decisión, trazo a mano -->
+          <svg viewBox="0 0 420 150" role="img" aria-label="Esquema: una ficha entra a un árbol de reglas y sale un único código">
+            <path d="M20 75h60" stroke="#8aa2b0" stroke-width="1.6"/>
+            <rect x="80" y="55" width="74" height="40" rx="4" fill="none" stroke="#8aa2b0" stroke-width="1.6"/>
+            <text x="117" y="79" fill="#a7bcc9" font-size="12" text-anchor="middle" font-family="JetBrains Mono, monospace">RGI 1</text>
+            <path d="M154 75h36m0 0-28-38h32m-4 76h-32l28-38" stroke="#8aa2b0" stroke-width="1.6" fill="none"/>
+            <rect x="190" y="17" width="74" height="40" rx="4" fill="none" stroke="#8aa2b0" stroke-width="1.6" opacity=".45"/>
+            <text x="227" y="41" fill="#8aa2b0" font-size="12" text-anchor="middle" font-family="JetBrains Mono, monospace" opacity=".6">84.66</text>
+            <rect x="190" y="93" width="74" height="40" rx="4" fill="none" stroke="#ed6a1f" stroke-width="1.8"/>
+            <text x="227" y="117" fill="#f58a45" font-size="12" text-anchor="middle" font-family="JetBrains Mono, monospace">84.67</text>
+            <path d="M264 113h36" stroke="#ed6a1f" stroke-width="1.8"/>
+            <rect x="300" y="93" width="100" height="40" rx="4" fill="rgba(237,106,31,.12)" stroke="#ed6a1f" stroke-width="1.8"/>
+            <text x="350" y="117" fill="#f58a45" font-size="12" text-anchor="middle" font-family="JetBrains Mono, monospace">8467.21.00</text>
+          </svg>
+        </div>
+      </div>
+      <div class="panel foso">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11l3 3v13H5V4z" stroke="#ed6a1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4.5" stroke="#ed6a1f" stroke-width="1.4" stroke-linecap="round"/></svg>
+          El libro
+        </h3>
+        <p>El corpus de resoluciones anticipadas y dictámenes de clasificación, público pero disperso, curado y al día. Más tu propio historial: cada clasificación defendida queda en tu libro, que es lo que muestras en una fiscalización.</p>
+      </div>
+      <div class="panel foso">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#ed6a1f" stroke-width="1.6"/><path d="M12 12 17 8.5" stroke="#ed6a1f" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12h.01" stroke="#ed6a1f" stroke-width="3" stroke-linecap="round"/></svg>
+          Vigilancia
+        </h3>
+        <p>Nuevas resoluciones, enmiendas del arancel y cambios de TLC, cruzados contra tus SKU históricos. Si algo toca lo que tú importas, te enteras antes que tu agente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ VIGILANCIA (muestra) ============================ -->
+<section class="seccion seccion-borde">
+  <div class="container">
+    <p class="estarcido">Vigilancia</p>
+    <h2 style="margin-top:.4rem;">Lo que cambió esta semana y toca tu carga</h2>
+    <p class="lede" style="max-width:58ch; margin-top: var(--sp-s);">Una muestra del feed real del producto. En el demo puedes filtrarlo y abrir cada evento.</p>
+
+    <!-- Eventos mock: números de resolución y fechas ficticios, marcados como ejemplo -->
+    <div class="panel feed">
+      <div class="feed-fila">
+        <span class="fecha">14-07-2026</span>
+        <div class="cuerpo">
+          <p>Resolución Anticipada N° 5.240/2026: los cargadores GaN multipuerto se clasifican en <span class="mono">8504.40</span>, no en <span class="mono">8504.31</span>.</p>
+          <p class="sub">coincide con tu SKU CHG-65 · diferencia de derechos: 0% se mantiene, glosa cambia</p>
+        </div>
+        <span class="badge badge--alerta"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1 1 10.5h10L6 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>afecta 1 SKU</span>
+      </div>
+      <div class="feed-fila">
+        <span class="fecha">09-07-2026</span>
+        <div class="cuerpo">
+          <p>Publicada la VIII Enmienda del Sistema Armonizado: 34 líneas del capítulo 85 cambian de glosa en el Arancel 2027.</p>
+          <p class="sub">3 SKU de tu libro requieren reclasificación antes del 01-01-2027</p>
+        </div>
+        <span class="badge badge--alerta"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1 1 10.5h10L6 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>afecta 3 SKU</span>
+      </div>
+      <div class="feed-fila">
+        <span class="fecha">02-07-2026</span>
+        <div class="cuerpo">
+          <p>TLC Chile-India: entra en vigencia la fase 2 de desgravación para el capítulo 94.</p>
+          <p class="sub">sin coincidencias con tu libro · informativo</p>
+        </div>
+        <span class="badge badge--neutro">informativo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PRECIOS ============================ -->
+<section class="seccion seccion-borde" id="precios">
+  <div class="container">
+    <h2>Precios</h2>
+    <p class="lede" style="max-width:56ch; margin-top: var(--sp-s);">Un dossier cuesta menos que media hora de abogado aduanero. Y muchísimo menos que una formulación de cargos.</p>
+
+    <div class="planes">
+      <div class="panel plan">
+        <p class="nombre">Dossier suelto</p>
+        <p class="precio num-tab">$45.000</p>
+        <p class="unidad">por clasificación</p>
+        <ul>
+          <li>Recorrido RGI completo y auditable</li>
+          <li>Resoluciones y dictámenes citados</li>
+          <li>Derechos, IVA y preferencia TLC calculados</li>
+          <li>PDF listo para la firma del agente</li>
+        </ul>
+        <a class="btn-sec" href="demo/index.html">Probar en el demo</a>
+      </div>
+      <div class="panel plan plan--destacado esquinas">
+        <p class="nombre">Plan Importador</p>
+        <p class="precio num-tab">$79.000</p>
+        <p class="unidad">al mes</p>
+        <ul>
+          <li>8 dossiers al mes incluidos</li>
+          <li>Dossier adicional a $9.900</li>
+          <li>Vigilancia de hasta 300 SKU</li>
+          <li>Libro de clasificaciones defendidas</li>
+          <li>Alertas de arancel, TLC y resoluciones</li>
+        </ul>
+        <a class="btn" href="demo/index.html">Ver el flujo completo</a>
+      </div>
+      <div class="panel plan">
+        <p class="nombre">Plan Agencia</p>
+        <p class="precio num-tab">$290.000</p>
+        <p class="unidad">al mes</p>
+        <ul>
+          <li>Multi-cliente: carpetas por importador</li>
+          <li>60 dossiers al mes incluidos</li>
+          <li>Vigilancia de hasta 3.000 SKU</li>
+          <li>API para integrar con tu sistema de despachos</li>
+        </ul>
+        <a class="btn-sec" href="negocio.html">Cómo se sostiene</a>
+      </div>
+    </div>
+    <p class="plan-nota">Referencia: los honorarios de un agente por despacho rondan $80.000 a $150.000 (estimación de mercado, ver <a href="negocio.html">negocio</a>), y una formulación de cargos parte en las UTM de la multa más las diferencias retroactivas de hasta 3 años.</p>
+  </div>
+</section>
+
+<!-- ============================ FAQ ============================ -->
+<section class="seccion seccion-borde">
+  <div class="container">
+    <h2>Preguntas que nos harías</h2>
+    <div class="faq">
+      <details>
+        <summary>¿Esto reemplaza a mi agente de aduana?</summary>
+        <div><p>No, y no queremos. El agente firma la declaración y responde ante Aduanas; eso no cambia. Aforqua le entrega el trabajo de clasificación hecho, documentado y citado, para que su firma valga más y se demore menos. Varios de nuestros mejores usuarios previstos son agencias.</p></div>
+      </details>
+      <details>
+        <summary>¿Qué pasa si Aduanas no comparte la clasificación?</summary>
+        <div><p>Puede pasar: la clasificación es materia discutible y la última palabra la tiene Aduanas. La diferencia es con qué llegas a esa discusión. Un dossier con el recorrido de las RGI y las resoluciones citadas es la base de una defensa o de una solicitud de resolución anticipada; "el agente lo hizo así siempre" no lo es.</p>
+        <p>Para casos de alto monto, el dossier incluye la recomendación de pedir una resolución anticipada formal, que sí es vinculante.</p></div>
+      </details>
+      <details>
+        <summary>¿La IA puede inventarse una resolución?</summary>
+        <div><p>No puede citarla: el dossier sólo referencia documentos que existen en nuestro corpus, con su número, fecha y enlace a la fuente. Y no puede elegir el código: la partida la decide el árbol de reglas determinista, no el modelo. La IA extrae atributos de tu ficha y redacta; cada afirmación queda anclada a una fuente verificable.</p></div>
+      </details>
+      <details>
+        <summary>¿De dónde salen las resoluciones y el arancel?</summary>
+        <div><p>De fuentes públicas: el Arancel Aduanero vigente, las resoluciones anticipadas y dictámenes de clasificación publicados por el Servicio Nacional de Aduanas, el Diario Oficial y los anexos de desgravación de los TLC. Son públicos pero están dispersos; nuestro trabajo es mantenerlos curados, indexados y al día.</p></div>
+      </details>
+      <details>
+        <summary>Importo dos contenedores al año. ¿Me sirve?</summary>
+        <div><p>Probablemente te baste el dossier suelto cuando tengas una duda cara. El plan mensual está pensado para quien importa todos los meses y acumula SKU: ahí la vigilancia y el libro empiezan a valer más que la clasificación puntual.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CIERRE ============================ -->
+<section class="seccion seccion-borde cierre">
+  <div class="container">
+    <h2>Tu próxima clasificación, defendible desde el día uno</h2>
+    <p>El demo recorre el flujo completo con tres productos reales de ejemplo. Sin registro, sin humo.</p>
+    <a class="btn" href="demo/index.html">Clasificar un producto</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="container pie-fila">
+    <span>Aforqua · prototipo. Los datos de ejemplo son ficticios y están marcados como tales.</span>
+    <span class="mono">aforqua.com verificado libre el 18-07-2026</span>
+  </div>
+</footer>
+
+<script src="sitio.js"></script>
+<script>
+/* Clasificador compacto de la portada.
+   TODOS LOS DATOS SON MOCK: partidas plausibles, números de resolución y
+   montos ilustrativos. El recorrido completo está en demo/index.html. */
+(function () {
+  var DATOS = {
+    tal: {
+      pasos: [
+        ["Atributos", "herramienta de mano, <b>motor eléctrico incorporado</b>, batería 20V, función: perforar con percusión"],
+        ["RGI 1", "texto de partida + notas Secc. XVI: herramientas con motor eléctrico incorporado → partida <b>84.67</b>"],
+        ["RGI 6", "subpartida <b>8467.21</b>: taladros de toda clase"],
+        ["Nota nac.", "apertura nacional → código de 8 dígitos"]
+      ],
+      codigo: "8467.21.00",
+      glosa: "Taladros de toda clase, con motor eléctrico incorporado",
+      respaldo: "Res. Anticipada N° 4.812/2024 (ejemplo)",
+      duty: "arancel general 6% · <b>TLC Chile-China: 0%</b> con certificado de origen · ahorro por contenedor CIF USD 18.400: <b>$1.048.800</b>"
+    },
+    led: {
+      pasos: [
+        ["Atributos", "luminaria empotrable, <b>fuente luminosa LED integrada</b>, 48W, uso en oficinas"],
+        ["RGI 1", "partida <b>94.05</b>: aparatos de alumbrado no expresados en otra parte"],
+        ["RGI 6", "subpartida <b>9405.11</b>: diseñados para fuente LED exclusivamente"],
+        ["Nota nac.", "apertura nacional → código de 8 dígitos"]
+      ],
+      codigo: "9405.11.00",
+      glosa: "Luminarias de techo diseñadas exclusivamente para fuentes LED",
+      respaldo: "Dictamen de Clasificación N° 17/2023 (ejemplo)",
+      duty: "arancel general 6% · <b>TLC Chile-China: 0%</b> con certificado de origen · en un CIF USD 9.200 son <b>$524.400</b> menos"
+    },
+    zap: {
+      pasos: [
+        ["Atributos", "calzado, <b>corte de materia textil</b>, suela de caucho, uso urbano (no deportivo)"],
+        ["RGI 1 + 3a", "corte textil descarta 64.03 (cuero); uso urbano descarta 6404.11 (deporte)"],
+        ["RGI 6", "subpartida <b>6404.19</b>: los demás calzados con corte textil"],
+        ["Nota nac.", "apertura nacional → código de 8 dígitos"]
+      ],
+      codigo: "6404.19.00",
+      glosa: "Calzado con suela de caucho y parte superior de materia textil, los demás",
+      respaldo: "Res. Anticipada N° 3.106/2023 (ejemplo)",
+      duty: "arancel general 6% · <b>TLC Chile-Vietnam: 0%</b> con certificado de origen · en un CIF USD 32.000 son <b>$1.824.000</b> menos"
+    }
+  };
+
+  var chips = document.querySelectorAll("#consola-viva .chip");
+  var traza = document.getElementById("traza");
+
+  function pinta(clave) {
+    var d = DATOS[clave];
+    var html = "";
+    d.pasos.forEach(function (p) {
+      html += '<div class="traza-l"><span class="r">' + p[0] + '</span><span class="d">' + p[1] + "</span></div>";
+    });
+    html += '<div class="traza-res aparece"><span class="codigo">' + d.codigo + '</span><span class="glosa">' + d.glosa + "<br><span class='atenuado'>" + d.respaldo + "</span></span></div>";
+    html += '<div class="traza-duty">' + d.duty + "</div>";
+    traza.innerHTML = html;
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      chips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      chip.setAttribute("aria-pressed", "true");
+      pinta(chip.dataset.prod);
+    });
+  });
+
+  pinta("tal");
+})();
+</script>
+</body>
+</html>
